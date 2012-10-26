@@ -181,25 +181,37 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
             Raise(Disposed, EventArgs.Empty);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!_isDisposed)
             {
-                Platform.Dispose();
-
-                // Dispose loaded game components
-                for (int i = 0; i < _components.Count; i++)
+                if (disposing)
                 {
-                    var disposable = _components[i] as IDisposable;
-                    if (disposable != null)
-                        disposable.Dispose();
-                }
-            }
+                    // Dispose loaded game components
+                    for (int i = 0; i < _components.Count; i++)
+                    {
+                        var disposable = _components[i] as IDisposable;
+                        if (disposable != null)
+                            disposable.Dispose();
+                    }
 
-            _isDisposed = true;
+                    if (Content != null)
+                        Content.Dispose();
+
+                    if (_graphicsDeviceManager != null)
+                    {
+                        (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
+                        _graphicsDeviceManager = null;
+                    }
+
+                    Platform.Dispose();
+                }
+                _isDisposed = true;
+            }
         }
 
         [System.Diagnostics.DebuggerNonUserCode]
@@ -493,7 +505,6 @@ namespace Microsoft.Xna.Framework
             else
             {
                 DoDraw(_gameTime);
-                Platform.Present();
             }
         }
 
@@ -502,7 +513,10 @@ namespace Microsoft.Xna.Framework
         #region Protected Methods
 
         protected virtual bool BeginDraw() { return true; }
-        protected virtual void EndDraw() { }
+        protected virtual void EndDraw()
+        {
+            Platform.Present();
+        }
 
         protected virtual void BeginRun() { }
         protected virtual void EndRun() { }

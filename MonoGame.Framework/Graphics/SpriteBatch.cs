@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentException ("graphicsDevice");
 			}	
 
-			this.graphicsDevice = graphicsDevice;
+			this.GraphicsDevice = graphicsDevice;
 
             // Use a custom SpriteEffect so we can control the transformation matrix
             _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
@@ -91,13 +91,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		void Setup() 
         {
-			graphicsDevice.BlendState = _blendState;
-			graphicsDevice.DepthStencilState = _depthStencilState;
-			graphicsDevice.RasterizerState = _rasterizerState;
-			graphicsDevice.SamplerStates[0] = _samplerState;
+            GraphicsDevice gd = GraphicsDevice;
+			gd.BlendState = _blendState;
+			gd.DepthStencilState = _depthStencilState;
+			gd.RasterizerState = _rasterizerState;
+			gd.SamplerStates[0] = _samplerState;
 			
             // Setup the default sprite effect.
-			var vp = graphicsDevice.Viewport;
+			var vp = gd.Viewport;
 
             // GL requires a half pixel offset where as DirectX and PSS does not.
 #if PSS || DIRECTX
@@ -365,19 +366,20 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
 		}
 
-        private bool _isDisposed;
-
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (_isDisposed)
-                return;
-
-            _spriteEffect.Dispose();
-            _spriteEffect = null;
-
-            _isDisposed = true;
-
-            base.Dispose();
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+                    if (_spriteEffect != null)
+                    {
+                        _spriteEffect.Dispose();
+                        _spriteEffect = null;
+                    }
+                }
+            }
+            base.Dispose(disposing);
         }
 	}
 }

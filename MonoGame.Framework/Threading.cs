@@ -78,14 +78,23 @@ namespace Microsoft.Xna.Framework
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
-        public static void SetUIThread()
+        /// <summary>
+        /// Checks if the code is currently running on the UI thread.
+        /// </summary>
+        /// <returns>true if the code is currently running on the UI thread.</returns>
+        public static bool IsOnUIThread()
         {
+            return mainThreadId == Thread.CurrentThread.ManagedThreadId;
         }
 
+        /// <summary>
+        /// Throws an exception if the code is not currently running on the UI thread.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the code is not currently running on the UI thread.</exception>
         public static void EnsureUIThread()
         {
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
-                throw new Exception(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
+                throw new InvalidOperationException(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
         }
 
         /// <summary>

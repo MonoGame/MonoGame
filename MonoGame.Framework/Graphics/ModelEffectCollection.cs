@@ -41,9 +41,12 @@ namespace Microsoft.Xna.Framework.Graphics
 	    public struct Enumerator : IEnumerator<Effect>, IDisposable, IEnumerator
 	    {
 			List<Effect>.Enumerator enumerator;
+            bool disposed;
+
 			internal Enumerator(List<Effect> list)
 			{
 				enumerator = list.GetEnumerator();
+                disposed = false;
 			}
 
 	        // Summary:
@@ -52,7 +55,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	        // Summary:
 	        //     Immediately releases the unmanaged resources used by this object.
-	        public void Dispose() { enumerator.Dispose(); }
+	        public void Dispose()
+            {
+                if (!disposed)
+                {
+                    enumerator.Dispose();
+                    disposed = true;
+                }
+            }
 	        //
 	        // Summary:
 	        //     Advances the enumerator to the next element of the ModelEffectCollection.

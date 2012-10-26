@@ -124,6 +124,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
 
+#if OPENGL
+        List<Action> disposeActions = new List<Action>();
+        object disposeActionsLock = new object();
+#endif
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
@@ -319,6 +323,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			PresentationParameters = new PresentationParameters ();
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+        }
+
+        ~GraphicsDevice()
+        {
+            Dispose(false);
         }
 
         internal void Initialize()
@@ -865,89 +874,120 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool aReleaseEverything)
+        protected virtual void Dispose(bool disposing)
         {
-            if (aReleaseEverything)
+            if (!_isDisposed)
             {
-#if DIRECTX
-                if (_swapChain != null)
+                if (disposing)
                 {
-                    _swapChain.Dispose();
-                    _swapChain = null;
-                }
-                if (_renderTargetView != null)
-                {
-                    _renderTargetView.Dispose();
-                    _renderTargetView = null;
-                }
-                if (_depthStencilView != null)
-                {
-                    _depthStencilView.Dispose();
-                    _depthStencilView = null;
-                }
-                if (_bitmapTarget != null)
-                {
-                    _bitmapTarget.Dispose();
-                    _depthStencilView = null;
-                }
+                    // Dispose of all remaining graphics resources before disposing of the graphics device
+                    GraphicsResource.DisposeAll();
 
-                if (_d3dDevice != null)
-                {
-                    _d3dDevice.Dispose();
-                    _d3dDevice = null;
-                }
-                if (_d3dContext != null)
-                {
-                    _d3dContext.Dispose();
-                    _d3dContext = null;
-                }
-                if (_d2dDevice != null)
-                {
-                    _d2dDevice.Dispose();
-                    _d2dDevice = null;
-                }
-                if (_d2dContext != null)
-                {
-                    _d2dContext.Target = null;
-                    _d2dContext.Dispose();
-                    _d2dContext = null;
-                }
-                if (_d2dFactory != null)
-                {
-                    _d2dFactory.Dispose();
-                    _d2dFactory = null;
-                }
-                if (_dwriteFactory != null)
-                {
-                    _dwriteFactory.Dispose();
-                    _dwriteFactory = null;
-                }
-                if (_wicFactory != null)
-                {
-                    _wicFactory.Dispose();
-                    _wicFactory = null;
-                }
+#if DIRECTX
+                    if (_swapChain != null)
+                    {
+                        _swapChain.Dispose();
+                        _swapChain = null;
+                    }
+                    if (_renderTargetView != null)
+                    {
+                        _renderTargetView.Dispose();
+                        _renderTargetView = null;
+                    }
+                    if (_depthStencilView != null)
+                    {
+                        _depthStencilView.Dispose();
+                        _depthStencilView = null;
+                    }
+                    if (_bitmapTarget != null)
+                    {
+                        _bitmapTarget.Dispose();
+                        _depthStencilView = null;
+                    }
+
+                    if (_d3dDevice != null)
+                    {
+                        _d3dDevice.Dispose();
+                        _d3dDevice = null;
+                    }
+                    if (_d3dContext != null)
+                    {
+                        _d3dContext.Dispose();
+                        _d3dContext = null;
+                    }
+                    if (_d2dDevice != null)
+                    {
+                        _d2dDevice.Dispose();
+                        _d2dDevice = null;
+                    }
+                    if (_d2dContext != null)
+                    {
+                        _d2dContext.Target = null;
+                        _d2dContext.Dispose();
+                        _d2dContext = null;
+                    }
+                    if (_d2dFactory != null)
+                    {
+                        _d2dFactory.Dispose();
+                        _d2dFactory = null;
+                    }
+                    if (_dwriteFactory != null)
+                    {
+                        _dwriteFactory.Dispose();
+                        _dwriteFactory = null;
+                    }
+                    if (_wicFactory != null)
+                    {
+                        _wicFactory.Dispose();
+                        _wicFactory = null;
+                    }
 
 #endif // DIRECTX
 
 #if OPENGL
-                // Free all the cached shader programs.
-                _programCache.Clear();
+                    // Free all the cached shader programs.
+                    _programCache.Dispose();
 #endif
 
 #if PSS
-                if (_graphics != null)
-                {
-                    _graphics.Dispose();
-                    _graphics = null;
-                }
+                    if (_graphics != null)
+                    {
+                        _graphics.Dispose();
+                        _graphics = null;
+                    }
 #endif
-            }
+                }
 
-            _isDisposed = true;
+                _isDisposed = true;
+            }
         }
+
+#if OPENGL
+        /// <summary>
+        /// Adds a dispose action to the list of pending dispose actions. These are executed at the end of each call to Present().
+        /// This allows GL resources to be disposed from other threads, such as the finalizer.
+        /// </summary>
+        /// <param name="disposeAction">The action to execute for the dispose.</param>
+        internal void AddDisposeAction(Action disposeAction)
+        {
+            if (disposeAction == null)
+                throw new ArgumentNullException("disposeAction");
+            if (Threading.IsOnUIThread())
+            {
+                disposeAction();
+            }
+            else
+            {
+                lock (disposeActionsLock)
+                {
+                    disposeActions.Add(disposeAction);
+                }
+            }
+        }
+#endif
 
         public void Present()
         {
@@ -983,11 +1023,20 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics.SwapBuffers();
             _availableVertexBuffers.AddRange(_usedVertexBuffers);
             _usedVertexBuffers.Clear();
-#elif ANDROID
-			Game.Instance.Platform.Present();
 #elif OPENGL
 			GL.Flush();
             GraphicsExtensions.CheckGLError();
+
+            // Dispose of any GL resources that were disposed in another thread
+            lock (disposeActionsLock)
+            {
+                if (disposeActions.Count > 0)
+                {
+                    foreach (var action in disposeActions)
+                        action();
+                    disposeActions.Clear();
+                }
+            }
 #endif
         }
 
@@ -1030,6 +1079,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
+            GraphicsResource.DoGraphicsDeviceResetting();
         }
 
         public DisplayMode DisplayMode

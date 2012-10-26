@@ -1,7 +1,7 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Sandbox\MonoGame\"
-!define VERSION "2.5"
+!define FrameworkPath "C:\Users\Dean\Desktop\MonoGame\"
+!define VERSION "3.0"
 !define REVISION "0.0"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
@@ -12,15 +12,19 @@ SetCompressor /SOLID /FINAL lzma
 !include "MUI2.nsh"
 !include "InstallOptions.nsh"
 
-Name '${APPNAME} ${VERSION} for MonoDevelop'
-OutFile '${INSTALLERFILENAME}-${VERSION}.exe'
-InstallDir '$PROGRAMFILES64\${APPNAME}'
+!define MUI_ICON "${FrameworkPath}Installers\monogame.ico"
+
+!define MUI_UNICON "${FrameworkPath}Installers\monogame.ico"
+
+Name '${APPNAME} ${VERSION} (BETA)'
+OutFile '${INSTALLERFILENAME}Installer-${VERSION}.exe'
+InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} for MonoDevelop"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} for MonoDevelop Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2012"
 
 ; Request application privileges for Windows Vista
@@ -31,10 +35,6 @@ RequestExecutionLevel admin
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "${FrameworkPath}Installers\monogame.bmp"
 !define MUI_ABORTWARNING
-
-; Pages
-
-!insertmacro MUI_PAGE_DIRECTORY
 
 ;--------------------------------
 ;Languages
@@ -48,27 +48,55 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-
-
 ; The stuff to install
 Section "MonoGame Core Components" ;No components page, name is not important
   SectionIn RO
-  SetOutPath $INSTDIR
+  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}
   File '..\monogame.ico'
-  SetOutPath '$INSTDIR\Assemblies'
-  File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
-  File /r '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
+  File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
+  File '..\..\MonoGame.ContentPipeline\*.targets'
+  File '..\..\ThirdParty\Libs\NAudio\*.dll'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
+  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.xml'
+  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
+  File '..\..\Tools\2MGFX\bin\Release\*.exe'
+  
+  File '..\..\ThirdParty\Libs\PVRTexLib\Windows_x86_32\Dll\PVRTexLib.dll'
+  File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
+  File '..\..\ThirdParty\Libs\lame_enc.dll'
+  
+  
+  
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies'
+  File /x *Windows8.dll '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
+  File /nonfatal /x *Windows8.xml '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
 
-  File /r '..\..\MonoGame.Framework\bin\Release\*.dll'
-  File /r '..\..\MonoGame.Framework\bin\Release\*.xml'
+  File /x *Windows8.dll '..\..\MonoGame.Framework\bin\Release\*.dll'
+  File /nonfatal /x *Windows8.xml '..\..\MonoGame.Framework\bin\Release\*.xml'
+  File '..\..\ThirdParty\Libs\OpenTK.dll'
+  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
+  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
+  File '..\..\ThirdParty\GamepadConfig\SDL.dll'
+  
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
+
+  File '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.xml'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*xml'
+
+  
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     GOTO End32Bitvs64BitCheck
 
   Is64bit:
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
 
   End32Bitvs64BitCheck:
   ; Add remote programs
@@ -79,10 +107,18 @@ Section "MonoGame Core Components" ;No components page, name is not important
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'MonoGame'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'UninstallString' '$INSTDIR\uninstall.exe'
 
+
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}'
   ; Uninstaller
   WriteUninstaller "uninstall.exe"
 
 
+SectionEnd
+
+Section "OpenAL"
+  ; SetOutPath $INSTDIR
+  File '..\..\ThirdParty\Libs\oalinst.exe'
+  ExecWait '$INSTDIR\oalinst.exe'
 SectionEnd
 
 Section "MonoDevelop Templates"
@@ -97,21 +133,17 @@ Section "MonoDevelop Templates"
 
   ${If} $0 == ""
   DetailPrint "MonoDevelop Not Found."
-  Abort
   ${Else}
   DetailPrint "MonoDevelop Found at $0"
-  ${EndIf}
-
-
   SetOutPath "$0AddIns\MonoDevelop.MonoGame"
   ; install the Templates for MonoDevelop
-  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
+;  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
+  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
-  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\icons\*.*'
+  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
-  File /r '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\templates\*.*'
-
+  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\templates\*.*'
+  ${EndIf}
   
 SectionEnd
 
@@ -124,12 +156,38 @@ Section "Visual Studio 2010 Templates"
     SetOutPath "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
 
     ; install the Templates for MonoDevelop
-    File /r '..\..\ProjectTemplates\VisualStudio2010.MonoGame.${VERSION}\*.*'
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
   
     DetailPrint "Visual Studio 2010 not found"
   EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2012 Templates"
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    ; Set output path to the installation directory.
+    SetOutPath "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
+
+    ; install the Templates for MonoDevelop
+    File /r '..\..\ProjectTemplates\VisualStudio2012\*.*'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+
+    DetailPrint "Visual Studio 2012 not found"
+  EndTemplates:
+
+SectionEnd
+
+; Optional section (can be disabled by the user)
+Section "Start Menu Shortcuts"
+	CreateDirectory $SMPROGRAMS\MonoGame
+	CreateShortCut "$SMPROGRAMS\MonoGame\Uninstall.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" 0
+	;CreateShortCut "$SMPROGRAMS\MonoGame\GettingStarted.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" 0
+	WriteINIStr "$SMPROGRAMS\MonoGame\Shortcut.url" "InternetShortcut" "URL" "http://www.monogame.net"
 
 SectionEnd
 
@@ -167,6 +225,8 @@ Section "Uninstall"
   ${EndIf}
   
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$SMPROGRAMS\MonoGame"
 
   Delete "$INSTDIR\Uninstall.exe"
   RMDir /r "$INSTDIR"

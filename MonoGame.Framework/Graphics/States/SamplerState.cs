@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // We're now bound to a device... no one should
                 // be changing the state of this object now!
-                graphicsDevice = device;
+                GraphicsDevice = device;
 
                 // Build the description.
                 var desc = new SharpDX.Direct3D11.SamplerStateDescription();
@@ -160,10 +160,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
 
                 // Create the state.
-                _state = new SharpDX.Direct3D11.SamplerState(graphicsDevice._d3dDevice, ref desc);
+                _state = new SharpDX.Direct3D11.SamplerState(GraphicsDevice._d3dDevice, ref desc);
             }
 
-            Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
             return _state;
         }
