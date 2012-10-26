@@ -150,34 +150,51 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(graphicsDevice._d3dDevice, _texture);
+                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, _texture);
 
             return _resourceView;
         }
 
 #endif
 
-        public override void Dispose()
-		{
-#if DIRECTX
-
-            if (_resourceView != null)
-            {
-                _resourceView.Dispose();
-                _resourceView = null;
-            }
-
-            if (_texture != null)
-            {
-                _texture.Dispose();
-                _texture = null;
-            }
-
-#elif OPENGL
-            GL.DeleteTextures(1, ref glTexture);
-            GraphicsExtensions.CheckGLError();
+        internal protected virtual void GraphicsDeviceResetting()
+        {
+#if OPENGL
+            this.glTexture = -1;
 #endif
-            base.Dispose();
+        }
+
+        protected override void Dispose(bool disposing)
+		{
+            if (!IsDisposed)
+            {
+#if DIRECTX
+                if (disposing)
+                {
+                    if (_resourceView != null)
+                    {
+                        _resourceView.Dispose();
+                        _resourceView = null;
+                    }
+
+                    if (_texture != null)
+                    {
+                        _texture.Dispose();
+                        _texture = null;
+                    }
+                }
+#elif OPENGL
+                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                {
+                    GraphicsDevice.AddDisposeAction(() =>
+                        {
+                            GL.DeleteTextures(1, ref glTexture);
+                            GraphicsExtensions.CheckGLError();
+                        });
+                }
+#endif
+            }
+            base.Dispose(disposing);
 		}
 		
 	}

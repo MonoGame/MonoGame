@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+        bool disposed;
 
 #if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = false;
@@ -110,6 +111,11 @@ namespace Microsoft.Xna.Framework
             // TODO: This should not occur here... it occurs during Game.Initialize().
             CreateDevice();
 #endif
+        }
+
+        ~GraphicsDeviceManager()
+        {
+            Dispose(false);
         }
 
         public void CreateDevice()
@@ -180,10 +186,23 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            if (_graphicsDevice != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                _graphicsDevice.Dispose();
-                _graphicsDevice = null;
+                if (disposing)
+                {
+                    if (_graphicsDevice != null)
+                    {
+                        _graphicsDevice.Dispose();
+                        _graphicsDevice = null;
+                    }
+                }
+                disposed = true;
             }
         }
 
