@@ -11,7 +11,8 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MAX_SIMULTANEOUS_SOUNDS = 10;
         private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, Stream.Music, 0);
         private int _soundId;
-		
+        bool disposed;
+
 		internal static SoundPool SoundPool
 		{
 			get {
@@ -32,14 +33,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         ~Sound()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            if (_soundId != 0)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                s_soundPool.Unload(_soundId);
+                if (_soundId != 0)
+                    s_soundPool.Unload(_soundId);
+                _soundId = 0;
+
+                disposed = true;
             }
         }
 
@@ -76,13 +87,8 @@ namespace Microsoft.Xna.Framework.Audio
             if (_soundId == 0)
                 return -1;
 
-            AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
-
-            float streamVolumeCurrent = audioManager.GetStreamVolume(Stream.Music);
-            float streamVolumeMax = audioManager.GetStreamMaxVolume(Stream.Music);
-            float streamVolume = streamVolumeCurrent / streamVolumeMax;
             float panRatio = (this.Pan + 1.0f) / 2.0f;
-            float volumeTotal = SoundEffect.MasterVolume * Volume * streamVolume;
+            float volumeTotal = SoundEffect.MasterVolume * this.Volume;
             float volumeLeft = volumeTotal * (1.0f - panRatio);
             float volumeRight = volumeTotal * panRatio;
 

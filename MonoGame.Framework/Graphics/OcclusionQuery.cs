@@ -18,9 +18,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public OcclusionQuery (GraphicsDevice graphicsDevice)
 		{
-			this.graphicsDevice = graphicsDevice;
+			this.GraphicsDevice = graphicsDevice;
 #if OPENGL
 			GL.GenQueries (1, out glQueryId);
+            GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 #endif
 		}
@@ -29,6 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 #if OPENGL
 			GL.BeginQuery (QueryTarget.SamplesPassed, glQueryId);
+            GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 #endif
 
@@ -38,18 +40,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 #if OPENGL
 			GL.EndQuery (QueryTarget.SamplesPassed);
+            GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 #endif
 
 		}
 
-		public override void Dispose ()
+		protected override void Dispose(bool disposing)
 		{
+            if (!IsDisposed)
+            {
 #if OPENGL
-			GL.DeleteQueries (1, ref glQueryId);
+                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                {
+                    GraphicsDevice.AddDisposeAction(() =>
+                        {
+                            GL.DeleteQueries(1, ref glQueryId);
+                            GraphicsExtensions.CheckGLError();
+                        });
+                }
 #elif DIRECTX
 #endif
-
+            }
+            base.Dispose(disposing);
 		}
 
 		public bool IsComplete {
@@ -61,6 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				                 resultReady);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, resultReady);
+                GraphicsExtensions.CheckGLError();
 #elif DIRECTX                
 #endif
 				return resultReady[0] != 0;
@@ -75,6 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				                 result);
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, result);
+                GraphicsExtensions.CheckGLError();
 #elif DIRECTX             
 #endif
                 return result[0];

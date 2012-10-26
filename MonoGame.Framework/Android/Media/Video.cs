@@ -51,15 +51,20 @@ namespace Microsoft.Xna.Framework.Media
         internal Android.Media.MediaPlayer Player;
 		private string _fileName;
 		private Color _backColor = Color.Black;
-       
-		
-		internal Video(string FileName)
+        bool disposed;
+
+        internal Video(string FileName)
 		{
 			_fileName = FileName;
 			Prepare();
 		}
-				
-		public Color BackgroundColor
+
+        ~Video()
+        {
+            Dispose(false);
+        }
+
+        public Color BackgroundColor
 		{
 			set
 			{
@@ -130,11 +135,21 @@ namespace Microsoft.Xna.Framework.Media
 		
 		public void Dispose()
 		{
-            if (Player != null)
-			{
-                Player.Dispose();
-                Player = null;
-			}
+            Dispose(true);
+            GC.SuppressFinalize(this);
 		}
+
+        void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (Player != null)
+                {
+                    Player.Dispose();
+                    Player = null;
+                }
+                disposed = true;
+            }
+        }
     }
 }

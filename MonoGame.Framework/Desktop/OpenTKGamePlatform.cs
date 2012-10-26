@@ -268,17 +268,25 @@ namespace Microsoft.Xna.Framework
         {
             base.Present();
 
-            if (_view != null) _view.Window.SwapBuffers();
+            var device = Game.GraphicsDevice;
+            if (device != null)
+                device.Present();
+
+            if (_view != null)
+                _view.Window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)
         {
-            if (_view != null)
+            if (!IsDisposed)
             {
-                _view.Dispose();
-                _view = null;
+                if (_view != null)
+                {
+                    _view.Dispose();
+                    _view = null;
+                }
             }
-			
+
 			base.Dispose(disposing);
         }
 			
