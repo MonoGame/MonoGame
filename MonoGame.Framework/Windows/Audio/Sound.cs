@@ -51,6 +51,7 @@ namespace Microsoft.Xna.Framework.Audio
         private bool looping;
         // when looping, to stop we must first disable looping then stop, but we still want to user to "believe" it has looping activated
         private bool loopingCtrl;
+        bool disposed;
 
         public double Duration
         {
@@ -191,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		~Sound()
 		{
-			Dispose();	
+			Dispose(false);	
 		}
 
         private static void InitilizeSoundServices()
@@ -236,15 +237,25 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            if (bufferID == -1)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            Stop();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
 
+                }
+                Stop();
+                AL.DeleteSource(sourceID);
+                AL.DeleteBuffer(bufferID);
+                bufferID = -1;
 
-            AL.DeleteSource(sourceID);
-            AL.DeleteBuffer(bufferID);
-            bufferID = -1;
+                disposed = true;
+            }
         }
 
         #region Buffer Info

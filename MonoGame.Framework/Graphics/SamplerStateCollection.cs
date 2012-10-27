@@ -44,6 +44,16 @@
 using System;
 using System.Collections.Generic;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
 
@@ -51,7 +61,9 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
         private SamplerState[] _samplers;
 
-        private int _dirty;
+#if DIRECTX
+        private int _d3dDirty;
+#endif
 
 		internal SamplerStateCollection( int maxSamplers )
         {
@@ -59,8 +71,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             for (var i = 0; i < maxSamplers; i++)
                 _samplers[i] = SamplerState.LinearWrap;
-
-            _dirty = int.MaxValue;
+            
+#if DIRECTX
+            _d3dDirty = int.MaxValue;
+#endif
         }
 		
 		public SamplerState this [int index] 
@@ -76,7 +90,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _samplers[index] = value;
-                _dirty |= 1 << index;
+
+#if DIRECTX
+                _d3dDirty |= 1 << index;
+#endif
             }
 		}
 
@@ -84,46 +101,69 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (var i = 0; i < _samplers.Length; i++)
                 _samplers[i] = null;
-
-            _dirty = int.MaxValue;
+            
+#if DIRECTX
+            _d3dDirty = int.MaxValue;
+#endif
         }
 
         internal void SetSamplers(GraphicsDevice device)
         {
+#if DIRECTX
             // Skip out if nothing has changed.
-            if (_dirty == 0)
+            if (_d3dDirty == 0)
                 return;
 
-#if DIRECTX
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var pixelShaderStage = device._d3dContext.PixelShader;
-#endif
+
             for (var i = 0; i < _samplers.Length; i++)
             {
                 var mask = 1 << i;
-                if ((_dirty & mask) == 0)
+                if ((_d3dDirty & mask) == 0)
                     continue;
 
                 var sampler = _samplers[i];
-#if OPENGL
-                var texture = device.Textures[i];
-                if (sampler != null && texture != null)
-                    sampler.Activate(texture.glTarget, texture.LevelCount > 1);
-#elif DIRECTX
                 SharpDX.Direct3D11.SamplerState state = null;
                 if (sampler != null)
                     state = sampler.GetState(device);
 
                 pixelShaderStage.SetSampler(i, state);
-#endif
 
-                _dirty &= ~mask;
-                if (_dirty == 0)
+                _d3dDirty &= ~mask;
+                if (_d3dDirty == 0)
                     break;
             }
 
-            _dirty = 0;
+            _d3dDirty = 0;
+
+#elif OPENGL
+
+            for (var i = 0; i < _samplers.Length; i++)
+            {
+                var sampler = _samplers[i];
+                var texture = device.Textures[i];
+
+                if (sampler != null && texture != null && sampler != texture.glLastSamplerState)
+                {
+                    // TODO: Avoid doing this redundantly (see TextureCollection.SetTextures())
+                    // However, I suspect that rendering from the same texture with different sampling modes
+                    // is a relatively rare occurrence...
+                    GL.ActiveTexture(TextureUnit.Texture0 + i);
+                    GraphicsExtensions.CheckGLError();
+
+                    // NOTE: We don't have to bind the texture here because it is already bound in
+                    // TextureCollection.SetTextures(). This, of course, assumes that SetTextures() is called
+                    // before this method is called. If that ever changes this code will misbehave.
+                    // GL.BindTexture(texture.glTarget, texture.glTexture);
+                    // GraphicsExtensions.CheckGLError();
+
+                    sampler.Activate(texture.glTarget, texture.LevelCount > 1);
+                    texture.glLastSamplerState = sampler;
+                }
+            }
+#endif
         }
 	}
 }

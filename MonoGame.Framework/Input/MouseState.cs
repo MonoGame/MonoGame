@@ -73,7 +73,8 @@ namespace Microsoft.Xna.Framework.Input
 				   left._y == right._y &&
 				   left._leftButton == right._leftButton &&
 				   left._middleButton == right._middleButton &&
-				   left._rightButton == right._rightButton;
+				   left._rightButton == right._rightButton &&
+                   left._scrollWheelValue == right._scrollWheelValue;
 		}
 		
 		public static bool operator !=(MouseState left, MouseState right)

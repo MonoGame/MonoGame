@@ -92,8 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal Shader(GraphicsDevice device, BinaryReader reader)
         {
-            graphicsDevice = device;
-            graphicsDevice.DeviceResetting += graphicsDevice_DeviceResetting;
+            GraphicsDevice = device;
 
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
@@ -248,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        internal protected virtual void GraphicsDeviceResetting()
         {
 #if OPENGL
             if (_shaderHandle != -1)
@@ -263,26 +262,30 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
-                graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-
 #if OPENGL
-                if (_shaderHandle != -1)
+                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
                 {
-                    if (GL.IsShader(_shaderHandle))
-                    {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                    _shaderHandle = -1;
+                    GraphicsDevice.AddDisposeAction(() =>
+                        {
+                            if (_shaderHandle != -1)
+                            {
+                                if (GL.IsShader(_shaderHandle))
+                                {
+                                    GL.DeleteShader(_shaderHandle);
+                                    GraphicsExtensions.CheckGLError();
+                                }
+                                _shaderHandle = -1;
+                            }
+                        });
                 }
 #endif
             }
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 	}
 }
