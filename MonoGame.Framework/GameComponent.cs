@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework
         public GameComponent(Game game)
         {
             this.Game = game;
-            this.Enabled = true;
+            this._enabled = true;
         }
 
         ~GameComponent()

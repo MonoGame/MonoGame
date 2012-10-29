@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework
         public DrawableGameComponent(Game game)
             : base(game)
         {
-            Visible = true;
+            this._visible = true;
         }
 
         public override void Initialize()
