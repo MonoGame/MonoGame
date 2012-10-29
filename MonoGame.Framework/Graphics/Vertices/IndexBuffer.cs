@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Do nothing
                 _buffer = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                if (disposing)
                 {
                     GraphicsDevice.AddDisposeAction(() =>
                         {

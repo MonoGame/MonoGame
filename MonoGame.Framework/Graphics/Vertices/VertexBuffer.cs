@@ -304,7 +304,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Do nothing
                 _vertexArray = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                if (disposing)
                 {
                     GraphicsDevice.AddDisposeAction(() =>
                         {

@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
+                if (disposing)
                 {
                     GraphicsDevice.AddDisposeAction(() =>
                         {
