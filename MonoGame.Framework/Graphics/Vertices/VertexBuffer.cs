@@ -304,14 +304,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Do nothing
                 _vertexArray = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteBuffers(1, ref vbo);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteBuffers(1, ref vbo);
+                        GraphicsExtensions.CheckGLError();
+                    });
 #endif
             }
             base.Dispose(disposing);
