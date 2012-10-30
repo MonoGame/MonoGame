@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework
     {
         private bool _initialized;
         private int _drawOrder;
-        private bool _visible;
+        private bool _visible = true;
 
         public int DrawOrder
         {
@@ -84,7 +84,6 @@ namespace Microsoft.Xna.Framework
         public DrawableGameComponent(Game game)
             : base(game)
         {
-            Visible = true;
         }
 
         public override void Initialize()
