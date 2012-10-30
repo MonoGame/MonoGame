@@ -174,8 +174,8 @@ namespace Microsoft.Xna.Framework.Content
             RemoveContentManager(this);
 		}
 
-		// If disposing is true, it was called explicitly.
-		// If disposing is false, it was called by the finalizer.
+		// If disposing is true, it was called explicitly and we should dispose managed objects.
+		// If disposing is false, it was called by the finalizer and managed objects should not be disposed.
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposed)

@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // We're now bound to a device... no one should
                 // be changing the state of this object now!
-                graphicsDevice = device;
+                GraphicsDevice = device;
 
                 // Build the description.
                 var desc = new SharpDX.Direct3D11.DepthStencilStateDescription();
@@ -257,10 +257,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.FrontFace.PassOperation = GetStencilOp(StencilPass);
 
                 // Create the state.
-                _state = new SharpDX.Direct3D11.DepthStencilState(graphicsDevice._d3dDevice, ref desc);
+                _state = new SharpDX.Direct3D11.DepthStencilState(GraphicsDevice._d3dDevice, ref desc);
             }
 
-            Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.

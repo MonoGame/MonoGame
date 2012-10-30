@@ -93,6 +93,11 @@ namespace Microsoft.Xna.Framework
             this.Enabled = true;
         }
 
+        ~GameComponent()
+        {
+            Dispose(false);
+        }
+
         public virtual void Initialize() { }
 
         public virtual void Update(GameTime gameTime) { }
@@ -112,6 +117,7 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #region IComparable<GameComponent> Members
