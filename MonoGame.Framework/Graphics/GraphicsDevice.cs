@@ -473,7 +473,7 @@ namespace Microsoft.Xna.Framework.Graphics
             featureLevels.Add(FeatureLevel.Level_9_1);
 
             // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, FeatureLevel.Level_9_1))
                 _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
 
             // Set the correct profile based on the feature level.
