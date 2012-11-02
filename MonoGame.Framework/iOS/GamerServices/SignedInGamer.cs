@@ -96,17 +96,11 @@ namespace Microsoft.Xna.Framework.GamerServices
     			        if (lp != null)
     					{
     						lp.Authenticate( delegate(NSError error) 
-    						                	{  							              
-    												try 
-    												{
-    													if ( error != null )
-    													{
-#if DEBUG									
-    														Console.WriteLine(error);
+    						                	{  	
+#if DEBUG
+    												if ( error != null )								
+    													Console.WriteLine(error);
 #endif
-                                                        }
-    												}
-                                                    catch { }
     											}
     						                );
     					}
