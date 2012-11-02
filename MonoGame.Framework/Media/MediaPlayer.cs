@@ -76,6 +76,17 @@ namespace Microsoft.Xna.Framework.Media
 #if WINRT
         private static MediaEngine _mediaEngineEx;
 
+        public static TimeSpan PlayPosition
+        {
+            get
+            {
+                if (_queue.ActiveSong == null)
+                    return TimeSpan.Zero;
+                else
+                    return _queue.ActiveSong.Position; 
+            } 
+        }
+
         static MediaPlayer()
         {            
             MediaManager.Startup(true);
@@ -222,6 +233,9 @@ namespace Microsoft.Xna.Framework.Media
         public static void Pause()
         {
 #if WINRT
+            if (State == MediaState.Stopped)
+                return;
+
             _mediaEngineEx.Pause();
 #else
             if (_queue.ActiveSong == null)
