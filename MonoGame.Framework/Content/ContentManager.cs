@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			var lastPathSeparatorIndex = Math.Max(assetName.LastIndexOf('\\'), assetName.LastIndexOf('/'));
-			CurrentAssetDirectory = lastPathSeparatorIndex == -1 ? RootDirectory : assetName.Substring(0, lastPathSeparatorIndex);
+			CurrentAssetDirectory = lastPathSeparatorIndex == -1 ? "" : assetName.Substring(0, lastPathSeparatorIndex);
 			
 			string originalAssetName = assetName;
 			object result = null;
