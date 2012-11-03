@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework
 {   
     public class GameComponent : IGameComponent, IUpdateable, IComparable<GameComponent>, IDisposable
     {
-        bool _enabled;
+        bool _enabled = true;
         int _updateOrder;
 
         public Game Game { get; private set; }
@@ -90,7 +90,11 @@ namespace Microsoft.Xna.Framework
         public GameComponent(Game game)
         {
             this.Game = game;
-            this.Enabled = true;
+        }
+
+        ~GameComponent()
+        {
+            Dispose(false);
         }
 
         public virtual void Initialize() { }
@@ -112,6 +116,7 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         #region IComparable<GameComponent> Members

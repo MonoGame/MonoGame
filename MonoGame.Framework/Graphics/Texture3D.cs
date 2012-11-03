@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
 		{
-			this.graphicsDevice = graphicsDevice;
+			this.GraphicsDevice = graphicsDevice;
 			Width = width;
 			Height = height;
 			Depth = depth;
