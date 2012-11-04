@@ -10,7 +10,6 @@ using OpenTK.Graphics.OpenGL;
 using Sce.PlayStation.Core.Graphics;
 #elif DIRECTX
 using System.Reflection;
-using System.Collections.Generic;
 #else
 using OpenTK.Graphics.ES20;
 #endif
