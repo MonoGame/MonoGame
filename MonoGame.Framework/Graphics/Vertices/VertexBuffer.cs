@@ -117,8 +117,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException ("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException ("This VertexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-            if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException ("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+                throw new ArgumentOutOfRangeException ("The vertex stride is larger than the vertex buffer.");
 
 #if DIRECTX
             throw new NotImplementedException();
@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 						for (int i = 0; i < elementCount; i++)
 						{
 							Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
-							dataPtr += dataSize;
+							dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
 						}
 					}
 
