@@ -27,7 +27,7 @@ namespace MonoGame.Framework.WindowsPhone
                 manipulationHost.PointerReleased += OnPointerReleased;
             }
 
-            private void OnPointerPressed(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            private static void OnPointerPressed(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
             {
                 var pointerPoint = args.CurrentPoint;
 
@@ -37,7 +37,7 @@ namespace MonoGame.Framework.WindowsPhone
                 TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
             }
 
-            private void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            private static void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
             {
                 var pointerPoint = args.CurrentPoint;
 
@@ -47,7 +47,7 @@ namespace MonoGame.Framework.WindowsPhone
                 TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
             }
 
-            private void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            private static void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
             {
                 var pointerPoint = args.CurrentPoint;
 
