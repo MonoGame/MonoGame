@@ -359,14 +359,18 @@ namespace Microsoft.Xna.Framework.Storage
 			StorageContainer returnValue = null;
 			try {
 				// Retrieve the delegate.
-                var asyncResult = result.AsyncState as OpenContainerAsynchronous;
+				AsyncResult asyncResult = result as AsyncResult;
+				if (asyncResult != null)
+				{
+					var asyncDelegate = asyncResult.AsyncDelegate as OpenContainerAsynchronous;
 
-				// Wait for the WaitHandle to become signaled.
-				result.AsyncWaitHandle.WaitOne ();
+					// Wait for the WaitHandle to become signaled.
+					result.AsyncWaitHandle.WaitOne();
 
-				// Call EndInvoke to retrieve the results.
-                if (asyncResult != null)
-                    returnValue = asyncResult.EndInvoke(result);
+					// Call EndInvoke to retrieve the results.
+					if (asyncDelegate != null)
+						returnValue = asyncDelegate.EndInvoke(result);
+				}
 			} finally {
 				// Close the wait handle.
 				result.AsyncWaitHandle.Dispose ();	 
