@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace TwoMGFX
 {
@@ -131,10 +133,15 @@ namespace TwoMGFX
 
         protected object GetValue(ParseTree tree, TokenType type, int index)
         {
-            return GetValue(tree, type, ref index);
+			return this.GetValue(tree, new[] { type }, ref index);
         }
 
-        protected object GetValue(ParseTree tree, TokenType type, ref int index)
+		protected object GetValue(ParseTree tree, TokenType[] types, int index)
+		{
+			return this.GetValue(tree, types, ref index);
+		}
+
+        protected object GetValue(ParseTree tree, TokenType[] types, ref int index)
         {
             object o = null;
             if (index < 0) return o;
@@ -142,7 +149,7 @@ namespace TwoMGFX
             // left to right
             foreach (ParseNode node in nodes)
             {
-                if (node.Token.Type == type)
+                if (types.Contains(node.Token.Type))
                 {
                     index--;
                     if (index < 0)
@@ -182,7 +189,15 @@ namespace TwoMGFX
                 case TokenType.PixelShader_Pass_Expression:
                     Value = EvalPixelShader_Pass_Expression(tree, paramlist);
                     break;
-
+				case TokenType.Pass_RenderState_Expression:
+					Value = this.EvalPass_RenderState_Expression(tree, paramlist);
+					break;
+				case TokenType.Sampler_Declaration:
+					Value = this.EvalSampler2D(tree, paramlist);
+					break;
+				case TokenType.Sampler_State_Expression:
+					Value = this.EvalSamplerStateExpression(tree, paramlist);
+					break;
                 default:
                     Value = Token.Text;
                     break;
@@ -196,9 +211,14 @@ namespace TwoMGFX
         
            foreach (ParseNode node in Nodes)
            {
-              var technique = node.Eval(tree, shader) as TechniqueInfo;
-              if ( technique != null )
-                 shader.Techniques.Add(technique);
+				object obj = node.Eval(tree, shader);
+				if (obj is TechniqueInfo)
+					shader.Techniques.Add((TechniqueInfo)obj);
+				else if (obj is SamplerStateInfo)
+				{
+					SamplerStateInfo sampler = obj as SamplerStateInfo;
+					shader.SamplerStates.Add(sampler.name, sampler.state);
+				}
            }
         
            return shader;
@@ -248,7 +268,240 @@ namespace TwoMGFX
            return null;
         }
 
+		private static BlendState blendState(PassInfo pass)
+		{
+			if (pass.blendState == null)
+				pass.blendState = new BlendState();
+			return pass.blendState;
+		}
 
+		private static DepthStencilState depthStencilState(PassInfo pass)
+		{
+			if (pass.depthStencilState == null)
+				pass.depthStencilState = new DepthStencilState();
+			return pass.depthStencilState;
+		}
+
+		private static RasterizerState rasterizerState(PassInfo pass)
+		{
+			if (pass.rasterizerState == null)
+				pass.rasterizerState = new RasterizerState();
+			return pass.rasterizerState;
+		}
+
+		private static bool parseBool(string value)
+		{
+			if (value == "true" || value == "1")
+				return true;
+			else if (value == "false" || value == "0")
+				return false;
+			else
+				throw new Exception("Invalid boolean value '" + value + "'");
+		}
+
+		private static BlendFunction parseBlendFunction(string value)
+		{
+			switch (value)
+			{
+				case "Add":
+					return BlendFunction.Add;
+				case "Subtract":
+					return BlendFunction.Subtract;
+				case "RevSubtract":
+					return BlendFunction.ReverseSubtract;
+				case "Min":
+					return BlendFunction.Min;
+				case "Max":
+					return BlendFunction.Max;
+				default:
+					throw new Exception("Invalid blend function value '" + value + "'");
+			}
+		}
+
+		private static Blend parseBlend(string value)
+		{
+			switch (value)
+			{
+				case "Zero":
+					return Blend.Zero;
+				case "One":
+					return Blend.One;
+				case "SrcColor":
+					return Blend.SourceColor;
+				case "InvSrcColor":
+					return Blend.InverseSourceColor;
+				case "SrcAlpha":
+					return Blend.SourceAlpha;
+				case "InvSrcAlpha":
+					return Blend.InverseSourceAlpha;
+				case "DestAlpha":
+					return Blend.DestinationAlpha;
+				case "InvDestAlpha":
+					return Blend.InverseDestinationAlpha;
+				case "DestColor":
+					return Blend.DestinationColor;
+				case "InvDestColor":
+					return Blend.InverseDestinationColor;
+				case "SrcAlphaSat":
+					return Blend.SourceAlphaSaturation;
+				case "BlendFactor":
+					return Blend.BlendFactor;
+				case "InvBlendFactor":
+					return Blend.InverseBlendFactor;
+				default:
+					throw new Exception("Invalid blend value '" + value + "'");
+			}
+		}
+
+		protected virtual object EvalSampler2D(ParseTree tree, params object[] paramlist)
+		{
+			SamplerStateInfo sampler = new SamplerStateInfo();
+			sampler.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
+			sampler.state = new SamplerState();
+
+			foreach (ParseNode node in Nodes)
+				node.Eval(tree, sampler);
+
+			// Figure out what kind of filter to set based on each individual min, mag, and mip filter
+			if (sampler.MinFilter == TextureFilterType.Anisotropic)
+				sampler.state.Filter = TextureFilter.Anisotropic;
+			else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
+				sampler.state.Filter = TextureFilter.Linear;
+			else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
+				sampler.state.Filter = TextureFilter.LinearMipPoint;
+			else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
+				sampler.state.Filter = TextureFilter.MinLinearMagPointMipLinear;
+			else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
+				sampler.state.Filter = TextureFilter.MinLinearMagPointMipPoint;
+			else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
+				sampler.state.Filter = TextureFilter.MinPointMagLinearMipLinear;
+			else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
+				sampler.state.Filter = TextureFilter.MinPointMagLinearMipPoint;
+			else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
+				sampler.state.Filter = TextureFilter.Point;
+			else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
+				sampler.state.Filter = TextureFilter.PointMipLinear;
+
+			return sampler;
+		}
+
+
+
+		private TextureAddressMode parseAddressMode(string value)
+		{
+			switch (value.ToLower())
+			{
+				case "clamp":
+					return TextureAddressMode.Clamp;
+				case "mirror":
+					return TextureAddressMode.Mirror;
+				case "wrap":
+					return TextureAddressMode.Wrap;
+				default:
+					throw new Exception("Unknown texture address mode '" + value + "'.");
+			}
+		}
+
+		private TextureFilterType parseTextureFilterType(string value)
+		{
+			switch (value.ToLower())
+			{
+				case "linear":
+					return TextureFilterType.Linear;
+				case "point":
+					return TextureFilterType.Point;
+				case "anisotropic":
+					return TextureFilterType.Anisotropic;
+				default:
+					throw new Exception("Unknown texture filter type '" + value + "'.");
+			}
+		}
+
+		protected virtual object EvalSamplerStateExpression(ParseTree tree, params object[] paramlist)
+		{
+			SamplerStateInfo sampler = paramlist[0] as SamplerStateInfo;
+			string name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+			string value = this.GetValue(tree, new[] { TokenType.Identifier, TokenType.Number, TokenType.TextureName }, 1) as string;
+			switch (name)
+			{
+				case "Texture":
+					// Ignore
+					break;
+				case "MinFilter":
+					sampler.MinFilter = this.parseTextureFilterType(value);
+					break;
+				case "MagFilter":
+					sampler.MagFilter = this.parseTextureFilterType(value);
+					break;
+				case "MipFilter":
+					sampler.MipFilter = this.parseTextureFilterType(value);
+					break;
+				case "Filter":
+					sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = this.parseTextureFilterType(value);
+					break;
+				case "AddressU":
+					sampler.state.AddressU = this.parseAddressMode(value);
+					break;
+				case "AddressV":
+					sampler.state.AddressV = this.parseAddressMode(value);
+					break;
+				case "AddressW":
+					sampler.state.AddressW = this.parseAddressMode(value);
+					break;
+				case "MaxAnisotropy":
+					sampler.state.MaxAnisotropy = int.Parse(value);
+					break;
+				default:
+					throw new Exception("Unknown sampler state '" + name + "'.");
+			}
+
+			return null;
+		}
+
+		protected virtual object EvalPass_RenderState_Expression(ParseTree tree, params object[] paramlist)
+		{
+			PassInfo pass = paramlist[0] as PassInfo;
+			string name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+			string value = this.GetValue(tree, new[] { TokenType.Identifier, TokenType.Number }, 1) as string;
+
+			Blend blend;
+
+			switch (name)
+			{
+				case "AlphaBlendEnable":
+					if (!parseBool(value))
+					{
+						blendState(pass).AlphaSourceBlend = Blend.One;
+						blendState(pass).ColorSourceBlend = Blend.One;
+						blendState(pass).ColorDestinationBlend = Blend.Zero;
+						blendState(pass).AlphaDestinationBlend = Blend.Zero;
+					}
+					break;
+				case "SrcBlend":
+					blend = parseBlend(value);
+					blendState(pass).AlphaSourceBlend = blend;
+					blendState(pass).ColorSourceBlend = blend;
+					break;
+				case "DestBlend":
+					blend = parseBlend(value);
+					blendState(pass).AlphaDestinationBlend = blend;
+					blendState(pass).ColorDestinationBlend = blend;
+					break;
+				case "BlendOp":
+					blendState(pass).AlphaBlendFunction = parseBlendFunction(value);
+					break;
+				case "ZEnable":
+					depthStencilState(pass).DepthBufferEnable = parseBool(value);
+					break;
+				case "ZWriteEnable":
+					depthStencilState(pass).DepthBufferWriteEnable = parseBool(value);
+					break;
+				default:
+					throw new Exception("Unknown render state '" + name + "'.");
+			}
+
+			return null;
+		}
     }
     
     #endregion ParseTree

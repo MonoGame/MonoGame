@@ -49,9 +49,17 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Whitespace, regex);
             Tokens.Add(TokenType.Whitespace);
 
+			regex = new Regex(@"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]", RegexOptions.Compiled);
+			Patterns.Add(TokenType.TextureName, regex);
+			Tokens.Add(TokenType.TextureName);
+
             regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
             Patterns.Add(TokenType.Identifier, regex);
             Tokens.Add(TokenType.Identifier);
+
+			regex = new Regex(@"[0-9]?\.?[0-9]+", RegexOptions.Compiled);
+			Patterns.Add(TokenType.Number, regex);
+			Tokens.Add(TokenType.Number);
 
             regex = new Regex(@"pass", RegexOptions.Compiled);
             Patterns.Add(TokenType.Pass, regex);
@@ -60,6 +68,14 @@ namespace TwoMGFX
             regex = new Regex(@"technique", RegexOptions.Compiled);
             Patterns.Add(TokenType.Technique, regex);
             Tokens.Add(TokenType.Technique);
+
+			regex = new Regex(@"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler", RegexOptions.Compiled);
+			Patterns.Add(TokenType.Sampler, regex);
+			Tokens.Add(TokenType.Sampler);
+
+			regex = new Regex(@"sampler_state", RegexOptions.Compiled);
+			Patterns.Add(TokenType.SamplerState, regex);
+			Tokens.Add(TokenType.SamplerState);
 
             regex = new Regex(@"VertexShader", RegexOptions.Compiled);
             Patterns.Add(TokenType.VertexShader, regex);
@@ -187,7 +203,7 @@ namespace TwoMGFX
                     if (m.Success && m.Index == 0 && ((m.Length > len) || (scantokens[i] < index && m.Length == len )))
                     {
                         len = m.Length;
-                        index = scantokens[i];  
+                        index = scantokens[i];
                     }
                 }
 
@@ -225,39 +241,47 @@ namespace TwoMGFX
 
     #region Token
 
+	// Order is important in this enumeration.
+	// Tokens higher in the list take priority.
     public enum TokenType
     {
-
-            //Non terminal tokens:
-            _NONE_  = 0,
-            _UNDETERMINED_= 1,
-
-            //Non terminal tokens:
-            Start   = 2,
-            Technique_Declaration= 3,
-            Pass_Declaration= 4,
-            VertexShader_Pass_Expression= 5,
-            PixelShader_Pass_Expression= 6,
-
-            //Terminal tokens:
-            BlockComment= 7,
-            Comment = 8,
-            Whitespace= 9,
-            Identifier= 10,
-            Pass    = 11,
-            Technique= 12,
-            VertexShader= 13,
-            PixelShader= 14,
-            OpenBracket= 15,
-            CloseBracket= 16,
-            Equals  = 17,
-            Semicolon= 18,
-            OpenParenthesis= 19,
-            CloseParenthesis= 20,
-            Compile = 21,
-            ShaderModel= 22,
-            Code    = 23,
-            EndOfFile= 24
+            // Non-terminal tokens
+            _NONE_,
+            _UNDETERMINED_,
+			
+            // Non terminal tokens
+            Start,
+            Technique_Declaration,
+            Pass_Declaration,
+			Sampler_Declaration,
+			Sampler_State_Expression,
+            VertexShader_Pass_Expression,
+            PixelShader_Pass_Expression,
+			Pass_RenderState_Expression,
+			
+            // Terminal tokens
+            BlockComment,
+            Comment,
+            Whitespace,
+            Pass,
+            Technique,
+			SamplerState,
+			Sampler,
+			PixelShader,
+            VertexShader,
+			Identifier,
+			TextureName,
+			Number,
+            OpenBracket,
+            CloseBracket,
+            Equals,
+            Semicolon,
+            OpenParenthesis,
+            CloseParenthesis,
+            Compile,
+            ShaderModel,
+            Code,
+            EndOfFile,
     }
 
     public class Token

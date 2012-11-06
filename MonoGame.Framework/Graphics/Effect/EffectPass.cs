@@ -141,8 +141,12 @@ namespace Microsoft.Xna.Framework.Graphics
 										
 					// If there is no texture assigned then skip it
 					// and leave whatever set directly on the device.
-                    if (texture != null)
-                        device.Textures[sampler.index] = texture;
+					if (texture != null)
+					{
+						device.Textures[sampler.index] = texture;
+						if (sampler.state != null)
+							device.SamplerStates[sampler.index] = sampler.state;
+					}
                 }
                 
                 // Update the constant buffers.

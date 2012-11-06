@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -15,7 +16,25 @@ namespace TwoMGFX
 
         public string psModel;
         public string psFunction;
+
+		public BlendState blendState;
+		public RasterizerState rasterizerState;
+		public DepthStencilState depthStencilState;
     }
+
+	public enum TextureFilterType
+	{
+		Linear, Anisotropic, Point
+	}
+
+	public class SamplerStateInfo
+	{
+		public string name;
+		public SamplerState state;
+		public TextureFilterType MinFilter;
+		public TextureFilterType MagFilter;
+		public TextureFilterType MipFilter;
+	}
 
     public class TechniqueInfo
     {
@@ -36,7 +55,7 @@ namespace TwoMGFX
         public bool Debug { get; private set; }
 
         public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
-
+		public Dictionary<string, SamplerState> SamplerStates = new Dictionary<string, SamplerState>();
 
         static public ShaderInfo FromFile(string path, Options options)
         {
