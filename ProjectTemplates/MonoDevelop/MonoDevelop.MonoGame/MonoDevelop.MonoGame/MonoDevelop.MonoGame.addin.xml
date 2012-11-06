@@ -10,6 +10,7 @@
 		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
 		<Import file="templates/MonoGameLinuxProject.xpt.xml" />
 		<Import file="templates/MonoGameMacProject.xpt.xml" />
+        <Import file="templates/MonoGameMacFsharpProject.xpt.xml" />
 		<Import file="templates/MonoGameAndroidClass.xft.xml" />
 		<Import file="templates/MonoGameiOSClass.xft.xml" />
 		<Import file="templates/MonoGameMacClass.xft.xml" />
@@ -31,8 +32,10 @@
 		<Import file="templates/MonoGameApplication/iOSInfo.plist" />
 		<Import file="templates/MonoGameApplication/iOSMain.cs" />
 		<Import file="templates/MonoGameApplication/MacGame.cs" />
+        <Import file="templates/MonoGameApplication/MacGame.fs" />
 		<Import file="templates/MonoGameApplication/MacInfo.plist" />
 		<Import file="templates/MonoGameApplication/MacMain.cs" />
+        <Import file="templates/MonoGameApplication/MacMain.fs" />
 		<Import file="templates/MonoGameApplication/Program.cs" />
 		<Import file="templates/MonoGameApplication/Resource.cs" />
 		<Import file="templates/MonoGameApplication/Splash.png" />
@@ -63,6 +66,7 @@
 		<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
 		<ProjectTemplate id="MonoGameForLinuxProject" file="templates/MonoGameLinuxProject.xpt.xml" />
 		<ProjectTemplate id="MonoGameForMacProject" file="templates/MonoGameMacProject.xpt.xml" />
+        <ProjectTemplate id="MonoGameForMacFSharpProject" file="templates/MonoGameMacFsharpProject.xpt.xml" />
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id="MonoGameAndroidClass" resource="MonoGameAndroidClass.xft.xml" />
