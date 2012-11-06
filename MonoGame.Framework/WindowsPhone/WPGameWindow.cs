@@ -49,11 +49,8 @@ namespace MonoGame.Framework.WindowsPhone
 {
     public class WindowsPhoneGameWindow : GameWindow
     {
-        private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
-        private Vector2 _backBufferScale;
-
 
         #region Internal Properties
 
