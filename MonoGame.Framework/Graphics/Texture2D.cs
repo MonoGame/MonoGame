@@ -678,7 +678,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return texture;
  
-#elif WINRT && !WINDOWS_PHONE
+#elif WINDOWS_STOREAPP
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
@@ -752,7 +752,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
 #else
             throw new NotImplementedException();
@@ -761,14 +761,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsPng(Stream stream, int width, int height)
         {
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #else
             throw new NotImplementedException();
 #endif
         }
 
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
 
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {

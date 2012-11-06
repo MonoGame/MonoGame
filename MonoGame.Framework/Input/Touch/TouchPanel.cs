@@ -279,7 +279,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (Game.Instance != null)
                     windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
                                                 Game.Instance.Window.ClientBounds.Height);
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
                 else
                 {
                     var dipFactor = DisplayProperties.LogicalDpi / 96.0f;

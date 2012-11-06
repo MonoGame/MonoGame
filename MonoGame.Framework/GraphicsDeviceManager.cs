@@ -48,7 +48,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#elif WINRT && !WINDOWS_PHONE
+#elif WINDOWS_STOREAPP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -355,9 +355,9 @@ namespace Microsoft.Xna.Framework
             IsFullScreen = !IsFullScreen;
         }
 
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
-#endif 
+#endif
 
         public GraphicsProfile GraphicsProfile { get; set; }
 

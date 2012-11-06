@@ -142,9 +142,9 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
-#endif //WINRT
+#endif
 
 #if MONOMAC || WINDOWS || LINUX
             // Set the window title.
@@ -342,7 +342,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
 
@@ -623,7 +623,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINRT && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();
