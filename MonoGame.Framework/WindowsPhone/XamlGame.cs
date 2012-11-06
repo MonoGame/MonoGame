@@ -15,14 +15,20 @@ namespace MonoGame.Framework.WindowsPhone
     /// Static class for initializing a Game object for a XAML application.
     /// </summary>
     /// <typeparam name="T">A class derived from Game.</typeparam>
-    public class XamlGame<T> : IDrawingSurfaceManipulationHandler
+    public static class XamlGame<T>
         where T : Game, new()
     {
-        class ContentProvider : DrawingSurfaceBackgroundContentProviderNativeBase
+        class SurfaceHost : DrawingSurfaceBackgroundContentProviderNativeBase, 
+                            IDrawingSurfaceManipulationHandler
         {
-            public ContentProvider(XamlGame<T> controller)
+            private Device _device;
+            private DeviceContext _context;
+            private readonly T _game;
+            DrawingSurfaceRuntimeHost _host;
+
+            public SurfaceHost(T game)
             {
-                _controller = controller;
+                _game = game;
             }
 
             public override void Connect(DrawingSurfaceRuntimeHost host, Device device)
@@ -37,7 +43,26 @@ namespace MonoGame.Framework.WindowsPhone
 
             public override void Draw(Device device, DeviceContext context, RenderTargetView renderTargetView)
             {
-                _controller.Tick(device, context, renderTargetView);
+                var deviceChanged = _device != device || _context != context;
+                _device = device;
+                _context = context;
+
+                if (!_game.Initialized)
+                {
+                    DrawingSurfaceState.Device = _device;
+                    DrawingSurfaceState.Context = _context;
+                    DrawingSurfaceState.RenderTargetView = renderTargetView;
+                    deviceChanged = false;
+
+                    // Start running the game.
+                    _game.Run(GameRunBehavior.Asynchronous);
+                }
+
+                if (deviceChanged)
+                    _game.GraphicsDevice.UpdateDevice(device, context);
+                _game.GraphicsDevice.UpdateTarget(renderTargetView);
+                _game.Tick();
+
                 _host.RequestAdditionalFrame();
             }
 
@@ -47,17 +72,44 @@ namespace MonoGame.Framework.WindowsPhone
                 WindowsPhoneGameWindow.Height = desiredRenderTargetSize.Height;
             }
 
-            private readonly XamlGame<T> _controller;
-            DrawingSurfaceRuntimeHost _host;
+            public void SetManipulationHost(DrawingSurfaceManipulationHost manipulationHost)
+            {
+                manipulationHost.PointerPressed += OnPointerPressed;
+                manipulationHost.PointerMoved += OnPointerMoved;
+                manipulationHost.PointerReleased += OnPointerReleased;
+            }
+
+            private void OnPointerPressed(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            {
+                var pointerPoint = args.CurrentPoint;
+
+                // To convert from DIPs (device independent pixels) to screen resolution pixels.
+                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
+            }
+
+            private void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            {
+                var pointerPoint = args.CurrentPoint;
+
+                // To convert from DIPs (device independent pixels) to screen resolution pixels.
+                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
+            }
+
+            private void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            {
+                var pointerPoint = args.CurrentPoint;
+
+                // To convert from DIPs (device independent pixels) to screen resolution pixels.
+                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
+                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
+            }
         }
 
-        private Device _device;
-        private DeviceContext _context;
-        private Game _game;
-
-        public XamlGame()
-        {            
-        }
  
         /// <summary>
         /// Creates your Game class initializing it to worth within a XAML application window.
@@ -65,7 +117,7 @@ namespace MonoGame.Framework.WindowsPhone
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
         /// <returns></returns>
-        public Game Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface)
+        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
@@ -74,77 +126,19 @@ namespace MonoGame.Framework.WindowsPhone
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
 
-            drawingSurface.SetBackgroundContentProvider(new ContentProvider(this));
-            drawingSurface.SetBackgroundManipulationHandler(this);
-
             // Construct the game.
-            _game = new T();
-
-            // Set the swap chain panel on the graphics mananger.
-            if (_game.graphicsDeviceManager == null)
+            var game = new T();
+            if (game.graphicsDeviceManager == null)
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
 
-            return _game;
-        }
+            // Hookup the surface host which will finish creating
+            // the game once a device and context are available.
+            var host = new SurfaceHost(game);
+            drawingSurface.SetBackgroundContentProvider(host);
+            drawingSurface.SetBackgroundManipulationHandler(host);
 
-        public void SetManipulationHost(DrawingSurfaceManipulationHost manipulationHost)
-        {
-            manipulationHost.PointerPressed += OnPointerPressed;
-            manipulationHost.PointerMoved += OnPointerMoved;
-            manipulationHost.PointerReleased += OnPointerReleased;
-        }
-
-        protected void OnPointerPressed(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
-        {
-            var pointerPoint = args.CurrentPoint;
-
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
-        }
-
-        protected void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
-        {
-            var pointerPoint = args.CurrentPoint;
-
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
-        }
-
-        protected void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
-        {
-            var pointerPoint = args.CurrentPoint;
-
-            // To convert from DIPs (device independent pixels) to screen resolution pixels.
-            var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-            var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
-        }
-
-        internal void Tick(Device device, DeviceContext context, RenderTargetView renderTargetView)
-        {
-            var deviceChanged = _device != device || _context != context;
-            _device = device;
-            _context = context;
-
-            if (!_game.Initialized)
-            {
-                DrawingSurfaceState.Device = _device;
-                DrawingSurfaceState.Context = _context;
-                DrawingSurfaceState.RenderTargetView = renderTargetView;
-                deviceChanged = false;
-
-                // Start running the game.
-                _game.Run(GameRunBehavior.Asynchronous);
-            }
-
-            if (deviceChanged)
-                _game.GraphicsDevice.UpdateDevice(device, context);
-            _game.GraphicsDevice.UpdateTarget(renderTargetView);
-            _game.Tick();
+            // Return the constructed, but not initialized game.
+            return game;
         }
     }
 }
