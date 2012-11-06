@@ -147,11 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
-#if WINDOWS_PHONE
-
-        protected Size _renderTargetViewSize;
-
-#else
+#if !WINDOWS_PHONE
 
         // Declare Direct2D Objects
         protected SharpDX.Direct2D1.Factory1 _d2dFactory;
@@ -470,14 +466,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var resource = _renderTargetView.Resource;
             using (var texture2D = new SharpDX.Direct3D11.Texture2D(resource.NativePointer))
             {
-                var currentWidth = (int)_renderTargetViewSize.Width;
-                var currentHeight = (int)_renderTargetViewSize.Height;
+                var currentWidth = PresentationParameters.BackBufferWidth;
+                var currentHeight = PresentationParameters.BackBufferHeight;
 
                 if (currentWidth != texture2D.Description.Width &&
                     currentHeight != texture2D.Description.Height)
                 {
-                    _renderTargetViewSize.Width = texture2D.Description.Width;
-                    _renderTargetViewSize.Height = texture2D.Description.Height;
+                    PresentationParameters.BackBufferWidth = texture2D.Description.Width;
+                    PresentationParameters.BackBufferHeight = texture2D.Description.Height;
 
                     ComObject.Dispose(ref _depthStencilView);
 
@@ -485,8 +481,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _d3dDevice,
                         new Texture2DDescription()
                         {
-                            Width = (int)_renderTargetViewSize.Width,
-                            Height = (int)_renderTargetViewSize.Height,
+                            Width = PresentationParameters.BackBufferWidth,
+                            Height = PresentationParameters.BackBufferHeight,
                             ArraySize = 1,
                             BindFlags = BindFlags.DepthStencil,
                             CpuAccessFlags = CpuAccessFlags.None,
@@ -497,6 +493,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             Usage = ResourceUsage.Default
                         }))
                         _depthStencilView = new DepthStencilView(_d3dDevice, depthTexture);
+
+                    Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
                 }
             }
         }
