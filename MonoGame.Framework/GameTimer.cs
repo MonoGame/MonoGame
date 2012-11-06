@@ -6,8 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+
+#if WINDOWS_PHONE
+
+#elif WINRT
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+#endif
 
 namespace Microsoft.Xna.Framework
 {

@@ -98,6 +98,8 @@ namespace Microsoft.Xna.Framework
             return new AndroidGamePlatform(game);
 #elif PSS
 			return new PSSGamePlatform(game);
+#elif WINDOWS_PHONE
+            return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
 #endif
@@ -161,7 +163,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
         private ApplicationViewState _viewState;
         public ApplicationViewState ViewState
         {
@@ -213,7 +215,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
         public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
 #endif
 

@@ -79,8 +79,11 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
 #if WINRT
+#if WINDOWS_PHONE
+#else
 using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Media.Imaging;
+#endif
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
 #endif
@@ -675,7 +678,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return texture;
  
-#elif WINRT
+#elif WINRT && !WINDOWS_PHONE
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
@@ -749,7 +752,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
 #else
             throw new NotImplementedException();
@@ -758,14 +761,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsPng(Stream stream, int width, int height)
         {
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #else
             throw new NotImplementedException();
 #endif
         }
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
+
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
             var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
@@ -790,7 +794,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             }).Wait();
         }
-		
 		
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {

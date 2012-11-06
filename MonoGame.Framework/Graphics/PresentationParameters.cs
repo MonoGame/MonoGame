@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-#if WINRT 
+#if WINRT && !WINDOWS_PHONE
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
             set { deviceWindowHandle = value; }
         }
 		
-#if WINRT 
+#if WINRT && !WINDOWS_PHONE
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif 
 

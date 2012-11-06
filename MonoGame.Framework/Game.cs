@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif //WINRT
 
@@ -342,8 +342,11 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
+#endif
+
+#if WINRT
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -620,7 +623,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();
