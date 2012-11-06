@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Input
 					int numSticks = Sdl.SDL_NumJoysticks();
 					for (int x = 0; x < numSticks; x++) {
 
-						PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), 0);
+						PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), x);
 						devices[x] = Sdl.SDL_JoystickOpen (pc.Index);
 
 						int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
@@ -85,7 +85,8 @@ namespace Microsoft.Xna.Framework.Input
 						}
 						
 						if (Sdl.SDL_JoystickName(x).Contains("Microsoft")
-                            || Sdl.SDL_JoystickName(x).Contains("潃瑮潲汬牥⠠托硯㌠〶圠物汥獥⁳敒散癩牥映牯圠湩潤獷)") 
+                            || Sdl.SDL_JoystickName(x).Contains("潃瑮潲汬牥⠠托硯㌠〶圠物汥獥⁳敒散癩牥映牯圠湩潤獷)")
+							|| Sdl.SDL_JoystickName(x).Contains("潃瑮潲汬牥⠠䉘塏㌠〶䘠牯圠湩潤獷)")
                             || (Sdl.SDL_JoystickName(x).Contains("X-Box") || Sdl.SDL_JoystickName(x).Contains("Xbox")))
 						{
 							pc.Button_A.ID = 0;
