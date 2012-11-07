@@ -172,18 +172,7 @@ namespace Microsoft.Xna.Framework
             if (winWidth == 0 || winHeight == 0)
                 return;
 
-            //If we've already got a pending change, do nothing
-            if (updateClientBounds)
-                return;
-            
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
-
             ChangeClientBounds(winRect);
-
-            OnClientSizeChanged();
         }
 
         private void OnRenderFrame(object sender, FrameEventArgs e)
@@ -206,6 +195,11 @@ namespace Microsoft.Xna.Framework
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
+				Game.GraphicsDevice.PresentationParameters.BackBufferWidth = clientBounds.Width;
+				Game.GraphicsDevice.PresentationParameters.BackBufferHeight = clientBounds.Height;
+
+				Game.GraphicsDevice.Viewport = new Viewport(0, 0, clientBounds.Width, clientBounds.Height);
+
                 updateClientBounds = false;
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
@@ -222,6 +216,8 @@ namespace Microsoft.Xna.Framework
                 WindowBorder desired = AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
                 if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
                     window.WindowBorder = desired;
+
+				OnClientSizeChanged();
             }
 
 
@@ -317,11 +313,8 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            if (!updateClientBounds)
-            {
-                updateClientBounds = true;
-                this.clientBounds = clientBounds;
-            }
+            updateClientBounds = true;
+            this.clientBounds = clientBounds;
         }
 
         #endregion

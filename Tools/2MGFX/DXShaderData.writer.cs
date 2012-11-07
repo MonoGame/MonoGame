@@ -18,6 +18,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 writer.Write((byte)sampler.type);
                 writer.Write((byte)sampler.index);
 
+				if (sampler.state != null)
+				{
+					writer.Write(true);
+					writer.Write((byte)sampler.state.AddressU);
+					writer.Write((byte)sampler.state.AddressV);
+					writer.Write((byte)sampler.state.AddressW);
+					writer.Write((byte)sampler.state.Filter);
+					writer.Write(sampler.state.MaxAnisotropy);
+					writer.Write(sampler.state.MaxMipLevel);
+					writer.Write(sampler.state.MipMapLevelOfDetailBias);
+				}
+				else
+					writer.Write(false);
+
                 if (!options.DX11Profile)
                     writer.Write(sampler.samplerName);
 

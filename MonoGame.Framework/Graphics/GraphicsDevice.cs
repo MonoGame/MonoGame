@@ -1267,6 +1267,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
+
                 if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
@@ -1277,6 +1278,17 @@ namespace Microsoft.Xna.Framework.Graphics
                         GraphicsExtensions.CheckGLError();
                     }
 				}
+
+				DrawBuffersEnum[] buffers = new DrawBuffersEnum[_currentRenderTargetBindings.Length];
+				buffers[0] = DrawBuffersEnum.ColorAttachment0;
+				for (int i = 1; i < _currentRenderTargetBindings.Length; i++)
+				{
+					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
+					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0 + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
+					buffers[i] = DrawBuffersEnum.ColorAttachment0 + i;
+				}
+
+				GL.DrawBuffers(buffers.Length, buffers);
 
 				var status = GL.CheckFramebufferStatus(GLFramebuffer);
 				if (status != GLFramebufferComplete)

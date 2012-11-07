@@ -125,10 +125,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 // having to generate this temp array on every set.
                 byte[] bytes;
 
-                if (data is float)
-                    bytes = BitConverter.GetBytes((float)data);
-                else
-                    bytes = BitConverter.GetBytes(((float[])data)[0]);
+				if (data is float[])
+					bytes = BitConverter.GetBytes(((float[])data)[0]);
+				else if (data is int)
+					bytes = BitConverter.GetBytes((int)data);
+				else
+					bytes = BitConverter.GetBytes((float)data);
+					
 
                 Buffer.BlockCopy(bytes, 0, _buffer, offset, elementSize);
             }

@@ -201,14 +201,24 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        // TODO: Implement this
+        
         public ContainmentType Contains(BoundingFrustum frustum)
         {
-            if (this == frustum)                // We check to see if the two frustums are equal
-                return ContainmentType.Contains;// If they are, there's no need to go any further.
-
-            throw new NotImplementedException();
+			var containment = ContainmentType.Disjoint;
+			this.Contains(ref frustum, out containment);
+			return containment;
         }
+
+		// TODO: Implement frustum-frustum containment test
+		public void Contains(ref BoundingFrustum frustum, out ContainmentType result)
+		{
+			if (this == frustum) // We check to see if the two frustums are equal
+				result = ContainmentType.Contains; // If they are, there's no need to go any further.
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -393,17 +403,30 @@ namespace Microsoft.Xna.Framework
 
         public bool Intersects(BoundingFrustum frustum)
         {
-            throw new NotImplementedException();
+			var result = false;
+			this.Intersects(ref frustum, out result);
+			return result;
         }
 
-        public bool Intersects(BoundingSphere sphere)
-        {
-            throw new NotImplementedException();
-        }
+		public void Intersects(ref BoundingFrustum frustum, out bool result)
+		{
+			var containment = ContainmentType.Disjoint;
+			this.Contains(ref frustum, out containment);
+			result = containment != ContainmentType.Disjoint;
+		}
+
+		public bool Intersects(BoundingSphere sphere)
+		{
+			var result = false;
+			this.Intersects(ref sphere, out result);
+			return result;
+		}
 
         public void Intersects(ref BoundingSphere sphere, out bool result)
         {
-            throw new NotImplementedException();
+			var containment = ContainmentType.Disjoint;
+			this.Contains(ref sphere, out containment);
+			result = containment != ContainmentType.Disjoint;
         }
 
         public PlaneIntersectionType Intersects(Plane plane)

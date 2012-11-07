@@ -29,9 +29,12 @@ namespace TwoMGFX
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.
             ShaderInfo shaderInfo;
+#if !DEBUG
             try
             {
+#endif
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+#if !DEBUG
             }
             catch (Exception ex)
             {
@@ -39,12 +42,18 @@ namespace TwoMGFX
                 Console.Error.WriteLine(ex.Message);
                 return 1;
             }
+#endif
 
-            // Create the effect object.
+				// Create the effect object.
             DXEffectObject effect;
+#if !DEBUG
+
             try
             {
+#endif
                 effect = DXEffectObject.FromShaderInfo(shaderInfo);
+#if !DEBUG
+
             }
             catch (Exception ex)
             {
@@ -52,8 +61,9 @@ namespace TwoMGFX
                 Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
-            
-            // Get the output file path.
+#endif
+
+				// Get the output file path.
             if ( options.OutputFile == string.Empty )
                 options.OutputFile = Path.GetFileNameWithoutExtension(options.SourceFile) + ".mgfxo";
 
