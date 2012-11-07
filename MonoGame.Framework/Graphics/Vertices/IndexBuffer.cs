@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             Threading.BlockOnUIThread(() =>
             {
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.GenBuffers(1, ref ibo);
 #else
                 GL.GenBuffers(1, out ibo);
@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
                 GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
 #else
                 IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Copy from the temporary buffer to the destination array
                     Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
