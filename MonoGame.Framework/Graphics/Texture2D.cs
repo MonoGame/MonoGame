@@ -80,6 +80,9 @@ using System.Diagnostics;
 
 #if WINRT
 #if WINDOWS_PHONE
+using System.Threading;
+using System.Windows;
+using System.Windows.Media.Imaging;
 #else
 using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Media.Imaging;
@@ -754,6 +757,22 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
+#elif WINDOWS_PHONE
+
+            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            GetData(pixelData);
+
+            var waitEvent = new ManualResetEventSlim(false);
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                var bitmap = new WriteableBitmap(width, height);
+                System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
+                bitmap.SaveJpeg(stream, width, height, 0, 100);
+                waitEvent.Set();
+            });
+
+            waitEvent.Wait();
+
 #else
             throw new NotImplementedException();
 #endif
@@ -764,6 +783,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #else
+            // TODO: We need to find a simple stand alone
+            // PNG encoder if we want to support this.
             throw new NotImplementedException();
 #endif
         }
