@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="MonoDevelop.Core">
-      <HintPath>..\..\..\..\..\..\..\..\..\Applications\MonoDevelop.app\Contents\MacOS\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <HintPath>References\MonoDevelop.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
