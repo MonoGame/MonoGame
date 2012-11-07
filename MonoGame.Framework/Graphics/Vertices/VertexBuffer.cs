@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.GenBuffers(1, ref this.vbo);
 #else
 			    GL.GenBuffers(1, out this.vbo);
@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -172,7 +172,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
