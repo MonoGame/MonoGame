@@ -123,6 +123,7 @@ namespace Microsoft.Xna.Framework
         private bool _isFixedTimeStep = true;
 
         private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
+        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(1);
 
         private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
@@ -244,8 +245,14 @@ namespace Microsoft.Xna.Framework
 
         public TimeSpan InactiveSleepTime
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _inactiveSleepTime; }
+            set 
+            {
+                if (_inactiveSleepTime != value)
+                {
+                    _inactiveSleepTime = value;
+                }
+            }
         }
 
         public bool IsActive
