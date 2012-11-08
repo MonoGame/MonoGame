@@ -81,10 +81,14 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 #endif
 
-        internal SoundEffectInstance()
-		{			
-		}
-		
+#if WINRT
+        internal SoundEffectInstance(SoundEffect effect, SourceVoice voice)
+        {
+            _effect = effect;
+            _voice = voice;
+        }
+#endif
+
 		public void Dispose()
 		{
 #if WINRT
@@ -253,7 +257,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if WINRT            
             if (_voice != null)
-                _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
+                _voice.Stop(immediate ? 0 : (int)PlayFlags.Tails);
 
             _paused = false;
 #else

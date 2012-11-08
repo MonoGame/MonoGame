@@ -306,10 +306,12 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public SoundEffectInstance CreateInstance()
 		{
-            var instance = new SoundEffectInstance();
 #if WINRT
-            instance._effect = this;
-            instance._voice = new SourceVoice(SoundEffect.Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);            
+		    SourceVoice voice = null;
+            if (Device != null)
+                voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
+
+            var instance = new SoundEffectInstance(this, voice);
 #else			
 			instance.Sound = _sound;			
 #endif
@@ -391,8 +393,8 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 #if WINRT        
-        private static XAudio2 Device;
-        private static MasteringVoice MasterVoice;
+        internal static XAudio2 Device { get; private set; }
+        internal static MasteringVoice MasterVoice { get; private set; }
 
         private static bool _device3DDirty = true;
         private static Speakers _speakers = Speakers.Stereo;
@@ -417,7 +419,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static X3DAudio _device3D;
 
-        private static X3DAudio Device3D
+        internal static X3DAudio Device3D
         {
             get
             {
