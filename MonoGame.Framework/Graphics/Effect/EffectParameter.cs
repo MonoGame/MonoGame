@@ -267,6 +267,18 @@ namespace Microsoft.Xna.Framework.Graphics
             StateKey = unchecked(NextStateKey++);
 		}
 
+		public void SetValueTranspose(Matrix value)
+		{
+			var matrixData = Matrix.ToFloatArray(value);
+			for (var y = 0; y < RowCount; y++)
+			{
+				for (var x = 0; x < ColumnCount; x++)
+					((float[])Data)[y * ColumnCount + x] = matrixData[y * 4 + x];
+			}
+
+			StateKey = unchecked(NextStateKey++);
+		}
+
 		public void SetValue (Matrix[] value)
 		{
             for (var i = 0; i < value.Length; i++)
