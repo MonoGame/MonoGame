@@ -391,8 +391,8 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 #if WINRT        
-        public static XAudio2 Device;        
-        public static MasteringVoice MasterVoice;
+        private static XAudio2 Device;
+        private static MasteringVoice MasterVoice;
 
         private static bool _device3DDirty = true;
         private static Speakers _speakers = Speakers.Stereo;
@@ -417,7 +417,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static X3DAudio _device3D;
 
-        public static X3DAudio Device3D
+        private static X3DAudio Device3D
         {
             get
             {
@@ -433,15 +433,29 @@ namespace Microsoft.Xna.Framework.Audio
 
         static SoundEffect()
         {
+            // This cannot fail.
             Device = new XAudio2();
-            Device.StartEngine();
 
-            // Let windows autodetect number of channels and sample rate.
-            MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
-            MasterVoice.SetVolume(_masterVolume, 0);
+            try
+            {
+                Device.StartEngine();
 
-            // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
-            Speakers = (Speakers)MasterVoice.ChannelMask;
+                // Let windows autodetect number of channels and sample rate.
+                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
+                MasterVoice.SetVolume(_masterVolume, 0);
+
+                // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
+                Speakers = (Speakers)MasterVoice.ChannelMask;
+            }
+            catch
+            {
+                // Release the device and null it as
+                // we have no audio support.
+                Device.Dispose();
+                Device = null;
+                MasterVoice = null;
+            }
+
         }
 
         // Does someone actually need to call this if it only happens when the whole
