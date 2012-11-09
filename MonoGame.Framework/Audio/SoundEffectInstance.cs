@@ -60,8 +60,8 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if WINRT        
-        internal SourceVoice _voice { get; set; }
-        internal SoundEffect _effect { get; set; }
+        private SourceVoice _voice { get; set; }
+        private SoundEffect _effect { get; set; }
 
         private bool _paused;
         private bool _loop;
@@ -81,17 +81,24 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 #endif
 
-        internal SoundEffectInstance()
-		{			
-		}
-		
+#if WINRT
+        internal SoundEffectInstance(SoundEffect effect, SourceVoice voice)
+        {
+            _effect = effect;
+            _voice = voice;
+        }
+#endif
+
 		public void Dispose()
 		{
 #if WINRT
-            _voice.DestroyVoice();
-            _voice.Dispose();
-            _voice = null;
-            _effect = null;
+            if (_voice != null)
+            {
+                _voice.DestroyVoice();
+                _voice.Dispose();
+                _voice = null;
+            }
+		    _effect = null;
 #elif ANDROID
             if (_streamId >= 0)
                 _sound.Stop(_streamId);
@@ -105,7 +112,11 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
-#if WINRT		
+#if WINRT	
+            // If we have no voice then nothing to do.
+            if (_voice == null)
+                return;
+
             // Convert from XNA Emitter to a SharpDX Emitter
             var e = emitter.ToEmitter();
             e.CurveDistanceScaler = SoundEffect.DistanceScale;
@@ -141,8 +152,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Pause ()
 		{
-#if WINRT            
-            _voice.Stop();
+#if WINRT         
+            if (_voice != null)
+                _voice.Stop();
             _paused = true;
 #else
             if ( _sound != null )
@@ -159,20 +171,23 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play ()
 		{
-#if WINRT              
-            // Choose the correct buffer depending on if we are looped.            
-            var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
-
-            if (_voice.State.BuffersQueued > 0)
+#if WINRT
+            if (_voice != null)
             {
-                _voice.Stop();
-                _voice.FlushSourceBuffers();
+                // Choose the correct buffer depending on if we are looped.            
+                var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
+
+                if (_voice.State.BuffersQueued > 0)
+                {
+                    _voice.Stop();
+                    _voice.FlushSourceBuffers();
+                }
+
+                _voice.SubmitSourceBuffer(buffer, null);
+                _voice.Start();
             }
 
-            _voice.SubmitSourceBuffer(buffer, null);
-            _voice.Start();
-
-            _paused = false;
+		    _paused = false;
 #else
 			if ( _sound != null )
 			{
@@ -195,7 +210,8 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Resume()
 		{
 #if WINRT
-            _voice.Start();
+            if (_voice != null)
+                _voice.Start();
             _paused = false;
 #else
 			if ( _sound != null )
@@ -216,9 +232,13 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Stop()
 		{
 #if WINRT
-            _voice.Stop(0);
-            _voice.FlushSourceBuffers();
-            _paused = false;
+            if (_voice != null)
+            {
+                _voice.Stop(0);
+                _voice.FlushSourceBuffers();
+            }
+
+		    _paused = false;
 #else
 			if ( _sound != null )
 			{
@@ -236,7 +256,9 @@ namespace Microsoft.Xna.Framework.Audio
         public void Stop(bool immediate)
         {
 #if WINRT            
-            _voice.Stop( immediate ? 0 : (int)PlayFlags.Tails );
+            if (_voice != null)
+                _voice.Stop(immediate ? 0 : (int)PlayFlags.Tails);
+
             _paused = false;
 #else
 			if ( _sound != null )
@@ -319,10 +341,14 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			set
 			{
-#if WINRT                
+#if WINRT       
                 // According to XNA documentation:
                 // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
                 _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
+
+                // If we have no voice then nothing more to do.
+                if (_voice == null)
+                    return;
                 
                 var srcChannelCount = _effect._format.Channels;
                 var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
@@ -420,6 +446,9 @@ namespace Microsoft.Xna.Framework.Audio
 	            get
 	            {                    
 #if WINRT
+                    if (_voice == null)
+                        return 0.0f;
+
                     // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
                     // which avoids the native call and is actually more accurate.
                     var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
@@ -439,6 +468,9 @@ namespace Microsoft.Xna.Framework.Audio
 	            set
 	            {
 #if WINRT
+                    if (_voice == null)
+                        return;
+
                     // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
                     // which avoids the native call and is actually more accurate.
                     var ratio = Math.Pow(2.0, value);
@@ -457,11 +489,9 @@ namespace Microsoft.Xna.Framework.Audio
 			get
 			{
 #if WINRT           
-                // If no buffers queued the sound is stopped.
-                if (_voice.State.BuffersQueued == 0)
-                {
+                // If no voice or no buffers queued the sound is stopped.
+                if (_voice == null || _voice.State.BuffersQueued == 0)
                     return SoundState.Stopped;
-                }
                 
                 // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
                 // we have to save the "paused" state ourself.
@@ -498,7 +528,10 @@ namespace Microsoft.Xna.Framework.Audio
 			get
 			{
 #if WINRT
-                return _voice.Volume;
+                if (_voice == null)
+                    return 0.0f;
+                else
+                    return _voice.Volume;
 #else
 				if (_sound != null)
 				{
@@ -514,7 +547,8 @@ namespace Microsoft.Xna.Framework.Audio
 			set
 			{
 #if WINRT
-                _voice.SetVolume(value, XAudio2.CommitNow);
+                if (_voice != null)
+                    _voice.SetVolume(value, XAudio2.CommitNow);
 #else
 				if ( _sound != null )
 				{
