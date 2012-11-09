@@ -224,8 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (int i = 0; i < _attributes.Length; ++i)
             {
-                if (_attributes[i].usage == usage)
-                    return _attributes[i].location + index;
+                if ((_attributes[i].usage == usage) && (_attributes[i].index == index))
+                    return _attributes[i].location;
             }
             return -1;
         }
