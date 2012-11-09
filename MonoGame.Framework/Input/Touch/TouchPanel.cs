@@ -158,9 +158,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     }
                 }
 
+                // If a new event was found then store it.
                 if (foundEvent)
                     state[i] = touch;
-                else
+
+                // Else if no event has come in then promote it to
+                // the moved state, but only when we're consuming state.
+                else if (consumeState)
                     state[i] = touch.AsMovedState();
             }
 
