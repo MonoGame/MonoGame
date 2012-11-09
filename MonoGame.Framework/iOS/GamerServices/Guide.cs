@@ -337,7 +337,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
-			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
+            NSUrl url = new NSUrl("http://getipad.rumrungame.com");
 			if (!UIApplication.SharedApplication.OpenUrl(url)) {
 				// Error
 			}
