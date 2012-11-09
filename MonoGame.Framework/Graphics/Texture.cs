@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             this.glTexture = -1;
