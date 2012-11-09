@@ -346,8 +346,12 @@ namespace Microsoft.Xna.Framework.GamerServices
             {
                 var uri = new Uri(@"ms-windows-store:PDP?PFN=" + Package.Current.Id.FamilyName);
                 Launcher.LaunchUriAsync(uri).AsTask<bool>().Wait();
+<<<<<<< HEAD
 >>>>>>> 0c3aaa7... Fixes #899
             }).AsTask().Wait();
+=======
+            });
+>>>>>>> f54bb18... Make ShowMarketplace work, instead of freeze the game.
 #endif
 		}
 
