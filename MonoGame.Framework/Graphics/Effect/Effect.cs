@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
                 ConstantBuffers[i].Clear();
