@@ -341,9 +341,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Process the gesture state.
-                var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
-                UpdateGestures(stateChanged);
+                // Process the pending gesture events.
+                while (_gestureEvents.Count > 0)
+                {
+                    var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
+                    UpdateGestures(stateChanged);
+                }
 
                 return GestureList.Count > 0;				
             }
