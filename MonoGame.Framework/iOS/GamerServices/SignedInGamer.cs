@@ -298,15 +298,17 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public void DoAwardAchievement( string achievementId, double percentageComplete )
 		{
-			GKAchievement a = new GKAchievement(achievementId);
-				a.PercentComplete = percentageComplete;
-				a.ReportAchievement( delegate(NSError error){
-					if (error != null)
-					{
-						// Retain the achievement object and try again later (not shown).
-					}
-		
-				} );
+			UIApplication.SharedApplication.InvokeOnMainThread(delegate {
+				GKAchievement a = new GKAchievement(achievementId);
+					a.PercentComplete = percentageComplete;
+					a.ReportAchievement( delegate(NSError error){
+						if (error != null)
+						{
+							// Retain the achievement object and try again later (not shown).
+						}
+			
+					} );
+				});
 		}
 		
 		public void AwardAchievement( string achievementId, double percentageComplete )
@@ -321,14 +323,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			if (IsSignedInToLive)
 			{
-				GKScore score = new GKScore(aCategory);
-				score.Value = aScore;
-				score.ReportScore(delegate (NSError error)
-					{
-						if (error != null)
+				UIApplication.SharedApplication.InvokeOnMainThread(delegate {
+					GKScore score = new GKScore(aCategory);
+					score.Value = aScore;
+					score.ReportScore(delegate (NSError error)
 						{
-							// Oh oh something went wrong.
-						}
+							if (error != null)
+							{
+								// Oh oh something went wrong.
+							}
+					});
 				});
 			}
 		}
@@ -337,12 +341,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			if (IsSignedInToLive)
 			{
-				GKAchievement.ResetAchivements(delegate (NSError error)
-					{
-						if (error != null)
+				UIApplication.SharedApplication.InvokeOnMainThread(delegate {
+					GKAchievement.ResetAchivements(delegate (NSError error)
 						{
-							// Oh oh something went wrong.
-						}
+							if (error != null)
+							{
+								// Oh oh something went wrong.
+							}
+					});
 				});
 			}
 		}
