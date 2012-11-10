@@ -23,8 +23,9 @@
     <Project File="Application.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.cs">App.xaml.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="MainPage.xaml">MainPage.xaml</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="MainPage.xaml.cs">MainPage.xaml.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml">GamePage.xaml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="GamePage.xaml.cs">GamePage.xaml.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="LocalizedStrings.cs">LocalizedStrings.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Resources\AppResources.resx">AppResources.resx</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Resources\AppResources.Designer.cs">AppResources.Designer.cs</ProjectItem>

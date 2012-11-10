@@ -13,21 +13,6 @@ using $safeprojectname$.Resources;
 
 namespace $safeprojectname$
 {
-    public class Game1 : Game
-    {
-        public Game1()
-        {
-            var manager = new GraphicsDeviceManager(this);
-        }
-
-        protected override void Draw(GameTime gameTime)
-        {
- 	        base.Draw(gameTime);
-
-            GraphicsDevice.Clear(Color.Red);
-        }
-    }
-
     public partial class MainPage : PhoneApplicationPage
     {
         private Game1 _game;
