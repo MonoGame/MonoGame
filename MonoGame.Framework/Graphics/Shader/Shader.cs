@@ -267,21 +267,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        if (_shaderHandle != -1)
                         {
-                            if (_shaderHandle != -1)
+                            if (GL.IsShader(_shaderHandle))
                             {
-                                if (GL.IsShader(_shaderHandle))
-                                {
-                                    GL.DeleteShader(_shaderHandle);
-                                    GraphicsExtensions.CheckGLError();
-                                }
-                                _shaderHandle = -1;
+                                GL.DeleteShader(_shaderHandle);
+                                GraphicsExtensions.CheckGLError();
                             }
-                        });
-                }
+                            _shaderHandle = -1;
+                        }
+                    });
 #endif
             }
 
