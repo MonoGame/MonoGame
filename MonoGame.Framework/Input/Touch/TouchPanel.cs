@@ -158,9 +158,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     }
                 }
 
+                // If a new event was found then store it.
                 if (foundEvent)
                     state[i] = touch;
-                else
+
+                // Else if no event has come in then promote it to
+                // the moved state, but only when we're consuming state.
+                else if (consumeState)
                     state[i] = touch.AsMovedState();
             }
 
@@ -337,9 +341,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Process the gesture state.
-                var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
-                UpdateGestures(stateChanged);
+                // Process the pending gesture events.
+                while (_gestureEvents.Count > 0)
+                {
+                    var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
+                    UpdateGestures(stateChanged);
+                }
 
                 return GestureList.Count > 0;				
             }
