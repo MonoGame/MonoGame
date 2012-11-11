@@ -85,6 +85,12 @@
     <Content Include="templates\MonoGameMacFsharpProject.xpt.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="templates\MonoGameApplication\MacGame.fs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="templates\MonoGameApplication\MacMain.fs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -167,9 +173,5 @@
     <Content Include="templates\MonoGameApplication\Styles.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="templates\MonoGameApplication\MacGame.fs" />
-    <None Include="templates\MonoGameApplication\MacMain.fs" />
   </ItemGroup>
 </Project>
