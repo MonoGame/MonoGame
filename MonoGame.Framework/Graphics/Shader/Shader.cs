@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             if (_shaderHandle != -1)
