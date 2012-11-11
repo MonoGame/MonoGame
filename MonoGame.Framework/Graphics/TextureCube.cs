@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif WINRT
 // TODO
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if WINRT
 
-#elif PSS
+#elif PSM
 		//TODO
 #else
 		PixelInternalFormat glInternalFormat;
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINRT
 
-#elif PSS
+#elif PSM
 			//TODO
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #if WINRT
 
-#elif PSS
+#elif PSM
 			//TODO
 #else
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			dataHandle.Free ();
 		}
 		
-#if !WINRT && !PSS
+#if !WINRT && !PSM
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;

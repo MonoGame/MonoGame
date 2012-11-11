@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
         internal SharpDX.Direct3D11.Buffer _buffer;
-#elif PSS
+#elif PSM
         internal ushort[] _buffer;
 #else
 		internal uint ibo;	
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
-#elif PSS
+#elif PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
             _buffer = new ushort[indexCount];
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
             throw new NotImplementedException();
-#elif PSS
+#elif PSM
             throw new NotImplementedException();
 #else        
             Threading.BlockOnUIThread(() =>
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 
-#elif PSS
+#elif PSM
             if (typeof(T) == typeof(ushort))
             {
                 Array.Copy(data, offsetInBytes / sizeof(ushort), _buffer, startIndex, elementCount);
@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         _buffer = null;
                     }
                 }
-#elif PSS
+#elif PSM
                 //Do nothing
                 _buffer = null;
 #else

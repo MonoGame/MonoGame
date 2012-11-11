@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var vp = gd.Viewport;
 
             // GL requires a half pixel offset where as DirectX and PSS does not.
-#if PSS || DIRECTX
+#if PSM || DIRECTX
             var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
             var transform = _matrix * projection;
 #else
