@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework
                 GraphicsDeviceManager.DefaultBackBufferHeight);
 
             _mainWindow = new MacGameNSWindow(
-                frame, NSWindowStyle.Titled | NSWindowStyle.Closable,
+				frame, NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable,
                 NSBackingStore.Buffered, true);
 
             _mainWindow.WindowController = new NSWindowController(_mainWindow);
@@ -330,7 +330,7 @@ namespace Microsoft.Xna.Framework
                 string oldTitle = _gameWindow.Title;
 
                 NSMenu.MenuBarVisible = true;
-                _mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
+				_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
                 if (_wasResizeable)
                     _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 
@@ -494,6 +494,11 @@ namespace Microsoft.Xna.Framework
                 NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
                     _owner.State = MacGamePlatform.RunState.Exited);
             }
+
+			public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
+			{
+				return _owner.AllowUserResizing;
+			}
         }
     }
 }

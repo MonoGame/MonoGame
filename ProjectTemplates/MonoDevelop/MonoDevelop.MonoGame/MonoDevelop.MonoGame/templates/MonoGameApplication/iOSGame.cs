@@ -26,7 +26,7 @@ namespace ${Namespace}
 	/// <summary>
 	/// Default Project Template
 	/// </summary>
-	public class ${Namespace}Game : Game
+	public class Game1 : Game
 	{
 
 	#region Fields
@@ -37,7 +37,7 @@ namespace ${Namespace}
 
 	#region Initialization
 
-        public ${Namespace}Game()  
+        public Game1()  
         {
 
 			graphics = new GraphicsDeviceManager(this);

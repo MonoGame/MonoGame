@@ -63,10 +63,31 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			string path = input.ReadString();
 			
-			// Songs don't have the full directory path in their .xnb. Build it.
-			path = Path.Combine (input.ContentManager.RootDirectory, input.ContentManager.CurrentAssetDirectory, path);
-			path = TitleContainer.GetFilename(path);
-
+			if (!String.IsNullOrEmpty(path))
+			{
+#if WINRT
+				const char notSeparator = '/';
+				const char separator = '\\';
+#else
+				const char notSeparator = '\\';
+				var separator = Path.DirectorySeparatorChar;
+#endif
+				path = path.Replace(notSeparator, separator);
+				
+				// Get a uri for the asset path using the file:// schema and no host
+				var src = new Uri("file:///" + input.AssetName.Replace(notSeparator, separator));
+				
+				// Add the relative path to the external reference
+				var dst = new Uri(src, path);
+				
+				// The uri now contains the path to the external reference within the content manager
+				// Get the local path and skip the first character (the path separator)
+				path = dst.LocalPath.Substring(1);
+				
+				// Adds the ContentManager's RootDirectory
+				path = input.ContentManager.RootDirectory + separator + path;
+			}
+			
 			/*int durationMS =*/ input.ReadObject<int>();
 			
 			return new Song(path); 

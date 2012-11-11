@@ -10,10 +10,10 @@
 		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
 		<Import file="templates/MonoGameLinuxProject.xpt.xml" />
 		<Import file="templates/MonoGameMacProject.xpt.xml" />
+        <Import file="templates/MonoGameMacFsharpProject.xpt.xml" />
 		<Import file="templates/MonoGameAndroidClass.xft.xml" />
 		<Import file="templates/MonoGameiOSClass.xft.xml" />
-		<Import file="templates/MonoGameMacClass.xft.xml" />
-		<Import file="MonoDevelop.MonoGame.dll" />
+		<Import file="templates/MonoGameMacClass.xft.xml" />		
 		<Import file="templates/MonoGameApplication/AboutAssets.txt" />
 		<Import file="templates/MonoGameApplication/AboutContent.txt" />
 		<Import file="templates/MonoGameApplication/AboutResources.txt" />
@@ -31,12 +31,17 @@
 		<Import file="templates/MonoGameApplication/iOSInfo.plist" />
 		<Import file="templates/MonoGameApplication/iOSMain.cs" />
 		<Import file="templates/MonoGameApplication/MacGame.cs" />
+        <Import file="templates/MonoGameApplication/MacGame.fs" />
 		<Import file="templates/MonoGameApplication/MacInfo.plist" />
 		<Import file="templates/MonoGameApplication/MacMain.cs" />
+        <Import file="templates/MonoGameApplication/MacMain.fs" />
 		<Import file="templates/MonoGameApplication/Program.cs" />
 		<Import file="templates/MonoGameApplication/Resource.cs" />
 		<Import file="templates/MonoGameApplication/Splash.png" />
 		<Import file="templates/MonoGameApplication/Styles.xml" />
+    <!-- Runtime assemblies -->
+    <Import file="assemblies/MonoGame.Framework.Windows.dll"/>    
+    <Import file="assemblies/Lidgren.Network.Windows.dll"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="3.0" />
@@ -63,10 +68,32 @@
 		<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
 		<ProjectTemplate id="MonoGameForLinuxProject" file="templates/MonoGameLinuxProject.xpt.xml" />
 		<ProjectTemplate id="MonoGameForMacProject" file="templates/MonoGameMacProject.xpt.xml" />
+        <ProjectTemplate id="MonoGameForMacFSharpProject" file="templates/MonoGameMacFsharpProject.xpt.xml" />
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id="MonoGameAndroidClass" resource="MonoGameAndroidClass.xft.xml" />
 		<FileTemplate id="MonoGameiOSClass" resource="MonoGameiOSClass.xft.xml" />
 		<FileTemplate id="MonoGameMacClass" resource="MonoGameMacClass.xft.xml" />
 	</Extension>
+  <!-- Add the monogame package if it is not installed already -->
+  <Extension path="/MonoDevelop/Core/SupportPackages">
+    <Condition id="PackageNotInstalled" name="monogame" version="3.0">
+      <Package name="monogame" version="3.0" clrVersion="Default">
+        <Assembly file="assemblies/MonoGame.Framework.MacOS.dll" />
+        <Assembly file="assemblies/MonoGame.Framework.Windows.dll" />
+        <Assembly file="assemblies/MonoGame.Framework.Linux.dll" />
+        <Assembly file="assemblies/MonoGame.Framework.iOS.dll" />
+        <Assembly file="assemblies/MonoGame.Framework.Android.dll" />
+        <Assembly file="assemblies/Lidgren.Network.dll" />
+        <Assembly file="assemblies/Lidgren.Network.Windows.dll" />
+        <Assembly file="assemblies/Lidgren.Network.Android.dll" />
+        <Assembly file="assemblies/Lidgren.Network.MacOS.dll" />
+        <Assembly file="assemblies/Lidgren.Network.iOS.dll" />
+        <Assembly file="assemblies/OpenTK.dll" />
+        <Assembly file="assemblies/Tao.Sdl.dll" />
+        <Assembly file="assemblies/sdl.dll" />
+      </Package>
+    </Condition>
+  </Extension>
+
 </Addin>

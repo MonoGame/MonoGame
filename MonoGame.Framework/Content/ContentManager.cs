@@ -260,10 +260,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ObjectDisposedException("ContentManager");
 			}
-			
-			var lastPathSeparatorIndex = Math.Max(assetName.LastIndexOf('\\'), assetName.LastIndexOf('/'));
-			CurrentAssetDirectory = lastPathSeparatorIndex == -1 ? RootDirectory : assetName.Substring(0, lastPathSeparatorIndex);
-			
+						
 			string originalAssetName = assetName;
 			object result = null;
 
@@ -333,8 +330,6 @@ namespace Microsoft.Xna.Framework.Content
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 
-			CurrentAssetDirectory = null;
-			
 			return (T)result;
 		}
 
@@ -676,8 +671,6 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 		
-		public string CurrentAssetDirectory { get; set; }
-
 		public IServiceProvider ServiceProvider
 		{
 			get
