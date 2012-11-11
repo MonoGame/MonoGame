@@ -131,8 +131,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _pixelShaderDirty;
 
 #if OPENGL
-        List<Action> disposeActions = new List<Action>();
-        object disposeActionsLock = new object();
+        static List<Action> disposeActions = new List<Action>();
+        static object disposeActionsLock = new object();
 #endif
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
@@ -1065,7 +1065,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// This allows GL resources to be disposed from other threads, such as the finalizer.
         /// </summary>
         /// <param name="disposeAction">The action to execute for the dispose.</param>
-        internal void AddDisposeAction(Action disposeAction)
+        static internal void AddDisposeAction(Action disposeAction)
         {
             if (disposeAction == null)
                 throw new ArgumentNullException("disposeAction");

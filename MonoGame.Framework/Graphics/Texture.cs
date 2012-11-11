@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             this.glTexture = -1;
@@ -185,14 +185,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 #elif OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteTextures(1, ref glTexture);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteTextures(1, ref glTexture);
+                        GraphicsExtensions.CheckGLError();
+                        glTexture = -1;
+                    });
 
                 glLastSamplerState = null;
 #endif

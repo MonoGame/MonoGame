@@ -10,3 +10,6 @@
 [submodule "StarterKits"]
 	path = StarterKits
 	url = https://github.com/kungfubanana/MonoGame-StarterKits.git
+[submodule "ThirdParty/Kickstart"]
+	path = ThirdParty/Kickstart
+	url = https://github.com/OutOfOrder/MonoKickstart.git
