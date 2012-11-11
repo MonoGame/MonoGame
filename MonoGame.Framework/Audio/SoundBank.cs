@@ -51,154 +51,163 @@ namespace Microsoft.Xna.Framework.Audio
 		//Defer loading because some programs load soundbanks before wavebanks
 		private void Load ()
 		{	
-			FileStream soundbankstream = new FileStream (filename, FileMode.Open);
-			BinaryReader soundbankreader = new BinaryReader (soundbankstream);
-            
-			//Parse the SoundBank.
-			//Thanks to Liandril for "xactxtract" for some of the offsets
-			
-			uint magic = soundbankreader.ReadUInt32 ();
-			if (magic != 0x4B424453) { //"SDBK"
-				throw new Exception ("Bad soundbank format");
-			}
-			
-			uint toolVersion = soundbankreader.ReadUInt16 ();
-			uint formatVersion = soundbankreader.ReadUInt16 ();
-			if (formatVersion != 46) {
-#if DEBUG
-				Console.WriteLine ("Warning: SoundBank format not supported");
+#if !ANDROID
+			using (FileStream soundbankstream = new FileStream (filename, FileMode.Open))
+			{
+#else
+				using (var fileStream = Game.Activity.Assets.Open(filename))
+			{
+				MemoryStream soundbankstream = new MemoryStream();
+				fileStream.CopyTo(soundbankstream);
+				soundbankstream.Position = 0;
 #endif
-			}
-			
-			uint crc = soundbankreader.ReadUInt16 ();
-			//TODO: Verify crc (FCS16)
-			
-			uint lastModifiedLow = soundbankreader.ReadUInt32 ();
-			uint lastModifiedHigh = soundbankreader.ReadUInt32 ();
-			uint platform = soundbankreader.ReadByte(); //???
-			
-			uint numSimpleCues = soundbankreader.ReadUInt16 ();
-			uint numComplexCues = soundbankreader.ReadUInt16 ();
-			soundbankreader.ReadUInt16 (); //unkn
-			uint numTotalCues = soundbankreader.ReadUInt16 ();
-			uint numWaveBanks = soundbankreader.ReadByte ();
-			uint numSounds = soundbankreader.ReadUInt16 ();
-			uint cueNameTableLen = soundbankreader.ReadUInt16 ();
-			soundbankreader.ReadUInt16 (); //unkn
-			
-			uint simpleCuesOffset = soundbankreader.ReadUInt32 ();
-			uint complexCuesOffset = soundbankreader.ReadUInt32 (); //unkn
-			uint cueNamesOffset = soundbankreader.ReadUInt32 ();
-			soundbankreader.ReadUInt32 (); //unkn
-			uint variationTablesOffset = soundbankreader.ReadUInt32 ();
-			soundbankreader.ReadUInt32 (); //unkn
-			uint waveBankNameTableOffset = soundbankreader.ReadUInt32 ();
-			uint cueNameHashTableOffset = soundbankreader.ReadUInt32 ();
-			uint cueNameHashValsOffset = soundbankreader.ReadUInt32 ();
-			uint soundsOffset = soundbankreader.ReadUInt32 ();
-			
-			name = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
-			
-			
-			//parse wave bank name table
-			soundbankstream.Seek (waveBankNameTableOffset, SeekOrigin.Begin);
-			waveBanks = new WaveBank[numWaveBanks];
-			for (int i=0; i<numWaveBanks; i++) {
-				string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
-				waveBanks[i] = audioengine.Wavebanks[bankname];
-			}
-			
-			//parse cue name table
-			soundbankstream.Seek (cueNamesOffset, SeekOrigin.Begin);
-			string[] cueNames = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes((int)cueNameTableLen)).Split('\0');
-			soundbankstream.Seek (simpleCuesOffset, SeekOrigin.Begin);
-			for (int i=0; i<numSimpleCues; i++) {
-				byte flags = soundbankreader.ReadByte ();
-				uint soundOffset = soundbankreader.ReadUInt32 ();
-				XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-				Cue cue = new Cue(audioengine, cueNames[i], sound);
-				
-				cues.Add(cue.Name, cue);
-			}
-			
-			soundbankstream.Seek (complexCuesOffset, SeekOrigin.Begin);
-			for (int i=0; i<numComplexCues; i++) {
-				Cue cue;
-				
-				byte flags = soundbankreader.ReadByte ();
-				if (((flags >> 2) & 1) != 0) {
-					//not sure :/
-					uint soundOffset = soundbankreader.ReadUInt32 ();
-					soundbankreader.ReadUInt32 (); //unkn
+				using(BinaryReader soundbankreader = new BinaryReader (soundbankstream))
+				{
+	            
+					//Parse the SoundBank.
+					//Thanks to Liandril for "xactxtract" for some of the offsets
 					
-					XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-					cue = new Cue(audioengine, cueNames[numSimpleCues+i], sound);
-				} else {
-					uint variationTableOffset = soundbankreader.ReadUInt32 ();
-					uint transitionTableOffset = soundbankreader.ReadUInt32 ();
-					
-					//parse variation table
-					long savepos = soundbankstream.Position;
-					soundbankstream.Seek (variationTableOffset, SeekOrigin.Begin);
-					
-					uint numEntries = soundbankreader.ReadUInt16 ();
-					uint variationflags = soundbankreader.ReadUInt16 ();
-					soundbankreader.ReadByte ();
-					soundbankreader.ReadUInt16 ();
-					soundbankreader.ReadByte ();
-					
-					XactSound[] cueSounds = new XactSound[numEntries];
-					float[] probs = new float[numEntries];
-					
-					uint tableType = (variationflags >> 3) & 0x7;
-					for (int j=0; j<numEntries; j++) {
-						switch (tableType) {
-						case 0: //Wave
-						{
-							uint trackIndex = soundbankreader.ReadUInt16 ();
-							byte waveBankIndex = soundbankreader.ReadByte ();
-							byte weightMin = soundbankreader.ReadByte ();
-							byte weightMax = soundbankreader.ReadByte ();
-	
-							cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
-							break;
-						}
-						case 1:
-						{
-							uint soundOffset = soundbankreader.ReadUInt32 ();
-							byte weightMin = soundbankreader.ReadByte ();
-							byte weightMax = soundbankreader.ReadByte ();
-							
-							cueSounds[j] = new XactSound(this, soundbankreader, soundOffset);
-							break;
-						}
-						case 4: //CompactWave
-						{
-							uint trackIndex = soundbankreader.ReadUInt16 ();
-							byte waveBankIndex = soundbankreader.ReadByte ();
-							cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
-							break;
-						}
-						default:
-							throw new NotImplementedException();
-						}
+					uint magic = soundbankreader.ReadUInt32 ();
+					if (magic != 0x4B424453) { //"SDBK"
+						throw new Exception ("Bad soundbank format");
 					}
 					
-					soundbankstream.Seek (savepos, SeekOrigin.Begin);
+					uint toolVersion = soundbankreader.ReadUInt16 ();
+					uint formatVersion = soundbankreader.ReadUInt16 ();
+					if (formatVersion != 46) {
+#if DEBUG
+						Console.WriteLine ("Warning: SoundBank format not supported");
+#endif
+					}
 					
-					cue = new Cue(cueNames[numSimpleCues+i], cueSounds, probs);
-				}
-				
-				//Instance Limit
-				soundbankreader.ReadUInt32 ();
-				soundbankreader.ReadByte ();
-				soundbankreader.ReadByte ();
-				
-				cues.Add(cue.Name, cue);
-			}
+					uint crc = soundbankreader.ReadUInt16 ();
+					//TODO: Verify crc (FCS16)
+					
+					uint lastModifiedLow = soundbankreader.ReadUInt32 ();
+					uint lastModifiedHigh = soundbankreader.ReadUInt32 ();
+					uint platform = soundbankreader.ReadByte(); //???
+					
+					uint numSimpleCues = soundbankreader.ReadUInt16 ();
+					uint numComplexCues = soundbankreader.ReadUInt16 ();
+					soundbankreader.ReadUInt16 (); //unkn
+					uint numTotalCues = soundbankreader.ReadUInt16 ();
+					uint numWaveBanks = soundbankreader.ReadByte ();
+					uint numSounds = soundbankreader.ReadUInt16 ();
+					uint cueNameTableLen = soundbankreader.ReadUInt16 ();
+					soundbankreader.ReadUInt16 (); //unkn
+					
+					uint simpleCuesOffset = soundbankreader.ReadUInt32 ();
+					uint complexCuesOffset = soundbankreader.ReadUInt32 (); //unkn
+					uint cueNamesOffset = soundbankreader.ReadUInt32 ();
+					soundbankreader.ReadUInt32 (); //unkn
+					uint variationTablesOffset = soundbankreader.ReadUInt32 ();
+					soundbankreader.ReadUInt32 (); //unkn
+					uint waveBankNameTableOffset = soundbankreader.ReadUInt32 ();
+					uint cueNameHashTableOffset = soundbankreader.ReadUInt32 ();
+					uint cueNameHashValsOffset = soundbankreader.ReadUInt32 ();
+					uint soundsOffset = soundbankreader.ReadUInt32 ();
+					
+					name = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
+					
+					
+					//parse wave bank name table
+					soundbankstream.Seek (waveBankNameTableOffset, SeekOrigin.Begin);
+					waveBanks = new WaveBank[numWaveBanks];
+					for (int i=0; i<numWaveBanks; i++) {
+						string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
+						waveBanks[i] = audioengine.Wavebanks[bankname];
+					}
+					
+					//parse cue name table
+					soundbankstream.Seek (cueNamesOffset, SeekOrigin.Begin);
+					string[] cueNames = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes((int)cueNameTableLen)).Split('\0');
+					soundbankstream.Seek (simpleCuesOffset, SeekOrigin.Begin);
+					for (int i=0; i<numSimpleCues; i++) {
+						byte flags = soundbankreader.ReadByte ();
+						uint soundOffset = soundbankreader.ReadUInt32 ();
+						XactSound sound = new XactSound(this, soundbankreader, soundOffset);
+						Cue cue = new Cue(audioengine, cueNames[i], sound);
+						
+						cues.Add(cue.Name, cue);
+					}
+					
+					soundbankstream.Seek (complexCuesOffset, SeekOrigin.Begin);
+					for (int i=0; i<numComplexCues; i++) {
+						Cue cue;
+						
+						byte flags = soundbankreader.ReadByte ();
+						if (((flags >> 2) & 1) != 0) {
+							//not sure :/
+							uint soundOffset = soundbankreader.ReadUInt32 ();
+							soundbankreader.ReadUInt32 (); //unkn
+							
+							XactSound sound = new XactSound(this, soundbankreader, soundOffset);
+							cue = new Cue(audioengine, cueNames[numSimpleCues+i], sound);
+						} else {
+							uint variationTableOffset = soundbankreader.ReadUInt32 ();
+							uint transitionTableOffset = soundbankreader.ReadUInt32 ();
+							
+							//parse variation table
+							long savepos = soundbankstream.Position;
+							soundbankstream.Seek (variationTableOffset, SeekOrigin.Begin);
+							
+							uint numEntries = soundbankreader.ReadUInt16 ();
+							uint variationflags = soundbankreader.ReadUInt16 ();
+							soundbankreader.ReadByte ();
+							soundbankreader.ReadUInt16 ();
+							soundbankreader.ReadByte ();
+							
+							XactSound[] cueSounds = new XactSound[numEntries];
+							float[] probs = new float[numEntries];
+							
+							uint tableType = (variationflags >> 3) & 0x7;
+							for (int j=0; j<numEntries; j++) {
+								switch (tableType) {
+								case 0: //Wave
+								{
+									uint trackIndex = soundbankreader.ReadUInt16 ();
+									byte waveBankIndex = soundbankreader.ReadByte ();
+									byte weightMin = soundbankreader.ReadByte ();
+									byte weightMax = soundbankreader.ReadByte ();
 			
-			soundbankreader.Close ();
-			soundbankstream.Close ();
+									cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
+									break;
+								}
+								case 1:
+								{
+									uint soundOffset = soundbankreader.ReadUInt32 ();
+									byte weightMin = soundbankreader.ReadByte ();
+									byte weightMax = soundbankreader.ReadByte ();
+									
+									cueSounds[j] = new XactSound(this, soundbankreader, soundOffset);
+									break;
+								}
+								case 4: //CompactWave
+								{
+									uint trackIndex = soundbankreader.ReadUInt16 ();
+									byte waveBankIndex = soundbankreader.ReadByte ();
+									cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
+									break;
+								}
+								default:
+									throw new NotImplementedException();
+								}
+							}
+							
+							soundbankstream.Seek (savepos, SeekOrigin.Begin);
+							
+							cue = new Cue(cueNames[numSimpleCues+i], cueSounds, probs);
+						}
+						
+						//Instance Limit
+						soundbankreader.ReadUInt32 ();
+						soundbankreader.ReadByte ();
+						soundbankreader.ReadByte ();
+						
+						cues.Add(cue.Name, cue);
+					}
+				}
+			}
 			
 			loaded = true;
         }
