@@ -79,23 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSS
             //Do nothing, we cannot create the storage array yet
 #else
-            Threading.BlockOnUIThread(() =>
-            {
-                //GLExt.Oes.GenVertexArrays(1, out this.vao);
-                //GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE || ANDROID
-                GL.GenBuffers(1, ref this.vbo);
-#else
-			    GL.GenBuffers(1, out this.vbo);
-#endif
-                GraphicsExtensions.CheckGLError();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
-                GraphicsExtensions.CheckGLError();
-                GL.BufferData(BufferTarget.ArrayBuffer,
-                              new IntPtr(vertexDeclaration.VertexStride * vertexCount), IntPtr.Zero,
-                              dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-                GraphicsExtensions.CheckGLError();
-            });
+            Threading.BlockOnUIThread(() => GenerateIfRequired());
 #endif
 		}
 
@@ -108,6 +92,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
 		{
         }
+
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
+        internal protected override void GraphicsDeviceResetting()
+        {
+#if OPENGL
+            vbo = 0;
+#endif
+        }
+
+#if OPENGL
+        /// <summary>
+        /// If the VBO does not exist, create it.
+        /// </summary>
+        void GenerateIfRequired()
+        {
+            if (vbo == 0)
+            {
+                //GLExt.Oes.GenVertexArrays(1, out this.vao);
+                //GLExt.Oes.BindVertexArray(this.vao);
+#if IPHONE || ANDROID
+                GL.GenBuffers(1, ref this.vbo);
+#else
+                GL.GenBuffers(1, out this.vbo);
+#endif
+                GraphicsExtensions.CheckGLError();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
+                GraphicsExtensions.CheckGLError();
+                GL.BufferData(BufferTarget.ArrayBuffer,
+                              new IntPtr(VertexDeclaration.VertexStride * VertexCount), IntPtr.Zero,
+                              _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+#endif
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -278,6 +298,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
+                GenerateIfRequired();
+
                 var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
@@ -316,14 +338,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Do nothing
                 _vertexArray = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteBuffers(1, ref vbo);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteBuffers(1, ref vbo);
+                        GraphicsExtensions.CheckGLError();
+                    });
 #endif
             }
             base.Dispose(disposing);
