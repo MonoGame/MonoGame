@@ -44,6 +44,7 @@ using System.Collections.Generic;
 using System.Reflection;
 #endif
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -69,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content
 						throw new NotImplementedException ();
 					}
 				} else {
-#if DEBUG
+#if DEBUG && !WINRT
 					Console.WriteLine ("No parameter " + item.Key);
 #endif
 				}
