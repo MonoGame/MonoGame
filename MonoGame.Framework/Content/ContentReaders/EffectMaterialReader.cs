@@ -70,9 +70,7 @@ namespace Microsoft.Xna.Framework.Content
 						throw new NotImplementedException ();
 					}
 				} else {
-#if DEBUG && !WINRT
-					Console.WriteLine ("No parameter " + item.Key);
-#endif
+					Debug.WriteLine ("No parameter " + item.Key);
 				}
 			}
 
