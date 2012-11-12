@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
-#elif PSS
+#elif PSM
         internal Array _vertexArray;
 #else
 		//internal uint vao;
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         );
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
-#elif PSS
+#elif PSM
             //Do nothing, we cannot create the storage array yet
 #else
             Threading.BlockOnUIThread(() => GenerateIfRequired());
@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
             throw new NotImplementedException();
-#elif PSS
+#elif PSM
             throw new NotImplementedException();
 #else
             Threading.BlockOnUIThread (() =>
@@ -239,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
    
-#if !PSS
+#if !PSM
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 #endif
 
@@ -290,7 +290,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 
-#elif PSS
+#elif PSM
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         _buffer = null;
                     }
                 }
-#elif PSS
+#elif PSM
                 //Do nothing
                 _vertexArray = null;
 #else
