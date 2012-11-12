@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
         internal SharpDX.Direct3D11.Buffer _buffer;
-#elif PSS
+#elif PSM
         internal ushort[] _buffer;
 #else
 		internal uint ibo;	
@@ -74,25 +74,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         SharpDX.Direct3D11.ResourceOptionFlags.None,
                                                         0  // StructureSizeInBytes
                                                         );
-#elif PSS
+#elif PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
             _buffer = new ushort[indexCount];
 #else
-            Threading.BlockOnUIThread(() =>
-            {
-#if IPHONE || ANDROID
-                GL.GenBuffers(1, ref ibo);
-#else
-                GL.GenBuffers(1, out ibo);
-#endif
-                GraphicsExtensions.CheckGLError();
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
-                GraphicsExtensions.CheckGLError();
-                GL.BufferData(BufferTarget.ElementArrayBuffer,
-                              (IntPtr)sizeInBytes, IntPtr.Zero, dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-                GraphicsExtensions.CheckGLError();
-            });
+            Threading.BlockOnUIThread(() => GenerateIfRequired());
 #endif
 		}
 		
@@ -107,7 +94,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			     indexCount, usage)
 		{
 		}
-		
+
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
+        internal protected override void GraphicsDeviceResetting()
+        {
+#if OPENGL
+            ibo = 0;
+#endif
+        }
+
+#if OPENGL
+        /// <summary>
+        /// If the IBO does not exist, create it.
+        /// </summary>
+        void GenerateIfRequired()
+        {
+            if (ibo == 0)
+            {
+                var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
+
+#if IPHONE || ANDROID
+                GL.GenBuffers(1, ref ibo);
+#else
+                GL.GenBuffers(1, out ibo);
+#endif
+                GraphicsExtensions.CheckGLError();
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
+                GraphicsExtensions.CheckGLError();
+                GL.BufferData(BufferTarget.ElementArrayBuffer,
+                              (IntPtr)sizeInBytes, IntPtr.Zero, _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+#endif
+
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             if (data == null)
@@ -119,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
             throw new NotImplementedException();
-#elif PSS
+#elif PSM
             throw new NotImplementedException();
 #else        
             Threading.BlockOnUIThread(() =>
@@ -242,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 
-#elif PSS
+#elif PSM
             if (typeof(T) == typeof(ushort))
             {
                 Array.Copy(data, offsetInBytes / sizeof(ushort), _buffer, startIndex, elementCount);
@@ -260,6 +282,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             Threading.BlockOnUIThread(() =>
             {
+                GenerateIfRequired();
+
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var sizeInBytes = elementSizeInByte * elementCount;
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -301,18 +325,15 @@ namespace Microsoft.Xna.Framework.Graphics
                         _buffer = null;
                     }
                 }
-#elif PSS
+#elif PSM
                 //Do nothing
                 _buffer = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteBuffers(1, ref ibo);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteBuffers(1, ref ibo);
+                        GraphicsExtensions.CheckGLError();
+                    });
 #endif
             }
             base.Dispose(disposing);

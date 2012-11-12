@@ -57,7 +57,7 @@ using SharpDX.Direct3D;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
@@ -125,8 +125,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _pixelShaderDirty;
 
 #if OPENGL
-        List<Action> disposeActions = new List<Action>();
-        object disposeActionsLock = new object();
+        static List<Action> disposeActions = new List<Action>();
+        static object disposeActionsLock = new object();
 #endif
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
-#elif PSS
+#elif PSM
 
         internal GraphicsContext _graphics;
         internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
@@ -365,7 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
 
-#elif PSS
+#elif PSM
             _graphics = new GraphicsContext();
 #elif OPENGL
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
@@ -796,7 +796,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
             }
 
-#elif PSS
+#elif PSM
 
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
@@ -952,7 +952,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _programCache.Dispose();
 #endif
 
-#if PSS
+#if PSM
                     if (_graphics != null)
                     {
                         _graphics.Dispose();
@@ -971,7 +971,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// This allows GL resources to be disposed from other threads, such as the finalizer.
         /// </summary>
         /// <param name="disposeAction">The action to execute for the dispose.</param>
-        internal void AddDisposeAction(Action disposeAction)
+        static internal void AddDisposeAction(Action disposeAction)
         {
             if (disposeAction == null)
                 throw new ArgumentNullException("disposeAction");
@@ -1019,7 +1019,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 */
             }
 						
-#elif PSS
+#elif PSM
             _graphics.SwapBuffers();
             _availableVertexBuffers.AddRange(_usedVertexBuffers);
             _usedVertexBuffers.Clear();
@@ -1764,7 +1764,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexElementType,
                                      indexOffsetInBytes);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
@@ -1848,7 +1848,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
@@ -1967,7 +1967,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if PSS
+#if PSM
         internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
         {
             int bestMatchIndex = -1;

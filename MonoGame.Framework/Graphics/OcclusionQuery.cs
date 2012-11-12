@@ -51,14 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteQueries(1, ref glQueryId);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteQueries(1, ref glQueryId);
+                        GraphicsExtensions.CheckGLError();
+                    });
 #elif DIRECTX
 #endif
             }
