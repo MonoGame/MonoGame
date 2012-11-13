@@ -96,3 +96,4 @@ and
 <img src="http://mono-project.com/skins/MonoWaveWide/images/mp-mono-logo.png" width="215"/>
 
 If your company plans to use and contribute to MonoGame, why not become a sponsor. If you would like to sponsor MonoGame, please contact us.
+
