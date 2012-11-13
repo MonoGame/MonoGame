@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINRT
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-#if DEBUG
+#if DEBUG && !WINDOWS_PHONE
             var licenseInformation = CurrentAppSimulator.LicenseInformation;
 #else
             var licenseInformation = CurrentApp.LicenseInformation;
@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
             int? result = null;
 
-#if WINRT
+#if WINDOWS_STOREAPP
             var dialog = new MessageDialog(text, title);
 		    var index = 0;
             foreach (var b in buttons)
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
 
 #endif
-		    return result;
+            return result;
 		}
 
 		public static IAsyncResult BeginShowMessageBox(
