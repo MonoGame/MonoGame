@@ -40,10 +40,6 @@ purpose and non-infringement.
 
 using System;
 
-#if IPHONE
-using MonoTouch.AudioToolbox;
-#endif
-
 using Microsoft.Xna.Framework.Audio;
 
 #if IPHONE
@@ -75,6 +71,7 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINRT
         private static MediaEngine _mediaEngineEx;
+        private static CoreDispatcher _dispatcher;
 
         public static TimeSpan PlayPosition
         {
@@ -96,13 +93,15 @@ namespace Microsoft.Xna.Framework.Media
                 var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
+
+            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
             {
-                OnSongFinishedPlaying(null, null);
+                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
             }
         }
 #endif
