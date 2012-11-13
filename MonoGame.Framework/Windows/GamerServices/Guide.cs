@@ -47,11 +47,12 @@ using System.Threading;
 using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
-using Windows.ApplicationModel.Store;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;    
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+using Windows.System;
 #else
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework.Net;
@@ -77,12 +78,8 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINRT
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-#if DEBUG && !WINDOWS_PHONE
-            var licenseInformation = CurrentAppSimulator.LicenseInformation;
-#else
+            
             var licenseInformation = CurrentApp.LicenseInformation;
-#endif
-
             licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
@@ -114,6 +111,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 #else
             throw new NotImplementedException();
 #endif
+            IsVisible = true;
+            string result;
+
+            // Enter the actual implementation here after removing the exception above
+
+            IsVisible = false;
+            return result;
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -136,8 +140,6 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state,
          bool usePasswordMode)
 		{
-			isVisible = true;
-
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
@@ -145,16 +147,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
-			try 
-			{
-				ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
+			ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
-				return ski.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}			
+			return ski.EndInvoke(result);		
 		}
 
 		delegate Nullable<int> ShowMessageBoxDelegate( string title,
@@ -163,53 +158,40 @@ namespace Microsoft.Xna.Framework.GamerServices
          int focusButton,
          MessageBoxIcon icon);
 
-		public static Nullable<int> ShowMessageBox( string title,
+        public static Nullable<int> ShowMessageBox(string title,
          string text,
          IEnumerable<string> buttons,
          int focusButton,
          MessageBoxIcon icon)
-		{
+        {
             int? result = null;
+            IsVisible = true;
 
 #if WINDOWS_STOREAPP
-            var dialog = new MessageDialog(text, title);
-		    var index = 0;
-            foreach (var b in buttons)
-            {
-                var cmd = new UICommand(b, null, index);
-                dialog.Commands.Add(cmd);
-                ++index;
-            }
-            
+            MessageDialog dialog = new MessageDialog(text, title);
+            foreach (string button in buttons)
+                dialog.Commands.Add(new UICommand(button, null, dialog.Commands.Count));
+
+            if (focusButton < 0 || focusButton >= dialog.Commands.Count)
+                throw new ArgumentOutOfRangeException("focusButton", "Specified argument was out of the range of valid values.");
             dialog.DefaultCommandIndex = (uint)focusButton;
 
             // The message box must be popped up on the UI thread.
-		    Task<IUICommand> dialogResult = null;
+            Task<IUICommand> dialogResult = null;
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                // We'll get an exception if we try to open a dialog while 
-                // one is already up.  Catch the exception and ignore it.
-                try
-                {
-                    dialogResult = dialog.ShowAsync().AsTask();
-                }
-                catch (Exception)
-                {
-                }
-
+                dialogResult = dialog.ShowAsync().AsTask();
             }).AsTask().Wait();
 
-            if (dialogResult != null)
-            {
-                dialogResult.Wait();
-                result = (int)dialogResult.Result.Id;
-            }
+            dialogResult.Wait();
+            result = (int)dialogResult.Result.Id;
 
 #endif
+            IsVisible = false;
             return result;
-		}
+        }
 
-		public static IAsyncResult BeginShowMessageBox(
+        public static IAsyncResult BeginShowMessageBox(
          PlayerIndex player,
          string title,
          string text,
@@ -218,16 +200,27 @@ namespace Microsoft.Xna.Framework.GamerServices
          MessageBoxIcon icon,
          AsyncCallback callback,
          Object state
-		)
-		{	
-			isVisible = true;
+        )
+        {
+            // TODO: GuideAlreadyVisibleException
+            if (IsVisible)
+                throw new Exception("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
 
-			ShowMessageBoxDelegate smb = ShowMessageBox; 
+            if (player != PlayerIndex.One)
+                throw new ArgumentOutOfRangeException("player", "Specified argument was out of the range of valid values.");
+            if (title == null)
+                throw new ArgumentNullException("title", "This string cannot be null or empty, and must be less than 256 characters long.");
+            if (text == null)
+                throw new ArgumentNullException("text", "This string cannot be null or empty, and must be less than 256 characters long.");
+            if (buttons == null)
+                throw new ArgumentNullException("buttons", "Value can not be null.");
 
-			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
-		}
+            ShowMessageBoxDelegate smb = ShowMessageBox;
 
-		public static IAsyncResult BeginShowMessageBox (
+            return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);
+        }
+
+        public static IAsyncResult BeginShowMessageBox(
          string title,
          string text,
          IEnumerable<string> buttons,
@@ -235,31 +228,24 @@ namespace Microsoft.Xna.Framework.GamerServices
          MessageBoxIcon icon,
          AsyncCallback callback,
          Object state
-		)
-		{
-			return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
-		}
+        )
+        {
+            return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
+        }
 
-		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
-		{
-			try
-			{
-				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
-
-				return smbd.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}
-		}
-
+        public static Nullable<int> EndShowMessageBox(IAsyncResult result)
+        {
+            return ((ShowMessageBoxDelegate)result.AsyncState).EndInvoke(result);
+        }
 
 		public static void ShowMarketplace(PlayerIndex player)
 		{
 #if WINRT
-            var uri = new Uri(@"ms-windows-store:PDP?PFN=" + Package.Current.Id.FamilyName);
-            Task.Run(async () => await Windows.System.Launcher.LaunchUriAsync(uri)).Wait();	
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                var uri = new Uri(@"ms-windows-store:PDP?PFN=" + Package.Current.Id.FamilyName);
+                Launcher.LaunchUriAsync(uri).AsTask<bool>().Wait();
+            }).AsTask();
 #endif
 		}
 
@@ -387,13 +373,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				// If simulate trial mode is enabled then 
 				// we're in the trial mode.
-				return simulateTrialMode || isTrialMode;
-			}
-
-			set
-			{
-				isTrialMode = value;
-			}
+#if DEBUG
+                return simulateTrialMode;
+#else
+                return simulateTrialMode || isTrialMode;
+#endif
+            }
 		}
 
 		public static bool IsVisible 
