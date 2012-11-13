@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         internal SharpDX.Direct3D11.VertexBufferBinding _binding;
         protected SharpDX.Direct3D11.Buffer _buffer;
-#elif PSS
+#elif PSM
         internal Array _vertexArray;
 #else
 		//internal uint vao;
@@ -76,26 +76,10 @@ namespace Microsoft.Xna.Framework.Graphics
                                                         );
 
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
-#elif PSS
+#elif PSM
             //Do nothing, we cannot create the storage array yet
 #else
-            Threading.BlockOnUIThread(() =>
-            {
-                //GLExt.Oes.GenVertexArrays(1, out this.vao);
-                //GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE || ANDROID
-                GL.GenBuffers(1, ref this.vbo);
-#else
-			    GL.GenBuffers(1, out this.vbo);
-#endif
-                GraphicsExtensions.CheckGLError();
-                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
-                GraphicsExtensions.CheckGLError();
-                GL.BufferData(BufferTarget.ArrayBuffer,
-                              new IntPtr(vertexDeclaration.VertexStride * vertexCount), IntPtr.Zero,
-                              dynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-                GraphicsExtensions.CheckGLError();
-            });
+            Threading.BlockOnUIThread(() => GenerateIfRequired());
 #endif
 		}
 
@@ -109,6 +93,42 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
         }
 
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
+        internal protected override void GraphicsDeviceResetting()
+        {
+#if OPENGL
+            vbo = 0;
+#endif
+        }
+
+#if OPENGL
+        /// <summary>
+        /// If the VBO does not exist, create it.
+        /// </summary>
+        void GenerateIfRequired()
+        {
+            if (vbo == 0)
+            {
+                //GLExt.Oes.GenVertexArrays(1, out this.vao);
+                //GLExt.Oes.BindVertexArray(this.vao);
+#if IPHONE || ANDROID
+                GL.GenBuffers(1, ref this.vbo);
+#else
+                GL.GenBuffers(1, out this.vbo);
+#endif
+                GraphicsExtensions.CheckGLError();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, this.vbo);
+                GraphicsExtensions.CheckGLError();
+                GL.BufferData(BufferTarget.ArrayBuffer,
+                              new IntPtr(VertexDeclaration.VertexStride * VertexCount), IntPtr.Zero,
+                              _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
+#endif
+
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             if (data == null)
@@ -117,12 +137,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException ("The array specified in the data parameter is not the correct size for the amount of data requested.");
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException ("This VertexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-            if ((vertexStride > (VertexCount * VertexDeclaration.VertexStride)) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException ("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
+			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
+                throw new ArgumentOutOfRangeException ("The vertex stride is larger than the vertex buffer.");
 
 #if DIRECTX
             throw new NotImplementedException();
-#elif PSS
+#elif PSM
             throw new NotImplementedException();
 #else
             Threading.BlockOnUIThread (() =>
@@ -146,15 +166,27 @@ namespace Microsoft.Xna.Framework.Graphics
                     Marshal.Copy (ptr, buffer, 0, buffer.Length);
                 } else {
                     // Temporary buffer to store the copied section of data
-                    byte[] buffer = new byte[elementCount * vertexStride];
+					byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
                     // Copy from the vertex buffer to the temporary buffer
-                    Marshal.Copy (ptr, buffer, 0, buffer.Length);
-                    // Copy from the temporary buffer to the destination array
+                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
                     
-                    var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
+					var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
                     var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
 
-                    Marshal.Copy (buffer, 0, dataPtr, buffer.Length);
+					// Copy from the temporary buffer to the destination array
+
+					int dataSize = Marshal.SizeOf(typeof(T));
+					if (dataSize == vertexStride)
+						Marshal.Copy(buffer, 0, dataPtr, buffer.Length);
+					else
+					{
+						// If the user is asking for a specific element within the vertex buffer, copy them one by one...
+						for (int i = 0; i < elementCount; i++)
+						{
+							Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
+							dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
+						}
+					}
 
                     dataHandle.Free ();
 
@@ -207,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
    
-#if !PSS
+#if !PSM
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 #endif
 
@@ -258,7 +290,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 
-#elif PSS
+#elif PSM
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
@@ -266,6 +298,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Threading.BlockOnUIThread(() =>
             {
+                GenerateIfRequired();
+
                 var sizeInBytes = elementSizeInBytes * elementCount;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
@@ -300,18 +334,15 @@ namespace Microsoft.Xna.Framework.Graphics
                         _buffer = null;
                     }
                 }
-#elif PSS
+#elif PSM
                 //Do nothing
                 _vertexArray = null;
 #else
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteBuffers(1, ref vbo);
-                            GraphicsExtensions.CheckGLError();
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteBuffers(1, ref vbo);
+                        GraphicsExtensions.CheckGLError();
+                    });
 #endif
             }
             base.Dispose(disposing);

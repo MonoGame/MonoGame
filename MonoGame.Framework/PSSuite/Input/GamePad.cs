@@ -62,7 +62,7 @@ using Microsoft.Xna.Framework.Graphics;
 		private int _buttons;
 		private Vector2 _leftStick, _rightStick;
 		
-		#region PssButtons -> Buttons Map
+		#region PSMButtons -> Buttons Map
 		private static Dictionary<PssGamePadButtons, Buttons> _buttonsMap = new Dictionary<PssGamePadButtons, Buttons>{
 			{ PssGamePadButtons.Cross, Buttons.A },
 			{ PssGamePadButtons.Circle, Buttons.B },

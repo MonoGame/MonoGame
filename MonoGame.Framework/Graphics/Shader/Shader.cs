@@ -11,7 +11,7 @@ using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-#elif PSS
+#elif PSM
 enum ShaderType //FIXME: Major Hack
 {
 	VertexShader,
@@ -224,8 +224,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (int i = 0; i < _attributes.Length; ++i)
             {
-                if (_attributes[i].usage == usage)
-                    return _attributes[i].location + index;
+                if ((_attributes[i].usage == usage) && (_attributes[i].index == index))
+                    return _attributes[i].location;
             }
             return -1;
         }
@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             if (_shaderHandle != -1)
@@ -267,21 +267,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        if (_shaderHandle != -1)
                         {
-                            if (_shaderHandle != -1)
+                            if (GL.IsShader(_shaderHandle))
                             {
-                                if (GL.IsShader(_shaderHandle))
-                                {
-                                    GL.DeleteShader(_shaderHandle);
-                                    GraphicsExtensions.CheckGLError();
-                                }
-                                _shaderHandle = -1;
+                                GL.DeleteShader(_shaderHandle);
+                                GraphicsExtensions.CheckGLError();
                             }
-                        });
-                }
+                            _shaderHandle = -1;
+                        }
+                    });
 #endif
             }
 

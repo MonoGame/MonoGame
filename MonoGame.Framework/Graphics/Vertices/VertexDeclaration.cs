@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif DIRECTX
 using System.Reflection;
-using System.Collections.Generic;
 #else
 using OpenTK.Graphics.ES20;
 #endif
@@ -19,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
-#if PSS
+#if PSM
         private VertexFormat[] _vertexFormat;
 #endif
 
@@ -188,7 +187,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
         
-#if PSS
+#if PSM
         internal VertexFormat[] GetVertexFormat()
         {
             if (_vertexFormat == null)
