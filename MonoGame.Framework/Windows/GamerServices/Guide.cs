@@ -39,11 +39,18 @@ purpose and non-infringement.
 #endregion License
 
 #region Using clause
+
+#if WINDOWS_PHONE
+extern alias MicrosoftXnaFramework;
+extern alias MicrosoftXnaGamerServices;
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
@@ -70,13 +77,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;		
 
-#if WINRT
+#if WINDOWS_STOREAPP
 	    private static readonly CoreDispatcher _dispatcher;
 #endif 
+
         static Guide()
         {
-#if WINRT
+#if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+#endif
+
+#if WINRT
+
 #if DEBUG && !WINDOWS_PHONE
             var licenseInformation = CurrentAppSimulator.LicenseInformation;
 #else
@@ -163,7 +175,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          int focusButton,
          MessageBoxIcon icon);
 
-		public static Nullable<int> ShowMessageBox( string title,
+		private static Nullable<int> ShowMessageBox( string title,
          string text,
          IEnumerable<string> buttons,
          int focusButton,
@@ -172,6 +184,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             int? result = null;
 
 #if WINDOWS_STOREAPP
+
             var dialog = new MessageDialog(text, title);
 		    var index = 0;
             foreach (var b in buttons)
@@ -220,12 +233,23 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state
 		)
 		{	
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of BeginShowMessageBox using an alias.
+		    return MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.Guide.BeginShowMessageBox(
+                (MicrosoftXnaFramework::Microsoft.Xna.Framework.PlayerIndex)player, 
+                title, text,
+		        buttons, focusButton,
+		        (MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.MessageBoxIcon)icon, 
+                callback, state);
+#else
 			isVisible = true;
 
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
 			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
-		}
+#endif
+        }
 
 		public static IAsyncResult BeginShowMessageBox (
          string title,
@@ -242,6 +266,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
 		{
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of EndShowMessageBox using an alias.
+		    return MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.Guide.EndShowMessageBox(result);
+#else
 			try
 			{
 				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
@@ -252,6 +281,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			{
 				isVisible = false;
 			}
+#endif
 		}
 
 
