@@ -1097,7 +1097,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // The first argument instructs DXGI to block until VSync, putting the application
                 // to sleep until the next VSync. This ensures we don't waste any cycles rendering
                 // frames that will never be displayed to the screen.
-                _swapChain.Present(1, SharpDX.DXGI.PresentFlags.None, parameters);
+                lock (_d3dContext)
+                    _swapChain.Present(1, PresentFlags.None, parameters);
             }
             catch (SharpDX.SharpDXException)
             {
