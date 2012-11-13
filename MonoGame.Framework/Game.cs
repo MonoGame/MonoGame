@@ -69,7 +69,7 @@ non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-#if !PSS
+#if !PSM
 using System.Drawing;
 #endif
 using System.IO;

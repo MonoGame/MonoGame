@@ -63,7 +63,7 @@ using Windows.Graphics.Display;
 using Windows.UI.Core;
 using SharpDX.DXGI;
 #endif
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
-#elif PSS
+#elif PSM
 
         internal GraphicsContext _graphics;
         internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
@@ -388,7 +388,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 #endif
 
-#elif PSS
+#elif PSM
             _graphics = new GraphicsContext();
 #elif OPENGL
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
@@ -886,7 +886,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
             }
 
-#elif PSS
+#elif PSM
 
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
@@ -1046,7 +1046,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _programCache.Dispose();
 #endif
 
-#if PSS
+#if PSM
                     if (_graphics != null)
                     {
                         _graphics.Dispose();
@@ -1113,7 +1113,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 */
             }
 						
-#elif PSS
+#elif PSM
             _graphics.SwapBuffers();
             _availableVertexBuffers.AddRange(_usedVertexBuffers);
             _usedVertexBuffers.Clear();
@@ -1877,7 +1877,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexElementType,
                                      indexOffsetInBytes);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
@@ -1961,7 +1961,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
@@ -2080,7 +2080,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if PSS
+#if PSM
         internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
         {
             int bestMatchIndex = -1;

@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif PSS
+#elif PSM
 			return new PSSGamePlatform(game);
 #elif WINDOWS_PHONE
             return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
@@ -185,7 +185,7 @@ namespace Microsoft.Xna.Framework
         {
             get; protected set;
         }
-#elif PSS
+#elif PSM
 		public PSSGameWindow Window
 		{
 			get; protected set;

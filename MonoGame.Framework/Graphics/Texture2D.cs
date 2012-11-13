@@ -39,7 +39,7 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-#if !PSS
+#if !PSM
 using System.Drawing;
 #endif
 using System.IO;
@@ -62,7 +62,7 @@ using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#elif PSS
+#elif PSM
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		protected int width;
 		protected int height;
 
-#if PSS
+#if PSM
 		internal PssTexture2D _texture2D;
 
 #elif OPENGL
@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
-#elif PSS
+#elif PSM
 			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
 #else
 
@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if PSS
+#if PSM
         private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
         {
             byte[] bytes = new byte[stream.Length];
@@ -273,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 #endif
-#if !PSS
+#if !PSM
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * elementSizeInByte;
@@ -312,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                     d3dContext.UpdateSubresource(box, _texture, level, region);
 
-#elif PSS
+#elif PSM
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
 
 
@@ -378,7 +378,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-#if !PSS
+#if !PSM
                 dataHandle.Free();
 #endif
 
@@ -530,7 +530,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new NotImplementedException("GetData not implemented for type.");
             }
-#elif PSS
+#elif PSM
             throw new NotImplementedException();
 #elif DIRECTX
 
@@ -705,7 +705,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return toReturn;
 #elif DIRECTX
             throw new NotImplementedException(); 
-#elif PSS
+#elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))

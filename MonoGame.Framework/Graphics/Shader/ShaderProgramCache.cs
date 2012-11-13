@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif WINRT
 
