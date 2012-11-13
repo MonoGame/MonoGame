@@ -107,6 +107,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /// <summary>
+        /// Mark all the sampler slots as dirty.
+        /// </summary>
+        internal void Dirty()
+        {
+#if DIRECTX
+            _d3dDirty = int.MaxValue;
+#endif
+        }
+
         internal void SetSamplers(GraphicsDevice device)
         {
 #if DIRECTX

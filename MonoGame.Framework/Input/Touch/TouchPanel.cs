@@ -47,7 +47,9 @@ using System.Linq;
 
 #if WINRT
 using Windows.Graphics.Display;
+#if !WINDOWS_PHONE
 using Windows.UI.Xaml;
+#endif
 #endif
 
 #endregion Using clause
@@ -158,9 +160,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     }
                 }
 
+                // If a new event was found then store it.
                 if (foundEvent)
                     state[i] = touch;
-                else
+
+                // Else if no event has come in then promote it to
+                // the moved state, but only when we're consuming state.
+                else if (consumeState)
                     state[i] = touch.AsMovedState();
             }
 
@@ -277,7 +283,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (Game.Instance != null)
                     windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
                                                 Game.Instance.Window.ClientBounds.Height);
-#if WINRT
+#if WINDOWS_STOREAPP
                 else
                 {
                     var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
@@ -337,9 +343,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Process the gesture state.
-                var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
-                UpdateGestures(stateChanged);
+                // Process the pending gesture events.
+                while (_gestureEvents.Count > 0)
+                {
+                    var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
+                    UpdateGestures(stateChanged);
+                }
 
                 return GestureList.Count > 0;				
             }

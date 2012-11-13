@@ -46,7 +46,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-#if PSS
+#if PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
 
@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
                 ConstantBuffers[i].Clear();
@@ -240,7 +240,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         private const int MGFXVersion = 2;
 
-#if !PSS
+#if !PSM
 
 		private void ReadEffect (BinaryReader reader)
 		{
@@ -435,7 +435,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return collection;
         }
-#else //PSS
+#else //PSM
         internal void ReadEffect(BinaryReader reader)
         {
             var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());

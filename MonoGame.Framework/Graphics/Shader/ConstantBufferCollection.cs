@@ -4,7 +4,7 @@
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
         internal void SetConstantBuffers(GraphicsDevice device)
-#elif OPENGL || PSS
+#elif OPENGL || PSM
         internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)
 #endif
         {
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
 #if DIRECTX
                     buffer.Apply(device, _stage, i);
-#elif OPENGL || PSS
+#elif OPENGL || PSM
                     buffer.Apply(device, shaderProgram);
 #endif
                 }

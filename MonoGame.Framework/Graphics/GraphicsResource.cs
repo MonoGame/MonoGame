@@ -55,9 +55,9 @@ namespace Microsoft.Xna.Framework.Graphics
         // collected by holding a strong reference to it in this list.
         static List<WeakReference> resources = new List<WeakReference>();
 
-        // The GraphicsDevice property should only be accessed in Dispose(bool) is the disposing
+        // The GraphicsDevice property should only be accessed in Dispose(bool) if the disposing
         // parameter is true. If disposing is false, the GraphicsDevice may or may not be
-        // disposed and/or garbage collected yet.
+        // disposed yet.
 		GraphicsDevice graphicsDevice;
 
 		internal GraphicsResource()
@@ -146,6 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     resources.Remove(new WeakReference(this));
                 }
 
+                graphicsDevice = null;
                 disposed = true;
             }
         }

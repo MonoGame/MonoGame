@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt5:
 					convertedFormat = SurfaceFormat.RgbaPvrtc4Bpp;
 					break;
-#elif ANDROID || PSS
+#elif ANDROID || PSM
 				case SurfaceFormat.Dxt1:
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Content
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-#if ANDROID || PSS
+#if ANDROID || PSM
 					//no Dxt in OpenGL ES
 					case SurfaceFormat.Dxt1:
 						levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);

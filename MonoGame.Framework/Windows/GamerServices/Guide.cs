@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             int? result = null;
             IsVisible = true;
 
-#if WINRT
+#if WINDOWS_STOREAPP
             MessageDialog dialog = new MessageDialog(text, title);
             foreach (string button in buttons)
                 dialog.Commands.Add(new UICommand(button, null, dialog.Commands.Count));
