@@ -79,8 +79,14 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
 #if WINRT
+#if WINDOWS_PHONE
+using System.Threading;
+using System.Windows;
+using System.Windows.Media.Imaging;
+#else
 using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Media.Imaging;
+#endif
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
 #endif
@@ -679,7 +685,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return texture;
             }
-#elif WINRT
+
+#elif WINDOWS_STOREAPP
+
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
@@ -755,8 +763,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
-#if WINRT
+#if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
+#elif WINDOWS_PHONE
+
+            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            GetData(pixelData);
+
+            var waitEvent = new ManualResetEventSlim(false);
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                var bitmap = new WriteableBitmap(width, height);
+                System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
+                bitmap.SaveJpeg(stream, width, height, 0, 100);
+                waitEvent.Set();
+            });
+
+            waitEvent.Wait();
+
 #else
             throw new NotImplementedException();
 #endif
@@ -764,14 +788,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsPng(Stream stream, int width, int height)
         {
-#if WINRT
+#if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #else
+            // TODO: We need to find a simple stand alone
+            // PNG encoder if we want to support this.
             throw new NotImplementedException();
 #endif
         }
 
-#if WINRT
+#if WINDOWS_STOREAPP
+
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
             var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
@@ -796,7 +823,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             }).Wait();
         }
-		
 		
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
