@@ -27,7 +27,5 @@ namespace Microsoft.Xna.Framework
 
             return result;
         }
-
-        public static bool MouseInPointerEnabled = false;
     }
 }
