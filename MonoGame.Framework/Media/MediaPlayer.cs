@@ -51,8 +51,8 @@ using MonoTouch.MediaPlayer;
 
 #if WINRT
 using SharpDX.MediaFoundation;
-using SharpDX;
-using Windows.Storage;
+using SharpDX.Multimedia;
+using Windows.UI.Core;
 #endif
 
 using System.Linq;
@@ -89,8 +89,9 @@ namespace Microsoft.Xna.Framework.Media
             MediaManager.Startup(true);
 
             using (var factory = new MediaEngineClassFactory())
+            using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
             {
-                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
+                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
