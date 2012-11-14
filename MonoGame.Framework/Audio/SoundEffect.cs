@@ -312,7 +312,8 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             var instance = new SoundEffectInstance(this, voice);
-#else			
+#else
+            var instance = new SoundEffectInstance();	
 			instance.Sound = _sound;			
 #endif
             return instance;
