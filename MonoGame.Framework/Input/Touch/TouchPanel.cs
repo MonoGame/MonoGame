@@ -203,10 +203,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
-            AddEvent(id, state, position, true);
+            AddEvent(id, state, position, false);
         }
 
-        internal static void AddEvent(int id, TouchLocationState state, Vector2 position, bool isTouch)
+        internal static void AddEvent(int id, TouchLocationState state, Vector2 position, bool isMouse)
         {
             // Different platforms return different touch identifiers
             // based on the specifics of their implementation and the
@@ -222,14 +222,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // 
             if (state == TouchLocationState.Pressed)
             {
-                if (isTouch)
-                {
-                    _touchIds[id] = _nextTouchId++;
-                }
-                else
+                if (isMouse)
                 {
                     // Mouse pointing devices always use touchId of 1
                     _touchIds[id] = 1;
+                }
+                else
+                {
+                    _touchIds[id] = _nextTouchId++;
                 }
             }
 
@@ -243,13 +243,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
             }
 
-            if (isTouch || EnableMouseTouchPoint || EnableMouseGestures)
+            if (!isMouse || EnableMouseTouchPoint || EnableMouseGestures)
             {
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
                 var evt = new TouchLocation(touchId, state, position * _touchScale);
 
-                if (isTouch || EnableMouseTouchPoint)
+                if (!isMouse || EnableMouseTouchPoint)
                 {
                     _touchEvents.Add(evt);
                     if (_touchEvents.Count > MaxEvents)
@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 // If we have gestures enabled then start to collect 
                 // events for those too.
-                if (EnabledGestures != GestureType.None && (isTouch || EnableMouseGestures))
+                if (EnabledGestures != GestureType.None && (!isMouse || EnableMouseGestures))
                 {
                     _gestureEvents.Add(evt);
                     if (_gestureEvents.Count > MaxEvents)
