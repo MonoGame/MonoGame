@@ -60,6 +60,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _dirty = int.MaxValue;
         }
 
+        /// <summary>
+        /// Marks all texture slots as dirty.
+        /// </summary>
+        internal void Dirty()
+        {
+            _dirty = int.MaxValue;
+        }
+
         internal void SetTextures(GraphicsDevice device)
         {
 #if !WINRT

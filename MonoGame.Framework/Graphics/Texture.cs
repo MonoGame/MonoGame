@@ -185,15 +185,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 #elif OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteTextures(1, ref glTexture);
-                            GraphicsExtensions.CheckGLError();
-                            glTexture = -1;
-                        });
-                }
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteTextures(1, ref glTexture);
+                        GraphicsExtensions.CheckGLError();
+                        glTexture = -1;
+                    });
 
                 glLastSamplerState = null;
 #endif

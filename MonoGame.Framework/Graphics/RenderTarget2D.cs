@@ -181,20 +181,17 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 #elif OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
-                        {
-                            GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
-                            GraphicsExtensions.CheckGLError();
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+                        GraphicsExtensions.CheckGLError();
 
-                            if (this.glFramebuffer > 0)
-                            {
-                                GL.DeleteFramebuffers(1, ref this.glFramebuffer);
-                                GraphicsExtensions.CheckGLError();
-                            }
-                        });
-                }
+                        if (this.glFramebuffer > 0)
+                        {
+                            GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                    });
 #endif
             }
             base.Dispose(disposing);
