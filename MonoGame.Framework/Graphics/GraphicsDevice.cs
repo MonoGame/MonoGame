@@ -1069,6 +1069,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
+
+            GraphicsResource.DoGraphicsDeviceResetting();
         }
 
         /// <summary>
@@ -1079,7 +1081,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceReset != null)
                 DeviceReset(this, EventArgs.Empty);
-            GraphicsResource.DoGraphicsDeviceResetting();
         }
 
         public DisplayMode DisplayMode
