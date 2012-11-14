@@ -8,7 +8,7 @@ using System.Diagnostics;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif WINRT
 
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
-#if PSS
+#if PSM
         internal ShaderProgram _shaderProgram;
 #endif
 
@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Annotations = cloneSource.Annotations;
             _vertexShader = cloneSource._vertexShader;
             _pixelShader = cloneSource._pixelShader;
-#if PSS
+#if PSM
             _shaderProgram = cloneSource._shaderProgram;
 #endif
         }
@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_depthStencilState != null)
                 device.DepthStencilState = _depthStencilState;
             
-#if PSS
+#if PSM
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 
             #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)

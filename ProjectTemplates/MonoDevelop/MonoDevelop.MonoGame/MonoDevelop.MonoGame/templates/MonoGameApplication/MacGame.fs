@@ -44,7 +44,7 @@ open Microsoft.Xna.Framework.Media
             spriteBatch.Begin()
 
             // draw the logo
-            spriteBatch.Draw (logoTexture, new Vector2 (130.f, 200.f), Color.White);
+            spriteBatch.Draw (logoTexture, Vector2 (130.f, 200.f), Color.White);
             spriteBatch.End()
 
             //TODO: Add your drawing code here

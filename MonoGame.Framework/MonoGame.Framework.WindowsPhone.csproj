@@ -1,0 +1,472 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <AssemblyName>MonoGame.Framework.WindowsPhone</AssemblyName>
+    <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\WindowsPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\WindowsPhone\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\WindowsPhone\x86\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\WindowsPhone\x86\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\WindowsPhone\ARM\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|ARM' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\WindowsPhone\ARM\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0436</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Audio\AudioChannels.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GameTimerEventArgs.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Effect\EffectMaterial.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\OcclusionQuery.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
+    <Compile Include="Input\AccelerometerCapabilities.cs" />
+    <Compile Include="Input\AccelerometerState.cs" />
+    <Compile Include="Input\ButtonDefinition.cs" />
+    <Compile Include="Input\Buttons.cs" />
+    <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePadButtons.cs" />
+    <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="Input\GamePadDPad.cs" />
+    <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Input\GamePadTriggers.cs" />
+    <Compile Include="Input\GamePadType.cs" />
+    <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Input\Keys.cs" />
+    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\Mouse.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\ThumbStickDefinition.cs" />
+    <Compile Include="Input\Touch\GestureSample.cs" />
+    <Compile Include="Input\Touch\GestureType.cs" />
+    <Compile Include="Input\Touch\TouchCollection.cs" />
+    <Compile Include="Input\Touch\TouchLocation.cs" />
+    <Compile Include="Input\Touch\TouchLocationState.cs" />
+    <Compile Include="Input\Touch\TouchPanel.cs" />
+    <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Media\MediaPlayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\MediaSourceType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\MediaState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\Playlist.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\PlaylistCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\Song.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\SongCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="GameWindow.cs" />
+    <Compile Include="Graphics\ColorWriteChannels.cs" />
+    <Compile Include="Graphics\DisplayModeCollection.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectTechnique.cs" />
+    <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\ImageEx.cs" />
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="Graphics\RenderTargetBinding.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
+    <Compile Include="Graphics\States\CompareFunction.cs" />
+    <Compile Include="Graphics\States\CullMode.cs" />
+    <Compile Include="Graphics\States\DepthFormat.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.cs" />
+    <Compile Include="Graphics\States\FillMode.cs" />
+    <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\States\SaveStateMode.cs" />
+    <Compile Include="Graphics\States\StencilOperation.cs" />
+    <Compile Include="Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="Graphics\States\TextureFilter.cs" />
+    <Compile Include="Graphics\TextureCollection.cs" />
+    <Compile Include="Graphics\Vertices\BufferUsage.cs" />
+    <Compile Include="Graphics\Vertices\IVertexType.cs" />
+    <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
+    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexElement.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Windows8\MetroHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Windows8\SharpDXHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
+    <Compile Include="WindowsPhone\WPGamePlatform.cs" />
+    <Compile Include="WindowsPhone\WPGameWindow.cs" />
+    <Compile Include="WindowsPhone\XamlGame.cs" />
+    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="BatteryChargeStatus.cs" />
+    <Compile Include="BoundingBox.cs" />
+    <Compile Include="BoundingFrustum.cs" />
+    <Compile Include="BoundingSphere.cs" />
+    <Compile Include="ContainmentType.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="CurveContinuity.cs" />
+    <Compile Include="CurveKey.cs" />
+    <Compile Include="CurveKeyCollection.cs" />
+    <Compile Include="CurveLoopType.cs" />
+    <Compile Include="CurveTangent.cs" />
+    <Compile Include="DisplayOrientation.cs" />
+    <Compile Include="DrawableGameComponent.cs" />
+    <Compile Include="GameComponent.cs" />
+    <Compile Include="GameComponentCollection.cs" />
+    <Compile Include="GameComponentCollectionEventArgs.cs" />
+    <Compile Include="GameServiceContainer.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="IDrawable.cs" />
+    <Compile Include="IGameComponent.cs" />
+    <Compile Include="IGraphicsDeviceManager.cs" />
+    <Compile Include="IUpdateable.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="PerformanceCounter.cs" />
+    <Compile Include="Plane.cs" />
+    <Compile Include="PlaneIntersectionType.cs" />
+    <Compile Include="PlayerIndex.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PowerLineStatus.cs" />
+    <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
+    <Compile Include="Quaternion.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="ReusableItemList.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <Compile Include="Vector4.cs" />
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Graphics\States\Blend.cs" />
+    <Compile Include="Graphics\States\BlendFunction.cs" />
+    <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\ClearOptions.cs" />
+    <Compile Include="Graphics\CompilerOptions.cs" />
+    <Compile Include="Graphics\DeviceType.cs" />
+    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
+    <Compile Include="Graphics\GraphicsProfile.cs" />
+    <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsDeviceService.cs" />
+    <Compile Include="Graphics\MultiSampleType.cs" />
+    <Compile Include="Graphics\RenderTargetUsage.cs" />
+    <Compile Include="Graphics\ResourceType.cs" />
+    <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\SpriteBatchItem.cs" />
+    <Compile Include="Graphics\SpriteBlendMode.cs" />
+    <Compile Include="Graphics\SpriteEffects.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\TextureUsage.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="Storage\StorageContainer.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="Graphics\Effect\IEffectFog.cs" />
+    <Compile Include="Graphics\Effect\IEffectLights.cs" />
+    <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Windows\GamerServices\Guide.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Utilities\Hash.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Platform)' == 'x86' ">
+    <Reference Include="SharpDX">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.Direct3D11.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.DXGI.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.MediaFoundation.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.WP8">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.WP8.winmd</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.XAudio2.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Platform)' == 'ARM' ">
+    <Reference Include="SharpDX">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.Direct3D11.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.DXGI.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.MediaFoundation.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.WP8">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.WP8.winmd</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.XAudio2.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
+  <ProjectExtensions />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

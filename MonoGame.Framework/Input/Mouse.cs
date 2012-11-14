@@ -61,8 +61,6 @@ namespace Microsoft.Xna.Framework.Input
 
 #if WINDOWS || LINUX
 		private static OpenTK.Input.MouseDevice _mouse = null;			
-#else
-        private static int _mouseTouchId = -1;
 #endif
 
 #if WINDOWS
