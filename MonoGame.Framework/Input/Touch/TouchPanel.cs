@@ -64,6 +64,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private const int MaxEvents = 100;
 
         /// <summary>
+        /// The reserved touchId for all mouse touch points.
+        /// </summary>
+        private const int MouseTouchId = 1;
+
+        /// <summary>
         /// The current touch state.
         /// </summary>
         private static readonly List<TouchLocation> _touchState = new List<TouchLocation>();
@@ -224,8 +229,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 if (isMouse)
                 {
-                    // Mouse pointing devices always use touchId of 1
-                    _touchIds[id] = 1;
+                    // Mouse pointing devices always use a reserved Id
+                    _touchIds[id] = MouseTouchId;
                 }
                 else
                 {
