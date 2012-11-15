@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -40,7 +41,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     pass.name = pinfo.name ?? string.Empty;
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
-                    
+
+                    pinfo.ValidateShaderModels(shaderInfo.DX11Profile);
+
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
