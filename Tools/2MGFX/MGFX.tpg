@@ -1,7 +1,7 @@
 // MonoGame Effect Parser
 //
-// For use with "Tiny Parser Generator"
-// http://www.codeproject.com/Articles/28294/a-Tiny-Parser-Generator-v1-2
+// For use with our fork of the "Tiny Parser Generator"
+// https://github.com/SickheadGames/TinyPG
 //
 
 <% @TinyPG Namespace="TwoMGFX" Language="C#"%>
@@ -12,18 +12,18 @@
 
 // TOKENS
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
-Pass -> @"pass";
-Technique -> @"technique";
-VertexShader -> @"VertexShader";
-PixelShader -> @"PixelShader";
+[IgnoreCase] Pass -> @"pass";
+[IgnoreCase] Technique -> @"technique";
+[IgnoreCase] VertexShader -> @"VertexShader";
+[IgnoreCase] PixelShader -> @"PixelShader";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
 Equals -> @"=";
 Semicolon -> @";";
 OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
-Compile -> @"compile";
-ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+[IgnoreCase] Compile -> @"compile";
+[IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
 Code -> @".";
 EndOfFile -> @"^$";
 

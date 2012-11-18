@@ -53,19 +53,19 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Identifier, regex);
             Tokens.Add(TokenType.Identifier);
 
-            regex = new Regex(@"pass", RegexOptions.Compiled);
+            regex = new Regex(@"pass", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Pass, regex);
             Tokens.Add(TokenType.Pass);
 
-            regex = new Regex(@"technique", RegexOptions.Compiled);
+            regex = new Regex(@"technique", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Technique, regex);
             Tokens.Add(TokenType.Technique);
 
-            regex = new Regex(@"VertexShader", RegexOptions.Compiled);
+            regex = new Regex(@"VertexShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.VertexShader, regex);
             Tokens.Add(TokenType.VertexShader);
 
-            regex = new Regex(@"PixelShader", RegexOptions.Compiled);
+            regex = new Regex(@"PixelShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.PixelShader, regex);
             Tokens.Add(TokenType.PixelShader);
 
@@ -93,11 +93,11 @@ namespace TwoMGFX
             Patterns.Add(TokenType.CloseParenthesis, regex);
             Tokens.Add(TokenType.CloseParenthesis);
 
-            regex = new Regex(@"compile", RegexOptions.Compiled);
+            regex = new Regex(@"compile", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Compile, regex);
             Tokens.Add(TokenType.Compile);
 
-            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
+            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.ShaderModel, regex);
             Tokens.Add(TokenType.ShaderModel);
 
