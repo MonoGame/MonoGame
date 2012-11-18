@@ -1126,7 +1126,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
 #elif OPENGL
-				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+		try
+		{
+			GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+		}
+		catch { }
 #endif
 
                 clearTarget = true;
@@ -1171,7 +1175,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				}
 
-				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
+				try
+				{
+					GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
+				}
+				catch { }
+
 				GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
 				if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
