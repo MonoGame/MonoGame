@@ -192,9 +192,9 @@ namespace TwoMGFX
 
         protected virtual object EvalStart(ParseTree tree, params object[] paramlist)
         {
-            ShaderInfo shader = new ShaderInfo();
+            var shader = new ShaderInfo();
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
            {
               var technique = node.Eval(tree, shader) as TechniqueInfo;
               if ( technique != null )
@@ -206,12 +206,12 @@ namespace TwoMGFX
 
         protected virtual object EvalTechnique_Declaration(ParseTree tree, params object[] paramlist)
         {
-            TechniqueInfo technique = new TechniqueInfo();
+            var technique = new TechniqueInfo();
            technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
            technique.startPos = Token.StartPos;
            technique.length = Token.Length;
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
            {
               var pass = node.Eval(tree, technique) as PassInfo;
               if ( pass != null )
@@ -223,10 +223,10 @@ namespace TwoMGFX
 
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = new PassInfo();
+            var pass = new PassInfo();
            pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
               node.Eval(tree, pass);
         
            return pass;
@@ -234,7 +234,7 @@ namespace TwoMGFX
 
         protected virtual object EvalVertexShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
+            var pass = paramlist[0] as PassInfo;
            pass.vsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
            pass.vsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
@@ -242,7 +242,7 @@ namespace TwoMGFX
 
         protected virtual object EvalPixelShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
+            var pass = paramlist[0] as PassInfo;
            pass.psModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
            pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
