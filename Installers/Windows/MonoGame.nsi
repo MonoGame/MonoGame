@@ -2,7 +2,7 @@ SetCompressor /SOLID /FINAL lzma
 
 !define FrameworkPath "C:\Users\Dean\Desktop\MonoGame\"
 !define VERSION "3.0"
-!define REVISION "0.0"
+!define REVISION "0.1"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
@@ -71,8 +71,8 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File /x *Windows8.dll '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
   File /nonfatal /x *Windows8.xml '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
 
-  File /x *Windows8.dll '..\..\MonoGame.Framework\bin\Release\*.dll'
-  File /nonfatal /x *Windows8.xml '..\..\MonoGame.Framework\bin\Release\*.xml'
+  File /x *Windows8.dll /x *WindowsPhone.dll '..\..\MonoGame.Framework\bin\Release\*.dll'
+  File /nonfatal /x *Windows8.xml /x *WindowsPhone.xml' ..\..\MonoGame.Framework\bin\Release\*.xml'
   File '..\..\ThirdParty\Libs\OpenTK.dll'
   File '..\..\ThirdParty\Libs\OpenTK.dll.config'
   File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
@@ -86,17 +86,36 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*xml'
 
-  
+  ; Install Windows Phone ARM Assemblies
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
+
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.xml'
+
+  ; Install Windows Phone x86 Assemblies
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
+
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.WindowsPhone.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.WindowsPhone.xml'
+
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
+
+  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
+  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*xml'  
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
     GOTO End32Bitvs64BitCheck
 
   Is64bit:
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
 
   End32Bitvs64BitCheck:
   ; Add remote programs
@@ -174,6 +193,8 @@ Section "Visual Studio 2012 Templates"
 
     ; install the Templates for MonoDevelop
     File /r '..\..\ProjectTemplates\VisualStudio2012\*.*'
+    ; Install the VS 2010 templates as well 
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
   CannotInstallTemplates:
 
