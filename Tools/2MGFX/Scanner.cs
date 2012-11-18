@@ -202,6 +202,10 @@ namespace TwoMGFX
                     tok.Text = Input.Substring(tok.StartPos, 1);
                 }
 
+                // Increment the line count.
+                CurrentLine += tok.Text.Length - tok.Text.Replace("\n", "").Length;
+                tok.StartLine = CurrentLine;
+
                 if (SkipList.Contains(tok.Type))
                 {
                     startpos = tok.EndPos;
@@ -262,6 +266,7 @@ namespace TwoMGFX
 
     public class Token
     {
+        private int startline;
         private int startpos;
         private int endpos;
         private string text;
@@ -269,6 +274,11 @@ namespace TwoMGFX
 
         // contains all prior skipped symbols
         private List<Token> skipped;
+
+        public int StartLine { 
+            get { return startline;} 
+            set { startline = value; }
+        }
 
         public int StartPos { 
             get { return startpos;} 

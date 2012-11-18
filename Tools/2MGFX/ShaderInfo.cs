@@ -110,14 +110,9 @@ namespace TwoMGFX
             var tree = new Parser(new Scanner()).Parse(newFile);
             if (tree.Errors.Count > 0)
             {
-                // TODO: Make the error info pretty!
                 var errors = String.Empty;
                 foreach (var error in tree.Errors)
-                {
-                    int line, col;
-                    FindLineAndCol(newFile, error.Position, out line, out col);
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, line, col, error.Message);
-                }
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, error.Line, 0, error.Message);
 
                 throw new Exception(errors);
             }
@@ -149,25 +144,6 @@ namespace TwoMGFX
             result.Debug = options.Debug;
 
             return result;
-        }
-
-        public static void FindLineAndCol(string src, int pos, out int line, out int col)
-        {
-            line = 1;
-            col = 1;
-
-            for (var i = 0; i < pos; i++)
-            {
-                if (src[i] == '\n')
-                {
-                    line++;
-                    col = 1;
-                }
-                else
-                {
-                    col++;
-                }
-            }
         }
     }
 }
