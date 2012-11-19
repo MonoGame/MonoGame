@@ -170,6 +170,15 @@ namespace TwoMGFX
                 case TokenType.Start:
                     Value = EvalStart(tree, paramlist);
                     break;
+                case TokenType.Sampler_Declaration:
+                    Value = EvalSampler_Declaration(tree, paramlist);
+                    break;
+                case TokenType.Sampler_Address_State_Declaration:
+                    Value = EvalSampler_Address_State_Declaration(tree, paramlist);
+                    break;
+                case TokenType.Sampler_Texture_State_Declaration:
+                    Value = EvalSampler_Texture_State_Declaration(tree, paramlist);
+                    break;
                 case TokenType.Technique_Declaration:
                     Value = EvalTechnique_Declaration(tree, paramlist);
                     break;
@@ -204,6 +213,21 @@ namespace TwoMGFX
            return shader;
         }
 
+        protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual object EvalSampler_Address_State_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            return null;
+        }
+
+        protected virtual object EvalSampler_Texture_State_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            return null;
+        }
+
         protected virtual object EvalTechnique_Declaration(ParseTree tree, params object[] paramlist)
         {
             var technique = new TechniqueInfo();
@@ -214,11 +238,11 @@ namespace TwoMGFX
            foreach (var node in Nodes)
            {
               var pass = node.Eval(tree, technique) as PassInfo;
-              if ( pass != null )
+              if (pass != null)
                  technique.Passes.Add(pass);
            }
-        
-           return technique;
+           
+           return technique.Passes.Count > 0 ? technique : null;
         }
 
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
@@ -228,6 +252,10 @@ namespace TwoMGFX
         
            foreach (var node in Nodes)
               node.Eval(tree, pass);
+        
+           // If we don't have a pixel or vertex shader then skip this technique.
+           if (string.IsNullOrEmpty(pass.psFunction) && string.IsNullOrEmpty(pass.vsFunction))
+              return null;
         
            return pass;
         }

@@ -9,6 +9,7 @@
 [Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
 [Skip] Comment -> @"//[^\n\r]*";
 [Skip] Whitespace -> @"[ \t\n\r]+";
+[Skip] LinePragma -> @"#line[^\n]*\n";
 
 // TOKENS
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
@@ -24,12 +25,24 @@ OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
 [IgnoreCase] Compile -> @"compile";
 [IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+
+[IgnoreCase] SamplerType -> @"(sampler|sampler1D|sampler2D|sampler3D|samplerCUBE|sampler_state|SamplerState)?";
+[IgnoreCase] Address -> @"(AddressU|AddressV|AddressW)";
+[IgnoreCase] AddressMode -> @"(Wrap|Mirror|Clamp|Border|MirrorOnce)";
+[IgnoreCase] Texture -> @"Texture";
+OpenElement -> @"<";
+CloseElement -> @">";
+
 Code -> @".";
 EndOfFile -> @"^$";
 
+//LinePragma -> @"#line";
+//Integer -> @"[0-9]+";
+//String -> @"@?\""(\""\""|[^\""])*\""";
+
 // Productions
-Start -> ( Code | Technique_Declaration )* EndOfFile
-{ 
+Start -> (Code | Technique_Declaration)+ EndOfFile
+{
    var shader = new ShaderInfo();
 
    foreach (var node in Nodes)
@@ -42,7 +55,28 @@ Start -> ( Code | Technique_Declaration )* EndOfFile
    return shader; 
 };
 
-Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket 
+/*
+LinePragma_Declaration -> LinePragma Integer String
+{
+   var filename = $String as string;
+   var lineNumber = int.Parse($Integer as string);
+   return null;
+};
+*/
+
+Sampler_Declaration -> SamplerType Identifier Equals SamplerType OpenBracket (Sampler_Address_State_Declaration|Sampler_Texture_State_Declaration)* CloseBracket Semicolon;
+
+Sampler_Address_State_Declaration -> Address Equals AddressMode Semicolon
+{
+   return null;
+};
+
+Sampler_Texture_State_Declaration -> Texture Equals OpenElement Identifier CloseElement Semicolon
+{
+   return null;
+};
+
+Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration* CloseBracket 
 {
    var technique = new TechniqueInfo();
    technique.name = $Identifier as string ?? string.Empty;
@@ -52,11 +86,11 @@ Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ Clo
    foreach (var node in Nodes)
    {
       var pass = node.Eval(tree, technique) as PassInfo;
-      if ( pass != null )
+      if (pass != null)
          technique.Passes.Add(pass);
    }
-
-   return technique;
+   
+   return technique.Passes.Count > 0 ? technique : null;
 };
 
 Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression)* CloseBracket 
@@ -66,6 +100,10 @@ Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression |
 
    foreach (var node in Nodes)
       node.Eval(tree, pass);
+
+   // If we don't have a pixel or vertex shader then skip this technique.
+   if (string.IsNullOrEmpty(pass.psFunction) && string.IsNullOrEmpty(pass.vsFunction))
+      return null;
 
    return pass;
 };

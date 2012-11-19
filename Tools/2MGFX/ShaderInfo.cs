@@ -122,25 +122,14 @@ namespace TwoMGFX
             result.fileName = filePath;
             result.fileContent = newFile;
 
-            // Remove empty techniques.
-            for (var i=0; i < result.Techniques.Count; i++)
-            {
-                var tech = result.Techniques[i];
-                if (tech.Passes.Count <= 0)
-                {
-                    result.Techniques.RemoveAt(i);
-                    i--;
-                }
-            }
-
             // We must have at least one technique.
             if (result.Techniques.Count <= 0)
                 throw new Exception("The effect must contain at least one technique and pass!");
 
             // Finally remove the techniques from the file.
             //
-            // TODO: Do we really need to do this, or will the HLSL 
-            // compiler just ignore it as we compile shaders?
+            // TODO: We might need to do this for GLSL which will 
+            // freak out if it sees techniques/passes.
             //
             /*
             var extra = 2;
