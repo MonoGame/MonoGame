@@ -70,9 +70,16 @@ namespace Microsoft.Xna.Framework.Input
 
 		public Keys[] GetPressedKeys ()
 		{
-			if (_keys == null)
-				_keys = new Keys[] {};
-			return _keys;
+			Keys[] keys;
+			for (int i = 0; i < _keys.Length; i++)
+			{
+				var k = _keys[i];
+				if (IsKeyDown (k))
+				{
+					keys [keys.Length] = k;
+				}
+			}
+			return keys;
 		}
 
 		public bool IsKeyDown (Keys key)
