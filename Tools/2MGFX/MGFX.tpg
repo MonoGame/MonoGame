@@ -11,11 +11,15 @@
 [Skip] Whitespace -> @"[ \t\n\r]+";
 
 // TOKENS
-Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 Pass -> @"pass";
 Technique -> @"technique";
+Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
+SamplerState -> @"sampler_state";
 VertexShader -> @"VertexShader";
 PixelShader -> @"PixelShader";
+Number -> @"[0-9]?\.?[0-9]+";
+TextureName -> @"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]";
+Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
 Equals -> @"=";
@@ -28,61 +32,198 @@ Code -> @".";
 EndOfFile -> @"^$";
 
 // Productions
-Start -> ( Code | Technique_Declaration )* EndOfFile
+Start -> ( Code | Technique_Declaration | Sampler_Declaration )* EndOfFile
 { 
-   ShaderInfo shader = new ShaderInfo();
+	ShaderInfo shader = new ShaderInfo();
 
-   foreach (ParseNode node in Nodes)
-   {
-      var technique = node.Eval(tree, shader) as TechniqueInfo;
-      if ( technique != null )
-         shader.Techniques.Add(technique);
-   }
+	foreach (ParseNode node in Nodes)
+	{
+	  var obj = node.Eval(tree, shader);
+	  if (obj is TechniqueInfo)
+		 shader.Techniques.Add((TechniqueInfo)obj);
+	  else if (obj is SamplerStateInfo)
+	  {
+		 var sampler = (SamplerStateInfo)obj;
+		 shader.SamplerStates.Add(sampler.name, sampler.state);
+	  }
+	}
 
-   return shader; 
+	return shader; 
 };
 
 Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket 
 {
-   TechniqueInfo technique = new TechniqueInfo();
-   technique.name = $Identifier as string ?? string.Empty;
-   technique.startPos = Token.StartPos;
-   technique.length = Token.Length;
+	TechniqueInfo technique = new TechniqueInfo();
+	technique.name = $Identifier as string ?? string.Empty;
+	technique.startPos = Token.StartPos;
+	technique.length = Token.Length;
 
-   foreach (ParseNode node in Nodes)
-   {
-      var pass = node.Eval(tree, technique) as PassInfo;
-      if ( pass != null )
-         technique.Passes.Add(pass);
-   }
+	foreach (ParseNode node in Nodes)
+	{
+	  var pass = node.Eval(tree, technique) as PassInfo;
+	  if ( pass != null )
+		 technique.Passes.Add(pass);
+	}
 
-   return technique;
+	return technique;
 };
 
-Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression)* CloseBracket 
+Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
+{
+	var pass = paramlist[0] as PassInfo;
+	var name = $Identifier[0] as string;
+	var value = ($Identifier[1] ?? $Number) as string;
+	
+	Microsoft.Xna.Framework.Graphics.Blend blend;
+	
+	switch (name)
+	{
+		case "AlphaBlendEnable":
+			if (!ParseTreeTools.ParseBool(value))
+			{
+				if (pass.blendState == null)
+					pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+				pass.blendState.AlphaSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
+				pass.blendState.ColorSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
+				pass.blendState.ColorDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
+				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
+			}
+			break;
+		case "SrcBlend":
+			blend = ParseTreeTools.ParseBlend(value);
+			if (pass.blendState == null)
+				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+			pass.blendState.AlphaSourceBlend = blend;
+			pass.blendState.ColorSourceBlend = blend;
+			break;
+		case "DestBlend":
+			blend = ParseTreeTools.ParseBlend(value);
+			if (pass.blendState == null)
+				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+			pass.blendState.AlphaDestinationBlend = blend;
+			pass.blendState.ColorDestinationBlend = blend;
+			break;
+		case "BlendOp":
+			if (pass.blendState == null)
+				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
+			break;
+		case "ZEnable":
+			if (pass.depthStencilState == null)
+				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
+			break;
+		case "ZWriteEnable":
+			if (pass.depthStencilState == null)
+				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
+			break;
+		default:
+			throw new Exception("Unknown render state '" + name + "'.");
+	}
+	
+	return null;
+};
+
+Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 
-   PassInfo pass = new PassInfo();
-   pass.name = $Identifier as string ?? string.Empty;
+	PassInfo pass = new PassInfo();
+	pass.name = $Identifier as string ?? string.Empty;
 
-   foreach (ParseNode node in Nodes)
-      node.Eval(tree, pass);
+	foreach (ParseNode node in Nodes)
+	  node.Eval(tree, pass);
 
-   return pass;
+	return pass;
 };
 
 VertexShader_Pass_Expression -> VertexShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
 {
-   PassInfo pass = paramlist[0] as PassInfo;
-   pass.vsModel = $ShaderModel as string;
-   pass.vsFunction = $Identifier as string;
-   return null;
+	PassInfo pass = paramlist[0] as PassInfo;
+	pass.vsModel = $ShaderModel as string;
+	pass.vsFunction = $Identifier as string;
+	return null;
 };
 
 PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
 {
-   PassInfo pass = paramlist[0] as PassInfo;
-   pass.psModel = $ShaderModel as string;
-   pass.psFunction = $Identifier as string;
-   return null;
+	PassInfo pass = paramlist[0] as PassInfo;
+	pass.psModel = $ShaderModel as string;
+	pass.psFunction = $Identifier as string;
+	return null;
 };
 
+Sampler_State_Expression -> Identifier Equals (TextureName | Identifier | Number) Semicolon
+{
+	var sampler = paramlist[0] as SamplerStateInfo;
+	var name = $Identifier[0] as string;
+	var value = ($TextureName[0] ?? ($Identifier[1] ?? $Number[0])) as string;
+	switch (name)
+	{
+		case "Texture":
+			// Ignore
+			break;
+		case "MinFilter":
+			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
+			break;
+		case "MagFilter":
+			sampler.MagFilter = ParseTreeTools.ParseTextureFilterType(value);
+			break;
+		case "MipFilter":
+			sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
+			break;
+		case "Filter":
+			sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
+			break;
+		case "AddressU":
+			sampler.state.AddressU = ParseTreeTools.ParseAddressMode(value);
+			break;
+		case "AddressV":
+			sampler.state.AddressV = ParseTreeTools.ParseAddressMode(value);
+			break;
+		case "AddressW":
+			sampler.state.AddressW = ParseTreeTools.ParseAddressMode(value);
+			break;
+		case "MaxAnisotropy":
+			sampler.state.MaxAnisotropy = int.Parse(value);
+			break;
+		default:
+			throw new Exception("Unknown sampler state '" + name + "'.");
+	}
+
+	return null;
+};
+
+Sampler_Declaration -> Sampler Identifier (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+{
+	var sampler = new SamplerStateInfo();
+	sampler.name = $Identifier as string;
+	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();
+
+	if ($SamplerState == null)
+		return null;
+	
+	foreach (ParseNode node in Nodes)
+		node.Eval(tree, sampler);
+	
+	// Figure out what kind of filter to set based on each individual min, mag, and mip filter
+	if (sampler.MinFilter == TextureFilterType.Anisotropic)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Anisotropic;
+	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Linear;
+	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.LinearMipPoint;
+	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinLinearMagPointMipLinear;
+	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinLinearMagPointMipPoint;
+	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinPointMagLinearMipLinear;
+	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinPointMagLinearMipPoint;
+	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Point;
+	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
+		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
+
+	return sampler;
+};
