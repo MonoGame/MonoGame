@@ -74,6 +74,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
+        /// <summary>
+        /// Called before the device is reset. Allows graphics resources to 
+        /// invalidate their state so they can be recreated after the device reset.
+        /// Warning: This may be called after a call to Dispose() up until
+        /// the resource is garbage collected.
+        /// </summary>
         internal protected virtual void GraphicsDeviceResetting()
         {
 
@@ -89,7 +95,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (target != null)
                         (target as GraphicsResource).GraphicsDeviceResetting();
                 }
-                resources.Clear();
+
+                // Remove references to resources that have been garbage collected.
+                resources.RemoveAll(wr => !wr.IsAlive);
             }
         }
 
