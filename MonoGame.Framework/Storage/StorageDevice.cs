@@ -356,6 +356,9 @@ namespace Microsoft.Xna.Framework.Storage
 		//     The IAsyncResult returned from BeginOpenContainer.
 		public StorageContainer EndOpenContainer (IAsyncResult result)
 		{
+#if WINRT
+            throw new NotImplementedException ();
+#else
 			StorageContainer returnValue = null;
 			try {
 				// Retrieve the delegate.
@@ -377,7 +380,7 @@ namespace Microsoft.Xna.Framework.Storage
 			}
 			
 			return returnValue;
-
+#endif
 		}			
 		//
 		// Summary:
