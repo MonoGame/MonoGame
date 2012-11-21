@@ -84,8 +84,11 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 using All = OpenTK.Graphics.ES20.All;
 
-namespace Microsoft.Xna.Framework {
-	partial class iOSGameView : UIView {
+namespace Microsoft.Xna.Framework
+{
+    [Register ("iOSGameView")]
+	partial class iOSGameView : UIView
+    {
 		private readonly iOSGamePlatform _platform;
 		private int _colorbuffer;
 		private int _depthbuffer;
@@ -182,6 +185,12 @@ namespace Microsoft.Xna.Framework {
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
 		}
+
+        [Export ("doTick")]
+        void DoTick()
+        {
+            _platform.Tick();
+        }
 
 		private void DestroyContext ()
 		{
