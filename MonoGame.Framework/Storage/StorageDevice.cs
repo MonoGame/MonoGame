@@ -358,6 +358,18 @@ namespace Microsoft.Xna.Framework.Storage
 		{
 			StorageContainer returnValue = null;
 			try {
+#if WINRT
+                // AsyncResult does not exist in WinRT
+                var asyncResult = result.AsyncState as OpenContainerAsynchronous;
+				if (asyncResult != null)
+				{
+					// Wait for the WaitHandle to become signaled.
+					result.AsyncWaitHandle.WaitOne();
+
+					// Call EndInvoke to retrieve the results.
+    				returnValue = asyncResult.EndInvoke(result);
+				}
+#else
 				// Retrieve the delegate.
 				AsyncResult asyncResult = result as AsyncResult;
 				if (asyncResult != null)
@@ -371,7 +383,10 @@ namespace Microsoft.Xna.Framework.Storage
 					if (asyncDelegate != null)
 						returnValue = asyncDelegate.EndInvoke(result);
 				}
-			} finally {
+#endif
+            }
+            finally
+            {
 				// Close the wait handle.
 				result.AsyncWaitHandle.Dispose ();	 
 			}
