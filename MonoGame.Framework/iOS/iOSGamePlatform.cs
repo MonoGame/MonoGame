@@ -226,14 +226,11 @@ namespace Microsoft.Xna.Framework
             if (_timeUntilNextVsync > 0)
                 Game.SuppressDraw();
             else
-            {
-                _sw.Restart();
                 _timeUntilNextVsync = 0;
-            }
 
             _prevFrameTimeStamp = curTimeStamp;
 
-
+            _sw.Restart();
 
             // FIXME: Remove this call, and the whole Tick method, once
             //        GraphicsDevice is where platform-specific Present
