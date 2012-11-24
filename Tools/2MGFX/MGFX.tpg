@@ -17,15 +17,20 @@ Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
 SamplerState -> @"sampler_state";
 VertexShader -> @"VertexShader";
 PixelShader -> @"PixelShader";
+Register -> @"register";
 Number -> @"[0-9]?\.?[0-9]+";
 TextureName -> @"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
 Equals -> @"=";
+Colon -> @":";
+Comma -> @",";
 Semicolon -> @";";
 OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
+OpenSquareBracket -> @"\[";
+CloseSquareBracket -> @"\]";
 Compile -> @"compile";
 ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
 Code -> @".";
@@ -119,7 +124,7 @@ Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
 			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
 			break;
 		default:
-			throw new Exception("Unknown render state '" + name + "'.");
+			break;
 	}
 	
 	return null;
@@ -186,21 +191,32 @@ Sampler_State_Expression -> Identifier Equals (TextureName | Identifier | Number
 		case "MaxAnisotropy":
 			sampler.state.MaxAnisotropy = int.Parse(value);
 			break;
+		case "MaxLOD":
+			sampler.state.MaxMipLevel = int.Parse(value);
+			break;
+		case "MipLODBias":
+			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
+			break;
 		default:
-			throw new Exception("Unknown sampler state '" + name + "'.");
+			break;
 	}
 
 	return null;
 };
 
-Sampler_Declaration -> Sampler Identifier (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma Identifier (OpenSquareBracket Number CloseSquareBracket)?)? CloseParenthesis
 {
-	var sampler = new SamplerStateInfo();
-	sampler.name = $Identifier as string;
-	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();
+	return null;
+};
 
+Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+{
 	if ($SamplerState == null)
 		return null;
+	
+	var sampler = new SamplerStateInfo();
+	sampler.name = $Identifier as string;
+	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();	
 	
 	foreach (ParseNode node in Nodes)
 		node.Eval(tree, sampler);

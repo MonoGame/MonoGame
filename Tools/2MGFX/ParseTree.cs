@@ -188,6 +188,9 @@ namespace TwoMGFX
                 case TokenType.Sampler_State_Expression:
                     Value = EvalSampler_State_Expression(tree, paramlist);
                     break;
+                case TokenType.Sampler_Register_Expression:
+                    Value = EvalSampler_Register_Expression(tree, paramlist);
+                    break;
                 case TokenType.Sampler_Declaration:
                     Value = EvalSampler_Declaration(tree, paramlist);
                     break;
@@ -286,7 +289,7 @@ namespace TwoMGFX
         			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
         			break;
         		default:
-        			throw new Exception("Unknown render state '" + name + "'.");
+        			break;
         	}
         	
         	return null;
@@ -353,21 +356,32 @@ namespace TwoMGFX
         		case "MaxAnisotropy":
         			sampler.state.MaxAnisotropy = int.Parse(value);
         			break;
+        		case "MaxLOD":
+        			sampler.state.MaxMipLevel = int.Parse(value);
+        			break;
+        		case "MipLODBias":
+        			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
+        			break;
         		default:
-        			throw new Exception("Unknown sampler state '" + name + "'.");
+        			break;
         	}
         
         	return null;
         }
 
+        protected virtual object EvalSampler_Register_Expression(ParseTree tree, params object[] paramlist)
+        {
+            return null;
+        }
+
         protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
         {
-            var sampler = new SamplerStateInfo();
-        	sampler.name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();
-        
-        	if (this.GetValue(tree, TokenType.SamplerState, 0) == null)
+            if (this.GetValue(tree, TokenType.SamplerState, 0) == null)
         		return null;
+        	
+        	var sampler = new SamplerStateInfo();
+        	sampler.name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+        	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();	
         	
         	foreach (ParseNode node in Nodes)
         		node.Eval(tree, sampler);
