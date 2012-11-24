@@ -170,6 +170,15 @@ namespace TwoMGFX
                 case TokenType.Start:
                     Value = EvalStart(tree, paramlist);
                     break;
+                case TokenType.Sampler_Declaration:
+                    Value = EvalSampler_Declaration(tree, paramlist);
+                    break;
+                case TokenType.Sampler_Address_State_Declaration:
+                    Value = EvalSampler_Address_State_Declaration(tree, paramlist);
+                    break;
+                case TokenType.Sampler_Texture_State_Declaration:
+                    Value = EvalSampler_Texture_State_Declaration(tree, paramlist);
+                    break;
                 case TokenType.Technique_Declaration:
                     Value = EvalTechnique_Declaration(tree, paramlist);
                     break;
@@ -192,9 +201,9 @@ namespace TwoMGFX
 
         protected virtual object EvalStart(ParseTree tree, params object[] paramlist)
         {
-            ShaderInfo shader = new ShaderInfo();
+            var shader = new ShaderInfo();
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
            {
               var technique = node.Eval(tree, shader) as TechniqueInfo;
               if ( technique != null )
@@ -204,37 +213,56 @@ namespace TwoMGFX
            return shader;
         }
 
+        protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual object EvalSampler_Address_State_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            return null;
+        }
+
+        protected virtual object EvalSampler_Texture_State_Declaration(ParseTree tree, params object[] paramlist)
+        {
+            return null;
+        }
+
         protected virtual object EvalTechnique_Declaration(ParseTree tree, params object[] paramlist)
         {
-            TechniqueInfo technique = new TechniqueInfo();
+            var technique = new TechniqueInfo();
            technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
            technique.startPos = Token.StartPos;
            technique.length = Token.Length;
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
            {
               var pass = node.Eval(tree, technique) as PassInfo;
-              if ( pass != null )
+              if (pass != null)
                  technique.Passes.Add(pass);
            }
-        
-           return technique;
+           
+           return technique.Passes.Count > 0 ? technique : null;
         }
 
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = new PassInfo();
+            var pass = new PassInfo();
            pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
         
-           foreach (ParseNode node in Nodes)
+           foreach (var node in Nodes)
               node.Eval(tree, pass);
+        
+           // If we don't have a pixel or vertex shader then skip this technique.
+           if (string.IsNullOrEmpty(pass.psFunction) && string.IsNullOrEmpty(pass.vsFunction))
+              return null;
         
            return pass;
         }
 
         protected virtual object EvalVertexShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
+            var pass = paramlist[0] as PassInfo;
            pass.vsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
            pass.vsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;
@@ -242,7 +270,7 @@ namespace TwoMGFX
 
         protected virtual object EvalPixelShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
+            var pass = paramlist[0] as PassInfo;
            pass.psModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
            pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
            return null;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace TwoMGFX
 {
@@ -15,6 +16,45 @@ namespace TwoMGFX
 
         public string psModel;
         public string psFunction;
+
+        private static readonly Regex _shaderModelRegex = new Regex(@"(vs_|ps_)(1|2|3|4|5)(_)(0|1|)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
+
+        public static void ParseShaderModel(string text, out int major, out int minor)
+        {
+            var match = _shaderModelRegex.Match(text);
+            if (match.Groups.Count < 5)
+            {
+                major = 0;
+                minor = 0;
+                return;
+            }
+
+            major = int.Parse(match.Groups[2].Value);
+            minor = int.Parse(match.Groups[4].Value);
+        }
+
+        public void ValidateShaderModels(bool dx11Profile)
+        {
+            int major, minor;
+
+            if (!string.IsNullOrEmpty(vsFunction))
+            {
+                ParseShaderModel(vsModel, out major, out minor);
+                if (dx11Profile && major <= 3)
+                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 4.0 level 9.1 or higher!", vsFunction));
+                if (!dx11Profile && major > 3)
+                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 3.0 or lower!", vsFunction));
+            }
+
+            if (!string.IsNullOrEmpty(psFunction))
+            {
+                ParseShaderModel(psModel, out major, out minor);
+                if (dx11Profile && major <= 3)
+                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 4.0 level 9.1 or higher!", psFunction));
+                if (!dx11Profile && major > 3)
+                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
+            }
+        }
     }
 
     public class TechniqueInfo
@@ -70,14 +110,9 @@ namespace TwoMGFX
             var tree = new Parser(new Scanner()).Parse(newFile);
             if (tree.Errors.Count > 0)
             {
-                // TODO: Make the error info pretty!
                 var errors = String.Empty;
                 foreach (var error in tree.Errors)
-                {
-                    int line, col;
-                    FindLineAndCol(newFile, error.Position, out line, out col);
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, line, col, error.Message);
-                }
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, error.Line, 0, error.Message);
 
                 throw new Exception(errors);
             }
@@ -87,10 +122,14 @@ namespace TwoMGFX
             result.fileName = filePath;
             result.fileContent = newFile;
 
+            // We must have at least one technique.
+            if (result.Techniques.Count <= 0)
+                throw new Exception("The effect must contain at least one technique and pass!");
+
             // Finally remove the techniques from the file.
             //
-            // TODO: Do we really need to do this, or will the HLSL 
-            // compiler just ignore it as we compile shaders?
+            // TODO: We might need to do this for GLSL which will 
+            // freak out if it sees techniques/passes.
             //
             /*
             var extra = 2;
@@ -109,25 +148,6 @@ namespace TwoMGFX
             result.Debug = options.Debug;
 
             return result;
-        }
-
-        public static void FindLineAndCol(string src, int pos, out int line, out int col)
-        {
-            line = 1;
-            col = 1;
-
-            for (var i = 0; i < pos; i++)
-            {
-                if (src[i] == '\n')
-                {
-                    line++;
-                    col = 1;
-                }
-                else
-                {
-                    col++;
-                }
-            }
         }
     }
 }
