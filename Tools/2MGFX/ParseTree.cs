@@ -407,9 +407,8 @@ namespace TwoMGFX
         	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
         		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
         
-        	// Make sure we have at least one pass.
-              	var shaderInfo = paramlist[0] as ShaderInfo;
-              	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+        	var shaderInfo = paramlist[0] as ShaderInfo;
+        	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
         
         	return null;
         }

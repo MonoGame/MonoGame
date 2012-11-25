@@ -34,7 +34,7 @@ OpenSquareBracket -> @"\[";
 CloseSquareBracket -> @"\]";
 [IgnoreCase] Compile -> @"compile";
 [IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
-Code -> @".";
+Code -> @"[\S]+";
 EndOfFile -> @"^$";
 
 // Productions
@@ -243,9 +243,8 @@ Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals
 	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
 		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
 
-	// Make sure we have at least one pass.
-      	var shaderInfo = paramlist[0] as ShaderInfo;
-      	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
 
 	return null;
 };

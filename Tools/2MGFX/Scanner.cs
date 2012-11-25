@@ -142,7 +142,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.ShaderModel, regex);
             Tokens.Add(TokenType.ShaderModel);
 
-            regex = new Regex(@".", RegexOptions.Compiled);
+            regex = new Regex(@"[\S]+", RegexOptions.Compiled);
             Patterns.Add(TokenType.Code, regex);
             Tokens.Add(TokenType.Code);
 
