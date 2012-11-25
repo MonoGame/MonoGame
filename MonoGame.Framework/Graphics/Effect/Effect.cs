@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int MGFXVersion = 2;
+        private const int MGFXVersion = 3;
 
 #if !PSM
 
@@ -247,8 +247,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Check the header to make sure the file and version is correct!
 			var header = new string (reader.ReadChars (MGFXHeader.Length));
 			var version = (int)reader.ReadByte ();
-			if (header != MGFXHeader || version != MGFXVersion)
-				throw new Exception ("Unsupported MGFX format!");
+			if (header != MGFXHeader)
+				throw new Exception ("The MGFX file is corrupt!");
+            if (version != MGFXVersion)
+                throw new Exception("Wrong MGFX file version!");
 
 			var profile = reader.ReadByte ();
 #if DIRECTX
