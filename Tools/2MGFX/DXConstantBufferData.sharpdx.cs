@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 parameters.Add(param);
             }
 
-            // Sort them by the offset for some consistant results.
+            // Sort them by the offset for some consistent results.
             Parameters = parameters.OrderBy(e => e.bufferOffset).ToList();
 
             // Store the parameter offsets.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
@@ -18,6 +19,45 @@ namespace TwoMGFX
 		public BlendState blendState;
 		public RasterizerState rasterizerState;
 		public DepthStencilState depthStencilState;
+		
+        private static readonly Regex _shaderModelRegex = new Regex(@"(vs_|ps_)(1|2|3|4|5)(_)(0|1|)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
+
+        public static void ParseShaderModel(string text, out int major, out int minor)
+        {
+            var match = _shaderModelRegex.Match(text);
+            if (match.Groups.Count < 5)
+            {
+                major = 0;
+                minor = 0;
+                return;
+            }
+
+            major = int.Parse(match.Groups[2].Value);
+            minor = int.Parse(match.Groups[4].Value);
+        }
+
+        public void ValidateShaderModels(bool dx11Profile)
+        {
+            int major, minor;
+
+            if (!string.IsNullOrEmpty(vsFunction))
+            {
+                ParseShaderModel(vsModel, out major, out minor);
+                if (dx11Profile && major <= 3)
+                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 4.0 level 9.1 or higher!", vsFunction));
+                if (!dx11Profile && major > 3)
+                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 3.0 or lower!", vsFunction));
+            }
+
+            if (!string.IsNullOrEmpty(psFunction))
+            {
+                ParseShaderModel(psModel, out major, out minor);
+                if (dx11Profile && major <= 3)
+                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 4.0 level 9.1 or higher!", psFunction));
+                if (!dx11Profile && major > 3)
+                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
+            }
+        }
 	}
 
 	public enum TextureFilterType
@@ -88,13 +128,9 @@ namespace TwoMGFX
 			if (tree.Errors.Count > 0)
 			{
 				// TODO: Make the error info pretty!
-				var errors = String.Empty;
-				foreach (var error in tree.Errors)
-				{
-					int line, col;
-					FindLineAndCol(newFile, error.Position, out line, out col);
-					errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, line, col, error.Message);
-				}
+                var errors = String.Empty;
+                foreach (var error in tree.Errors)
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, error.Line, 0, error.Message);
 
 				throw new Exception(errors);
 			}
@@ -143,23 +179,5 @@ namespace TwoMGFX
 			return result;
 		}
 
-		public static void FindLineAndCol(string src, int pos, out int line, out int col)
-		{
-			line = 1;
-			col = 1;
-
-			for (var i = 0; i < pos; i++)
-			{
-				if (src[i] == '\n')
-				{
-					line++;
-					col = 1;
-				}
-				else
-				{
-					col++;
-				}
-			}
-		}
 	}
 }

@@ -46,7 +46,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
-                    
+
+                    pinfo.ValidateShaderModels(shaderInfo.DX11Profile);
+
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;

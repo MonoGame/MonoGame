@@ -1,7 +1,7 @@
 // MonoGame Effect Parser
 //
-// For use with "Tiny Parser Generator"
-// http://www.codeproject.com/Articles/28294/a-Tiny-Parser-Generator-v1-2
+// For use with our fork of the "Tiny Parser Generator"
+// https://github.com/SickheadGames/TinyPG
 //
 
 <% @TinyPG Namespace="TwoMGFX" Language="C#"%>
@@ -9,15 +9,16 @@
 [Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
 [Skip] Comment -> @"//[^\n\r]*";
 [Skip] Whitespace -> @"[ \t\n\r]+";
+[Skip] LinePragma -> @"#line[^\n]*\n";
 
 // TOKENS
-Pass -> @"pass";
-Technique -> @"technique";
-Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
-SamplerState -> @"sampler_state";
-VertexShader -> @"VertexShader";
-PixelShader -> @"PixelShader";
-Register -> @"register";
+[IgnoreCase] Pass -> @"pass";
+[IgnoreCase] Technique -> @"technique";
+[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
+[IgnoreCase] SamplerState -> @"sampler_state";
+[IgnoreCase] VertexShader -> @"VertexShader";
+[IgnoreCase] PixelShader -> @"PixelShader";
+[IgnoreCase] Register -> @"register";
 Number -> @"[0-9]?\.?[0-9]+";
 TextureName -> @"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
@@ -31,8 +32,8 @@ OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
 OpenSquareBracket -> @"\[";
 CloseSquareBracket -> @"\]";
-Compile -> @"compile";
-ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+[IgnoreCase] Compile -> @"compile";
+[IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
 Code -> @".";
 EndOfFile -> @"^$";
 
