@@ -204,38 +204,32 @@ namespace TwoMGFX
 
         protected virtual object EvalStart(ParseTree tree, params object[] paramlist)
         {
-            ShaderInfo shader = new ShaderInfo();
+            var shader = new ShaderInfo();
         
-        	foreach (ParseNode node in Nodes)
-        	{
-        	  var obj = node.Eval(tree, shader);
-        	  if (obj is TechniqueInfo)
-        		 shader.Techniques.Add((TechniqueInfo)obj);
-        	  else if (obj is SamplerStateInfo)
-        	  {
-        		 var sampler = (SamplerStateInfo)obj;
-        		 shader.SamplerStates.Add(sampler.name, sampler.state);
-        	  }
-        	}
+           foreach (var node in Nodes)
+              node.Eval(tree, shader);
         
-        	return shader;
+           return shader;
         }
 
         protected virtual object EvalTechnique_Declaration(ParseTree tree, params object[] paramlist)
         {
-            TechniqueInfo technique = new TechniqueInfo();
-        	technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
-        	technique.startPos = Token.StartPos;
-        	technique.length = Token.Length;
+            var technique = new TechniqueInfo();
+           technique.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
+           technique.startPos = Token.StartPos;
+           technique.length = Token.Length;
         
-        	foreach (ParseNode node in Nodes)
-        	{
-        	  var pass = node.Eval(tree, technique) as PassInfo;
-        	  if ( pass != null )
-        		 technique.Passes.Add(pass);
-        	}
+           foreach (var node in Nodes)
+              node.Eval(tree, technique);
+           
+           // Make sure we have at least one pass.
+           if (technique.Passes.Count > 0)
+           {
+              var shaderInfo = paramlist[0] as ShaderInfo;
+              shaderInfo.Techniques.Add(technique);
+           }
         
-        	return technique;
+           return null;
         }
 
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
@@ -297,29 +291,36 @@ namespace TwoMGFX
 
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = new PassInfo();
-        	pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
+            var pass = new PassInfo();
+           pass.name = this.GetValue(tree, TokenType.Identifier, 0) as string ?? string.Empty;
         
-        	foreach (ParseNode node in Nodes)
-        	  node.Eval(tree, pass);
+           foreach (var node in Nodes)
+              node.Eval(tree, pass);
         
-        	return pass;
+           // We need to have a pixel or vertex shader to keep this pass.
+           if (!string.IsNullOrEmpty(pass.psFunction) || !string.IsNullOrEmpty(pass.vsFunction))
+           {
+              var technique = paramlist[0] as TechniqueInfo;
+              technique.Passes.Add(pass);
+           }
+        
+           return null;
         }
 
         protected virtual object EvalVertexShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
-        	pass.vsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
-        	pass.vsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	return null;
+            var pass = paramlist[0] as PassInfo;
+           pass.vsModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+           pass.vsFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+           return null;
         }
 
         protected virtual object EvalPixelShader_Pass_Expression(ParseTree tree, params object[] paramlist)
         {
-            PassInfo pass = paramlist[0] as PassInfo;
-        	pass.psModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
-        	pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	return null;
+            var pass = paramlist[0] as PassInfo;
+           pass.psModel = this.GetValue(tree, TokenType.ShaderModel, 0) as string;
+           pass.psFunction = this.GetValue(tree, TokenType.Identifier, 0) as string;
+           return null;
         }
 
         protected virtual object EvalSampler_State_Expression(ParseTree tree, params object[] paramlist)
@@ -406,7 +407,11 @@ namespace TwoMGFX
         	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
         		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
         
-        	return sampler;
+        	// Make sure we have at least one pass.
+              	var shaderInfo = paramlist[0] as ShaderInfo;
+              	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+        
+        	return null;
         }
 
 
