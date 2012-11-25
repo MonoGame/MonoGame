@@ -49,10 +49,6 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Whitespace, regex);
             Tokens.Add(TokenType.Whitespace);
 
-            regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
-            Patterns.Add(TokenType.Identifier, regex);
-            Tokens.Add(TokenType.Identifier);
-
             regex = new Regex(@"pass", RegexOptions.Compiled);
             Patterns.Add(TokenType.Pass, regex);
             Tokens.Add(TokenType.Pass);
@@ -61,6 +57,14 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Technique, regex);
             Tokens.Add(TokenType.Technique);
 
+            regex = new Regex(@"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Sampler, regex);
+            Tokens.Add(TokenType.Sampler);
+
+            regex = new Regex(@"sampler_state", RegexOptions.Compiled);
+            Patterns.Add(TokenType.SamplerState, regex);
+            Tokens.Add(TokenType.SamplerState);
+
             regex = new Regex(@"VertexShader", RegexOptions.Compiled);
             Patterns.Add(TokenType.VertexShader, regex);
             Tokens.Add(TokenType.VertexShader);
@@ -68,6 +72,22 @@ namespace TwoMGFX
             regex = new Regex(@"PixelShader", RegexOptions.Compiled);
             Patterns.Add(TokenType.PixelShader, regex);
             Tokens.Add(TokenType.PixelShader);
+
+            regex = new Regex(@"register", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Register, regex);
+            Tokens.Add(TokenType.Register);
+
+            regex = new Regex(@"[0-9]?\.?[0-9]+", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Number, regex);
+            Tokens.Add(TokenType.Number);
+
+            regex = new Regex(@"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]", RegexOptions.Compiled);
+            Patterns.Add(TokenType.TextureName, regex);
+            Tokens.Add(TokenType.TextureName);
+
+            regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Identifier, regex);
+            Tokens.Add(TokenType.Identifier);
 
             regex = new Regex(@"{", RegexOptions.Compiled);
             Patterns.Add(TokenType.OpenBracket, regex);
@@ -81,6 +101,14 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Equals, regex);
             Tokens.Add(TokenType.Equals);
 
+            regex = new Regex(@":", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Colon, regex);
+            Tokens.Add(TokenType.Colon);
+
+            regex = new Regex(@",", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Comma, regex);
+            Tokens.Add(TokenType.Comma);
+
             regex = new Regex(@";", RegexOptions.Compiled);
             Patterns.Add(TokenType.Semicolon, regex);
             Tokens.Add(TokenType.Semicolon);
@@ -92,6 +120,14 @@ namespace TwoMGFX
             regex = new Regex(@"\)", RegexOptions.Compiled);
             Patterns.Add(TokenType.CloseParenthesis, regex);
             Tokens.Add(TokenType.CloseParenthesis);
+
+            regex = new Regex(@"\[", RegexOptions.Compiled);
+            Patterns.Add(TokenType.OpenSquareBracket, regex);
+            Tokens.Add(TokenType.OpenSquareBracket);
+
+            regex = new Regex(@"\]", RegexOptions.Compiled);
+            Patterns.Add(TokenType.CloseSquareBracket, regex);
+            Tokens.Add(TokenType.CloseSquareBracket);
 
             regex = new Regex(@"compile", RegexOptions.Compiled);
             Patterns.Add(TokenType.Compile, regex);
@@ -235,29 +271,42 @@ namespace TwoMGFX
             //Non terminal tokens:
             Start   = 2,
             Technique_Declaration= 3,
-            Pass_Declaration= 4,
-            VertexShader_Pass_Expression= 5,
-            PixelShader_Pass_Expression= 6,
+            Render_State_Expression= 4,
+            Pass_Declaration= 5,
+            VertexShader_Pass_Expression= 6,
+            PixelShader_Pass_Expression= 7,
+            Sampler_State_Expression= 8,
+            Sampler_Register_Expression= 9,
+            Sampler_Declaration= 10,
 
             //Terminal tokens:
-            BlockComment= 7,
-            Comment = 8,
-            Whitespace= 9,
-            Identifier= 10,
-            Pass    = 11,
-            Technique= 12,
-            VertexShader= 13,
-            PixelShader= 14,
-            OpenBracket= 15,
-            CloseBracket= 16,
-            Equals  = 17,
-            Semicolon= 18,
-            OpenParenthesis= 19,
-            CloseParenthesis= 20,
-            Compile = 21,
-            ShaderModel= 22,
-            Code    = 23,
-            EndOfFile= 24
+            BlockComment= 11,
+            Comment = 12,
+            Whitespace= 13,
+            Pass    = 14,
+            Technique= 15,
+            Sampler = 16,
+            SamplerState= 17,
+            VertexShader= 18,
+            PixelShader= 19,
+            Register= 20,
+            Number  = 21,
+            TextureName= 22,
+            Identifier= 23,
+            OpenBracket= 24,
+            CloseBracket= 25,
+            Equals  = 26,
+            Colon   = 27,
+            Comma   = 28,
+            Semicolon= 29,
+            OpenParenthesis= 30,
+            CloseParenthesis= 31,
+            OpenSquareBracket= 32,
+            CloseSquareBracket= 33,
+            Compile = 34,
+            ShaderModel= 35,
+            Code    = 36,
+            EndOfFile= 37
     }
 
     public class Token
