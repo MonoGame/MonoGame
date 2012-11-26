@@ -121,7 +121,7 @@ namespace TwoMGFX
 			// all #includes and macros.... this even works for GLSL.
 			string newFile;
 			using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath))))
-				newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer);
+                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, filePath);
 
 			// Parse the resulting file for techniques and passes.
 			var tree = new Parser(new Scanner()).Parse(newFile);
