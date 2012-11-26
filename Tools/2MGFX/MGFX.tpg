@@ -118,6 +118,31 @@ Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
 				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
 			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
 			break;
+		case "depthbias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.DepthBias = float.Parse(value);
+			break;
+		case "cullmode":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
+			break;
+		case "fillmode":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
+			break;
+		case "multisampleantialias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
+			break;
+		case "slopescaledepthbias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.SlopeScaleDepthBias = float.Parse(value);
+			break;
 		default:
 			break;
 	}

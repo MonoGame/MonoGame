@@ -8,6 +8,34 @@ namespace TwoMGFX
 {
 	public class ParseTreeTools
 	{
+        public static FillMode ParseFillMode(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "solid":
+                    return FillMode.Solid;
+                case "wireframe":
+                    return FillMode.WireFrame;
+                default:
+                    throw new Exception("Unknown fill mode '" + value + "'.");
+            }
+        }
+
+        public static CullMode ParseCullMode(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "none":
+                    return CullMode.None;
+                case "cw":
+                    return CullMode.CullClockwiseFace;
+                case "ccw":
+                    return CullMode.CullCounterClockwiseFace;
+                default:
+                    throw new Exception("Unknown cull mode '" + value + "'.");
+            }
+        }
+
 		public static TextureAddressMode ParseAddressMode(string value)
 		{
 			switch (value.ToLower())
