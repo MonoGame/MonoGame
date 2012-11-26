@@ -35,7 +35,7 @@
 				<File name="Main.fs" AddStandardHeader="True" src="MonoGameApplication/MacMain.fs" />
 				<File name="Info.plist" AddStandardHeader="False" src="MonoGameApplication/MacInfo.plist" />
 				<Directory name="Content">
-					<RawFile name="logo.png" src="MonoGameApplication/Icon-hd.png" />
+					<RawFile name="logo.png" src="MonoGameApplication/Icon-hd.png" BuildAction="Content" />
 				</Directory>
 			</Files>
 		</Project>

@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			public string samplerName;
 			public string parameterName;
 			public int parameter;
+			public SamplerState state;
 		}
 
 		public struct Attribute

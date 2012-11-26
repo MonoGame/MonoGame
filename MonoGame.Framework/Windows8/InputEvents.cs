@@ -148,9 +148,10 @@ namespace Microsoft.Xna.Framework
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
-            if (isTouch)
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
-            else
+
+            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
+            
+            if (!isTouch)
             {
                 // Mouse or stylus event.
                 UpdateMouse(pointerPoint);
@@ -169,12 +170,13 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
             var touchIsDown = pointerPoint.IsInContact;
-            if (isTouch)
+
+            if (touchIsDown)
             {
-                if (touchIsDown)
-                    TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
+                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos, !isTouch);
             }
-            else
+
+            if (!isTouch)
             {
                 // Mouse or stylus event.
                 UpdateMouse(pointerPoint);
@@ -188,9 +190,10 @@ namespace Microsoft.Xna.Framework
             var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
-            if (isTouch)
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
-            else
+
+            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos, !isTouch);
+
+            if (!isTouch)
             {
                 // Mouse or stylus event.
                 UpdateMouse(pointerPoint);

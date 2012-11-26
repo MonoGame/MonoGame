@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -34,13 +35,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var p = 0; p < tinfo.Passes.Count; p++)
                 {
-                    var pinfo = tinfo.Passes[p];;
+                    var pinfo = tinfo.Passes[p];
 
                     var pass = new d3dx_pass();
                     pass.name = pinfo.name ?? string.Empty;
+
+					pass.blendState = pinfo.blendState;
+					pass.depthStencilState = pinfo.depthStencilState;
+					pass.rasterizerState = pinfo.rasterizerState;
+
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
-                    
+
+                    pinfo.ValidateShaderModels(shaderInfo.DX11Profile);
+
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
@@ -89,6 +97,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
+			var samplerStates = new Dictionary<string, SamplerState>();
+
             // Add the texture parameters from the samplers.
             foreach (var shader in effect.Shaders)
             {
@@ -106,6 +116,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         param.type = D3DXPARAMETER_TYPE.TEXTURE2D; // TODO: Fix this right!
                         param.name = sampler.parameterName;
                         param.semantic = string.Empty;
+
+						SamplerState state = null;
+						shaderInfo.SamplerStates.TryGetValue(param.name, out state);
+						samplerStates[param.name] = state;
 
                         parameters.Add(param);
                     }
@@ -137,6 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             */
 
+			effect.SamplerStates = samplerStates;
             effect.Parameters = parameters.ToArray();
 
             return effect;
@@ -175,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     shaderProfile, 
                     shaderFlags, 
                     0, 
-                    null, 
+                    null,
                     null,
                     shaderInfo.fileName);
 
@@ -208,9 +223,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
+                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 else
-                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
 
                 Shaders.Add(dxShader);
             }
