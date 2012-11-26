@@ -96,8 +96,6 @@ namespace Microsoft.Xna.Framework
         public iOSGamePlatform(Game game) :
             base(game)
         {
-
-            //PerformanceCounter.Begin();
             game.Services.AddService(typeof(iOSGamePlatform), this);
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
