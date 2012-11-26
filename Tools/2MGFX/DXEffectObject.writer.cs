@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -169,20 +166,6 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write((byte)count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, annotations[i]);
-        }
-
-        private static void WriteStates(BinaryWriter writer, d3dx_state [] states, uint count)
-        {
-            writer.Write((byte)count);
-            for (var s = 0; s < count; s++)
-            {
-                var state = states[s];
-
-                writer.Write((ushort)state.index);
-                writer.Write((byte)state.operation);
-                writer.Write((byte)state.type);
-                WriteParameter(writer, state.parameter);
-            }
         }
 	}
 }
