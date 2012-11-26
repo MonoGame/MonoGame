@@ -9,7 +9,7 @@
 [Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
 [Skip] Comment -> @"//[^\n\r]*";
 [Skip] Whitespace -> @"[ \t\n\r]+";
-[Skip] LinePragma -> @"#line[^\n]*\n";
+[FileAndLine] LinePragma -> @"^[ \t]*#line[ \t]*(?<Line>\d*)[ \t]*(\""(?<File>[^\""\\]*(?:\\.[^\""\\]*)*)\"")?\n";
 
 // TOKENS
 [IgnoreCase] Pass -> @"pass";

@@ -16,6 +16,7 @@ namespace TwoMGFX
     [Serializable]
     public class ParseError
     {
+        private string file;
         private string message;
         private int code;
         private int line;
@@ -23,6 +24,7 @@ namespace TwoMGFX
         private int pos;
         private int length;
 
+        public string File { get { return file; } }
         public int Code { get { return code; } }
         public int Line { get { return line; } }
         public int Column { get { return col; } }
@@ -35,12 +37,17 @@ namespace TwoMGFX
         {
         }
 
-        public ParseError(string message, int code, ParseNode node) : this(message, code,  0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
+        public ParseError(string message, int code, ParseNode node) : this(message, code, node.Token)
         {
         }
 
-        public ParseError(string message, int code, int line, int col, int pos, int length)
+        public ParseError(string message, int code, Token token) : this(message, code, token.File, token.Line, token.Column, token.StartPos, token.Length)
         {
+        }
+
+        public ParseError(string message, int code, string file = "", int line = 0, int col = 0, int pos = 0, int length = 0)
+        {
+            this.file = file;
             this.message = message;
             this.code = code;
             this.line = line;
