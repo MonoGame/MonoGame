@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class DXShaderData
     {
-        public static DXShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, bool debug)
+        public static DXShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerState> samplerStates, bool debug)
         {
             var dxshader = new DXShaderData();
             dxshader.IsVertexShader = isVertexShader;
@@ -53,11 +52,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         var rdesc = refelect.GetResourceBindingDescription(i);
                         if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
                         {
+							SamplerState state = null;
+							samplerStates.TryGetValue(rdesc.Name, out state);
                             samplers.Add(new Sampler
                             {
                                 index = rdesc.BindPoint,
                                 parameterName = rdesc.Name,
-
+								state = state,
                                 // TODO: Detect the sampler type for realz.
                                 type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D
                             });

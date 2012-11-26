@@ -135,11 +135,11 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			var playerSave = string.Empty;
 			if (playerIndex.HasValue) {
-				playerSave = Path.Combine(root,"Player" + (int)playerIndex.Value);
+				playerSave = Path.Combine(_storagePath, "Player" + (int)playerIndex.Value);
 			}
 			
 			if (!string.IsNullOrEmpty(playerSave))
-				_storagePath = Path.Combine(root,"Player" + (int)playerIndex);
+				_storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
 
             // Create the "device" if need be
 #if WINRT
