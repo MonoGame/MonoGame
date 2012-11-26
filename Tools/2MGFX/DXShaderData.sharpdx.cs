@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
