@@ -247,9 +247,9 @@ namespace TwoMGFX
         	
         	Microsoft.Xna.Framework.Graphics.Blend blend;
         	
-        	switch (name)
+        	switch (name.ToLower())
         	{
-        		case "AlphaBlendEnable":
+        		case "alphablendenable":
         			if (!ParseTreeTools.ParseBool(value))
         			{
         				if (pass.blendState == null)
@@ -260,31 +260,31 @@ namespace TwoMGFX
         				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
         			}
         			break;
-        		case "SrcBlend":
+        		case "srcblend":
         			blend = ParseTreeTools.ParseBlend(value);
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaSourceBlend = blend;
         			pass.blendState.ColorSourceBlend = blend;
         			break;
-        		case "DestBlend":
+        		case "destblend":
         			blend = ParseTreeTools.ParseBlend(value);
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaDestinationBlend = blend;
         			pass.blendState.ColorDestinationBlend = blend;
         			break;
-        		case "BlendOp":
+        		case "blendop":
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
         			break;
-        		case "ZEnable":
+        		case "zenable":
         			if (pass.depthStencilState == null)
         				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
         			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
         			break;
-        		case "ZWriteEnable":
+        		case "zwriteenable":
         			if (pass.depthStencilState == null)
         				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
         			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
@@ -335,39 +335,39 @@ namespace TwoMGFX
             var sampler = paramlist[0] as SamplerStateInfo;
         	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	var value = (this.GetValue(tree, TokenType.TextureName, 0) ?? (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0))) as string;
-        	switch (name)
+        	switch (name.ToLower())
         	{
-        		case "Texture":
+        		case "texture":
         			// Ignore
         			break;
-        		case "MinFilter":
+        		case "minfilter":
         			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "MagFilter":
+        		case "magfilter":
         			sampler.MagFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "MipFilter":
+        		case "mipfilter":
         			sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "Filter":
+        		case "filter":
         			sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "AddressU":
+        		case "addressu":
         			sampler.state.AddressU = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "AddressV":
+        		case "addressv":
         			sampler.state.AddressV = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "AddressW":
+        		case "addressw":
         			sampler.state.AddressW = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "MaxAnisotropy":
+        		case "maxanisotropy":
         			sampler.state.MaxAnisotropy = int.Parse(value);
         			break;
-        		case "MaxLOD":
+        		case "maxlod":
         			sampler.state.MaxMipLevel = int.Parse(value);
         			break;
-        		case "MipLODBias":
+        		case "miplodbias":
         			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
         			break;
         		default:
