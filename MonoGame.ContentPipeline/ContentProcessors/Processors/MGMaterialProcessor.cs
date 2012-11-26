@@ -28,5 +28,10 @@ namespace MonoGameContentProcessors.Processors
 
             return context.BuildAsset<TextureContent, TextureContent>(texture, typeof(MGTextureProcessor).Name, processorParameters, null, null);
         }
+
+		protected override ExternalReference<CompiledEffectContent> BuildEffect(ExternalReference<EffectContent> effect, ContentProcessorContext context)
+		{
+			return context.BuildAsset<EffectContent, CompiledEffectContent>(effect, typeof(MGEffectProcessor).Name);
+		}
     }
 }
