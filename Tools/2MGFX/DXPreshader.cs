@@ -1,7 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-
 namespace Microsoft.Xna.Framework.Graphics
 {
 	internal partial class DXPreshader
