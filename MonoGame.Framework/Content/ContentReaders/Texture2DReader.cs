@@ -52,6 +52,11 @@ namespace Microsoft.Xna.Framework.Content
             return Normalize(fileName, supportedExtensions);
         }
 
+        bool IsPowerOfTwo(UInt32 x)
+        {
+            return x != 0 && 0 == (x & (x - 1));
+        }
+
         protected internal override Texture2D Read(ContentReader reader, Texture2D existingInstance)
 		{
 			Texture2D texture = null;
@@ -84,6 +89,18 @@ namespace Microsoft.Xna.Framework.Content
 			int width = (reader.ReadInt32 ());
 			int height = (reader.ReadInt32 ());
 			int levelCount = (reader.ReadInt32 ());
+            int levelCountOutput = levelCount;
+
+
+#if IPHONE
+            if (levelCount > 1 && 
+                (!IsPowerOfTwo((UInt32)width) || 
+                 !IsPowerOfTwo((UInt32)height)))
+            {
+                levelCountOutput = 1;
+                System.Diagnostics.Debug.WriteLine("Detected texture with mipmaps that is not power of two size. Ignoring mipmaps.");
+            }
+#endif
 
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
@@ -112,7 +129,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
             if (existingInstance == null)
-			    texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+                texture = new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
             else
                 texture = existingInstance;
 			
@@ -122,6 +139,12 @@ namespace Microsoft.Xna.Framework.Content
 				byte[] levelData = reader.ReadBytes (levelDataSizeInBytes);
                 int levelWidth = width >> level;
                 int levelHeight = height >> level;
+
+                if (level >= levelCountOutput)
+                {
+                    continue;
+                }
+
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
