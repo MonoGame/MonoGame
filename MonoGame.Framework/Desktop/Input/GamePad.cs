@@ -72,8 +72,9 @@ namespace Microsoft.Xna.Framework.Input
 			if (!sdl) return;
 #if DEBUG
 			Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
-#endif
-			int numSticks = Sdl.SDL_NumJoysticks();
+#endif			
+			// Limit to the first 4 sticks to avoid crashes
+			int numSticks = Math.Min (4,Sdl.SDL_NumJoysticks());
 			for (int x = 0; x < numSticks; x++)
 			{
 
