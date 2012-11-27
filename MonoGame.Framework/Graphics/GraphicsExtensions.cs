@@ -538,6 +538,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 4;
                 case SurfaceFormat.Dxt3:
                     return 4;
+                case SurfaceFormat.Bgr565:
+                    return 2;
                 case SurfaceFormat.Bgra4444:
                     return 2;
                 case SurfaceFormat.Bgra5551:
