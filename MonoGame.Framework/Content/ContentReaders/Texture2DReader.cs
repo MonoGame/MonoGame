@@ -158,6 +158,7 @@ namespace Microsoft.Xna.Framework.Content
 						break;
 					case SurfaceFormat.Bgra4444:
 						{
+#if GLES
 							// Shift the channels to suit GLES
 							int offset = 0;
 							for (int y = 0; y < levelHeight; y++)
@@ -171,6 +172,7 @@ namespace Microsoft.Xna.Framework.Content
 									offset += 2;
 								}
 							}
+#endif
 						}
 						break;
 					case SurfaceFormat.NormalizedByte4:
