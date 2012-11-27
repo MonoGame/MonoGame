@@ -475,18 +475,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort4444;
 				break;
 			case SurfaceFormat.Bgra5551:
-                glInternalFormat = PixelInternalFormat.Rgba;
-                glFormat = PixelFormat.Rgba;
-
-                // Xna content pipeline supplies texture data in ARGB 1555
-                // but Android appears not to support this reversed 5551.
-#if IPHONE
-                glType = PixelType.UnsignedShort1555Rev;
-#elif ANDROID
-                glType = PixelType.UnsignedShort5551;
-#else
-                glType = PixelType.UnsignedShort1555Reversed;
-#endif
+				glInternalFormat = PixelInternalFormat.Rgba;
+				glFormat = PixelFormat.Rgba;
+				glType = PixelType.UnsignedShort5551;
 				break;
 			case SurfaceFormat.Alpha8:
 				glInternalFormat = PixelInternalFormat.Luminance;
