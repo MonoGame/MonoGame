@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics

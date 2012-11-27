@@ -1,6 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -12,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private MojoShader.MOJOSHADER_symbol[] _symbols;
 
-		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex)
+		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerState> samplerStates)
 		{
 			var dxshader = new DXShaderData ();
 			dxshader.SharedIndex = sharedIndex;
@@ -101,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_FLOAT4:
 						symbols [i].register_index = float4_index;
-						float4_index += symbols [i].register_count;
+						float4_index += symbols[i].register_count;
 						break;
 
 					case MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_INT4:
@@ -130,6 +128,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					symbols.First (e => e.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
 					e.register_index == samplers [i].index
 				).name;
+
+				SamplerState state = null;
+				samplerStates.TryGetValue(dxshader._samplers[i].parameterName, out state);
+				dxshader._samplers[i].state = state;
 
 				// Set the rest of the sampler info.
 				dxshader._samplers [i].type = samplers [i].type;

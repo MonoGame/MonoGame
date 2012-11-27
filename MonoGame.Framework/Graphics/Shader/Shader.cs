@@ -43,6 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public SamplerType type;
         public int index;
         public string name;
+		public SamplerState state;
 
         // TODO: This should be moved to EffectPass.
         public int parameter;
@@ -106,6 +107,19 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Samplers[s].type = (SamplerType)reader.ReadByte();
                 Samplers[s].index = reader.ReadByte();
+
+				if (reader.ReadBoolean())
+				{
+					Samplers[s].state = new SamplerState();
+					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
+					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
+					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
+					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
+				}
+
 #if OPENGL
                 Samplers[s].name = reader.ReadString();
 #endif

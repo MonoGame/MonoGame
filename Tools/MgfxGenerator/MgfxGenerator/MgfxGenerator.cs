@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -106,7 +106,13 @@ namespace MonoGame.Tools.VisualStudio
 
                         /// match errors in the format
                         /// filenamePath(line,col): summary: detail
-                        const string pattern = @"(?<filename>[^\(]+)\((?<line>[^,]+)\,(?<col>[^\)]*)[^\:]*\:\s+((?<summary>[^\:]*)\:)?(?<detail>[^\n]*)";
+                        /// or
+                        /// (line,col):summary:detail
+                        /// examples:
+                        /// (97,8): error X3507: 'PixelShaderFunction': Not all control paths return a value
+                        /// example.fx (97,8): error X3507: 'PixelShaderFunction': Not all control paths return a value
+                        const string pattern = @"(?<filename>[^\(]*)?\((?<line>[^,]+)\,(?<col>[^\)]+)\):(?<summary>[^:]+):(?<detail>.*)";
+
 
                         foreach (var error in errors)
                         {
@@ -114,6 +120,7 @@ namespace MonoGame.Tools.VisualStudio
 
                             if (matches.Count <= 0)
                             {
+                                /// send the complete error back if we couldn't parse it.
                                 GeneratorErrorCallback(false, 0, error, 0, 0);
                             }
 
