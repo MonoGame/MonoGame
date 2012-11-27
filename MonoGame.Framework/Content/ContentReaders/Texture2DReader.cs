@@ -158,8 +158,8 @@ namespace Microsoft.Xna.Framework.Content
 						break;
 					case SurfaceFormat.Bgra4444:
 						{
-#if GLES
-							// Shift the channels to suit GLES
+#if OPENGL
+                            // Shift the channels to suit OPENGL
 							int offset = 0;
 							for (int y = 0; y < levelHeight; y++)
 							{
