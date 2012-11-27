@@ -91,16 +91,15 @@ namespace Microsoft.Xna.Framework.Content
 			int levelCount = (reader.ReadInt32 ());
             int levelCountOutput = levelCount;
 
-
-#if IPHONE
-            if (levelCount > 1 && 
-                (!IsPowerOfTwo((UInt32)width) || 
-                 !IsPowerOfTwo((UInt32)height)))
+            // If the system does not fully support Power of Two textures,
+            // skip any mip maps supplied with any non PoT textures.
+            if (levelCount > 1 && !GraphicsCapabilities.NonPowerOfTwo &&
+                (!IsPowerOfTwo((UInt32)width) || !IsPowerOfTwo((UInt32)height)))
             {
                 levelCountOutput = 1;
-                System.Diagnostics.Debug.WriteLine("Detected texture with mipmaps that is not power of two size. Ignoring mipmaps.");
+                System.Diagnostics.Debug.WriteLine(
+                    "Device does not support non Power of Two textures. Skipping mipmaps.");
             }
-#endif
 
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
