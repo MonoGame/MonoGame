@@ -348,7 +348,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                 {
                     // Set pixel alignment to match texel size in bytes
-                    GL.PixelStore(All.UnpackAlignment, GraphicsExtensions.Size(this.Format));
+                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.Size(this.Format));
+                    //GL.PixelStore(All.UnpackAlignment, GraphicsExtensions.Size(this.Format));
                     if (rect.HasValue)
                     {
                         GL.TexSubImage2D(TextureTarget.Texture2D, level,
@@ -368,7 +369,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         GraphicsExtensions.CheckGLError();
                     }
                     // Return to default pixel alignment
-                    GL.PixelStore(All.UnpackAlignment, 4);
+                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
+                    //GL.PixelStore(All.UnpackAlignment, 4);
                 }
 
 #if !ANDROID
