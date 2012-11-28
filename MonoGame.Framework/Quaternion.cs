@@ -822,7 +822,17 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            throw new NotImplementedException();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(32);
+            sb.Append("{X:");
+            sb.Append(this.X);
+            sb.Append(" Y:");
+            sb.Append(this.Y);
+            sb.Append(" Z:");
+            sb.Append(this.Z);
+            sb.Append(" W:");
+            sb.Append(this.W);
+            sb.Append("}");
+            return sb.ToString();
         }
 
 		internal Matrix ToMatrix ()

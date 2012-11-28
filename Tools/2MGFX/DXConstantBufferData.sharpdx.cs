@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -28,15 +27,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 param.semantic = string.Empty;
                 param.bufferOffset = vdesc.Description.StartOffset;
 
+                var size = param.columns * param.rows * 4;
+                var data = new byte[size];
+
                 if (vdesc.Description.DefaultValue != IntPtr.Zero)
-                    throw new NotImplementedException("No support for default values yet!");
-                else
-                    param.data = new byte[param.columns * param.rows * 4];
+                    Marshal.Copy(vdesc.Description.DefaultValue, data, 0, (int)size);
+
+                param.data = data;
 
                 parameters.Add(param);
             }
 
-            // Sort them by the offset for some consistant results.
+            // Sort them by the offset for some consistent results.
             Parameters = parameters.OrderBy(e => e.bufferOffset).ToList();
 
             // Store the parameter offsets.

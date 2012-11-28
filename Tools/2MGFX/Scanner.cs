@@ -36,6 +36,7 @@ namespace TwoMGFX
             SkipList.Add(TokenType.BlockComment);
             SkipList.Add(TokenType.Comment);
             SkipList.Add(TokenType.Whitespace);
+            SkipList.Add(TokenType.LinePragma);
 
             regex = new Regex(@"/\*([^*]|\*[^/])*\*/", RegexOptions.Compiled);
             Patterns.Add(TokenType.BlockComment, regex);
@@ -49,25 +50,49 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Whitespace, regex);
             Tokens.Add(TokenType.Whitespace);
 
-            regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
-            Patterns.Add(TokenType.Identifier, regex);
-            Tokens.Add(TokenType.Identifier);
+            regex = new Regex(@"#line[^\n]*\n", RegexOptions.Compiled);
+            Patterns.Add(TokenType.LinePragma, regex);
+            Tokens.Add(TokenType.LinePragma);
 
-            regex = new Regex(@"pass", RegexOptions.Compiled);
+            regex = new Regex(@"pass", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Pass, regex);
             Tokens.Add(TokenType.Pass);
 
-            regex = new Regex(@"technique", RegexOptions.Compiled);
+            regex = new Regex(@"technique", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Technique, regex);
             Tokens.Add(TokenType.Technique);
 
-            regex = new Regex(@"VertexShader", RegexOptions.Compiled);
+            regex = new Regex(@"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Sampler, regex);
+            Tokens.Add(TokenType.Sampler);
+
+            regex = new Regex(@"sampler_state", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.SamplerState, regex);
+            Tokens.Add(TokenType.SamplerState);
+
+            regex = new Regex(@"VertexShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.VertexShader, regex);
             Tokens.Add(TokenType.VertexShader);
 
-            regex = new Regex(@"PixelShader", RegexOptions.Compiled);
+            regex = new Regex(@"PixelShader", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.PixelShader, regex);
             Tokens.Add(TokenType.PixelShader);
+
+            regex = new Regex(@"register", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Register, regex);
+            Tokens.Add(TokenType.Register);
+
+            regex = new Regex(@"[0-9]?\.?[0-9]+", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Number, regex);
+            Tokens.Add(TokenType.Number);
+
+            regex = new Regex(@"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]", RegexOptions.Compiled);
+            Patterns.Add(TokenType.TextureName, regex);
+            Tokens.Add(TokenType.TextureName);
+
+            regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Identifier, regex);
+            Tokens.Add(TokenType.Identifier);
 
             regex = new Regex(@"{", RegexOptions.Compiled);
             Patterns.Add(TokenType.OpenBracket, regex);
@@ -81,6 +106,14 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Equals, regex);
             Tokens.Add(TokenType.Equals);
 
+            regex = new Regex(@":", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Colon, regex);
+            Tokens.Add(TokenType.Colon);
+
+            regex = new Regex(@",", RegexOptions.Compiled);
+            Patterns.Add(TokenType.Comma, regex);
+            Tokens.Add(TokenType.Comma);
+
             regex = new Regex(@";", RegexOptions.Compiled);
             Patterns.Add(TokenType.Semicolon, regex);
             Tokens.Add(TokenType.Semicolon);
@@ -93,15 +126,23 @@ namespace TwoMGFX
             Patterns.Add(TokenType.CloseParenthesis, regex);
             Tokens.Add(TokenType.CloseParenthesis);
 
-            regex = new Regex(@"compile", RegexOptions.Compiled);
+            regex = new Regex(@"\[", RegexOptions.Compiled);
+            Patterns.Add(TokenType.OpenSquareBracket, regex);
+            Tokens.Add(TokenType.OpenSquareBracket);
+
+            regex = new Regex(@"\]", RegexOptions.Compiled);
+            Patterns.Add(TokenType.CloseSquareBracket, regex);
+            Tokens.Add(TokenType.CloseSquareBracket);
+
+            regex = new Regex(@"compile", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Compile, regex);
             Tokens.Add(TokenType.Compile);
 
-            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
+            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.ShaderModel, regex);
             Tokens.Add(TokenType.ShaderModel);
 
-            regex = new Regex(@".", RegexOptions.Compiled);
+            regex = new Regex(@"[\S]+", RegexOptions.Compiled);
             Patterns.Add(TokenType.Code, regex);
             Tokens.Add(TokenType.Code);
 
@@ -202,6 +243,12 @@ namespace TwoMGFX
                     tok.Text = Input.Substring(tok.StartPos, 1);
                 }
 
+                // Update the line and column count.
+                CurrentLine += tok.Text.Length - tok.Text.Replace("\n", "").Length;
+                tok.Line = CurrentLine;
+                if (tok.StartPos < Input.Length)
+                    tok.Column = tok.StartPos - Input.LastIndexOf('\n', tok.StartPos);
+
                 if (SkipList.Contains(tok.Type))
                 {
                     startpos = tok.EndPos;
@@ -235,33 +282,49 @@ namespace TwoMGFX
             //Non terminal tokens:
             Start   = 2,
             Technique_Declaration= 3,
-            Pass_Declaration= 4,
-            VertexShader_Pass_Expression= 5,
-            PixelShader_Pass_Expression= 6,
+            Render_State_Expression= 4,
+            Pass_Declaration= 5,
+            VertexShader_Pass_Expression= 6,
+            PixelShader_Pass_Expression= 7,
+            Sampler_State_Expression= 8,
+            Sampler_Register_Expression= 9,
+            Sampler_Declaration= 10,
 
             //Terminal tokens:
-            BlockComment= 7,
-            Comment = 8,
-            Whitespace= 9,
-            Identifier= 10,
-            Pass    = 11,
-            Technique= 12,
-            VertexShader= 13,
-            PixelShader= 14,
-            OpenBracket= 15,
-            CloseBracket= 16,
-            Equals  = 17,
-            Semicolon= 18,
-            OpenParenthesis= 19,
-            CloseParenthesis= 20,
-            Compile = 21,
-            ShaderModel= 22,
-            Code    = 23,
-            EndOfFile= 24
+            BlockComment= 11,
+            Comment = 12,
+            Whitespace= 13,
+            LinePragma= 14,
+            Pass    = 15,
+            Technique= 16,
+            Sampler = 17,
+            SamplerState= 18,
+            VertexShader= 19,
+            PixelShader= 20,
+            Register= 21,
+            Number  = 22,
+            TextureName= 23,
+            Identifier= 24,
+            OpenBracket= 25,
+            CloseBracket= 26,
+            Equals  = 27,
+            Colon   = 28,
+            Comma   = 29,
+            Semicolon= 30,
+            OpenParenthesis= 31,
+            CloseParenthesis= 32,
+            OpenSquareBracket= 33,
+            CloseSquareBracket= 34,
+            Compile = 35,
+            ShaderModel= 36,
+            Code    = 37,
+            EndOfFile= 38
     }
 
     public class Token
     {
+        private int line;
+        private int column;
         private int startpos;
         private int endpos;
         private string text;
@@ -269,6 +332,16 @@ namespace TwoMGFX
 
         // contains all prior skipped symbols
         private List<Token> skipped;
+
+        public int Line { 
+            get { return line; } 
+            set { line = value; }
+        }
+
+        public int Column {
+            get { return column; } 
+            set { column = value; }
+        }
 
         public int StartPos { 
             get { return startpos;} 
