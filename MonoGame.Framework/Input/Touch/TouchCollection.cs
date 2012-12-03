@@ -50,8 +50,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 {
     public struct TouchCollection : IList<TouchLocation>
 	{
-        private TouchLocation[] _collection;
-
+        private IList<TouchLocation> _collection;
+ 
         private bool _isConnected;
 
 		#region Properties
@@ -66,9 +66,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _collection = touches;
         }
 
+        public TouchCollection(IList<TouchLocation> touches)
+        {
+            _isConnected = true;
+            _collection = touches;
+        }
+
         public bool FindById(int id, out TouchLocation touchLocation)
 		{
-            for (var i = 0; i < _collection.Length; i++)
+            for (var i = 0; i < _collection.Count; i++)
             {
                 var location = _collection[i];
                 if (location.Id == id)
@@ -91,13 +97,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public int IndexOf(TouchLocation item)
         {
-            for (var i = 0; i < _collection.Length; i++)
-            {
-                if (item == _collection[i])
-                    return i;
-            }
-
-            return -1;
+            return _collection.IndexOf(item);
         }
 
         public void Insert(int index, TouchLocation item)
@@ -131,13 +131,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public bool Contains(TouchLocation item)
         {
-            for (var i = 0; i < _collection.Length; i++)
-            {
-                if (item == _collection[i])
-                    return true;
-            }
-
-            return false;
+            return _collection.Contains(item);
         }
 
         public void CopyTo(TouchLocation[] array, int arrayIndex)
@@ -147,7 +141,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public int Count
         {
-            get { return _collection.Length; }
+            get { return _collection.Count; }
         }
 
         public bool Remove(TouchLocation item)

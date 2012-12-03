@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             while (RefreshState(consumeState, _touchState, _touchEvents))
                 consumeState = false;
 
-            return new TouchCollection(_touchState.ToArray());
+            return new TouchCollection(_touchState);
         }
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// This will release all touch locations.  It should only be 
         /// called on platforms where touch state is reset all at once.
         /// </summary>
-        internal static void ReleaseAllTouches()
+        public static void ReleaseAllTouches()
         {
             // Clear any pending events.
             _touchEvents.Clear();
