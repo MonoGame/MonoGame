@@ -275,7 +275,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             throw new NotSupportedException();
         }
 
-        public IEnumerator<TouchLocation> GetEnumerator()
+        public TouchCollection.Enumerator GetEnumerator()
+        {
+            return new TouchCollection.Enumerator(this);
+        }
+
+        IEnumerator<TouchLocation> IEnumerable<TouchLocation>.GetEnumerator()
         {
             return new TouchCollection.Enumerator(this);
         }
