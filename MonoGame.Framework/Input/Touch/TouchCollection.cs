@@ -97,9 +97,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _location10 = new TouchLocation();
             _location11 = new TouchLocation();
 
-            foreach (TouchLocation cur in touches)
+            for (int i = 0; i < touches.Count; i++)
             {
-                _internalAdd(cur);
+                _internalAdd(touches[i]);
             }
         }
 
