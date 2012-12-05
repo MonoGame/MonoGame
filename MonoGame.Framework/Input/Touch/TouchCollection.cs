@@ -50,7 +50,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
 {
     public struct TouchCollection : IList<TouchLocation>
 	{
-        private TouchLocation[] _collection;
+        private const int MAX_TOUCHES = 12;
+
+        private int _count;
+        private TouchLocation _location0;
+        private TouchLocation _location1;
+        private TouchLocation _location2;
+        private TouchLocation _location3;
+        private TouchLocation _location4;
+        private TouchLocation _location5;
+        private TouchLocation _location6;
+        private TouchLocation _location7;
+        private TouchLocation _location8;
+        private TouchLocation _location9;
+        private TouchLocation _location10;
+        private TouchLocation _location11;
 
         private bool _isConnected;
 
@@ -60,17 +74,83 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		#endregion
 
-        public TouchCollection(TouchLocation[] touches)
+        public TouchCollection(IList<TouchLocation> touches)
         {
+            if (touches == null)
+                throw new ArgumentNullException();
+
             _isConnected = true;
-            _collection = touches;
+
+            _count = 0;
+            _location0 = new TouchLocation();
+            _location1 = new TouchLocation();
+            _location2 = new TouchLocation();
+            _location3 = new TouchLocation();
+            _location4 = new TouchLocation();
+            _location5 = new TouchLocation();
+            _location6 = new TouchLocation();
+            _location7 = new TouchLocation();
+            _location8 = new TouchLocation();
+            _location9 = new TouchLocation();
+            _location10 = new TouchLocation();
+            _location11 = new TouchLocation();
+
+            for (int i = 0; i < Math.Min(touches.Count, MAX_TOUCHES); i++)
+            {
+                _internalAdd(touches[i]);
+            }
+        }
+
+        private void _internalAdd(TouchLocation touch)
+        {
+            switch (_count)
+            {
+                case 0:
+                    _location0 = touch;
+                    break;
+                case 1:
+                    _location1 = touch;
+                    break;
+                case 2:
+                    _location2 = touch;
+                    break;
+                case 3:
+                    _location3 = touch;
+                    break;
+                case 4:
+                    _location4 = touch;
+                    break;
+                case 5:
+                    _location5 = touch;
+                    break;
+                case 6:
+                    _location6 = touch;
+                    break;
+                case 7:
+                    _location7 = touch;
+                    break;
+                case 8:
+                    _location8 = touch;
+                    break;
+                case 9:
+                    _location9 = touch;
+                    break;
+                case 10:
+                    _location10 = touch;
+                    break;
+                case 11:
+                    _location11 = touch;
+                    break;
+            }
+
+            _count++;
         }
 
         public bool FindById(int id, out TouchLocation touchLocation)
 		{
-            for (var i = 0; i < _collection.Length; i++)
+            for (var i = 0; i < _count; i++)
             {
-                var location = _collection[i];
+                var location = this[i];
                 if (location.Id == id)
                 {
                     touchLocation = location;
@@ -91,9 +171,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public int IndexOf(TouchLocation item)
         {
-            for (var i = 0; i < _collection.Length; i++)
+            for (int i = 0; i < _count; i++)
             {
-                if (item == _collection[i])
+                if (this[i] == item)
                     return i;
             }
 
@@ -112,7 +192,41 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchLocation this[int index]
         {
-            get { return _collection[index]; }
+            get
+            {
+                if (index < 0 || index >= _count)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                switch (index)
+                {
+                    case 0:
+                        return _location0;
+                    case 1:
+                        return _location1;
+                    case 2:
+                        return _location2;
+                    case 3:
+                        return _location3;
+                    case 4:
+                        return _location4;
+                    case 5:
+                        return _location5;
+                    case 6:
+                        return _location6;
+                    case 7:
+                        return _location7;
+                    case 8:
+                        return _location8;
+                    case 9:
+                        return _location9;
+                    case 10:
+                        return _location10;
+                    default:
+                        return _location11;
+                }
+            }
             set
             {
                 throw new NotSupportedException();
@@ -131,23 +245,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public bool Contains(TouchLocation item)
         {
-            for (var i = 0; i < _collection.Length; i++)
-            {
-                if (item == _collection[i])
-                    return true;
-            }
-
-            return false;
+            return IndexOf(item) >= 0;
         }
 
         public void CopyTo(TouchLocation[] array, int arrayIndex)
         {
-            _collection.CopyTo(array, arrayIndex);
+            if (array == null)
+                throw new ArgumentNullException();
+            if (arrayIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            if (array.Length < _count + arrayIndex)
+                throw new ArgumentOutOfRangeException();
+
+            for (int i = 0; i < _count; i++)
+            {
+                array[arrayIndex + i] = this[i];
+            }
         }
 
         public int Count
         {
-            get { return _collection.Length; }
+            get { return _count; }
         }
 
         public bool Remove(TouchLocation item)
@@ -155,14 +273,69 @@ namespace Microsoft.Xna.Framework.Input.Touch
             throw new NotSupportedException();
         }
 
-        public IEnumerator<TouchLocation> GetEnumerator()
+        public TouchCollection.Enumerator GetEnumerator()
         {
-            return _collection.AsEnumerable().GetEnumerator();
+            return new TouchCollection.Enumerator(this);
+        }
+
+        IEnumerator<TouchLocation> IEnumerable<TouchLocation>.GetEnumerator()
+        {
+            return new TouchCollection.Enumerator(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _collection.GetEnumerator();
+            return new TouchCollection.Enumerator(this);
+        }
+
+        public struct Enumerator : IEnumerator<TouchLocation>, IDisposable
+        {
+            private TouchCollection collection;
+            private int position;
+
+            public TouchLocation Current
+            {
+                get
+                {
+                    return this.collection[this.position];
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return (object)this.Current;
+                }
+            }
+
+            internal Enumerator(TouchCollection collection)
+            {
+                this.collection = collection;
+                this.position = -1;
+            }
+
+            public bool MoveNext()
+            {
+                this.position++;
+
+                if (this.position < this.collection.Count)
+                    return true;
+
+                this.position = this.collection.Count;
+
+                return false;
+            }
+
+            void IEnumerator.Reset()
+            {
+                this.position = -1;
+            }
+
+            public void Dispose()
+            {
+               
+            }
         }
 
         #endregion // IList<TouchLocation>

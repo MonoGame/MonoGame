@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             while (RefreshState(consumeState, _touchState, _touchEvents))
                 consumeState = false;
 
-            return new TouchCollection(_touchState.ToArray());
+            return new TouchCollection(_touchState);
         }
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
