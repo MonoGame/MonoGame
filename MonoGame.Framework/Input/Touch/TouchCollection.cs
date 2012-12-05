@@ -78,9 +78,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             if (touches == null)
                 throw new ArgumentNullException();
-            if (touches.Count > MAX_TOUCHES)
-                throw new ArgumentOutOfRangeException("Value exceeds max touches of " + MAX_TOUCHES);
-   
+
             _isConnected = true;
 
             _count = 0;
@@ -97,7 +95,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _location10 = new TouchLocation();
             _location11 = new TouchLocation();
 
-            for (int i = 0; i < touches.Count; i++)
+            for (int i = 0; i < Math.Min(touches.Count, MAX_TOUCHES); i++)
             {
                 _internalAdd(touches[i]);
             }
