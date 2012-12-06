@@ -9,7 +9,7 @@
 [Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
 [Skip] Comment -> @"//[^\n\r]*";
 [Skip] Whitespace -> @"[ \t\n\r]+";
-[Skip] LinePragma -> @"#line[^\n]*\n";
+[FileAndLine] LinePragma -> @"^[ \t]*#line[ \t]*(?<Line>\d*)[ \t]*(\""(?<File>[^\""\\]*(?:\\.[^\""\\]*)*)\"")?\n";
 
 // TOKENS
 [IgnoreCase] Pass -> @"pass";
@@ -76,9 +76,9 @@ Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
 	
 	Microsoft.Xna.Framework.Graphics.Blend blend;
 	
-	switch (name)
+	switch (name.ToLower())
 	{
-		case "AlphaBlendEnable":
+		case "alphablendenable":
 			if (!ParseTreeTools.ParseBool(value))
 			{
 				if (pass.blendState == null)
@@ -89,34 +89,59 @@ Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
 				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
 			}
 			break;
-		case "SrcBlend":
+		case "srcblend":
 			blend = ParseTreeTools.ParseBlend(value);
 			if (pass.blendState == null)
 				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
 			pass.blendState.AlphaSourceBlend = blend;
 			pass.blendState.ColorSourceBlend = blend;
 			break;
-		case "DestBlend":
+		case "destblend":
 			blend = ParseTreeTools.ParseBlend(value);
 			if (pass.blendState == null)
 				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
 			pass.blendState.AlphaDestinationBlend = blend;
 			pass.blendState.ColorDestinationBlend = blend;
 			break;
-		case "BlendOp":
+		case "blendop":
 			if (pass.blendState == null)
 				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
 			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
 			break;
-		case "ZEnable":
+		case "zenable":
 			if (pass.depthStencilState == null)
 				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
 			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
 			break;
-		case "ZWriteEnable":
+		case "zwriteenable":
 			if (pass.depthStencilState == null)
 				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
 			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
+			break;
+		case "depthbias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.DepthBias = float.Parse(value);
+			break;
+		case "cullmode":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
+			break;
+		case "fillmode":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
+			break;
+		case "multisampleantialias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
+			break;
+		case "slopescaledepthbias":
+			if (pass.rasterizerState == null)
+				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+			pass.rasterizerState.SlopeScaleDepthBias = float.Parse(value);
 			break;
 		default:
 			break;
@@ -164,39 +189,39 @@ Sampler_State_Expression -> Identifier Equals (TextureName | Identifier | Number
 	var sampler = paramlist[0] as SamplerStateInfo;
 	var name = $Identifier[0] as string;
 	var value = ($TextureName[0] ?? ($Identifier[1] ?? $Number[0])) as string;
-	switch (name)
+	switch (name.ToLower())
 	{
-		case "Texture":
+		case "texture":
 			// Ignore
 			break;
-		case "MinFilter":
+		case "minfilter":
 			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
 			break;
-		case "MagFilter":
+		case "magfilter":
 			sampler.MagFilter = ParseTreeTools.ParseTextureFilterType(value);
 			break;
-		case "MipFilter":
+		case "mipfilter":
 			sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
 			break;
-		case "Filter":
+		case "filter":
 			sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
 			break;
-		case "AddressU":
+		case "addressu":
 			sampler.state.AddressU = ParseTreeTools.ParseAddressMode(value);
 			break;
-		case "AddressV":
+		case "addressv":
 			sampler.state.AddressV = ParseTreeTools.ParseAddressMode(value);
 			break;
-		case "AddressW":
+		case "addressw":
 			sampler.state.AddressW = ParseTreeTools.ParseAddressMode(value);
 			break;
-		case "MaxAnisotropy":
+		case "maxanisotropy":
 			sampler.state.MaxAnisotropy = int.Parse(value);
 			break;
-		case "MaxLOD":
+		case "maxlod":
 			sampler.state.MaxMipLevel = int.Parse(value);
 			break;
-		case "MipLODBias":
+		case "miplodbias":
 			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
 			break;
 		default:

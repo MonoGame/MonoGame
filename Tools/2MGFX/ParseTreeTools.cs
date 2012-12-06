@@ -5,6 +5,34 @@ namespace TwoMGFX
 {
 	public class ParseTreeTools
 	{
+        public static FillMode ParseFillMode(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "solid":
+                    return FillMode.Solid;
+                case "wireframe":
+                    return FillMode.WireFrame;
+                default:
+                    throw new Exception("Unknown fill mode '" + value + "'.");
+            }
+        }
+
+        public static CullMode ParseCullMode(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "none":
+                    return CullMode.None;
+                case "cw":
+                    return CullMode.CullClockwiseFace;
+                case "ccw":
+                    return CullMode.CullCounterClockwiseFace;
+                default:
+                    throw new Exception("Unknown cull mode '" + value + "'.");
+            }
+        }
+
 		public static TextureAddressMode ParseAddressMode(string value)
 		{
 			switch (value.ToLower())
@@ -37,9 +65,9 @@ namespace TwoMGFX
 
 		public static bool ParseBool(string value)
 		{
-			if (value == "true" || value == "1")
+			if (value.ToLower() == "true" || value == "1")
 				return true;
-			else if (value == "false" || value == "0")
+            else if (value.ToLower() == "false" || value == "0")
 				return false;
 			else
 				throw new Exception("Invalid boolean value '" + value + "'");
@@ -47,17 +75,17 @@ namespace TwoMGFX
 
 		public static BlendFunction ParseBlendFunction(string value)
 		{
-			switch (value)
+			switch (value.ToLower())
 			{
-				case "Add":
+				case "add":
 					return BlendFunction.Add;
-				case "Subtract":
+				case "subtract":
 					return BlendFunction.Subtract;
-				case "RevSubtract":
+				case "revsubtract":
 					return BlendFunction.ReverseSubtract;
-				case "Min":
+				case "min":
 					return BlendFunction.Min;
-				case "Max":
+				case "max":
 					return BlendFunction.Max;
 				default:
 					throw new Exception("Invalid blend function value '" + value + "'");
@@ -66,33 +94,33 @@ namespace TwoMGFX
 
 		public static Blend ParseBlend(string value)
 		{
-			switch (value)
+			switch (value.ToLower())
 			{
-				case "Zero":
+				case "zero":
 					return Blend.Zero;
-				case "One":
+				case "one":
 					return Blend.One;
-				case "SrcColor":
+				case "srccolor":
 					return Blend.SourceColor;
-				case "InvSrcColor":
+				case "invsrccolor":
 					return Blend.InverseSourceColor;
-				case "SrcAlpha":
+				case "srcalpha":
 					return Blend.SourceAlpha;
-				case "InvSrcAlpha":
+				case "invsrcalpha":
 					return Blend.InverseSourceAlpha;
-				case "DestAlpha":
+				case "destalpha":
 					return Blend.DestinationAlpha;
-				case "InvDestAlpha":
+				case "invdestalpha":
 					return Blend.InverseDestinationAlpha;
-				case "DestColor":
+				case "destcolor":
 					return Blend.DestinationColor;
-				case "InvDestColor":
+				case "invdestcolor":
 					return Blend.InverseDestinationColor;
-				case "SrcAlphaSat":
+				case "srcalphasat":
 					return Blend.SourceAlphaSaturation;
-				case "BlendFactor":
+				case "blendfactor":
 					return Blend.BlendFactor;
-				case "InvBlendFactor":
+				case "invblendfactor":
 					return Blend.InverseBlendFactor;
 				default:
 					throw new Exception("Invalid blend value '" + value + "'");
