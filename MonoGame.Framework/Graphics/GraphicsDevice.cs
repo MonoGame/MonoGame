@@ -46,26 +46,11 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Diagnostics;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
-using SharpDX;
-using SharpDX.Direct3D;
-#if WINDOWS_PHONE
-using SharpDX.Direct3D11;
-using Windows.Foundation;
-using MonoGame.Framework.WindowsPhone;
-#else
-using Windows.UI.Xaml.Controls;
-using Windows.Graphics.Display;
-using Windows.UI.Core;
-using SharpDX.DXGI;
-#endif
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
-using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
@@ -80,6 +65,24 @@ using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#endif
+#elif DIRECTX
+using SharpDX;
+using SharpDX.Direct3D;
+#if WINDOWS_PHONE
+using SharpDX.Direct3D11;
+using Windows.Foundation;
+using MonoGame.Framework.WindowsPhone;
+#elif WINDOWS_STOREAPP
+using Windows.UI.Xaml.Controls;
+using Windows.Graphics.Display;
+using Windows.UI.Core;
+using SharpDX.DXGI;
+#elif WINDOWS
+#endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #endif
 
 
@@ -147,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
-#if !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
 
         // Declare Direct2D Objects
         protected SharpDX.Direct2D1.Factory1 _d2dFactory;
@@ -239,7 +242,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal int MaxTextureSlots;
 
-#if DIRECTX && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
 
         internal float Dpi
         {
@@ -257,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#endif // DIRECTX
+#endif
 
 
 #if OPENGL
@@ -379,13 +382,15 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawingSurfaceState.Context = null;
             DrawingSurfaceState.RenderTargetView = null;
 			
-#else
+#elif WINDOWS_STOREAPP
 
             CreateDeviceIndependentResources();
             CreateDeviceResources();
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
 			
+#elif WINDOWS
+
 #endif
 
 #elif PSM
@@ -499,7 +504,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#else
+#elif WINDOWS_STOREAPP
 
         /// <summary>
         /// Creates resources not tied the active graphics device.
@@ -1000,7 +1005,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _d3dContext = null;
                     }
 
-#if !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
+
                     if (_swapChain != null)
                     {
                         _swapChain.Dispose();
@@ -1037,7 +1043,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _wicFactory.Dispose();
                         _wicFactory = null;
                     }
-#endif
+
+#endif // WINDOWS_STOREAPP
 
 #endif // DIRECTX
 
@@ -1085,7 +1092,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
-#if DIRECTX && !WINDOWS_PHONE
+#if WINDOWS_STOREAPP
             // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
             // in certain scenarios.  In this sample, however, we do not utilize those features.
             var parameters = new SharpDX.DXGI.PresentParameters();

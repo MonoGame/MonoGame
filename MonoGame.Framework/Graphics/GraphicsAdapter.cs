@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
                        SurfaceFormat.Color);
 #elif ANDROID
                 return new DisplayMode(_view.Width, _view.Height, 60, SurfaceFormat.Color);
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
 #else
@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (supportedDisplayModes == null)
                 {
                     List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
                     IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
                     if (displays.Count > 0)
                     {

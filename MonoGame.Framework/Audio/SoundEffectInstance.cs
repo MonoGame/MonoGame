@@ -40,7 +40,7 @@
 
 #region Using Statements
 using System;
-#if WINRT
+#if DIRECTX
 using SharpDX.XAudio2;
 using SharpDX.X3DAudio;
 using SharpDX.Multimedia;
@@ -52,14 +52,14 @@ namespace Microsoft.Xna.Framework.Audio
 	public sealed class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
-#if !WINRT
-		private SoundState soundState = SoundState.Stopped;
+#if !DIRECTX
+        private SoundState soundState = SoundState.Stopped;
 #endif
 #if ANDROID
         private int _streamId = -1;
 #endif
 
-#if WINRT        
+#if DIRECTX        
         private SourceVoice _voice { get; set; }
         private SoundEffect _effect { get; set; }
 
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 #endif
 
-#if WINRT
+#if DIRECTX
         internal SoundEffectInstance(SoundEffect effect, SourceVoice voice)
         {
             _effect = effect;
@@ -89,9 +89,9 @@ namespace Microsoft.Xna.Framework.Audio
         }
 #endif
 
-		public void Dispose()
-		{
-#if WINRT
+        public void Dispose()
+        {
+#if DIRECTX
             if (_voice != null)
             {
                 _voice.DestroyVoice();
@@ -111,8 +111,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
-		{
-#if WINRT	
+        {
+#if DIRECTX	
             // If we have no voice then nothing to do.
             if (_voice == null)
                 return;
@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Audio
             // Apply Pitch settings (from doppler) ...
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
 #endif
-		}
+        }
 		
 		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
 		{
@@ -151,8 +151,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}		
 		
 		public void Pause ()
-		{
-#if WINRT         
+        {
+#if DIRECTX         
             if (_voice != null)
                 _voice.Stop();
             _paused = true;
@@ -170,8 +170,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Play ()
-		{
-#if WINRT
+        {
+#if DIRECTX
             if (_voice != null)
             {
                 // Choose the correct buffer depending on if we are looped.            
@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		    _paused = false;
 #else
-			if ( _sound != null )
+            if ( _sound != null )
 			{
 #if ANDROID
 				if (soundState == SoundState.Paused)
@@ -208,13 +208,13 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Resume()
-		{
-#if WINRT
+        {
+#if DIRECTX
             if (_voice != null)
                 _voice.Start();
             _paused = false;
 #else
-			if ( _sound != null )
+            if ( _sound != null )
 			{
 				if (soundState == SoundState.Paused)
 				{
@@ -230,8 +230,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
 		public void Stop()
-		{
-#if WINRT
+        {
+#if DIRECTX
             if (_voice != null)
             {
                 _voice.Stop(0);
@@ -240,7 +240,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		    _paused = false;
 #else
-			if ( _sound != null )
+            if ( _sound != null )
 			{
 #if ANDROID
 				_sound.Stop(_streamId);
@@ -255,13 +255,13 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop(bool immediate)
         {
-#if WINRT            
+#if DIRECTX            
             if (_voice != null)
                 _voice.Stop(immediate ? 0 : (int)PlayFlags.Tails);
 
             _paused = false;
 #else
-			if ( _sound != null )
+            if ( _sound != null )
 			{
 #if ANDROID
                 _sound.Stop(_streamId);
@@ -285,11 +285,11 @@ namespace Microsoft.Xna.Framework.Audio
 		public bool IsLooped 
 		{ 
 			get
-			{
-#if WINRT
+            {
+#if DIRECTX
                 return _loop;
 #else
-				if ( _sound != null )
+                if ( _sound != null )
 				{
 					return _sound.Looping;
 				}
@@ -301,11 +301,11 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			
 			set
-			{
-#if WINRT
+            {
+#if DIRECTX
                 _loop = value;
 #else
-				if ( _sound != null )
+                if ( _sound != null )
 				{
 					if ( _sound.Looping != value )
 					{
@@ -315,17 +315,17 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 			}
 		}
-		        
-#if WINRT
+
+#if DIRECTX
         private float _pan;
         private static float[] _panMatrix;
 #endif
 
-		public float Pan 
+        public float Pan 
 		{ 
 			get
-			{
-#if WINRT                
+            {
+#if DIRECTX                
                 return _pan;
 #else
                 if ( _sound != null )
@@ -340,8 +340,8 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			
 			set
-			{
-#if WINRT       
+            {
+#if DIRECTX       
                 // According to XNA documentation:
                 // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
                 _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
@@ -390,38 +390,38 @@ namespace Microsoft.Xna.Framework.Audio
                 var lVal = 1.0f - _pan;
                 var rVal = 1.0f + _pan;
                                 
-                switch (SoundEffect.MasterVoice.ChannelMask)
+                switch (SoundEffect.Speakers)
                 {
-                    case ((int)Speakers.Stereo):
-                    case ((int)Speakers.TwoPointOne):
-                    case ((int)Speakers.Surround):
+                    case Speakers.Stereo:
+                    case Speakers.TwoPointOne:
+                    case Speakers.Surround:
                         _panMatrix[0] = lVal;
                         _panMatrix[1] = rVal;
                         break;
 
-                    case ((int)Speakers.Quad):
+                    case Speakers.Quad:
                         _panMatrix[0] = _panMatrix[2] = lVal;
                         _panMatrix[1] = _panMatrix[3] = rVal;
                         break;
 
-                    case ((int)Speakers.FourPointOne):
+                    case Speakers.FourPointOne:
                         _panMatrix[0] = _panMatrix[3] = lVal;
                         _panMatrix[1] = _panMatrix[4] = rVal;
                         break;
 
-                    case ((int)Speakers.FivePointOne):
-                    case ((int)Speakers.SevenPointOne):
-                    case ((int)Speakers.FivePointOneSurround):
+                    case Speakers.FivePointOne:
+                    case Speakers.SevenPointOne:
+                    case Speakers.FivePointOneSurround:
                         _panMatrix[0] = _panMatrix[4] = lVal;
                         _panMatrix[1] = _panMatrix[5] = rVal;
                         break;
 
-                    case ((int)Speakers.SevenPointOneSurround):
+                    case Speakers.SevenPointOneSurround:
                         _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
                         _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
                         break;
 
-                    case ((int)Speakers.Mono):
+                    case Speakers.Mono:
                     default:
                         // don't do any panning here   
                         break;
@@ -444,8 +444,8 @@ namespace Microsoft.Xna.Framework.Audio
 		public float Pitch         
 		{             
 	            get
-	            {                    
-#if WINRT
+            {
+#if DIRECTX
                     if (_voice == null)
                         return 0.0f;
 
@@ -458,7 +458,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                     return (float)pitch;
 #else
-					if ( _sound != null)
+                if ( _sound != null)
 				    {
 	                   return _sound.Rate;
 				    }
@@ -466,8 +466,8 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 	            }
 	            set
-	            {
-#if WINRT
+            {
+#if DIRECTX
                     if (_voice == null)
                         return;
 
@@ -476,7 +476,7 @@ namespace Microsoft.Xna.Framework.Audio
                     var ratio = Math.Pow(2.0, value);
                     _voice.SetFrequencyRatio((float)ratio);                  
 #else
-				    if ( _sound != null && _sound.Rate != value)
+                if ( _sound != null && _sound.Rate != value)
 				    {
 	                   _sound.Rate = value;
 				    } 
@@ -487,8 +487,8 @@ namespace Microsoft.Xna.Framework.Audio
 		public SoundState State 
 		{ 
 			get
-			{
-#if WINRT           
+            {
+#if DIRECTX           
                 // If no voice or no buffers queued the sound is stopped.
                 if (_voice == null || _voice.State.BuffersQueued == 0)
                     return SoundState.Stopped;
@@ -526,14 +526,14 @@ namespace Microsoft.Xna.Framework.Audio
 		public float Volume
 		{ 
 			get
-			{
-#if WINRT
+            {
+#if DIRECTX
                 if (_voice == null)
                     return 0.0f;
                 else
                     return _voice.Volume;
 #else
-				if (_sound != null)
+                if (_sound != null)
 				{
 					return _sound.Volume;
 				}
@@ -545,12 +545,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			
 			set
-			{
-#if WINRT
+            {
+#if DIRECTX
                 if (_voice != null)
                     _voice.SetVolume(value, XAudio2.CommitNow);
 #else
-				if ( _sound != null )
+                if ( _sound != null )
 				{
 					if ( _sound.Volume != value )
 					{

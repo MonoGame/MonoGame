@@ -4,17 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
-using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

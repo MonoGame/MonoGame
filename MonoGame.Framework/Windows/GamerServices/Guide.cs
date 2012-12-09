@@ -55,7 +55,9 @@ using Windows.UI.Popups;
 using Windows.System;
 #else
 using System.Runtime.Remoting.Messaging;
+#if !(WINDOWS && DIRECTX)
 using Microsoft.Xna.Framework.Net;
+#endif
 #endif
 
 #endregion Using clause
@@ -262,7 +264,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-#if !WINRT
+#if !WINRT && !(WINDOWS && DIRECTX)
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)
@@ -414,7 +416,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
-#if !WINRT
+#if !DIRECTX
             MonoGameGamerServicesHelper.Initialise(game);
 #endif
         }

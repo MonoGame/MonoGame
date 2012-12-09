@@ -49,9 +49,11 @@ using MonoTouch.Foundation;
 using MonoTouch.MediaPlayer;
 #endif
 
-#if WINRT
+#if DIRECTX
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
+#endif
+#if WINRT
 using Windows.UI.Core;
 #endif
 
@@ -69,9 +71,12 @@ namespace Microsoft.Xna.Framework.Media
 		private static bool _isMuted = false;
 		private static MediaQueue _queue = new MediaQueue();
 
-#if WINRT
+#if DIRECTX
         private static MediaEngine _mediaEngineEx;
+
+#if WINRT
         private static CoreDispatcher _dispatcher;
+#endif
 
         public static TimeSpan PlayPosition
         {
@@ -95,14 +100,18 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
+#if WINRT
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+#endif
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
             {
+#if WINRT
                 _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
+#endif
             }
         }
 #endif
@@ -118,7 +127,7 @@ namespace Microsoft.Xna.Framework.Media
             {
 				_isMuted = value;
 
-#if WINRT
+#if DIRECTX
                 _mediaEngineEx.Muted = value;
 #else
 				if (_queue.Count == 0)
@@ -143,7 +152,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 _isRepeating = value;
 
-#if WINRT
+#if DIRECTX
                 _mediaEngineEx.Loop = value;
 #endif
             }
@@ -152,7 +161,7 @@ namespace Microsoft.Xna.Framework.Media
         public static bool IsShuffled { get; set; }
 
         public static bool IsVisualizationEnabled { get { return false; } }
-#if !WINRT
+#if !DIRECTX
         public static TimeSpan PlayPosition
         {
             get
@@ -164,7 +173,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 #endif
-		
+
         public static MediaState State
         {
             get { return _state; }
@@ -216,8 +225,8 @@ namespace Microsoft.Xna.Framework.Media
 			set 
 			{       
 				_volume = value;
-				
-#if WINRT
+
+#if DIRECTX
                 _mediaEngineEx.Volume = value;       
 #else
 				if (_queue.ActiveSong == null)
@@ -232,7 +241,7 @@ namespace Microsoft.Xna.Framework.Media
 		
         public static void Pause()
         {
-#if WINRT
+#if DIRECTX
             if (State == MediaState.Stopped)
                 return;
 
@@ -275,8 +284,8 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 		private static void PlaySong(Song song)
-		{
-#if WINRT
+        {
+#if DIRECTX
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
             var path = folder + "\\" + song.FilePath;
             var uri = new Uri(path);
@@ -314,7 +323,7 @@ namespace Microsoft.Xna.Framework.Media
 
         public static void Resume()
         {
-#if WINRT
+#if DIRECTX
             _mediaEngineEx.Play();            
 #else
 			if (_queue.ActiveSong == null)
@@ -327,7 +336,7 @@ namespace Microsoft.Xna.Framework.Media
 
         public static void Stop()
         {
-#if WINRT
+#if DIRECTX
             _mediaEngineEx.Source = null;
 #else
 			if (_queue.ActiveSong == null)

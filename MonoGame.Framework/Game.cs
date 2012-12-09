@@ -697,7 +697,7 @@ namespace Microsoft.Xna.Framework
 
         internal void ResizeWindow(bool changed)
         {
-#if LINUX || WINDOWS
+#if LINUX || (WINDOWS && OPENGL)
             ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
 #endif
         }
