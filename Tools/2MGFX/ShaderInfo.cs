@@ -120,17 +120,18 @@ namespace TwoMGFX
 			// Use the D3DCompiler to pre-process the file resolving 
 			// all #includes and macros.... this even works for GLSL.
 			string newFile;
+		    var full = Path.GetFullPath(filePath);
+		    var dir = Path.GetDirectoryName(full);
 			using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath))))
-				newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer);
+                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, Path.GetFullPath(filePath));
 
 			// Parse the resulting file for techniques and passes.
-			var tree = new Parser(new Scanner()).Parse(newFile);
+			var tree = new Parser(new Scanner()).Parse(newFile, filePath);
 			if (tree.Errors.Count > 0)
 			{
-				// TODO: Make the error info pretty!
                 var errors = String.Empty;
                 foreach (var error in tree.Errors)
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", filePath, error.Line, 0, error.Message);
+                    errors += string.Format("{0}({1},{2}) : {3}\r\n", error.File, error.Line, error.Column, error.Message);
 
 				throw new Exception(errors);
 			}
