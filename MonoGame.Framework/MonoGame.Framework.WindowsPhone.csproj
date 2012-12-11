@@ -406,6 +406,16 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <SpecificVersion>False</SpecificVersion>
+      <Aliases>MicrosoftXnaGamerServices</Aliases>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <SpecificVersion>False</SpecificVersion>
+      <Aliases>MicrosoftXnaFramework</Aliases>
+    </Reference>    
+  </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <Reference Include="SharpDX">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.dll</HintPath>
@@ -421,10 +431,6 @@
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.MediaFoundation.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="SharpDX.WP8">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\x86\SharpDX.WP8.winmd</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
@@ -447,10 +453,6 @@
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.MediaFoundation.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="SharpDX.WP8">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.WP8.winmd</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
