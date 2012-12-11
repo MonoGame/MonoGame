@@ -128,6 +128,8 @@ namespace MonoGame.Framework.WindowsPhone
                 throw new NullReferenceException("The drawing surface cannot be null!");
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
+            WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
+            WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
 
             // Construct the game.
             var game = new T();
