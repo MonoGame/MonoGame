@@ -106,7 +106,7 @@ namespace MonoGame.Framework.WindowsPhone
                 _host.RequestAdditionalFrame();
             }
 
-            public override void PrepareResources(DateTime presentTargetTime, DrawingSizeF desiredRenderTargetSize)
+            public override void PrepareResources(DateTime presentTargetTime, ref DrawingSizeF desiredRenderTargetSize)
             {
                 WindowsPhoneGameWindow.Width = desiredRenderTargetSize.Width;
                 WindowsPhoneGameWindow.Height = desiredRenderTargetSize.Height;
@@ -128,6 +128,8 @@ namespace MonoGame.Framework.WindowsPhone
                 throw new NullReferenceException("The drawing surface cannot be null!");
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
+            WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
+            WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
 
             // Construct the game.
             var game = new T();
