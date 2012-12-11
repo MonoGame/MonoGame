@@ -50,12 +50,12 @@ namespace Microsoft.Xna.Framework.Input
 
 		public static KeyboardState GetState()
 		{
-            return new KeyboardState(_keys.ToArray());
+            return new KeyboardState(_keys);
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return new KeyboardState(_keys.ToArray());
+            return new KeyboardState(_keys);
 		}
 
         internal static void SetKeys(List<Keys> keys)

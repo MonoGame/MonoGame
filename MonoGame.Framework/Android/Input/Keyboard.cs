@@ -137,12 +137,12 @@ namespace Microsoft.Xna.Framework.Input
 
 	    public static KeyboardState GetState()
 		{
-			return new KeyboardState(keys.ToArray());
+			return new KeyboardState(keys);
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return new KeyboardState(keys.ToArray());
+            return new KeyboardState(keys);
 		}
 	}
 }
