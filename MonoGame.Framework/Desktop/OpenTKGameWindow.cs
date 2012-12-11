@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework
             // mouse doesn't need to be treated here, Mouse class does it alone
 
             // keyboard
-            Keyboard.State = new KeyboardState(keys.ToArray());
+            Keyboard.SetKeys(keys);
         }
 
         #endregion

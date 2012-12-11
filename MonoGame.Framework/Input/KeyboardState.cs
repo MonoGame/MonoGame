@@ -48,10 +48,9 @@ namespace Microsoft.Xna.Framework.Input
 		private Keys[] _keys;
 
 		#region Methods
-		public KeyboardState (Keys[] keys)
+		public KeyboardState (params Keys[] keys)
 		{
 			_keys = keys;
-			// Never used on iPhone or Zune
 		}
 
 		public override bool Equals (Object obj)
