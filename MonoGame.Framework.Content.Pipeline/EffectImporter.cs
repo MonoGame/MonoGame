@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -18,7 +18,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public EffectImporter()
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -29,7 +28,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override EffectContent Import(string filename, ContentImporterContext context)
         {
-            throw new NotImplementedException();
+            var effect = new EffectContent();
+            using (var reader = new StreamReader(filename))
+                effect.EffectCode = reader.ReadToEnd();
+            return effect;
         }
     }
 }
