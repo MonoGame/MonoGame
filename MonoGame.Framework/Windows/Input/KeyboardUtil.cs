@@ -25,7 +25,9 @@ namespace Microsoft.Xna.Framework.Input
                     return Keys.Back;
                     
                 case OpenTK.Input.Key.BackSlash:
-                    return Keys.OemBackslash;
+                    // Issue 1012: XNA 4.0 returns this key as OemPipe, not OemBackslash,
+                    // even though OemPipe is the shifted version of the key.
+                    return Keys.OemPipe;
                     
                 case OpenTK.Input.Key.BracketLeft:
                     return Keys.OemOpenBrackets;

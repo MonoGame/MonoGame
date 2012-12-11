@@ -1,4 +1,4 @@
-﻿#if !ANDROID && !IOS && !PSS
+﻿#if !ANDROID && !IOS && !PSM
 #define IS_FULL_NET_AVAILABLE
 #endif
 

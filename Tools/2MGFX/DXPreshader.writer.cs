@@ -1,6 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics

@@ -459,7 +459,8 @@ namespace Microsoft.Xna.Framework.Content
                 memStream.Seek(0, SeekOrigin.Begin);
                 stream.Dispose();
                 stream = memStream;
-                pos = -14;
+                // Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
+                pos = 0;
 #endif
 
                 while (pos - startPos < compressedSize)
