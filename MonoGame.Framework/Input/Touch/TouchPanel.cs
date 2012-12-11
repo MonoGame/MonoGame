@@ -47,7 +47,9 @@ using System.Linq;
 
 #if WINRT
 using Windows.Graphics.Display;
+#if !WINDOWS_PHONE
 using Windows.UI.Xaml;
+#endif
 #endif
 
 #endregion Using clause
@@ -60,6 +62,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// The maximum number of events to allow in the touch or gesture event lists.
         /// </summary>
         private const int MaxEvents = 100;
+
+        /// <summary>
+        /// The reserved touchId for all mouse touch points.
+        /// </summary>
+        private const int MouseTouchId = 1;
 
         /// <summary>
         /// The current touch state.
@@ -94,8 +101,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         /// <summary>
         /// The next touch location identifier.
+        /// The value 1 is reserved for the mouse touch point.
         /// </summary>
-        private static int _nextTouchId = 1;
+        private static int _nextTouchId = 2;
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -158,9 +166,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     }
                 }
 
+                // If a new event was found then store it.
                 if (foundEvent)
                     state[i] = touch;
-                else
+
+                // Else if no event has come in then promote it to
+                // the moved state, but only when we're consuming state.
+                else if (consumeState)
                     state[i] = touch.AsMovedState();
             }
 
@@ -196,6 +208,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         internal static void AddEvent(int id, TouchLocationState state, Vector2 position)
         {
+            AddEvent(id, state, position, false);
+        }
+
+        internal static void AddEvent(int id, TouchLocationState state, Vector2 position, bool isMouse)
+        {
             // Different platforms return different touch identifiers
             // based on the specifics of their implementation and the
             // system drivers.
@@ -209,7 +226,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // and release events.
             // 
             if (state == TouchLocationState.Pressed)
-                _touchIds[id] = _nextTouchId++;
+            {
+                if (isMouse)
+                {
+                    // Mouse pointing devices always use a reserved Id
+                    _touchIds[id] = MouseTouchId;
+                }
+                else
+                {
+                    _touchIds[id] = _nextTouchId++;
+                }
+            }
 
             // Try to find the touch id.
             int touchId;
@@ -221,20 +248,27 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
             }
 
-            // Add the new touch event keeping the list from getting
-            // too large if no one happens to be requesting the state.
-            var evt = new TouchLocation(touchId, state, position*_touchScale);
-            _touchEvents.Add(evt);
-            if (_touchEvents.Count > MaxEvents)
-                _touchEvents.RemoveRange(0, _touchEvents.Count - MaxEvents);
-
-            // If we have gestures enabled then start to collect 
-            // events for those too.
-            if (EnabledGestures != GestureType.None)
+            if (!isMouse || EnableMouseTouchPoint || EnableMouseGestures)
             {
-                _gestureEvents.Add(evt);
-                if (_gestureEvents.Count > MaxEvents)
-                    _gestureEvents.RemoveRange(0, _gestureEvents.Count - MaxEvents);
+                // Add the new touch event keeping the list from getting
+                // too large if no one happens to be requesting the state.
+                var evt = new TouchLocation(touchId, state, position * _touchScale);
+
+                if (!isMouse || EnableMouseTouchPoint)
+                {
+                    _touchEvents.Add(evt);
+                    if (_touchEvents.Count > MaxEvents)
+                        _touchEvents.RemoveRange(0, _touchEvents.Count - MaxEvents);
+                }
+
+                // If we have gestures enabled then start to collect 
+                // events for those too.
+                if (EnabledGestures != GestureType.None && (!isMouse || EnableMouseGestures))
+                {
+                    _gestureEvents.Add(evt);
+                    if (_gestureEvents.Count > MaxEvents)
+                        _gestureEvents.RemoveRange(0, _gestureEvents.Count - MaxEvents);
+                }
             }
 
             // If this is a release unmap the hardware id.
@@ -277,7 +311,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 if (Game.Instance != null)
                     windowSize = new Vector2(   Game.Instance.Window.ClientBounds.Width,
                                                 Game.Instance.Window.ClientBounds.Height);
-#if WINRT
+#if WINDOWS_STOREAPP
                 else
                 {
                     var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
@@ -333,13 +367,20 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
         public static GestureType EnabledGestures { get; set; }
 
+        public static bool EnableMouseTouchPoint { get; set; }
+
+        public static bool EnableMouseGestures { get; set; }
+
         public static bool IsGestureAvailable
         {
             get
             {
-                // Process the gesture state.
-                var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
-                UpdateGestures(stateChanged);
+                // Process the pending gesture events.
+                while (_gestureEvents.Count > 0)
+                {
+                    var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
+                    UpdateGestures(stateChanged);
+                }
 
                 return GestureList.Count > 0;				
             }

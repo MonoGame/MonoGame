@@ -96,8 +96,10 @@ namespace Microsoft.Xna.Framework
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif PSS
+#elif PSM
 			return new PSSGamePlatform(game);
+#elif WINDOWS_PHONE
+            return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
 #endif
@@ -161,7 +163,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINRT
+#if WINDOWS_STOREAPP
         private ApplicationViewState _viewState;
         public ApplicationViewState ViewState
         {
@@ -183,7 +185,7 @@ namespace Microsoft.Xna.Framework
         {
             get; protected set;
         }
-#elif PSS
+#elif PSM
 		public PSSGameWindow Window
 		{
 			get; protected set;
@@ -213,7 +215,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-#if WINRT
+#if WINDOWS_STOREAPP
         public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
 #endif
 

@@ -46,7 +46,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-#if PSS
+#if PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
 
@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
                 ConstantBuffers[i].Clear();
@@ -238,17 +238,19 @@ namespace Microsoft.Xna.Framework.Graphics
         /// We should avoid supporting old versions for very long as
         /// users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int MGFXVersion = 2;
+        private const int MGFXVersion = 3;
 
-#if !PSS
+#if !PSM
 
 		private void ReadEffect (BinaryReader reader)
 		{
 			// Check the header to make sure the file and version is correct!
 			var header = new string (reader.ReadChars (MGFXHeader.Length));
 			var version = (int)reader.ReadByte ();
-			if (header != MGFXHeader || version != MGFXVersion)
-				throw new Exception ("Unsupported MGFX format!");
+			if (header != MGFXHeader)
+				throw new Exception ("The MGFX file is corrupt!");
+            if (version != MGFXVersion)
+                throw new Exception("Wrong MGFX file version!");
 
 			var profile = reader.ReadByte ();
 #if DIRECTX
@@ -364,90 +366,111 @@ namespace Microsoft.Xna.Framework.Graphics
                     pixelShader = shaders[shaderIndex];
                 }
 
-                // TODO: Add the state objects to the format!
+				BlendState blend = null;
+				DepthStencilState depth = null;
+				RasterizerState raster = null;
+				if (reader.ReadBoolean())
+				{
+					blend = new BlendState
+					{
+						AlphaBlendFunction = (BlendFunction)reader.ReadByte(),
+						AlphaDestinationBlend = (Blend)reader.ReadByte(),
+						AlphaSourceBlend = (Blend)reader.ReadByte(),
+						BlendFactor = new Color(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte()),
+						ColorBlendFunction = (BlendFunction)reader.ReadByte(),
+						ColorDestinationBlend = (Blend)reader.ReadByte(),
+						ColorSourceBlend = (Blend)reader.ReadByte(),
+						ColorWriteChannels = (ColorWriteChannels)reader.ReadByte(),
+						ColorWriteChannels1 = (ColorWriteChannels)reader.ReadByte(),
+						ColorWriteChannels2 = (ColorWriteChannels)reader.ReadByte(),
+						ColorWriteChannels3 = (ColorWriteChannels)reader.ReadByte(),
+						MultiSampleMask = reader.ReadInt32(),
+					};
+				}
+				if (reader.ReadBoolean())
+				{
+					depth = new DepthStencilState
+					{
+						CounterClockwiseStencilDepthBufferFail = (StencilOperation)reader.ReadByte(),
+						CounterClockwiseStencilFail = (StencilOperation)reader.ReadByte(),
+						CounterClockwiseStencilFunction = (CompareFunction)reader.ReadByte(),
+						CounterClockwiseStencilPass = (StencilOperation)reader.ReadByte(),
+						DepthBufferEnable = reader.ReadBoolean(),
+						DepthBufferFunction = (CompareFunction)reader.ReadByte(),
+						DepthBufferWriteEnable = reader.ReadBoolean(),
+						ReferenceStencil = reader.ReadInt32(),
+						StencilDepthBufferFail = (StencilOperation)reader.ReadByte(),
+						StencilEnable = reader.ReadBoolean(),
+						StencilFail = (StencilOperation)reader.ReadByte(),
+						StencilFunction = (CompareFunction)reader.ReadByte(),
+						StencilMask = reader.ReadInt32(),
+						StencilPass = (StencilOperation)reader.ReadByte(),
+						StencilWriteMask = reader.ReadInt32(),
+						TwoSidedStencilMode = reader.ReadBoolean(),
+					};
+				}
+				if (reader.ReadBoolean())
+				{
+					raster = new RasterizerState
+					{
+						CullMode = (CullMode)reader.ReadByte(),
+						DepthBias = reader.ReadSingle(),
+						FillMode = (FillMode)reader.ReadByte(),
+						MultiSampleAntiAlias = reader.ReadBoolean(),
+						ScissorTestEnable = reader.ReadBoolean(),
+						SlopeScaleDepthBias = reader.ReadSingle(),
+					};
+				}
+				var pass = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
+				collection.Add(pass);         
+			}
 
-                var pass = new EffectPass(effect, name, vertexShader, pixelShader, null, null, null, annotations);
-                collection.Add(pass);
+			return collection;
+		}
 
-                // need to fix up the                 
-            }
+		private static EffectParameterCollection ReadParameters(BinaryReader reader)
+		{
+			var collection = new EffectParameterCollection();
+			var count = (int)reader.ReadByte();			if (count == 0)				return collection;
+			for (var i = 0; i < count; i++)
+			{
+				var class_ = (EffectParameterClass)reader.ReadByte();				var type = (EffectParameterType)reader.ReadByte();
+				var name = reader.ReadString();
+				var semantic = reader.ReadString();
+				var annotations = ReadAnnotations(reader);
+				var rowCount = (int)reader.ReadByte();
+				var columnCount = (int)reader.ReadByte();
 
-            return collection;
-        }
+				var elements = ReadParameters(reader);
+				var structMembers = ReadParameters(reader);
 
-        private static EffectParameterCollection ReadParameters(BinaryReader reader)
-        {
-            var collection = new EffectParameterCollection();
-            var count = (int)reader.ReadByte();
-            if (count == 0)
-                return collection;
+				object data = null;
+				if (elements.Count == 0 && structMembers.Count == 0)
+				{
+					switch (type)
+					{						case EffectParameterType.Bool:						case EffectParameterType.Int32:							{								var buffer = new int[rowCount * columnCount];								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadInt32();								data = buffer;								break;							}
+						case EffectParameterType.Single:
+							{
+								var buffer = new float[rowCount * columnCount];
+								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadSingle();								data = buffer;								break;							}
+						case EffectParameterType.String:
+							throw new NotImplementedException();
+					};				}
+				var param = new EffectParameter(
+					class_, type, name, rowCount, columnCount, semantic, 
+					annotations, elements, structMembers, data);
 
-            for (var i = 0; i < count; i++)
-            {
-                var class_ = (EffectParameterClass)reader.ReadByte();
-                var type = (EffectParameterType)reader.ReadByte();
+				collection.Add(param);
+			}
 
-                var name = reader.ReadString();
-                var semantic = reader.ReadString();
-                var annotations = ReadAnnotations(reader);
-
-                var rowCount = (int)reader.ReadByte();
-                var columnCount = (int)reader.ReadByte();
-
-                var elements = ReadParameters(reader);
-                var structMembers = ReadParameters(reader);
-
-                object data = null;
-                if (elements.Count == 0 && structMembers.Count == 0)
-                {
-                    switch (type)
-                    {
-                        case EffectParameterType.Bool:
-                        case EffectParameterType.Int32:
-                            {
-                                var buffer = new int[rowCount * columnCount];
-                                for (var j = 0; j < buffer.Length; j++)
-                                    buffer[j] = reader.ReadInt32();
-                                data = buffer;
-                                break;
-                            }
-
-                        case EffectParameterType.Single:
-                            {
-                                var buffer = new float[rowCount * columnCount];
-                                for (var j = 0; j < buffer.Length; j++)
-                                    buffer[j] = reader.ReadSingle();
-                                data = buffer;
-                                break;
-                            }
-
-                        case EffectParameterType.String:
-                            throw new NotImplementedException();
-                    };
-                }
-
-                var param = new EffectParameter(
-                    class_, type, name, rowCount, columnCount, semantic, 
-                    annotations, elements, structMembers, data);
-
-                collection.Add(param);
-            }
-
-            return collection;
-        }
-#else //PSS
-        internal void ReadEffect(BinaryReader reader)
-        {
-            var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
-            effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
-            var shaderProgram = effectPass._shaderProgram;
-            
-            Parameters = new EffectParameterCollection();
-            for (int i = 0; i < shaderProgram.UniformCount; i++)
-            {
-                Parameters.Add(EffectParameterForUniform(shaderProgram, i));
-            }
-#warning Hacks for BasicEffect as we don't have these parameters yet
+			return collection;
+		}
+#else //PSM
+		internal void ReadEffect(BinaryReader reader)
+		{
+			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
+			var shaderProgram = effectPass._shaderProgram;						Parameters = new EffectParameterCollection();			for (int i = 0; i < shaderProgram.UniformCount; i++)			{				Parameters.Add(EffectParameterForUniform(shaderProgram, i));			}#warning Hacks for BasicEffect as we don't have these parameters yet
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
                 3, 1, "float3",

@@ -40,7 +40,7 @@ purpose and non-infringement.
 
 using System;
 
-#if WINRT 
+#if WINDOWS_STOREAPP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -118,10 +118,10 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
-		
-#if WINRT 
+
+#if WINDOWS_STOREAPP
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
-#endif 
+#endif
 
         public DepthFormat DepthStencilFormat
         {

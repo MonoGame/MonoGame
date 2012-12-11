@@ -11,7 +11,7 @@ using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-#elif PSS
+#elif PSM
 enum ShaderType //FIXME: Major Hack
 {
 	VertexShader,
@@ -43,6 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public SamplerType type;
         public int index;
         public string name;
+		public SamplerState state;
 
         // TODO: This should be moved to EffectPass.
         public int parameter;
@@ -106,6 +107,19 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Samplers[s].type = (SamplerType)reader.ReadByte();
                 Samplers[s].index = reader.ReadByte();
+
+				if (reader.ReadBoolean())
+				{
+					Samplers[s].state = new SamplerState();
+					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
+					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
+					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
+					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
+				}
+
 #if OPENGL
                 Samplers[s].name = reader.ReadString();
 #endif
@@ -247,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        internal protected virtual void GraphicsDeviceResetting()
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             if (_shaderHandle != -1)
@@ -267,21 +281,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!IsDisposed)
             {
 #if OPENGL
-                if ((GraphicsDevice != null) && !GraphicsDevice.IsDisposed)
-                {
-                    GraphicsDevice.AddDisposeAction(() =>
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        if (_shaderHandle != -1)
                         {
-                            if (_shaderHandle != -1)
+                            if (GL.IsShader(_shaderHandle))
                             {
-                                if (GL.IsShader(_shaderHandle))
-                                {
-                                    GL.DeleteShader(_shaderHandle);
-                                    GraphicsExtensions.CheckGLError();
-                                }
-                                _shaderHandle = -1;
+                                GL.DeleteShader(_shaderHandle);
+                                GraphicsExtensions.CheckGLError();
                             }
-                        });
-                }
+                            _shaderHandle = -1;
+                        }
+                    });
 #endif
             }
 

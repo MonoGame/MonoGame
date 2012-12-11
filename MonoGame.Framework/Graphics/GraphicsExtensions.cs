@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public static class GraphicsExtensions
     {
-#if !WINRT && !PSS
+#if !WINRT && !PSM
         public static All OpenGL11(CullMode cull)
         {
             switch (cull)
@@ -466,7 +466,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
-#if IPHONE
+#if IPHONE || ANDROID
 				glInternalFormat = PixelInternalFormat.Rgba;
 #else
 				glInternalFormat = PixelInternalFormat.Rgba4;
@@ -538,6 +538,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 4;
                 case SurfaceFormat.Dxt3:
                     return 4;
+                case SurfaceFormat.Bgr565:
+                    return 2;
                 case SurfaceFormat.Bgra4444:
                     return 2;
                 case SurfaceFormat.Bgra5551:

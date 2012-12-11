@@ -55,10 +55,10 @@ namespace Microsoft.Xna.Framework.Graphics
         // collected by holding a strong reference to it in this list.
         static List<WeakReference> resources = new List<WeakReference>();
 
-        // Keep GraphicsDevice in a WeakReference because it may be disposed and collected at
-        // any time during shutdown and some graphics objects may still be trying to dispose,
-        // which tries to access the GraphicsDevice property.
-		WeakReference graphicsDevice;
+        // The GraphicsDevice property should only be accessed in Dispose(bool) if the disposing
+        // parameter is true. If disposing is false, the GraphicsDevice may or may not be
+        // disposed yet.
+		GraphicsDevice graphicsDevice;
 
 		internal GraphicsResource()
         {
@@ -74,6 +74,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
+        /// <summary>
+        /// Called before the device is reset. Allows graphics resources to 
+        /// invalidate their state so they can be recreated after the device reset.
+        /// Warning: This may be called after a call to Dispose() up until
+        /// the resource is garbage collected.
+        /// </summary>
         internal protected virtual void GraphicsDeviceResetting()
         {
 
@@ -85,10 +91,13 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 foreach (var resource in resources)
                 {
-                    if (resource.IsAlive)
-                        (resource.Target as GraphicsResource).GraphicsDeviceResetting();
+                    var target = resource.Target;
+                    if (target != null)
+                        (target as GraphicsResource).GraphicsDeviceResetting();
                 }
-                resources.Clear();
+
+                // Remove references to resources that have been garbage collected.
+                resources.RemoveAll(wr => !wr.IsAlive);
             }
         }
 
@@ -101,8 +110,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 foreach (var resource in resources)
                 {
-                    if (resource.IsAlive)
-                        (resource.Target as IDisposable).Dispose();
+                    var target = resource.Target;
+                    if (target != null)
+                        (target as IDisposable).Dispose();
                 }
                 resources.Clear();
             }
@@ -144,6 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     resources.Remove(new WeakReference(this));
                 }
 
+                graphicsDevice = null;
                 disposed = true;
             }
         }
@@ -154,12 +165,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get
 			{
-				return (graphicsDevice != null) && graphicsDevice.IsAlive ? (graphicsDevice.Target as GraphicsDevice) : null;
+				return graphicsDevice;
 			}
 
             internal set
             {
-                graphicsDevice = new WeakReference(value);
+                graphicsDevice = value;
             }
 		}
 		

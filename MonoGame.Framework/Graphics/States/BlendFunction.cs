@@ -45,10 +45,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public enum BlendFunction
 	{
-		Add, 
-		Max, 	
-		Min, 	
-		ReverseSubtract, 	
-		Subtract, 	
+		Add,
+		Subtract,
+		ReverseSubtract,
+		Max,
+		Min,
 	}
 }
