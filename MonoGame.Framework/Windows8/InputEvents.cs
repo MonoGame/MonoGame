@@ -224,7 +224,7 @@ namespace Microsoft.Xna.Framework
         public void UpdateState()
         {
             // Update the keyboard state.
-            Keyboard.State = new KeyboardState(_keys.ToArray());
+            Keyboard.SetKeys(_keys);
         }
 
         private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
