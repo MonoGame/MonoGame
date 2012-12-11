@@ -255,26 +255,82 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException();
 		}
 
-		public void SetValue (Matrix value)
-		{
-			var matrixData = Matrix.ToFloatArray(Matrix.Transpose (value));
-			for (var y=0; y<RowCount; y++) 
+        public void SetValue(Matrix value)
+        {
+            if (RowCount == 4 && ColumnCount == 4)
             {
-				for (var x=0; x<ColumnCount; x++)
-					((float[])Data)[y*ColumnCount+x] = matrixData[y*4+x];
-			}
+                float[] fData = (float[])Data;
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+                fData[3] = value.M41;
+
+                fData[4] = value.M12;
+                fData[5] = value.M22;
+                fData[6] = value.M32;
+                fData[7] = value.M42;
+
+                fData[8] = value.M13;
+                fData[9] = value.M23;
+                fData[10] = value.M33;
+                fData[11] = value.M43;
+
+                fData[12] = value.M14;
+                fData[13] = value.M24;
+                fData[14] = value.M34;
+                fData[15] = value.M44;
+            }
+            else
+            {
+                var matrixData = Matrix.ToFloatArray(Matrix.Transpose(value));
+
+                for (var y = 0; y < RowCount; y++)
+                {
+                    for (var x = 0; x < ColumnCount; x++)
+                        ((float[])Data)[y * ColumnCount + x] = matrixData[y * 4 + x];
+                }
+            }
 
             StateKey = unchecked(NextStateKey++);
-		}
+        }
 
 		public void SetValueTranspose(Matrix value)
 		{
-			var matrixData = Matrix.ToFloatArray(value);
-			for (var y = 0; y < RowCount; y++)
-			{
-				for (var x = 0; x < ColumnCount; x++)
-					((float[])Data)[y * ColumnCount + x] = matrixData[y * 4 + x];
-			}
+            if (RowCount == 4 && ColumnCount == 4)
+            {
+                value = Matrix.Transpose(value);
+
+                float[] fData = (float[])Data;
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+                fData[3] = value.M41;
+
+                fData[4] = value.M12;
+                fData[5] = value.M22;
+                fData[6] = value.M32;
+                fData[7] = value.M42;
+
+                fData[8] = value.M13;
+                fData[9] = value.M23;
+                fData[10] = value.M33;
+                fData[11] = value.M43;
+
+                fData[12] = value.M14;
+                fData[13] = value.M24;
+                fData[14] = value.M34;
+                fData[15] = value.M44;
+            }
+            else
+            {
+                var matrixData = Matrix.ToFloatArray(value);
+
+                for (var y = 0; y < RowCount; y++)
+                {
+                    for (var x = 0; x < ColumnCount; x++)
+                        ((float[])Data)[y * ColumnCount + x] = matrixData[y * 4 + x];
+                }
+            }
 
 			StateKey = unchecked(NextStateKey++);
 		}
