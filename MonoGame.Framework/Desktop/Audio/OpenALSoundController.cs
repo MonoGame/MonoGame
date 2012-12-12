@@ -27,6 +27,7 @@ namespace Microsoft.Xna.Framework.Audio
 		HashSet<int> availableSourcesCollection;
 		HashSet<OALSoundBuffer> inUseSourcesCollection;
 		HashSet<OALSoundBuffer> playingSourcesCollection;
+        HashSet<OALSoundBuffer> purgeMe;
 
 		private OpenALSoundController ()
 		{
@@ -54,6 +55,7 @@ namespace Microsoft.Xna.Framework.Audio
 			availableSourcesCollection = new HashSet<int> ();
 			inUseSourcesCollection = new HashSet<OALSoundBuffer> ();
 			playingSourcesCollection = new HashSet<OALSoundBuffer> ();
+            purgeMe = new HashSet<OALSoundBuffer> ();
 
 
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
@@ -172,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Update ()
 		{
-			HashSet<OALSoundBuffer> purgeMe = new HashSet<OALSoundBuffer> ();
+            purgeMe.Clear();
 
 			ALSourceState state;
 			foreach (var soundBuffer in playingSourcesCollection) {
