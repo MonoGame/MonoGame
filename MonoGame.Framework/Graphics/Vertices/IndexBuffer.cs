@@ -63,17 +63,17 @@ namespace Microsoft.Xna.Framework.Graphics
             // the Buffer until SetData() and recreate them if set more than once.
 
             var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            var usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            var resUsage = SharpDX.Direct3D11.ResourceUsage.Default;
 
             if (dynamic)
             {
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
-                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+                resUsage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             }
 
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         sizeInBytes,
-                                                        usage,
+                                                        resUsage,
                                                         SharpDX.Direct3D11.BindFlags.IndexBuffer,
                                                         accessflags,
                                                         SharpDX.Direct3D11.ResourceOptionFlags.None,
