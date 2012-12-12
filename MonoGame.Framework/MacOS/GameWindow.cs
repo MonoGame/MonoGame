@@ -475,8 +475,7 @@ namespace Microsoft.Xna.Framework
 			_keyStates.Clear ();
 			_keyStates.AddRange (_flags);
 			_keyStates.AddRange (_keys);
-			var kbs = new KeyboardState (_keyStates.ToArray ());
-			Keyboard.State = kbs;
+			Keyboard.SetKeys(_keyStates);
 		}
 		
 		// This method should only be called when necessary like when the Guide is displayed
