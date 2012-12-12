@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
+using MonoGame.Framework;
 
 #if WINRT
 using Windows.UI.ViewManagement;
@@ -99,7 +100,7 @@ namespace Microsoft.Xna.Framework
 #elif PSM
 			return new PSSGamePlatform(game);
 #elif WINDOWS && DIRECTX
-            return null; // TODO!
+            return new WinFormsGamePlatform(game);
 #elif WINDOWS_PHONE
             return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT

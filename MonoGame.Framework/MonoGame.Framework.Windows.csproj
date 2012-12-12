@@ -360,6 +360,8 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Windows\WinFormsGamePlatform.cs" />
+    <Compile Include="Windows\WinFormsGameWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
