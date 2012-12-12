@@ -169,6 +169,7 @@ namespace Microsoft.Xna.Framework
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
             
             // If window size is zero, leave bounds unchanged
+            // OpenTK appears to set the window client size to 1x1 when minimizing
             if (winWidth <= 1 || winHeight <= 1)
                 return;
 
