@@ -470,7 +470,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
-			var shaderProgram = effectPass._shaderProgram;						Parameters = new EffectParameterCollection();			for (int i = 0; i < shaderProgram.UniformCount; i++)			{				Parameters.Add(EffectParameterForUniform(shaderProgram, i));			}#warning Hacks for BasicEffect as we don't have these parameters yet
+			var shaderProgram = effectPass._shaderProgram;
+			Parameters = new EffectParameterCollection();
+			for (int i = 0; i < shaderProgram.UniformCount; i++)
+			{	
+			    Parameters.Add(EffectParameterForUniform(shaderProgram, i));
+			}
+			
+			#warning Hacks for BasicEffect as we don't have these parameters yet
             Parameters.Add (new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
                 3, 1, "float3",
