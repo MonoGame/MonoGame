@@ -93,17 +93,30 @@ namespace Microsoft.Xna.Framework {
 				var bounds = _viewController.View.Bounds;
                 var screen = _viewController.View.Window.Screen;
 
+                // TODO: Calculate this only when dirty.
                 if (_viewController is iOSGameViewController)
                 {
-                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((_viewController as iOSGameViewController).SupportedOrientations);
-                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-                        return new Rectangle(
-                            (int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale),
-                            (int)(Math.Max(bounds.Width, bounds.Height) * screen.Scale), (int)(Math.Min(bounds.Width, bounds.Height) * screen.Scale));
+                    var currentOrientation = OrientationConverter.ToDisplayOrientation(_viewController.InterfaceOrientation);
+                    int width;
+                    int height;
+
+                    if (currentOrientation == DisplayOrientation.LandscapeLeft || 
+                        currentOrientation == DisplayOrientation.LandscapeRight)
+                    {
+                        width = (int)Math.Max(bounds.Width, bounds.Height);
+                        height = (int)Math.Min(bounds.Width, bounds.Height);
+
+                    }
                     else
-                        return new Rectangle(
-                            (int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale),
-                            (int)(Math.Min(bounds.Width, bounds.Height) * screen.Scale), (int)(Math.Max(bounds.Width, bounds.Height) * screen.Scale));
+                    {
+                        width = (int)Math.Min(bounds.Width, bounds.Height);
+                        height = (int)Math.Max(bounds.Width, bounds.Height);
+                    }
+
+                    width *= (int)screen.Scale;
+                    height *= (int)screen.Scale;
+
+                    return new Rectangle( (int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale), width, height);
                 }
 
 				return new Rectangle(
