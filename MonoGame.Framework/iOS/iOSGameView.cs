@@ -256,8 +256,8 @@ namespace Microsoft.Xna.Framework {
 
                 if (this.NextResponder is iOSGameViewController)
                 {
-                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
-                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                    var displayOrientation = TouchPanel.DisplayOrientation;
+                    if (displayOrientation == DisplayOrientation.LandscapeLeft || displayOrientation == DisplayOrientation.LandscapeRight)
                     {
                         height = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
                         width = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
