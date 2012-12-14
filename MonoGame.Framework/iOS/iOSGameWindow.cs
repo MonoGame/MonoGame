@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework {
 		public override Rectangle ClientBounds {
 			get {
 				var bounds = _viewController.View.Bounds;
-                var screen = _viewController.View.Window.Screen;
+                var scale = _viewController.View.ContentScaleFactor;
 
                 // TODO: Calculate this only when dirty.
                 if (_viewController is iOSGameViewController)
@@ -113,15 +113,15 @@ namespace Microsoft.Xna.Framework {
                         height = (int)Math.Max(bounds.Width, bounds.Height);
                     }
 
-                    width *= (int)screen.Scale;
-                    height *= (int)screen.Scale;
+                    width *= (int)scale;
+                    height *= (int)scale;
 
-                    return new Rectangle( (int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale), width, height);
+                    return new Rectangle( (int)(bounds.X * scale), (int)(bounds.Y * scale), width, height);
                 }
 
 				return new Rectangle(
-					(int)(bounds.X * screen.Scale), (int)(bounds.Y * screen.Scale),
-					(int)(bounds.Width * screen.Scale), (int)(bounds.Height * screen.Scale));
+                    (int)(bounds.X * scale), (int)(bounds.Y * scale),
+                    (int)(bounds.Width * scale), (int)(bounds.Height * scale));
 			}
 		}
 
