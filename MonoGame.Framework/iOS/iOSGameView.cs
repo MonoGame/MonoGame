@@ -91,8 +91,6 @@ namespace Microsoft.Xna.Framework {
 		private int _depthbuffer;
 		private int _framebuffer;
 
-        public bool PreserveFrameBuffer = false;
-
 		#region Construction/Destruction
 		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
 			: base(frame)
@@ -198,9 +196,6 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-            if (PreserveFrameBuffer)
-                return;
-
 			__renderbuffergraphicsContext.MakeCurrent (null);
 			
 			// HACK:  GraphicsDevice itself should be calling
@@ -288,9 +283,6 @@ namespace Microsoft.Xna.Framework {
 
 		private void DestroyFramebuffer ()
 		{
-            if (PreserveFrameBuffer)
-                return;
-
 			AssertNotDisposed ();
 			AssertValidContext ();
 
@@ -361,25 +353,17 @@ namespace Microsoft.Xna.Framework {
 
 		#region UIWindow Notifications
 
-		public override void WillMoveToWindow (UIWindow window)
-		{
-			base.WillMoveToWindow (window);
-
-			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
-				DestroyFramebuffer();
-		}
-
 		[Export ("didMoveToWindow")]
 		public virtual void DidMoveToWindow ()
 		{
 
-			if (Window != null) {
-				
-				if (__renderbuffergraphicsContext == null)
-					CreateContext ();
-				if (_framebuffer * _colorbuffer * _depthbuffer == 0)
-					CreateFramebuffer ();
-			}
+            if (Window != null) {
+                
+                if (__renderbuffergraphicsContext == null)
+                    CreateContext ();
+                if (_framebuffer * _colorbuffer * _depthbuffer == 0)
+                    CreateFramebuffer ();
+            }
 		}
 
 		#endregion UIWindow Notifications
