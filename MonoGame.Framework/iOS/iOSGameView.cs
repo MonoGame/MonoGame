@@ -237,8 +237,8 @@ namespace Microsoft.Xna.Framework {
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
-			_glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
-			_glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
+            _glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
+            _glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
 
 			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
 				typeof (IGraphicsDeviceService));
@@ -251,8 +251,8 @@ namespace Microsoft.Xna.Framework {
 
                 if (this.NextResponder is iOSGameViewController)
                 {
-                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
-                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                    var displayOrientation = _platform.Game.Window.CurrentOrientation;
+                    if (displayOrientation == DisplayOrientation.LandscapeLeft || displayOrientation == DisplayOrientation.LandscapeRight)
                     {
                         height = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
                         width = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
