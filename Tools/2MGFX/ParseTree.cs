@@ -16,6 +16,7 @@ namespace TwoMGFX
     [Serializable]
     public class ParseError
     {
+        private string file;
         private string message;
         private int code;
         private int line;
@@ -23,6 +24,7 @@ namespace TwoMGFX
         private int pos;
         private int length;
 
+        public string File { get { return file; } }
         public int Code { get { return code; } }
         public int Line { get { return line; } }
         public int Column { get { return col; } }
@@ -35,12 +37,17 @@ namespace TwoMGFX
         {
         }
 
-        public ParseError(string message, int code, ParseNode node) : this(message, code,  0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
+        public ParseError(string message, int code, ParseNode node) : this(message, code, node.Token)
         {
         }
 
-        public ParseError(string message, int code, int line, int col, int pos, int length)
+        public ParseError(string message, int code, Token token) : this(message, code, token.File, token.Line, token.Column, token.StartPos, token.Length)
         {
+        }
+
+        public ParseError(string message, int code, string file = "", int line = 0, int col = 0, int pos = 0, int length = 0)
+        {
+            this.file = file;
             this.message = message;
             this.code = code;
             this.line = line;
@@ -240,9 +247,9 @@ namespace TwoMGFX
         	
         	Microsoft.Xna.Framework.Graphics.Blend blend;
         	
-        	switch (name)
+        	switch (name.ToLower())
         	{
-        		case "AlphaBlendEnable":
+        		case "alphablendenable":
         			if (!ParseTreeTools.ParseBool(value))
         			{
         				if (pass.blendState == null)
@@ -253,34 +260,59 @@ namespace TwoMGFX
         				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
         			}
         			break;
-        		case "SrcBlend":
+        		case "srcblend":
         			blend = ParseTreeTools.ParseBlend(value);
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaSourceBlend = blend;
         			pass.blendState.ColorSourceBlend = blend;
         			break;
-        		case "DestBlend":
+        		case "destblend":
         			blend = ParseTreeTools.ParseBlend(value);
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaDestinationBlend = blend;
         			pass.blendState.ColorDestinationBlend = blend;
         			break;
-        		case "BlendOp":
+        		case "blendop":
         			if (pass.blendState == null)
         				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
         			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
         			break;
-        		case "ZEnable":
+        		case "zenable":
         			if (pass.depthStencilState == null)
         				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
         			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
         			break;
-        		case "ZWriteEnable":
+        		case "zwriteenable":
         			if (pass.depthStencilState == null)
         				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
         			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
+        			break;
+        		case "depthbias":
+        			if (pass.rasterizerState == null)
+        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+        			pass.rasterizerState.DepthBias = float.Parse(value);
+        			break;
+        		case "cullmode":
+        			if (pass.rasterizerState == null)
+        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+        			pass.rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
+        			break;
+        		case "fillmode":
+        			if (pass.rasterizerState == null)
+        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+        			pass.rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
+        			break;
+        		case "multisampleantialias":
+        			if (pass.rasterizerState == null)
+        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+        			pass.rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
+        			break;
+        		case "slopescaledepthbias":
+        			if (pass.rasterizerState == null)
+        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
+        			pass.rasterizerState.SlopeScaleDepthBias = float.Parse(value);
         			break;
         		default:
         			break;
@@ -328,39 +360,39 @@ namespace TwoMGFX
             var sampler = paramlist[0] as SamplerStateInfo;
         	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	var value = (this.GetValue(tree, TokenType.TextureName, 0) ?? (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0))) as string;
-        	switch (name)
+        	switch (name.ToLower())
         	{
-        		case "Texture":
+        		case "texture":
         			// Ignore
         			break;
-        		case "MinFilter":
+        		case "minfilter":
         			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "MagFilter":
+        		case "magfilter":
         			sampler.MagFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "MipFilter":
+        		case "mipfilter":
         			sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "Filter":
+        		case "filter":
         			sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
         			break;
-        		case "AddressU":
+        		case "addressu":
         			sampler.state.AddressU = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "AddressV":
+        		case "addressv":
         			sampler.state.AddressV = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "AddressW":
+        		case "addressw":
         			sampler.state.AddressW = ParseTreeTools.ParseAddressMode(value);
         			break;
-        		case "MaxAnisotropy":
+        		case "maxanisotropy":
         			sampler.state.MaxAnisotropy = int.Parse(value);
         			break;
-        		case "MaxLOD":
+        		case "maxlod":
         			sampler.state.MaxMipLevel = int.Parse(value);
         			break;
-        		case "MipLODBias":
+        		case "miplodbias":
         			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
         			break;
         		default:

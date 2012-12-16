@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
 
-        public static void KeyDown(Keycode keyCode)
+        internal static void KeyDown(Keycode keyCode)
         {
             Keys key;
             if (KeyMap.TryGetValue(keyCode, out key))
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-        public static void KeyUp(Keycode keyCode)
+        internal static void KeyUp(Keycode keyCode)
         {
             Keys key;
             if (KeyMap.TryGetValue(keyCode, out key))
@@ -137,12 +137,12 @@ namespace Microsoft.Xna.Framework.Input
 
 	    public static KeyboardState GetState()
 		{
-			return new KeyboardState(keys.ToArray()); // TODO Not used on iPhone or Zune
+			return new KeyboardState(keys);
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return new KeyboardState(keys.ToArray());  // TODO Not used on iPhone or Zune
+            return new KeyboardState(keys);
 		}
 	}
 }

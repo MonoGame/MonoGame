@@ -37,16 +37,21 @@ namespace Microsoft.Xna.Framework.Graphics
         public int IndexCount { get; private set; }
         public IndexElementSize IndexElementSize { get; private set; }
 
-		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage, bool dynamic)
+   		protected IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage, bool dynamic)
+            : this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, dynamic)
+        {
+        }
+
+		protected IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage, bool dynamic)
         {
 			if (graphicsDevice == null)
             {
-                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+                throw new ArgumentNullException("GraphicsDevice is null");
             }
 			this.GraphicsDevice = graphicsDevice;
 			this.IndexElementSize = indexElementSize;	
             this.IndexCount = indexCount;
-            this.BufferUsage = bufferUsage;
+            this.BufferUsage = usage;
 			
 			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
@@ -58,17 +63,17 @@ namespace Microsoft.Xna.Framework.Graphics
             // the Buffer until SetData() and recreate them if set more than once.
 
             var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            var usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            var resUsage = SharpDX.Direct3D11.ResourceUsage.Default;
 
             if (dynamic)
             {
                 accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
-                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+                resUsage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
             }
 
             _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
                                                         sizeInBytes,
-                                                        usage,
+                                                        resUsage,
                                                         SharpDX.Direct3D11.BindFlags.IndexBuffer,
                                                         accessflags,
                                                         SharpDX.Direct3D11.ResourceOptionFlags.None,
@@ -89,11 +94,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
 		public IndexBuffer(GraphicsDevice graphicsDevice, Type indexType, int indexCount, BufferUsage usage) :
-			this(graphicsDevice,
-			     (indexType == typeof(short) || indexType == typeof(ushort)) ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits,
-			     indexCount, usage)
+			this(graphicsDevice, SizeForType(graphicsDevice, indexType), indexCount, usage, false)
 		{
 		}
+
+        /// <summary>
+        /// Gets the relevant IndexElementSize enum value for the given type.
+        /// </summary>
+        /// <param name="type">The type to use for the index buffer</param>
+        /// <returns>The IndexElementSize enum value that matches the type</returns>
+        static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
+        {
+            switch (Marshal.SizeOf(type))
+            {
+                case 2:
+                    return IndexElementSize.SixteenBits;
+                case 4:
+                    if (graphicsDevice.GraphicsProfile == GraphicsProfile.Reach)
+                        throw new NotSupportedException("The profile does not support an elementSize of IndexElementSize.ThirtyTwoBits; use IndexElementSize.SixteenBits or a type that has a size of two bytes.");
+                    return IndexElementSize.ThirtyTwoBits;
+                default:
+                    throw new ArgumentOutOfRangeException("Index buffers can only be created for types that are sixteen or thirty two bits in length");
+            }
+        }
 
         /// <summary>
         /// The GraphicsDevice is resetting, so GPU resources must be recreated.

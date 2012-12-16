@@ -211,7 +211,19 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 #if WINRT
             if (_voice != null)
+            {
+                // Restart the sound if (and only if) it stopped playing
+                if (!_loop)
+                {
+                    if (_voice.State.BuffersQueued == 0)
+                    {
+                        _voice.Stop();
+                        _voice.FlushSourceBuffers();
+                        _voice.SubmitSourceBuffer(_effect._buffer, null);
+                    }
+                }
                 _voice.Start();
+            }
             _paused = false;
 #else
 			if ( _sound != null )
