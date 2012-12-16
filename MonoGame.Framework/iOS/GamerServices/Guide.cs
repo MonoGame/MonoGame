@@ -244,8 +244,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			keyboardViewController = new KeyboardInputViewController(
 				title, description, defaultText, usePasswordMode);
 
-            (_gameViewController.View as iOSGameView).PreserveFrameBuffer = true;
-
 			_gameViewController.PresentModalViewController (keyboardViewController, true);
 
 			keyboardViewController.View.InputAccepted += (sender, e) => {
@@ -265,7 +263,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
-            (_gameViewController.View as iOSGameView).PreserveFrameBuffer = false;
             keyboardViewController = null;
 
 			if (!(result is KeyboardInputAsyncResult))
