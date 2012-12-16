@@ -208,8 +208,8 @@ namespace Microsoft.Xna.Framework {
 			//        here and then force the state into
 			//        GraphicsDevice.  However, that change is a
 			//        ways off, yet.
-			int unscaledViewportHeight = (int) Math.Round (Layer.Bounds.Size.Height);
-			int unscaledViewportWidth = (int) Math.Round (Layer.Bounds.Size.Width);
+            int viewportHeight = (int) Math.Round (Layer.Bounds.Size.Height) * (int)Layer.ContentsScale;
+            int viewportWidth = (int) Math.Round (Layer.Bounds.Size.Width) * (int)Layer.ContentsScale ;
 
 			int previousRenderbuffer = 0;
 			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework {
 			// Create our Depth buffer. Color buffer must be the last one bound
 			GL.GenRenderbuffers(1, ref _depthbuffer);
 			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, unscaledViewportWidth * (int)Layer.ContentsScale, unscaledViewportHeight * (int)Layer.ContentsScale );
+			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
 			
 			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
 
@@ -242,8 +242,8 @@ namespace Microsoft.Xna.Framework {
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
-			_glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
-			_glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
+			_glapi.Viewport (0, 0, viewportWidth, viewportHeight);
+			_glapi.Scissor (0, 0, viewportWidth, viewportHeight);
 
 			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
 				typeof (IGraphicsDeviceService));
@@ -251,21 +251,21 @@ namespace Microsoft.Xna.Framework {
 			if (gds != null && gds.GraphicsDevice != null)
 			{
                 var pp = gds.GraphicsDevice.PresentationParameters;
-                int height = (int)(unscaledViewportHeight * Layer.ContentsScale);
-                int width = (int)(unscaledViewportWidth * Layer.ContentsScale);
+                int height = (int)(viewportHeight * Layer.ContentsScale);
+                int width = (int)(viewportWidth * Layer.ContentsScale);
 
                 if (this.NextResponder is iOSGameViewController)
                 {
                     DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
                     if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
                     {
-                        height = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
-                        width = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        height = (int)(Math.Min (viewportHeight,viewportWidth) * Layer.ContentsScale);
+                        width = (int)(Math.Max (viewportHeight,viewportWidth) * Layer.ContentsScale);
                     }
                     else
                     {
-                        height = (int)(Math.Max (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
-                        width = (int)(Math.Min (unscaledViewportHeight,unscaledViewportWidth) * Layer.ContentsScale);
+                        height = (int)(Math.Max (viewportHeight,viewportWidth) * Layer.ContentsScale);
+                        width = (int)(Math.Min (viewportHeight,viewportWidth) * Layer.ContentsScale);
                     }
                 }
 
