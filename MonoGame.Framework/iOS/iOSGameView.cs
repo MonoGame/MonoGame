@@ -208,8 +208,8 @@ namespace Microsoft.Xna.Framework {
 			//        here and then force the state into
 			//        GraphicsDevice.  However, that change is a
 			//        ways off, yet.
-            int viewportHeight = (int) Math.Round (Layer.Bounds.Size.Height) * (int)Layer.ContentsScale;
-            int viewportWidth = (int) Math.Round (Layer.Bounds.Size.Width) * (int)Layer.ContentsScale;
+            int viewportHeight = (int)Math.Round(Layer.Bounds.Size.Height * Layer.ContentsScale);
+            int viewportWidth = (int)Math.Round(Layer.Bounds.Size.Width * Layer.ContentsScale);
 
 			int previousRenderbuffer = 0;
 			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
@@ -242,10 +242,10 @@ namespace Microsoft.Xna.Framework {
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
-			_glapi.Viewport (0, 0, viewportWidth, viewportHeight);
-			_glapi.Scissor (0, 0, viewportWidth, viewportHeight);
+			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
+            _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
 
-			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
+			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService(
 				typeof (IGraphicsDeviceService));
 
 			if (gds != null && gds.GraphicsDevice != null)
@@ -259,13 +259,13 @@ namespace Microsoft.Xna.Framework {
                     DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
                     if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
                     {
-                        height = Math.Min(viewportHeight,viewportWidth);
-                        width = Math.Max(viewportHeight,viewportWidth);
+                        height = Math.Min(viewportHeight, viewportWidth);
+                        width = Math.Max(viewportHeight, viewportWidth);
                     }
                     else
                     {
-                        height = Math.Max(viewportHeight,viewportWidth);
-                        width = Math.Min(viewportHeight,viewportWidth);
+                        height = Math.Max(viewportHeight, viewportWidth);
+                        width = Math.Min(viewportHeight, viewportWidth);
                     }
                 }
 
