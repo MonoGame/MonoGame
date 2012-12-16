@@ -237,8 +237,8 @@ namespace Microsoft.Xna.Framework {
 				throw new InvalidOperationException (
 					"Framebuffer was not created correctly: " + status);
 
-            _glapi.Viewport (0, 0, unscaledViewportWidth, unscaledViewportHeight);
-            _glapi.Scissor (0, 0, unscaledViewportWidth, unscaledViewportHeight);
+            _glapi.Viewport (0, 0, unscaledViewportWidth * (int)Layer.ContentsScale, unscaledViewportHeight * (int)Layer.ContentsScale);
+            _glapi.Scissor (0, 0, unscaledViewportWidth * (int)Layer.ContentsScale, unscaledViewportHeight * (int)Layer.ContentsScale);
 
 			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
 				typeof (IGraphicsDeviceService));
