@@ -203,8 +203,7 @@ namespace Microsoft.Xna.Framework
         }
 
 
-        double _timeUntilNextVsync = 0.0;
-        double _prevFrameTimeStamp = 0.0;
+        double _bank = 0.0;
         System.Diagnostics.Stopwatch _sw = new System.Diagnostics.Stopwatch();
         public void Tick()
         {
@@ -217,16 +216,14 @@ namespace Microsoft.Xna.Framework
             // There's no way to disable vSync on iOS, so avoid missing it.
             // Skip rendering the frame if it doesn't line up with the vertical sync.
             // Technique discussed here: http://www.ananseproductions.com/game-loops-on-ios
-            var curTimeStamp = _displayLink.Timestamp;
-            var frameTime = (curTimeStamp - _prevFrameTimeStamp);
+            var curTime = CAAnimation.CurrentMediaTime();
+            var timeToNext = Game.TargetElapsedTime.TotalSeconds - (curTime - _displayLink.Timestamp);
 
-            _timeUntilNextVsync -= frameTime;
-            if (_timeUntilNextVsync > 0)
+            var dropFrame = _bank > timeToNext;
+            if (dropFrame)
                 Game.SuppressDraw();
-            else
-                _timeUntilNextVsync = 0;
 
-            _prevFrameTimeStamp = curTimeStamp;
+            _bank = 0.0;
 
             _sw.Restart();
 
@@ -235,21 +232,18 @@ namespace Microsoft.Xna.Framework
             //        functionality is actually implemented.  At that
             //        point, it should be possible to pass Game.Tick
             //        directly to NSTimer.CreateRepeatingTimer.
-            _viewController.View.MakeCurrent();
+
+            if (!dropFrame)
+                _viewController.View.MakeCurrent();
+
             Game.Tick ();
 
-            if (!IsPlayingVideo)
+            if (!dropFrame && !IsPlayingVideo)
                 _viewController.View.Present ();
 
             _sw.Stop();
 
-            if (_timeUntilNextVsync == 0)
-            {
-                _timeUntilNextVsync = _sw.Elapsed.TotalSeconds;
-                
-                if (_timeUntilNextVsync > frameTime)
-                    _timeUntilNextVsync = frameTime + (_timeUntilNextVsync % frameTime);
-            }
+            _bank += _sw.Elapsed.TotalSeconds - timeToNext;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
