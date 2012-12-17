@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NAudio.Wave;
+using NAudio.WindowsMediaFormat;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -26,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// Gets the raw audio data.
         /// </summary>
         /// <value>If unprocessed, the source data; otherwise, the processed data.</value>
-        public ReadOnlyCollection<byte> Data { get { return data.AsReadOnly(); } }
+        public ReadOnlyCollection<byte> Data { get { return data == null ? format.NativeWaveFormat : data.AsReadOnly(); } }
 
         /// <summary>
         /// Gets the duration (in milliseconds) of the audio data.
@@ -73,7 +75,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <remarks>Constructs the object from the specified source file, in the format specified.</remarks>
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
-            throw new NotImplementedException();
+            fileName = audioFileName;
+            fileType = audioFileType;
+
+            switch (fileType)
+            {
+                case AudioFileType.Wav:
+                    ReadWav();
+                    break;
+
+                case AudioFileType.Mp3:
+                    ReadMp3();
+                    break;
+
+                case AudioFileType.Wma:
+                    ReadWma();
+                    break;
+            }
         }
 
         /// <summary>
@@ -121,6 +139,42 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     // ...
                 }
                 disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Read a WAV format file.
+        /// </summary>
+        void ReadWav()
+        {
+            using (var reader = new WaveFileReader(fileName))
+            {
+                duration = reader.TotalTime;
+                format = new AudioFormat(reader);
+            }
+        }
+
+        /// <summary>
+        /// Read a MP3 format file.
+        /// </summary>
+        void ReadMp3()
+        {
+            using (var reader = new Mp3FileReader(fileName))
+            {
+                duration = reader.TotalTime;
+                format = new AudioFormat(reader);
+            }
+        }
+
+        /// <summary>
+        /// Read a WMA format file.
+        /// </summary>
+        void ReadWma()
+        {
+            using (var reader = new WMAFileReader(fileName))
+            {
+                duration = reader.TotalTime;
+                format = new AudioFormat(reader);
             }
         }
     }
