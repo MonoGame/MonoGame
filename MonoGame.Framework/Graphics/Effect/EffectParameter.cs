@@ -486,7 +486,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2 value)
 		{
-			Data = new float[2] { value.X, value.Y };
+            float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -499,7 +501,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
-			Data = new float[3] { value.X, value.Y, value.Z };
+            float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
+            fData[2] = value.Z;
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -512,7 +517,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
-			Data = new float[4] { value.X, value.Y, value.Z, value.W };
+			float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
+            fData[2] = value.Z;
+            fData[3] = value.W;
             StateKey = unchecked(NextStateKey++);
 		}
 
