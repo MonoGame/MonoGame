@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content
     {
 #if ANDROID
         static string[] supportedExtensions = new string[] { ".3gp", ".mkv", ".mp4", ".ts", ".webm" };
-#elif IPHONE || MONOMAC
+#elif IOS || MONOMAC
         static string[] supportedExtensions = new string[] { ".mp4", ".mov", ".avi", ".m4v", ".3gp" };
 #else
         static string[] supportedExtensions = new string[] { ".mp4", ".mov", ".avi", ".m4v" };
