@@ -43,7 +43,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
-#if IPHONE
+#if IOS
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 #if ES11
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
-#elif IPHONE
+#elif IOS
         public static EAGLContext BackgroundContext;
 #elif WINDOWS || LINUX
         public static IGraphicsContext BackgroundContext;
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-#if IPHONE
+#if IOS
             lock (BackgroundContext)
             {
                 // Make the context current on this thread if it is not already

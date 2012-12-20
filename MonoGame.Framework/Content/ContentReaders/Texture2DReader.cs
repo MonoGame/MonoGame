@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if IPHONE
+#if IOS
 		        // At the moment. If a DXT Texture comes in on iOS, it's really a PVR compressed
 				// texture. We need to use this hack until the content pipeline is implemented.
 				// For now DXT5 means we're using 4bpp PVRCompression and DXT3 means 2bpp. Look at
