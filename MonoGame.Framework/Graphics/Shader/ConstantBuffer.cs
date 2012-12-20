@@ -89,7 +89,8 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ConstantBuffer;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            _cbuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, desc);
+            lock (GraphicsDevice._d3dContext)
+                _cbuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, desc);
 
 #elif OPENGL 
 

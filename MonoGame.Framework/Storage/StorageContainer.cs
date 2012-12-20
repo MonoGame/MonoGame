@@ -45,7 +45,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 
-#if WINRT
+#if WINDOWS_STOREAPP
 using Windows.Storage;
 using System.Linq;
 using Windows.Storage.Search;
@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Storage
 				_storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
 
             // Create the "device" if need be
-#if WINRT
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             folder.CreateFolderAsync(_storagePath, CreationCollisionOption.OpenIfExists).GetResults();
 #else
@@ -192,13 +192,13 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var dirPath = Path.Combine(_storagePath, directory);
-			
-			// Now let's try to create it
-#if WINRT
+
+            // Now let's try to create it
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             folder.CreateFolderAsync(dirPath, CreationCollisionOption.OpenIfExists).GetResults();
 #else
-			Directory.CreateDirectory(dirPath);
+            Directory.CreateDirectory(dirPath);
 #endif			
 		}
 		
@@ -216,13 +216,13 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var awaiter = folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.ReplaceExisting).GetAwaiter();
             return awaiter.GetResult();
 #else
-			// return A new file with read/write access.
+            // return A new file with read/write access.
 			return File.Create(filePath);				
 #endif			
 		}		
@@ -242,14 +242,14 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var dirPath = Path.Combine(_storagePath, directory);
-			
-			// Now let's try to delete itd
-#if WINRT
+
+            // Now let's try to delete itd
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var deleteFolder = folder.GetFolderAsync(dirPath).GetResults();
             deleteFolder.DeleteAsync().GetResults();
 #else
-			Directory.Delete(dirPath);
+            Directory.Delete(dirPath);
 #endif
         }		
 		
@@ -267,13 +267,13 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var deleteFile = folder.GetFileAsync(filePath).GetResults();
             deleteFile.DeleteAsync().GetResults();
 #else
-			// Now let's try to delete it
+            // Now let's try to delete it
 			File.Delete(filePath);		
 #endif
         }
@@ -293,13 +293,13 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var dirPath = Path.Combine(_storagePath, directory);
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var result = folder.GetFolderAsync(dirPath).GetResults();
             return result != null;
 #else
-			return Directory.Exists(dirPath);
+            return Directory.Exists(dirPath);
 #endif
 		}	
 			
@@ -327,13 +327,13 @@ namespace Microsoft.Xna.Framework.Storage
 			
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var existsFile = folder.GetFileAsync(filePath).GetResults();
             return existsFile != null;
 #else
-			// return A new file with read/write access.
+            // return A new file with read/write access.
 			return File.Exists(filePath);		
 #endif
         }			
@@ -342,13 +342,13 @@ namespace Microsoft.Xna.Framework.Storage
 		// Summary:
 		//     Enumerates the directories in the root of a StorageContainer.
 		public string[] GetDirectoryNames ()
-		{
-#if WINRT
+        {
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var results = folder.GetFoldersAsync().GetResults();
             return results.Select<StorageFolder, string>(e => e.Name).ToArray();
 #else
-			return Directory.GetDirectories(_storagePath);
+            return Directory.GetDirectories(_storagePath);
 #endif
 		}		
 		
@@ -369,13 +369,13 @@ namespace Microsoft.Xna.Framework.Storage
 		// Summary:
 		//     Enumerates files in the root directory of a StorageContainer.
 		public string[] GetFileNames ()
-		{
-#if WINRT
+        {
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var results = folder.GetFilesAsync().GetResults();
             return results.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
-			return Directory.GetFiles(_storagePath);
+            return Directory.GetFiles(_storagePath);
 #endif
 		}				
 		//
@@ -391,15 +391,15 @@ namespace Microsoft.Xna.Framework.Storage
 		{
 			if (string.IsNullOrEmpty(searchPattern))
 				throw new ArgumentNullException("Parameter searchPattern must contain a value.");
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             var options = new QueryOptions( CommonFileQuery.DefaultQuery, new [] { searchPattern } );
             var query = folder.CreateFileQueryWithOptions(options);
             var files = query.GetFilesAsync().GetResults();
             return files.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
-			return Directory.GetFiles(_storagePath, searchPattern);
+            return Directory.GetFiles(_storagePath, searchPattern);
 #endif
         }				
 
@@ -462,8 +462,8 @@ namespace Microsoft.Xna.Framework.Storage
 		
 			// relative so combine with our path
 			var filePath= Path.Combine(_storagePath, file);
-			
-#if WINRT
+
+#if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
             if (fileMode == FileMode.Create || fileMode == FileMode.CreateNew)
             {
@@ -486,7 +486,7 @@ namespace Microsoft.Xna.Framework.Storage
                 return folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.OpenIfExists).GetAwaiter().GetResult();
             }
 #else
-			return File.Open(filePath, fileMode, fileAccess, fileShare);
+            return File.Open(filePath, fileMode, fileAccess, fileShare);
 #endif
         }				
 	}
