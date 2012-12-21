@@ -52,14 +52,15 @@ namespace Microsoft.Xna.Framework
     /// Example usage in Game.Initialise():
     /// 
     /// #if ANDROID
-    ///    this.Window.SetResumer(new ResumeManager(GraphicsDevice, 
+    ///    this.Window.SetResumer(new ResumeManager(this.Services, 
     ///                                             spriteBatch, 
-    ///                                             "Content/UI/Resuming.png", 
+    ///                                             "UI/ResumingTexture",
     ///                                             1.0f, 0.01f));
     /// #endif                                         
     /// </summary>
     public class ResumeManager : IResumeManager
     {
+        ContentManager content;
         GraphicsDevice device;
         SpriteBatch spriteBatch;
         string resumeTextureName;
@@ -68,17 +69,14 @@ namespace Microsoft.Xna.Framework
         float scale;
         float rotateSpeed;
 
-        /// <summary>
-        /// Note: The resumeTextureName should include the full asset path and extension, eg:
-        ///     "Content/Textures/RotatingResumeImage.png"
-        /// </summary>
-        public ResumeManager(GraphicsDevice device, 
+        public ResumeManager(IServiceProvider services,
                              SpriteBatch spriteBatch,
                              string resumeTextureName,
                              float scale,
                              float rotateSpeed)
         {
-            this.device = device;
+            this.content = new ContentManager(services, "Content");
+            this.device = ((IGraphicsDeviceService)services.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
             this.spriteBatch = spriteBatch;
             this.resumeTextureName = resumeTextureName;
             this.scale = scale;
@@ -87,10 +85,8 @@ namespace Microsoft.Xna.Framework
 
         public virtual void LoadContent()
         {
-            using (System.IO.Stream s = TitleContainer.OpenStream(resumeTextureName))
-            {
-                resumeTexture = Texture2D.FromStream(device, s);
-            }
+            content.Unload();
+            resumeTexture = content.Load<Texture2D>(resumeTextureName);
         }
 
         public virtual void Draw()
