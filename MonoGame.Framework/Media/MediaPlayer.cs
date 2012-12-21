@@ -42,7 +42,7 @@ using System;
 
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
+#if IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Media
         public static event EventHandler<EventArgs> MediaStateChanged;
         
 		
-#if IPHONE
+#if IOS
 		public static bool GameHasControl 
 		{ 
 			get 
