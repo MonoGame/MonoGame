@@ -358,7 +358,7 @@
     <Reference Include="SharpDX.Direct3D11">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.DXGI, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SharpDX.DXGI">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
     </Reference>
