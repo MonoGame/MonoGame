@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Media
             using (var factory = new MediaEngineClassFactory())
             using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
             {
-                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
+                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateFlags.AudioOnly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
