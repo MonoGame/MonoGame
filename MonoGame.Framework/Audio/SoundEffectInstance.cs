@@ -172,6 +172,9 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Play ()
 		{
 #if WINRT
+            if (State == SoundState.Playing)
+                return;
+
             if (_voice != null)
             {
                 // Choose the correct buffer depending on if we are looped.            
