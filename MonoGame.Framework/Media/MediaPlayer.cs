@@ -55,6 +55,10 @@ using SharpDX.Multimedia;
 using Windows.UI.Core;
 #endif
 
+#if WINDOWS_PHONE
+using System.Windows;
+#endif
+
 using System.Linq;
 
 namespace Microsoft.Xna.Framework.Media
@@ -71,7 +75,9 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINRT
         private static MediaEngine _mediaEngineEx;
+#if !WINDOWS_PHONE
         private static CoreDispatcher _dispatcher;
+#endif
 
         public static TimeSpan PlayPosition
         {
@@ -91,18 +97,25 @@ namespace Microsoft.Xna.Framework.Media
             using (var factory = new MediaEngineClassFactory())
             using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
             {
-                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
+                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateFlags.AudioOnly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
+#if !WINDOWS_PHONE
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+#endif
+
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
             {
-                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
+#if WINDOWS_PHONE
+                Deployment.Current.Dispatcher.BeginInvoke(() => OnSongFinishedPlaying(null, EventArgs.Empty));
+#else
+                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, EventArgs.Empty)).AsTask();
+#endif
             }
         }
 #endif
