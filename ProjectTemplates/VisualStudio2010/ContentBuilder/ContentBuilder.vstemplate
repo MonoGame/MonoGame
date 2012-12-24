@@ -17,10 +17,6 @@
   <TemplateContent>
       <Project TargetFileName="ContentBuilder1.csproj" File="ContentBuilder.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="Game1.cs">Game1.cs</ProjectItem>
-      <Folder Name="Properties" TargetFolderName="Properties">
-        <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
-      </Folder>
     </Project>
   </TemplateContent>
 </VSTemplate>
