@@ -30,7 +30,7 @@ namespace $safeprojectname$
 
         private void GamePageWP8_Loaded(object sender, RoutedEventArgs e)
         {
-            _game = XamlGame<RumRun>.Create("", XnaSurface);
+            _game = XamlGame<Game1>.Create("", XnaSurface, XnaMediaElement);
         }
 
         private void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
