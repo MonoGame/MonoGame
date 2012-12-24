@@ -25,11 +25,14 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'iOS' ">
       <MonoGamePlatform>iOS</MonoGamePlatform>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Mac' ">
-      <MonoGamePlatform>Mac</MonoGamePlatform>
+  <PropertyGroup Condition=" '$(Configuration)' == 'OSX' ">
+      <MonoGamePlatform>OSX</MonoGamePlatform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Linux' ">
       <MonoGamePlatform>Linux</MonoGamePlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'PSM' ">
+      <MonoGamePlatform>PSM</MonoGamePlatform>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>MonoGameContent</RootNamespace>
