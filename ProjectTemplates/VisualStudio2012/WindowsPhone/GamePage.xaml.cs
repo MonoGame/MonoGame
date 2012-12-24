@@ -40,6 +40,11 @@ namespace $safeprojectname$
             // We should detect if Game.Exit() is called and only do this if it wasn't
             e.Cancel = true;
         }
+        
+        private void GamePageWP8_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        {
+            (this._game.Window as WindowsPhoneGameWindow).OrientationChangedTo(e.Orientation);
+        }
 
         // Sample code for building a localized ApplicationBar
         //private void BuildLocalizedApplicationBar()
