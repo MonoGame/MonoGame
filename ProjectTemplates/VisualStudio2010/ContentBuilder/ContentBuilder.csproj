@@ -43,17 +43,23 @@
     <MonoGamePlatform>iOS</MonoGamePlatform>
     <OutputPath>bin\iOS\Release</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Mac' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'OSX' ">
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <XnaCompressContent>true</XnaCompressContent>
-    <MonoGamePlatform>Mac</MonoGamePlatform>
-    <OutputPath>bin\Mac\Release</OutputPath>
+    <MonoGamePlatform>OSX</MonoGamePlatform>
+    <OutputPath>bin\OSX\Release</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Linux' ">
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <XnaCompressContent>true</XnaCompressContent>
     <MonoGamePlatform>Linux</MonoGamePlatform>
     <OutputPath>bin\Linux\Release</OutputPath>
+  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'PSM' ">
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+    <MonoGamePlatform>PSM</MonoGamePlatform>
+    <OutputPath>bin\PSM\Release</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
