@@ -38,6 +38,11 @@ purpose and non-infringement.
 */
 #endregion License
 
+#if WINDOWS_PHONE
+extern alias MicrosoftXnaFramework;
+using MsXna_MediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaPlayer;
+#endif
+
 using System;
 
 using Microsoft.Xna.Framework.Audio;
@@ -47,16 +52,15 @@ using MonoTouch.AudioToolbox;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
 using MonoTouch.MediaPlayer;
-#endif
-
-#if WINRT
+#elif WINDOWS_STOREAPP
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
 using Windows.UI.Core;
-#endif
-
-#if WINDOWS_PHONE
+#elif WINDOWS_PHONE
+using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 #endif
 
 using System.Linq;
@@ -73,22 +77,9 @@ namespace Microsoft.Xna.Framework.Media
 		private static bool _isMuted = false;
 		private static MediaQueue _queue = new MediaQueue();
 
-#if WINRT
+#if WINDOWS_STOREAPP
         private static MediaEngine _mediaEngineEx;
-#if !WINDOWS_PHONE
         private static CoreDispatcher _dispatcher;
-#endif
-
-        public static TimeSpan PlayPosition
-        {
-            get
-            {
-                if (_queue.ActiveSong == null)
-                    return TimeSpan.Zero;
-                else
-                    return _queue.ActiveSong.Position; 
-            } 
-        }
 
         static MediaPlayer()
         {            
@@ -101,22 +92,18 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
-#if !WINDOWS_PHONE
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-#endif
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
             {
-#if WINDOWS_PHONE
-                Deployment.Current.Dispatcher.BeginInvoke(() => OnSongFinishedPlaying(null, EventArgs.Empty));
-#else
                 _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, EventArgs.Empty)).AsTask();
-#endif
             }
         }
+#elif WINDOWS_PHONE
+        internal static MediaElement _mediaElement;
 #endif
 
 		#region Properties
@@ -130,8 +117,10 @@ namespace Microsoft.Xna.Framework.Media
             {
 				_isMuted = value;
 
-#if WINRT
+#if WINDOWS_STOREAPP
                 _mediaEngineEx.Muted = value;
+#elif WINDOWS_PHONE
+                _mediaElement.IsMuted = value;
 #else
 				if (_queue.Count == 0)
 					return;
@@ -155,7 +144,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 _isRepeating = value;
 
-#if WINRT
+#if WINDOWS_STOREAPP
                 _mediaEngineEx.Loop = value;
 #endif
             }
@@ -164,19 +153,25 @@ namespace Microsoft.Xna.Framework.Media
         public static bool IsShuffled { get; set; }
 
         public static bool IsVisualizationEnabled { get { return false; } }
-#if !WINRT
+
         public static TimeSpan PlayPosition
         {
             get
             {
+#if WINDOWS_STOREAPP
+                return TimeSpan.FromSeconds(_mediaEngineEx.CurrentTime);
+#elif WINDOWS_PHONE
+                return _mediaElement.Position;
+#else
 				if (_queue.ActiveSong == null)
 					return TimeSpan.Zero;
 				
 				return _queue.ActiveSong.Position;
+#endif
             }
         }
-#endif
-		
+
+
         public static MediaState State
         {
             get { return _state; }
@@ -192,7 +187,6 @@ namespace Microsoft.Xna.Framework.Media
         }
         public static event EventHandler<EventArgs> MediaStateChanged;
         
-		
 #if IOS
 		public static bool GameHasControl 
 		{ 
@@ -217,10 +211,18 @@ namespace Microsoft.Xna.Framework.Media
 				return true;
 			} 
 		}
+#elif WINDOWS_PHONE
+        public static bool GameHasControl
+        {
+            get
+            {
+                return State == MediaState.Playing || MsXna_MediaPlayer.GameHasControl;
+            }
+        }
 #else
 		public static bool GameHasControl { get { return true; } }
 #endif
-		
+
 
         public static float Volume
         {
@@ -229,8 +231,10 @@ namespace Microsoft.Xna.Framework.Media
 			{       
 				_volume = value;
 				
-#if WINRT
-                _mediaEngineEx.Volume = value;       
+#if WINDOWS_STOREAPP
+                _mediaEngineEx.Volume = value;
+#elif WINDOWS_PHONE
+                _mediaElement.Volume = value;
 #else
 				if (_queue.ActiveSong == null)
 					return;
@@ -244,11 +248,16 @@ namespace Microsoft.Xna.Framework.Media
 		
         public static void Pause()
         {
-#if WINRT
             if (State == MediaState.Stopped)
                 return;
 
+#if WINDOWS_STOREAPP
             _mediaEngineEx.Pause();
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Pause();
+                });
 #else
             if (_queue.ActiveSong == null)
                 return;
@@ -265,7 +274,7 @@ namespace Microsoft.Xna.Framework.Media
 		/// Playback starts immediately at the beginning of the song.
 		/// </summary>
         public static void Play(Song song)
-        {                        
+        {
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
@@ -287,8 +296,8 @@ namespace Microsoft.Xna.Framework.Media
 		}
 		
 		private static void PlaySong(Song song)
-		{
-#if WINRT
+        {
+#if WINDOWS_STOREAPP
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
             var path = folder + "\\" + song.FilePath;
             var uri = new Uri(path);
@@ -298,15 +307,29 @@ namespace Microsoft.Xna.Framework.Media
             _mediaEngineEx.Load();
             _mediaEngineEx.Play();
 
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Source = new Uri(song.FilePath, UriKind.Relative);
+                    _mediaElement.Play();
+
+                    // Ensure only one subscribe
+                    _mediaElement.MediaEnded -= OnSongFinishedPlaying;
+                    _mediaElement.MediaEnded += OnSongFinishedPlaying;
+                });
 #else
-			song.SetEventHandler(OnSongFinishedPlaying);			
+            song.SetEventHandler(OnSongFinishedPlaying);			
 			song.Volume = _isMuted ? 0.0f : _volume;
 			song.Play();
 #endif
 			State = MediaState.Playing;
 		}
 		
-		internal static void OnSongFinishedPlaying (object sender, EventArgs args)
+#if WINDOWS_PHONE
+        internal static void OnSongFinishedPlaying(object sender, RoutedEventArgs args)
+#else
+		internal static void OnSongFinishedPlaying(object sender, EventArgs args)
+#endif
 		{
 			// TODO: Check args to see if song sucessfully played
 			_numSongsInQueuePlayed++;
@@ -326,10 +349,15 @@ namespace Microsoft.Xna.Framework.Media
 
         public static void Resume()
         {
-#if WINRT
-            _mediaEngineEx.Play();            
+#if WINDOWS_STOREAPP
+            _mediaEngineEx.Play();
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Play();
+                });
 #else
-			if (_queue.ActiveSong == null)
+            if (_queue.ActiveSong == null)
 				return;
 			
 			_queue.ActiveSong.Resume();
@@ -339,10 +367,15 @@ namespace Microsoft.Xna.Framework.Media
 
         public static void Stop()
         {
-#if WINRT
+#if WINDOWS_STOREAPP
             _mediaEngineEx.Source = null;
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Stop();
+                });
 #else
-			if (_queue.ActiveSong == null)
+            if (_queue.ActiveSong == null)
 				return;
 			
 			// Loop through so that we reset the PlayCount as well
@@ -360,7 +393,7 @@ namespace Microsoft.Xna.Framework.Media
 		public static void MovePrevious()
 		{
 			NextSong(-1);
-		}
+        }
 		
 		private static void NextSong(int direction)
 		{
