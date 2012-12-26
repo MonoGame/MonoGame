@@ -1,14 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 
 namespace MGCB
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            var options = new Options();
+            var parser = new Utilities.CommandLineParser(options);
+            parser.Title = "MGCB - The MonoGame content builder command-line tool.";
+
+            // Make sure we got a valid command line.
+            if (!parser.ParseCommandLine(args))
+                return 1;
+
+            // TODO: Eventually we will support our own simple file format
+            // in addition to MSBuild .contentproj files.
+
+            // Validate the content project exits.
+            if (!File.Exists(options.ContentProjectFile))
+            {
+                Console.Error.WriteLine("The input file '{0}' was not found!", options.ContentProjectFile);
+                return 1;
+            }
+
+            var project = new ContentProject(options.ContentProjectFile, "foo");
+            project.Build("foo");
+
+            return 0;
         }
     }
 }

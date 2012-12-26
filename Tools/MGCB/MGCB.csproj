@@ -11,7 +11,8 @@
     <RootNamespace>MGCB</RootNamespace>
     <AssemblyName>MGCB</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -34,8 +35,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Microsoft.Build.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +51,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PathHelper.cs">
+      <Link>Builder\PathHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineBuildEvent.cs">
+      <Link>Builder\PipelineBuildEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineBuildLogger.cs">
+      <Link>Builder\PipelineBuildLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineImporterContext.cs">
+      <Link>Builder\PipelineImporterContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineManager.cs">
+      <Link>Builder\PipelineManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineProcessorContext.cs">
+      <Link>Builder\PipelineProcessorContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\TypeExtensions.cs">
+      <Link>Builder\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\XmlColor.cs">
+      <Link>Builder\XmlColor.cs</Link>
+    </Compile>
+    <Compile Include="..\2MGFX\CommandLineParser.cs">
+      <Link>CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="ContentProject.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

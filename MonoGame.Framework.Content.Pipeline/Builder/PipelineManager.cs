@@ -80,7 +80,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
                 catch (Exception)
                 {
-                    continue;
+                    try
+                    {
+                        var a = Assembly.Load(assemblyName);
+                        exportedTypes = a.GetExportedTypes();
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
                 }
 
                 foreach (var t in exportedTypes)
