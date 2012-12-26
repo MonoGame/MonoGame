@@ -42,7 +42,7 @@ using System;
 
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
+#if IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Media
             using (var factory = new MediaEngineClassFactory())
             using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
             {
-                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
+                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateFlags.AudioOnly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
 
@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Media
         public static event EventHandler<EventArgs> MediaStateChanged;
         
 		
-#if IPHONE
+#if IOS
 		public static bool GameHasControl 
 		{ 
 			get 

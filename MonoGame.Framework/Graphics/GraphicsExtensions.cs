@@ -345,7 +345,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch (function) {
 			case BlendFunction.Add:
 				return BlendEquationMode.FuncAdd;
-#if IPHONE
+#if IOS
 			case BlendFunction.Max:
 				return BlendEquationMode.MaxExt;
 			case BlendFunction.Min:
@@ -466,7 +466,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 				glInternalFormat = PixelInternalFormat.Rgba;
 #else
 				glInternalFormat = PixelInternalFormat.Rgba4;
@@ -484,7 +484,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IPHONE && !ANDROID
+#if !IOS && !ANDROID
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -505,7 +505,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 #endif
 				
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;

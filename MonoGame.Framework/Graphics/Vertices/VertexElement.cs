@@ -131,6 +131,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.SemanticName = "BLENDWEIGHT";
                     break;
 
+                case Graphics.VertexElementUsage.Binormal:
+                    element.SemanticName = "BINORMAL";
+                    break;
+
+                case Graphics.VertexElementUsage.Tangent:
+                    element.SemanticName = "TANGENT";
+                    break;
+
+                case Graphics.VertexElementUsage.PointSize:
+                    element.SemanticName = "PSIZE";
+                    break;
+
                 default:
                     throw new NotImplementedException("Unknown vertex element usage!");
             }

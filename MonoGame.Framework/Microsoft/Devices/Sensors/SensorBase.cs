@@ -9,7 +9,7 @@ namespace Microsoft.Devices.Sensors
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading
 	{
-#if IPHONE
+#if IOS
         protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
 #endif
         bool disposed;
