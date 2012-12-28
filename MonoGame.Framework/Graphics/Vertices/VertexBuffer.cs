@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
             //Do nothing, we cannot create the storage array yet
 #else
-            Threading.BlockOnUIThread(() => GenerateIfRequired());
+            Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
 		}
 
@@ -145,62 +145,77 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
             throw new NotImplementedException();
 #else
-            Threading.BlockOnUIThread (() =>
+
+            if (Threading.IsOnUIThread())
             {
-                GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
-                GraphicsExtensions.CheckGLError();
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IOS || ANDROID
-                // I think the access parameter takes zero for read only or read/write.
-                // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
-                IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
-#else
-                IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
-#endif
-                // Pointer to the start of data to read in the index buffer
-                ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
-                if (data is byte[]) {
-                    byte[] buffer = data as byte[];
-                    // If data is already a byte[] we can skip the temporary buffer
-                    // Copy from the vertex buffer to the destination array
-                    Marshal.Copy (ptr, buffer, 0, buffer.Length);
-                } else {
-                    // Temporary buffer to store the copied section of data
-					byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
-                    // Copy from the vertex buffer to the temporary buffer
-                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
-                    
-					var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
-                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
+                GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride);
+            }
+            else
+            {
+                Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
+            }
 
-					// Copy from the temporary buffer to the destination array
-
-					int dataSize = Marshal.SizeOf(typeof(T));
-					if (dataSize == vertexStride)
-						Marshal.Copy(buffer, 0, dataPtr, buffer.Length);
-					else
-					{
-						// If the user is asking for a specific element within the vertex buffer, copy them one by one...
-						for (int i = 0; i < elementCount; i++)
-						{
-							Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
-							dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
-						}
-					}
-
-                    dataHandle.Free ();
-
-                    //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
-                }
-#if IOS || ANDROID
-                GL.Oes.UnmapBuffer(All.ArrayBuffer);
-#else
-                GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-#endif
-            });
 #endif
         }
 
+#if OPENGL
+
+        private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        {
+            GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
+            GraphicsExtensions.CheckGLError();
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+#if IOS || ANDROID
+            // I think the access parameter takes zero for read only or read/write.
+            // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
+            IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
+#else
+            IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+#endif
+            // Pointer to the start of data to read in the index buffer
+            ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
+            if (data is byte[]) {
+                byte[] buffer = data as byte[];
+                // If data is already a byte[] we can skip the temporary buffer
+                // Copy from the vertex buffer to the destination array
+                Marshal.Copy (ptr, buffer, 0, buffer.Length);
+            } else {
+                // Temporary buffer to store the copied section of data
+                byte[] buffer = new byte[elementCount * vertexStride - offsetInBytes];
+                // Copy from the vertex buffer to the temporary buffer
+                Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                
+                var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
+                
+                // Copy from the temporary buffer to the destination array
+                
+                int dataSize = Marshal.SizeOf(typeof(T));
+                if (dataSize == vertexStride)
+                    Marshal.Copy(buffer, 0, dataPtr, buffer.Length);
+                else
+                {
+                    // If the user is asking for a specific element within the vertex buffer, copy them one by one...
+                    for (int i = 0; i < elementCount; i++)
+                    {
+                        Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
+                        dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
+                    }
+                }
+                
+                dataHandle.Free ();
+                
+                //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
+            }
+#if IOS || ANDROID
+            GL.Oes.UnmapBuffer(All.ArrayBuffer);
+#else
+            GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+#endif
+        }
+        
+#endif
+        
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
@@ -296,32 +311,45 @@ namespace Microsoft.Xna.Framework.Graphics
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
 #else
 
-            Threading.BlockOnUIThread(() =>
+            if (Threading.IsOnUIThread())
             {
-                GenerateIfRequired();
-
-                var sizeInBytes = elementSizeInBytes * elementCount;
-                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-                GraphicsExtensions.CheckGLError();
-
-                if (options == SetDataOptions.Discard)
-                {
-                    // By assigning NULL data to the buffer this gives a hint
-                    // to the device to discard the previous content.
-                    GL.BufferData(  BufferTarget.ArrayBuffer,
-                                    (IntPtr)bufferSize, 
-                                    IntPtr.Zero,
-                                    _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
-                    GraphicsExtensions.CheckGLError();
-                }
-
-                GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, data);
-                GraphicsExtensions.CheckGLError();
-            });
+                SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options);
+            }
+            else
+            {
+                Threading.BlockOnUIThread(() => SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options));
+            }
 #endif
         }
 
-		protected override void Dispose(bool disposing)
+#if OPENGL
+
+        private void SetBufferData<T>(int bufferSize, int elementSizeInBytes, int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        {
+            GenerateIfRequired();
+            
+            var sizeInBytes = elementSizeInBytes * elementCount;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GraphicsExtensions.CheckGLError();
+            
+            if (options == SetDataOptions.Discard)
+            {
+                // By assigning NULL data to the buffer this gives a hint
+                // to the device to discard the previous content.
+                GL.BufferData(  BufferTarget.ArrayBuffer,
+                              (IntPtr)bufferSize, 
+                              IntPtr.Zero,
+                              _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
+                GraphicsExtensions.CheckGLError();
+            }
+            
+            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, data);
+            GraphicsExtensions.CheckGLError();
+        }
+        
+#endif
+        
+        protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
