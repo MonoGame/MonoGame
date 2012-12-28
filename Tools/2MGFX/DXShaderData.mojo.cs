@@ -176,7 +176,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// Add the required precision specifiers for GLES.
 			glslCode = "#ifdef GL_ES\r\n" +
-				"precision highp float;\r\n" +
+				"precision mediump float;\r\n" +
 				"precision mediump int;\r\n" +
 				"#endif\r\n" +
 				glslCode;
