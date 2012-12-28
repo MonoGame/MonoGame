@@ -13,6 +13,7 @@
     <SynchReleaseVersion>False</SynchReleaseVersion>
     <ReleaseVersion>1.6</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>True</DebugSymbols>
@@ -30,7 +31,6 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -41,7 +41,6 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>IOS;GLES;OPENGL</DefineConstants>
-    <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
@@ -55,7 +54,6 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -66,7 +64,6 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>IOS;GLES;OPENGL</DefineConstants>
-    <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <ItemGroup>
