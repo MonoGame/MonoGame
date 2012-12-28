@@ -43,8 +43,8 @@
     <Reference Include="OpenTK">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.Windows">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\MonoGame.Framework.Windows.dll</HintPath>
+    <Reference Include="MonoGame.Framework">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Lidgren.Network.dll</HintPath>
