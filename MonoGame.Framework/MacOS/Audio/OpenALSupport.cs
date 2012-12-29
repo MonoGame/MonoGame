@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-#if IPHONE
+#if IOS
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.CoreFoundation;

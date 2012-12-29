@@ -14,6 +14,6 @@ namespace MonoGameContentProcessors
         Android,
         Linux,
         OSX,
-        PSS
+        PSM
     };
 }
