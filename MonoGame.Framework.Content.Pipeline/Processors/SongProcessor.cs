@@ -4,6 +4,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -26,7 +27,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// </summary>
         public SongProcessor()
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -37,7 +37,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <returns>The built audio.</returns>
         public override SongContent Process(AudioContent input, ContentProcessorContext context)
         {
-            throw new NotImplementedException();
+            string songFileName = Path.ChangeExtension(input.FileName, "wma");
+            input.ConvertFormat(ConversionFormat.WindowsMedia, quality, songFileName);
+            var song = new SongContent(songFileName);
+            return song;
         }
     }
 }

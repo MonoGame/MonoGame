@@ -14,13 +14,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class WavImporter : ContentImporter<AudioContent>
     {
         /// <summary>
-        /// Initializes a new instance of WavImporter.
-        /// </summary>
-        public WavImporter()
-        {
-        }
-
-        /// <summary>
         /// Called by the XNA Framework when importing a .wav audio file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
         /// <param name="filename">Name of a game asset file.</param>
