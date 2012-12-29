@@ -47,7 +47,7 @@
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Lidgren.Network.dll</HintPath>
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Tao.Sdl">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Tao.Sdl.dll</HintPath>

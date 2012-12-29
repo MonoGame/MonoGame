@@ -66,13 +66,15 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File '..\..\ThirdParty\Libs\lame_enc.dll'
   
   
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows GL'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Windows GL\Release\.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows GL\Release\*.xml'
+  
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies'
-  File /x *Windows8.dll '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
-  File /nonfatal /x *Windows8.xml '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
-
-  File /x *Windows8.dll /x *WindowsPhone.dll '..\..\MonoGame.Framework\bin\Release\*.dll'
-  File /nonfatal /x *Windows8.xml /x *WindowsPhone.xml' ..\..\MonoGame.Framework\bin\Release\*.xml'
   File '..\..\ThirdParty\Libs\OpenTK.dll'
   File '..\..\ThirdParty\Libs\OpenTK.dll.config'
   File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
@@ -81,22 +83,22 @@ Section "MonoGame Core Components" ;No components page, name is not important
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
 
-  File '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.xml'
+  File '..\..\MonoGame.Framework\bin\Windows 8\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\Windows 8\bin\Release\MonoGame.Framework.xml'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
 
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
 
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.WindowsPhone.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.WindowsPhone.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.xml'
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
 
@@ -157,7 +159,7 @@ Section "MonoDevelop Templates"
   SetOutPath "$0AddIns\MonoDevelop.MonoGame"
   ; install the Templates for MonoDevelop
 ;  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
+  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Windows GL\Release\MonoDevelop.MonoGame.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
   File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
