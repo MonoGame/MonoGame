@@ -13,7 +13,7 @@ using Sce.PlayStation.Core.Graphics;
 
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;

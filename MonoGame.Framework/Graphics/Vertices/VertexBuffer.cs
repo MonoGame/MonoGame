@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.GenBuffers(1, ref this.vbo);
 #else
                 GL.GenBuffers(1, out this.vbo);
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
                 GraphicsExtensions.CheckGLError();
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 // I think the access parameter takes zero for read only or read/write.
                 // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
                 IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
                 }
-#if IPHONE || ANDROID
+#if IOS || ANDROID
                 GL.Oes.UnmapBuffer(All.ArrayBuffer);
 #else
                 GL.UnmapBuffer(BufferTarget.ArrayBuffer);
@@ -215,20 +215,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
         }
         		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-            SetData<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.Discard);
         }
 
-        protected void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
             if (data == null)
                 throw new ArgumentNullException("data is null");

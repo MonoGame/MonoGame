@@ -11,7 +11,7 @@ using Sce.PlayStation.Core.Graphics;
 // TODO
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
 
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
 #else
 			GL.GenTextures(1, out this.glTexture);
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
 					throw new NotImplementedException();
 				} else {
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #else
 					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			if (mipMap)
 			{
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
