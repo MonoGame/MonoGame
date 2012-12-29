@@ -70,6 +70,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             base.SetData<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
         }
+
+        new public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        {
+            base.SetData<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
+        }
     }
 }
 
