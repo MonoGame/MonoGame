@@ -66,12 +66,12 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File '..\..\ThirdParty\Libs\lame_enc.dll'
   
   
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows GL'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows GL\Release\.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows GL\Release\*.xml'
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\Release\*.xml'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies'
@@ -159,7 +159,7 @@ Section "MonoDevelop Templates"
   SetOutPath "$0AddIns\MonoDevelop.MonoGame"
   ; install the Templates for MonoDevelop
 ;  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Windows GL\Release\MonoDevelop.MonoGame.dll'
+  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\WindowsGL\Release\MonoDevelop.MonoGame.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
   File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
