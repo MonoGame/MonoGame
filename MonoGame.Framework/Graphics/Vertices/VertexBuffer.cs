@@ -141,7 +141,51 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException ("The vertex stride is larger than the vertex buffer.");
 
 #if DIRECTX
-            throw new NotImplementedException();
+            if (_isDynamic)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var deviceContext = GraphicsDevice._d3dContext;
+                
+                // Copy the texture to a staging resource
+                var stagingDesc = _buffer.Description;
+                stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+                stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
+                stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+                stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+                var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
+                
+                lock (GraphicsDevice._d3dContext)
+                    deviceContext.CopyResource(_buffer, stagingBuffer);
+
+                int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * vertexStride;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, data.Length * TsizeInBytes);
+
+                lock (GraphicsDevice._d3dContext)
+                {
+                    // Map the staging resource to a CPU accessible memory
+                    var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+                    if (vertexStride == TsizeInBytes)
+                    {
+                        SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, vertexStride*data.Length);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < data.Length; i++)
+                            SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride, TsizeInBytes);
+                    }
+
+                    // Make sure that we unmap the resource in case of an exception
+                    deviceContext.UnmapSubresource(stagingBuffer, 0);
+                }
+                stagingBuffer.Dispose();
+            }
 #elif PSM
             throw new NotImplementedException();
 #else
@@ -244,7 +288,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-
             if (_isDynamic)
             {
                 // We assume discard by default.
@@ -289,7 +332,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dataHandle.Free();
             }
-
 #elif PSM
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
