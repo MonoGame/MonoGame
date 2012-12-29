@@ -175,8 +175,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			glslCode = glslCode.Replace ("#version 110", "");
 
 			// Add the required precision specifiers for GLES.
+
+            var floatPrecision = dxshader.IsVertexShader ? "precision highp float;\r\n" : "precision mediump float;\r\n";
+
 			glslCode = "#ifdef GL_ES\r\n" +
-				"precision highp float;\r\n" +
+                 floatPrecision +
 				"precision mediump int;\r\n" +
 				"#endif\r\n" +
 				glslCode;
