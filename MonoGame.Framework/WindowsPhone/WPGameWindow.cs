@@ -38,11 +38,12 @@ purpose and non-infringement.
 
 using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using Microsoft.Phone.Controls;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Windows.UI.Core;
 using Windows.Graphics.Display;
-using Microsoft.Xna.Framework.Graphics;
-using System.Windows;
 
 
 namespace MonoGame.Framework.WindowsPhone
@@ -50,6 +51,7 @@ namespace MonoGame.Framework.WindowsPhone
     public class WindowsPhoneGameWindow : GameWindow
     {
         private DisplayOrientation _orientation;
+        private DisplayOrientation _supportedOrientations;
         private Rectangle _clientBounds;
 
         #region Internal Properties
@@ -86,23 +88,22 @@ namespace MonoGame.Framework.WindowsPhone
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            /*
             // We don't want to trigger orientation changes 
             // when no preference is being changed.
             if (_supportedOrientations == orientations)
                 return;
-            
-            _supportedOrientations = orientations;
+
+            if (orientations == DisplayOrientation.Default)
+                _supportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            else
+                _supportedOrientations = orientations;
+            /*
             var supported = DisplayOrientations.None;
 
             if (orientations == DisplayOrientation.Default)
             {
-                // Make the decision based on the preferred backbuffer dimensions.
-                var manager = _game.graphicsDeviceManager;
-                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                    supported = DisplayOrientations.Landscape | DisplayOrientations.LandscapeFlipped;
-                else
-                    supported = DisplayOrientations.Portrait | DisplayOrientations.PortraitFlipped;                    
+     
+                supported = DisplayOrientations.Landscape | DisplayOrientations.LandscapeFlipped;         
             }
             else
             {
@@ -227,6 +228,25 @@ namespace MonoGame.Framework.WindowsPhone
             return result;
         }
 
+        private static DisplayOrientation ToOrientation(PageOrientation orientation)
+        {
+            switch (orientation)
+            {
+                case PageOrientation.Landscape:
+                case PageOrientation.LandscapeLeft:
+                    return DisplayOrientation.LandscapeLeft;
+                case PageOrientation.LandscapeRight:
+                    return DisplayOrientation.LandscapeRight;
+                case PageOrientation.Portrait:
+                case PageOrientation.PortraitUp:
+                    return DisplayOrientation.Portrait;
+                case PageOrientation.PortraitDown:
+                    return DisplayOrientation.PortraitUpsideDown;
+                default:
+                    return DisplayOrientation.Unknown;
+            }
+        }
+
         /*
         private void DisplayProperties_OrientationChanged(object sender)
         {
@@ -262,6 +282,16 @@ namespace MonoGame.Framework.WindowsPhone
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
 
+        }
+
+        public void OrientationChangedTo(PageOrientation orientation)
+        {
+            DisplayOrientation orient = ToOrientation(orientation);
+            if (this.CurrentOrientation != orient && (this._supportedOrientations & orient) != 0)
+            {
+                this._orientation = orient;
+                this.OnOrientationChanged();
+            }
         }
 
         #endregion

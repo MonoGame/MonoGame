@@ -22,10 +22,28 @@ namespace $safeprojectname$
         {
             InitializeComponent();
 
-            _game = XamlGame<Game1>.Create("", XnaSurface);
+            Loaded += GamePageWP8_Loaded;
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
+        }
+
+        private void GamePageWP8_Loaded(object sender, RoutedEventArgs e)
+        {
+            _game = XamlGame<Game1>.Create("", XnaSurface, XnaMediaElement);
+        }
+
+        private void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Microsoft.Xna.Framework.Input.GamePad.OnBackPressed();
+
+            // We should detect if Game.Exit() is called and only do this if it wasn't
+            e.Cancel = true;
+        }
+        
+        private void GamePageWP8_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        {
+            (this._game.Window as WindowsPhoneGameWindow).OrientationChangedTo(e.Orientation);
         }
 
         // Sample code for building a localized ApplicationBar
