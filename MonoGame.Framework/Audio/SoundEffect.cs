@@ -393,6 +393,25 @@ namespace Microsoft.Xna.Framework.Audio
 			}
         }
 
+        public static SoundEffect FromStream(Stream stream)
+        {            
+#if ANDROID
+            MemoryStream memStream = new MemoryStream();
+            stream.CopyTo(memStream);
+            memStream.Seek(0, SeekOrigin.Begin);
+
+            var data = new byte[memStream.Length];
+            stream.Read(data, 0, (int)memStream.Length);
+
+            memStream.Dispose();
+#else
+            var data = new byte[stream.Length];
+            stream.Read(data, 0, (int)stream.Length);
+#endif
+
+            return new SoundEffect("", data);
+        }
+
 #if WINRT        
         internal static XAudio2 Device { get; private set; }
         internal static MasteringVoice MasterVoice { get; private set; }

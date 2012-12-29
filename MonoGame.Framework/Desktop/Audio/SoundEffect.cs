@@ -301,7 +301,15 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 speedOfSound = value;
             }
-        }		
+        }
+
+        public static SoundEffect FromStream(Stream stream)
+        {
+            var data = new byte[stream.Length];
+            stream.Read(data, 0, (int)stream.Length);
+
+            return new SoundEffect("", data);
+        }
     }
 }
 
