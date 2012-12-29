@@ -39,7 +39,6 @@
 // #endregion License
 
 using System;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoTouch.MediaPlayer;
 using MonoTouch.Foundation;
@@ -49,30 +48,11 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed class VideoPlayer
     {
-        private Game _game;
+		private Video  _video;
+		private MediaState _state;
+		private bool _isLooped;
+		private Game _game;
         private iOSGamePlatform _platform;
-        private MediaState _state;
-        private ContentManager contentManager;
-
-        public bool IsLooped { get; private set; }
-
-        public MediaState State
-        {
-            get { return _state; }
-            private set
-            {
-                if (_state != value)
-                {
-                    _state = value;
-                    if (this.StateChanged != null)
-                        StateChanged(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public Video Video { get; private set; }
-
-        public event EventHandler<EventArgs> StateChanged;
 		
         public VideoPlayer()
         {
@@ -93,6 +73,13 @@ namespace Microsoft.Xna.Framework.Media
 			throw new NotImplementedException();
         }
 		
+		 public MediaState State
+        {
+            get
+            {
+				return _state;
+            }
+        }
 		
         private NSObject _playbackDidFinishObserver;
 		private void PlayVideo()
@@ -103,23 +90,16 @@ namespace Microsoft.Xna.Framework.Media
             _playbackDidFinishObserver = NSNotificationCenter.DefaultCenter.AddObserver(
                 MPMoviePlayerController.PlaybackDidFinishNotification, OnStop);
 
-            Video.MovieView.MoviePlayer.RepeatMode = IsLooped ? MPMovieRepeatMode.One: MPMovieRepeatMode.None;
+            _video.MovieView.MoviePlayer.RepeatMode = _isLooped ? MPMovieRepeatMode.One : MPMovieRepeatMode.None;
 
-            _platform.ViewController.PresentModalViewController(Video.MovieView, animated: false);
-            Video.MovieView.MoviePlayer.Play();
+            _platform.ViewController.PresentModalViewController(_video.MovieView, animated: false);
+            _video.MovieView.MoviePlayer.Play();
 		}
 
-        public void Play(Video video)
+        public void Play(Microsoft.Xna.Framework.Media.Video video)
         {	
-			Video = video;
+			_video = video;
 			PlayVideo();		
-        }
-
-        public void Play(string path)
-        {
-            this.contentManager = new ContentManager(_game.Services);
-            this.Play(contentManager.Load<Video>(path));
-            this.StateChanged += UnloadVideo;
         }
 		
 		private void OnStop(NSNotification e)
@@ -135,18 +115,29 @@ namespace Microsoft.Xna.Framework.Media
                 _playbackDidFinishObserver = null;
             }
 
-			Video.MovieView.MoviePlayer.Stop();
+			_video.MovieView.MoviePlayer.Stop();
 			_state = MediaState.Stopped;
 			_platform.IsPlayingVideo = false;
             _platform.ViewController.DismissModalViewControllerAnimated(false);
         }
 
-        private void UnloadVideo(object sender, EventArgs args)
+        public bool IsLooped
         {
-            if (this.State == MediaState.Stopped)
+            get
             {
-                this.contentManager.Dispose();
-                this.contentManager = null;
+				return _isLooped;
+            }
+            set
+            {
+				_isLooped = value;
+            }
+        }
+
+        public Microsoft.Xna.Framework.Media.Video Video
+        {
+            get
+            {
+                return _video;
             }
         }
 	}
