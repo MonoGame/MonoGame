@@ -29,8 +29,8 @@ namespace MGCB
                 return 1;
             }
 
-            var project = new ContentProject(options.ContentProjectFile, "foo");
-            project.Build("foo");
+            var project = new ContentProject(options.ContentProjectFile, options.OutputName);
+            project.Build();
 
             return 0;
         }

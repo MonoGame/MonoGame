@@ -14,17 +14,17 @@ namespace MGCB
 {
     public class ContentProject
     {
-        private ProjectRootElement _project;
+        private readonly ProjectRootElement _project;
 
-        private PipelineManager _manager;
+        private readonly PipelineManager _manager;
 
-        public ContentProject(string projectPath, string outputDirectoryName)
+        public ContentProject(string projectPath, string configName)
         {
             _project = ProjectRootElement.Open(projectPath);
 
             var projectDirectory = _project.DirectoryPath;
-            var outputPath = projectDirectory + @"\bin\" + outputDirectoryName;
-            var intermediatePath = projectDirectory + @"\obj\" + outputDirectoryName;
+            var outputPath = projectDirectory + @"\bin\" + configName;
+            var intermediatePath = projectDirectory + @"\obj\" + configName;
 
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
 
@@ -77,7 +77,7 @@ namespace MGCB
             }
         }
 
-        public void Build(string target)
+        public void Build()
         {
             var compile = _project.Items.Where(e => e.ItemType == "Compile");
             foreach (var c in compile)

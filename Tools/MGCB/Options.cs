@@ -8,5 +8,8 @@ namespace MGCB
     {
         [Utilities.CommandLineParser.Required]
         public string ContentProjectFile;
+
+        [Utilities.CommandLineParser.Required]
+        public string OutputName;
     }
 }
