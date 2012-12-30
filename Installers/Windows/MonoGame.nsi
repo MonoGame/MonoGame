@@ -83,10 +83,10 @@ Section "MonoGame Core Components" ;No components page, name is not important
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
 
-  File '..\..\MonoGame.Framework\bin\Windows 8\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\Windows 8\bin\Release\MonoGame.Framework.xml'
+  File '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.xml'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*xml'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
@@ -103,7 +103,7 @@ Section "MonoGame Core Components" ;No components page, name is not important
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
 
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*xml'  
+  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
