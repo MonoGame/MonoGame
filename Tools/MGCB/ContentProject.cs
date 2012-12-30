@@ -1,5 +1,11 @@
-﻿using System.IO;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Build.Construction;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
@@ -22,14 +28,52 @@ namespace MGCB
 
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
 
+            // Find the XNA assembly path.
+            var xnaGs = Environment.GetEnvironmentVariable("XNAGSv4");
+            if (xnaGs == null)
+                xnaGs = projectDirectory;
+            else
+                xnaGs = Path.Combine(xnaGs, @"References\Windows\x86");
+
+            // Add the references.
             var references = _project.Items.Where(e => e.ItemType == "Reference");
             foreach (var r in references)
             {
                 var hintPath = r.Metadata.FirstOrDefault(e => e.Name == "HintPath");
                 if (hintPath != null)
-                    _manager.AddAssembly(hintPath.Value);
+                {
+                    var filePath = hintPath.Value;
+
+                    // Resolve the path to absolute.
+                    if (!Path.IsPathRooted(filePath))
+                        filePath = Path.GetFullPath(Path.Combine(projectDirectory, filePath));
+
+                    _manager.AddAssembly(filePath);
+                }
                 else
-                    _manager.AddAssembly(r.Include);
+                {
+                    var assemblyName = r.Include;
+
+                    try
+                    {
+                        // First try to use reflecation loading which should
+                        // find the assembly if it is in the the GAC.
+                        var filePath = Assembly.ReflectionOnlyLoad(assemblyName).Location;
+                        _manager.AddAssembly(filePath);
+                    }
+                    catch (Exception)
+                    {
+                        // If this is an XNA assembly then resolve it to 
+                        // the known XNA assembly path.                        
+                        if (assemblyName.StartsWith("Microsoft.Xna.Framework."))
+                        {
+                            // We don't know where the assembly is 
+                            // located, so try the XNA install path.
+                            var filePath = Path.Combine(xnaGs, assemblyName.Split(',')[0] + ".dll");
+                            _manager.AddAssembly(filePath);
+                        }
+                    }
+                }
             }
         }
 

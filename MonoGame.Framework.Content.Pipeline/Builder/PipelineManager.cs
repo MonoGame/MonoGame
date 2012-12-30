@@ -56,12 +56,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             IntermediateDirectory = intermediateDir + @"\";
         }
 
-        public void AddAssembly(string fileName)
+        public void AddAssembly(string assemblyFilePath)
         {
-            if (Assemblies.Contains(fileName))
-                return;
+            if (assemblyFilePath == null)
+                throw new NullReferenceException("assemblyFilePath cannot be null!");
+            if (!Path.IsPathRooted(assemblyFilePath))
+                throw new NullReferenceException("assemblyFilePath must be absolute!");
 
-            Assemblies.Add(fileName);
+            // Make sure we're not adding the same assembly twice.
+            assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
+            if (!Assemblies.Contains(assemblyFilePath))
+                Assemblies.Add(assemblyFilePath);
         }
 
         private void ResolveAssemblies()
@@ -70,25 +75,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             _processors = new List<ProcessorInfo>();
             _writers = new List<Type>();
 
-            foreach (var assemblyName in Assemblies)
+            // Finally load the pipeline assemblies.
+            foreach (var assemblyPath in Assemblies)
             {
                 Type[] exportedTypes;
                 try
                 {
-                    var a = Assembly.LoadFrom(assemblyName);
+                    var a = Assembly.LoadFrom(assemblyPath);
                     exportedTypes = a.GetExportedTypes();
                 }
                 catch (Exception)
                 {
-                    try
-                    {
-                        var a = Assembly.Load(assemblyName);
-                        exportedTypes = a.GetExportedTypes();
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
+                    // The assembly failed to load... nothing
+                    // we can do but ignore it.
+                    continue;
                 }
 
                 foreach (var t in exportedTypes)
@@ -312,16 +312,41 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Do we need to rebuild?
             if (rebuild)
             {
-                // Import the asset.
+                // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
-                var importContext = new PipelineImporterContext(this);
-                var importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
+                var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
+                if (importer == null || processor == null)
+                {
+                    // TODO: Log error?
+                    return;
+                }
+
+                // Try importing the content.
+                object importedObject;
+                try
+                {
+                    var importContext = new PipelineImporterContext(this);
+                    importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
+                }
+                catch (Exception)
+                {
+                    // TODO: Log error?
+                    return;
+                }
 
                 // Process the imported object.
-                var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
-                var processContext = new PipelineProcessorContext(this, pipelineEvent);
-                var processedObject = processor.Process(importedObject, processContext);
-                
+                object processedObject;
+                try
+                {
+                    var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                    processedObject = processor.Process(importedObject, processContext);
+                }
+                catch (Exception)
+                {
+                    // TODO: Log error?
+                    return;                   
+                }
+
                 // Write the content to disk.
                 WriteXnb(processedObject, pipelineEvent);
 
