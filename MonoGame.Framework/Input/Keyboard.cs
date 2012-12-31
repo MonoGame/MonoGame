@@ -40,23 +40,27 @@
 // 
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
 {
-
-
 	public static class Keyboard
 	{
+        static List<Keys> _keys;
+
 		public static KeyboardState GetState()
 		{
-            return State; // TODO Not used on iPhone or Zune
+            return new KeyboardState(_keys);
 		}
 		
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return State;  // TODO Not used on iPhone or Zune
+            return new KeyboardState(_keys);
 		}
 
-        internal static KeyboardState State { private get; set; }
+        internal static void SetKeys(List<Keys> keys)
+        {
+            _keys = keys;
+        }
 	}
 }

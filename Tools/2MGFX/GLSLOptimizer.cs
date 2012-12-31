@@ -9,7 +9,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using ShaderType = OpenTK.Graphics.ES20.All;
 #endif
 #endif
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	internal class GLSLOptimizer
 	{
-#if IPHONE
+#if IOS
 		const string libglsl_optmizer_dll = "__Internal";
 #elif ANDROID
 		const string libglsl_optmizer_dll = "libglsl_optimizer.so";

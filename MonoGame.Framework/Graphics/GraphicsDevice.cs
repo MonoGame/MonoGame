@@ -868,7 +868,7 @@ namespace Microsoft.Xna.Framework.Graphics
             lock (_d3dContext)
             {
                 // Clear the diffuse render buffer.
-                if (options.HasFlag(ClearOptions.Target))
+                if ((options & ClearOptions.Target) == ClearOptions.Target)
                 {
                     foreach (var view in _currentRenderTargets)
                     {
@@ -879,9 +879,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Clear the depth/stencil render buffer.
                 SharpDX.Direct3D11.DepthStencilClearFlags flags = 0;
-                if (options.HasFlag(ClearOptions.DepthBuffer))
+                if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Depth;
-                if (options.HasFlag(ClearOptions.Stencil))
+                if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
                 if (flags != 0 && _currentDepthStencilView != null)
@@ -914,20 +914,20 @@ namespace Microsoft.Xna.Framework.Graphics
             ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
-            if (options.HasFlag(ClearOptions.Target))
+            if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
                 GL.ClearColor(color.X, color.Y, color.Z, color.W);
                 GraphicsExtensions.CheckGLError();
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
-			if (options.HasFlag(ClearOptions.Stencil))
+			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
 				GL.ClearStencil(stencil);
                 GraphicsExtensions.CheckGLError();
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
-			if (options.HasFlag(ClearOptions.DepthBuffer)) 
+			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
 #if GLES
                 GL.ClearDepth (depth);
@@ -1213,7 +1213,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _viewport = value;
 #if DIRECTX
-                var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
@@ -1436,9 +1436,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 lock (_d3dContext)
                 {
-                    var viewport = new SharpDX.Direct3D11.Viewport( _viewport.X, _viewport.Y, 
-                                                                    _viewport.Width, _viewport.Height, 
-                                                                    _viewport.MinDepth, _viewport.MaxDepth);
+                    var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
+                                                          _viewport.Width, _viewport.Height, 
+                                                          _viewport.MinDepth, _viewport.MaxDepth);
                     _d3dContext.Rasterizer.SetViewports(viewport);
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
                 }
@@ -1791,7 +1791,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
                 buffer.UserOffset += vertexCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, vertexDecl.VertexStride, SetDataOptions.NoOverwrite);
             }
             else
             {

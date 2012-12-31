@@ -39,11 +39,21 @@ purpose and non-infringement.
 #endregion License
 
 #region Using clause
+
+#if WINDOWS_PHONE
+extern alias MicrosoftXnaFramework;
+extern alias MicrosoftXnaGamerServices;
+using MsXna_Guide = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.Guide;
+using MsXna_MessageBoxIcon = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.MessageBoxIcon;
+using MsXna_PlayerIndex = MicrosoftXnaFramework::Microsoft.Xna.Framework.PlayerIndex;
+#endif
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
@@ -71,14 +81,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;		
 
-#if WINRT
+#if WINDOWS_STOREAPP
 	    private static readonly CoreDispatcher _dispatcher;
 #endif 
+
         static Guide()
         {
-#if WINRT
+#if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-            
+#endif
+
+#if WINRT
+
             var licenseInformation = CurrentApp.LicenseInformation;
             licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
@@ -96,7 +110,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          string defaultText,
 		 bool usePasswordMode);
 
-		public static string ShowKeyboardInput(
+		private static string ShowKeyboardInput(
 		 PlayerIndex player,           
          string title,
          string description,
@@ -111,13 +125,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 #else
             throw new NotImplementedException();
 #endif
-            IsVisible = true;
-            string result;
-
-            // Enter the actual implementation here after removing the exception above
-
-            IsVisible = false;
-            return result;
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -128,7 +135,13 @@ namespace Microsoft.Xna.Framework.GamerServices
          AsyncCallback callback,
          Object state)
 		{
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
+            return MsXna_Guide.BeginShowKeyboardInput((MsXna_PlayerIndex)player, title, description, defaultText, callback, state);
+#else
 			return BeginShowKeyboardInput(player, title, description, defaultText, callback, state, false );
+#endif
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
@@ -140,16 +153,28 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state,
          bool usePasswordMode)
 		{
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
+            return MsXna_Guide.BeginShowKeyboardInput((MsXna_PlayerIndex)player, title, description, defaultText, callback, state, usePasswordMode);
+#else
 			ShowKeyboardInputDelegate ski = ShowKeyboardInput; 
 
 			return ski.BeginInvoke(player, title, description, defaultText, usePasswordMode, callback, ski);
+#endif
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of BeginShowKeyboardInput using an alias.
+            return MsXna_Guide.EndShowKeyboardInput(result);
+#else
 			ShowKeyboardInputDelegate ski = (ShowKeyboardInputDelegate)result.AsyncState; 
 
 			return ski.EndInvoke(result);		
+#endif
 		}
 
 		delegate Nullable<int> ShowMessageBoxDelegate( string title,
@@ -158,7 +183,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          int focusButton,
          MessageBoxIcon icon);
 
-        public static Nullable<int> ShowMessageBox(string title,
+        private static Nullable<int> ShowMessageBox(string title,
          string text,
          IEnumerable<string> buttons,
          int focusButton,
@@ -168,6 +193,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             IsVisible = true;
 
 #if WINDOWS_STOREAPP
+
             MessageDialog dialog = new MessageDialog(text, title);
             foreach (string button in buttons)
                 dialog.Commands.Add(new UICommand(button, null, dialog.Commands.Count));
@@ -202,6 +228,16 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state
         )
         {
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of BeginShowMessageBox using an alias.
+            return MsXna_Guide.BeginShowMessageBox(
+                (MsXna_PlayerIndex)player, 
+                title, text,
+		        buttons, focusButton,
+                (MsXna_MessageBoxIcon)icon, 
+                callback, state);
+#else
             // TODO: GuideAlreadyVisibleException
             if (IsVisible)
                 throw new Exception("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
@@ -218,6 +254,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             ShowMessageBoxDelegate smb = ShowMessageBox;
 
             return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);
+#endif
         }
 
         public static IAsyncResult BeginShowMessageBox(
@@ -235,19 +272,30 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public static Nullable<int> EndShowMessageBox(IAsyncResult result)
         {
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of EndShowMessageBox using an alias.
+            return MsXna_Guide.EndShowMessageBox(result);
+#else
             return ((ShowMessageBoxDelegate)result.AsyncState).EndInvoke(result);
+#endif
         }
 
 		public static void ShowMarketplace(PlayerIndex player)
-		{
-#if WINRT
+        {
+#if WINDOWS_PHONE
+
+            // Call the Microsoft implementation of ShowMarketplace using an alias.
+            MsXna_Guide.ShowMarketplace((MsXna_PlayerIndex)player);
+
+#elif WINDOWS_STOREAPP
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var uri = new Uri(@"ms-windows-store:PDP?PFN=" + Package.Current.Id.FamilyName);
                 Launcher.LaunchUriAsync(uri).AsTask<bool>().Wait();
             }).AsTask();
 #endif
-		}
+        }
 
 		public static void Show ()
 		{

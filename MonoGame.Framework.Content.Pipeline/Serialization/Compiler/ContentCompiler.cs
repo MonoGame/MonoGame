@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -11,7 +12,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         public ContentTypeWriter GetTypeWriter(Type type)
         {
             throw new NotImplementedException();
-            return null;
         }
     }
 }

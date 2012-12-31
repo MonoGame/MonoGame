@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if IPHONE || WINDOWS || LINUX
+#if IOS || WINDOWS || LINUX
 using OpenTK.Audio.OpenAL;
 using OpenTK;
 #elif MONOMAC
@@ -27,10 +27,11 @@ namespace Microsoft.Xna.Framework.Audio
 		HashSet<int> availableSourcesCollection;
 		HashSet<OALSoundBuffer> inUseSourcesCollection;
 		HashSet<OALSoundBuffer> playingSourcesCollection;
+        HashSet<OALSoundBuffer> purgeMe;
 
 		private OpenALSoundController ()
 		{
-#if MACOSX || IPHONE
+#if MACOSX || IOS
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
 			_device = Alc.OpenDevice (string.Empty);
@@ -54,6 +55,7 @@ namespace Microsoft.Xna.Framework.Audio
 			availableSourcesCollection = new HashSet<int> ();
 			inUseSourcesCollection = new HashSet<OALSoundBuffer> ();
 			playingSourcesCollection = new HashSet<OALSoundBuffer> ();
+            purgeMe = new HashSet<OALSoundBuffer> ();
 
 
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
@@ -172,7 +174,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Update ()
 		{
-			HashSet<OALSoundBuffer> purgeMe = new HashSet<OALSoundBuffer> ();
+            purgeMe.Clear();
 
 			ALSourceState state;
 			foreach (var soundBuffer in playingSourcesCollection) {
@@ -195,7 +197,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-#if MACOSX || IPHONE
+#if MACOSX || IOS
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";
 
 		[DllImport(OpenALLibrary, EntryPoint = "alcMacOSXMixerOutputRate")]

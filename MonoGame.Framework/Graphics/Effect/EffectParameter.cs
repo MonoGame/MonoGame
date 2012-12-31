@@ -255,26 +255,176 @@ namespace Microsoft.Xna.Framework.Graphics
 			throw new NotImplementedException();
 		}
 
-		public void SetValue (Matrix value)
-		{
-			var matrixData = Matrix.ToFloatArray(Matrix.Transpose (value));
-			for (var y=0; y<RowCount; y++) 
+        public void SetValue(Matrix value)
+        {
+            // HLSL expects matrices to be transposed by default.
+            // These unrolled loops do the transpose during assignment.
+            if (RowCount == 4 && ColumnCount == 4)
             {
-				for (var x=0; x<ColumnCount; x++)
-					((float[])Data)[y*ColumnCount+x] = matrixData[y*4+x];
-			}
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+                fData[3] = value.M41;
+
+                fData[4] = value.M12;
+                fData[5] = value.M22;
+                fData[6] = value.M32;
+                fData[7] = value.M42;
+
+                fData[8] = value.M13;
+                fData[9] = value.M23;
+                fData[10] = value.M33;
+                fData[11] = value.M43;
+
+                fData[12] = value.M14;
+                fData[13] = value.M24;
+                fData[14] = value.M34;
+                fData[15] = value.M44;
+            }
+            else if (RowCount == 4 && ColumnCount == 3)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+                fData[3] = value.M41;
+
+                fData[4] = value.M12;
+                fData[5] = value.M22;
+                fData[6] = value.M32;
+                fData[7] = value.M42;
+
+                fData[8] = value.M13;
+                fData[9] = value.M23;
+                fData[10] = value.M33;
+                fData[11] = value.M43;
+            }
+            else if (RowCount == 3 && ColumnCount == 4)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+
+                fData[3] = value.M12;
+                fData[4] = value.M22;
+                fData[5] = value.M32;
+
+                fData[6] = value.M13;
+                fData[7] = value.M23;
+                fData[8] = value.M33;
+
+                fData[9] = value.M14;
+                fData[10] = value.M24;
+                fData[11] = value.M34;
+            }
+            else if (RowCount == 3 && ColumnCount == 3)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+
+                fData[3] = value.M12;
+                fData[4] = value.M22;
+                fData[5] = value.M32;
+
+                fData[6] = value.M13;
+                fData[7] = value.M23;
+                fData[8] = value.M33;
+            }
 
             StateKey = unchecked(NextStateKey++);
-		}
+        }
 
 		public void SetValueTranspose(Matrix value)
 		{
-			var matrixData = Matrix.ToFloatArray(value);
-			for (var y = 0; y < RowCount; y++)
-			{
-				for (var x = 0; x < ColumnCount; x++)
-					((float[])Data)[y * ColumnCount + x] = matrixData[y * 4 + x];
-			}
+            // HLSL expects matrices to be transposed by default, so copying them straight
+            // from the in-memory version effectively transposes them back to row-major.
+            if (RowCount == 4 && ColumnCount == 4)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+                fData[3] = value.M14;
+
+                fData[4] = value.M21;
+                fData[5] = value.M22;
+                fData[6] = value.M23;
+                fData[7] = value.M24;
+
+                fData[8] = value.M31;
+                fData[9] = value.M32;
+                fData[10] = value.M33;
+                fData[11] = value.M34;
+
+                fData[12] = value.M41;
+                fData[13] = value.M42;
+                fData[14] = value.M43;
+                fData[15] = value.M44;
+            }
+            else if (RowCount == 4 && ColumnCount == 3)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+
+                fData[3] = value.M21;
+                fData[4] = value.M22;
+                fData[5] = value.M23;
+
+                fData[6] = value.M31;
+                fData[7] = value.M32;
+                fData[8] = value.M33;
+
+                fData[9] = value.M41;
+                fData[10] = value.M42;
+                fData[11] = value.M43;
+            }
+            else if (RowCount == 3 && ColumnCount == 4)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+                fData[3] = value.M14;
+
+                fData[4] = value.M21;
+                fData[5] = value.M22;
+                fData[6] = value.M23;
+                fData[7] = value.M24;
+
+                fData[8] = value.M31;
+                fData[9] = value.M32;
+                fData[10] = value.M33;
+                fData[11] = value.M34;
+            }
+            else if (RowCount == 3 && ColumnCount == 3)
+            {
+                float[] fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+
+                fData[3] = value.M21;
+                fData[4] = value.M22;
+                fData[5] = value.M23;
+
+                fData[6] = value.M31;
+                fData[7] = value.M32;
+                fData[8] = value.M33;
+            }
 
 			StateKey = unchecked(NextStateKey++);
 		}
@@ -336,7 +486,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2 value)
 		{
-			Data = new float[2] { value.X, value.Y };
+            float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -349,7 +501,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector3 value)
 		{
-			Data = new float[3] { value.X, value.Y, value.Z };
+            float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
+            fData[2] = value.Z;
             StateKey = unchecked(NextStateKey++);
 		}
 
@@ -362,7 +517,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector4 value)
 		{
-			Data = new float[4] { value.X, value.Y, value.Z, value.W };
+			float[] fData = (float[])Data;
+            fData[0] = value.X;
+            fData[1] = value.Y;
+            fData[2] = value.Z;
+            fData[3] = value.W;
             StateKey = unchecked(NextStateKey++);
 		}
 
