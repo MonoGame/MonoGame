@@ -131,6 +131,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
+#if GLES
+            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
+            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
+            throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
+#else
             if (data == null)
                 throw new ArgumentNullException ("data is null");
             if (data.Length < (startIndex + elementCount))
@@ -156,22 +161,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif
+#endif
         }
 
-#if OPENGL
+#if OPENGL && !GLES
 
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IOS || ANDROID
-            // I think the access parameter takes zero for read only or read/write.
-            // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
-            IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
-#else
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
-#endif
+            GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
             if (data is byte[]) {
@@ -207,12 +208,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
-#if IOS || ANDROID
-            GL.Oes.UnmapBuffer(All.ArrayBuffer);
-#else
             GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-#endif
-        }
+            }
         
 #endif
         
