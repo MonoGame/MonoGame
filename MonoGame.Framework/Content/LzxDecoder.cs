@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework.Content
 				     * remaining - in this boundary case they aren't really part of
 				     * the compressed data)
 					 */
-					Debug.WriteLine("WTF");
+					//Debug.WriteLine("WTF");
 
 					if(inData.Position > (startpos+inLen+2) || bitbuf.GetBitsLeft() < 16) return -1; //TODO throw proper exception
 				}
