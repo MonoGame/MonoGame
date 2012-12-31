@@ -10,8 +10,8 @@
     <RootNamespace>$safeprojectname$Content</RootNamespace>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
-    <OutputPath>bin\$(Configuration)</OutputPath>
-    <MonoGamePlatform>Windows</MonoGamePlatform>
+	<MonoGamePlatform>Windows</MonoGamePlatform>
+    <OutputPath>bin\$(MonoGamePlatform)\$(Configuration)</OutputPath>
     <ContentRootDirectory>Content</ContentRootDirectory>
     <PlatformTarget>x86</PlatformTarget>
  </PropertyGroup>
