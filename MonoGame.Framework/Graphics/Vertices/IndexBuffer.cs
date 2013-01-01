@@ -168,7 +168,42 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
 #if DIRECTX
-            throw new NotImplementedException();
+            if (_isDynamic)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var deviceContext = GraphicsDevice._d3dContext;
+
+                // Copy the texture to a staging resource
+                var stagingDesc = _buffer.Description;
+                stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+                stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
+                stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+                stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+                var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
+
+                lock (GraphicsDevice._d3dContext)
+                    deviceContext.CopyResource(_buffer, stagingBuffer);
+
+                int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * TsizeInBytes;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, data.Length * TsizeInBytes);
+
+                lock (GraphicsDevice._d3dContext)
+                {
+                    // Map the staging resource to a CPU accessible memory
+                    var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+                    SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, TsizeInBytes * data.Length);
+                    
+                    // Make sure that we unmap the resource in case of an exception
+                    deviceContext.UnmapSubresource(stagingBuffer, 0);
+                }
+            }
 #elif PSM
             throw new NotImplementedException();
 #else        
