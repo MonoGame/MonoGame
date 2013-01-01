@@ -68,6 +68,7 @@ namespace TwoMGFX
 	public class SamplerStateInfo
 	{
 		public string name;
+        public string textureName;
 		public SamplerState state;
 		public TextureFilterType MinFilter;
 		public TextureFilterType MagFilter;
