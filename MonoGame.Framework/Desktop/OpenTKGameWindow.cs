@@ -173,10 +173,6 @@ namespace Microsoft.Xna.Framework
             if (winWidth <= 1 || winHeight <= 1)
                 return;
 
-            //If we've already got a pending change, do nothing
-            if (updateClientBounds)
-                return;
-            
             Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
             Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 
@@ -318,11 +314,8 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            if (!updateClientBounds)
-            {
-                updateClientBounds = true;
-                this.clientBounds = clientBounds;
-            }
+            updateClientBounds = true;
+            this.clientBounds = clientBounds;
         }
 
         #endregion
