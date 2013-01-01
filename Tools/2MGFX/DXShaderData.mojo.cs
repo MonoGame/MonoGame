@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private MojoShader.MOJOSHADER_symbol[] _symbols;
 
-		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerState> samplerStates)
+		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
 		{
 			var dxshader = new DXShaderData ();
 			dxshader.SharedIndex = sharedIndex;
@@ -119,19 +120,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				//sampler mapping to parameter is unknown atm
 				dxshader._samplers [i].parameter = -1;
 
-				// GLSL needs the sampler name.
+				// GLSL needs the MojoShader mangled sampler name.
 				dxshader._samplers [i].samplerName = samplers [i].name;
 
-				// We need the parameter name for creating the parameter
-				// listing for the effect... look for that in the symbols.
-				dxshader._samplers [i].parameterName =
+				// We need the original sampler name... look for that in the symbols.
+				var originalSamplerName =
 					symbols.First (e => e.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
 					e.register_index == samplers [i].index
 				).name;
 
-				SamplerState state = null;
-				samplerStates.TryGetValue(dxshader._samplers[i].parameterName, out state);
-				dxshader._samplers[i].state = state;
+                var state = samplerStates[originalSamplerName];
+				dxshader._samplers[i].state = state.state;
+                dxshader._samplers[i].parameterName = state.textureName ?? originalSamplerName;
 
 				// Set the rest of the sampler info.
 				dxshader._samplers [i].type = samplers [i].type;

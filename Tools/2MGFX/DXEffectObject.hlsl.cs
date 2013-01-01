@@ -94,8 +94,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-			var samplerStates = new Dictionary<string, SamplerState>();
-
             // Add the texture parameters from the samplers.
             foreach (var shader in effect.Shaders)
             {
@@ -106,6 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var match = parameters.FindIndex(e => e.name == sampler.parameterName);
                     if (match == -1)
                     {
+                        // Store the index for runtime lookup.
                         shader._samplers[s].parameter = parameters.Count;
 
                         var param = new d3dx_parameter();
@@ -113,10 +112,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         param.type = D3DXPARAMETER_TYPE.TEXTURE2D; // TODO: Fix this right!
                         param.name = sampler.parameterName;
                         param.semantic = string.Empty;
-
-						SamplerState state = null;
-						shaderInfo.SamplerStates.TryGetValue(param.name, out state);
-						samplerStates[param.name] = state;
 
                         parameters.Add(param);
                     }
@@ -148,7 +143,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             */
 
-			effect.SamplerStates = samplerStates;
             effect.Parameters = parameters.ToArray();
 
             return effect;

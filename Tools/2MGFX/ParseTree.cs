@@ -444,7 +444,7 @@ namespace TwoMGFX
         		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
         
         	var shaderInfo = paramlist[0] as ShaderInfo;
-        	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+        	shaderInfo.SamplerStates.Add(sampler.name, sampler);
         
         	return null;
         }

@@ -94,7 +94,7 @@ namespace TwoMGFX
 		public bool Debug { get; private set; }
 
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
-		public Dictionary<string, SamplerState> SamplerStates = new Dictionary<string, SamplerState>();
+        public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 
 		static public ShaderInfo FromFile(string path, Options options)
 		{
