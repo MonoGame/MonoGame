@@ -211,7 +211,7 @@ namespace Microsoft.Devices.Sensors
                         // On Android, this is available through Android.Hardware.GeomagneticField, but this requires your geo position.
                         reading.TrueHeading = reading.MagneticHeading;
                         reading.Timestamp = DateTime.Now;
-                        compass.FireOnCurrentValueChanged(this, new SensorReadingEventArgs<CompassReading>(reading));
+                        compass.CurrentValue = reading;
                     }
                 }
                 catch (NullReferenceException)
