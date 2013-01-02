@@ -109,9 +109,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
                         var param = new d3dx_parameter();
                         param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.type = D3DXPARAMETER_TYPE.TEXTURE2D; // TODO: Fix this right!
                         param.name = sampler.parameterName;
                         param.semantic = string.Empty;
+
+                        switch (sampler.type)
+                        {
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE;
+                                break;
+                        }
 
                         parameters.Add(param);
                     }

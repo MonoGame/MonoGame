@@ -115,27 +115,38 @@ namespace Microsoft.Xna.Framework.Graphics
 			var samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
 					parseData.samplers, parseData.sampler_count);
 			dxshader._samplers = new Sampler[samplers.Length];
-			for (var i = 0; i < samplers.Length; i++) {
+			for (var i = 0; i < samplers.Length; i++) 
+            {
+                // We need the original sampler name... look for that in the symbols.
+                var originalSamplerName =
+                    symbols.First(e => e.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
+                    e.register_index == samplers[i].index
+                ).name;
 
-				//sampler mapping to parameter is unknown atm
-				dxshader._samplers [i].parameter = -1;
+                var sampler = new Sampler
+                {
+                    //sampler mapping to parameter is unknown atm
+                    parameter = -1,
+                                      
+                    // GLSL needs the MojoShader mangled sampler name.
+                    samplerName = samplers[i].name,
 
-				// GLSL needs the MojoShader mangled sampler name.
-				dxshader._samplers [i].samplerName = samplers [i].name;
+                    // By default use the original sampler name for the parameter name.
+                    parameterName = originalSamplerName,
 
-				// We need the original sampler name... look for that in the symbols.
-				var originalSamplerName =
-					symbols.First (e => e.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_SAMPLER &&
-					e.register_index == samplers [i].index
-				).name;
+                    index = samplers[i].index,
+                    type = samplers[i].type,
+                };
 
-                var state = samplerStates[originalSamplerName];
-				dxshader._samplers[i].state = state.state;
-                dxshader._samplers[i].parameterName = state.textureName ?? originalSamplerName;
+                SamplerStateInfo state;
+                if (samplerStates.TryGetValue(originalSamplerName, out state))
+                {
+                    sampler.state = state.state;
+                    sampler.parameterName = state.textureName ?? originalSamplerName;
+                }
 
-				// Set the rest of the sampler info.
-				dxshader._samplers [i].type = samplers [i].type;
-				dxshader._samplers [i].index = samplers [i].index;					
+                // Store the sampler.
+			    dxshader._samplers[i] = sampler;
 			}
 
 			// Gather all the parameters used by this shader.
