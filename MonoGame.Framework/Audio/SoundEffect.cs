@@ -154,6 +154,15 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
+        public SoundEffect(Stream s)
+        {
+            var data = new byte[s.Length];
+            s.Read(data, 0, (int)s.Length);
+
+            _data = data;
+            _sound = new Sound(_data, 1.0f, false);
+        }
+
 #if WINRT
 
         // Extended constructor which supports custom formats / compression.
@@ -398,10 +407,7 @@ namespace Microsoft.Xna.Framework.Audio
 #if ANDROID
             throw new NotImplementedException();
 #else
-            var data = new byte[stream.Length];
-            stream.Read(data, 0, (int)stream.Length);
-
-            return new SoundEffect("", data);
+            return new SoundEffect(stream);
 #endif
         }
 

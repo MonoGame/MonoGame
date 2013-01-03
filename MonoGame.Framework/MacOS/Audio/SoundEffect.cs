@@ -149,6 +149,15 @@ namespace Microsoft.Xna.Framework.Audio
 
 		}
 
+        public SoundEffect(Stream s)
+        {
+            var data = new byte[s.Length];
+            s.Read(data, 0, (int)s.Length);
+
+            _data = data;
+            LoadAudioStream(_data);
+        }
+
 		void LoadAudioStream (byte[] audiodata)
 		{
 			AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
@@ -345,7 +354,12 @@ namespace Microsoft.Xna.Framework.Audio
 			set {
 				speedOfSound = value;
 			}
-		}		
+		}
+
+        public static SoundEffect FromStream(Stream stream)
+        {
+            return new SoundEffect(stream);
+        }
 	}
 }
 
