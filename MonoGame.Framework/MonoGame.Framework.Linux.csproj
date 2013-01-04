@@ -414,6 +414,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoGame.Framework.Linux.dll.config">
+      <Link>MonoGame.Framework.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Libs\libmojoshader_32.so">
