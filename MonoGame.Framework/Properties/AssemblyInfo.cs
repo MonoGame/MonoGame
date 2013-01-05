@@ -7,16 +7,18 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MonoGame.Framework")]
-#if ANDROID
+#if OUYA
+[assembly: AssemblyDescription("MonoGame for OUYA")]
+#elif ANDROID
 [assembly: AssemblyDescription("MonoGame for Android")]
 #elif WINDOWS
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (OpenGL)")]
 #elif PSM
-[assembly: AssemblyDescription("MonoGame for Playstation Mobile")]
+[assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
 #elif LINUX
 [assembly: AssemblyDescription("MonoGame for Linux")]
 #elif MAC
-[assembly: AssemblyDescription("MonoGame for MacOSX")]
+[assembly: AssemblyDescription("MonoGame for Mac OS X")]
 #elif IOS
 [assembly: AssemblyDescription("MonoGame for iOS")]
 #elif WINDOWS_STOREAPP
