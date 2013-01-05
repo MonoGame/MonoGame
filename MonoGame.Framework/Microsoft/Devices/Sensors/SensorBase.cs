@@ -75,13 +75,6 @@ namespace Microsoft.Devices.Sensors
 		public abstract void Start();
 
 		public abstract void Stop();
-
-        [Obsolete("Use CurrentValue instead")]
-		protected void FireOnCurrentValueChanged(object sender, SensorReadingEventArgs<TSensorReading> sample)
-		{
-			if (this.CurrentValueChanged != null)
-				this.CurrentValueChanged(this, sample);
-		}
 	}
 }
 

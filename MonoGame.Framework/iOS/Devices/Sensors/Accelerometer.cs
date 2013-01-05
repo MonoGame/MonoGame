@@ -89,7 +89,6 @@ namespace Microsoft.Devices.Sensors
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
             }
-            FireOnCurrentValueChanged(this, new SensorReadingEventArgs<AccelerometerReading>(reading));
 		}
 
 		private void UpdateInterval(object sender, EventArgs args)
