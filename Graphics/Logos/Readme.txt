@@ -4,6 +4,9 @@ NOTES ABOUT THE MONOGAME LOGO AND LOGOTYPE
 2. The "mono" is written to the left of the logo, rotated counter-clockwise 90 degrees.
 2. The "mono" is bottom aligned with the logo.
 3. The "Game" is written above the logo left aligned with the left edge of the logo.
+4. MonoGame.ai is derived from the SVG file and fixed up for curve alignment.
+5. LogoNoText.psd is a smart object linked to MonoGame.ai
+6. The logo is not transparent. It has a full white (0xFFFFFF) background.
 
 The template splash screens are 480 x 800 to match the default screen format
 of the XNA devices, e.g. Windows 7 and Windows 8 phone devices.
