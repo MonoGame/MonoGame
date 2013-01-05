@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">ARM</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F13744CE-A3B0-426B-8A4A-CF6F482B80CD}</ProjectGuid>
+    <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
