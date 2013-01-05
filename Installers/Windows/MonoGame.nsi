@@ -2,7 +2,7 @@ SetCompressor /SOLID /FINAL lzma
 
 !define FrameworkPath "C:\Users\Dean\Desktop\MonoGame\"
 !define VERSION "3.0"
-!define REVISION "0.1"
+!define REVISION "0.0"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
@@ -16,16 +16,16 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}Installers\monogame.ico"
 
-Name '${APPNAME} ${VERSION} (BETA)'
+Name '${APPNAME} ${VERSION}'
 OutFile '${INSTALLERFILENAME}Installer-${VERSION}.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} for MonoDevelop"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development Tools"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2012"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2013"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -53,7 +53,7 @@ Section "MonoGame Core Components" ;No components page, name is not important
   SectionIn RO
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}
   File '..\monogame.ico'
-  File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
+  File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\x86\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
   File '..\..\ThirdParty\Libs\NAudio\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
@@ -64,15 +64,20 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File '..\..\ThirdParty\Libs\PVRTexLib\Windows_x86_32\Dll\PVRTexLib.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
   File '..\..\ThirdParty\Libs\lame_enc.dll'
+
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  
   
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\Release\*.xml'
   
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies'
-  File /x *Windows8.dll '..\..\ThirdParty\Lidgren.Network\bin\Release\*.dll'
-  File /nonfatal /x *Windows8.xml '..\..\ThirdParty\Lidgren.Network\bin\Release\*.xml'
-
-  File /x *Windows8.dll /x *WindowsPhone.dll '..\..\MonoGame.Framework\bin\Release\*.dll'
-  File /nonfatal /x *Windows8.xml /x *WindowsPhone.xml' ..\..\MonoGame.Framework\bin\Release\*.xml'
   File '..\..\ThirdParty\Libs\OpenTK.dll'
   File '..\..\ThirdParty\Libs\OpenTK.dll.config'
   File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
@@ -81,31 +86,34 @@ Section "MonoGame Core Components" ;No components page, name is not important
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
 
-  File '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Release\MonoGame.Framework.Windows8.xml'
+  File '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.xml'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*xml'
+  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
 
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.WindowsPhone.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
 
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.WindowsPhone.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.WindowsPhone.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll'
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\86\Release\MonoGame.Framework.xml'
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
 
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*xml'  
+  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
@@ -113,6 +121,9 @@ Section "MonoGame Core Components" ;No components page, name is not important
 
   Is64bit:
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
@@ -162,6 +173,15 @@ Section "MonoDevelop Templates"
   File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
   File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\templates\*.*'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies"
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\WindowsGL"
+  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Android"
+  File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Linux"
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\MacOS"
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\iOS"
   ${EndIf}
   
 SectionEnd

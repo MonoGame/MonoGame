@@ -40,6 +40,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _program = -1;
         private int _location;
 
+        static ConstantBuffer _lastConstantBufferApplied = null;
+
         /// <summary>
         /// A hash value which can be used to compare constant buffers.
         /// </summary>
@@ -150,20 +152,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void SetParameter(int offset, EffectParameter param)
+        private int SetParameter(int offset, EffectParameter param)
         {
             const int elementSize = 4;
             const int rowSize = elementSize * 4;
+
+            int rowsUsed = 0;
 
             if (param.Elements.Count > 0)
             {
                 foreach (var subparam in param.Elements)
                 {
-                    SetParameter(offset, subparam);
+                    int rowsUsedSubParam = SetParameter(offset, subparam);
 
-                    //TODO: Sometimes directx decides to transpose matricies
-                    //to fit in fewer registers.
-                    offset += subparam.RowCount * rowSize;
+                    offset += rowsUsedSubParam * rowSize;
+                    rowsUsed += rowsUsedSubParam;
                 }
             }
             else if (param.Data != null)
@@ -172,12 +175,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     case EffectParameterType.Single:
 					case EffectParameterType.Int32:
-						SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                        // HLSL assumes matrices are column-major, whereas in-memory we use row-major.
+                        // TODO: HLSL can be told to use row-major. We should handle that too.
+                        if (param.ParameterClass == EffectParameterClass.Matrix)
+                        {
+                            rowsUsed = param.ColumnCount;
+                            SetData(offset, param.ColumnCount, param.RowCount, param.Data);
+                        }
+                        else
+                        {
+                            rowsUsed = param.RowCount;
+                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                        }
                         break;
                     default:
                         throw new NotImplementedException("Not supported!");
                 }
             }
+
+            return rowsUsed;
         }
 
         public void Update(EffectParameterCollection parameters)
@@ -257,6 +273,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _dirty = true;
             }
 
+            // If the shader program is the same, the effect may still be different and have different values in the buffer
+            if (!Object.ReferenceEquals(this, _lastConstantBufferApplied))
+                _dirty = true;
+
             // If the buffer content hasn't changed then we're
             // done... use the previously set uniform state.
             if (!_dirty)
@@ -274,6 +294,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the dirty flag.
             _dirty = false;
+
+            _lastConstantBufferApplied = this;
 #endif
             
 #if PSM
