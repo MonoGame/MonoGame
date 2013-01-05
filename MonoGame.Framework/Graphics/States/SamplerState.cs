@@ -250,6 +250,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
 				break;
+			case TextureFilter.PointMipLinear:
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Nearest));
+                GraphicsExtensions.CheckGLError();
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                GraphicsExtensions.CheckGLError();
+				break;
 			default:
 				throw new NotImplementedException();
 			}

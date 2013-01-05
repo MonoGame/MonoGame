@@ -1218,7 +1218,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _viewport = value;
 #if DIRECTX
-                var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
@@ -1441,9 +1441,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 lock (_d3dContext)
                 {
-                    var viewport = new SharpDX.Direct3D11.Viewport( _viewport.X, _viewport.Y, 
-                                                                    _viewport.Width, _viewport.Height, 
-                                                                    _viewport.MinDepth, _viewport.MaxDepth);
+                    var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
+                                                          _viewport.Width, _viewport.Height, 
+                                                          _viewport.MinDepth, _viewport.MaxDepth);
                     _d3dContext.Rasterizer.SetViewports(viewport);
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
                 }
@@ -1529,7 +1529,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _indexBufferDirty = true;
         }
 
-        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+        public IndexBuffer Indices { set { SetIndexBuffer(value); } get { return _indexBuffer; } }
 
         internal Shader VertexShader
         {
@@ -1796,7 +1796,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
                 buffer.UserOffset += vertexCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, vertexDecl.VertexStride, SetDataOptions.NoOverwrite);
             }
             else
             {
