@@ -64,10 +64,16 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File '..\..\ThirdParty\Libs\PVRTexLib\Windows_x86_32\Dll\PVRTexLib.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
   File '..\..\ThirdParty\Libs\lame_enc.dll'
+  File '..\..\ThirdParty\Libs\OUYA\*.dll'
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  
+
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
+  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\OUYA\Release\*.xml'  
+  File '..\..\ThirdParty\Libs\OUYA\*.dll'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
@@ -114,6 +120,7 @@ Section "MonoGame Core Components" ;No components page, name is not important
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
+    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\OUYA'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
@@ -124,6 +131,7 @@ Section "MonoGame Core Components" ;No components page, name is not important
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\OUYA'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
@@ -178,6 +186,9 @@ Section "MonoDevelop Templates"
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Android"
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\OUYA"
+  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
+  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Linux"
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\MacOS"
