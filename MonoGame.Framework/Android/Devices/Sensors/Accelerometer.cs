@@ -180,7 +180,7 @@ namespace Microsoft.Devices.Sensors
                                 reading.Acceleration = new Vector3(values[0], values[1], values[2]);
                                 reading.Timestamp = DateTime.Now;
                             }
-                            accelerometer.FireOnCurrentValueChanged(this, new SensorReadingEventArgs<AccelerometerReading>(reading));
+                            accelerometer.CurrentValue = reading;
                         }
                         finally
                         {
