@@ -216,7 +216,8 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_PHONE
 
-#elif WINRT
+#elif WINDOWS_STOREAPP
+
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
@@ -243,6 +244,25 @@ namespace Microsoft.Xna.Framework
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
                 _graphicsDevice.PresentationParameters.SwapChainPanel = null;
             }
+
+            // Update the back buffer.
+            _graphicsDevice.CreateSizeDependentResources();
+            _graphicsDevice.ApplyRenderTargets(null);
+
+#elif WINDOWS && DIRECTX
+
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+
+            // TODO: We probably should be resetting the whole 
+            // device if this changes as we are targeting a different
+            // hardware feature level.
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
 
             // Update the back buffer.
             _graphicsDevice.CreateSizeDependentResources();

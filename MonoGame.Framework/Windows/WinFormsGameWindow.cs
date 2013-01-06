@@ -50,6 +50,7 @@ using Microsoft.Xna.Framework.Input;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Framework
 {
@@ -121,8 +122,7 @@ namespace MonoGame.Framework
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
-
-            //_coreWindow.SizeChanged += Window_SizeChanged;
+            _form.ClientSizeChanged += OnClientSizeChanged;
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -166,43 +166,32 @@ namespace MonoGame.Framework
             _form.Show();
         }
 
-        /*
-        private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
+        private void OnClientSizeChanged(object sender, EventArgs eventArgs)
         {
             var manager = Game.graphicsDeviceManager;
-
-            // If we haven't calculated the back buffer scale then do it now.
-            if (_backBufferScale == Vector2.Zero)
-            {
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth/(float)_clientBounds.Width, 
-                                                manager.PreferredBackBufferHeight/(float)_clientBounds.Height);
-            }
-
-            // Set the new client bounds.
-            SetClientBounds(args.Size.Width, args.Size.Height);
 
             // Set the default new back buffer size and viewport, but this
             // can be overloaded by the two events below.
             
-            var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
-            var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
+            var newWidth = _form.ClientRectangle.Width;
+            var newHeight = _form.ClientRectangle.Height;
             manager.PreferredBackBufferWidth = newWidth;
             manager.PreferredBackBufferHeight = newHeight;
+            if (manager.GraphicsDevice == null)
+                return;
 
             manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
 
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
-            Platform.ViewState = ApplicationView.Value;
             OnClientSizeChanged();
 
             // If we have a valid client bounds then 
             // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+            if (newWidth > 0 && newHeight > 0)
                 manager.ApplyChanges();
         }
-        */
 
         protected override void SetTitle(string title)
         {
