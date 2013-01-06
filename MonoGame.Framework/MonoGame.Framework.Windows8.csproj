@@ -255,9 +255,11 @@
     <Compile Include="SharedGraphicsDeviceManager.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
+    <Compile Include="Windows8\GameFrameworkViewSourceByDelegate.cs" />
     <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\InputEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
+    <Compile Include="Windows8\MetroFrameworkViewByDelegate.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
     <Compile Include="Windows8\MetroGameWindow.cs" />
     <Compile Include="Windows8\MetroHelper.cs" />
