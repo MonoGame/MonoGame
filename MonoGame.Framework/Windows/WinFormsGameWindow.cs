@@ -43,17 +43,20 @@ using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-
+using XnaKey = Microsoft.Xna.Framework.Input.Keys;
 
 namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
         private Form _form;
+
+        private List<XnaKey> _keyState = new List<XnaKey>();
 
         #region Internal Properties
 
@@ -103,11 +106,15 @@ namespace MonoGame.Framework
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
-            // Capture mouse events.
+            // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
             _form.MouseMove += OnMouseState;
             _form.MouseUp += OnMouseState;
             _form.MouseWheel += OnMouseState;
+            _form.KeyDown += OnKeyDown;
+            _form.KeyUp += OnKeyUp;
+
+            Keyboard.SetKeys(_keyState);
 
             //_coreWindow.SizeChanged += Window_SizeChanged;
             //_coreWindow.Closed += Window_Closed;
@@ -123,6 +130,18 @@ namespace MonoGame.Framework
             Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+            _keyState.Add(key);
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+            _keyState.Remove(key);
         }
 
         internal void Initialize()
