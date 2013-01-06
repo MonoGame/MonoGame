@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework
             _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
             _game.Services.AddService(typeof(IGraphicsDeviceService), this);
 
-#if (WINDOWS && !WINRT) || LINUX
+#if (WINDOWS && !DIRECTX) || LINUX
             // TODO: This should not occur here... it occurs during Game.Initialize().
             CreateDevice();
 #endif
