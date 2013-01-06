@@ -180,8 +180,6 @@ namespace MonoGame.Framework
             if (manager.GraphicsDevice == null)
                 return;
 
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
-
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
