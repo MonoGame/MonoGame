@@ -83,7 +83,7 @@ namespace MonoGame.Framework
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
-            _window = new WinFormsGameWindow(game);
+            _window = new WinFormsGameWindow(this);
             Window = _window;
         }
 

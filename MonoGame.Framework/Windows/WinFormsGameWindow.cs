@@ -58,6 +58,8 @@ namespace MonoGame.Framework
 
         private List<XnaKey> _keyState = new List<XnaKey>();
 
+        private WinFormsGamePlatform _platform;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -99,9 +101,10 @@ namespace MonoGame.Framework
 
         #endregion
 
-        public WinFormsGameWindow(Game game)
+        internal WinFormsGameWindow(WinFormsGamePlatform platform)
         {
-            Game = game;
+            _platform = platform;
+            Game = platform.Game;
 
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
@@ -113,13 +116,25 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseState;
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
-
             Keyboard.SetKeys(_keyState);
 
+            _form.Activated += OnActivated;
+            _form.Deactivate += OnDeactivate;
             //_coreWindow.SizeChanged += Window_SizeChanged;
             //_coreWindow.Closed += Window_Closed;
             //_coreWindow.Activated += Window_FocusChanged;
             //_clientBounds = bounds;
+        }
+
+        private void OnActivated(object sender, EventArgs eventArgs)
+        {
+            _platform.IsActive = true;
+        }
+
+        private void OnDeactivate(object sender, EventArgs eventArgs)
+        {
+            _platform.IsActive = false;
+            _keyState.Clear();
         }
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
@@ -135,7 +150,8 @@ namespace MonoGame.Framework
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
-            _keyState.Add(key);
+            if (!_keyState.Contains(key))
+                _keyState.Add(key);
         }
 
         private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
@@ -209,7 +225,6 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            //_form.Activate();
             Application.Idle += OnIdle;
             Application.Run(_form);
             Application.Idle -= OnIdle;
