@@ -1218,9 +1218,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _viewport = value;
 #if DIRECTX
-                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-                lock (_d3dContext) 
-                    _d3dContext.Rasterizer.SetViewports(viewport);
+                if (_d3dContext != null)
+                {
+                    var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                    lock (_d3dContext)
+                        _d3dContext.Rasterizer.SetViewports(viewport);
+                }
 #elif OPENGL
                 if (IsRenderTargetBound)
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
