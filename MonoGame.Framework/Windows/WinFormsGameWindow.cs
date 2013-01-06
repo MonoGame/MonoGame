@@ -39,6 +39,7 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -120,10 +121,8 @@ namespace MonoGame.Framework
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
+
             //_coreWindow.SizeChanged += Window_SizeChanged;
-            //_coreWindow.Closed += Window_Closed;
-            //_coreWindow.Activated += Window_FocusChanged;
-            //_clientBounds = bounds;
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -168,19 +167,6 @@ namespace MonoGame.Framework
         }
 
         /*
-        private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
-        {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
-        }
-
-        private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
-        {
-            Game.Exit();
-        }
-
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
             var manager = Game.graphicsDeviceManager;
@@ -232,17 +218,11 @@ namespace MonoGame.Framework
 
         private void OnIdle(object sender, EventArgs eventArgs)
         {
-            while (StillIdle)
+            // While there are no pending messages 
+            // to be processed tick the game.
+            Message msg;
+            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
                 Game.Tick();
-        }
-
-        private bool StillIdle
-        {
-            get
-            {
-                Message msg;
-                return !PeekMessage(out msg, IntPtr.Zero, 0, 0, 0);
-            }
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
