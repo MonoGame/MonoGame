@@ -15,7 +15,6 @@ using GLStencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
 #endif
-
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
