@@ -66,8 +66,10 @@ non-infringement.
 */
 #endregion License
 
+using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using System.Windows.Forms;
 
 
 namespace MonoGame.Framework
@@ -76,9 +78,13 @@ namespace MonoGame.Framework
     {
         internal static string LaunchParameters;
 
+        private WinFormsGameWindow _window;
+
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
+            _window = new WinFormsGameWindow(game);
+            Window = _window;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -86,16 +92,28 @@ namespace MonoGame.Framework
             get { return GameRunBehavior.Synchronous; }
         }
 
+        public override void BeforeInitialize()
+        {
+            _window.Initialize();
+
+            base.BeforeInitialize();
+        }
+
         public override void RunLoop()
         {
+            OnIsMouseVisibleChanged();
+            _window.RunLoop();
         }
 
         public override void StartRunLoop()
         {
+            // We don't support syncronous run loops right now!
+            throw new NotSupportedException();
         }
         
         public override void Exit()
         {
+            Application.Exit();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -124,9 +142,9 @@ namespace MonoGame.Framework
         {
         }
 
-        public override void Log(string Message)
+        public override void Log(string message)
         {
-            Debug.WriteLine(Message);
+            Debug.WriteLine(message);
         }
 
         public override void Present()
@@ -138,16 +156,30 @@ namespace MonoGame.Framework
 
         protected override void OnIsMouseVisibleChanged() 
         {
+            if (IsMouseVisible)
+                Cursor.Show();
+            else
+                Cursor.Hide();
         }
 		
         protected override void Dispose(bool disposing)
         {
-            // Make sure we dispose the graphics system.
-            var graphicsDeviceManager = Game.graphicsDeviceManager;
-            if (graphicsDeviceManager != null)
-                graphicsDeviceManager.Dispose();
+            if (disposing)
+            {
+                if (_window != null)
+                {
+                    _window.Dispose();
+                    _window = null;
+                    Window = null;
+                }
+                
+                // Make sure we dispose the graphics system.
+                var graphicsDeviceManager = Game.graphicsDeviceManager;
+                if (graphicsDeviceManager != null)
+                    graphicsDeviceManager.Dispose();
+            }
 
-			base.Dispose(disposing);
+            base.Dispose(disposing);
         }
     }
 }

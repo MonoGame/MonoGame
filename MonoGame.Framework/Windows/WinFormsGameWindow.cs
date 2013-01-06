@@ -39,63 +39,79 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Drawing;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 
 namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
-        private DisplayOrientation _supportedOrientations;
-        private DisplayOrientation _orientation;
-        protected Game game;
-        private Rectangle _clientBounds;
-        private Vector2 _backBufferScale;
+        private Form _form;
 
         #region Internal Properties
 
-        internal Game Game { get; set; }
-
-        internal bool IsExiting { get; set; }
+        internal Game Game { get; private set; }
 
         #endregion
 
         #region Public Properties
 
-        public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle { get { return _form.Handle; } }
 
-        public override string ScreenDeviceName { get { return String.Empty; } } // window.Title
+        public override string ScreenDeviceName { get { return String.Empty; } }
 
-        public override Rectangle ClientBounds { get { return _clientBounds; } }
+        public override Rectangle ClientBounds
+        {
+            get
+            {
+                var clientRect = _form.ClientRectangle;
+                return new Rectangle(clientRect.X, clientRect.Y, clientRect.Width, clientRect.Height);
+            }
+        }
 
         public override bool AllowUserResizing
         {
-            get { return true; }
-            set 
+            get { return _form.FormBorderStyle == FormBorderStyle.Sizable; }
+            set
             {
-
+                _form.FormBorderStyle = value ? FormBorderStyle.Sizable : FormBorderStyle.Fixed3D;
             }
         }
 
         public override DisplayOrientation CurrentOrientation
         {
-            get { return _orientation; }
+            get { return DisplayOrientation.Default; }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            // TODO: Support orientation changes on Windows desktop apps.
         }
 
         #endregion
 
-        public WinFormsGameWindow(Rectangle bounds)
+        public WinFormsGameWindow(Game game)
         {
+            Game = game;
+
+            _form = new Form();
+            _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+
             //_coreWindow.SizeChanged += Window_SizeChanged;
             //_coreWindow.Closed += Window_Closed;
             //_coreWindow.Activated += Window_FocusChanged;
+            //_clientBounds = bounds;
+        }
 
-            _clientBounds = bounds;
+        internal void Initialize()
+        {
+            var manager = Game.graphicsDeviceManager;
+            _form.ClientSize = new Size(manager.PreferredBackBufferWidth, manager.PreferredBackBufferHeight);
+            _form.Show();
         }
 
         /*
@@ -151,40 +167,45 @@ namespace MonoGame.Framework
 
         protected override void SetTitle(string title)
         {
-        }
-
-        internal void SetCursor(bool visible)
-        {
+            _form.Text = title;
         }
 
         internal void RunLoop()
         {
-            /*
-            SetCursor(Game.IsMouseVisible);
-            _coreWindow.Activate();
-
-            while (true)
-            {
-                // Process events incoming to the window.
-                _coreWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
-
-                // Update state based on window events.
-                //_windowEvents.UpdateState();
-
-                // Update and render the game.
-                if (Game != null)
-                    Game.Tick();
-
-                if (IsExiting)
-                    break;
-            }
-            */
+            //_form.Activate();
+            Application.Idle += OnIdle;
+            Application.Run(_form);
+            Application.Idle -= OnIdle;
         }
+
+        private void OnIdle(object sender, EventArgs eventArgs)
+        {
+            while (StillIdle)
+                Game.Tick();
+        }
+
+        private bool StillIdle
+        {
+            get
+            {
+                Message msg;
+                return !PeekMessage(out msg, IntPtr.Zero, 0, 0, 0);
+            }
+        }
+
+        [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern bool PeekMessage(out Message msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
 
         #region Public Methods
 
         public void Dispose()
         {
+            if (_form != null)
+            {
+                _form.Dispose();
+                _form = null;
+            }
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
@@ -193,7 +214,6 @@ namespace MonoGame.Framework
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-
         }
 
         #endregion
