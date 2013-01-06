@@ -20,7 +20,6 @@
 [IgnoreCase] PixelShader -> @"PixelShader";
 [IgnoreCase] Register -> @"register";
 Number -> @"[0-9]?\.?[0-9]+";
-TextureName -> @"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
@@ -32,6 +31,8 @@ OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
 OpenSquareBracket -> @"\[";
 CloseSquareBracket -> @"\]";
+LessThan -> @"<";
+GreaterThan -> @">";
 [IgnoreCase] Compile -> @"compile";
 [IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
 Code -> @"[\S]+";
@@ -184,15 +185,15 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
    return null;
 };
 
-Sampler_State_Expression -> Identifier Equals (TextureName | Identifier | Number) Semicolon
+Sampler_State_Expression -> Identifier Equals (LessThan Identifier GreaterThan | Identifier | Number) Semicolon
 {
 	var sampler = paramlist[0] as SamplerStateInfo;
 	var name = $Identifier[0] as string;
-	var value = ($TextureName[0] ?? ($Identifier[1] ?? $Number[0])) as string;
+	var value = ($Identifier[1] ?? ($Identifier[2] ?? $Number[0])) as string;
 	switch (name.ToLower())
 	{
 		case "texture":
-			// Ignore
+			sampler.textureName = value;
 			break;
 		case "minfilter":
 			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
@@ -269,7 +270,7 @@ Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals
 		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
 
 	var shaderInfo = paramlist[0] as ShaderInfo;
-	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+	shaderInfo.SamplerStates.Add(sampler.name, sampler);
 
 	return null;
 };

@@ -509,16 +509,38 @@ namespace TwoMGFX
             }
 
             
-            tok = scanner.LookAhead(TokenType.TextureName, TokenType.Identifier, TokenType.Number);
+            tok = scanner.LookAhead(TokenType.LessThan, TokenType.Identifier, TokenType.Number);
             switch (tok.Type)
             {
-                case TokenType.TextureName:
-                    tok = scanner.Scan(TokenType.TextureName);
+                case TokenType.LessThan:
+
+                    
+                    tok = scanner.Scan(TokenType.LessThan);
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
-                    if (tok.Type != TokenType.TextureName) {
-                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.TextureName.ToString(), 0x1001, tok));
+                    if (tok.Type != TokenType.LessThan) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.LessThan.ToString(), 0x1001, tok));
+                        return;
+                    }
+
+                    
+                    tok = scanner.Scan(TokenType.Identifier);
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.Identifier) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Identifier.ToString(), 0x1001, tok));
+                        return;
+                    }
+
+                    
+                    tok = scanner.Scan(TokenType.GreaterThan);
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.GreaterThan) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.GreaterThan.ToString(), 0x1001, tok));
                         return;
                     }
                     break;
