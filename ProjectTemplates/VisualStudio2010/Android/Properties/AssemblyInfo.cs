@@ -7,10 +7,10 @@ using Android.App;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("$projectname$")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("$registeredorganization$")]
 [assembly: AssemblyProduct("$projectname$")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCompany("$registeredorganization$")]
 [assembly: AssemblyCopyright("Copyright © $registeredorganization$ $year$")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +21,7 @@ using Android.App;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("$guid1$")]
+[assembly: Guid("$guid2$")]
 
 // Version information for an assembly consists of the following four values:
 //
