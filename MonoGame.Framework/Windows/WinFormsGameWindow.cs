@@ -44,6 +44,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 
@@ -101,10 +103,26 @@ namespace MonoGame.Framework
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
+            // Capture mouse events.
+            _form.MouseDown += OnMouseState;
+            _form.MouseMove += OnMouseState;
+            _form.MouseUp += OnMouseState;
+            _form.MouseWheel += OnMouseState;
+
             //_coreWindow.SizeChanged += Window_SizeChanged;
             //_coreWindow.Closed += Window_Closed;
             //_coreWindow.Activated += Window_FocusChanged;
             //_clientBounds = bounds;
+        }
+
+        private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
+        {
+            Mouse.State.X = mouseEventArgs.X;
+            Mouse.State.Y = mouseEventArgs.Y;
+            Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
         }
 
         internal void Initialize()
