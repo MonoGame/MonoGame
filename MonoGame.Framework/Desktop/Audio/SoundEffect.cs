@@ -114,7 +114,12 @@ namespace Microsoft.Xna.Framework.Audio
             _data = LoadAudioStream(s, 1.0f, false);
 
 		}
-		
+
+        internal SoundEffect(Stream s)
+        {
+            _data = LoadAudioStream(s, 1.0f, false);
+        }
+
 		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
 			//buffer should contain 16-bit PCM wave data
@@ -155,12 +160,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 			//_sound = new Sound(_data, 1.0f, false);
-		}
-
-        internal SoundEffect(Stream s)
-        {
-            _data = LoadAudioStream(s, 1.0f, false);
-        }
+		}        
 
         byte[] LoadAudioStream(Stream s, float volume, bool looping)
         {

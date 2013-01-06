@@ -103,8 +103,17 @@ namespace Microsoft.Xna.Framework.Audio
 			_data = data;
 			_name = name;
 			_sound = new Sound(_data, 1.0f, false);
-		}
+		}        
 #endif
+
+        internal SoundEffect(Stream s)
+        {
+            var data = new byte[s.Length];
+            s.Read(data, 0, (int)s.Length);
+
+            _data = data;
+            _sound = new Sound(_data, 1.0f, false);
+        }
 
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
@@ -152,16 +161,7 @@ namespace Microsoft.Xna.Framework.Audio
 #else
             throw new NotImplementedException();
 #endif
-        }
-
-        public SoundEffect(Stream s)
-        {
-            var data = new byte[s.Length];
-            s.Read(data, 0, (int)s.Length);
-
-            _data = data;
-            _sound = new Sound(_data, 1.0f, false);
-        }
+        }        
 
 #if WINRT
 
