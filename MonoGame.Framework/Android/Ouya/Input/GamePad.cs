@@ -38,8 +38,6 @@ purpose and non-infringement.
 */
 #endregion License
 
-using Android.Content;
-using Android.OS;
 using Android.Views;
 using System;
 
@@ -128,17 +126,9 @@ namespace Microsoft.Xna.Framework.Input
 			{
 				if (GamePads[i] == null) //Have looked at all the gamepads, must be a new one
 				{
-					//Identify the type
-					switch (device.Name)
-					{
-						case "OUYA Game Controller":
-							Console.WriteLine("Found new ouya controller " + i);
-							GamePads[i] = new GamePad(device);
-							return GamePads[i];
-						default:
-							Console.WriteLine("Unknown GamePad: " + device.Name);
-							return null;
-					}
+					Console.WriteLine("Found new controller [" + i + "] " + device.Name);
+					GamePads[i] = new GamePad(device);
+					return GamePads[i];
 				}
 
 				if (GamePads[i]._deviceId == device.Id)
@@ -222,6 +212,11 @@ namespace Microsoft.Xna.Framework.Input
 					return Buttons.DPadLeft;
 				case Keycode.DpadRight:
 					return Buttons.DPadRight;
+
+				case Keycode.ButtonStart:
+					return Buttons.Start;
+				case Keycode.Back:
+					return Buttons.Back;
 			}
 
 			return 0;
@@ -231,12 +226,16 @@ namespace Microsoft.Xna.Framework.Input
 		private static GamePadCapabilities CapabilitiesOfDevice(InputDevice device)
 		{
 			//TODO: There is probably a better way to do this. Maybe device.GetMotionRange and device.GetKeyCharacterMap?
+			//Or not http://stackoverflow.com/questions/11686703/android-enumerating-the-buttons-on-a-gamepad
 
 			var capabilities = new GamePadCapabilities();
+			capabilities.IsConnected = true;
+			capabilities.GamePadType = GamePadType.GamePad;
+			capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
+
 			switch (device.Name)
 			{
 				case "OUYA Game Controller":
-					capabilities.IsConnected = true;
 
 					capabilities.HasAButton = true;
 					capabilities.HasBButton = true;
@@ -257,10 +256,31 @@ namespace Microsoft.Xna.Framework.Input
 					capabilities.HasDPadLeftButton = true;
 					capabilities.HasDPadRightButton = true;
 					capabilities.HasDPadUpButton = true;
-					
-					capabilities.GamePadType = GamePadType.GamePad;;
+					break;
 
-					capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
+				case "Microsoft X-Box 360 pad":
+					capabilities.HasAButton = true;
+					capabilities.HasBButton = true;
+					capabilities.HasXButton = true;
+					capabilities.HasYButton = true;
+
+					capabilities.HasLeftXThumbStick = true;
+					capabilities.HasLeftYThumbStick = true;
+					capabilities.HasRightXThumbStick = true;
+					capabilities.HasRightYThumbStick = true;
+
+					capabilities.HasLeftShoulderButton = true;
+					capabilities.HasRightShoulderButton = true;
+					capabilities.HasLeftTrigger = true;
+					capabilities.HasRightTrigger = true;
+
+					capabilities.HasDPadDownButton = true;
+					capabilities.HasDPadLeftButton = true;
+					capabilities.HasDPadRightButton = true;
+					capabilities.HasDPadUpButton = true;
+
+					capabilities.HasStartButton = true;
+					capabilities.HasBackButton = true;
 					break;
 			}
 			return capabilities;
