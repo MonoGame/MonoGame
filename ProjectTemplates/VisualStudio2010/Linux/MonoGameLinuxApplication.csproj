@@ -43,11 +43,11 @@
     <Reference Include="OpenTK">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework.Linux">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\MonoGame.Framework.Linux.dll</HintPath>
+    <Reference Include="MonoGame.Framework">
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Lidgren.Network.dll</HintPath>
+       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Tao.Sdl">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Tao.Sdl.dll</HintPath>
