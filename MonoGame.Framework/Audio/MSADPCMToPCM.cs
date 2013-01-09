@@ -42,6 +42,7 @@ public class MSADPCMToPCM {
 	 * @param nibbleBlock we copy the parsed shorts into here
 	 */
 	private static void getNibbleBlock(byte block, byte[] nibbleBlock) {
+        System.Console.WriteLine(block);
 		nibbleBlock[0] = (byte) (block >> 4); // Upper half
 		nibbleBlock[1] = (byte) (block & 0xF); // Lower half
 	}
@@ -124,8 +125,8 @@ public class MSADPCMToPCM {
 		// Mono or Stereo?
 		if (numChannels == 1) {
 			// Read to the end of the file.
-			int blockSize = 7 + blockAlign;
-			while ((Source.BaseStream.Length - Source.BaseStream.Position) >= blockSize) {
+			long fileLength = blockAlign + Source.BaseStream.Length;
+			while (Source.BaseStream.Position >= fileLength) {
 				// Read block preamble
 				byte predictor = Source.ReadByte();
 				short delta = Source.ReadInt16();
@@ -155,8 +156,8 @@ public class MSADPCMToPCM {
 			}
 		} else if (numChannels == 2) {
 			// Read to the end of the file.
-			int blockSize = 14 + blockAlign;
-			while ((Source.BaseStream.Length - Source.BaseStream.Position) >= blockSize) {
+			long fileLength = (blockAlign * 2) + Source.BaseStream.Length;
+			while (Source.BaseStream.Position >= fileLength) {
 				// Read block preamble
 				byte l_predictor = Source.ReadByte();
 				byte r_predictor = Source.ReadByte();
