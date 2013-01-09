@@ -69,6 +69,8 @@ namespace Microsoft.Xna.Framework.Media
 		private static bool _isMuted = false;
 		private static MediaQueue _queue = new MediaQueue();
 
+		public static event EventHandler<EventArgs> ActiveSongChanged;
+
 #if WINRT
         private static MediaEngine _mediaEngineEx;
         private static CoreDispatcher _dispatcher;
