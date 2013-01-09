@@ -104,9 +104,11 @@ public class MSADPCMToPCM {
 	 * @param Source A BinaryReader containing the headerless MSADPCM data
 	 * @param numChannels The number of channels (WAVEFORMATEX nChannels)
 	 * @param blockAlign The ADPCM block size (WAVEFORMATEX nBlockAlign)
-	 * @return A short array containing the raw 16-bit PCM wavedata
+	 * @return A byte array containing the raw 16-bit PCM wavedata
+     *
+     * NOTE: The original MSADPCMToPCM class returns as a short[] array!
 	 */
-	public static short[] MSADPCM_TO_PCM(
+	public static byte[] MSADPCM_TO_PCM(
 		BinaryReader Source,
 		short numChannels,
 		short blockAlign
@@ -208,19 +210,9 @@ public class MSADPCMToPCM {
 
 		// We're done writing PCM data...
 		pcmOut.Close();
+        output.Close();
 
-		// ... But now we need to read it all back into a short array.
-		BinaryReader reinterpreter = new BinaryReader(output);
-		short[] returnValue = new short[output.ToArray().Length / 2];
-		for (int i = 0; i < returnValue.Length; i++) {
-			returnValue[i] = reinterpreter.ReadInt16();
-		}
-
-		// Close remaining streams...
-		reinterpreter.Close();
-		output.Close();
-
-		// Finally.
-		return returnValue;
+		// Return the array.
+		return output.ToArray();
 	}
 }
