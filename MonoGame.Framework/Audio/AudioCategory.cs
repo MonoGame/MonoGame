@@ -90,6 +90,10 @@ namespace Microsoft.Xna.Framework.Audio
 			throw new NotImplementedException ();
 		}
 
+		public void Stop (AudioStopOptions option)
+		{
+			throw new NotImplementedException ();
+		}
 		public void SetVolume(float volume) {
 			throw new NotImplementedException();
 		}
