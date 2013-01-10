@@ -71,9 +71,9 @@ public class MSADPCMToPCM {
 
 		// Calculate new sample
 		int sampleInt = (
-			(sample_1 * AdaptCoeff_1[predictor]) +
-			(sample_2 * AdaptCoeff_2[predictor]) /
-			256
+			(	(sample_1 * AdaptCoeff_1[predictor]) +
+				(sample_2 * AdaptCoeff_2[predictor])
+			) / 256
 		);
 		sampleInt += signedNibble * delta;
 
