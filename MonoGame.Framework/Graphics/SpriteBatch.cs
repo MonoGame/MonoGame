@@ -45,6 +45,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
 		{
+            if (_beginCalled)
+                throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
 
 			// defaults
 			_sortMode = sortMode;

@@ -35,8 +35,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to parse the input file '{0}'!", options.SourceFile);
                 Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to parse the input file '{0}'!", options.SourceFile);
                 return 1;
             }
 
@@ -48,13 +48,13 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Fatal exception when creating the effect!");
-                Console.Error.WriteLine(ex.ToString());
+                Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to compile the input file '{0}'!", options.SourceFile);
                 return 1;
             }
             
             // Get the output file path.
-            if ( options.OutputFile == string.Empty )
+            if (options.OutputFile == string.Empty)
                 options.OutputFile = Path.GetFileNameWithoutExtension(options.SourceFile) + ".mgfxo";
 
             // Write out the effect to a runtime format.
@@ -66,8 +66,8 @@ namespace TwoMGFX
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
                 Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine("Failed to write the output file '{0}'!", options.OutputFile);
                 return 1;
             }
 

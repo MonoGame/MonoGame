@@ -80,6 +80,8 @@
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="FbxImporter.cs" />
+    <Compile Include="FontDescriptionImporter.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
     <Compile Include="Graphics\AnimationChannelDictionary.cs" />
     <Compile Include="Graphics\AnimationContent.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
+    <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
@@ -145,7 +148,13 @@
     <Compile Include="Tasks\BuildContent.cs" />
     <Compile Include="Tasks\CleanContent.cs" />
     <Compile Include="Tasks\GetLastOutputs.cs" />
+    <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
+    <Compile Include="WavImporter.cs" />
+    <Compile Include="WmaImporter.cs" />
+    <Compile Include="WmvImporter.cs" />
+    <Compile Include="XImporter.cs" />
+    <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
@@ -153,7 +162,6 @@
       <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

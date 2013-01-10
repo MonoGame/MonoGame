@@ -15,7 +15,7 @@ using Sce.PlayStation.Core.Graphics;
 #else
 using OpenTK.Graphics.ES20;
 
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
@@ -141,8 +141,12 @@ namespace Microsoft.Xna.Framework.Graphics
 										
 					// If there is no texture assigned then skip it
 					// and leave whatever set directly on the device.
-                    if (texture != null)
-                        device.Textures[sampler.index] = texture;
+					if (texture != null)
+					{
+						device.Textures[sampler.index] = texture;
+						if (sampler.state != null)
+							device.SamplerStates[sampler.index] = sampler.state;
+					}
                 }
                 
                 // Update the constant buffers.

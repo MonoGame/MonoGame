@@ -6,21 +6,23 @@
 
 	<target name="build" description="Build MonoGame Release">
 
-		<call target="buildwindows"/>
-		<!--
-		<call target="buildlinux"/>
-		<call target="buildios"/>
+		<call target="buildwindows"/>		
+		<call target="buildlinux"/>		
 		<call target="buildandroid" />
-	    -->
-	    <nant buildfile="ProjectTemplates/MonoDevelop.MonoGame.2.5/MonoDevelop.MonoGame/default.build" target="build" />
-    	<nant buildfile="ProjectTemplates/VisualStudio2010.MonoGame.2.5/default.build" target="build" />
+    <call target="buildwindows8" />
+    <call target="buildwindowsphone" />
+    
+    <call target="buildtools"/>		
+	   
+	  <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
+    <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
 		
 		<nant buildfile="Installers/default.build" target="build" />
 		
 	</target>
 
     <target name="buildwindows" description="Build Windows">      
-        <if test="${os == 'Win32NT'}">
+    <if test="${os == 'Win32NT'}">
 			<exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Build /p:Configuration=Release" />			
 		</if>
 		<if test="${os == 'Unix'}">
@@ -37,12 +39,35 @@
 		</if>	
     </target>
     
-    <target name="buildios" description="Build Windows">
+    <target name="buildios" description="Build iOS">
     </target>
     
-    <target name="buildandroid" description="Build Windows">
+    <target name="buildandroid" description="Build Android">
+    <if test="${os == 'Win32NT'}">
+			<exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />			
+		</if>
+		<if test="${os == 'Unix'}">
+			<exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Android.sln" />
+		</if>	
     </target>
 		
-	
+	  <target name="buildwindows8" description="Build Windows 8">
+    <if test="${os == 'Win32NT'}">
+			<exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Build /p:Configuration=Release" />			
+		</if>
+		</target>
+  
+    <target name="buildwindowsphone" description="Build Windows Phone">
+    <if test="${os == 'Win32NT'}">
+			<exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="ARM"' />			
+      <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />			
+		</if>
+		</target>
+  
+<target name="buildtools" description="Build Tools">
+    <if test="${os == 'Win32NT'}">
+			<exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Build /p:Configuration=Release" />			
+		</if>
+		</target>
 	
 </project>

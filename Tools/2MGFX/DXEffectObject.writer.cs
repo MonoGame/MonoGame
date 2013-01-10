@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -10,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 2;
+        private const int Version = 3;
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -62,6 +59,65 @@ namespace Microsoft.Xna.Framework.Graphics
                     writer.Write((byte)pixelShader);
 
                     // Write the state objects too!
+					if (pass.blendState != null)
+					{
+						writer.Write(true);
+						writer.Write((byte)pass.blendState.AlphaBlendFunction);
+						writer.Write((byte)pass.blendState.AlphaDestinationBlend);
+						writer.Write((byte)pass.blendState.AlphaSourceBlend);
+						writer.Write(pass.blendState.BlendFactor.R);
+						writer.Write(pass.blendState.BlendFactor.G);
+						writer.Write(pass.blendState.BlendFactor.B);
+						writer.Write(pass.blendState.BlendFactor.A);
+						writer.Write((byte)pass.blendState.ColorBlendFunction);
+						writer.Write((byte)pass.blendState.ColorDestinationBlend);
+						writer.Write((byte)pass.blendState.ColorSourceBlend);
+						writer.Write((byte)pass.blendState.ColorWriteChannels);
+						writer.Write((byte)pass.blendState.ColorWriteChannels1);
+						writer.Write((byte)pass.blendState.ColorWriteChannels2);
+						writer.Write((byte)pass.blendState.ColorWriteChannels3);
+						writer.Write(pass.blendState.MultiSampleMask);
+					}
+					else
+						writer.Write(false);
+
+					if (pass.depthStencilState != null)
+					{
+						writer.Write(true);
+						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilDepthBufferFail);
+						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilFail);
+						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilFunction);
+						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilPass);
+						writer.Write(pass.depthStencilState.DepthBufferEnable);
+						writer.Write((byte)pass.depthStencilState.DepthBufferFunction);
+						writer.Write(pass.depthStencilState.DepthBufferWriteEnable);
+						writer.Write(pass.depthStencilState.ReferenceStencil);
+						writer.Write((byte)pass.depthStencilState.StencilDepthBufferFail);
+						writer.Write(pass.depthStencilState.StencilEnable);
+						writer.Write((byte)pass.depthStencilState.StencilFail);
+						writer.Write((byte)pass.depthStencilState.StencilFunction);
+						writer.Write(pass.depthStencilState.StencilMask);
+						writer.Write((byte)pass.depthStencilState.StencilPass);
+						writer.Write(pass.depthStencilState.StencilWriteMask);
+						writer.Write(pass.depthStencilState.TwoSidedStencilMode);
+					}
+					else
+						writer.Write(false);
+
+					if (pass.rasterizerState != null)
+					{
+						writer.Write(true);
+						writer.Write((byte)pass.rasterizerState.CullMode);
+						writer.Write(pass.rasterizerState.DepthBias);
+						writer.Write((byte)pass.rasterizerState.FillMode);
+						writer.Write(pass.rasterizerState.MultiSampleAntiAlias);
+						writer.Write(pass.rasterizerState.ScissorTestEnable);
+						writer.Write(pass.rasterizerState.SlopeScaleDepthBias);
+					}
+					else
+						writer.Write(false);
+
+
                 }
             }
         }
@@ -110,20 +166,6 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write((byte)count);
             for (var i = 0; i < count; i++)
                 WriteParameter(writer, annotations[i]);
-        }
-
-        private static void WriteStates(BinaryWriter writer, d3dx_state [] states, uint count)
-        {
-            writer.Write((byte)count);
-            for (var s = 0; s < count; s++)
-            {
-                var state = states[s];
-
-                writer.Write((ushort)state.index);
-                writer.Write((byte)state.operation);
-                writer.Write((byte)state.type);
-                WriteParameter(writer, state.parameter);
-            }
         }
 	}
 }

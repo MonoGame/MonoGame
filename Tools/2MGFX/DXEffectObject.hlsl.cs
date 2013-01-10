@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -34,13 +32,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var p = 0; p < tinfo.Passes.Count; p++)
                 {
-                    var pinfo = tinfo.Passes[p];;
+                    var pinfo = tinfo.Passes[p];
 
                     var pass = new d3dx_pass();
                     pass.name = pinfo.name ?? string.Empty;
+
+					pass.blendState = pinfo.blendState;
+					pass.depthStencilState = pinfo.depthStencilState;
+					pass.rasterizerState = pinfo.rasterizerState;
+
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
-                    
+
+                    pinfo.ValidateShaderModels(shaderInfo.DX11Profile);
+
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
@@ -99,13 +104,32 @@ namespace Microsoft.Xna.Framework.Graphics
                     var match = parameters.FindIndex(e => e.name == sampler.parameterName);
                     if (match == -1)
                     {
+                        // Store the index for runtime lookup.
                         shader._samplers[s].parameter = parameters.Count;
 
                         var param = new d3dx_parameter();
                         param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.type = D3DXPARAMETER_TYPE.TEXTURE2D; // TODO: Fix this right!
                         param.name = sampler.parameterName;
                         param.semantic = string.Empty;
+
+                        switch (sampler.type)
+                        {
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE;
+                                break;
+                        }
 
                         parameters.Add(param);
                     }
@@ -175,7 +199,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     shaderProfile, 
                     shaderFlags, 
                     0, 
-                    null, 
+                    null,
                     null,
                     shaderInfo.fileName);
 
@@ -208,9 +232,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if ( dxShader == null )
             {
                 if (shaderInfo.DX11Profile)
-                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.Debug);
+                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 else
-                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count);
+                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
 
                 Shaders.Add(dxShader);
             }

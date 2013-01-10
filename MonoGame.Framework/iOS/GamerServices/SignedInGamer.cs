@@ -411,6 +411,15 @@ namespace Microsoft.Xna.Framework.GamerServices
                 return _privileges;
             }
         }
+
+        LeaderboardWriter _leaderboardWriter = new LeaderboardWriter();
+        public LeaderboardWriter LeaderboardWriter
+        {
+            get
+            {
+                return _leaderboardWriter;
+            }
+        }
 		#endregion
 		
 		

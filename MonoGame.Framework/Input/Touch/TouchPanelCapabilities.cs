@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // XNA does not expose a pressure value, so let's assume it doesn't support it.
                 hasPressure = false;
 
-#if WINRT
+#if WINDOWS_STOREAPP
                 // Is a touch device present?
                 var caps = new Windows.Devices.Input.TouchCapabilities();
                 isConnected = caps.TouchPresent != 0;

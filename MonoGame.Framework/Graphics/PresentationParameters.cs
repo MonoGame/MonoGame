@@ -46,7 +46,7 @@ using Windows.UI.Xaml.Controls;
 
 #if MONOMAC
 using MonoMac.AppKit;
-#elif IPHONE
+#elif IOS
 using MonoTouch.UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // If we are not on windows 8 set the value otherwise ignore it.
 				isFullScreen = value;				
 #endif
-#if IPHONE
+#if IOS
 				UIApplication.SharedApplication.StatusBarHidden = isFullScreen;
 #endif
 
@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear()
         {
             backBufferFormat = SurfaceFormat.Color;
-#if IPHONE
+#if IOS
 			// Mainscreen.Bounds does not account for the device's orientation. it ALWAYS assumes portrait
 			var width = (int)(UIScreen.MainScreen.Bounds.Width * UIScreen.MainScreen.Scale);
 			var height = (int)(UIScreen.MainScreen.Bounds.Height * UIScreen.MainScreen.Scale);
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
             backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;     
 #endif
             deviceWindowHandle = IntPtr.Zero;
-#if IPHONE
+#if IOS
 			isFullScreen = UIApplication.SharedApplication.StatusBarHidden;
 #else
             // isFullScreen = false;
