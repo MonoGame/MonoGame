@@ -42,7 +42,6 @@ public class MSADPCMToPCM {
 	 * @param nibbleBlock we copy the parsed shorts into here
 	 */
 	private static void getNibbleBlock(byte block, byte[] nibbleBlock) {
-        System.Console.WriteLine(block);
 		nibbleBlock[0] = (byte) (block >> 4); // Upper half
 		nibbleBlock[1] = (byte) (block & 0xF); // Lower half
 	}
@@ -106,8 +105,8 @@ public class MSADPCMToPCM {
 	 * @param numChannels The number of channels (WAVEFORMATEX nChannels)
 	 * @param blockAlign The ADPCM block size (WAVEFORMATEX nBlockAlign)
 	 * @return A byte array containing the raw 16-bit PCM wavedata
-     *
-     * NOTE: The original MSADPCMToPCM class returns as a short[] array!
+	 *
+	 * NOTE: The original MSADPCMToPCM class returns as a short[] array!
 	 */
 	public static byte[] MSADPCM_TO_PCM(
 		BinaryReader Source,
@@ -211,7 +210,7 @@ public class MSADPCMToPCM {
 
 		// We're done writing PCM data...
 		pcmOut.Close();
-        output.Close();
+		output.Close();
 
 		// Return the array.
 		return output.ToArray();
