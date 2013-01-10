@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -22,16 +26,16 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static uint PackHelper(float vectorX, float vectorY)
         {
-            uint num2 = HalfTypeHelper.convert(vectorX);
-            uint num = (uint)(HalfTypeHelper.convert(vectorY) << 0x10);
+            uint num2 = HalfTypeHelper.Convert(vectorX);
+            uint num = (uint)(HalfTypeHelper.Convert(vectorY) << 0x10);
             return (num2 | num);
         }
 
         public Vector2 ToVector2()
         {
             Vector2 vector;
-            vector.X = HalfTypeHelper.convert((ushort)this.packedValue);
-            vector.Y = HalfTypeHelper.convert((ushort)(this.packedValue >> 0x10));
+            vector.X = HalfTypeHelper.Convert((ushort)this.packedValue);
+            vector.Y = HalfTypeHelper.Convert((ushort)(this.packedValue >> 0x10));
             return vector;
         }
 

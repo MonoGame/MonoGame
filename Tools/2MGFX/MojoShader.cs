@@ -2631,11 +2631,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// MOJOSHADER_SAMPLER_UNKNOWN -> -1
 		    MOJOSHADER_SAMPLER_UNKNOWN = -1,
 		    
-		    MOJOSHADER_SAMPLER_2D,
+		    MOJOSHADER_SAMPLER_2D = 0,
 		    
-		    MOJOSHADER_SAMPLER_CUBE,
+		    MOJOSHADER_SAMPLER_CUBE = 1,
 		    
-		    MOJOSHADER_SAMPLER_VOLUME,
+		    MOJOSHADER_SAMPLER_VOLUME = 2,
+
+            MOJOSHADER_SAMPLER_1D = 3,
 		}
 		
 		public enum MOJOSHADER_usage {
