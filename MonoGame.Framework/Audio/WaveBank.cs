@@ -411,6 +411,16 @@ namespace Microsoft.Xna.Framework.Audio
                         //An xWMA or XMA2 file. Can't be played atm :(
                         throw new NotImplementedException();
                     }
+                } else if (codec == MiniFormatTag_ADPCM) {
+                    MemoryStream dataStream = new MemoryStream(audiodata);
+                    BinaryReader source = new BinaryReader(dataStream);
+                    sounds[current_entry] = new SoundEffect(
+                        MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
+                        rate,
+                        (chans == 1) ? AudioChannels.Mono : AudioChannels.Stereo
+                    ).CreateInstance();
+                    source.Close();
+                    dataStream.Close();
                 } else {
                     throw new NotImplementedException();
                 }
