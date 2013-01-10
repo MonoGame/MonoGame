@@ -74,6 +74,14 @@
     <Compile Include="Audio\AudioFormat.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Builder\PathHelper.cs" />
+    <Compile Include="Builder\PipelineBuildEvent.cs" />
+    <Compile Include="Builder\PipelineBuildLogger.cs" />
+    <Compile Include="Builder\PipelineImporterContext.cs" />
+    <Compile Include="Builder\PipelineManager.cs" />
+    <Compile Include="Builder\PipelineProcessorContext.cs" />
+    <Compile Include="Builder\TypeExtensions.cs" />
+    <Compile Include="Builder\XmlColor.cs" />
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
