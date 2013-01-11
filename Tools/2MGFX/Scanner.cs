@@ -89,10 +89,6 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Number, regex);
             Tokens.Add(TokenType.Number);
 
-            regex = new Regex(@"[\(<]\s*[A-Za-z_][A-Za-z0-9_]*\s*[>\)]", RegexOptions.Compiled);
-            Patterns.Add(TokenType.TextureName, regex);
-            Tokens.Add(TokenType.TextureName);
-
             regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
             Patterns.Add(TokenType.Identifier, regex);
             Tokens.Add(TokenType.Identifier);
@@ -137,6 +133,14 @@ namespace TwoMGFX
             Patterns.Add(TokenType.CloseSquareBracket, regex);
             Tokens.Add(TokenType.CloseSquareBracket);
 
+            regex = new Regex(@"<", RegexOptions.Compiled);
+            Patterns.Add(TokenType.LessThan, regex);
+            Tokens.Add(TokenType.LessThan);
+
+            regex = new Regex(@">", RegexOptions.Compiled);
+            Patterns.Add(TokenType.GreaterThan, regex);
+            Tokens.Add(TokenType.GreaterThan);
+
             regex = new Regex(@"compile", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Patterns.Add(TokenType.Compile, regex);
             Tokens.Add(TokenType.Compile);
@@ -156,7 +160,7 @@ namespace TwoMGFX
 
         }
 
-        public void Init(string input, string fileName = "")
+        public void Init(string input, string fileName)
         {
             this.Input = input;
             StartPos = 0;
@@ -328,22 +332,23 @@ namespace TwoMGFX
             PixelShader= 20,
             Register= 21,
             Number  = 22,
-            TextureName= 23,
-            Identifier= 24,
-            OpenBracket= 25,
-            CloseBracket= 26,
-            Equals  = 27,
-            Colon   = 28,
-            Comma   = 29,
-            Semicolon= 30,
-            OpenParenthesis= 31,
-            CloseParenthesis= 32,
-            OpenSquareBracket= 33,
-            CloseSquareBracket= 34,
-            Compile = 35,
-            ShaderModel= 36,
-            Code    = 37,
-            EndOfFile= 38
+            Identifier= 23,
+            OpenBracket= 24,
+            CloseBracket= 25,
+            Equals  = 26,
+            Colon   = 27,
+            Comma   = 28,
+            Semicolon= 29,
+            OpenParenthesis= 30,
+            CloseParenthesis= 31,
+            OpenSquareBracket= 32,
+            CloseSquareBracket= 33,
+            LessThan= 34,
+            GreaterThan= 35,
+            Compile = 36,
+            ShaderModel= 37,
+            Code    = 38,
+            EndOfFile= 39
     }
 
     public class Token

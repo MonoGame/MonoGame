@@ -272,9 +272,11 @@
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
@@ -443,15 +445,6 @@
     <Folder Include="MacOS\GamerServices\" />
     <Folder Include="MacOS\Storage\" />
     <Folder Include="Desktop\Audio\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MonoGame.Framework.MacOS.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader.dylib">
-      <Link>libmojoshader.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />

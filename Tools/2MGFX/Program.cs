@@ -54,7 +54,7 @@ namespace TwoMGFX
             }
             
             // Get the output file path.
-            if ( options.OutputFile == string.Empty )
+            if (options.OutputFile == string.Empty)
                 options.OutputFile = Path.GetFileNameWithoutExtension(options.SourceFile) + ".mgfxo";
 
             // Write out the effect to a runtime format.

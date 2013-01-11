@@ -60,31 +60,36 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		public static bool operator !=(Short2 a, Short2 b)
 		{
-			return !a.Equals (b);
+			return a.PackedValue != b.PackedValue;
 		}
 
 		public static bool operator ==(Short2 a, Short2 b)
 		{
-			return a.Equals (b);
+			return a.PackedValue == b.PackedValue;
 		}
 
-		public uint PackedValue { 
-			get { 
+		public uint PackedValue
+        { 
+			get
+            { 
 				return _short2Packed; 
 			} 
-			set { 
+			set
+            { 
 				_short2Packed = value; 
 			} 
 		}
 
 		public override bool Equals (object obj)
 		{
-			throw new NotImplementedException ();
+            if (obj is Short2)
+                return this == (Short2)obj;
+            return false;
 		}
 
 		public bool Equals (Short2 other)
 		{
-			throw new NotImplementedException ();
+            return this == other;
 		}
 
 		public override int GetHashCode ()
@@ -94,9 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		public override string ToString ()
 		{
-			// not sure what to return here
-			// microsoft returns some funky formatted string
-			return string.Format("{0} / {1}", (short)(_short2Packed & 0xFFFF), (short)(_short2Packed >> 0x10) );
+            return _short2Packed.ToString("x8");
 		}
 
 		public Vector2 ToVector2 ()

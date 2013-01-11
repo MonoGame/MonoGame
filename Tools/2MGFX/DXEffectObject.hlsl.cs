@@ -94,8 +94,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-			var samplerStates = new Dictionary<string, SamplerState>();
-
             // Add the texture parameters from the samplers.
             foreach (var shader in effect.Shaders)
             {
@@ -106,17 +104,32 @@ namespace Microsoft.Xna.Framework.Graphics
                     var match = parameters.FindIndex(e => e.name == sampler.parameterName);
                     if (match == -1)
                     {
+                        // Store the index for runtime lookup.
                         shader._samplers[s].parameter = parameters.Count;
 
                         var param = new d3dx_parameter();
                         param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.type = D3DXPARAMETER_TYPE.TEXTURE2D; // TODO: Fix this right!
                         param.name = sampler.parameterName;
                         param.semantic = string.Empty;
 
-						SamplerState state = null;
-						shaderInfo.SamplerStates.TryGetValue(param.name, out state);
-						samplerStates[param.name] = state;
+                        switch (sampler.type)
+                        {
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE;
+                                break;
+                        }
 
                         parameters.Add(param);
                     }
@@ -148,7 +161,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             */
 
-			effect.SamplerStates = samplerStates;
             effect.Parameters = parameters.ToArray();
 
             return effect;

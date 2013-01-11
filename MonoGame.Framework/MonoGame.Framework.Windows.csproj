@@ -128,6 +128,8 @@
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Desktop\Input\PadConfig.cs" />
