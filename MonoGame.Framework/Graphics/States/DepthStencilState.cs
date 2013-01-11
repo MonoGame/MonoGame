@@ -266,6 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
+            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }
 
