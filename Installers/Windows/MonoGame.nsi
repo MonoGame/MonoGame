@@ -187,7 +187,7 @@ SectionEnd
 Section "OpenAL" OpenAL
   ; SetOutPath $INSTDIR
   File '..\..\ThirdParty\Libs\oalinst.exe'
-  ExecWait '$INSTDIR\oalinst.exe'
+  ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
 
 Section "MonoDevelop Templates" MonoDevelop
