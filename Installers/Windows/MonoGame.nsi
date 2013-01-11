@@ -41,25 +41,25 @@ RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
 
-!insertmacro MUI_PAGE_LICENSE "License.txt"
+;!insertmacro MUI_PAGE_LICENSE "License.txt"
 
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
-Page custom XamarinPageEnter XamarinPageLeave
+;Page custom XamarinPageEnter XamarinPageLeave
 
-  Function XamarinPageEnter
-      ReserveFile "xamarin.ini"
-      ReserveFile "mono.bmp"
-      ReserveFile "xamarin.bmp"
-      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
-      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
-      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
-      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
-  FunctionEnd
+;  Function XamarinPageEnter
+;      ReserveFile "xamarin.ini"
+;      ReserveFile "mono.bmp"
+;      ReserveFile "xamarin.bmp"
+;      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
+;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
+;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
+;      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
+;  FunctionEnd
   
-  Function XamarinPageLeave
-  FunctionEnd
+;  Function XamarinPageLeave
+;  FunctionEnd
 
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
