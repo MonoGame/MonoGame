@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal SoundEffect(Stream s)
         {
-#if !WINRT
+#if !DIRECTX
             var data = new byte[s.Length];
             s.Read(data, 0, (int)s.Length);
 
