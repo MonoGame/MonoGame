@@ -61,6 +61,7 @@
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Android\Ouya\Input\GamePad.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
@@ -189,7 +190,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Android\Audio\Sound.cs" />
-    <Compile Include="Android\Input\GamePad.cs" />
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Android\PowerStatus.cs" />
