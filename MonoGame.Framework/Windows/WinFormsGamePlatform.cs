@@ -85,6 +85,8 @@ namespace MonoGame.Framework
         {
             _window = new WinFormsGameWindow(this);
             Window = _window;
+
+            this.IsMouseVisible = true;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -101,7 +103,6 @@ namespace MonoGame.Framework
 
         public override void RunLoop()
         {
-            OnIsMouseVisibleChanged();
             _window.RunLoop();
         }
 

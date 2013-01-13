@@ -111,6 +111,8 @@ namespace MonoGame.Framework
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
+            Mouse.setWindows(_form);
+
             // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
             _form.MouseMove += OnMouseState;
