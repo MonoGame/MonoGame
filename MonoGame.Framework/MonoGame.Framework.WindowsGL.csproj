@@ -99,6 +99,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
+    <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
