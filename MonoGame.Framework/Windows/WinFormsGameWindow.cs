@@ -39,7 +39,6 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -50,7 +49,6 @@ using Microsoft.Xna.Framework.Input;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Framework
 {
@@ -89,6 +87,7 @@ namespace MonoGame.Framework
             set
             {
                 _form.FormBorderStyle = value ? FormBorderStyle.Sizable : FormBorderStyle.Fixed3D;
+                _form.MaximizeBox = value;
             }
         }
 
@@ -110,6 +109,8 @@ namespace MonoGame.Framework
 
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+            _form.MaximizeBox = false;
+            _form.FormBorderStyle = FormBorderStyle.Fixed3D;
 
             // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
