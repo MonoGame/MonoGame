@@ -46,6 +46,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
+    <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
