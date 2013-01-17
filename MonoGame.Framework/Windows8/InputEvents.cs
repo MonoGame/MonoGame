@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework
                 if(isDown)
                     _keys.Add(xnakey);
             }                        
-        }
+        } 
 
         private void CoreWindow_KeyUp(object sender, KeyEventArgs args)
         {
