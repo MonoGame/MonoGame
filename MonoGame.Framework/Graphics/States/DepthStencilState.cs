@@ -246,10 +246,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.StencilReadMask = (byte)StencilMask; // TODO: Should this instead grab the upper 8bits?
                 desc.StencilWriteMask = (byte)StencilWriteMask;
 
-                desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
-                desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
-                desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
-                desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                if (TwoSidedStencilMode)
+                {
+                    desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                }
+                else
+                {   //use same settings as frontFace 
+                    desc.BackFace.Comparison = GetComparison(StencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(StencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(StencilPass);
+                }
 
                 desc.FrontFace.Comparison = GetComparison(StencilFunction);
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
@@ -266,6 +276,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
+            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }
 
