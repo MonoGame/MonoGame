@@ -162,6 +162,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if OPENGL
             this.glTexture = -1;
+            this.glLastSamplerState = null;
 #endif
         }
 

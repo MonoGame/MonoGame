@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
-    <AssemblyName>MonoGame.Framework.Android</AssemblyName>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidSupportedAbis>armeabi%3barmeabi-v7a%3bx86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
@@ -22,7 +22,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Android\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;ANDROID;GLES;GLSL;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -33,7 +33,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Android\Release\</OutputPath>
     <DefineConstants>TRACE;ANDROID;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -120,10 +120,6 @@
     <Compile Include="Graphics\ModelMeshCollection.cs" />
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
-    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
-    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
-    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
-    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
@@ -367,6 +363,13 @@
     <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="GamerServices\GamerCollection.cs" />
     <Compile Include="GamerServices\GamerPresenceMode.cs" />
     <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
