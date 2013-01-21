@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
         private WindowState windowState;
         private Rectangle clientBounds;
         private bool updateClientBounds;
+        private bool updateWindowState;
         bool disposed;
 
         #region Internal Properties
@@ -213,8 +214,10 @@ namespace Microsoft.Xna.Framework
 
         private void UpdateClientBounds()
         {
-            UpdateWindowState();
-
+            if (updateWindowState)
+            {
+                UpdateWindowState();
+            }
             if (updateClientBounds)
             {
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
@@ -313,7 +316,7 @@ namespace Microsoft.Xna.Framework
             {
                 windowState = WindowState.Fullscreen;
             }
-
+            updateWindowState = true;
             UpdateBorderState();
         }
 

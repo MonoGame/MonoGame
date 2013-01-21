@@ -181,6 +181,7 @@ namespace Microsoft.Xna.Framework
 
             var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
 
+            bool justLeftFullscreen = false;
             // If fullscreen has been toggled, we need to tell the window.
             if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
             {
@@ -188,6 +189,8 @@ namespace Microsoft.Xna.Framework
                 
                 // Store the current fullscreen state.
                 isCurrentlyFullScreen = graphicsDeviceManager.IsFullScreen;
+                if (!isCurrentlyFullScreen)
+                    justLeftFullscreen = true;
             }
 
             Rectangle clientBounds = _view.ClientBounds;
@@ -207,6 +210,10 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
+                if (justLeftFullscreen)
+                {
+                    OpenTK.DisplayDevice.Default.RestoreResolution();
+                }
                 if (Game.GraphicsDevice.PresentationParameters.BackBufferWidth != graphicsDeviceManager.PreferredBackBufferWidth ||
                     Game.GraphicsDevice.PresentationParameters.BackBufferHeight != graphicsDeviceManager.PreferredBackBufferHeight)
                 {
