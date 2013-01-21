@@ -11,8 +11,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// </summary>
     public abstract class ContentTypeWriter
     {
-        readonly Type _targetType;
-        int _typeVersion;
+        readonly Type targetType;
+        protected int typeVersion;
 
         /// <summary>
         /// Determines if deserialization into an existing object is possible.
@@ -30,13 +30,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// Gets the type handled by this compiler component.
         /// </summary>
         /// <value>The type handled by this compiler component.</value>
-        public Type TargetType { get { return _targetType; } }
+        public Type TargetType { get { return targetType; } }
 
         /// <summary>
         /// Gets a format version number for this type.
         /// </summary>
         /// <value>A format version number for this type.</value>
-        public virtual int TypeVersion { get { return _typeVersion; } }
+        public virtual int TypeVersion { get { return typeVersion; } }
 
         /// <summary>
         /// Initializes a new instance of the ContentTypeWriter class.
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             if (targetType == null)
                 throw new ArgumentNullException();
 
-            _targetType = targetType;
+            this.targetType = targetType;
         }
         
         /// <summary>
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>The qualified name.</returns>
         public virtual string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            return String.Empty;
+            return targetType.FullName;
         }
 
         /// <summary>
@@ -89,16 +89,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// content types is already in compressed form.</remarks>
         protected internal virtual bool ShouldCompressContent(TargetPlatform targetPlatform, object value)
         {
-            switch (targetPlatform)
-            {
-                case TargetPlatform.Windows:
-                case TargetPlatform.Linux:
-                case TargetPlatform.MacOSX:
-                case TargetPlatform.WindowsStoreApp:
-                    return true;
-                default:
-                    return false;
-            }
+            // For now, only support uncompressed
+            return false;
+
+            //switch (targetPlatform)
+            //{
+            //    case TargetPlatform.Windows:
+            //    case TargetPlatform.Linux:
+            //    case TargetPlatform.MacOSX:
+            //    case TargetPlatform.WindowsStoreApp:
+            //        return true;
+            //    default:
+            //        return false;
+            //}
         }
 
         /// <summary>

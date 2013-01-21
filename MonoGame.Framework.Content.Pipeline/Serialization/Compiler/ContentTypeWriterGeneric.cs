@@ -17,7 +17,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected ContentTypeWriter()
             : base(typeof(T))
         {
-
         }
 
         /// <summary>
@@ -27,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="value">The value to write.</param>
         protected internal override void Write(ContentWriter output, object value)
         {
-
+            Write(output, (T)value);
         }
 
         /// <summary>

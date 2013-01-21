@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NAudio.Wave;
 using NAudio.WindowsMediaFormat;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -16,6 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public class AudioContent : ContentItem, IDisposable
     {
         List<byte> data;
+        WaveStream reader;
         TimeSpan duration;
         string fileName;
         AudioFileType fileType;
@@ -113,11 +115,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (disposed)
                 throw new ObjectDisposedException("AudioContent");
 
-            throw new NotImplementedException();
+            switch (formatType)
+            {
+                case ConversionFormat.Adpcm:
+                    break;
+
+                case ConversionFormat.Pcm:
+                    break;
+
+                case ConversionFormat.WindowsMedia:
+#if WINDOWS
+                    break;
+#else
+                    throw new NotSupportedException("WindowsMedia encoding supported on Windows only");
+#endif
+
+                case ConversionFormat.Xma:
+                    throw new NotSupportedException("Xma is not a supported encoding format");
+
+                case ConversionFormat.Aac:
+                    break;
+
+                case ConversionFormat.Vorbis:
+                    break;
+            }
         }
 
         /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
+        /// Immediately releases the managed and unmanaged resources used by this object.
         /// </summary>
         public void Dispose()
         {
@@ -128,15 +153,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// Immediately releases the unmanaged resources used by this object.
         /// </summary>
-        /// <param name="disposing">True if disposing of the unmanaged resources</param>
+        /// <param name="disposing">True if disposing of the managed resources</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    // Release unmanaged resources
-                    // ...
+                    // Release managed resources
+                    if (reader != null)
+                        reader.Dispose();
+                    reader = null;
                 }
                 disposed = true;
             }
@@ -147,11 +174,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// </summary>
         void ReadWav()
         {
-            using (var reader = new WaveFileReader(fileName))
-            {
-                duration = reader.TotalTime;
-                format = new AudioFormat(reader);
-            }
+            reader = new WaveFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
         }
 
         /// <summary>
@@ -159,11 +184,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// </summary>
         void ReadMp3()
         {
-            using (var reader = new Mp3FileReader(fileName))
-            {
-                duration = reader.TotalTime;
-                format = new AudioFormat(reader);
-            }
+            reader = new Mp3FileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
         }
 
         /// <summary>
@@ -171,11 +194,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// </summary>
         void ReadWma()
         {
-            using (var reader = new WMAFileReader(fileName))
-            {
-                duration = reader.TotalTime;
-                format = new AudioFormat(reader);
-            }
+            reader = new WMAFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
         }
     }
 }

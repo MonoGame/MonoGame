@@ -49,6 +49,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
             Assemblies = new List<string>();
+            Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
             ProjectDirectory = projectDir + @"\";
@@ -81,8 +82,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 Type[] exportedTypes;
                 try
                 {
-                    var a = Assembly.LoadFrom(assemblyPath);
-                    exportedTypes = a.GetExportedTypes();
+                    Assembly a;
+                    if (string.IsNullOrEmpty(assemblyPath))
+                    {
+                        // Get the types from this assembly, which includes all of the
+                        // built-in importers, processors and type writers
+                        a = Assembly.GetExecutingAssembly();
+                        // The built-in types may not be public, so get all types
+                        exportedTypes = a.GetTypes();
+                    }
+                    else
+                    {
+                        a = Assembly.LoadFrom(assemblyPath);
+                        // We only look at public types for external importers, processors
+                        // and type writers.
+                        exportedTypes = a.GetExportedTypes();
+                    }
                 }
                 catch (Exception)
                 {

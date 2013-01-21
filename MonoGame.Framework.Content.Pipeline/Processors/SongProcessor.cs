@@ -5,6 +5,7 @@
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
 using System.IO;
+using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -37,9 +38,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <returns>The built audio.</returns>
         public override SongContent Process(AudioContent input, ContentProcessorContext context)
         {
-            string songFileName = Path.ChangeExtension(input.FileName, "wma");
-            input.ConvertFormat(ConversionFormat.WindowsMedia, quality, songFileName);
-            var song = new SongContent(songFileName);
+            // Most platforms will use AAC ("mp4") by default
+            var targetFormat = ConversionFormat.Aac;
+
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    targetFormat = ConversionFormat.WindowsMedia;
+                    break;
+
+                case TargetPlatform.Linux:
+                    targetFormat = ConversionFormat.Vorbis;
+                    break;
+            }
+
+            string songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
+            //input.ConvertFormat(targetFormat, quality, songFileName);
+            var song = new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
             return song;
         }
     }
