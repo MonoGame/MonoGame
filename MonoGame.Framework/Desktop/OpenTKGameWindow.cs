@@ -166,6 +166,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         private void OnResize(object sender, EventArgs e)
         {
+            Console.WriteLine("MonoGame: OnResize");
             var newWindowWidth = window.ClientRectangle.Width;
             var newWindowHeight = window.ClientRectangle.Height;
 
