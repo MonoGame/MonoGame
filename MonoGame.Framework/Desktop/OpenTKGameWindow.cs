@@ -259,6 +259,7 @@ namespace Microsoft.Xna.Framework
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
+            updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;            
@@ -318,7 +319,10 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeWindowSize(int width, int height)
         {
-            window.ClientSize = new Size(width, height);
+            if (window.ClientSize.Width != width || window.ClientSize.Height != height)
+            {
+                window.ClientSize = new Size(width, height);
+            }
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)

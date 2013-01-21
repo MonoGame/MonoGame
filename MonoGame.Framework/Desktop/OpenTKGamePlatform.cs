@@ -207,11 +207,15 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                _view.ChangeWindowSize(graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+                if (Game.GraphicsDevice.PresentationParameters.BackBufferWidth != graphicsDeviceManager.PreferredBackBufferWidth ||
+                    Game.GraphicsDevice.PresentationParameters.BackBufferHeight != graphicsDeviceManager.PreferredBackBufferHeight)
+                {
+                    _view.ChangeWindowSize(graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
 
-                // now update the bounds 
-                clientBounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
-                clientBounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
+                    // now update the bounds
+                    clientBounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
+                    clientBounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
+                }
             }
 
             _view.ChangeClientBounds(clientBounds);
