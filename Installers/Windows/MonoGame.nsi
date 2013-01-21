@@ -1,6 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Users\Dean\Desktop\MonoGameMaster\"
+!define FrameworkPath "C:\Users\Dean\Desktop\Desktop\MonoGameMaster\"
 !define VERSION "3.0"
 !define REVISION "0.0"
 !define INSTALLERFILENAME "MonoGame"
@@ -153,19 +153,19 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android' '' '$INSTDIR\Assemblies\Android'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA' '' '$INSTDIR\Assemblies\OUYA'
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
     GOTO End32Bitvs64BitCheck
   Is64bit:
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' '' '$INSTDIR\Assemblies\Windows8'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\OUYA'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android' '' '$INSTDIR\Assemblies\Android'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA' '' '$INSTDIR\Assemblies\OUYA'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Linux' '' '$INSTDIR\Assemblies\Linux'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
 
   End32Bitvs64BitCheck:
   ; Add remote programs
@@ -190,45 +190,6 @@ Section "OpenAL" OpenAL
   File '..\..\ThirdParty\Libs\oalinst.exe'
   ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
-
-Section "MonoDevelop Templates" MonoDevelop
-
-; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  ; check pre-requsites
-  ReadRegStr $0 HKLM 'SOFTWARE\Wow6432Node\Xamarin\MonoDevelop' "Path"
-  ${If} $0 == "" ; check on 32 bit machines just in case
-  ReadRegStr $0 HKLM 'SOFTWARE\Xamarin\MonoDevelop' "Path"
-  ${EndIf}
-
-  ${If} $0 == ""
-  DetailPrint "MonoDevelop Not Found."
-  ${Else}
-  DetailPrint "MonoDevelop Found at $0"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame"
-  ; install the Templates for MonoDevelop
-;  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
-  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
-  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\templates\*.*'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\WindowsGL"
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Android"
-  File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\OUYA"
-  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
-  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Linux"
-  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\MacOS"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\iOS"
-  ${EndIf}
-  
-SectionEnd
-
 
 Section "Visual Studio 2010 Templates" VS2010
 
@@ -314,6 +275,7 @@ Section "Uninstall"
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA'
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
@@ -325,6 +287,7 @@ Section "Uninstall"
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
     DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA'
 
 
   End32Bitvs64BitCheck:
