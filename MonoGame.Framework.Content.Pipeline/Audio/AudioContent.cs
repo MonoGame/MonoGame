@@ -5,6 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NAudio.Wave;
+using NAudio.WindowsMediaFormat;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -14,6 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public class AudioContent : ContentItem, IDisposable
     {
         List<byte> data;
+        WaveStream reader;
         TimeSpan duration;
         string fileName;
         AudioFileType fileType;
@@ -26,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// Gets the raw audio data.
         /// </summary>
         /// <value>If unprocessed, the source data; otherwise, the processed data.</value>
-        public ReadOnlyCollection<byte> Data { get { return data.AsReadOnly(); } }
+        public ReadOnlyCollection<byte> Data { get { return data == null ? format.NativeWaveFormat : data.AsReadOnly(); } }
 
         /// <summary>
         /// Gets the duration (in milliseconds) of the audio data.
@@ -73,7 +77,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <remarks>Constructs the object from the specified source file, in the format specified.</remarks>
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
-            throw new NotImplementedException();
+            fileName = audioFileName;
+            fileType = audioFileType;
+
+            switch (fileType)
+            {
+                case AudioFileType.Wav:
+                    ReadWav();
+                    break;
+
+                case AudioFileType.Mp3:
+                    ReadMp3();
+                    break;
+
+                case AudioFileType.Wma:
+                    ReadWma();
+                    break;
+            }
         }
 
         /// <summary>
@@ -95,11 +115,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (disposed)
                 throw new ObjectDisposedException("AudioContent");
 
-            throw new NotImplementedException();
+            switch (formatType)
+            {
+                case ConversionFormat.Adpcm:
+                    break;
+
+                case ConversionFormat.Pcm:
+                    break;
+
+                case ConversionFormat.WindowsMedia:
+#if WINDOWS
+                    break;
+#else
+                    throw new NotSupportedException("WindowsMedia encoding supported on Windows only");
+#endif
+
+                case ConversionFormat.Xma:
+                    throw new NotSupportedException("Xma is not a supported encoding format");
+
+                case ConversionFormat.Aac:
+                    break;
+
+                case ConversionFormat.Vorbis:
+                    break;
+            }
         }
 
         /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
+        /// Immediately releases the managed and unmanaged resources used by this object.
         /// </summary>
         public void Dispose()
         {
@@ -110,18 +153,50 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// Immediately releases the unmanaged resources used by this object.
         /// </summary>
-        /// <param name="disposing">True if disposing of the unmanaged resources</param>
+        /// <param name="disposing">True if disposing of the managed resources</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    // Release unmanaged resources
-                    // ...
+                    // Release managed resources
+                    if (reader != null)
+                        reader.Dispose();
+                    reader = null;
                 }
                 disposed = true;
             }
+        }
+
+        /// <summary>
+        /// Read a WAV format file.
+        /// </summary>
+        void ReadWav()
+        {
+            reader = new WaveFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
+        }
+
+        /// <summary>
+        /// Read a MP3 format file.
+        /// </summary>
+        void ReadMp3()
+        {
+            reader = new Mp3FileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
+        }
+
+        /// <summary>
+        /// Read a WMA format file.
+        /// </summary>
+        void ReadWma()
+        {
+            reader = new WMAFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
         }
     }
 }
