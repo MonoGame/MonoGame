@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the element at the specified index.
         /// </summary>
-        public T this[int index]
+        public new T this[int index]
         {
             get
             {
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Gets an enumerator interface for reading channel content.
         /// </summary>
         /// <returns>Enumeration of the channel content.</returns>
-        public IEnumerator<T> GetEnumerator()
+        public new IEnumerator<T> GetEnumerator()
         {
             return items.GetEnumerator();
         }

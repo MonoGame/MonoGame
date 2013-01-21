@@ -300,7 +300,7 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException)
+            catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
 
@@ -310,7 +310,7 @@ namespace Microsoft.Xna.Framework.Content
 	
 				if (string.IsNullOrEmpty(assetName))
 				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
 				}
 
                 result = ReadRawAsset<T>(assetName, originalAssetName);
