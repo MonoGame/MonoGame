@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Input
 
         static System.Windows.Forms.Form Window;
 
-        internal static void setWindows(System.Windows.Forms.Form window)
+        internal static void SetWindows(System.Windows.Forms.Form window)
         {
             Window = window;
         }

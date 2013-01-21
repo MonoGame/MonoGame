@@ -112,7 +112,7 @@ namespace MonoGame.Framework
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.Fixed3D;
 
-            Mouse.setWindows(_form);
+            Mouse.SetWindows(_form);
 
             // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
