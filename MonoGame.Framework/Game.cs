@@ -86,6 +86,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
+using MonoGame.Framework;
 
 
 namespace Microsoft.Xna.Framework
@@ -699,6 +700,8 @@ namespace Microsoft.Xna.Framework
         {
 #if LINUX || (WINDOWS && OPENGL)
             ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
+#elif WINDOWS && DIRECTX
+            ((WinFormsGamePlatform)Platform).ResetWindowBounds(changed);
 #endif
         }
 
