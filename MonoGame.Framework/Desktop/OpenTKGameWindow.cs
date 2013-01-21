@@ -96,17 +96,13 @@ namespace Microsoft.Xna.Framework
 
         public override Rectangle ClientBounds { get { return clientBounds; } }
 
-        // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
         {
             get { return _allowUserResizing; }
             set
             {
                 _allowUserResizing = value;
-                if (_allowUserResizing)
-                    window.WindowBorder = WindowBorder.Resizable;
-                else
-                    window.WindowBorder = WindowBorder.Fixed; // OTK's buggy here, let's wait for 1.1
+                UpdateBorderState();
             }
         }
 
@@ -162,30 +158,28 @@ namespace Microsoft.Xna.Framework
         
         #endregion
 
+        /// <summary>
+        /// When the native window is resized, we first update the client
+        /// bounds, then fire ClientSizeChanged so that clients have a 
+        /// chance to make any necessary graphics-related changes.
+        /// </summary>
         private void OnResize(object sender, EventArgs e)
         {
-            var winWidth = window.ClientRectangle.Width;
-            var winHeight = window.ClientRectangle.Height;
-            var winRect = new Rectangle(0, 0, winWidth, winHeight);
-            
-            // If window size is zero, leave bounds unchanged
+            var newWindowWidth = window.ClientRectangle.Width;
+            var newWindowHeight = window.ClientRectangle.Height;
+
+            // If the new window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
-            if (winWidth <= 1 || winHeight <= 1)
+            if (newWindowWidth <= 1 || newWindowHeight <= 1)
                 return;
 
-            //If we've already got a pending change, do nothing
-            if (updateClientBounds)
-                return;
+            var newWindowRectangle = new Rectangle(0, 0, newWindowWidth, newWindowHeight);
+            ChangeClientBounds(newWindowRectangle);
             
-            Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
-            Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
-
-            Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
-
-            ChangeClientBounds(winRect);
-
             OnClientSizeChanged();
         }
+
+        private void OnWindowStateChanged(object sender, EventArgs e) { windowState = window.WindowState; }
 
         private void OnRenderFrame(object sender, FrameEventArgs e)
         {
@@ -196,42 +190,42 @@ namespace Microsoft.Xna.Framework
             if (!GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
 
-            UpdateWindowState();
+            UpdateClientBounds();
+        }
+
+        private void UpdateBorderState()
+        {
+            if (_allowUserResizing)
+            {
+                if (windowState == WindowState.Fullscreen)
+                    window.WindowBorder = WindowBorder.Hidden;
+                else
+                    window.WindowBorder = WindowBorder.Resizable;
+            }
+            else
+                window.WindowBorder = WindowBorder.Fixed;
         }
 
         private void UpdateWindowState()
         {
-            // we should wait until window's not fullscreen to resize
+            window.WindowState = windowState;
+        }
+
+        private void UpdateClientBounds()
+        {
+            UpdateWindowState();
+
             if (updateClientBounds)
             {
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
 
                 updateClientBounds = false;
-                
-                // if the window-state is set from the outside (maximized button pressed) we have to update it here.
-                // if it was set from the inside (.IsFullScreen changed), we have to change the window.
-                // this code might not cover all corner cases
-                // window was maximized
-                if ((windowState == WindowState.Normal && window.WindowState == WindowState.Maximized) ||
-                    (windowState == WindowState.Maximized && window.WindowState == WindowState.Normal))
-                    windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
-                else
-                    window.WindowState = windowState; // usually fullscreen-stuff is set from the code
-                
-                // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
-                WindowBorder desired = AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
-                if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
-                    window.WindowBorder = desired;
             }
-
-
         }
 
         private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
-            UpdateWindowState();
-
             if (Game != null)
             {
                 HandleInput();
@@ -258,13 +252,13 @@ namespace Microsoft.Xna.Framework
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
+            window.WindowStateChanged += new EventHandler<EventArgs>(OnWindowStateChanged);
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);                        
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
-            updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;            
@@ -311,18 +305,26 @@ namespace Microsoft.Xna.Framework
         internal void ToggleFullScreen()
         {
             if (windowState == WindowState.Fullscreen)
+            {
                 windowState = WindowState.Normal;
+            }
             else
+            {
                 windowState = WindowState.Fullscreen;
+            }
+
+            UpdateBorderState();
+        }
+
+        internal void ChangeWindowSize(int width, int height)
+        {
+            window.ClientSize = new Size(width, height);
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            if (!updateClientBounds)
-            {
-                updateClientBounds = true;
-                this.clientBounds = clientBounds;
-            }
+            this.clientBounds = clientBounds;
+            updateClientBounds = true;
         }
 
         #endregion
