@@ -235,8 +235,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<EventArgs> DeviceLost;
 		public event EventHandler<EventArgs> DeviceReset;
 		public event EventHandler<EventArgs> DeviceResetting;
-		//public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
-		//public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+		public event EventHandler<ResourceCreatedEventArgs> ResourceCreated;
+		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
+        public event EventHandler<EventArgs> Disposing;
 
         readonly List<string> _extensions = new List<string>();
 
