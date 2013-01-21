@@ -73,6 +73,15 @@ namespace Microsoft.Xna.Framework.Input
             Window = window;
             _mouse = window.Mouse;        
         }
+
+#elif (WINDOWS && DIRECTX)
+
+        static System.Windows.Forms.Form Window;
+
+        internal static void setWindows(System.Windows.Forms.Form window)
+        {
+            Window = window;
+        }
         
 #elif LINUX         
         
@@ -141,12 +150,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && OPENGL) || LINUX
-            ///correcting the coordinate system
-            ///Only way to set the mouse position !!!
-            System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX
+            // correcting the coordinate system
+            // Only way to set the mouse position !!!
+            var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
 #elif WINDOWS
-            var pt = new System.Drawing.Point(0,0);
+            var pt = new System.Drawing.Point(0, 0);
 #endif
 
 #if WINDOWS
