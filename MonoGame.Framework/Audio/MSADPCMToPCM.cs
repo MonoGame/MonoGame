@@ -64,7 +64,7 @@ public class MSADPCMToPCM {
 	) {
 		// Get a signed number out of the nibble. We need to retain the
 		// original nibble value for when we access AdaptionTable[].
-		byte signedNibble = nibble;
+		sbyte signedNibble = (sbyte) nibble;
 		if ((signedNibble & 0x8) == 0x8) {
 			signedNibble -= 0x10;
 		}
