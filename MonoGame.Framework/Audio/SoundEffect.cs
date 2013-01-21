@@ -457,7 +457,8 @@ namespace Microsoft.Xna.Framework.Audio
         static SoundEffect()
         {
             var flags = XAudio2Flags.None;
-#if DEBUG
+
+#if !WINRT && DEBUG
             flags |= XAudio2Flags.DebugEngine;
 #endif
             // This cannot fail.
@@ -468,17 +469,21 @@ namespace Microsoft.Xna.Framework.Audio
                 Device.StartEngine();
 
                 // Just use the default device.
-                const int deviceIndex = 0;
+#if WINRT
+                string deviceId = null;
+#else
+                const int deviceId = 0;
+#endif
 
                 // Let windows autodetect number of channels and sample rate.
-                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceIndex);            
+                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);            
                 MasterVoice.SetVolume(_masterVolume, 0);
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
 #if WINRT
                 Speakers = (Speakers)MasterVoice.ChannelMask;
 #else
-                var deviceDetails = Device.GetDeviceDetails(deviceIndex);
+                var deviceDetails = Device.GetDeviceDetails(deviceId);
                 Speakers = deviceDetails.OutputFormat.ChannelMask;
 #endif
             }
