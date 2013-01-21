@@ -28,5 +28,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// The Xbox compression format
         /// </summary>
         Xma,
+
+        /// <summary>
+        /// Advanced Audio Coding
+        /// </summary>
+        Aac,
+
+        /// <summary>
+        /// Vorbis open, patent-free audio encoding
+        /// </summary>
+        Vorbis,
     }
 }
