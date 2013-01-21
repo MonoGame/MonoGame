@@ -210,6 +210,7 @@ namespace Microsoft.Xna.Framework
         private void UpdateWindowState()
         {
             window.WindowState = windowState;
+            updateWindowState = false;
         }
 
         private void UpdateClientBounds()
