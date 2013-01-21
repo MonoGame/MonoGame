@@ -125,7 +125,6 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
             _view.Window.Run(0);
         }
 
@@ -164,33 +163,38 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            UpdateWindowBounds();
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            UpdateWindowBounds();
         }
 
-        internal void ResetWindowBounds(bool toggleFullScreen)
+        internal void UpdateWindowBounds()
         {
-            Rectangle bounds;
-
-            bounds = Window.ClientBounds;
-
             //Changing window style forces a redraw. Some games
             //have fail-logic and toggle fullscreen in their draw function,
             //so temporarily become inactive so it won't execute.
-
             bool wasActive = IsActive;
             IsActive = false;
 
-            var graphicsDeviceManager = (GraphicsDeviceManager)
-                Game.Services.GetService(typeof(IGraphicsDeviceManager));
+            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
 
-            if (graphicsDeviceManager.IsFullScreen)
+            // If fullscreen has been toggled, we need to tell the window.
+            if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
             {
-                bounds = new Rectangle(0, 0,graphicsDeviceManager.PreferredBackBufferWidth,graphicsDeviceManager.PreferredBackBufferHeight);
+                _view.ToggleFullScreen();
+                
+                // Store the current fullscreen state.
+                isCurrentlyFullScreen = graphicsDeviceManager.IsFullScreen;
+            }
+
+            Rectangle clientBounds = _view.ClientBounds;
+
+            if (isCurrentlyFullScreen)
+            {
+                clientBounds = new Rectangle(0, 0, graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
 
                 if (OpenTK.DisplayDevice.Default.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
                     OpenTK.DisplayDevice.Default.Height != graphicsDeviceManager.PreferredBackBufferHeight)
@@ -203,39 +207,14 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                
-                // switch back to the normal screen resolution
-                OpenTK.DisplayDevice.Default.RestoreResolution();
+                _view.ChangeWindowSize(graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
+
                 // now update the bounds 
-                bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
-                bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
-            }
-            
-
-            // Now we set our Presentation Parameters
-            var device = (GraphicsDevice)graphicsDeviceManager.GraphicsDevice;
-            // FIXME: Eliminate the need for null checks by only calling
-            //        ResetWindowBounds after the device is ready.  Or,
-            //        possibly break this method into smaller methods.
-            if (device != null)
-            {
-                PresentationParameters parms = device.PresentationParameters;
-                parms.BackBufferHeight = (int)bounds.Height;
-                parms.BackBufferWidth = (int)bounds.Width;
+                clientBounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
+                clientBounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             }
 
-            if (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen)
-            {                
-                _view.ToggleFullScreen();
-            }
-
-            // we only change window bounds if we are not fullscreen
-            // or if fullscreen mode was just entered
-            if (!graphicsDeviceManager.IsFullScreen || (graphicsDeviceManager.IsFullScreen != isCurrentlyFullScreen))
-                _view.ChangeClientBounds(bounds);
-
-            // store the current fullscreen state
-            isCurrentlyFullScreen = graphicsDeviceManager.IsFullScreen;
+            _view.ChangeClientBounds(clientBounds);
 
             IsActive = wasActive;
         }
