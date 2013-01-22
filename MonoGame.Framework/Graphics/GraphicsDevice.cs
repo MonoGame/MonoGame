@@ -1450,6 +1450,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
                 GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
+                
+                // In OpenGL we have to re-apply the special "posFixup"
+                // vertex shader uniform if the viewport changes.
+                _vertexShaderDirty = true;
 #endif
             }
         }
@@ -1516,12 +1520,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentRenderTargetBindings = renderTargets;
 		
             var clearTarget = false;
-
-#if OPENGL
-            // In OpenGL we have to re-apply the special "posFixup"
-            // vertex shader uniform if the render target changes.
-            _vertexShaderDirty = true;
-#endif
 
             if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
 			{
