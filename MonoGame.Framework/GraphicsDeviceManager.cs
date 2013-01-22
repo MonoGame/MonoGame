@@ -249,7 +249,13 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.ApplyRenderTargets(null);
 
 #elif WINDOWS || LINUX
-            _game.ResizeWindow(false);
+            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
+
+            _game.UpdateWindowBounds();
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
