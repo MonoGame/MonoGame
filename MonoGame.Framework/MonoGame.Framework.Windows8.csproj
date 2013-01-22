@@ -352,6 +352,7 @@
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">

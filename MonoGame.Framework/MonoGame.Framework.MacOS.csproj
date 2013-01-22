@@ -431,6 +431,7 @@
     <Compile Include="FrameworkDispatcher.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

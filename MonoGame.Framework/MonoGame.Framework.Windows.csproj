@@ -461,6 +461,7 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
