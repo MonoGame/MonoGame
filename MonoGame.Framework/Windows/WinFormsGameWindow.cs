@@ -111,6 +111,7 @@ namespace MonoGame.Framework
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
+            _form.StartPosition = FormStartPosition.CenterScreen;
 
             Mouse.SetWindows(_form);
 
