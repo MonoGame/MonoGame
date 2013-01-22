@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using NAudio.Wave;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -66,9 +67,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// Creates a new instance of the AudioFormat class
         /// </summary>
-        internal AudioFormat()
+        internal AudioFormat(WaveStream waveStream)
         {
-            throw new NotImplementedException();
+            var waveFormat = waveStream.WaveFormat;
+            averageBytesPerSecond = waveFormat.AverageBytesPerSecond;
+            bitsPerSample = waveFormat.BitsPerSample;
+            blockAlign = waveFormat.BlockAlign;
+            channelCount = waveFormat.Channels;
+            format = (int)waveFormat.Encoding;
+            sampleRate = waveFormat.SampleRate;
+
+            var length = waveStream.Length;
+            var bytes = new byte[length];
+            var read = waveStream.Read(bytes, 0, (int)length);
+            Debug.Assert(length == read, "length != read");
+            nativeWaveFormat = new List<byte>(bytes);
         }
     }
 }

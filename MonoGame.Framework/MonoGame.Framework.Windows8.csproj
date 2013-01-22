@@ -396,6 +396,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Windows8\x86\Debug\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE;DEBUG;WINRT;WINDOWS_STOREAPP;DIRECTX</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -421,6 +422,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Windows8\x64\Debug\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE;DEBUG;WINRT;WINDOWS_STOREAPP;DIRECTX</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -446,6 +448,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Windows8\ARM\Debug\</OutputPath>
     <DefineConstants>TRACE;NETFX_CORE;DEBUG;WINRT;WINDOWS_STOREAPP;DIRECTX</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoStdLib>true</NoStdLib>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
