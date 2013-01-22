@@ -187,11 +187,6 @@ namespace MonoGame.Framework
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
             OnClientSizeChanged();
-
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (newWidth > 0 && newHeight > 0)
-                manager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
@@ -224,6 +219,11 @@ namespace MonoGame.Framework
             public IntPtr lParam;
             public uint time;
             public System.Drawing.Point p;
+        }
+
+        internal void ChangeClientSize(Size clientBounds)
+        {
+            this._form.ClientSize = clientBounds;
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
