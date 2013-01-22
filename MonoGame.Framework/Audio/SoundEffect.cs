@@ -46,7 +46,7 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if WINRT
+#if DIRECTX
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
-#if WINRT
+#if DIRECTX
         internal DataStream _dataStream;
         internal AudioBuffer _buffer;
         internal AudioBuffer _loopedBuffer;
@@ -69,17 +69,17 @@ namespace Microsoft.Xna.Framework.Audio
         private List<SoundEffectInstance> _availableInstances;
         private List<SoundEffectInstance> _toBeRecycledInstances;
 #else
-		private Sound _sound;
+        private Sound _sound;
         private SoundEffectInstance _instance;
 #endif
 
         private string _name;
-#if !WINRT
-		private string _filename = "";
+#if !DIRECTX
+        private string _filename = "";
         private byte[] _data;
 #endif
 
-#if WINRT
+#if DIRECTX
         internal SoundEffect()
         {
         }
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal SoundEffect(Stream s)
         {
-#if !WINRT
+#if !DIRECTX
             var data = new byte[s.Length];
             s.Read(data, 0, (int)s.Length);
 
@@ -118,11 +118,11 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
-		{
-#if WINRT            
+        {
+#if DIRECTX            
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
 #else
-			//buffer should contain 16-bit PCM wave data
+            //buffer should contain 16-bit PCM wave data
 			short bitsPerSample = 16;
 
             _name = "";
@@ -157,15 +157,15 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {            
-#if WINRT
+        {
+#if DIRECTX
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
 #else
             throw new NotImplementedException();
 #endif
         }        
 
-#if WINRT
+#if DIRECTX
 
         // Extended constructor which supports custom formats / compression.
         internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Audio
             };            
         }
 #endif
-		
+
         public bool Play()
         {				
             return Play(1.0f, 0.0f, 0.0f);
@@ -211,7 +211,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play(float volume, float pitch, float pan)
         {
-#if WINRT
+#if DIRECTX
             if (MasterVolume > 0.0f)
             {
                 if (_playingInstances == null)
@@ -267,7 +267,7 @@ namespace Microsoft.Xna.Framework.Audio
             // has been reached. However, there is no limit on PC.
             return true;
 #else
-			if ( MasterVolume > 0.0f )
+            if ( MasterVolume > 0.0f )
 			{
                 if(_instance == null)
 				    _instance = CreateInstance();
@@ -284,14 +284,14 @@ namespace Microsoft.Xna.Framework.Audio
 		public TimeSpan Duration 
 		{ 
 			get
-			{
-#if WINRT                    
+            {
+#if DIRECTX                    
                 var sampleCount = _buffer.PlayLength;
                 var avgBPS = _format.AverageBytesPerSecond;
                 
                 return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
 #else
-				if ( _sound != null )
+                if ( _sound != null )
 				{
 					return new TimeSpan(0,0,(int)_sound.Duration);
 				}
@@ -316,8 +316,8 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 		public SoundEffectInstance CreateInstance()
-		{
-#if WINRT
+        {
+#if DIRECTX
 		    SourceVoice voice = null;
             if (Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
@@ -334,10 +334,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-#if WINRT
+#if DIRECTX
             _dataStream.Dispose();               
 #else
-			_sound.Dispose();
+            _sound.Dispose();
 #endif
         }
 
@@ -356,10 +356,10 @@ namespace Microsoft.Xna.Framework.Audio
                 if ( _masterVolume != value )
                     _masterVolume = value;
 
-#if WINRT
+#if DIRECTX
                 MasterVoice.SetVolume(_masterVolume, 0);
 #endif
-			}
+            }
 		}
 
 		static float _distanceScale = 1f;
@@ -404,7 +404,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
         }
 
-        public static SoundEffect FromStream(Stream stream)
+		public static SoundEffect FromStream(Stream stream)
         {            
 #if ANDROID
             throw new NotImplementedException();
@@ -413,8 +413,8 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-#if WINRT        
-        internal static XAudio2 Device { get; private set; }
+#if DIRECTX
+	    internal static XAudio2 Device { get; private set; }
         internal static MasteringVoice MasterVoice { get; private set; }
 
         private static bool _device3DDirty = true;
@@ -456,19 +456,36 @@ namespace Microsoft.Xna.Framework.Audio
 
         static SoundEffect()
         {
+            var flags = XAudio2Flags.None;
+
+#if !WINRT && DEBUG
+            flags |= XAudio2Flags.DebugEngine;
+#endif
             // This cannot fail.
-            Device = new XAudio2();
+            Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
 
             try
             {
                 Device.StartEngine();
 
+                // Just use the default device.
+#if WINRT
+                string deviceId = null;
+#else
+                const int deviceId = 0;
+#endif
+
                 // Let windows autodetect number of channels and sample rate.
-                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
+                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);            
                 MasterVoice.SetVolume(_masterVolume, 0);
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
+#if WINRT
                 Speakers = (Speakers)MasterVoice.ChannelMask;
+#else
+                var deviceDetails = Device.GetDeviceDetails(deviceId);
+                Speakers = deviceDetails.OutputFormat.ChannelMask;
+#endif
             }
             catch
             {

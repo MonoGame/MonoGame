@@ -1,17 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
-#elif WINRT
-// TODO
-#else
+#elif GLES
 using OpenTK.Graphics.ES20;
-#if IOS || ANDROID
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
@@ -19,6 +15,10 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 #endif
+#elif DIRECTX
+// TODO
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
-#if WINRT
+#if DIRECTX
 
 #elif PSM
 		//TODO
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.size = size;
 			this.levelCount = 1;
 
-#if WINRT
+#if DIRECTX
 
 #elif PSM
 			//TODO
@@ -113,8 +113,8 @@ namespace Microsoft.Xna.Framework.Graphics
 					this.levelCount++;
 				}
 			}
-#endif			
-		}
+#endif
+        }
 
         /// <summary>
         /// Gets a copy of cube texture data specifying a cubemap face.
@@ -171,9 +171,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				yOffset = rect.Value.Y;
 				width = rect.Value.Width;
 				height = rect.Value.Height;
-			}
-			
-#if WINRT
+            }
+
+#if DIRECTX
 
 #elif PSM
 			//TODO
@@ -188,11 +188,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
                 GraphicsExtensions.CheckGLError();
             }
-#endif			
-			dataHandle.Free ();
+#endif
+            dataHandle.Free ();
 		}
 		
-#if !WINRT && !PSM
+#if OPENGL
 		private TextureTarget GetGLCubeFace(CubeMapFace face) {
 			switch (face) {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;
