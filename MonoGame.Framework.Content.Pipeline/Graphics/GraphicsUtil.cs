@@ -7,57 +7,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-
-    public static class ByteColorConverter
-    {
-        /*public static void GetPixel<T>(this byte[] data, int startIndex, SurfaceFormat format, out T result) where T : struct
-        {
-            result = new Color();
-        }*/
-
-        public static void GetPixel(this byte[] data, int startIndex, SurfaceFormat format, out Color result)
-        {
-            result = new Color();
-        }
-
-        public static void SetPixelData<T>(this byte[] data, PixelBitmapContent<T> bmpContent, int startIndex, SurfaceFormat format) where T : struct, IEquatable<T>
-        {
-        }
-
-        public static void SetPixelData(this byte[] data, PixelBitmapContent<Color> bmpContent, SurfaceFormat format)
-        {
-            var formatSize = format.Size();
-
-            for (int y = 0; y < bmpContent.Height; y++)
-            {
-                for (int x = 0; x < bmpContent.Width; x++)
-                {
-                    switch(format)
-                    {
-                        case SurfaceFormat.Vector4:
-
-                            var startIdx = (y * formatSize) + (x * formatSize);
-                            var vec4 = new Vector4( BitConverter.ToSingle(data, startIdx),
-                                                    BitConverter.ToSingle(data, startIdx + 4),
-                                                    BitConverter.ToSingle(data, startIdx + 8),
-                                                    BitConverter.ToSingle(data, startIdx + 12) );
-
-                            bmpContent._pixelData[y][x] = new Color(vec4);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
     public static class GraphicsUtil
     {
+        public static void ConvertBitmap(Bitmap bmp, out byte[] output)
+        {
+            var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                                    ImageLockMode.ReadOnly,
+                                    bmp.PixelFormat);
+
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            if (bitmapData.PixelFormat != PixelFormat.Format32bppArgb)
+                throw new NotSupportedException("Unsupported pixel format.");
+
+            output = new byte[length];
+
+            // Copy bitmap to byte[]
+            // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
+            // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
+            // Image data from any GDI based function will always come in BGR/BGRA even if the format comes in as RGBA
+            Marshal.Copy(bitmapData.Scan0, output, 0, length);
+            bmp.UnlockBits(bitmapData);
+        }
+
 
         public static void PremultiplyAlpha(TextureContent content)
         {
@@ -76,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
             else
             {
-                var vec4Tex = content.Faces[0][0] as PixelBitmapContent<Vector4>;
+                /*var vec4Tex = content.Faces[0][0] as PixelBitmapContent<Vector4>;
                 if (vec4Tex == null)
                     throw new NotSupportedException();
 
@@ -92,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             row[y].Z *= row[y].W;
                         }
                     }
-                }
+                }*/
             }
         }
     }

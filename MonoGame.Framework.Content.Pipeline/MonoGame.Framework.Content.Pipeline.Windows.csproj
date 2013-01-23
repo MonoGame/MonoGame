@@ -121,6 +121,7 @@
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="Graphics\PixelBitmapContent.cs" />
+    <Compile Include="Graphics\PixelBitmapContentColor.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
     <Compile Include="Serialization\Compiler\ContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
-    <Compile Include="Serialization\Compiler\TextureContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="Tasks\BuildContent.cs" />
     <Compile Include="Tasks\CleanContent.cs" />

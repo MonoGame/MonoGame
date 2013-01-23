@@ -7,65 +7,27 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class PixelBitmapContent<T> : BitmapContent where T : struct, IEquatable<T>
+    public abstract class PixelBitmapContentBase<T> : BitmapContent where T : struct, IEquatable<T>
     {
-        internal T[][] _pixelData;
+        internal T[,] _pixelData;
+        protected SurfaceFormat _format;
 
-        protected PixelBitmapContent()
+        public virtual T GetPixel(int x, int y)
         {
-        }
+            if (x * y == 0 || x >= Width || y >= Height)
+                throw new ArgumentOutOfRangeException("x or y");
 
-        public PixelBitmapContent(int width, int height) : base(width, height)
-        {
-            _pixelData = new T[height][];
-
-            for (int y = 0; y < height; y++)
-                _pixelData[y] = new T[width];
-        }
-
-        public T GetPixel(int x, int y)
-        {
-            checkPixelRange(y, x);
-
-            return _pixelData[y][x];
+            return _pixelData[y, x];
         }
 
         public override byte[] GetPixelData()
         {
-            SurfaceFormat format;
-            if (!TryGetFormat(out format))
-                throw new Exception(string.Format("Tried to get pixel Data for PixedBitmapContent<{0}> with an invalid surfaceformat", 
-                                                    typeof(T)));
-
-            if (typeof(T) != typeof(Color))
-                throw new NotImplementedException("GetPixelData is not supported for Non-Color formats.");
-
-            var pixelSize = format.Size();
-            var outputData = new byte[Width * Height * pixelSize];
-
-            for (int i = 0; i < Width; i++) 
-            {
-                var row = GetRow(i);
-                for (int j = 0; j < row.Length; j++) 
-                {
-                    var col = (row[j] as Color?).Value;
-
-                    outputData[(i * row.Length) + j] = col.R;
-                    outputData[(i * row.Length) + j + 1] = col.G;
-                    outputData[(i * row.Length) + j + 2] = col.B;
-                    outputData[(i * row.Length) + j + 3] = col.A;
-                }
-            }
-
-            return outputData;
+            throw new NotImplementedException();
         }
 
-        public T[] GetRow(int y)
+        public virtual T[] GetRow(int y)
         {
-            if ((y < 0) || (y >= Height))
-                throw new ArgumentOutOfRangeException("y");
-
-            return _pixelData[y];
+            throw new NotImplementedException();
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destRegion)
@@ -90,55 +52,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public override void SetPixelData(byte[] sourceData)
         {
-            if (typeof(T) != typeof(Color))
-                throw new NotImplementedException("SetPixelData is not supported for Non-Color formats.");
-
-            SurfaceFormat format;
-            if (!TryGetFormat(out format))
-                throw new Exception(string.Format("Tried to get pixel Data for PixedBitmapContent<{0}> with an invalid surfaceformat",
-                                                    typeof(T)));
-
-            sourceData.SetPixelData(this, 0, format);
-            /*var formatSize = format.Size();
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    sourceData.GetPixel((y * formatSize) + (x * formatSize), format, out _pixelData[y][x]);
-                }
-            }*/
+            throw new NotImplementedException();
         }
 
-        private void SetPixelData()
+        public virtual void SetPixel(int x, int y, T value)
         {
-
+            throw new NotImplementedException();
         }
 
-        public void SetPixel(int x, int y, T value)
+        public virtual void ReplaceColor(T originalColor, T newColor)
         {
-            checkPixelRange(y, x);
-
-            _pixelData[y][x] = value;
-        }
-
-        public void ReplaceColor(T originalColor, T newColor)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    if (_pixelData[y][x].Equals(originalColor))
-                    {
-                        _pixelData[y][x] = newColor;
-                    }
-                }
-            }
-        }
-
-        private void checkPixelRange(int y, int x)
-        {
-            if (x * y == 0 || x >= Height || y >= Width)
-                throw new ArgumentOutOfRangeException("x or y");
+            throw new NotImplementedException();
         }
     }
 }
