@@ -355,26 +355,26 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.MediaFoundation.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows 8 Metro\SharpDX.XInput.dll</HintPath>
+      <HintPath>..\..\..\Development\MonoGame-Dependencies\trunk\SharpDX\Windows 8 Metro\SharpDX.XInput.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
