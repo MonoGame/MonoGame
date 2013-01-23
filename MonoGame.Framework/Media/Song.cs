@@ -239,7 +239,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                return new TimeSpan(0);
+                if (MediaPlayer.Queue.ActiveSong == this)
+                    return MediaPlayer.Duration;
+                else
+                    return TimeSpan.Zero;
             }
         }
 		
