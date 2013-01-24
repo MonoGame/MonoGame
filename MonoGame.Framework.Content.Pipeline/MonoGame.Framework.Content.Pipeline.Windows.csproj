@@ -162,9 +162,6 @@
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\TextureContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
-    <Compile Include="Tasks\BuildContent.cs" />
-    <Compile Include="Tasks\CleanContent.cs" />
-    <Compile Include="Tasks\GetLastOutputs.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />
