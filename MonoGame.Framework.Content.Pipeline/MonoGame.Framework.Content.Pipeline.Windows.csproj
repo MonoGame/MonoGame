@@ -171,9 +171,9 @@
     <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsGL.csproj">
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.WindowsGL</Name>
+      <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
