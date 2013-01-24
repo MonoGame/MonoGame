@@ -51,8 +51,6 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
     </Reference>
@@ -162,9 +160,6 @@
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
-    <Compile Include="Tasks\BuildContent.cs" />
-    <Compile Include="Tasks\CleanContent.cs" />
-    <Compile Include="Tasks\GetLastOutputs.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />

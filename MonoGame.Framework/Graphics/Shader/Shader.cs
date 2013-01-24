@@ -2,11 +2,20 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
+#elif GLES
+using System.Text;
+using OpenTK.Graphics.ES20;
+using ShaderType = OpenTK.Graphics.ES20.All;
+using ShaderParameter = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
+#elif DIRECTX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -17,13 +26,6 @@ enum ShaderType //FIXME: Major Hack
 	VertexShader,
 	FragmentShader
 }
-#elif GLES
-using System.Text;
-using OpenTK.Graphics.ES20;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using ShaderParameter = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

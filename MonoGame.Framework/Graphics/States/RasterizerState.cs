@@ -1,17 +1,19 @@
 using System;
 using System.Diagnostics;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using CullFaceMode = OpenTK.Graphics.ES20.All;
+#endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

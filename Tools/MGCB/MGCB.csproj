@@ -38,9 +38,6 @@
     <Reference Include="Microsoft.Build">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Microsoft.Build.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -51,30 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PathHelper.cs">
-      <Link>Builder\PathHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineBuildEvent.cs">
-      <Link>Builder\PipelineBuildEvent.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineBuildLogger.cs">
-      <Link>Builder\PipelineBuildLogger.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineImporterContext.cs">
-      <Link>Builder\PipelineImporterContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineManager.cs">
-      <Link>Builder\PipelineManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\PipelineProcessorContext.cs">
-      <Link>Builder\PipelineProcessorContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\TypeExtensions.cs">
-      <Link>Builder\TypeExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Builder\XmlColor.cs">
-      <Link>Builder\XmlColor.cs</Link>
-    </Compile>
     <Compile Include="..\2MGFX\CommandLineParser.cs">
       <Link>CommandLineParser.cs</Link>
     </Compile>
@@ -82,6 +55,16 @@
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj">
+      <Project>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</Project>
+      <Name>MonoGame.Framework.Content.Pipeline.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
