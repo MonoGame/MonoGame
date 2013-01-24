@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework
 
             Vector3 cross = Vector3.Cross(ab, ac);
             Normal = Vector3.Normalize(cross);
-            D = -(Vector3.Dot(cross, a));
+            D = -(Vector3.Dot(Normal, a));
         }
 
         public Plane(float a, float b, float c, float d)

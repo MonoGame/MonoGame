@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
 
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
-#if WINRT
+#if WINRT && !WINDOWS_PHONE
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif 
 

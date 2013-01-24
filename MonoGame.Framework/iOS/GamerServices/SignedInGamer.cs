@@ -95,26 +95,12 @@ namespace Microsoft.Xna.Framework.GamerServices
                         
     			        if (lp != null)
     					{
-    						Guide.IsVisible = true;
     						lp.Authenticate( delegate(NSError error) 
-    						                	{  							              
-    												try 
-    												{
-    													if ( error != null )
-    													{
-#if DEBUG									
-    														Console.WriteLine(error);
+    						                	{  	
+#if DEBUG
+    												if ( error != null )								
+    													Console.WriteLine(error);
 #endif
-    													}
-    													else
-    													{
-    														
-    													}
-    												} 
-    												finally 
-    												{
-    													Guide.IsVisible = false;
-    												}
     											}
     						                );
     					}
@@ -423,6 +409,15 @@ namespace Microsoft.Xna.Framework.GamerServices
             get
             {
                 return _privileges;
+            }
+        }
+
+        LeaderboardWriter _leaderboardWriter = new LeaderboardWriter();
+        public LeaderboardWriter LeaderboardWriter
+        {
+            get
+            {
+                return _leaderboardWriter;
             }
         }
 		#endregion

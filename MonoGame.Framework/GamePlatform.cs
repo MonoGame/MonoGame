@@ -76,15 +76,19 @@ namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
-        #region
+        #region Fields
+
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
+        bool disposed;
+        protected bool IsDisposed { get { return disposed; } }
+
         #endregion
 
         #region Construction/Destruction
         public static GamePlatform Create(Game game)
         {
-#if IPHONE
+#if IOS
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
@@ -92,8 +96,10 @@ namespace Microsoft.Xna.Framework
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif PSS
+#elif PSM
 			return new PSSGamePlatform(game);
+#elif WINDOWS_PHONE
+            return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
 #elif WINRT
             return new MetroGamePlatform(game);
 #endif
@@ -157,7 +163,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINRT
+#if WINDOWS_STOREAPP
         private ApplicationViewState _viewState;
         public ApplicationViewState ViewState
         {
@@ -179,7 +185,7 @@ namespace Microsoft.Xna.Framework
         {
             get; protected set;
         }
-#elif PSS
+#elif PSM
 		public PSSGameWindow Window
 		{
 			get; protected set;
@@ -209,7 +215,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-#if WINRT
+#if WINDOWS_STOREAPP
         public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
 #endif
 
@@ -375,9 +381,16 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing) {}
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                disposed = true;
+            }
+        }
 		
 		/// <summary>
 		/// Log the specified Message.

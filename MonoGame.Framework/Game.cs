@@ -69,7 +69,7 @@ non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-#if !PSS
+#if !PSM
 using System.Drawing;
 #endif
 using System.IO;
@@ -122,7 +122,8 @@ namespace Microsoft.Xna.Framework
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
 
-        private TimeSpan _targetElapsedTime = TimeSpan.FromSeconds(1 / DefaultTargetFramesPerSecond);
+        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks((long)10000000 / (long)DefaultTargetFramesPerSecond);
+        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(1);
 
         private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
@@ -142,9 +143,9 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINRT
+#if WINDOWS_STOREAPP
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
-#endif //WINRT
+#endif
 
 #if MONOMAC || WINDOWS || LINUX
             // Set the window title.
@@ -181,25 +182,37 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
             Raise(Disposed, EventArgs.Empty);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!_isDisposed)
             {
-                Platform.Dispose();
-
-                // Dispose loaded game components
-                for (int i = 0; i < _components.Count; i++)
+                if (disposing)
                 {
-                    var disposable = _components[i] as IDisposable;
-                    if (disposable != null)
-                        disposable.Dispose();
-                }
-            }
+                    // Dispose loaded game components
+                    for (int i = 0; i < _components.Count; i++)
+                    {
+                        var disposable = _components[i] as IDisposable;
+                        if (disposable != null)
+                            disposable.Dispose();
+                    }
 
-            _isDisposed = true;
+                    if (Content != null)
+                        Content.Dispose();
+
+                    if (_graphicsDeviceManager != null)
+                    {
+                        (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
+                        _graphicsDeviceManager = null;
+                    }
+
+                    Platform.Dispose();
+                }
+                _isDisposed = true;
+            }
         }
 
         [System.Diagnostics.DebuggerNonUserCode]
@@ -232,8 +245,14 @@ namespace Microsoft.Xna.Framework
 
         public TimeSpan InactiveSleepTime
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _inactiveSleepTime; }
+            set 
+            {
+                if (_inactiveSleepTime != value)
+                {
+                    _inactiveSleepTime = value;
+                }
+            }
         }
 
         public bool IsActive
@@ -330,8 +349,11 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINRT
+#if WINDOWS_STOREAPP
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
+#endif
+
+#if WINRT
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -493,7 +515,6 @@ namespace Microsoft.Xna.Framework
             else
             {
                 DoDraw(_gameTime);
-                Platform.Present();
             }
         }
 
@@ -502,7 +523,10 @@ namespace Microsoft.Xna.Framework
         #region Protected Methods
 
         protected virtual bool BeginDraw() { return true; }
-        protected virtual void EndDraw() { }
+        protected virtual void EndDraw()
+        {
+            Platform.Present();
+        }
 
         protected virtual void BeginRun() { }
         protected virtual void EndRun() { }
@@ -606,7 +630,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINRT
+#if WINDOWS_STOREAPP
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();

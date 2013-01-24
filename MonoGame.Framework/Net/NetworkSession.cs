@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework.Net
 		private GamerCollection<NetworkGamer> _previousGamers;
 		
 		internal Queue<CommandEvent> commandQueue;
+        bool disposed;
 
 		// use the static Create or BeginCreate methods
 		private NetworkSession ()
@@ -94,6 +95,11 @@ namespace Microsoft.Xna.Framework.Net
 			activeSessions.Add(this);
 		}
 		
+        ~NetworkSession()
+        {
+            Dispose(false);
+        }
+
 		private NetworkSessionType sessionType;
 		private int maxGamers;
 		private int privateGamerSlots;
@@ -237,29 +243,33 @@ namespace Microsoft.Xna.Framework.Net
 		public void Dispose ()
 		{
 			this.Dispose(true);
-			GC.SuppressFinalize (this);				
+			GC.SuppressFinalize(this);				
 		}
 		
 		public void Dispose (bool disposing) 
 		{
-#if DEBUG
-			Console.WriteLine("Network Session Disposing");
-#endif
-			if (disposing) {
-				
-				foreach (Gamer gamer in _allGamers) {
-					gamer.Dispose();
-				}
-				//Console.WriteLine("disposing");
-				// Make sure we shut down our server instance as we no longer need it.
-				if (networkPeer != null) {
-					networkPeer.ShutDown();
-				}
-				if (networkPeer != null) {
-					networkPeer.ShutDown();					
-				}				
-				this._isDisposed = true;
-			}
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    foreach (Gamer gamer in _allGamers)
+                    {
+                        gamer.Dispose();
+                    }
+
+                    // Make sure we shut down our server instance as we no longer need it.
+                    if (networkPeer != null)
+                    {
+                        networkPeer.ShutDown();
+                    }
+                    if (networkPeer != null)
+                    {
+                        networkPeer.ShutDown();
+                    }
+                }
+
+                this._isDisposed = true;
+            }
 		}
 
 	#endregion

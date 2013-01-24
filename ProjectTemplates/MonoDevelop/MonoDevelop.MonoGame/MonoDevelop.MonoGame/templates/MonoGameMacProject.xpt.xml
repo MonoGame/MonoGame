@@ -26,9 +26,8 @@
 				<Reference type="Gac" refto="System.Xml.Linq" />
 				<Reference type="Gac" refto="System.Drawing" />
 				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
-
-				<Reference type="Project" refto="MonoGame.Framework.MacOS" />
-				<Reference type="Project" refto="Lidgren.Network.MacOS" />
+				<Reference type="Gac" refto="MonoGame.Framework.MacOS" />
+				<Reference type="Gac" refto="Lidgren.Network.MacOS" />
 			</References>
 			<Files>
 				<File name="Game1.cs" AddStandardHeader="True" src="MonoGameApplication/MacGame.cs" />

@@ -48,7 +48,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.ES20;
 #elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
+#elif WINDOWS_STOREAPP
 using Windows.UI.Xaml.Controls;
 #endif
 
@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+        bool disposed;
 
 #if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = false;
@@ -96,24 +97,29 @@ namespace Microsoft.Xna.Framework
             // Preferred buffer width/height is used to determine default supported orientations,
             // so set the default values to match Xna behaviour of landscape only by default.
             // Note also that it's using the device window dimensions.
-            _preferredBackBufferWidth = Math.Max(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
-            _preferredBackBufferHeight = Math.Min(game.Window.ClientBounds.Height, game.Window.ClientBounds.Width);
+            _preferredBackBufferWidth = Math.Max(_game.Window.ClientBounds.Height, _game.Window.ClientBounds.Width);
+            _preferredBackBufferHeight = Math.Min(_game.Window.ClientBounds.Height, _game.Window.ClientBounds.Width);
 #endif
 
             _preferredBackBufferFormat = SurfaceFormat.Color;
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            if (game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
+            if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
 
-            game.Services.AddService(typeof(IGraphicsDeviceManager), this);
-            game.Services.AddService(typeof(IGraphicsDeviceService), this);
+            _game.Services.AddService(typeof(IGraphicsDeviceManager), this);
+            _game.Services.AddService(typeof(IGraphicsDeviceService), this);
 
 #if (WINDOWS && !WINRT) || LINUX
             // TODO: This should not occur here... it occurs during Game.Initialize().
             CreateDevice();
 #endif
+        }
+
+        ~GraphicsDeviceManager()
+        {
+            Dispose(false);
         }
 
         public void CreateDevice()
@@ -184,10 +190,23 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            if (_graphicsDevice != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                _graphicsDevice.Dispose();
-                _graphicsDevice = null;
+                if (disposing)
+                {
+                    if (_graphicsDevice != null)
+                    {
+                        _graphicsDevice.Dispose();
+                        _graphicsDevice = null;
+                    }
+                }
+                disposed = true;
             }
         }
 
@@ -198,7 +217,10 @@ namespace Microsoft.Xna.Framework
             // Calling ApplyChanges() before CreateDevice() should have no effect
             if (_graphicsDevice == null)
                 return;
-#if WINRT
+
+#if WINDOWS_PHONE
+
+#elif WINRT
             // TODO:  Does this need to occur here?
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
@@ -281,7 +303,9 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
 
-#if WINRT
+#if WINDOWS_PHONE
+
+#elif WINRT
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
             if (SwapChainPanel != null)
@@ -335,9 +359,9 @@ namespace Microsoft.Xna.Framework
             IsFullScreen = !IsFullScreen;
         }
 
-#if WINRT
+#if WINDOWS_STOREAPP
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
-#endif 
+#endif
 
         public GraphicsProfile GraphicsProfile { get; set; }
 

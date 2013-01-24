@@ -174,8 +174,8 @@ namespace Microsoft.Xna.Framework.Content
             RemoveContentManager(this);
 		}
 
-		// If disposing is true, it was called explicitly.
-		// If disposing is false, it was called by the finalizer.
+		// If disposing is true, it was called explicitly and we should dispose managed objects.
+		// If disposing is false, it was called by the finalizer and managed objects should not be disposed.
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposed)
@@ -260,10 +260,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ObjectDisposedException("ContentManager");
 			}
-			
-			var lastPathSeparatorIndex = Math.Max(assetName.LastIndexOf('\\'), assetName.LastIndexOf('/'));
-			CurrentAssetDirectory = lastPathSeparatorIndex == -1 ? RootDirectory : assetName.Substring(0, lastPathSeparatorIndex);
-			
+						
 			string originalAssetName = assetName;
 			object result = null;
 
@@ -303,7 +300,7 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException)
+            catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
 
@@ -313,7 +310,7 @@ namespace Microsoft.Xna.Framework.Content
 	
 				if (string.IsNullOrEmpty(assetName))
 				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
 				}
 
                 result = ReadRawAsset<T>(assetName, originalAssetName);
@@ -333,8 +330,6 @@ namespace Microsoft.Xna.Framework.Content
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 
-			CurrentAssetDirectory = null;
-			
 			return (T)result;
 		}
 
@@ -464,7 +459,8 @@ namespace Microsoft.Xna.Framework.Content
                 memStream.Seek(0, SeekOrigin.Begin);
                 stream.Dispose();
                 stream = memStream;
-                pos = -14;
+                // Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
+                pos = 0;
 #endif
 
                 while (pos - startPos < compressedSize)
@@ -676,8 +672,6 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 		
-		public string CurrentAssetDirectory { get; set; }
-
 		public IServiceProvider ServiceProvider
 		{
 			get

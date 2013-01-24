@@ -40,13 +40,9 @@ purpose and non-infringement.
 
 using System;
 
-#if IPHONE
-using MonoTouch.AudioToolbox;
-#endif
-
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
+#if IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
@@ -55,8 +51,8 @@ using MonoTouch.MediaPlayer;
 
 #if WINRT
 using SharpDX.MediaFoundation;
-using SharpDX;
-using Windows.Storage;
+using SharpDX.Multimedia;
+using Windows.UI.Core;
 #endif
 
 using System.Linq;
@@ -75,23 +71,38 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINRT
         private static MediaEngine _mediaEngineEx;
+        private static CoreDispatcher _dispatcher;
+
+        public static TimeSpan PlayPosition
+        {
+            get
+            {
+                if (_queue.ActiveSong == null)
+                    return TimeSpan.Zero;
+                else
+                    return _queue.ActiveSong.Position; 
+            } 
+        }
 
         static MediaPlayer()
         {            
             MediaManager.Startup(true);
 
             using (var factory = new MediaEngineClassFactory())
+            using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
             {
-                var mediaEngine = new MediaEngine(factory, null, MediaEngineCreateflags.Audioonly, MediaEngineExOnPlaybackEvent);
+                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateFlags.AudioOnly, MediaEngineExOnPlaybackEvent);
                 _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
             }
+
+            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
             {
-                OnSongFinishedPlaying(null, null);
+                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
             }
         }
 #endif
@@ -170,7 +181,7 @@ namespace Microsoft.Xna.Framework.Media
         public static event EventHandler<EventArgs> MediaStateChanged;
         
 		
-#if IPHONE
+#if IOS
 		public static bool GameHasControl 
 		{ 
 			get 
@@ -222,6 +233,9 @@ namespace Microsoft.Xna.Framework.Media
         public static void Pause()
         {
 #if WINRT
+            if (State == MediaState.Stopped)
+                return;
+
             _mediaEngineEx.Pause();
 #else
             if (_queue.ActiveSong == null)

@@ -7,7 +7,7 @@ using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -203,13 +203,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 case StencilOperation.Keep:
                     return StencilOp.Keep;
                 case StencilOperation.Decrement:
-                    return StencilOp.Decr;
-                case StencilOperation.DecrementSaturation:
                     return StencilOp.DecrWrap;
+                case StencilOperation.DecrementSaturation:
+                    return StencilOp.Decr;
                 case StencilOperation.IncrementSaturation:
-                    return StencilOp.IncrWrap;
-                case StencilOperation.Increment:
                     return StencilOp.Incr;
+                case StencilOperation.Increment:
+                    return StencilOp.IncrWrap;
                 case StencilOperation.Invert:
                     return StencilOp.Invert;
                 case StencilOperation.Replace:
@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // We're now bound to a device... no one should
                 // be changing the state of this object now!
-                graphicsDevice = device;
+                GraphicsDevice = device;
 
                 // Build the description.
                 var desc = new SharpDX.Direct3D11.DepthStencilStateDescription();
@@ -246,10 +246,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.StencilReadMask = (byte)StencilMask; // TODO: Should this instead grab the upper 8bits?
                 desc.StencilWriteMask = (byte)StencilWriteMask;
 
-                desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
-                desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
-                desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
-                desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                if (TwoSidedStencilMode)
+                {
+                    desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                }
+                else
+                {   //use same settings as frontFace 
+                    desc.BackFace.Comparison = GetComparison(StencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(StencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(StencilPass);
+                }
 
                 desc.FrontFace.Comparison = GetComparison(StencilFunction);
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
@@ -257,15 +267,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.FrontFace.PassOperation = GetStencilOp(StencilPass);
 
                 // Create the state.
-                _state = new SharpDX.Direct3D11.DepthStencilState(graphicsDevice._d3dDevice, ref desc);
+                _state = new SharpDX.Direct3D11.DepthStencilState(GraphicsDevice._d3dDevice, desc);
             }
 
-            Debug.Assert(graphicsDevice == device, "The state was created for a different device!");
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
 
             // Apply the state!
+            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }
 
@@ -336,7 +347,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #endif // DIRECTX
-#if PSS
+#if PSM
         internal void ApplyState(GraphicsDevice device)
         {
             #warning Unimplemented

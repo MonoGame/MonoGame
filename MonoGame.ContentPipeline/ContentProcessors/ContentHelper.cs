@@ -36,8 +36,8 @@ namespace MonoGameContentProcessors
                     return MonoGamePlatform.Linux;
                 case "OSX":
                     return MonoGamePlatform.OSX;
-                case "PSS":
-                    return MonoGamePlatform.PSS;
+                case "PSM":
+                    return MonoGamePlatform.PSM;
 
                 default:
                     throw new PipelineException("Unexpected MonoGame platform '{0}'!", platform);

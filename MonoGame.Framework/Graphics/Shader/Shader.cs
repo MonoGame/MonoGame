@@ -11,7 +11,7 @@ using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-#elif PSS
+#elif PSM
 enum ShaderType //FIXME: Major Hack
 {
 	VertexShader,
@@ -30,9 +30,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal enum SamplerType
     {
-        Sampler2D,
-        SamplerCube,
-        SamplerVolume,
+        Sampler2D = 0,
+        SamplerCube = 1,
+        SamplerVolume = 2,
+        Sampler1D = 3,
     }
 
     // TODO: We should convert the sampler info below 
@@ -43,6 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public SamplerType type;
         public int index;
         public string name;
+		public SamplerState state;
 
         // TODO: This should be moved to EffectPass.
         public int parameter;
@@ -92,8 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         internal Shader(GraphicsDevice device, BinaryReader reader)
         {
-            graphicsDevice = device;
-            graphicsDevice.DeviceResetting += graphicsDevice_DeviceResetting;
+            GraphicsDevice = device;
 
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
@@ -107,6 +108,19 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Samplers[s].type = (SamplerType)reader.ReadByte();
                 Samplers[s].index = reader.ReadByte();
+
+				if (reader.ReadBoolean())
+				{
+					Samplers[s].state = new SamplerState();
+					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
+					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
+					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
+					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
+					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
+				}
+
 #if OPENGL
                 Samplers[s].name = reader.ReadString();
 #endif
@@ -225,8 +239,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (int i = 0; i < _attributes.Length; ++i)
             {
-                if (_attributes[i].usage == usage)
-                    return _attributes[i].location + index;
+                if ((_attributes[i].usage == usage) && (_attributes[i].index == index))
+                    return _attributes[i].location;
             }
             return -1;
         }
@@ -248,7 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-        void graphicsDevice_DeviceResetting(object sender, EventArgs e)
+        internal protected override void GraphicsDeviceResetting()
         {
 #if OPENGL
             if (_shaderHandle != -1)
@@ -263,26 +277,27 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
-                graphicsDevice.DeviceResetting -= graphicsDevice_DeviceResetting;
-
 #if OPENGL
-                if (_shaderHandle != -1)
-                {
-                    if (GL.IsShader(_shaderHandle))
+                GraphicsDevice.AddDisposeAction(() =>
                     {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                    _shaderHandle = -1;
-                }
+                        if (_shaderHandle != -1)
+                        {
+                            if (GL.IsShader(_shaderHandle))
+                            {
+                                GL.DeleteShader(_shaderHandle);
+                                GraphicsExtensions.CheckGLError();
+                            }
+                            _shaderHandle = -1;
+                        }
+                    });
 #endif
             }
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 	}
 }

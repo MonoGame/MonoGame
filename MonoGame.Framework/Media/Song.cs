@@ -43,7 +43,7 @@ using System.IO;
 
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
+#if IOS
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
 #endif
@@ -52,32 +52,38 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed class Song : IEquatable<Song>, IDisposable
     {
-#if IPHONE
+#if IOS
 		private AVAudioPlayer _sound;
-#elif PSS
+#elif PSM
         private PSSuiteSong _sound;
 #elif !WINRT
 		private SoundEffectInstance _sound;
 #endif
 		
 		private string _name;
-		private int _playCount = 0;   
-		
+		private int _playCount = 0;
+        bool disposed;
+
 		internal Song(string fileName)
 		{			
 			_name = fileName;
 			
-#if IPHONE
+#if IOS
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
-#elif PSS
+#elif PSM
             _sound = new PSSuiteSong(_name);
 #elif !WINRT       
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
 		}
-				
+
+        ~Song()
+        {
+            Dispose(false);
+        }
+
         public string FilePath
 		{
 			get { return _name; }
@@ -91,19 +97,23 @@ namespace Microsoft.Xna.Framework.Media
         
         void Dispose(bool disposing)
         {
-#if !WINRT
-            if (disposing)
+            if (!disposed)
             {
-                if (_sound != null)
+#if !WINRT
+                if (disposing)
                 {
-#if IPHONE
-                    _sound.FinishedPlaying -= OnFinishedPlaying;
+                    if (_sound != null)
+                    {
+#if IOS
+                       _sound.FinishedPlaying -= OnFinishedPlaying;
 #endif
-                    _sound.Dispose();
-                    _sound = null;
+                        _sound.Dispose();
+                        _sound = null;
+                    }
                 }
-            }
 #endif
+                disposed = true;
+            }
         }
         
 		public bool Equals(Song song) 		
@@ -182,7 +192,7 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			if (_sound == null)
 				return;			
-    #if IPHONE
+    #if IOS
 			_sound.Play();
     #else
 			_sound.Resume();

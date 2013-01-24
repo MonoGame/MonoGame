@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if IPHONE
+#if IOS
 		        // At the moment. If a DXT Texture comes in on iOS, it's really a PVR compressed
 				// texture. We need to use this hack until the content pipeline is implemented.
 				// For now DXT5 means we're using 4bpp PVRCompression and DXT3 means 2bpp. Look at
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt5:
 					convertedFormat = SurfaceFormat.RgbaPvrtc4Bpp;
 					break;
-#elif ANDROID || PSS
+#elif ANDROID || PSM
 				case SurfaceFormat.Dxt1:
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Content
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-#if ANDROID || PSS
+#if ANDROID || PSM
 					//no Dxt in OpenGL ES
 					case SurfaceFormat.Dxt1:
 						levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
@@ -156,9 +156,29 @@ namespace Microsoft.Xna.Framework.Content
 							 */
 						}
 						break;
+                    case SurfaceFormat.Bgra5551:
+                        {
+#if OPENGL
+                            // Shift the channels to suit OPENGL
+                            int offset = 0;
+                            for (int y = 0; y < levelHeight; y++)
+                            {
+                                for (int x = 0; x < levelWidth; x++)
+                                {
+                                    ushort pixel = BitConverter.ToUInt16(levelData, offset);
+                                    pixel = (ushort)(((pixel & 0x7FFF) << 1) | ((pixel & 0x8000) >> 15));
+                                    levelData[offset] = (byte)(pixel);
+                                    levelData[offset + 1] = (byte)(pixel >> 8);
+                                    offset += 2;
+                                }
+                            }
+#endif
+                        }
+                        break;
 					case SurfaceFormat.Bgra4444:
 						{
-							// Shift the channels to suit GLES
+#if OPENGL
+                            // Shift the channels to suit OPENGL
 							int offset = 0;
 							for (int y = 0; y < levelHeight; y++)
 							{
@@ -171,6 +191,7 @@ namespace Microsoft.Xna.Framework.Content
 									offset += 2;
 								}
 							}
+#endif
 						}
 						break;
 					case SurfaceFormat.NormalizedByte4:

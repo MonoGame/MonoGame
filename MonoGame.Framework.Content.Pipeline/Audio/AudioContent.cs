@@ -1,46 +1,13 @@
-﻿#region License
-/*
- Microsoft Public License (Ms-PL)
- MonoGame - Copyright © 2012 The MonoGame Team
- 
- All rights reserved.
- 
- This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
- accept the license, do not use the software.
- 
- 1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
- U.S. copyright law.
- 
- A "contribution" is the original software, or any additions or changes to the software.
- A "contributor" is any person that distributes its contribution under this license.
- "Licensed patents" are a contributor's patent claims that read directly on its contribution.
- 
- 2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
- each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
- 
- 3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
- your patent license from such contributor to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
- notices that are present in the software.
- (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
- a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
- code form, you may only do so under a license that complies with this license.
- (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
- or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
- permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
- purpose and non-infringement.
- */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NAudio.Wave;
+using NAudio.WindowsMediaFormat;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -50,6 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public class AudioContent : ContentItem, IDisposable
     {
         List<byte> data;
+        WaveStream reader;
         TimeSpan duration;
         string fileName;
         AudioFileType fileType;
@@ -62,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// Gets the raw audio data.
         /// </summary>
         /// <value>If unprocessed, the source data; otherwise, the processed data.</value>
-        public ReadOnlyCollection<byte> Data { get { return data.AsReadOnly(); } }
+        public ReadOnlyCollection<byte> Data { get { return data == null ? format.NativeWaveFormat : data.AsReadOnly(); } }
 
         /// <summary>
         /// Gets the duration (in milliseconds) of the audio data.
@@ -109,7 +77,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <remarks>Constructs the object from the specified source file, in the format specified.</remarks>
         public AudioContent(string audioFileName, AudioFileType audioFileType)
         {
-            throw new NotImplementedException();
+            fileName = audioFileName;
+            fileType = audioFileType;
+
+            switch (fileType)
+            {
+                case AudioFileType.Wav:
+                    ReadWav();
+                    break;
+
+                case AudioFileType.Mp3:
+                    ReadMp3();
+                    break;
+
+                case AudioFileType.Wma:
+                    ReadWma();
+                    break;
+            }
         }
 
         /// <summary>
@@ -131,11 +115,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (disposed)
                 throw new ObjectDisposedException("AudioContent");
 
-            throw new NotImplementedException();
+            switch (formatType)
+            {
+                case ConversionFormat.Adpcm:
+                    break;
+
+                case ConversionFormat.Pcm:
+                    break;
+
+                case ConversionFormat.WindowsMedia:
+#if WINDOWS
+                    break;
+#else
+                    throw new NotSupportedException("WindowsMedia encoding supported on Windows only");
+#endif
+
+                case ConversionFormat.Xma:
+                    throw new NotSupportedException("Xma is not a supported encoding format");
+
+                case ConversionFormat.Aac:
+                    break;
+
+                case ConversionFormat.Vorbis:
+                    break;
+            }
         }
 
         /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
+        /// Immediately releases the managed and unmanaged resources used by this object.
         /// </summary>
         public void Dispose()
         {
@@ -146,18 +153,50 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// Immediately releases the unmanaged resources used by this object.
         /// </summary>
-        /// <param name="disposing">True if disposing of the unmanaged resources</param>
+        /// <param name="disposing">True if disposing of the managed resources</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                    // Release unmanaged resources
-                    // ...
+                    // Release managed resources
+                    if (reader != null)
+                        reader.Dispose();
+                    reader = null;
                 }
                 disposed = true;
             }
+        }
+
+        /// <summary>
+        /// Read a WAV format file.
+        /// </summary>
+        void ReadWav()
+        {
+            reader = new WaveFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
+        }
+
+        /// <summary>
+        /// Read a MP3 format file.
+        /// </summary>
+        void ReadMp3()
+        {
+            reader = new Mp3FileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
+        }
+
+        /// <summary>
+        /// Read a WMA format file.
+        /// </summary>
+        void ReadWma()
+        {
+            reader = new WMAFileReader(fileName);
+            duration = reader.TotalTime;
+            format = new AudioFormat(reader);
         }
     }
 }

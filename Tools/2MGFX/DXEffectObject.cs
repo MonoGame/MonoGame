@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -327,6 +325,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			public string name;
 			public uint state_count;
 			public uint annotation_count;
+
+			public BlendState blendState;
+			public DepthStencilState depthStencilState;
+			public RasterizerState rasterizerState;
 
 			public d3dx_state[] states;
 			public d3dx_parameter[] annotation_handles;
@@ -658,7 +660,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return -1;
         }
-        
+
         public d3dx_parameter[] Objects { get; private set; }
 
         public d3dx_parameter[] Parameters { get; private set; }

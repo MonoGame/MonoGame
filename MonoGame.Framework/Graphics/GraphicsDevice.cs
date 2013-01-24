@@ -52,12 +52,18 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
 using SharpDX;
-using SharpDX.DXGI;
 using SharpDX.Direct3D;
+#if WINDOWS_PHONE
+using SharpDX.Direct3D11;
+using Windows.Foundation;
+using MonoGame.Framework.WindowsPhone;
+#else
+using Windows.UI.Xaml.Controls;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using Windows.UI.Xaml.Controls;
-#elif PSS
+using SharpDX.DXGI;
+#endif
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
@@ -124,11 +130,24 @@ namespace Microsoft.Xna.Framework.Graphics
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
 
+#if OPENGL
+        static List<Action> disposeActions = new List<Action>();
+        static object disposeActionsLock = new object();
+#endif
 
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
 
 #if DIRECTX
+
+        // Core Direct3D Objects
+        internal SharpDX.Direct3D11.Device _d3dDevice;
+        internal SharpDX.Direct3D11.DeviceContext _d3dContext;
+        protected FeatureLevel _featureLevel;
+        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+
+#if !WINDOWS_PHONE
 
         // Declare Direct2D Objects
         protected SharpDX.Direct2D1.Factory1 _d2dFactory;
@@ -139,25 +158,20 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SharpDX.DirectWrite.Factory _dwriteFactory;
         protected SharpDX.WIC.ImagingFactory2 _wicFactory;
 
-        // Direct3D Objects
-        internal SharpDX.Direct3D11.Device1 _d3dDevice;
-        internal SharpDX.Direct3D11.DeviceContext1 _d3dContext;
-        protected FeatureLevel _featureLevel;
-
-        // The backbuffer resources.
-        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+        // The swap chain resources.
         protected SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         protected SharpDX.DXGI.SwapChain1 _swapChain;
         protected SwapChainBackgroundPanel _swapChainPanel;
+
+        protected float _dpi; 
+
+#endif
 
         // The active render targets.
         protected SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
 
         // The active depth view.
         protected SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
-
-        protected float _dpi; 
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -178,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
 
-#elif PSS
+#elif PSM
 
         internal GraphicsContext _graphics;
         internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
@@ -225,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal int MaxTextureSlots;
 
-#if DIRECTX
+#if DIRECTX && !WINDOWS_PHONE
 
         internal float Dpi
         {
@@ -321,6 +335,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
+        ~GraphicsDevice()
+        {
+            Dispose(false);
+        }
+
         internal void Initialize()
         {
             // Setup extensions.
@@ -351,12 +370,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+#if WINDOWS_PHONE
+
+            UpdateDevice(DrawingSurfaceState.Device, DrawingSurfaceState.Context);
+            UpdateTarget(DrawingSurfaceState.RenderTargetView);
+
+            DrawingSurfaceState.Device = null;
+            DrawingSurfaceState.Context = null;
+            DrawingSurfaceState.RenderTargetView = null;
+			
+#else
+
             CreateDeviceIndependentResources();
             CreateDeviceResources();
             Dpi = DisplayProperties.LogicalDpi;
             CreateSizeDependentResources();
+			
+#endif
 
-#elif PSS
+#elif PSM
             _graphics = new GraphicsContext();
 #elif OPENGL
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
@@ -402,7 +434,72 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if DIRECTX
+#if DIRECTX 
+
+#if WINDOWS_PHONE
+
+        internal void UpdateDevice(Device device, DeviceContext context)
+        {
+            // TODO: Lost device logic!
+
+            if (_d3dDevice != null)
+            {
+                _d3dDevice.Dispose();
+                _d3dDevice = null;
+            }
+            _d3dDevice = device;
+
+            if (_d3dContext != null)
+            {
+                _d3dContext.Dispose();
+                _d3dContext = null;
+            }
+            _d3dContext = context;
+        }
+
+        internal void UpdateTarget(RenderTargetView renderTargetView)
+        {
+            _renderTargetView = renderTargetView;
+            _currentRenderTargets[0] = _renderTargetView;
+            _currentDepthStencilView = _depthStencilView;
+			
+            var resource = _renderTargetView.Resource;
+            using (var texture2D = new SharpDX.Direct3D11.Texture2D(resource.NativePointer))
+            {
+                var currentWidth = PresentationParameters.BackBufferWidth;
+                var currentHeight = PresentationParameters.BackBufferHeight;
+
+                if (currentWidth != texture2D.Description.Width &&
+                    currentHeight != texture2D.Description.Height)
+                {
+                    PresentationParameters.BackBufferWidth = texture2D.Description.Width;
+                    PresentationParameters.BackBufferHeight = texture2D.Description.Height;
+
+                    ComObject.Dispose(ref _depthStencilView);
+
+                    using (var depthTexture = new SharpDX.Direct3D11.Texture2D(
+                        _d3dDevice,
+                        new Texture2DDescription()
+                        {
+                            Width = PresentationParameters.BackBufferWidth,
+                            Height = PresentationParameters.BackBufferHeight,
+                            ArraySize = 1,
+                            BindFlags = BindFlags.DepthStencil,
+                            CpuAccessFlags = CpuAccessFlags.None,
+                            Format = SharpDX.DXGI.Format.D24_UNorm_S8_UInt,
+                            MipLevels = 1,
+                            OptionFlags = ResourceOptionFlags.None,
+                            SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                            Usage = ResourceUsage.Default
+                        }))
+                        _depthStencilView = new DepthStencilView(_d3dDevice, depthTexture);
+
+                    Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+                }
+            }
+        }
+
+#else
 
         /// <summary>
         /// Creates resources not tied the active graphics device.
@@ -684,7 +781,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _d2dContext.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
         }
 
-#endif // WINRT
+#endif // !WINDOWS_PHONE
+
+#endif // DIRECTX
 
         public RasterizerState RasterizerState
         {
@@ -767,7 +866,7 @@ namespace Microsoft.Xna.Framework.Graphics
             lock (_d3dContext)
             {
                 // Clear the diffuse render buffer.
-                if (options.HasFlag(ClearOptions.Target))
+                if ((options & ClearOptions.Target) == ClearOptions.Target)
                 {
                     foreach (var view in _currentRenderTargets)
                     {
@@ -778,16 +877,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Clear the depth/stencil render buffer.
                 SharpDX.Direct3D11.DepthStencilClearFlags flags = 0;
-                if (options.HasFlag(ClearOptions.DepthBuffer))
+                if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Depth;
-                if (options.HasFlag(ClearOptions.Stencil))
+                if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
                 if (flags != 0 && _currentDepthStencilView != null)
                     _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
             }
 
-#elif PSS
+#elif PSM
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
             ApplyState(false);
@@ -812,20 +911,20 @@ namespace Microsoft.Xna.Framework.Graphics
             ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
-            if (options.HasFlag(ClearOptions.Target))
+            if ((options & ClearOptions.Target) == ClearOptions.Target)
             {
                 GL.ClearColor(color.X, color.Y, color.Z, color.W);
                 GraphicsExtensions.CheckGLError();
                 bufferMask = bufferMask | ClearBufferMask.ColorBufferBit;
             }
-			if (options.HasFlag(ClearOptions.Stencil))
+			if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
             {
 				GL.ClearStencil(stencil);
                 GraphicsExtensions.CheckGLError();
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
-			if (options.HasFlag(ClearOptions.DepthBuffer)) 
+			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
             {
 #if GLES
                 GL.ClearDepth (depth);
@@ -864,93 +963,128 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool aReleaseEverything)
+        protected virtual void Dispose(bool disposing)
         {
-            if (aReleaseEverything)
+            if (!_isDisposed)
             {
-#if DIRECTX
-                if (_swapChain != null)
+                if (disposing)
                 {
-                    _swapChain.Dispose();
-                    _swapChain = null;
-                }
-                if (_renderTargetView != null)
-                {
-                    _renderTargetView.Dispose();
-                    _renderTargetView = null;
-                }
-                if (_depthStencilView != null)
-                {
-                    _depthStencilView.Dispose();
-                    _depthStencilView = null;
-                }
-                if (_bitmapTarget != null)
-                {
-                    _bitmapTarget.Dispose();
-                    _depthStencilView = null;
-                }
+                    // Dispose of all remaining graphics resources before disposing of the graphics device
+                    GraphicsResource.DisposeAll();
 
-                if (_d3dDevice != null)
-                {
-                    _d3dDevice.Dispose();
-                    _d3dDevice = null;
-                }
-                if (_d3dContext != null)
-                {
-                    _d3dContext.Dispose();
-                    _d3dContext = null;
-                }
-                if (_d2dDevice != null)
-                {
-                    _d2dDevice.Dispose();
-                    _d2dDevice = null;
-                }
-                if (_d2dContext != null)
-                {
-                    _d2dContext.Target = null;
-                    _d2dContext.Dispose();
-                    _d2dContext = null;
-                }
-                if (_d2dFactory != null)
-                {
-                    _d2dFactory.Dispose();
-                    _d2dFactory = null;
-                }
-                if (_dwriteFactory != null)
-                {
-                    _dwriteFactory.Dispose();
-                    _dwriteFactory = null;
-                }
-                if (_wicFactory != null)
-                {
-                    _wicFactory.Dispose();
-                    _wicFactory = null;
-                }
+#if DIRECTX
+
+                    if (_renderTargetView != null)
+                    {
+                        _renderTargetView.Dispose();
+                        _renderTargetView = null;
+                    }
+                    if (_depthStencilView != null)
+                    {
+                        _depthStencilView.Dispose();
+                        _depthStencilView = null;
+                    }
+
+                    if (_d3dDevice != null)
+                    {
+                        _d3dDevice.Dispose();
+                        _d3dDevice = null;
+                    }
+                    if (_d3dContext != null)
+                    {
+                        _d3dContext.Dispose();
+                        _d3dContext = null;
+                    }
+
+#if !WINDOWS_PHONE
+                    if (_swapChain != null)
+                    {
+                        _swapChain.Dispose();
+                        _swapChain = null;
+                    }
+                    if (_bitmapTarget != null)
+                    {
+                        _bitmapTarget.Dispose();
+                        _depthStencilView = null;
+                    }
+                    if (_d2dDevice != null)
+                    {
+                        _d2dDevice.Dispose();
+                        _d2dDevice = null;
+                    }
+                    if (_d2dContext != null)
+                    {
+                        _d2dContext.Target = null;
+                        _d2dContext.Dispose();
+                        _d2dContext = null;
+                    }
+                    if (_d2dFactory != null)
+                    {
+                        _d2dFactory.Dispose();
+                        _d2dFactory = null;
+                    }
+                    if (_dwriteFactory != null)
+                    {
+                        _dwriteFactory.Dispose();
+                        _dwriteFactory = null;
+                    }
+                    if (_wicFactory != null)
+                    {
+                        _wicFactory.Dispose();
+                        _wicFactory = null;
+                    }
+#endif
 
 #endif // DIRECTX
 
 #if OPENGL
-                // Free all the cached shader programs.
-                _programCache.Clear();
+                    // Free all the cached shader programs.
+                    _programCache.Dispose();
 #endif
 
-#if PSS
-                if (_graphics != null)
-                {
-                    _graphics.Dispose();
-                    _graphics = null;
+#if PSM
+                    if (_graphics != null)
+                    {
+                        _graphics.Dispose();
+                        _graphics = null;
+                    }
+#endif
                 }
-#endif
-            }
 
-            _isDisposed = true;
+                _isDisposed = true;
+            }
         }
+
+#if OPENGL
+        /// <summary>
+        /// Adds a dispose action to the list of pending dispose actions. These are executed at the end of each call to Present().
+        /// This allows GL resources to be disposed from other threads, such as the finalizer.
+        /// </summary>
+        /// <param name="disposeAction">The action to execute for the dispose.</param>
+        static internal void AddDisposeAction(Action disposeAction)
+        {
+            if (disposeAction == null)
+                throw new ArgumentNullException("disposeAction");
+            if (Threading.IsOnUIThread())
+            {
+                disposeAction();
+            }
+            else
+            {
+                lock (disposeActionsLock)
+                {
+                    disposeActions.Add(disposeAction);
+                }
+            }
+        }
+#endif
 
         public void Present()
         {
-#if DIRECTX
+#if DIRECTX && !WINDOWS_PHONE
             // The application may optionally specify "dirty" or "scroll" rects to improve efficiency
             // in certain scenarios.  In this sample, however, we do not utilize those features.
             var parameters = new SharpDX.DXGI.PresentParameters();
@@ -962,7 +1096,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 // The first argument instructs DXGI to block until VSync, putting the application
                 // to sleep until the next VSync. This ensures we don't waste any cycles rendering
                 // frames that will never be displayed to the screen.
-                _swapChain.Present(1, SharpDX.DXGI.PresentFlags.None, parameters);
+                lock (_d3dContext)
+                    _swapChain.Present(1, PresentFlags.None, parameters);
             }
             catch (SharpDX.SharpDXException)
             {
@@ -978,15 +1113,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 */
             }
 						
-#elif PSS
+#elif PSM
             _graphics.SwapBuffers();
             _availableVertexBuffers.AddRange(_usedVertexBuffers);
             _usedVertexBuffers.Clear();
-#elif ANDROID
-			Game.Instance.Platform.Present();
 #elif OPENGL
 			GL.Flush();
             GraphicsExtensions.CheckGLError();
+
+            // Dispose of any GL resources that were disposed in another thread
+            lock (disposeActionsLock)
+            {
+                if (disposeActions.Count > 0)
+                {
+                    foreach (var action in disposeActions)
+                        action();
+                    disposeActions.Clear();
+                }
+            }
 #endif
         }
 
@@ -1019,6 +1163,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (DeviceResetting != null)
                 DeviceResetting(this, EventArgs.Empty);
+
+            GraphicsResource.DoGraphicsDeviceResetting();
         }
 
         /// <summary>
@@ -1064,7 +1210,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _viewport = value;
 #if DIRECTX
-                var viewport = new SharpDX.Direct3D11.Viewport(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                 lock (_d3dContext) 
                     _d3dContext.Rasterizer.SetViewports(viewport);
 #elif OPENGL
@@ -1079,6 +1225,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
                 GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
+                
+                // In OpenGL we have to re-apply the special "posFixup"
+                // vertex shader uniform if the viewport changes.
+                _vertexShaderDirty = true;
 #endif
             }
         }
@@ -1145,12 +1295,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _currentRenderTargetBindings = renderTargets;
 		
             var clearTarget = false;
-
-#if OPENGL
-            // In OpenGL we have to re-apply the special "posFixup"
-            // vertex shader uniform if the render target changes.
-            _vertexShaderDirty = true;
-#endif
 
             if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
 			{
@@ -1283,9 +1427,28 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINRT
         internal void ResetRenderTargets()
         {
-            if ( _d3dContext != null )
+            if (_d3dContext != null)
+            {
                 lock (_d3dContext)
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
+                {
+                    var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
+                                                          _viewport.Width, _viewport.Height, 
+                                                          _viewport.MinDepth, _viewport.MaxDepth);
+                    _d3dContext.Rasterizer.SetViewports(viewport);
+                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
+                }
+            }
+
+            Textures.Dirty();
+            SamplerStates.Dirty();
+            _depthStencilStateDirty = true;
+            _blendStateDirty = true;
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _pixelShaderDirty = true;
+            _vertexShaderDirty = true;
+            _rasterizerStateDirty = true;
+            _scissorRectangleDirty = true;            
         }
 #endif
 
@@ -1356,7 +1519,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _indexBufferDirty = true;
         }
 
-        public IndexBuffer Indices { set { SetIndexBuffer(value); } }
+        public IndexBuffer Indices { set { SetIndexBuffer(value); } get { return _indexBuffer; } }
 
         internal Shader VertexShader
         {
@@ -1623,7 +1786,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
             {
                 buffer.UserOffset += vertexCount;
-                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, SetDataOptions.NoOverwrite);
+                buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, vertexDecl.VertexStride, SetDataOptions.NoOverwrite);
             }
             else
             {
@@ -1713,7 +1876,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                      indexElementType,
                                      indexOffsetInBytes);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
@@ -1797,7 +1960,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			              vertexStart,
 			              vertexCount);
             GraphicsExtensions.CheckGLError();
-#elif PSS
+#elif PSM
             BindVertexBuffer(false);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), vertexStart, vertexCount);
 #endif
@@ -1916,7 +2079,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if PSS
+#if PSM
         internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
         {
             int bestMatchIndex = -1;

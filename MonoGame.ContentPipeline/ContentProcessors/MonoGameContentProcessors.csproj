@@ -33,7 +33,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -42,7 +42,7 @@
     <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -140,6 +140,9 @@
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\ParseTree.cs">
       <Link>Processors\Effect\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ParseTreeTools.cs">
+      <Link>Processors\Effect\ParseTreeTools.cs</Link>
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\Scanner.cs">
       <Link>Processors\Effect\Scanner.cs</Link>

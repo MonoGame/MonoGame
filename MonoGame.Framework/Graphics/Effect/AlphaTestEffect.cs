@@ -13,12 +13,12 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 
 
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using OpenTK.Graphics.ES20;
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 #elif MONOMAC
 using MonoMac.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core;
 #elif !WINRT
 using OpenTK.Graphics.OpenGL;
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Graphics
         static readonly byte[] Bytecode = LoadEffectResource(
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
-#elif PSS
+#elif PSM
             "MonoGame.Framework.PSMobile.PSSuite.Graphics.AlphaTestEffect.cgx" //FIXME: This shader is totally incomplete
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"

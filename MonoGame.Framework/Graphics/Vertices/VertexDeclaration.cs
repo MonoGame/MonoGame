@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSS
+#elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif DIRECTX
 using System.Reflection;
-using System.Collections.Generic;
 #else
 using OpenTK.Graphics.ES20;
 #endif
@@ -19,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class VertexDeclaration : GraphicsResource
 	{
-#if PSS
+#if PSM
         private VertexFormat[] _vertexFormat;
 #endif
 
@@ -136,7 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!shaderAttributeInfo.TryGetValue(shaderHash, out attrInfo))
             {
                 // Get the vertex attribute info and cache it
-                attrInfo = new VertexDeclarationAttributeInfo(graphicsDevice.MaxVertexAttributes);
+                attrInfo = new VertexDeclarationAttributeInfo(GraphicsDevice.MaxVertexAttributes);
 
                 foreach (var ve in _elements)
                 {
@@ -170,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     (IntPtr)(offset.ToInt64() + element.Offset));
                 GraphicsExtensions.CheckGLError();
             }
-            graphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
+            GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
 		}
 
 #endif // OPENGL
@@ -188,7 +187,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
         
-#if PSS
+#if PSM
         internal VertexFormat[] GetVertexFormat()
         {
             if (_vertexFormat == null)

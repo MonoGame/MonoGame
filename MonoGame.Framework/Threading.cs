@@ -43,7 +43,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
-#if IPHONE
+#if IOS
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 #if ES11
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
-#elif IPHONE
+#elif IOS
         public static EAGLContext BackgroundContext;
 #elif WINDOWS || LINUX
         public static IGraphicsContext BackgroundContext;
@@ -78,14 +78,23 @@ namespace Microsoft.Xna.Framework
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
         }
 
-        public static void SetUIThread()
+        /// <summary>
+        /// Checks if the code is currently running on the UI thread.
+        /// </summary>
+        /// <returns>true if the code is currently running on the UI thread.</returns>
+        public static bool IsOnUIThread()
         {
+            return mainThreadId == Thread.CurrentThread.ManagedThreadId;
         }
 
+        /// <summary>
+        /// Throws an exception if the code is not currently running on the UI thread.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the code is not currently running on the UI thread.</exception>
         public static void EnsureUIThread()
         {
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
-                throw new Exception(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
+                throw new InvalidOperationException(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
         }
 
         /// <summary>
@@ -98,7 +107,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if DIRECTX || PSS
+#if DIRECTX || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
@@ -108,7 +117,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-#if IPHONE
+#if IOS
             lock (BackgroundContext)
             {
                 // Make the context current on this thread if it is not already

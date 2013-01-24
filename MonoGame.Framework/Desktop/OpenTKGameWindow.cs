@@ -54,7 +54,7 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    public class OpenTKGameWindow : GameWindow
+    public class OpenTKGameWindow : GameWindow, IDisposable
     {
         private bool _allowUserResizing;
         private DisplayOrientation _currentOrientation;
@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
         private WindowState windowState;
         private Rectangle clientBounds;
         private bool updateClientBounds;
+        bool disposed;
 
         #region Internal Properties
 
@@ -126,6 +127,11 @@ namespace Microsoft.Xna.Framework
             Initialize();
         }
 
+        ~OpenTKGameWindow()
+        {
+            Dispose(false);
+        }
+
         #region Restricted Methods
 
         #region OpenTK GameWindow Methods
@@ -163,7 +169,8 @@ namespace Microsoft.Xna.Framework
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
             
             // If window size is zero, leave bounds unchanged
-            if (winWidth == 0 || winHeight == 0)
+            // OpenTK appears to set the window client size to 1x1 when minimizing
+            if (winWidth <= 1 || winHeight <= 1)
                 return;
 
             //If we've already got a pending change, do nothing
@@ -237,7 +244,7 @@ namespace Microsoft.Xna.Framework
             // mouse doesn't need to be treated here, Mouse class does it alone
 
             // keyboard
-            Keyboard.State = new KeyboardState(keys.ToArray());
+            Keyboard.SetKeys(keys);
         }
 
         #endregion
@@ -274,10 +281,10 @@ namespace Microsoft.Xna.Framework
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
-   
-#if LINUX
-            Threading.BackgroundContext.MakeCurrent(Threading.WindowInfo);      
-#endif     
+
+            // Make the foreground context the current context
+            if (GraphicsContext.CurrentContext == null || !GraphicsContext.CurrentContext.IsCurrent)
+                window.MakeCurrent();
             
             // mouse
             // TODO review this when opentk 1.1 is released
@@ -324,13 +331,30 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
-            if (Threading.BackgroundContext != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                Threading.BackgroundContext.Dispose();
-                Threading.BackgroundContext = null;
-                Threading.WindowInfo = null;
+                if (disposing)
+                {
+                    // Dispose/release managed objects
+                    window.Dispose();
+                }
+
+                // Release native resources
+                if (Threading.BackgroundContext != null)
+                {
+                    Threading.BackgroundContext.Dispose();
+                    Threading.BackgroundContext = null;
+                    Threading.WindowInfo = null;
+                }
+
+                disposed = true;
             }
-            window.Dispose();
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)

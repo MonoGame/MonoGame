@@ -13,13 +13,14 @@
     <SynchReleaseVersion>False</SynchReleaseVersion>
     <ReleaseVersion>1.6</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
+    <DefineConstants>DEBUG;IOS;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -30,7 +31,6 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -40,8 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
-    <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
+    <DefineConstants>IOS;GLES;OPENGL</DefineConstants>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
@@ -49,13 +48,12 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;IPHONE;GLES;OPENGL</DefineConstants>
+    <DefineConstants>DEBUG;IOS;GLES;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoGame.Framework</AssemblyName>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
@@ -65,8 +63,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>IPHONE;GLES;OPENGL</DefineConstants>
-    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <DefineConstants>IOS;GLES;OPENGL</DefineConstants>
     <MtouchUseArmv7>false</MtouchUseArmv7>
   </PropertyGroup>
   <ItemGroup>
@@ -78,8 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
-    <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
@@ -88,6 +83,7 @@
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
@@ -355,7 +351,15 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentLoadException.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -383,6 +387,8 @@
     <Compile Include="Content\ContentReaders\DoubleReader.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
@@ -437,6 +443,13 @@
     <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
     <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="GameUpdateRequiredException.cs" />
   </ItemGroup>
   <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
