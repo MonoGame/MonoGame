@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// Called by the XNA Framework when importing a texture audio file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
+        /// Called by the XNA Framework when importing a texture file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
         /// <param name="filename">Name of a game asset file.</param>
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
@@ -31,23 +31,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var output = new Texture2DContent();
             var bmp = new Bitmap(filename);
-            
+
+            var imageData = GraphicsUtil.ConvertBitmap(bmp);
+
             var bitmapContent = new PixelBitmapContent<Color>(bmp.Width, bmp.Height);
-
-            var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
-                                                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                                                System.Drawing.Imaging.PixelFormat.DontCare);
-
-            var length = bitmapData.Stride * bitmapData.Height;
-            var imageData = new byte[length];
-
-            // Copy bitmap to byte[]
-            Marshal.Copy(bitmapData.Scan0, imageData, 0, length);
-            bmp.UnlockBits(bitmapData);
-
             bitmapContent.SetPixelData(imageData);
 
-            output.Faces[0].Add(bitmapContent);
+            output.Faces.Add(new MipmapChain(bitmapContent));
             return output;
         }
     }
