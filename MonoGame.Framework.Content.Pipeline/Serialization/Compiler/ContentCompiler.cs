@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// </summary>
     public sealed class ContentCompiler
     {
-        Dictionary<Type, Type> typeWriterMap = new Dictionary<Type, Type>();
+        readonly Dictionary<Type, Type> typeWriterMap = new Dictionary<Type, Type>();
 
         internal ContentCompiler()
         {
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="compress">True if the content should be compressed.</param>
         /// <param name="rootDirectory">The root directory of the content.</param>
         /// <param name="referenceRelocationPath">The path of the XNB file, used to calculate relative paths for external references.</param>
-        void Compile(Stream stream, object content, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)
+        internal void Compile(Stream stream, object content, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)
         {
             using (var writer = new ContentWriter(this, stream, targetPlatform, targetProfile, compressContent, rootDirectory, referenceRelocationPath))
             {

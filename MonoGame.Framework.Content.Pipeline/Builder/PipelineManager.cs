@@ -329,12 +329,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
+                if (importer == null)
+                    throw new PipelineException("Failed to create importer '{0}'", pipelineEvent.Importer);
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
-                if (importer == null || processor == null)
-                {
-                    // TODO: Log error?
-                    return;
-                }
+                if (processor == null)
+                    throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
 
                 // Try importing the content.
                 object importedObject;
@@ -343,10 +342,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var importContext = new PipelineImporterContext(this);
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
                 }
 
                 // Process the imported object.
@@ -356,10 +358,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var processContext = new PipelineProcessorContext(this, pipelineEvent);
                     processedObject = processor.Process(importedObject, processContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;                   
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
                 }
 
                 // Write the content to disk.
@@ -376,24 +381,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile) + @"\";
             Directory.CreateDirectory(outputFileDir);
 
-            // TODO: For now use XNA's ContentCompiler which knows 
-            // how to write XNBs for us.
-            //
-            // http://xboxforums.create.msdn.com/forums/t/72563.aspx
-            //
-            // We need to replace this with our own implementation
-            // that isn't all internal methods!
-            //
             if (_compiler == null)
-            {
-                var ctor = typeof(ContentCompiler).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)[0];
-                _compiler = (ContentCompiler)ctor.Invoke(new object[] { });
-                _compileMethod = typeof(ContentCompiler).GetMethod("Compile", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            }
+                _compiler = new ContentCompiler();
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compileMethod.Invoke(_compiler, new[] { stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir });
+                _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.

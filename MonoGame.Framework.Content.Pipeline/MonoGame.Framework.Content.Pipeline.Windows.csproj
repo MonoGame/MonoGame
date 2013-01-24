@@ -51,8 +51,6 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
     </Reference>
@@ -162,9 +160,6 @@
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\TextureContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
-    <Compile Include="Tasks\BuildContent.cs" />
-    <Compile Include="Tasks\CleanContent.cs" />
-    <Compile Include="Tasks\GetLastOutputs.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />
@@ -174,9 +169,9 @@
     <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsGL.csproj">
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.WindowsGL</Name>
+      <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
