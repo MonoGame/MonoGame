@@ -59,6 +59,8 @@ namespace MonoGame.Framework
         private List<XnaKey> _keyState = new List<XnaKey>();
 
         private WinFormsGamePlatform _platform;
+        
+        private bool _isMouseHidden;
 
         #region Internal Properties
 
@@ -122,6 +124,8 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseState;
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
+            _form.MouseEnter += OnMouseEnter;
+            _form.MouseLeave += OnMouseLeave;
             Keyboard.SetKeys(_keyState);
 
             _form.Activated += OnActivated;
@@ -161,6 +165,24 @@ namespace MonoGame.Framework
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
             _keyState.Remove(key);
+        }
+
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!_platform.IsMouseVisible && !_isMouseHidden)
+            {
+                Cursor.Hide();
+                _isMouseHidden = true;
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            if (_isMouseHidden)
+            {
+                Cursor.Show();
+                _isMouseHidden = false;
+            }
         }
 
         internal void Initialize()
