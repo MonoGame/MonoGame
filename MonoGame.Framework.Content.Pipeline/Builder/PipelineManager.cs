@@ -376,24 +376,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile) + @"\";
             Directory.CreateDirectory(outputFileDir);
 
-            // TODO: For now use XNA's ContentCompiler which knows 
-            // how to write XNBs for us.
-            //
-            // http://xboxforums.create.msdn.com/forums/t/72563.aspx
-            //
-            // We need to replace this with our own implementation
-            // that isn't all internal methods!
-            //
             if (_compiler == null)
-            {
-                var ctor = typeof(ContentCompiler).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)[0];
-                _compiler = (ContentCompiler)ctor.Invoke(new object[] { });
-                _compileMethod = typeof(ContentCompiler).GetMethod("Compile", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            }
+                _compiler = new ContentCompiler();
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compileMethod.Invoke(_compiler, new[] { stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir });
+                _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.
