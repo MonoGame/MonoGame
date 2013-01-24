@@ -69,6 +69,8 @@ namespace Microsoft.Xna.Framework
         private Rectangle clientBounds;
         private bool updateClientBounds;
         bool disposed;
+        
+        private bool _isMouseHidden;
 
         #region Internal Properties
 
@@ -158,6 +160,24 @@ namespace Microsoft.Xna.Framework
             }
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
+        }
+
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!game.IsMouseVisible && !_isMouseHidden)
+            {
+                System.Windows.Forms.Cursor.Hide();
+                _isMouseHidden = true;
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            if (_isMouseHidden)
+            {
+                System.Windows.Forms.Cursor.Show();
+                _isMouseHidden = false;
+            }
         }
         
         #endregion
@@ -259,7 +279,9 @@ namespace Microsoft.Xna.Framework
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);                        
+            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+            window.MouseEnter += OnMouseEnter;
+            window.MouseLeave += OnMouseLeave;
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
