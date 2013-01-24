@@ -75,6 +75,9 @@ namespace Microsoft.Xna.Framework {
 
 		[DefaultValue(false)]
 		public abstract bool AllowUserResizing { get; set; }
+		
+        	//not all platforms need to implement this - virtual seems suitable
+        	public virtual bool IsBorderless { get; set; }
 
 		public abstract Rectangle ClientBounds { get; }
 
