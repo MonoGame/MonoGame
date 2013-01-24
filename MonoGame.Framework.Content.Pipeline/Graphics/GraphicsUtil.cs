@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             switch (bitmapData.PixelFormat)
             {
-                case PixelFormat.Format32bppPArgb:
+                case PixelFormat.Format32bppArgb:
                     BGRAtoRGBA(output);
                     break;
 
@@ -80,14 +80,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var colorTex = content.Faces[0][0] as PixelBitmapContent<Color>;
             if (colorTex != null)
             {
-                for (int x = 0; x < colorTex.Height; x++)
+                for (var y = 0; y < colorTex.Height; y++)
                 {
-                    var row = colorTex.GetRow(x);
-                    for (int y = 0; y < row.Length; y++)
+                    for (var x = 0; x < colorTex.Width; x++)
                     {
-                        if (row[y].A < 0xff)
-                            row[y] = Color.FromNonPremultiplied(row[y].R, row[y].G, row[y].B, row[y].A);
+                        colorTex._pixelData[y][x] = Color.FromNonPremultiplied(colorTex._pixelData[y][x].R,
+                                                                            colorTex._pixelData[y][x].G,
+                                                                            colorTex._pixelData[y][x].B,
+                                                                            colorTex._pixelData[y][x].A);
                     }
+
                 }
             }
             else

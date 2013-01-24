@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public class PixelBitmapContent<T> : BitmapContent where T : struct, IEquatable<T>
     {
-        internal T[] _pixelData;
+        internal T[][] _pixelData;
         protected SurfaceFormat _format = SurfaceFormat.Color;
 
         public PixelBitmapContent(int width, int height)
@@ -19,56 +19,55 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Height = height;
             Width = width;
 
-            _pixelData = new T[height * width];
+            _pixelData = new T[height][];
 
-            var counter = 0;
             for (int y = 0; y < height; y++)
-            {
-                for (var x = 0; x < width; x++)
-                {
-                    _pixelData[counter++] = new T();
-                }
-            }
+                _pixelData[y] = new T[width];
         }
 
         public override byte[] GetPixelData()
         {
-            var dataSize = Width * Height * _format.Size();
-            int dataSize2 = Marshal.SizeOf(typeof(T));
+            if (_format != SurfaceFormat.Color)
+                throw new NotImplementedException();
+
+            var formatSize = _format.Size();
+            var dataSize = Width * Height * formatSize;
             var outputData = new byte[dataSize];
 
-            var dataHandle = GCHandle.Alloc(_pixelData, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+            for (var x = 0; x < Height; x++)
+            {
+                var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
 
-            Marshal.Copy(dataPtr, outputData, 0, dataSize);
+                Marshal.Copy(dataPtr, outputData, (formatSize * x * Height), (Width * formatSize));
 
-            dataHandle.Free();
+                dataHandle.Free();
+            }
 
             return outputData;
         }
 
         public override void SetPixelData(byte[] sourceData)
         {
-            var dataHandle = GCHandle.Alloc(_pixelData, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
+            var size = _format.Size();
 
-            // Copy from the temporary buffer to the destination array
-            int dataSize = Marshal.SizeOf(typeof(T));
+            for(var x = 0; x < Height; x++)
+            {
+                var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
+                var dataPtr = (IntPtr)dataHandle.AddrOfPinnedObject().ToInt64();
 
-            Marshal.Copy(sourceData, 0, dataPtr, sourceData.Length);
+                Marshal.Copy(sourceData, (x * Height * size), dataPtr, Width * size);
 
-            dataHandle.Free();
+                dataHandle.Free();
+            }
         }
 
-        // TODO: Docs say the value for this needs to be modifiable?
         public T[] GetRow(int y)
         {
-            var output = new T[Width];
+            if (y >= Height)
+                throw new ArgumentOutOfRangeException("y");
 
-            for (var x = 0; x < Width; x++)
-                output[x] = _pixelData[(y * Height) + x];
-
-            return output;
+            return _pixelData[y];
         }
 
         /// <summary>
@@ -84,20 +83,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public T GetPixel(int x, int y)
         {
-            return _pixelData[(y * Width) + x];
+            return _pixelData[y][x];
         }
 
         public void SetPixel(int x, int y, T value)
         {
-            _pixelData[(y * Width) + x] = value;
+            _pixelData[y][x] = value;
         }
 
         public void ReplaceColor(T originalColor, T newColor)
         {
-            for (var x = 0; x < _pixelData.Length; x++)
+            for (var y = 0; y < Height; y++ )
             {
-                if (_pixelData[x].Equals(originalColor))
-                    _pixelData[x] = newColor;
+                for (var x = 0; x < Width; x++)
+                {
+                    if (_pixelData[y][x].Equals(originalColor))
+                        _pixelData[y][x] = newColor;
+                }
             }
         }
 
