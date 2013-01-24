@@ -887,10 +887,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif PSM
-
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
-
+            ApplyState(false);
 #elif OPENGL
 
             // Unlike with XNA and DirectX...  GL.Clear() obeys several

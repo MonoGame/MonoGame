@@ -223,10 +223,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var vertexCount = end - start;
-
-#warning this should be applied somewhere else
-            _device._graphics.Enable(EnableMode.Blend);  
-            _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.OneMinusSrcAlpha);
             _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
 		}
 	}

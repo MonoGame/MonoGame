@@ -398,12 +398,15 @@
     <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <Reference Include="Sce.PlayStation.Core" />
     <Reference Include="System.Core" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+=======
+>>>>>>> upstream/develop3d
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSMobile.csproj">
       <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
       <Name>Lidgren.Network.PSMobile</Name>
