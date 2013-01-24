@@ -329,12 +329,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
+                if (importer == null)
+                    throw new PipelineException("Failed to find importer '{0}' for '{1}'", pipelineEvent.Importer, pipelineEvent.SourceFile);
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
-                if (importer == null || processor == null)
-                {
-                    // TODO: Log error?
-                    return;
-                }
+                if (processor == null)
+                    throw new PipelineException("Failed to find processor '{0}' for '{1}'", pipelineEvent.Processor, pipelineEvent.SourceFile);
 
                 // Try importing the content.
                 object importedObject;
@@ -343,10 +342,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var importContext = new PipelineImporterContext(this);
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Failed to import '{0}'", pipelineEvent.SourceFile), inner);
                 }
 
                 // Process the imported object.
@@ -356,10 +358,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var processContext = new PipelineProcessorContext(this, pipelineEvent);
                     processedObject = processor.Process(importedObject, processContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;                   
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Failed to process '{0}'", pipelineEvent.SourceFile), inner);
                 }
 
                 // Write the content to disk.
