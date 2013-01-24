@@ -79,6 +79,11 @@ namespace MGCB
 
         public void Build()
         {
+            Console.WriteLine("Building {0}\n", _project.FullPath);
+
+            var errorCount = 0;
+            var fileCount = 0;
+
             var compile = _project.Items.Where(e => e.ItemType == "Compile");
             foreach (var c in compile)
             {
@@ -97,12 +102,25 @@ namespace MGCB
                     processorParameters.Add(propName, meta.Value);
                 }
 
-                _manager.BuildContent(sourceFile, 
-                    null,
-                    importer != null ? importer.Value : null, 
-                    processor != null ? processor.Value : null,
-                    processorParameters);
+                try
+                {
+                    _manager.BuildContent(sourceFile,
+                                          null,
+                                          importer != null ? importer.Value : null,
+                                          processor != null ? processor.Value : null,
+                                          processorParameters);
+
+                    Console.WriteLine("{0}", c.Include);
+                    ++fileCount;
+                }
+                catch (PipelineException ex)
+                {
+                    ++errorCount;
+                    Console.WriteLine("{0}: error: {1}", c.Include, ex.Message);
+                }                
             }
+
+            Console.WriteLine("\nBuild: {0} succeeded, {1} failed.", fileCount, errorCount);
         }
     }
 }

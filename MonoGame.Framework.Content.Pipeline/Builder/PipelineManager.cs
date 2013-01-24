@@ -330,10 +330,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
                 if (importer == null)
-                    throw new PipelineException("Failed to find importer '{0}' for '{1}'", pipelineEvent.Importer, pipelineEvent.SourceFile);
+                    throw new PipelineException("Failed to create importer '{0}'", pipelineEvent.Importer);
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
                 if (processor == null)
-                    throw new PipelineException("Failed to find processor '{0}' for '{1}'", pipelineEvent.Processor, pipelineEvent.SourceFile);
+                    throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
 
                 // Try importing the content.
                 object importedObject;
@@ -348,7 +348,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
                 catch (Exception inner)
                 {
-                    throw new PipelineException(string.Format("Failed to import '{0}'", pipelineEvent.SourceFile), inner);
+                    throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
                 }
 
                 // Process the imported object.
@@ -364,7 +364,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
                 catch (Exception inner)
                 {
-                    throw new PipelineException(string.Format("Failed to process '{0}'", pipelineEvent.SourceFile), inner);
+                    throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
                 }
 
                 // Write the content to disk.
