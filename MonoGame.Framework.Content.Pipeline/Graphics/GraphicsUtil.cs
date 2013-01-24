@@ -10,30 +10,68 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public static class GraphicsUtil
     {
-        public static void ConvertBitmap(Bitmap bmp, out byte[] output)
+        public static byte[] ConvertBitmap(Bitmap bmp)
         {
             var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
                                     ImageLockMode.ReadOnly,
                                     bmp.PixelFormat);
 
             var length = bitmapData.Stride * bitmapData.Height;
-
-            if (bitmapData.PixelFormat != PixelFormat.Format32bppArgb)
-                throw new NotSupportedException("Unsupported pixel format.");
-
-            output = new byte[length];
+            var output = new byte[length];
 
             // Copy bitmap to byte[]
-            // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
-            // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
-            // Image data from any GDI based function will always come in BGR/BGRA even if the format comes in as RGBA
             Marshal.Copy(bitmapData.Scan0, output, 0, length);
             bmp.UnlockBits(bitmapData);
+
+            // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
+            // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
+            // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RBGA.
+
+            switch (bitmapData.PixelFormat)
+            {
+                case PixelFormat.Format32bppPArgb:
+                    BGRAtoRGBA(output);
+                    break;
+
+                case PixelFormat.Format32bppRgb:
+                    BGRtoRGBA(output);
+                    break;
+                    
+                default:
+                    throw new NotSupportedException("Unsupported pixel format.");
+            }
+            return output;
+        }
+
+        public static void BGRAtoRGBA(byte[] data)
+        {
+            for (var x = 0; x < data.Length; x += 4)
+            {
+                data[x] ^= data[x + 2];
+                data[x + 2] ^= data[x];
+                data[x] ^= data[x + 2];
+            }
+        }
+
+        public static void BGRtoRGBA(byte[] data)
+        {
+            var output = new byte[(int)(data.LongLength * 4.0f / 3.0f)];
+            var counter = 0;
+            for (var x = 0; x < data.Length;)
+            {
+                output[counter++] = data[x + 2];
+                output[counter++] = data[x + 1];
+                output[counter++] = data[x];
+                output[counter++] = (byte)255;
+
+                x += 3;
+            }
         }
 
 

@@ -32,11 +32,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var output = new Texture2DContent();
             var bmp = new Bitmap(filename);
 
-            byte[] imageData;
-            GraphicsUtil.ConvertBitmap(bmp, out imageData);
+            var imageData = GraphicsUtil.ConvertBitmap(bmp);
 
             var bitmapContent = new PixelBitmapContent<Color>(bmp.Width, bmp.Height);
-            bitmapContent.SetPixelData(imageData, bmp.PixelFormat);
+            bitmapContent.SetPixelData(imageData);
 
             output.Faces.Add(new MipmapChain(bitmapContent));
             return output;

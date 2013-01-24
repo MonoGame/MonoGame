@@ -121,7 +121,6 @@
     <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="Graphics\PixelBitmapContent.cs" />
-    <Compile Include="Graphics\PixelBitmapContentColor.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
