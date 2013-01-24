@@ -51,8 +51,6 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
     </Reference>
