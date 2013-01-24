@@ -72,10 +72,14 @@ namespace Microsoft.Xna.Framework
 
 #if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = false;
-#endif
+#endif        
+#if PSS
+        public static readonly int DefaultBackBufferHeight = 544;
+        public static readonly int DefaultBackBufferWidth = 960;
+#else
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
-
+#endif
         public GraphicsDeviceManager(Game game)
         {
             if (game == null)

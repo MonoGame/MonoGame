@@ -246,8 +246,11 @@ namespace Microsoft.Xna.Framework.Media
             
             PlaySong(song);
         }
-		
-		public static void Play(SongCollection collection, int index = 0)
+#if PSS
+		public static void Play(SongCollection collection, int index)
+#else
+        public static void Play(SongCollection collection, int index = 0)
+#endif
 		{
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
