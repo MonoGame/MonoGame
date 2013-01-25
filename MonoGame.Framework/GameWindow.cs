@@ -95,6 +95,10 @@ namespace Microsoft.Xna.Framework {
 			}
 		}
 		
+
+        	/// <summary>
+        	/// Set the visibility of the window's border.
+        	/// </summary>
         	public virtual bool IsBorderless
         	{
             		get { return false; }
