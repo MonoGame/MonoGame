@@ -1,6 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Users\Dean\Desktop\MonoGame\"
+!define FrameworkPath "C:\Users\Dean\Desktop\MonoGameMaster\"
 !define VERSION "3.0"
 !define REVISION "0.0"
 !define INSTALLERFILENAME "MonoGame"
@@ -36,24 +36,53 @@ RequestExecutionLevel admin
 !define MUI_HEADERIMAGE_BITMAP "${FrameworkPath}Installers\monogame.bmp"
 !define MUI_ABORTWARNING
 
-;--------------------------------
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${FrameworkPath}Installers\panel.bmp"
 ;Languages
 
-!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_PAGE_WELCOME
+
+;!insertmacro MUI_PAGE_LICENSE "License.txt"
+
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
+;Page custom XamarinPageEnter XamarinPageLeave
+
+;  Function XamarinPageEnter
+;      ReserveFile "xamarin.ini"
+;      ReserveFile "mono.bmp"
+;      ReserveFile "xamarin.bmp"
+;      !insertmacro INSTALLOPTIONS_EXTRACT "xamarin.ini"
+;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 1" "Text" "mono.bmp"
+;      !insertmacro INSTALLOPTIONS_WRITE "xamarin.ini" "Field 2" "Text" "xamarin.bmp"
+;      !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
+;  FunctionEnd
+  
+;  Function XamarinPageLeave
+;  FunctionEnd
+
+!insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
 ;--------------------------------
+;Languages
+
+!insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+
+Function CustomPageFunction ;Function name defined with Page command
+  !insertmacro INSTALLOPTIONS_DISPLAY "xamarin.ini"
+FunctionEnd
+
 
 ; The stuff to install
-Section "MonoGame Core Components" ;No components page, name is not important
+Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}
   File '..\monogame.ico'
-  File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\x86\Release\*.dll'
+  File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
   File '..\..\ThirdParty\Libs\NAudio\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
@@ -68,22 +97,32 @@ Section "MonoGame Core Components" ;No components page, name is not important
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  
+
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
+  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\OUYA\Release\*.xml'  
+  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\Release\*.xml'
-  
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
-  
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies'
   File '..\..\ThirdParty\Libs\OpenTK.dll'
   File '..\..\ThirdParty\Libs\OpenTK.dll.config'
   File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
+  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
+  File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\Release\*.xml'
+  File '..\..\ThirdParty\Libs\OpenTK.dll'
+  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
+  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
+  File '..\..\ThirdParty\GamepadConfig\SDL.dll'
+  File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
+
+    
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
 
   File '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll'
@@ -108,23 +147,23 @@ Section "MonoGame Core Components" ;No components page, name is not important
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
 
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux' '' '$INSTDIR\Assemblies\Linux'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' '' '$INSTDIR\Assemblies\Windows8'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
+  WriteRegStr HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android' '' '$INSTDIR\Assemblies\Android'
+
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
-    WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
     GOTO End32Bitvs64BitCheck
-
   Is64bit:
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsGL'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Linux'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
-    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' '' '$INSTDIR\Assemblies\Windows8'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Android'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\OUYA'
+    WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\Windows8'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\ARM'
     WriteRegStr HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}' '' '$INSTDIR\Assemblies\WindowsPhone\x86'
 
@@ -139,19 +178,20 @@ Section "MonoGame Core Components" ;No components page, name is not important
 
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}'
+  File '..\monogame.ico'
   ; Uninstaller
   WriteUninstaller "uninstall.exe"
 
 
 SectionEnd
 
-Section "OpenAL"
+Section "OpenAL" OpenAL
   ; SetOutPath $INSTDIR
   File '..\..\ThirdParty\Libs\oalinst.exe'
-  ExecWait '$INSTDIR\oalinst.exe'
+  ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
 
-Section "MonoDevelop Templates"
+Section "MonoDevelop Templates" MonoDevelop
 
 ; Set output path to the installation directory.
   SetOutPath $INSTDIR
@@ -178,6 +218,9 @@ Section "MonoDevelop Templates"
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Android"
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
+  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\OUYA"
+  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
+  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Linux"
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
   SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\MacOS"
@@ -187,7 +230,7 @@ Section "MonoDevelop Templates"
 SectionEnd
 
 
-Section "Visual Studio 2010 Templates"
+Section "Visual Studio 2010 Templates" VS2010
 
   IfFileExists `$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
@@ -204,7 +247,7 @@ Section "Visual Studio 2010 Templates"
 
 SectionEnd
 
-Section "Visual Studio 2012 Templates"
+Section "Visual Studio 2012 Templates" VS2012
 
   IfFileExists `$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
   InstallTemplates:
@@ -212,7 +255,7 @@ Section "Visual Studio 2012 Templates"
     SetOutPath "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
 
     ; install the Templates for MonoDevelop
-    File /r '..\..\ProjectTemplates\VisualStudio2012\*.*'
+    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
     ; Install the VS 2010 templates as well 
     File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
     GOTO EndTemplates
@@ -224,13 +267,32 @@ Section "Visual Studio 2012 Templates"
 SectionEnd
 
 ; Optional section (can be disabled by the user)
-Section "Start Menu Shortcuts"
+Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\MonoGame
 	CreateShortCut "$SMPROGRAMS\MonoGame\Uninstall.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\uninstall.exe" 0
 	;CreateShortCut "$SMPROGRAMS\MonoGame\GettingStarted.lnk" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" "" "$PROGRAMFILES\${APPNAME}\v${VERSION}\GettingStarted.pdf" 0
-	WriteINIStr "$SMPROGRAMS\MonoGame\Shortcut.url" "InternetShortcut" "URL" "http://www.monogame.net"
+	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "URL" "http://www.monogame.net"
+	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "IconFile" "$PROGRAMFILES\${APPNAME}\v${VERSION}\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\MonoGame\MonoGame Web Site.url" "InternetShortcut" "IconIndex" "0"
 
 SectionEnd
+
+LangString CoreComponentsDesc ${LANG_ENGLISH} "Install the Runtimes and the MSBuild extensions for MonoGame"
+LangString OpenALDesc ${LANG_ENGLISH} "Install the OpenAL drivers"
+LangString MonoDevelopDesc ${LANG_ENGLISH} "Install the project templates for MonoDevelop"
+LangString VS2010Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2010"
+LangString VS2012Desc ${LANG_ENGLISH} "Install the project templates for Visual Studio 2012"
+LangString MenuDesc ${LANG_ENGLISH} "Add a link to the MonoGame website to your start menu"
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${CoreComponents} $(CoreComponentsDesc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${OpenAL} $(OpenALDesc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${MonoDevelop} $(MonoDevelopDesc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2010} $(VS2010Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${VS2012} $(VS2012Desc)
+  !insertmacro MUI_DESCRIPTION_TEXT ${Menu} $(MenuDesc)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
 
 
 Function .onInit
@@ -245,13 +307,25 @@ FunctionEnd
 Section "Uninstall"
 
   DeleteRegKey HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store' 
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
+  DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
+
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
-    DeleteRegKey HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}'
     GOTO End32Bitvs64BitCheck
-
   Is64bit:
-    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME}'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Linux'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50709\AssemblyFoldersEx\${APPNAME} for Windows Store'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone ARM'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows Phone x86'
+    DeleteRegKey HKLM 'SOFTWARE\Wow6432Node\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
+
 
   End32Bitvs64BitCheck:
 
@@ -267,6 +341,7 @@ Section "Uninstall"
   
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}"
   RMDir /r "$SMPROGRAMS\MonoGame"
 
   Delete "$INSTDIR\Uninstall.exe"

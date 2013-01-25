@@ -40,6 +40,7 @@
 	<Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD:ProjectTemplates/VisualStudio2010/Windows/MonoGameWindowsApplication.csproj
     <Reference Include="OpenTK">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\OpenTK.dll</HintPath>
     </Reference>
@@ -52,6 +53,12 @@
     <Reference Include="Tao.Sdl">
        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Tao.Sdl.dll</HintPath>
     </Reference>
+=======
+    <Reference Include="OpenTK" />
+    <Reference Include="MonoGame.Framework.Windows" />
+    <Reference Include="Lidgren.Network" />
+    <Reference Include="Tao.Sdl"/>
+>>>>>>> origin/master:ProjectTemplates/VisualStudio2010.MonoGame.2.5/VS2010MGWindowsTemplate/MonoGameWindowsApplication.csproj
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>

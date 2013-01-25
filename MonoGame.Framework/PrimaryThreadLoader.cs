@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework
         private static readonly object ListLockObject = new object();
         private static readonly List<IPrimaryThreadLoaded> NeedToLoad = new List<IPrimaryThreadLoaded>(); 
         private static readonly List<IPrimaryThreadLoaded> RemoveList = new List<IPrimaryThreadLoaded>();
-        private static DateTime _lastUpdate = DateTime.Now;
+        private static DateTime _lastUpdate = DateTime.UtcNow;
 
         public static void AddToList(IPrimaryThreadLoaded primaryThreadLoaded)
         {
@@ -61,9 +61,9 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public static void DoLoads()
         {
-            if((DateTime.Now - _lastUpdate).Milliseconds < 250) return;
+            if((DateTime.UtcNow - _lastUpdate).Milliseconds < 250) return;
 
-            _lastUpdate = DateTime.Now;
+            _lastUpdate = DateTime.UtcNow;
             lock (ListLockObject)
             {
                 for (int i = 0; i < NeedToLoad.Count; i++)
