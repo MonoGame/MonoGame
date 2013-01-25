@@ -12,10 +12,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// <summary>
     /// A custom song processor that processes an intermediate AudioContent type. This type encapsulates the source audio content, producing a Song type that can be used in the game.
     /// </summary>
-    [ContentProcessor(DisplayName = "Song Processor - MonoGame")]
+    [ContentProcessor(DisplayName = "Song - MonoGame")]
     public class SongProcessor : ContentProcessor<AudioContent, SongContent>
     {
-        ConversionQuality quality;
+        ConversionQuality quality = ConversionQuality.Best;
 
         /// <summary>
         /// Gets or sets the target format quality of the audio content.
