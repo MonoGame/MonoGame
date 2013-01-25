@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework {
 				}
 			}
 		}
-		//not all platforms need to implement this - virtual seems suitable
+		
         	public virtual bool IsBorderless
         	{
             		get { return false; }
