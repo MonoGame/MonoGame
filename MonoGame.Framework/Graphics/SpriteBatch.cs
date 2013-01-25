@@ -87,7 +87,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
-
+#if PSM   
+            GraphicsDevice.BlendState = _blendState;
+            _blendState.ApplyState(GraphicsDevice);
+#endif
+            
             _batcher.DrawBatch(_sortMode);
         }
 		
