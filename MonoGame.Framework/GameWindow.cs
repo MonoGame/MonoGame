@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework {
         	/// Set the visibility of the window's border. Only the WindowsDX platform currently
         	/// supports this property.
         	/// </summary>
-        	/// <exception cref="System.Exception">
+        	/// <exception cref="System.NotImplementedException">
         	/// Thrown when trying to use this property on
         	/// all other non-WinDX platforms.
         	/// </exception>
