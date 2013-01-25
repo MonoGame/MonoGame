@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// A sound effect processor that processes an intermediate AudioContent type. This type encapsulates the source audio content, producing a SoundEffect type that can be used in the game.
     /// </summary>
     [ContentProcessor(DisplayName = "Sound Effect - MonoGame")]
-    public class SoundEffectProcessor : ContentProcessor<AudioContent, AudioContent>
+    public class SoundEffectProcessor : ContentProcessor<AudioContent, SoundEffectContent>
     {
         ConversionQuality quality = ConversionQuality.Best;
 
@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <param name="input">The audio content to build.</param>
         /// <param name="context">Context for the specified processor.</param>
         /// <returns>The built audio.</returns>
-        public override AudioContent Process(AudioContent input, ContentProcessorContext context)
+        public override SoundEffectContent Process(AudioContent input, ContentProcessorContext context)
         {
             var targetFormat = ConversionFormat.Pcm;
 
@@ -44,16 +44,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 case ConversionQuality.Medium:
                 case ConversionQuality.Low:
-                    targetFormat = ConversionFormat.Adpcm;
+                    if ((context.TargetPlatform == TargetPlatform.iOS) || (context.TargetPlatform == TargetPlatform.MacOSX))
+                        targetFormat = ConversionFormat.ImaAdpcm;
+                    else
+                        targetFormat = ConversionFormat.Adpcm;
                     break;
             }
 
-            input.ConvertFormat(targetFormat, )
+            input.ConvertFormat(targetFormat, quality, null);
 
-            string songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
-            //input.ConvertFormat(targetFormat, quality, songFileName);
-            var song = new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
-            return song;
+            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, input.LoopStart, input.LoopLength, (int)input.Duration.TotalMilliseconds);
         }
     }
 }
