@@ -52,17 +52,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = projectDir + @"\";
-            OutputDirectory = outputDir + @"\";
-            IntermediateDirectory = intermediateDir + @"\";
+            ProjectDirectory = PathHelper.Normalize(projectDir + @"\");
+            OutputDirectory = PathHelper.Normalize(outputDir + @"\");
+            IntermediateDirectory = PathHelper.Normalize(intermediateDir + @"\");
         }
 
         public void AddAssembly(string assemblyFilePath)
         {
             if (assemblyFilePath == null)
-                throw new NullReferenceException("assemblyFilePath cannot be null!");
+                throw new ArgumentException("assemblyFilePath cannot be null!");
             if (!Path.IsPathRooted(assemblyFilePath))
-                throw new NullReferenceException("assemblyFilePath must be absolute!");
+                throw new ArgumentException("assemblyFilePath must be absolute!");
 
             // Make sure we're not adding the same assembly twice.
             assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
