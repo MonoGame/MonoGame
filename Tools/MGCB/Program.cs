@@ -30,7 +30,7 @@ namespace MGCB
             }
 
             var project = new ContentProject(options.ContentProjectFile, options.OutputName);
-            project.Build();
+            project.Build(options.Rebuild);
 
             return 0;
         }

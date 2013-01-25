@@ -11,5 +11,7 @@ namespace MGCB
 
         [Utilities.CommandLineParser.Required]
         public string OutputName;
+
+        public bool Rebuild;
     }
 }
