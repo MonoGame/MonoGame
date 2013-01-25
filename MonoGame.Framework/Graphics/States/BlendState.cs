@@ -323,24 +323,27 @@ namespace Microsoft.Xna.Framework.Graphics
 #if PSM
         internal void ApplyState(GraphicsDevice device)
         {
-#warning its a simplistic implementation..i am not sure about this equivalence
-            device._graphics.Enable(EnableMode.Blend);     
             if (device.BlendState == BlendState.Additive)
             {
+                device._graphics.Enable(EnableMode.Blend);    
                 device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.One);
             }
             else if (device.BlendState == BlendState.AlphaBlend)
             {
+                device._graphics.Enable(EnableMode.Blend);     
                 device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
             }
             else if (device.BlendState == BlendState.NonPremultiplied)
             {
+                device._graphics.Enable(EnableMode.Blend);     
                 device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcColor, BlendFuncFactor.OneMinusSrcColor);
             }
             else if (device.BlendState == BlendState.Opaque)
             {
+                device._graphics.Enable(EnableMode.Blend);     
                 device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.Zero);
             }
+            else device._graphics.Disable(EnableMode.Blend);           
         }
 #endif
 	}
