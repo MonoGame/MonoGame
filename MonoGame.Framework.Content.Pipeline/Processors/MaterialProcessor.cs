@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// Provides methods and properties for maintaining a collection of named texture references.
     /// </summary>
     /// <remarks>In addition to texture references, opaque data values are stored in the OpaqueData property of the base class.</remarks>
-    [ContentProcessor(DisplayName = "Material Processor - MonoGame")]
+    [ContentProcessor(DisplayName = "Material - MonoGame")]
     public class MaterialProcessor : ContentProcessor<MaterialContent, MaterialContent>
     {
         Color colorKeyColor;
