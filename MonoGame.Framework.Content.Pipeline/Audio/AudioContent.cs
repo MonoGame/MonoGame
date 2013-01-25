@@ -105,11 +105,47 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         }
 
         /// <summary>
+        /// Returns the sample rate for the given quality setting.
+        /// </summary>
+        /// <param name="quality">The quality setting.</param>
+        /// <returns>The sample rate for the quality.</returns>
+        int QualityToSampleRate(ConversionQuality quality)
+        {
+            switch (quality)
+            {
+                case ConversionQuality.Low:
+                    return 11025;
+                case ConversionQuality.Medium:
+                    return 22050;
+            }
+
+            return 44100;
+        }
+
+        /// <summary>
+        /// Returns the bitrate for the given quality setting.
+        /// </summary>
+        /// <param name="quality">The quality setting.</param>
+        /// <returns>The bitrate for the quality.</returns>
+        int QualityToBitRate(ConversionQuality quality)
+        {
+            switch (quality)
+            {
+                case ConversionQuality.Low:
+                    return 96;
+                case ConversionQuality.Medium:
+                    return 128;
+            }
+
+            return 192;
+        }
+
+        /// <summary>
         /// Transcodes the source audio to the target format and quality.
         /// </summary>
-        /// <param name="formatType">Format of the processed source audio: WAV, MP3 or WMA.</param>
-        /// <param name="quality">Quality of the processed source audio. It can be one of the following: Low (96 kbps), Medium (128 kbps), Best (192 kbps)</param>
-        /// <param name="targetFileName">Name of the file containing the processed source audio.</param>
+        /// <param name="formatType">Format to convert this audio to.</param>
+        /// <param name="quality">Quality of the processed output audio. For streaming formats, it can be one of the following: Low (96 kbps), Medium (128 kbps), Best (192 kbps).  For WAV formats, it can be one of the following: Low (11kHz ADPCM), Medium (22kHz ADPCM), Best (44kHz PCM)</param>
+        /// <param name="targetFileName">Name of the file containing the processed source audio. Must be null for Wav and Adpcm. Must not be null for streaming compressed formats.</param>
         public void ConvertFormat(ConversionFormat formatType, ConversionQuality quality, string targetFileName)
         {
             if (disposed)
@@ -118,9 +154,47 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             switch (formatType)
             {
                 case ConversionFormat.Adpcm:
+                    {
+                        var wavFormat = new AdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount);
+                        using (var wavStream = new WaveFormatConversionStream(wavFormat, reader))
+                        {
+                            using (var output = new MemoryStream())
+                            {
+                                var writer = new WaveFileWriter(output, wavFormat);
+                                reader.Position = 0;
+                                reader.CopyTo(writer);
+
+                                reader.Dispose();
+
+                                output.Position = 0;
+                                reader = new WaveFileReader(output);
+                                duration = reader.TotalTime;
+                                format = new AudioFormat(reader);
+                            }
+                        }
+                    }
                     break;
 
                 case ConversionFormat.Pcm:
+                    {
+                        var wavFormat = new WaveFormat(QualityToSampleRate(quality), format.ChannelCount);
+                        using (var wavStream = new WaveFormatConversionStream(wavFormat, reader))
+                        {
+                            using (var output = new MemoryStream())
+                            {
+                                var writer = new WaveFileWriter(output, wavFormat);
+                                reader.Position = 0;
+                                reader.CopyTo(writer);
+
+                                reader.Dispose();
+
+                                output.Position = 0;
+                                reader = new WaveFileReader(output);
+                                duration = reader.TotalTime;
+                                format = new AudioFormat(reader);
+                            }
+                        }
+                    }
                     break;
 
                 case ConversionFormat.WindowsMedia:
@@ -134,6 +208,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     throw new NotSupportedException("Xma is not a supported encoding format");
 
                 case ConversionFormat.Aac:
+
                     break;
 
                 case ConversionFormat.Vorbis:

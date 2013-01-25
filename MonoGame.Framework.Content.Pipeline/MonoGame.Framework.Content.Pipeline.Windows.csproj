@@ -146,6 +146,7 @@
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
+    <Compile Include="Processors\SoundEffectProcessor.cs" />
     <Compile Include="Processors\SpriteFontContent.cs" />
     <Compile Include="Processors\TextureProcessor.cs" />
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
