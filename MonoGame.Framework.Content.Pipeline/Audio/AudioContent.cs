@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NAudio.Wave;
-using NAudio.WindowsMediaFormat;
 using System.IO;
 using System.Diagnostics;
 
@@ -80,21 +79,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             fileName = audioFileName;
             fileType = audioFileType;
-
-            switch (fileType)
-            {
-                case AudioFileType.Wav:
-                    ReadWav();
-                    break;
-
-                case AudioFileType.Mp3:
-                    ReadMp3();
-                    break;
-
-                case AudioFileType.Wma:
-                    ReadWma();
-                    break;
-            }
+            Read();
         }
 
         /// <summary>
@@ -131,12 +116,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             switch (quality)
             {
                 case ConversionQuality.Low:
-                    return 96;
+                    return 96000;
                 case ConversionQuality.Medium:
-                    return 128;
+                    return 128000;
             }
 
-            return 192;
+            return 192000;
         }
 
         /// <summary>
@@ -145,6 +130,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <param name="waveFormat">The WaveFormat to use for the conversion.</param>
         void ConvertWav(WaveFormat waveFormat)
         {
+            /*
             reader.Position = 0;
             using (var wavStream = new WaveFormatConversionStream(waveFormat, reader))
             {
@@ -152,6 +138,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 wavStream.Read(bytes, 0, bytes.Length);
                 data = new List<byte>(bytes);
                 format = new AudioFormat(waveFormat);
+            }
+             */
+            reader.Position = 0;
+            //var mediaTypes = MediaFoundationEncoder.GetOutputMediaTypes(NAudio.MediaFoundation.AudioSubtypes.MFAudioFormat_PCM);
+            using (var resampler = new MediaFoundationResampler(reader, waveFormat))
+            {
+                using (var outStream = new MemoryStream())
+                {
+                    // Since we cannot determine ahead of time the number of bytes to be
+                    // read, read four seconds worth at a time.
+                    byte[] bytes = new byte[reader.WaveFormat.AverageBytesPerSecond * 4];
+                    while (true)
+                    {
+                        int bytesRead = resampler.Read(bytes, 0, bytes.Length);
+                        if (bytesRead == 0)
+                            break;
+                        outStream.Write(bytes, 0, bytesRead);
+                    }
+                    data = new List<byte>(outStream.ToArray());
+                    format = new AudioFormat(waveFormat);
+                }
             }
         }
 
@@ -178,24 +185,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.WindowsMedia:
 #if WINDOWS
+                    reader.Position = 0;
+                    MediaFoundationEncoder.EncodeToWma(reader, targetFileName, QualityToBitRate(quality));
                     break;
 #else
                     throw new NotSupportedException("WindowsMedia encoding supported on Windows only");
 #endif
 
                 case ConversionFormat.Xma:
-                    throw new NotSupportedException("Xma is not a supported encoding format");
+                    throw new NotSupportedException("XMA is not a supported encoding format. It is specific to the Xbox 360.");
 
                 case ConversionFormat.ImaAdpcm:
                     ConvertWav(new ImaAdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount, 4));
                     break;
 
                 case ConversionFormat.Aac:
-
+                    reader.Position = 0;
+                    MediaFoundationEncoder.EncodeToAac(reader, targetFileName, QualityToBitRate(quality));
                     break;
 
                 case ConversionFormat.Vorbis:
-                    break;
+                    throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");
             }
         }
 
@@ -228,39 +238,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         }
 
         /// <summary>
-        /// Read a WAV format file.
+        /// Read an audio file.
         /// </summary>
-        void ReadWav()
+        void Read()
         {
-            reader = new WaveFileReader(fileName);
-            duration = reader.TotalTime;
-            format = new AudioFormat(reader.WaveFormat);
-
-            var bytes = new byte[reader.Length];
-            var read = reader.Read(bytes, 0, bytes.Length);
-            data = new List<byte>(bytes);
-        }
-
-        /// <summary>
-        /// Read a MP3 format file.
-        /// </summary>
-        void ReadMp3()
-        {
-            reader = new Mp3FileReader(fileName);
-            duration = reader.TotalTime;
-            format = new AudioFormat(reader.WaveFormat);
-
-            var bytes = new byte[reader.Length];
-            var read = reader.Read(bytes, 0, bytes.Length);
-            data = new List<byte>(bytes);
-        }
-
-        /// <summary>
-        /// Read a WMA format file.
-        /// </summary>
-        void ReadWma()
-        {
-            reader = new WMAFileReader(fileName);
+            reader = new MediaFoundationReader(fileName);
             duration = reader.TotalTime;
             format = new AudioFormat(reader.WaveFormat);
 
