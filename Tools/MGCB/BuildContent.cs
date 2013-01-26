@@ -13,7 +13,7 @@ namespace MGCB
     class BuildContent
     {
         [CommandLineParameter("reference")]
-        public List<string> References = new List<string>();
+        public readonly List<string> References = new List<string>();
 
         [CommandLineParameter("outputDir", true)]
         public string OutputDir;
@@ -34,7 +34,7 @@ namespace MGCB
         public string Processor;
 
         [CommandLineParameter("processorParam")]
-        public List<string> ProcessorParams = new List<string>();
+        public readonly List<string> ProcessorParams = new List<string>();
 
         [CommandLineParameter("build")]
         public void OnBuild(string sourceFile)
@@ -88,6 +88,10 @@ namespace MGCB
             var buildStarted = DateTime.Now;
             Console.WriteLine("Build started {0}\n", buildStarted);
 
+            // TODO: We should be using the previously serialized list
+            // of input files to the intermediate folder so we can clean
+            // them here even if we don't build new content.
+
             var errorCount = 0;
             var fileCount = 0;
 
@@ -119,6 +123,12 @@ namespace MGCB
                 }
             }
 
+            // TODO: If this isn't an incremental build we should
+            // clean old content that is no longer a build item.
+
+            // TODO: We should be using serializing the list
+            // of input files we just built for use in cleaning.
+            
             Console.WriteLine("\nBuild {0} succeeded, {1} failed.", fileCount, errorCount);
             Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
         }
