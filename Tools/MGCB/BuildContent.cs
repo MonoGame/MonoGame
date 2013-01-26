@@ -12,9 +12,6 @@ namespace MGCB
 {
     class BuildContent
     {
-        [CommandLineParameter("reference")]
-        public readonly List<string> References = new List<string>();
-
         [CommandLineParameter("outputDir", true)]
         public string OutputDir;
 
@@ -26,6 +23,9 @@ namespace MGCB
 
         [CommandLineParameter("clean")]
         public bool Clean;
+
+        [CommandLineParameter("reference")]
+        public readonly List<string> References = new List<string>();
 
         [CommandLineParameter("importer")]
         public string Importer;
@@ -75,7 +75,7 @@ namespace MGCB
 
         private PipelineManager _manager;
 
-        public void Build()
+        public void Build(out int fileCount, out int errorCount)
         {
             var projectDirectory = Directory.GetCurrentDirectory();
             var outputPath = Path.Combine(projectDirectory, OutputDir);
@@ -85,15 +85,12 @@ namespace MGCB
             foreach(var r in References)
                 _manager.AddAssembly(r);
 
-            var buildStarted = DateTime.Now;
-            Console.WriteLine("Build started {0}\n", buildStarted);
-
             // TODO: We should be using the previously serialized list
             // of input files to the intermediate folder so we can clean
             // them here even if we don't build new content.
 
-            var errorCount = 0;
-            var fileCount = 0;
+            errorCount = 0;
+            fileCount = 0;
 
             foreach (var c in _content)
             {
@@ -127,10 +124,7 @@ namespace MGCB
             // clean old content that is no longer a build item.
 
             // TODO: We should be using serializing the list
-            // of input files we just built for use in cleaning.
-            
-            Console.WriteLine("\nBuild {0} succeeded, {1} failed.", fileCount, errorCount);
-            Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+            // of input files we just built for use in cleaning
         }
     }
 }
