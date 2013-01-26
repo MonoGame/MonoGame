@@ -234,6 +234,11 @@ namespace MGCB
 
         public string Title { get; set; }
 
+        public void ShowUsage()
+        {
+            ShowError(null);
+        }
+
         public void ShowError(string message, params object[] args)
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
@@ -243,8 +248,12 @@ namespace MGCB
                 Console.Error.WriteLine(Title);
                 Console.Error.WriteLine();
             }
-            Console.Error.WriteLine(message, args);
-            Console.Error.WriteLine();
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                Console.Error.WriteLine(message, args);
+                Console.Error.WriteLine();
+            }
 
             Console.Error.WriteLine("Usage: {0} {1}{2}", 
                 name, 

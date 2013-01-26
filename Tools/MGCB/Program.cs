@@ -35,6 +35,13 @@ namespace MGCB
                 if (!parser.ParseCommandLine(commands))
                     return -1;
             }
+            
+            // Do we have anything to do?
+            if (!content.HasWork)
+            {
+                parser.ShowUsage();
+                return 0;
+            }
 
             // Print a startup message.
             var buildStarted = DateTime.Now;

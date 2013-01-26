@@ -78,6 +78,11 @@ namespace MGCB
 
         private PipelineManager _manager;
 
+        public bool HasWork
+        {
+            get { return _content.Count > 0 || Clean; }    
+        }
+
         public void Build(out int fileCount, out int errorCount)
         {
             var projectDirectory = Directory.GetCurrentDirectory();
