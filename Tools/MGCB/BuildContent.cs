@@ -21,6 +21,12 @@ namespace MGCB
         [CommandLineParameter("IntermediateDir", true)]
         public string IntermediateDir;
 
+        [CommandLineParameter("Rebuild")]
+        public bool Rebuild;
+
+        [CommandLineParameter("Clean")]
+        public bool Clean;
+
         [CommandLineParameter("Importer")]
         public string Importer;
 
@@ -79,7 +85,8 @@ namespace MGCB
             foreach(var r in References)
                 _manager.AddAssembly(r);
 
-            Console.WriteLine("Building {0} Items\n", Content.Count);
+            var buildStarted = DateTime.Now;
+            Console.WriteLine("Build started {0}\n", buildStarted);
 
             var errorCount = 0;
             var fileCount = 0;
@@ -89,6 +96,10 @@ namespace MGCB
                 var sourceFile = c.SourceFile;
                 if (!Path.IsPathRooted(sourceFile))
                     sourceFile = Path.Combine(projectDirectory, c.SourceFile);
+
+                // Clean any cached file first if requested.
+                if (Clean || Rebuild)
+                    _manager.CleanContent(sourceFile);
 
                 try
                 {
@@ -108,7 +119,8 @@ namespace MGCB
                 }
             }
 
-            Console.WriteLine("\nBuild: {0} succeeded, {1} failed.", fileCount, errorCount);
+            Console.WriteLine("\nBuild {0} succeeded, {1} failed.", fileCount, errorCount);
+            Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
         }
     }
 }
