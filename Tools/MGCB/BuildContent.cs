@@ -60,7 +60,7 @@ namespace MGCB
             }
             ProcessorParams.Clear();
 
-            Content.Add(item);
+            _content.Add(item);
         }
 
         public class ContentItem
@@ -71,7 +71,7 @@ namespace MGCB
             public OpaqueDataDictionary ProcessorParams = new OpaqueDataDictionary();
         }
 
-        public List<ContentItem> Content = new List<ContentItem>();
+        private readonly List<ContentItem> _content = new List<ContentItem>();
 
         private PipelineManager _manager;
 
@@ -91,7 +91,7 @@ namespace MGCB
             var errorCount = 0;
             var fileCount = 0;
 
-            foreach (var c in Content)
+            foreach (var c in _content)
             {
                 var sourceFile = c.SourceFile;
                 if (!Path.IsPathRooted(sourceFile))
