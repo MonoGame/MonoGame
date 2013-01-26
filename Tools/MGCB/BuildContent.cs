@@ -16,10 +16,10 @@ namespace MGCB
         public readonly List<string> ResponseFiles = new List<string>();
 
         [CommandLineParameter("outputDir")]
-        public string OutputDir;
+        public string OutputDir = string.Empty; 
 
         [CommandLineParameter("intermediateDir")]
-        public string IntermediateDir;
+        public string IntermediateDir = string.Empty;
 
         [CommandLineParameter("rebuild")]
         public bool Rebuild;

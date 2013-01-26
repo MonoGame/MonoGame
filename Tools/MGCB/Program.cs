@@ -36,18 +36,6 @@ namespace MGCB
                     return -1;
             }
 
-            // Create the output directory.
-            if (string.IsNullOrEmpty(content.OutputDir))
-            {
-                parser.ShowError("/outputDir is required.");
-                return -1;
-            }
-            if (string.IsNullOrEmpty(content.IntermediateDir))
-            {
-                parser.ShowError("/intermediateDir is required.");
-                return -1;
-            }
-
             // Print a startup message.
             var buildStarted = DateTime.Now;
             Console.WriteLine("Build started {0}\n", buildStarted);
