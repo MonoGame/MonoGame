@@ -11,12 +11,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// </summary>
     public sealed class SongContent
     {
+        internal string fileName;
+        internal TimeSpan duration;
+
         /// <summary>
         /// Creates a new instance of the SongContent class
         /// </summary>
-        internal SongContent()
+        /// <param name="fileName">Filename of the song</param>
+        /// <param name="duration">Duration of the song</param>
+        internal SongContent(string fileName, TimeSpan duration)
         {
-            throw new NotImplementedException();
+            this.fileName = fileName;
+            this.duration = duration;
         }
     }
 }

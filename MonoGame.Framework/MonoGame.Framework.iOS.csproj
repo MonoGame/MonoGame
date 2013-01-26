@@ -74,6 +74,8 @@
     <Reference Include="OpenTK" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
+    <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />

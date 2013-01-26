@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			IsVisible = true;
 
 			keyboardViewController = new KeyboardInputViewController(
-				title, description, defaultText, usePasswordMode);
+				title, description, defaultText, usePasswordMode, _gameViewController);
 
 			_gameViewController.PresentModalViewController (keyboardViewController, true);
 

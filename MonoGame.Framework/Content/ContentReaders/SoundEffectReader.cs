@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Content
 			int loopLength = input.ReadInt32();
 			int num = input.ReadInt32();
 
-#if WINRT            
+#if DIRECTX            
             var count = data.Length;
             var format = (int)BitConverter.ToUInt16(header, 0);
             var sampleRate = (int)BitConverter.ToUInt16(header, 4);
