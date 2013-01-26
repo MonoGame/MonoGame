@@ -41,6 +41,21 @@ namespace MGCB
                 Importer = Importer, 
                 Processor = Processor
             };
+
+            foreach (var p in ProcessorParams)
+            {
+                var nameAndValue = p.Split('=');
+
+                // We should have two objects here.
+                if (nameAndValue.Length != 2)
+                {
+                    continue;
+                }
+
+                item.ProcessorParams.Add(nameAndValue[0], nameAndValue[1]);
+            }
+            ProcessorParams.Clear();
+
             Content.Add(item);
         }
 
@@ -49,6 +64,7 @@ namespace MGCB
             public string SourceFile;
             public string Importer;
             public string Processor;
+            public OpaqueDataDictionary ProcessorParams = new OpaqueDataDictionary();
         }
 
         public List<ContentItem> Content = new List<ContentItem>();
@@ -82,7 +98,7 @@ namespace MGCB
                                           null,
                                           c.Importer,
                                           c.Processor,
-                                          null);
+                                          c.ProcessorParams);
 
                     Console.WriteLine("{0}", sourceFile);
                     ++fileCount;
