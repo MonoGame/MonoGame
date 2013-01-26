@@ -12,31 +12,31 @@ namespace MGCB
 {
     class BuildContent
     {
-        [CommandLineParameter("Reference")]
+        [CommandLineParameter("reference")]
         public List<string> References = new List<string>();
 
-        [CommandLineParameter("OutputDir", true)]
+        [CommandLineParameter("outputDir", true)]
         public string OutputDir;
 
-        [CommandLineParameter("IntermediateDir", true)]
+        [CommandLineParameter("intermediateDir", true)]
         public string IntermediateDir;
 
-        [CommandLineParameter("Rebuild")]
+        [CommandLineParameter("rebuild")]
         public bool Rebuild;
 
-        [CommandLineParameter("Clean")]
+        [CommandLineParameter("clean")]
         public bool Clean;
 
-        [CommandLineParameter("Importer")]
+        [CommandLineParameter("importer")]
         public string Importer;
 
-        [CommandLineParameter("Processor")]
+        [CommandLineParameter("processor")]
         public string Processor;
 
-        [CommandLineParameter("ProcessorParam")]
+        [CommandLineParameter("processorParam")]
         public List<string> ProcessorParams = new List<string>();
 
-        [CommandLineParameter("Build")]
+        [CommandLineParameter("build")]
         public void OnBuild(string sourceFile)
         {
             var item = new ContentItem
