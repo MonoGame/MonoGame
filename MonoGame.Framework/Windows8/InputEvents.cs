@@ -255,7 +255,7 @@ namespace Microsoft.Xna.Framework
                     break;
                 default:
                     Keys xnaKey = (Keys)inkey;                   
-                    if (_keys.Contains(xnaKey))
+                    if (_keys.Contains(xnaKey)) 
                     {
                         if (IsKeyReleased) _keys.Remove(xnaKey);
                     }
