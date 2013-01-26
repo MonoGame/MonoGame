@@ -52,17 +52,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = projectDir + @"\";
-            OutputDirectory = outputDir + @"\";
-            IntermediateDirectory = intermediateDir + @"\";
+            ProjectDirectory = PathHelper.Normalize(projectDir + @"\");
+            OutputDirectory = PathHelper.Normalize(outputDir + @"\");
+            IntermediateDirectory = PathHelper.Normalize(intermediateDir + @"\");
         }
 
         public void AddAssembly(string assemblyFilePath)
         {
             if (assemblyFilePath == null)
-                throw new NullReferenceException("assemblyFilePath cannot be null!");
+                throw new ArgumentException("assemblyFilePath cannot be null!");
             if (!Path.IsPathRooted(assemblyFilePath))
-                throw new NullReferenceException("assemblyFilePath must be absolute!");
+                throw new ArgumentException("assemblyFilePath must be absolute!");
 
             // Make sure we're not adding the same assembly twice.
             assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
@@ -237,7 +237,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return processor;
         }
 
-        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
         {
             // If the output path is null... build it from the source file path.
             if (string.IsNullOrEmpty(outputFilepath))
@@ -262,6 +262,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     outputFilepath = Path.Combine(OutputDirectory, outputFilepath);
             }
 
+            outputFilepath = PathHelper.Normalize(outputFilepath);
+        }
+
+        private PipelineBuildEvent LoadBuildEvent(string destFile, out string eventFilepath)
+        {
+            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, destFile), ".content");
+            eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
+            return PipelineBuildEvent.Load(eventFilepath);
+        }
+
+        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        {
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
                 importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
@@ -273,7 +287,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
             {
-                SourceFile = sourceFilepath,
+                SourceFile = PathHelper.Normalize(sourceFilepath),
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
@@ -281,9 +295,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             };
 
             // Load the previous content event if it exists.
-            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, contentEvent.DestFile), ".content");
-            var eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
-            var cachedEvent = PipelineBuildEvent.Load(eventFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(contentEvent.DestFile, out eventFilepath);
 
             BuildContent(contentEvent, cachedEvent, eventFilepath);
 
@@ -297,10 +310,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 // While this asset doesn't need to be rebuilt the dependent assets might.
                 foreach (var asset in cachedEvent.BuildAsset)
-                {                    
-                    var assetPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, asset), ".content");
-                    var assetEventFilepath = Path.Combine(IntermediateDirectory, assetPath);
-                    var assetCachedEvent = PipelineBuildEvent.Load(assetEventFilepath);
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
 
                     // If we cannot find the cached event for the dependancy
                     // then we have to trigger a rebuild of the parent content.
@@ -329,12 +341,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
+                if (importer == null)
+                    throw new PipelineException("Failed to create importer '{0}'", pipelineEvent.Importer);
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
-                if (importer == null || processor == null)
-                {
-                    // TODO: Log error?
-                    return;
-                }
+                if (processor == null)
+                    throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
 
                 // Try importing the content.
                 object importedObject;
@@ -343,10 +354,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var importContext = new PipelineImporterContext(this);
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
                 }
 
                 // Process the imported object.
@@ -356,10 +370,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     var processContext = new PipelineProcessorContext(this, pipelineEvent);
                     processedObject = processor.Process(importedObject, processContext);
                 }
-                catch (Exception)
+                catch (PipelineException)
                 {
-                    // TODO: Log error?
-                    return;                   
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
                 }
 
                 // Write the content to disk.
@@ -370,30 +387,48 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
         }
 
+        public void CleanContent(string sourceFilepath, string outputFilepath = null)
+        {
+            // First try to load the event file.
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(outputFilepath, out eventFilepath);
+
+            if (cachedEvent != null)
+            {
+                foreach (var asset in cachedEvent.BuildAsset)
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
+
+                    if (assetCachedEvent == null)
+                    {
+                        File.Delete(asset);
+                        File.Delete(assetEventFilepath);
+                        continue;
+                    }
+
+                    // Give the asset a chance to rebuild.                    
+                    CleanContent(string.Empty, asset);
+                }                
+            }
+
+            File.Delete(outputFilepath);
+            File.Delete(eventFilepath);
+        }
+
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
         {
             // Make sure the output directory exists.
             var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile) + @"\";
             Directory.CreateDirectory(outputFileDir);
 
-            // TODO: For now use XNA's ContentCompiler which knows 
-            // how to write XNBs for us.
-            //
-            // http://xboxforums.create.msdn.com/forums/t/72563.aspx
-            //
-            // We need to replace this with our own implementation
-            // that isn't all internal methods!
-            //
             if (_compiler == null)
-            {
-                var ctor = typeof(ContentCompiler).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)[0];
-                _compiler = (ContentCompiler)ctor.Invoke(new object[] { });
-                _compileMethod = typeof(ContentCompiler).GetMethod("Compile", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            }
+                _compiler = new ContentCompiler();
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compileMethod.Invoke(_compiler, new[] { stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir });
+                _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.

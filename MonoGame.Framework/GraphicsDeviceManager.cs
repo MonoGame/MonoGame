@@ -268,6 +268,8 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
+            _game.ResizeWindow(false);
+
 #elif WINDOWS || LINUX
             _game.ResizeWindow(false);
 #elif MONOMAC

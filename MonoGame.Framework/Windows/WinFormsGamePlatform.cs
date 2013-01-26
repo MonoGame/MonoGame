@@ -68,6 +68,7 @@ non-infringement.
 
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
 
@@ -85,6 +86,8 @@ namespace MonoGame.Framework
         {
             _window = new WinFormsGameWindow(this);
             Window = _window;
+
+            this.IsMouseVisible = true;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -101,7 +104,6 @@ namespace MonoGame.Framework
 
         public override void RunLoop()
         {
-            OnIsMouseVisibleChanged();
             _window.RunLoop();
         }
 
@@ -132,6 +134,11 @@ namespace MonoGame.Framework
 
         public override void ExitFullScreen()
         {
+        }
+
+        public void ResetWindowBounds(bool toggleFullScreen)
+        {
+            _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
         }
         
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)

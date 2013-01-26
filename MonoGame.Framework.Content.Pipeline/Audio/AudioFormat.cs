@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using NAudio.Wave;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -19,7 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         int blockAlign;
         int channelCount;
         int format;
-        List<byte> nativeWaveFormat;
+        internal List<byte> nativeWaveFormat;
         int sampleRate;
 
         /// <summary>
@@ -67,9 +68,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <summary>
         /// Creates a new instance of the AudioFormat class
         /// </summary>
-        internal AudioFormat(WaveStream waveStream)
+        /// <param name="waveFormat">The WaveFormat representing the WAV header.</param>
+        internal AudioFormat(WaveFormat waveFormat)
         {
-            var waveFormat = waveStream.WaveFormat;
             averageBytesPerSecond = waveFormat.AverageBytesPerSecond;
             bitsPerSample = waveFormat.BitsPerSample;
             blockAlign = waveFormat.BlockAlign;
@@ -77,11 +78,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             format = (int)waveFormat.Encoding;
             sampleRate = waveFormat.SampleRate;
 
-            var length = waveStream.Length;
-            var bytes = new byte[length];
-            var read = waveStream.Read(bytes, 0, (int)length);
-            Debug.Assert(length == read, "length != read");
-            nativeWaveFormat = new List<byte>(bytes);
+            var stream = new MemoryStream();
+            using (var writer = new BinaryWriter(stream))
+            {
+                waveFormat.Serialize(writer);
+                nativeWaveFormat = new List<byte>(stream.ToArray());
+            }
         }
     }
 }
