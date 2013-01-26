@@ -146,6 +146,8 @@
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
+    <Compile Include="Processors\SoundEffectContent.cs" />
+    <Compile Include="Processors\SoundEffectProcessor.cs" />
     <Compile Include="Processors\SpriteFontContent.cs" />
     <Compile Include="Processors\TextureProcessor.cs" />
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
@@ -158,7 +160,8 @@
     <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
     <Compile Include="Serialization\Compiler\ContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
-    <Compile Include="Serialization\Compiler\TextureContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />

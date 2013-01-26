@@ -1094,7 +1094,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
-
 #elif OPENGL
 
             // Unlike with XNA and DirectX...  GL.Clear() obeys several
