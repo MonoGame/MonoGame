@@ -227,38 +227,71 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(_keys);
         }
 
-        private static Keys KeyTranslate(Windows.System.VirtualKey inkey)
+        private void KeyTranslate(CoreWindow window, Windows.System.VirtualKey inkey, bool IsKeyReleased)
         {
             switch (inkey)
             {
-                // XNA does not have have 'handless' key values.
-                // So, we arebitrarily map those to the 'Left' version.                 
+                // WinRT does not distinguish between left/right keys
+                // We have to check for special keys such as control/shift/alt/ etc
                 case Windows.System.VirtualKey.Control:
-                    return Keys.LeftControl;
+                    {
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.LeftControl);
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.RightControl);
+                    }
+                    break;
                 case Windows.System.VirtualKey.Shift:
-                    return Keys.LeftShift;
+                    {
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.LeftShift);
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.RightShift);
+                    }
+                    break;
                 // Note that the Alt key is now refered to as Menu.
+                // NOTE: ALT key doesn't get fired by CoreWindow.
                 case Windows.System.VirtualKey.Menu:
-                    return Keys.LeftAlt;
+                    {
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.LeftMenu);
+                        UpdateSpecialKeyState(window, Windows.System.VirtualKey.RightMenu);
+                    }
+                    break;
                 default:
-                    return (Keys)inkey;
+                    Keys xnaKey = (Keys)inkey;                   
+                    if (_keys.Contains(xnaKey))
+                    {
+                        if (IsKeyReleased) _keys.Remove(xnaKey);
+                    }
+                    else
+                    {
+                        if (!IsKeyReleased) _keys.Add(xnaKey);
+                    }
+                    break;
             }
+            return;
+        }
+
+        private void UpdateSpecialKeyState(CoreWindow window, Windows.System.VirtualKey virtualKey)
+        {
+            CoreVirtualKeyStates keyStates = window.GetKeyState(virtualKey);
+            bool isDown = (keyStates & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+            Keys xnaKey = (Keys)virtualKey;
+
+            if (_keys.Contains(xnaKey))
+            {
+                if (!isDown) _keys.Remove(xnaKey);
+            }
+            else
+            {
+                if (isDown) _keys.Add(xnaKey);
+            }          
         }
 
         private void CoreWindow_KeyUp(object sender, KeyEventArgs args)
         {
-            var xnaKey = KeyTranslate(args.VirtualKey);
-
-            if (_keys.Contains(xnaKey))
-                _keys.Remove(xnaKey);
+            KeyTranslate(sender as CoreWindow, args.VirtualKey,args.KeyStatus.IsKeyReleased);
         }
 
         private void CoreWindow_KeyDown(object sender, KeyEventArgs args)
         {
-            var xnaKey = KeyTranslate(args.VirtualKey);
-
-            if (!_keys.Contains(xnaKey))
-                _keys.Add(xnaKey);
+            KeyTranslate(sender as CoreWindow, args.VirtualKey,args.KeyStatus.IsKeyReleased);
         }
     }
 }
