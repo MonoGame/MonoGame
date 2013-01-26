@@ -77,7 +77,7 @@ namespace MGCB
             }
         }
 
-        public void Build()
+        public void Build(bool rebuild)
         {
             Console.WriteLine("Building {0}\n", _project.FullPath);
 
@@ -101,6 +101,10 @@ namespace MGCB
                     var propName = meta.Name.Substring(propertyPrefix.Length);
                     processorParameters.Add(propName, meta.Value);
                 }
+
+                // If we're rebuilding then remove the old content first.
+                if (rebuild)
+                    _manager.CleanContent(sourceFile);
 
                 try
                 {
