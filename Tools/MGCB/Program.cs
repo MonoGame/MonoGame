@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 
 namespace MGCB
 {
@@ -11,28 +12,56 @@ namespace MGCB
     {
         static int Main(string[] args)
         {
-            var options = new Options();
-            var parser = new Utilities.CommandLineParser(options);
-            parser.Title = "MGCB - The MonoGame content builder command-line tool.";
+            var content = new BuildContent();
 
-            // Make sure we got a valid command line.
-            if (!parser.ParseCommandLine(args))
-                return 1;
-
-            // TODO: Eventually we will support our own simple file format
-            // in addition to MSBuild .contentproj files.
-
-            // Validate the content project exits.
-            if (!File.Exists(options.ContentProjectFile))
+            // Parse the command line.
+            var parser = new CommandLineParser(content)
             {
-                Console.Error.WriteLine("The input file '{0}' was not found!", options.ContentProjectFile);
-                return 1;
+                Title = "MonoGame Content Builder"
+            };
+            if (!parser.ParseCommandLine(args))
+                return -1;
+
+            // Process all resoponse files.
+            foreach (var r in content.ResponseFiles)
+            {
+                // Read in all the lines, trim whitespace, and remove empty or comment lines.
+                var commands = File.ReadAllLines(r).
+                                Select(x => x.Trim()).
+                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
+                                ToArray();
+
+                // Parse the commands like they came from the command line.
+                if (!parser.ParseCommandLine(commands))
+                    return -1;
             }
 
-            var project = new ContentProject(options.ContentProjectFile, options.OutputName);
-            project.Build();
+            // Create the output directory.
+            if (string.IsNullOrEmpty(content.OutputDir))
+            {
+                parser.ShowError("/outputDir is required.");
+                return -1;
+            }
+            if (string.IsNullOrEmpty(content.IntermediateDir))
+            {
+                parser.ShowError("/intermediateDir is required.");
+                return -1;
+            }
 
-            return 0;
+            // Print a startup message.
+            var buildStarted = DateTime.Now;
+            Console.WriteLine("Build started {0}\n", buildStarted);
+
+            // Let the content build.
+            int fileCount, errorCount;
+            content.Build(out fileCount, out errorCount);
+
+            // Print the finishing info.
+            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", fileCount, errorCount);
+            Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+
+            // Return the error count.
+            return errorCount;
         }
     }
 }

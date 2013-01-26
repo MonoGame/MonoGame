@@ -134,6 +134,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (cachedEvent.Processor != Processor)
                 return true;
 
+            // If the count of parameters is different then we have
+            // to assume the results of processing are different.
+            if (cachedEvent.Parameters.Count != Parameters.Count)
+                return true;
+
             // Finally did any of the processor parameters change?
             foreach (var pair in cachedEvent.Parameters)
             {
