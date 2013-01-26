@@ -51,11 +51,8 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NAudio">
+    <Reference Include="NAudio, Version=1.7.0.9, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.WindowsMediaFormat">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
