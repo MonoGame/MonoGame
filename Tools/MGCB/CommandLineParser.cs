@@ -12,7 +12,7 @@ using System.Reflection;
 using System.ComponentModel;
 
 
-namespace Utilities
+namespace MGCB
 {
     // Reusable, reflection based helper for parsing commandline options.
     //
@@ -30,66 +30,62 @@ namespace Utilities
         readonly List<string> _requiredUsageHelp = new List<string>();
         readonly List<string> _optionalUsageHelp = new List<string>();
 
-
-        // Constructor.
         public CommandLineParser(object optionsObject)
         {
-            this._optionsObject = optionsObject;
+            _optionsObject = optionsObject;
 
             // Reflect to find what commandline options are available.
             foreach (var field in optionsObject.GetType().GetFields())
             {
-                var fieldName = GetOptionName(field);
-                if (fieldName == null)
+                var param = GetAttribute<CommandLineParameterAttribute>(field);
+                if (param == null)
                     continue;
 
-                if (GetAttribute<RequiredAttribute>(field) != null)
+                if (param.Required)
                 {
                     // Record a required option.
                     _requiredOptions.Enqueue(field);
 
-                    _requiredUsageHelp.Add(string.Format("<{0}>", fieldName));
+                    _requiredUsageHelp.Add(string.Format("<{0}>", param.Name));
                 }
                 else
                 {
                     // Record an optional option.
-                    _optionalOptions.Add(fieldName.ToLowerInvariant(), field);
+                    _optionalOptions.Add(param.Name.ToLowerInvariant(), field);
 
                     if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0}", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}", param.Name));
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}:value", param.Name));
                 }
             }
 
             foreach (var method in optionsObject.GetType().GetMethods())
             {
-                var nameAttribute = GetAttribute<NameAttribute>(method);
-                if (nameAttribute == null)
+                var param = GetAttribute<CommandLineParameterAttribute>(method);
+                if (param == null)
                     continue;
 
                 // Only accept methods that take less than 1 parameter.
                 if (method.GetParameters().Length > 1)
                     throw new NotSupportedException("Methods must have one or zero parameters.");
 
-                var fieldName = nameAttribute.Name;
-
-                if (GetAttribute<RequiredAttribute>(method) != null)
+                if (param.Required)
                 {
                     // Record a required option.
                     _requiredOptions.Enqueue(method);
 
-                    _requiredUsageHelp.Add(string.Format("<{0}>", fieldName));
+                    _requiredUsageHelp.Add(string.Format("<{0}>", param.Name));
                 }
                 else
                 {
                     // Record an optional option.
-                    _optionalOptions.Add(fieldName.ToLowerInvariant(), method);
+                    _optionalOptions.Add(param.Name.ToLowerInvariant(), method);
 
                     if (method.GetParameters().Length == 0)
-                        _optionalUsageHelp.Add(string.Format("/{0}", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}", param.Name));
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}:value", param.Name));
                 }
             }
         }
@@ -113,7 +109,7 @@ namespace Utilities
             var missingRequiredOption = _requiredOptions.FirstOrDefault(field => !IsList(field) || GetList(field).Count == 0);
             if (missingRequiredOption != null)
             {
-                ShowError("Missing argument '{0}'", GetOptionName(missingRequiredOption));
+                ShowError("Missing argument '{0}'", GetAttribute<CommandLineParameterAttribute>(missingRequiredOption).Name);
                 return false;
             }
 
@@ -198,7 +194,7 @@ namespace Utilities
             }
             catch
             {
-                ShowError("Invalid value '{0}' for option '{1}'", value, GetOptionName(member));
+                ShowError("Invalid value '{0}' for option '{1}'", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
                 return false;
             }
         }
@@ -236,16 +232,6 @@ namespace Utilities
             return interfaces.First().GetGenericArguments()[0];
         }
 
-
-        static string GetOptionName(MemberInfo member)
-        {
-            var nameAttribute = GetAttribute<NameAttribute>(member);
-            if (nameAttribute == null)
-                return null;
-
-            return nameAttribute.Name;
-        }
-
         public string Title { get; set; }
 
         void ShowError(string message, params object[] args)
@@ -276,24 +262,20 @@ namespace Utilities
         {
             return provider.GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
         }
+    }
 
-
-        // Used on optionsObject fields to indicate which options are required.
-        [AttributeUsage(AttributeTargets.Field)]
-        public sealed class RequiredAttribute : Attribute
+    // Used on an optionsObject field or method to rename the corresponding commandline option.
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method)]
+    public sealed class CommandLineParameterAttribute : Attribute
+    {
+        public CommandLineParameterAttribute(string name, bool required = false)
         {
+            Name = name;
+            Required = required;
         }
 
-        // Used on an optionsObject field or method to rename the corresponding commandline option.
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method)]
-        public sealed class NameAttribute : Attribute
-        {
-            public NameAttribute(string name)
-            {
-                Name = name;
-            }
+        public string Name { get; private set; }
 
-            public string Name { get; private set; }
-        }
+        public bool Required { get; private set; }
     }
 }

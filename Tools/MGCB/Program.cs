@@ -12,7 +12,7 @@ namespace MGCB
         static int Main(string[] args)
         {
             var content = new BuildContent();
-            var parser = new Utilities.CommandLineParser(content);
+            var parser = new CommandLineParser(content);
             parser.Title = "MGCB - The MonoGame content builder command-line tool.";
 
             // Make sure we got a valid command line.

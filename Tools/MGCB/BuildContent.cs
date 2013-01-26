@@ -12,27 +12,25 @@ namespace MGCB
 {
     class BuildContent
     {
-        [Utilities.CommandLineParser.Name("Reference")]
+        [CommandLineParameter("Reference")]
         public List<string> References = new List<string>();
 
-        [Utilities.CommandLineParser.Name("OutputDir")]
-        [Utilities.CommandLineParser.Required]
+        [CommandLineParameter("OutputDir", true)]
         public string OutputDir;
 
-        [Utilities.CommandLineParser.Name("IntermediateDir")]
-        [Utilities.CommandLineParser.Required]
+        [CommandLineParameter("IntermediateDir", true)]
         public string IntermediateDir;
 
-        [Utilities.CommandLineParser.Name("Importer")]
+        [CommandLineParameter("Importer")]
         public string Importer;
 
-        [Utilities.CommandLineParser.Name("Processor")]
+        [CommandLineParameter("Processor")]
         public string Processor;
 
-        [Utilities.CommandLineParser.Name("ProcessorParam")]
+        [CommandLineParameter("ProcessorParam")]
         public List<string> ProcessorParams = new List<string>();
 
-        [Utilities.CommandLineParser.Name("Build")]
+        [CommandLineParameter("Build")]
         public void OnBuild(string sourceFile)
         {
             var item = new ContentItem
