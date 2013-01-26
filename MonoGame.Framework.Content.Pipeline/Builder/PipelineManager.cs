@@ -52,17 +52,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = projectDir + @"\";
-            OutputDirectory = outputDir + @"\";
-            IntermediateDirectory = intermediateDir + @"\";
+            ProjectDirectory = PathHelper.Normalize(projectDir + @"\");
+            OutputDirectory = PathHelper.Normalize(outputDir + @"\");
+            IntermediateDirectory = PathHelper.Normalize(intermediateDir + @"\");
         }
 
         public void AddAssembly(string assemblyFilePath)
         {
             if (assemblyFilePath == null)
-                throw new NullReferenceException("assemblyFilePath cannot be null!");
+                throw new ArgumentException("assemblyFilePath cannot be null!");
             if (!Path.IsPathRooted(assemblyFilePath))
-                throw new NullReferenceException("assemblyFilePath must be absolute!");
+                throw new ArgumentException("assemblyFilePath must be absolute!");
 
             // Make sure we're not adding the same assembly twice.
             assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
@@ -237,7 +237,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return processor;
         }
 
-        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
         {
             // If the output path is null... build it from the source file path.
             if (string.IsNullOrEmpty(outputFilepath))
@@ -262,6 +262,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     outputFilepath = Path.Combine(OutputDirectory, outputFilepath);
             }
 
+            outputFilepath = PathHelper.Normalize(outputFilepath);
+        }
+
+        private PipelineBuildEvent LoadBuildEvent(string destFile, out string eventFilepath)
+        {
+            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, destFile), ".content");
+            eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
+            return PipelineBuildEvent.Load(eventFilepath);
+        }
+
+        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        {
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
                 importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
@@ -273,7 +287,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
             {
-                SourceFile = sourceFilepath,
+                SourceFile = PathHelper.Normalize(sourceFilepath),
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
@@ -281,9 +295,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             };
 
             // Load the previous content event if it exists.
-            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, contentEvent.DestFile), ".content");
-            var eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
-            var cachedEvent = PipelineBuildEvent.Load(eventFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(contentEvent.DestFile, out eventFilepath);
 
             BuildContent(contentEvent, cachedEvent, eventFilepath);
 
@@ -297,10 +310,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 // While this asset doesn't need to be rebuilt the dependent assets might.
                 foreach (var asset in cachedEvent.BuildAsset)
-                {                    
-                    var assetPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, asset), ".content");
-                    var assetEventFilepath = Path.Combine(IntermediateDirectory, assetPath);
-                    var assetCachedEvent = PipelineBuildEvent.Load(assetEventFilepath);
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
 
                     // If we cannot find the cached event for the dependancy
                     // then we have to trigger a rebuild of the parent content.
@@ -373,6 +385,36 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
             }
+        }
+
+        public void CleanContent(string sourceFilepath, string outputFilepath = null)
+        {
+            // First try to load the event file.
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(outputFilepath, out eventFilepath);
+
+            if (cachedEvent != null)
+            {
+                foreach (var asset in cachedEvent.BuildAsset)
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
+
+                    if (assetCachedEvent == null)
+                    {
+                        File.Delete(asset);
+                        File.Delete(assetEventFilepath);
+                        continue;
+                    }
+
+                    // Give the asset a chance to rebuild.                    
+                    CleanContent(string.Empty, asset);
+                }                
+            }
+
+            File.Delete(outputFilepath);
+            File.Delete(eventFilepath);
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
