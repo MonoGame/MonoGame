@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 
 namespace MGCB
 {
@@ -12,12 +13,40 @@ namespace MGCB
         static int Main(string[] args)
         {
             var content = new BuildContent();
-            var parser = new CommandLineParser(content);
-            parser.Title = "MonoGame Content Builder";
 
-            // Make sure we got a valid command line.
+            // Parse the command line.
+            var parser = new CommandLineParser(content)
+            {
+                Title = "MonoGame Content Builder"
+            };
             if (!parser.ParseCommandLine(args))
                 return -1;
+
+            // Process all resoponse files.
+            foreach (var r in content.ResponseFiles)
+            {
+                // Read in all the lines, trim whitespace, and remove empty or comment lines.
+                var commands = File.ReadAllLines(r).
+                                Select(x => x.Trim()).
+                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
+                                ToArray();
+
+                // Parse the commands like they came from the command line.
+                if (!parser.ParseCommandLine(commands))
+                    return -1;
+            }
+
+            // Create the output directory.
+            if (string.IsNullOrEmpty(content.OutputDir))
+            {
+                parser.ShowError("/outputDir is required.");
+                return -1;
+            }
+            if (string.IsNullOrEmpty(content.IntermediateDir))
+            {
+                parser.ShowError("/intermediateDir is required.");
+                return -1;
+            }
 
             // Print a startup message.
             var buildStarted = DateTime.Now;
@@ -28,7 +57,7 @@ namespace MGCB
             content.Build(out fileCount, out errorCount);
 
             // Print the finishing info.
-            Console.WriteLine("\nBuild {0} succeeded, {1} failed.", fileCount, errorCount);
+            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", fileCount, errorCount);
             Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
 
             // Return the error count.

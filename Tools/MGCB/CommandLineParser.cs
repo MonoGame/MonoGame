@@ -234,7 +234,7 @@ namespace MGCB
 
         public string Title { get; set; }
 
-        void ShowError(string message, params object[] args)
+        public void ShowError(string message, params object[] args)
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
@@ -245,15 +245,19 @@ namespace MGCB
             }
             Console.Error.WriteLine(message, args);
             Console.Error.WriteLine();
-            Console.Error.WriteLine("Usage: {0} {1}", name, string.Join(" ", _requiredUsageHelp));
+
+            Console.Error.WriteLine("Usage: {0} {1}{2}", 
+                name, 
+                string.Join(" ", _requiredUsageHelp), 
+                _optionalUsageHelp.Count > 0 ? " <Options>" : string.Empty);
 
             if (_optionalUsageHelp.Count > 0)
             {
                 Console.Error.WriteLine();
-                Console.Error.WriteLine("Options:");
+                Console.Error.WriteLine("Options:\n");
 
                 foreach (string optional in _optionalUsageHelp)
-                    Console.Error.WriteLine("    {0}", optional);
+                    Console.Error.WriteLine("   {0}", optional);
             }
         }
 

@@ -12,10 +12,13 @@ namespace MGCB
 {
     class BuildContent
     {
-        [CommandLineParameter("outputDir", true)]
+        [CommandLineParameter("@")]
+        public readonly List<string> ResponseFiles = new List<string>();
+
+        [CommandLineParameter("outputDir")]
         public string OutputDir;
 
-        [CommandLineParameter("intermediateDir", true)]
+        [CommandLineParameter("intermediateDir")]
         public string IntermediateDir;
 
         [CommandLineParameter("rebuild")]
