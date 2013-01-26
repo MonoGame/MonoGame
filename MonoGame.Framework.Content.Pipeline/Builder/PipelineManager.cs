@@ -261,6 +261,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 if (!Path.IsPathRooted(outputFilepath))
                     outputFilepath = Path.Combine(OutputDirectory, outputFilepath);
             }
+
+            outputFilepath = PathHelper.Normalize(outputFilepath);
         }
 
         private PipelineBuildEvent LoadBuildEvent(string destFile, out string eventFilepath)
@@ -285,7 +287,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
             {
-                SourceFile = sourceFilepath,
+                SourceFile = PathHelper.Normalize(sourceFilepath),
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,

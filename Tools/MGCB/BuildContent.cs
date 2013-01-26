@@ -72,21 +72,25 @@ namespace MGCB
 
             foreach (var c in Content)
             {
+                var sourceFile = c.SourceFile;
+                if (!Path.IsPathRooted(sourceFile))
+                    sourceFile = Path.Combine(projectDirectory, c.SourceFile);
+
                 try
                 {
-                    _manager.BuildContent(c.SourceFile,
+                    _manager.BuildContent(sourceFile,
                                           null,
                                           c.Importer,
                                           c.Processor,
                                           null);
 
-                    Console.WriteLine("{0}", c.SourceFile);
+                    Console.WriteLine("{0}", sourceFile);
                     ++fileCount;
                 }
                 catch (PipelineException ex)
                 {
                     ++errorCount;
-                    Console.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    Console.WriteLine("{0}: error: {1}", sourceFile, ex.Message);
                 }
             }
 
