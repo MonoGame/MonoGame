@@ -28,7 +28,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public string SourceFile { get; set; }
 
+		public string FullPathToSourceFile {
+			get { return Path.GetFullPath(SourceFile);}
+		}
+
         public string DestFile { get; set; }
+
+		public string FullPathToDestFile {
+			get { return Path.GetFullPath(DestFile);}
+		}
 
         public DateTime DestTime { get; set; }
 
@@ -54,11 +62,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public static PipelineBuildEvent Load(string filePath)
         {
+            var fullFilePath = Path.GetFullPath(filePath);
             var deserializer = new XmlSerializer(typeof (PipelineBuildEvent));
             PipelineBuildEvent pipelineEvent;
             try
             {
-                using (var textReader = new StreamReader(filePath))
+                using (var textReader = new StreamReader(fullFilePath))
                     pipelineEvent = (PipelineBuildEvent) deserializer.Deserialize(textReader);
             }
             catch (Exception)
@@ -76,8 +85,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public void Save(string filePath)
         {
+			var fullFilePath = Path.GetFullPath(filePath);
             // Make sure the directory exists.
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath) + @"\");
+            Directory.CreateDirectory(Path.GetDirectoryName(fullFilePath) + Path.DirectorySeparatorChar);
 
             // Convert the parameters into something we can serialize.
             ParametersXML.Clear();
@@ -89,7 +99,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Serialize our state.
             var serializer = new XmlSerializer(typeof (PipelineBuildEvent));
-            using (var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(false)))
+            using (var textWriter = new StreamWriter(fullFilePath, false, new UTF8Encoding(false)))
                 serializer.Serialize(textWriter, this);
         }
 

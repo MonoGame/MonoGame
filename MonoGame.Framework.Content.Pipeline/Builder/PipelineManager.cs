@@ -420,19 +420,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
         {
             // Make sure the output directory exists.
-            var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile) + @"\";
+            var outputFileDir = Path.GetDirectoryName(pipelineEvent.FullPathToDestFile + Path.DirectorySeparatorChar);
+
             Directory.CreateDirectory(outputFileDir);
 
             if (_compiler == null)
                 _compiler = new ContentCompiler();
 
             // Write the XNB.
-            using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var stream = new FileStream(pipelineEvent.FullPathToDestFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.
-            pipelineEvent.DestTime = File.GetLastWriteTime(pipelineEvent.DestFile);
+            pipelineEvent.DestTime = File.GetLastWriteTime(pipelineEvent.FullPathToDestFile);
         }
     }
 }

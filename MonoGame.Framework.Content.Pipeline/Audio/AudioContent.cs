@@ -141,6 +141,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
              */
             reader.Position = 0;
+#if WINDOWS
             //var mediaTypes = MediaFoundationEncoder.GetOutputMediaTypes(NAudio.MediaFoundation.AudioSubtypes.MFAudioFormat_PCM);
             using (var resampler = new MediaFoundationResampler(reader, waveFormat))
             {
@@ -160,6 +161,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     format = new AudioFormat(waveFormat);
                 }
             }
+#else
+			throw new NotImplementedException();
+#endif
         }
 
         /// <summary>
@@ -200,9 +204,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     break;
 
                 case ConversionFormat.Aac:
+#if WINDOWS
                     reader.Position = 0;
                     MediaFoundationEncoder.EncodeToAac(reader, targetFileName, QualityToBitRate(quality));
                     break;
+#else
+					throw new NotImplementedException();
+#endif
 
                 case ConversionFormat.Vorbis:
                     throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");
@@ -242,6 +250,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// </summary>
         void Read()
         {
+#if WINDOWS
             reader = new MediaFoundationReader(fileName);
             duration = reader.TotalTime;
             format = new AudioFormat(reader.WaveFormat);
@@ -249,6 +258,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             var bytes = new byte[reader.Length];
             var read = reader.Read(bytes, 0, bytes.Length);
             data = new List<byte>(bytes);
+#else
+			throw new NotImplementedException();
+#endif
         }
     }
 }
