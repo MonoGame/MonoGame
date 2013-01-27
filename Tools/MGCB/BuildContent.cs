@@ -12,34 +12,62 @@ namespace MGCB
 {
     class BuildContent
     {
-        [CommandLineParameter("@")]
+        [CommandLineParameter(
+            Name = "@",
+            ValueName = "responseFile",
+            Description = "Read a text response file with additional command line options and switches.")]
         public readonly List<string> ResponseFiles = new List<string>();
 
-        [CommandLineParameter("outputDir")]
-        public string OutputDir = string.Empty; 
+        [CommandLineParameter(
+            Name = "outputDir",
+            ValueName = "directoryPath",
+            Description = "The directory where all content is written.")]
+        public string OutputDir = string.Empty;
 
-        [CommandLineParameter("intermediateDir")]
+        [CommandLineParameter(
+            Name = "intermediateDir",
+            ValueName = "directoryPath",
+            Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir = string.Empty;
 
-        [CommandLineParameter("rebuild")]
+        [CommandLineParameter(
+            Name = "rebuild",
+            Description = "Forces a full rebuild of all content.")]
         public bool Rebuild;
 
-        [CommandLineParameter("clean")]
+        [CommandLineParameter(
+            Name = "clean",            
+            Description = "Delete all previously built content and intermediate files.")]
         public bool Clean;
 
-        [CommandLineParameter("reference")]
+        [CommandLineParameter(
+            Name = "reference",
+            ValueName = "assemblyNameOrFile",
+            Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
         public readonly List<string> References = new List<string>();
 
-        [CommandLineParameter("importer")]
+        [CommandLineParameter(
+            Name = "importer",
+            ValueName = "className",
+            Description = "Defines the class name of the content importer for reading source content.")]
         public string Importer;
 
-        [CommandLineParameter("processor")]
+        [CommandLineParameter(
+            Name = "processor",
+            ValueName = "className",
+            Description = "Defines the class name of the content processor for processing imported content.")]
         public string Processor;
 
-        [CommandLineParameter("processorParam")]
+        [CommandLineParameter(
+            Name = "processorParam",
+            ValueName = "name=value",
+            Description = "Defines a parameter name and value to set on a content processor.")]
         public readonly List<string> ProcessorParams = new List<string>();
 
-        [CommandLineParameter("build")]
+        [CommandLineParameter(
+            Name = "build",
+            ValueName = "sourceFile",
+            Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
         {
             var item = new ContentItem

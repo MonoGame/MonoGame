@@ -17,7 +17,8 @@ namespace MGCB
             // Parse the command line.
             var parser = new CommandLineParser(content)
             {
-                Title = "MonoGame Content Builder"
+                Title = "MonoGame Content Builder\n" +
+                        "Builds optimized game content for MonoGame projects."
             };
             if (!parser.ParseCommandLine(args))
                 return -1;
