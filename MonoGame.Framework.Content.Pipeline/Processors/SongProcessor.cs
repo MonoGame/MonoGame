@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             string songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
-            //input.ConvertFormat(targetFormat, quality, songFileName);
+            input.ConvertFormat(targetFormat, quality, songFileName);
             var song = new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
             return song;
         }
