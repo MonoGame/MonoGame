@@ -44,6 +44,7 @@
 using System;
 using System.Collections.Generic;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -52,6 +53,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

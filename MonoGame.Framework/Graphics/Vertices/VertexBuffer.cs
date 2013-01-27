@@ -4,18 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
-
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -131,6 +132,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
+#if GLES
+            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
+            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
+            throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
+#else
             if (data == null)
                 throw new ArgumentNullException ("data is null");
             if (data.Length < (startIndex + elementCount))
@@ -141,7 +147,51 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException ("The vertex stride is larger than the vertex buffer.");
 
 #if DIRECTX
-            throw new NotImplementedException();
+            if (_isDynamic)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var deviceContext = GraphicsDevice._d3dContext;
+                
+                // Copy the texture to a staging resource
+                var stagingDesc = _buffer.Description;
+                stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+                stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
+                stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+                stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+                var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
+                
+                lock (GraphicsDevice._d3dContext)
+                    deviceContext.CopyResource(_buffer, stagingBuffer);
+
+                int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                var startBytes = startIndex * vertexStride;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, data.Length * TsizeInBytes);
+
+                lock (GraphicsDevice._d3dContext)
+                {
+                    // Map the staging resource to a CPU accessible memory
+                    var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+                    if (vertexStride == TsizeInBytes)
+                    {
+                        SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, vertexStride*data.Length);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < data.Length; i++)
+                            SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride, TsizeInBytes);
+                    }
+
+                    // Make sure that we unmap the resource in case of an exception
+                    deviceContext.UnmapSubresource(stagingBuffer, 0);
+                }
+                stagingBuffer.Dispose();
+            }
 #elif PSM
             throw new NotImplementedException();
 #else
@@ -156,22 +206,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif
+#endif
         }
 
-#if OPENGL
+#if OPENGL && !GLES
 
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
             GL.BindBuffer (BufferTarget.ArrayBuffer, vbo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
-#if IOS || ANDROID
-            // I think the access parameter takes zero for read only or read/write.
-            // The glMapBufferOES extension spec and gl2ext.h both only mention GL_WRITE_ONLY
-            IntPtr ptr = GL.Oes.MapBuffer(All.ArrayBuffer, (All)0);
-#else
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
-#endif
+            GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
             if (data is byte[]) {
@@ -207,12 +253,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 //Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
             }
-#if IOS || ANDROID
-            GL.Oes.UnmapBuffer(All.ArrayBuffer);
-#else
             GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-#endif
-        }
+            }
         
 #endif
         
@@ -230,17 +272,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
         }
         		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.Discard);
+            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.None);
         }
 
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
@@ -342,9 +384,14 @@ namespace Microsoft.Xna.Framework.Graphics
                               _isDynamic ? BufferUsageHint.StreamDraw : BufferUsageHint.StaticDraw);
                 GraphicsExtensions.CheckGLError();
             }
-            
-            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, data);
+
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
+
+            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
             GraphicsExtensions.CheckGLError();
+
+            dataHandle.Free();
         }
         
 #endif

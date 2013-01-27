@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
@@ -24,12 +24,13 @@ using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
 using System.Diagnostics;
 #endif
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public static class GraphicsExtensions
     {
-#if !WINRT && !PSM
+#if OPENGL
         public static All OpenGL11(CullMode cull)
         {
             switch (cull)
@@ -528,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#endif
+#endif // OPENGL
 
         public static int Size(this SurfaceFormat surfaceFormat)
         {
