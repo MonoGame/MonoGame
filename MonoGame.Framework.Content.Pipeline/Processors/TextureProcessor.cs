@@ -30,7 +30,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             if (ColorKeyEnabled)
             {
-                ColorKeyColor = Color.Red;
                 var replaceColor = System.Drawing.Color.FromArgb(0);
                 for (var x = 0; x < input._bitmap.Width; x++)
                 {
