@@ -203,13 +203,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 case StencilOperation.Keep:
                     return StencilOp.Keep;
                 case StencilOperation.Decrement:
-                    return StencilOp.Decr;
-                case StencilOperation.DecrementSaturation:
                     return StencilOp.DecrWrap;
+                case StencilOperation.DecrementSaturation:
+                    return StencilOp.Decr;
                 case StencilOperation.IncrementSaturation:
-                    return StencilOp.IncrWrap;
-                case StencilOperation.Increment:
                     return StencilOp.Incr;
+                case StencilOperation.Increment:
+                    return StencilOp.IncrWrap;
                 case StencilOperation.Invert:
                     return StencilOp.Invert;
                 case StencilOperation.Replace:
@@ -266,6 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
+            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }
 

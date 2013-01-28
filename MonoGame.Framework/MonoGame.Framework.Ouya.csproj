@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8BEA875D-66D2-4A5F-B137-83D262A3851D}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <AndroidSupportedAbis>armeabi-v7a%3bx86</AndroidSupportedAbis>
+    <AndroidStoreUncompressedFileExtensions />
+    <MandroidI18n />
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <DeployExternal>False</DeployExternal>
+    <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\OUYA\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ANDROID;GLES;GLSL;OPENGL;OUYA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <MonoDroidLinkMode>None</MonoDroidLinkMode>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\OUYA\Release\</OutputPath>
+    <DefineConstants>TRACE;ANDROID;GLES;OPENGL;OUYA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Reference Include="OpenTK" />
+    <Reference Include="Ouya.Console.Api">
+      <HintPath>..\ThirdParty\Libs\OUYA\Ouya.Console.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Android\AndroidCompatibility.cs" />
+    <Compile Include="Android\AndroidGamePlatform.cs" />
+    <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Android\Ouya\Input\GamePad.cs" />
+    <Compile Include="Input\Mouse.cs" />
+    <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
+    <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\ScreenReciever.cs" />
+    <Compile Include="Android\TitleContainer.cs" />
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentExtensions.cs" />
+    <Compile Include="Content\ContentReaders\ArrayReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingFrustumReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingSphereReader.cs" />
+    <Compile Include="Content\ContentReaders\ByteReader.cs" />
+    <Compile Include="Content\ContentReaders\CurveReader.cs" />
+    <Compile Include="Content\ContentReaders\DateTimeReader.cs" />
+    <Compile Include="Content\ContentReaders\DecimalReader.cs" />
+    <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EffectReader.cs" />
+    <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
+    <Compile Include="Content\ContentReaders\NullableReader.cs" />
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
+    <Compile Include="Content\ContentReaders\PointReader.cs" />
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
+    <Compile Include="Content\ContentReaders\RayReader.cs" />
+    <Compile Include="Content\ContentReaders\SByteReader.cs" />
+    <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SongReader.cs" />
+    <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\SpriteFontReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
+    <Compile Include="Content\ContentReaders\TextureReader.cs" />
+    <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt32Reader.cs" />
+    <Compile Include="Content\ContentReaders\UInt64Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
+    <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
+    <Compile Include="Content\ContentReaders\VideoReader.cs" />
+    <Compile Include="Content\ResourceContentManager.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="GamePlatform.cs" />
+    <Compile Include="GraphicsDeviceManager.cs" />
+    <Compile Include="Graphics\CubeMapFace.cs" />
+    <Compile Include="Graphics\DisplayMode.cs" />
+    <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderStage.cs" />
+    <Compile Include="Graphics\Effect\DualTextureEffect.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
+    <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
+    <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
+    <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\Effect\SpriteEffect.cs" />
+    <Compile Include="Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Graphics\Model.cs" />
+    <Compile Include="Graphics\ModelBone.cs" />
+    <Compile Include="Graphics\ModelBoneCollection.cs" />
+    <Compile Include="Graphics\ModelEffectCollection.cs" />
+    <Compile Include="Graphics\ModelMesh.cs" />
+    <Compile Include="Graphics\ModelMeshCollection.cs" />
+    <Compile Include="Graphics\ModelMeshPart.cs" />
+    <Compile Include="Graphics\ModelMeshPartCollection.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
+    <Compile Include="Graphics\PresentationParameters.cs" />
+    <Compile Include="Graphics\PresentInterval.cs" />
+    <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
+    <Compile Include="PrimaryThreadLoader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Android\AndroidGameActivity.cs" />
+    <Compile Include="Audio\AudioChannels.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\Effect\BasicEffect.cs" />
+    <Compile Include="Graphics\Effect\Effect.cs" />
+    <Compile Include="Graphics\Effect\EffectParameter.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectPass.cs" />
+    <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
+    <Compile Include="Graphics\Effect\EffectTechnique.cs" />
+    <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
+    <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\States\BlendFunction.cs" />
+    <Compile Include="Graphics\States\Blend.cs" />
+    <Compile Include="Graphics\States\CompareFunction.cs" />
+    <Compile Include="Graphics\States\CullMode.cs" />
+    <Compile Include="Graphics\States\DepthFormat.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.cs" />
+    <Compile Include="Graphics\States\FillMode.cs" />
+    <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\SaveStateMode.cs" />
+    <Compile Include="Graphics\States\StencilOperation.cs" />
+    <Compile Include="Graphics\TextureCollection.cs" />
+    <Compile Include="Graphics\Vertices\BufferUsage.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IVertexType.cs" />
+    <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
+    <Compile Include="Graphics\Vertices\VertexElement.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
+    <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Android\Audio\Sound.cs" />
+    <Compile Include="Android\Media\Video.cs" />
+    <Compile Include="Android\Media\VideoPlayer.cs" />
+    <Compile Include="Android\PowerStatus.cs" />
+    <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="BatteryChargeStatus.cs" />
+    <Compile Include="BoundingBox.cs" />
+    <Compile Include="BoundingFrustum.cs" />
+    <Compile Include="BoundingSphere.cs" />
+    <Compile Include="ContainmentType.cs" />
+    <Compile Include="Curve.cs" />
+    <Compile Include="CurveContinuity.cs" />
+    <Compile Include="CurveKey.cs" />
+    <Compile Include="CurveKeyCollection.cs" />
+    <Compile Include="CurveLoopType.cs" />
+    <Compile Include="CurveTangent.cs" />
+    <Compile Include="DisplayOrientation.cs" />
+    <Compile Include="DrawableGameComponent.cs" />
+    <Compile Include="GameComponent.cs" />
+    <Compile Include="GameComponentCollection.cs" />
+    <Compile Include="GameComponentCollectionEventArgs.cs" />
+    <Compile Include="GameServiceContainer.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="Android\AndroidGameWindow.cs" />
+    <Compile Include="GameWindow.cs" />
+    <Compile Include="GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="IDrawable.cs" />
+    <Compile Include="IGameComponent.cs" />
+    <Compile Include="IGraphicsDeviceManager.cs" />
+    <Compile Include="Input\ButtonDefinition.cs" />
+    <Compile Include="Input\Buttons.cs" />
+    <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePadButtons.cs" />
+    <Compile Include="Input\GamePadCapabilities.cs" />
+    <Compile Include="Input\GamePadType.cs" />
+    <Compile Include="Input\GamePadDPad.cs" />
+    <Compile Include="Input\GamePadState.cs" />
+    <Compile Include="Input\GamePadThumbSticks.cs" />
+    <Compile Include="Input\GamePadTriggers.cs" />
+    <Compile Include="Android\Input\Keyboard.cs" />
+    <Compile Include="Input\Keys.cs" />
+    <Compile Include="Input\KeyState.cs" />
+    <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\ThumbStickDefinition.cs" />
+    <Compile Include="IUpdateable.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaQueue.cs" />
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="PerformanceCounter.cs" />
+    <Compile Include="Plane.cs" />
+    <Compile Include="PlaneIntersectionType.cs" />
+    <Compile Include="PlayerIndex.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PowerLineStatus.cs" />
+    <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
+    <Compile Include="Quaternion.cs" />
+    <Compile Include="Ray.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="ReusableItemList.cs" />
+    <Compile Include="Threading.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
+    <Compile Include="Vector4.cs" />
+    <Compile Include="Content\ContentLoadException.cs" />
+    <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Content\ContentTypeReader.cs" />
+    <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Content\ContentReaders\CharReader.cs" />
+    <Compile Include="Content\ContentReaders\ListReader.cs" />
+    <Compile Include="Content\ContentReaders\RectangleReader.cs" />
+    <Compile Include="Content\ContentReaders\StringReader.cs" />
+    <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
+    <Compile Include="Graphics\ClearOptions.cs" />
+    <Compile Include="Graphics\CompilerOptions.cs" />
+    <Compile Include="Graphics\DeviceType.cs" />
+    <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
+    <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
+    <Compile Include="Graphics\GraphicsProfile.cs" />
+    <Compile Include="Graphics\GraphicsResource.cs" />
+    <Compile Include="Graphics\IGraphicsDeviceService.cs" />
+    <Compile Include="Graphics\MultiSampleType.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Graphics\RenderTargetUsage.cs" />
+    <Compile Include="Graphics\ResourceType.cs" />
+    <Compile Include="Graphics\SetDataOptions.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\SpriteBatcher.cs" />
+    <Compile Include="Graphics\SpriteBatchItem.cs" />
+    <Compile Include="Graphics\SpriteBlendMode.cs" />
+    <Compile Include="Graphics\SpriteEffects.cs" />
+    <Compile Include="Graphics\SpriteFont.cs" />
+    <Compile Include="Graphics\SpriteSortMode.cs" />
+    <Compile Include="Graphics\SurfaceFormat.cs" />
+    <Compile Include="Graphics\TextureUsage.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="Input\Touch\GestureSample.cs" />
+    <Compile Include="Input\Touch\GestureType.cs" />
+    <Compile Include="Input\Touch\TouchCollection.cs" />
+    <Compile Include="Input\Touch\TouchLocation.cs" />
+    <Compile Include="Input\Touch\TouchLocationState.cs" />
+    <Compile Include="Input\Touch\TouchPanel.cs" />
+    <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="Storage\StorageContainer.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="Graphics\Effect\IEffectFog.cs" />
+    <Compile Include="Graphics\Effect\IEffectLights.cs" />
+    <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
+    <Compile Include="Graphics\ColorWriteChannels.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\States\TextureAddressMode.cs" />
+    <Compile Include="Graphics\States\TextureFilter.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Content\ContentReaders\BooleanReader.cs" />
+    <Compile Include="Content\ContentReaders\ColorReader.cs" />
+    <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
+    <Compile Include="Content\ContentReaders\DoubleReader.cs" />
+    <Compile Include="Content\ContentReaders\EnumReader.cs" />
+    <Compile Include="Content\ContentReaders\Int16Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int32Reader.cs" />
+    <Compile Include="Content\ContentReaders\Int64Reader.cs" />
+    <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
+    <Compile Include="Content\ContentReaders\SingleReader.cs" />
+    <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
+    <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Graphics\DxtUtil.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.cs" />
+    <Compile Include="Graphics\RenderTargetBinding.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
+    <Compile Include="Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="Graphics\DisplayModeCollection.cs" />
+    <Compile Include="Net\NetworkGamer.cs" />
+    <Compile Include="GamerServices\Achievement.cs" />
+    <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\Gamer.cs" />
+    <Compile Include="Android\GamerServices\SignedInGamer.cs" />
+    <Compile Include="Net\NetworkSession.cs" />
+    <Compile Include="Net\NetworkMachine.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="GamerServices\GamerProfile.cs" />
+    <Compile Include="Net\GamerStates.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
+    <Compile Include="GamerServices\GamerPrivileges.cs" />
+    <Compile Include="GamerServices\GamerDefaults.cs" />
+    <Compile Include="GamerServices\GamerPresence.cs" />
+    <Compile Include="Net\NetworkSessionType.cs" />
+    <Compile Include="Net\NetworkSessionProperties.cs" />
+    <Compile Include="Net\AvailableNetworkSession.cs" />
+    <Compile Include="Net\AvailableNetworkSessionCollection.cs" />
+    <Compile Include="Net\CommandEvent.cs" />
+    <Compile Include="Net\CommandEventType.cs" />
+    <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandReceiveData.cs" />
+    <Compile Include="Net\CommandSendData.cs" />
+    <Compile Include="Net\CommandSessionStateChange.cs" />
+    <Compile Include="Net\ICommand.cs" />
+    <Compile Include="Net\LocalNetworkGamer.cs" />
+    <Compile Include="Net\MonoGamerPeer.cs" />
+    <Compile Include="Net\NetworkException.cs" />
+    <Compile Include="Net\NetworkMessageType.cs" />
+    <Compile Include="Net\NetworkNotAvailableException.cs" />
+    <Compile Include="Net\NetworkSessionEndReason.cs" />
+    <Compile Include="Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Net\NetworkSessionJoinException.cs" />
+    <Compile Include="Net\NetworkSessionState.cs" />
+    <Compile Include="Net\PacketReader.cs" />
+    <Compile Include="Net\PacketWriter.cs" />
+    <Compile Include="Net\QualityOfService.cs" />
+    <Compile Include="Net\SendDataOptions.cs" />
+    <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
+    <Compile Include="Graphics\PackedVector\Short2.cs" />
+    <Compile Include="GamerServices\GamerCollection.cs" />
+    <Compile Include="GamerServices\GamerPresenceMode.cs" />
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
+    <Compile Include="GamerServices\GamerServicesComponent.cs" />
+    <Compile Include="GamerServices\GamerZone.cs" />
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="Android\GamerServices\Guide.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Content\LzxDecoder.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Input\GamePadDeadZone.cs" />
+    <Compile Include="Input\KeyboardState.cs" />
+    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Audio\XactSound.cs" />
+    <Compile Include="Android\Media\Song.cs" />
+    <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
+    <Compile Include="LaunchParameters.cs" />
+    <Compile Include="Content\ContentReaders\BasicEffectReader.cs" />
+    <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
+    <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
+    <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
+    <Compile Include="Graphics\Effect\EffectHelpers.cs" />
+    <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
+    <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Graphics\Effect\EffectMaterial.cs" />
+    <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
+    <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">
+      <Project>{565129E0-4EE5-4F6F-B403-C3484C9740BE}</Project>
+      <Name>Lidgren.Network.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+    <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
+  </ItemGroup>
+  <ItemGroup />
+</Project>
