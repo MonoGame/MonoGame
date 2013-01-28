@@ -99,7 +99,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // CANCEL, OUTSIDE                
                 case MotionEventActions.Cancel:
                 case MotionEventActions.Outside:
-                    TouchPanel.AddEvent(id, TouchLocationState.Released, position);
+                    for (int i = 0; i < e.PointerCount; i++)
+                    {
+                        id = e.GetPointerId(i);
+                        TouchPanel.AddEvent(id, TouchLocationState.Released, position);
+                    }
                     break;
             }
         }

@@ -45,7 +45,11 @@ namespace TwoMGFX
         {
         }
 
-        public ParseError(string message, int code, string file = "", int line = 0, int col = 0, int pos = 0, int length = 0)
+        public ParseError(string message, int code) : this(message, code, string.Empty, 0, 0, 0, 0)
+        {
+        }
+
+        public ParseError(string message, int code, string file, int line, int col, int pos, int length)
         {
             this.file = file;
             this.message = message;
@@ -359,11 +363,11 @@ namespace TwoMGFX
         {
             var sampler = paramlist[0] as SamplerStateInfo;
         	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (this.GetValue(tree, TokenType.TextureName, 0) ?? (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0))) as string;
+        	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0))) as string;
         	switch (name.ToLower())
         	{
         		case "texture":
-        			// Ignore
+        			sampler.textureName = value;
         			break;
         		case "minfilter":
         			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
@@ -440,7 +444,7 @@ namespace TwoMGFX
         		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
         
         	var shaderInfo = paramlist[0] as ShaderInfo;
-        	shaderInfo.SamplerStates.Add(sampler.name, sampler.state);
+        	shaderInfo.SamplerStates.Add(sampler.name, sampler);
         
         	return null;
         }

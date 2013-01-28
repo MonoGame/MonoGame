@@ -115,7 +115,6 @@ namespace Microsoft.Devices.Sensors
                 reading.Timestamp = DateTime.Now;
                 this.CurrentValue = reading;
             }
-            FireOnCurrentValueChanged(this, new SensorReadingEventArgs<CompassReading>(reading));
         }
 
         private void UpdateInterval(object sender, EventArgs args)

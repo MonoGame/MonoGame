@@ -41,18 +41,17 @@
 using System;
 using System.Diagnostics;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif WINRT
-// TODO
 #elif GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 #endif
-
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -162,6 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if OPENGL
             this.glTexture = -1;
+            this.glLastSamplerState = null;
 #endif
         }
 
