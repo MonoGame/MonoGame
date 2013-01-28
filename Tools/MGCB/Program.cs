@@ -49,11 +49,11 @@ namespace MGCB
             Console.WriteLine("Build started {0}\n", buildStarted);
 
             // Let the content build.
-            int fileCount, errorCount;
-            content.Build(out fileCount, out errorCount);
+            int successCount, errorCount;
+            content.Build(out successCount, out errorCount);
 
             // Print the finishing info.
-            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", fileCount, errorCount);
+            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
             Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
 
             // Return the error count.

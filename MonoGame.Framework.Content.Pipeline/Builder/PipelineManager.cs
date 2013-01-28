@@ -42,7 +42,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private ContentCompiler _compiler;
         private MethodInfo _compileMethod;
 
-        public PipelineBuildLogger Logger { get; private set; }
+        public ContentBuildLogger Logger { get; private set; }
 
         public List<string> Assemblies { get; private set; }
 
@@ -305,6 +305,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
+            Logger.PushFile(pipelineEvent.SourceFile);            
+
             var rebuild = pipelineEvent.NeedsRebuild(cachedEvent);
             if (!rebuild)
             {
@@ -339,6 +341,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Do we need to rebuild?
             if (rebuild)
             {
+                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
                 if (importer == null)
@@ -385,6 +389,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
             }
+            else
+            {
+                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+            }
+
+            Logger.PopFile();
         }
 
         public void CleanContent(string sourceFilepath, string outputFilepath = null)

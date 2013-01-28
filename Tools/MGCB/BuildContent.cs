@@ -111,7 +111,7 @@ namespace MGCB
             get { return _content.Count > 0 || Clean; }    
         }
 
-        public void Build(out int fileCount, out int errorCount)
+        public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = Directory.GetCurrentDirectory();
             var outputPath = Path.Combine(projectDirectory, OutputDir);
@@ -126,7 +126,7 @@ namespace MGCB
             // them here even if we don't build new content.
 
             errorCount = 0;
-            fileCount = 0;
+            successCount = 0;
 
             foreach (var c in _content)
             {
@@ -146,13 +146,12 @@ namespace MGCB
                                           c.Processor,
                                           c.ProcessorParams);
 
-                    Console.WriteLine("{0}", sourceFile);
-                    ++fileCount;
+                    ++successCount;
                 }
                 catch (PipelineException ex)
                 {
-                    ++errorCount;
                     Console.WriteLine("{0}: error: {1}", sourceFile, ex.Message);
+                    ++errorCount;
                 }
             }
 
