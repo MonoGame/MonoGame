@@ -42,7 +42,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private ContentCompiler _compiler;
         private MethodInfo _compileMethod;
 
-        public PipelineBuildLogger Logger { get; private set; }
+        public ContentBuildLogger Logger { get; private set; }
 
         public List<string> Assemblies { get; private set; }
 
@@ -191,28 +191,32 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return null;
         }
 
-        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        public Type GetProcessorType(string name)
         {
             if (_processors == null)
                 ResolveAssemblies();
 
-            // Search for the processor.
-            IContentProcessor processor = null;
+            // Search for the processor type.
             foreach (var info in _processors)
             {
                 if (info.type.Name.Equals(name))
-                {
-                    processor = (IContentProcessor)Activator.CreateInstance(info.type);
-                    break;
-                }
+                    return info.type;
             }
 
-            // No processor found... exception?
-            if (processor == null)
+            return null;
+        }
+
+
+        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        {
+            var processorType = GetProcessorType(name);
+            if (processorType == null)
                 return null;
 
+            // Create the processor.
+            var processor = (IContentProcessor)Activator.CreateInstance(processorType);
+
             // Convert and set the parameters on the processor.
-            var processorType = processor.GetType();
             foreach (var param in processorParameters)
             {
                 var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
@@ -235,6 +239,37 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             return processor;
+        }
+
+        public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
+        {
+            var result = new OpaqueDataDictionary();
+
+            var processorType = GetProcessorType(name);
+            if (processorType == null || processorParameters == null)
+            {
+                return result;
+            }
+
+            foreach (var param in processorParameters)
+            {
+                var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
+                if (propInfo == null || propInfo.GetSetMethod(false) == null)
+                    continue;
+
+                // Make sure we can assign the value.
+                if (!propInfo.PropertyType.IsInstanceOfType(param.Value))
+                {
+                    // Make sure we can convert the value.
+                    var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
+                    if (!typeConverter.CanConvertFrom(param.Value.GetType()))
+                        continue;
+                }
+
+                result.Add(param.Key, param.Value);
+            }
+
+            return result;
         }
 
         private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
@@ -274,6 +309,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
         {
+            sourceFilepath = PathHelper.Normalize(sourceFilepath);
             ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
 
             // Resolve the importer name.
@@ -291,7 +327,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
-                Parameters = processorParameters ?? new OpaqueDataDictionary(),
+                Parameters = ValidateProcessorParameters(processorName, processorParameters)
             };
 
             // Load the previous content event if it exists.
@@ -305,6 +341,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
+            Logger.PushFile(pipelineEvent.SourceFile);            
+
             var rebuild = pipelineEvent.NeedsRebuild(cachedEvent);
             if (!rebuild)
             {
@@ -339,6 +377,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Do we need to rebuild?
             if (rebuild)
             {
+                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
                 if (importer == null)
@@ -346,7 +386,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
                 if (processor == null)
                     throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
-
+                
                 // Try importing the content.
                 object importedObject;
                 try
@@ -361,6 +401,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 catch (Exception inner)
                 {
                     throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
+                }
+
+                // Make sure the input type is valid.
+                if (!processor.InputType.IsAssignableFrom(importedObject.GetType()))
+                {
+                    throw new PipelineException(
+                        string.Format("The type '{0}' cannot be processed by {1} as a {2}!",
+                        importedObject.GetType().FullName, 
+                        pipelineEvent.Processor, 
+                        processor.InputType.FullName));
                 }
 
                 // Process the imported object.
@@ -385,6 +435,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
             }
+            else
+            {
+                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+            }
+
+            Logger.PopFile();
         }
 
         public void CleanContent(string sourceFilepath, string outputFilepath = null)
@@ -420,7 +476,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
         {
             // Make sure the output directory exists.
-            var outputFileDir = Path.GetDirectoryName(pipelineEvent.FullPathToDestFile + Path.DirectorySeparatorChar);
+            var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile);
 
             Directory.CreateDirectory(outputFileDir);
 
@@ -428,12 +484,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 _compiler = new ContentCompiler();
 
             // Write the XNB.
-            using (var stream = new FileStream(pipelineEvent.FullPathToDestFile, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.
-            pipelineEvent.DestTime = File.GetLastWriteTime(pipelineEvent.FullPathToDestFile);
+            pipelineEvent.DestTime = File.GetLastWriteTime(pipelineEvent.DestFile);
         }
     }
 }
