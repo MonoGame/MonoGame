@@ -52,11 +52,6 @@ namespace Microsoft.Xna.Framework.Content
             return Normalize(fileName, supportedExtensions);
         }
 
-        bool IsPowerOfTwo(UInt32 x)
-        {
-            return x != 0 && 0 == (x & (x - 1));
-        }
-
         protected internal override Texture2D Read(ContentReader reader, Texture2D existingInstance)
 		{
 			Texture2D texture = null;
@@ -94,7 +89,7 @@ namespace Microsoft.Xna.Framework.Content
             // If the system does not fully support Power of Two textures,
             // skip any mip maps supplied with any non PoT textures.
             if (levelCount > 1 && !GraphicsCapabilities.NonPowerOfTwo &&
-                (!IsPowerOfTwo((UInt32)width) || !IsPowerOfTwo((UInt32)height)))
+                (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
             {
                 levelCountOutput = 1;
                 System.Diagnostics.Debug.WriteLine(
