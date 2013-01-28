@@ -386,7 +386,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
                 if (processor == null)
                     throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
-
+                
                 // Try importing the content.
                 object importedObject;
                 try
@@ -401,6 +401,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 catch (Exception inner)
                 {
                     throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
+                }
+
+                // Make sure the input type is valid.
+                if (!processor.InputType.IsAssignableFrom(importedObject.GetType()))
+                {
+                    throw new PipelineException(
+                        string.Format("The type '{0}' cannot be processed by {1} as a {2}!",
+                        importedObject.GetType().FullName, 
+                        pipelineEvent.Processor, 
+                        processor.InputType.FullName));
                 }
 
                 // Process the imported object.
