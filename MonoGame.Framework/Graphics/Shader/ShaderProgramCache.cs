@@ -143,7 +143,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!disposed)
             {
-                Clear();
+                if (disposing)
+                    Clear();
                 disposed = true;
             }
         }

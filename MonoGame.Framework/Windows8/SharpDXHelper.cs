@@ -14,7 +14,11 @@ namespace Microsoft.Xna.Framework
                 case PresentInterval.One:
                 case PresentInterval.Two:
                 default:
+#if WINRT
                     effect = SharpDX.DXGI.SwapEffect.FlipSequential;
+#else
+                    effect = SharpDX.DXGI.SwapEffect.Discard;
+#endif
                     break;
 
                 case PresentInterval.Immediate:
@@ -57,8 +61,11 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.B5G6R5_UNorm;
                 case SurfaceFormat.Bgra5551:
                     return SharpDX.DXGI.Format.B5G5R5A1_UNorm;
+#if WINRT
                 case SurfaceFormat.Bgra4444:
                     return SharpDX.DXGI.Format.B4G4R4A4_UNorm;
+#endif
+
                 case SurfaceFormat.Dxt1:
                     return SharpDX.DXGI.Format.BC1_UNorm;
                 case SurfaceFormat.Dxt3:

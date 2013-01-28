@@ -4,23 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif PSM
+#if PSM
 using Sce.PlayStation.Core.Graphics;
-#elif WINRT
-
-#else
-using OpenTK.Graphics.ES20;
-
-#if IOS || ANDROID
-using ActiveUniformType = OpenTK.Graphics.ES20.All;
-using ShaderType = OpenTK.Graphics.ES20.All;
-using ProgramParameter = OpenTK.Graphics.ES20.All;
 #endif
-#endif
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
