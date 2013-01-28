@@ -29,7 +29,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
             if (ColorKeyEnabled)
-                throw new NotImplementedException();
+            {
+                ColorKeyColor = Color.Red;
+                var replaceColor = System.Drawing.Color.FromArgb(0);
+                for (var x = 0; x < input._bitmap.Width; x++)
+                {
+                    for (var y = 0; y < input._bitmap.Height; y++)
+                    {
+                        var col = input._bitmap.GetPixel(x, y);
+
+                        if (col.ColorsEqual(ColorKeyColor))
+                        {
+                            input._bitmap.SetPixel(x, y, replaceColor);
+                        }
+                    }
+                }
+
+                input.Faces[0][0].SetPixelData(GraphicsUtil.ConvertBitmap(input._bitmap));
+            }
 
             var face = input.Faces[0][0];
             if (ResizeToPowerOfTwo)
