@@ -161,15 +161,9 @@ namespace Microsoft.Xna.Framework
             return true;
         }
 
-        public override void EnterFullScreen()
-        {
-            UpdateWindowBounds();
-        }
+        public override void EnterFullScreen() { }
 
-        public override void ExitFullScreen()
-        {
-            UpdateWindowBounds();
-        }
+        public override void ExitFullScreen() { }
 
         internal void UpdateWindowBounds()
         {
@@ -214,8 +208,8 @@ namespace Microsoft.Xna.Framework
                 {
                     OpenTK.DisplayDevice.Default.RestoreResolution();
                 }
-                if (Game.GraphicsDevice.PresentationParameters.BackBufferWidth != graphicsDeviceManager.PreferredBackBufferWidth ||
-                    Game.GraphicsDevice.PresentationParameters.BackBufferHeight != graphicsDeviceManager.PreferredBackBufferHeight)
+                if (_view.Window.Bounds.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
+                    _view.Window.Bounds.Height != graphicsDeviceManager.PreferredBackBufferHeight)
                 {
                     _view.ChangeWindowSize(graphicsDeviceManager.PreferredBackBufferWidth, graphicsDeviceManager.PreferredBackBufferHeight);
 

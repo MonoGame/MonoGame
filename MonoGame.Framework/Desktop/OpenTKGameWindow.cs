@@ -166,7 +166,6 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         private void OnResize(object sender, EventArgs e)
         {
-            Console.WriteLine("MonoGame: OnResize");
             var newWindowWidth = window.ClientRectangle.Width;
             var newWindowHeight = window.ClientRectangle.Height;
 
@@ -252,7 +251,7 @@ namespace Microsoft.Xna.Framework
         {
             GraphicsContext.ShareContexts = true;
 
-            window = new OpenTK.GameWindow();
+            window = new OpenTK.GameWindow(800, 480);
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);

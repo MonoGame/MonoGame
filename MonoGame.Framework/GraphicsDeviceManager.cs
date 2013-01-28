@@ -74,6 +74,7 @@ namespace Microsoft.Xna.Framework
 #if !(WINDOWS || LINUX || WINRT)
         private bool _wantFullScreen = false;
 #endif
+        // XNA has a default BackBufferWidth/Height of 800x480 that it never changes.
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
 
