@@ -58,11 +58,23 @@ namespace MGCB
             Description = "Defines the class name of the content processor for processing imported content.")]
         public string Processor;
 
+        private OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
+
         [CommandLineParameter(
             Name = "processorParam",
             ValueName = "name=value",
             Description = "Defines a parameter name and value to set on a content processor.")]
-        public readonly List<string> ProcessorParams = new List<string>();
+        public void AddProcessorParam(string nameAndValue)
+        {
+            var keyAndValue = nameAndValue.Split('=');
+            if (keyAndValue.Length != 2)
+            {
+                // Do we error out or something?
+                return;
+            }
+
+            _processorParams.Add(keyAndValue[0], keyAndValue[1]);
+        }
 
         [CommandLineParameter(
             Name = "build",
@@ -74,22 +86,15 @@ namespace MGCB
             {
                 SourceFile = sourceFile, 
                 Importer = Importer, 
-                Processor = Processor
+                Processor = Processor,
+                ProcessorParams = new OpaqueDataDictionary()
             };
 
-            foreach (var p in ProcessorParams)
-            {
-                var nameAndValue = p.Split('=');
-
-                // We should have two objects here.
-                if (nameAndValue.Length != 2)
-                {
-                    continue;
-                }
-
-                item.ProcessorParams.Add(nameAndValue[0], nameAndValue[1]);
-            }
-            ProcessorParams.Clear();
+            // Copy the current processor parameters blind as we
+            // will validate and remove invalid parameters during
+            // the build process later.
+            foreach (var pair in _processorParams)
+                item.ProcessorParams.Add(pair.Key, pair.Value);
 
             _content.Add(item);
         }
@@ -99,7 +104,7 @@ namespace MGCB
             public string SourceFile;
             public string Importer;
             public string Processor;
-            public OpaqueDataDictionary ProcessorParams = new OpaqueDataDictionary();
+            public OpaqueDataDictionary ProcessorParams;
         }
 
         private readonly List<ContentItem> _content = new List<ContentItem>();

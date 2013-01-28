@@ -191,28 +191,32 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return null;
         }
 
-        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        public Type GetProcessorType(string name)
         {
             if (_processors == null)
                 ResolveAssemblies();
 
-            // Search for the processor.
-            IContentProcessor processor = null;
+            // Search for the processor type.
             foreach (var info in _processors)
             {
                 if (info.type.Name.Equals(name))
-                {
-                    processor = (IContentProcessor)Activator.CreateInstance(info.type);
-                    break;
-                }
+                    return info.type;
             }
 
-            // No processor found... exception?
-            if (processor == null)
+            return null;
+        }
+
+
+        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        {
+            var processorType = GetProcessorType(name);
+            if (processorType == null)
                 return null;
 
+            // Create the processor.
+            var processor = (IContentProcessor)Activator.CreateInstance(processorType);
+
             // Convert and set the parameters on the processor.
-            var processorType = processor.GetType();
             foreach (var param in processorParameters)
             {
                 var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
@@ -235,6 +239,37 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             return processor;
+        }
+
+        public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
+        {
+            var result = new OpaqueDataDictionary();
+
+            var processorType = GetProcessorType(name);
+            if (processorType == null || processorParameters == null)
+            {
+                return result;
+            }
+
+            foreach (var param in processorParameters)
+            {
+                var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
+                if (propInfo == null || propInfo.GetSetMethod(false) == null)
+                    continue;
+
+                // Make sure we can assign the value.
+                if (!propInfo.PropertyType.IsInstanceOfType(param.Value))
+                {
+                    // Make sure we can convert the value.
+                    var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
+                    if (!typeConverter.CanConvertFrom(param.Value.GetType()))
+                        continue;
+                }
+
+                result.Add(param.Key, param.Value);
+            }
+
+            return result;
         }
 
         private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
@@ -292,7 +327,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
-                Parameters = processorParameters ?? new OpaqueDataDictionary(),
+                Parameters = ValidateProcessorParameters(processorName, processorParameters)
             };
 
             // Load the previous content event if it exists.
