@@ -28,16 +28,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-            if (PremultiplyAlpha)
-                GraphicsUtil.PremultiplyAlpha(input);
-
             if (ColorKeyEnabled)
                 throw new NotImplementedException();
 
-            if (GenerateMipmaps)
-                throw new NotImplementedException();
-
+            var face = input.Faces[0][0];
             if (ResizeToPowerOfTwo)
+            {
+                if (!GraphicsUtil.IsPowerOfTwo(face.Width) || !GraphicsUtil.IsPowerOfTwo(face.Height))
+                    input.Resize(GraphicsUtil.GetNextPowerOfTwo(face.Width), GraphicsUtil.GetNextPowerOfTwo(face.Height));
+            }
+
+            if (PremultiplyAlpha)
+                GraphicsUtil.PremultiplyAlpha(input);
+
+            if (GenerateMipmaps)
                 throw new NotImplementedException();
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
