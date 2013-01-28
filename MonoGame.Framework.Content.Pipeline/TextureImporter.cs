@@ -30,11 +30,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public override TextureContent Import(string filename, ContentImporterContext context)
         {
             var output = new Texture2DContent();
-            var bmp = new Bitmap(filename);
+            output._bitmap = new Bitmap(filename);
 
-            var imageData = GraphicsUtil.ConvertBitmap(bmp);
+            var imageData = GraphicsUtil.ConvertBitmap(output._bitmap);
 
-            var bitmapContent = new PixelBitmapContent<Color>(bmp.Width, bmp.Height);
+            var bitmapContent = new PixelBitmapContent<Color>(output._bitmap.Width, output._bitmap.Height);
             bitmapContent.SetPixelData(imageData);
 
             output.Faces.Add(new MipmapChain(bitmapContent));

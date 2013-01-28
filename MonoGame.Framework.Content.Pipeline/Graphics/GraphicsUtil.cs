@@ -74,6 +74,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        public static bool IsPowerOfTwo(int x)
+        {
+            return (x & (x - 1)) == 0;
+        }
+
+        /// <summary>
+        /// Returns the next power of two. Returns same value if already is PoT.
+        /// </summary>
+        public static int GetNextPowerOfTwo(int value)
+        {
+            if (IsPowerOfTwo(value))
+                return value;
+
+            var nearestPower = 1;
+            while (nearestPower < value)
+                nearestPower = nearestPower << 1;
+
+            return nearestPower;
+        }
+
+        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
+        {
+            var resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
+            {
+                graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
+
+                content._bitmap.Dispose();
+                content._bitmap = resizedBmp;
+            }
+
+            var imageData = GraphicsUtil.ConvertBitmap(content._bitmap);
+
+            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
+            bitmapContent.SetPixelData(imageData);
+
+            content.Faces.Clear();
+            content.Faces.Add(new MipmapChain(bitmapContent));
+        }
 
         public static void PremultiplyAlpha(TextureContent content)
         {
