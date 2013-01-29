@@ -94,6 +94,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return nearestPower;
         }
 
+        /// <summary>
+        /// Compares a System.Drawing.Color to a Microsoft.Xna.Framework.Color
+        /// </summary>
+        internal static bool ColorsEqual(this System.Drawing.Color a, Color b)
+        {
+            if (a.A != b.A)
+                return false;
+
+            if (a.R != b.R)
+                return false;
+
+            if (a.G != b.G)
+                return false;
+
+            if (a.B != b.B)
+                return false;
+
+            return true;
+        }
+
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
         {
             var resizedBmp = new Bitmap(newWidth, newHeight);
