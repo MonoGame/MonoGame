@@ -53,7 +53,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             if (PremultiplyAlpha)
-                GraphicsUtil.PremultiplyAlpha(input);
+            {
+                for (var x = 0; x < input._bitmap.Width; x++)
+                {
+                    for (var y = 0; y < input._bitmap.Height; y++)
+                    {
+                        var oldCol = input._bitmap.GetPixel(x, y);
+                        var preMultipliedColor = Color.FromNonPremultiplied(oldCol.R, oldCol.G, oldCol.B, oldCol.A);
+                        input._bitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(preMultipliedColor.A, 
+                                                                                   preMultipliedColor.R,
+                                                                                   preMultipliedColor.G,
+                                                                                   preMultipliedColor.B));
+                    }
+                }
+
+                input.Faces[0][0].SetPixelData(GraphicsUtil.ConvertBitmap(input._bitmap));
+            }
 
             if (GenerateMipmaps)
                 throw new NotImplementedException();
