@@ -51,7 +51,7 @@ namespace MonoGame.Framework
         }
         
         /// <summary>
-        /// Creates your Game class initializing it to worth within a XAML application window.
+        /// Preserves the previous execution state in MetroGamePlatform and returns the constructed game object initialized with the given window.
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
