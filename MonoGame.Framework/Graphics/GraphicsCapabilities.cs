@@ -41,7 +41,11 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 #if OPENGL
+#if GLES
 using OpenTK.Graphics.ES20;
+#else
+using OpenTK.Graphics.OpenGL;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
