@@ -4,12 +4,29 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MGCB
 {
     [XmlRoot(ElementName = "SourceFileCollection")]
-    public sealed class SourceFileCollection : List<string>
+    public sealed class SourceFileCollection
     {
+        public GraphicsProfile Profile { get; set; }
+
+        public TargetPlatform Platform { get; set; }
+
+        public string Config { get; set; }
+
+        [XmlArrayItem("File")]
+        public List<string> SourceFiles { get; set; }
+
+        public SourceFileCollection()
+        {
+            SourceFiles = new List<string>();
+            Config = string.Empty;
+        }
+
         static public SourceFileCollection Read(string filePath)
         {
             var deserializer = new XmlSerializer(typeof(SourceFileCollection));
@@ -34,11 +51,11 @@ namespace MGCB
 
         public void Merge(SourceFileCollection other)
         {
-            foreach (var sourceFile in other)
+            foreach (var sourceFile in other.SourceFiles)
             {
-                var inContent = this.Any(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+                var inContent = SourceFiles.Any(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
                 if (!inContent)
-                    Add(sourceFile);
+                    SourceFiles.Add(sourceFile);
             }
         }
     }

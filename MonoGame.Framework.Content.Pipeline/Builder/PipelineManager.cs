@@ -46,15 +46,31 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public List<string> Assemblies { get; private set; }
 
+        /// <summary>
+        /// The current target graphics profile for which all content is built.
+        /// </summary>
+        public GraphicsProfile Profile { get; set; }
+
+        /// <summary>
+        /// The current target platform for which all content is built.
+        /// </summary>
+        public TargetPlatform Platform { get; set; }
+
+        /// <summary>
+        /// The build configuration passed thru to content processors.
+        /// </summary>
+        public string Config { get; set; }
+
+
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
             Assemblies = new List<string>();
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = PathHelper.Normalize(projectDir + @"\");
-            OutputDirectory = PathHelper.Normalize(outputDir + @"\");
-            IntermediateDirectory = PathHelper.Normalize(intermediateDir + @"\");
+            ProjectDirectory = PathHelper.Normalize(projectDir + Path.DirectorySeparatorChar);
+            OutputDirectory = PathHelper.Normalize(outputDir + Path.DirectorySeparatorChar);
+            IntermediateDirectory = PathHelper.Normalize(intermediateDir + Path.DirectorySeparatorChar);
         }
 
         public void AddAssembly(string assemblyFilePath)
@@ -327,7 +343,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
-                Parameters = ValidateProcessorParameters(processorName, processorParameters)
+                Parameters = ValidateProcessorParameters(processorName, processorParameters),
             };
 
             // Load the previous content event if it exists.

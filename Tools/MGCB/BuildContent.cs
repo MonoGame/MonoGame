@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace MGCB
@@ -51,6 +52,24 @@ namespace MGCB
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
         public readonly List<string> References = new List<string>();
+
+        [CommandLineParameter(
+            Name = "platform",
+            ValueName = "targetPlatform",
+            Description = "Set the target platform for this build.  Defaults to Windows.")]
+        public TargetPlatform Platform;
+
+        [CommandLineParameter(
+            Name = "profile",
+            ValueName = "graphicsProfile",
+            Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
+        public GraphicsProfile Profile;
+
+        [CommandLineParameter(
+            Name = "config",
+            ValueName = "string",
+            Description = "The optional build config string from the build system.")]
+        public string Config = string.Empty;
 
         [CommandLineParameter(
             Name = "importer",
@@ -147,17 +166,28 @@ namespace MGCB
             var contentFile = Path.Combine(intermediatePath, PipelineBuildEvent.Extension);
             var previousContent = SourceFileCollection.Read(contentFile);
 
+            // If the target changed in any way then we need to force
+            // a fuull rebuild even under incremental builds.
+            var targetChanged = previousContent.Config != Config ||
+                                previousContent.Platform != Platform ||
+                                previousContent.Profile != Profile;
+
             // First clean previously built content.
-            foreach (var sourceFile in previousContent)
+            foreach (var sourceFile in previousContent.SourceFiles)
             {
                 var inContent = _content.Any(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
                 var cleanOldContent = !inContent && !Incremental;
                 var cleanRebuiltContent = inContent && (Rebuild || Clean);
-                if (cleanRebuiltContent || cleanOldContent)
+                if (cleanRebuiltContent || cleanOldContent || targetChanged)
                     _manager.CleanContent(sourceFile);                
             }
 
-            var newContent = new SourceFileCollection();
+            var newContent = new SourceFileCollection
+            {
+                Profile = _manager.Profile = Profile,
+                Platform = _manager.Platform = Platform,
+                Config = _manager.Config = Config
+            };
             errorCount = 0;
             successCount = 0;
 
@@ -171,7 +201,7 @@ namespace MGCB
                                           c.Processor,
                                           c.ProcessorParams);
 
-                    newContent.Add(c.SourceFile);
+                    newContent.SourceFiles.Add(c.SourceFile);
 
                     ++successCount;
                 }
@@ -184,13 +214,13 @@ namespace MGCB
 
             // If this is an incremental build we merge the list
             // of previous content with the new list.
-            if (Incremental)
+            if (Incremental && !targetChanged)
                 newContent.Merge(previousContent);
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
             File.Delete(contentFile);
-            if (newContent.Count > 0)
+            if (newContent.SourceFiles.Count > 0)
                 newContent.Write(contentFile);
         }
     }

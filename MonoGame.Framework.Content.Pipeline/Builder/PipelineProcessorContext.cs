@@ -21,10 +21,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             _pipelineEvent = pipelineEvent;
         }
 
-        public override TargetPlatform TargetPlatform { get { return TargetPlatform.Windows; } }
-        public override GraphicsProfile TargetProfile { get { return GraphicsProfile.Reach; } }
+        public override TargetPlatform TargetPlatform { get { return _manager.Platform; } }
+        public override GraphicsProfile TargetProfile { get { return _manager.Profile; } }
 
-        public override string BuildConfiguration { get { return string.Empty; } }
+        public override string BuildConfiguration { get { return _manager.Config; } }
 
         public override string IntermediateDirectory { get { return _manager.IntermediateDirectory; } }
         public override string OutputDirectory { get { return _manager.OutputDirectory; } }
