@@ -134,44 +134,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             content.Faces.Clear();
             content.Faces.Add(new MipmapChain(bitmapContent));
         }
-
-        public static void PremultiplyAlpha(TextureContent content)
-        {
-            var colorTex = content.Faces[0][0] as PixelBitmapContent<Color>;
-            if (colorTex != null)
-            {
-                for (var y = 0; y < colorTex.Height; y++)
-                {
-                    for (var x = 0; x < colorTex.Width; x++)
-                    {
-                        colorTex._pixelData[y][x] = Color.FromNonPremultiplied(colorTex._pixelData[y][x].R,
-                                                                            colorTex._pixelData[y][x].G,
-                                                                            colorTex._pixelData[y][x].B,
-                                                                            colorTex._pixelData[y][x].A);
-                    }
-
-                }
-            }
-            else
-            {
-                /*var vec4Tex = content.Faces[0][0] as PixelBitmapContent<Vector4>;
-                if (vec4Tex == null)
-                    throw new NotSupportedException();
-
-                for (int x = 0; x < vec4Tex.Height; x++)
-                {
-                    var row = vec4Tex.GetRow(x);
-                    for (int y = 0; y < row.Length; y++)
-                    {
-                        if (row[y].W < 1.0f)
-                        {
-                            row[y].X *= row[y].W;
-                            row[y].Y *= row[y].W;
-                            row[y].Z *= row[y].W;
-                        }
-                    }
-                }*/
-            }
-        }
     }
 }
