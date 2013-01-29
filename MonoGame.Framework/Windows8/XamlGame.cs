@@ -48,5 +48,19 @@ namespace MonoGame.Framework
             // Return the created game object.
             return game;
         }
+        
+        /// <summary>
+        /// Creates your Game class initializing it to worth within a XAML application window.
+        /// </summary>
+        /// <param name="launchParameters">The command line arguments from launch.</param>
+        /// <param name="window">The core window object.</param>
+        /// <param name="swapPanel">The XAML swapchain panel to which we render the scene and recieve input events.</param>
+        /// <returns></returns>
+        static public T Create(LaunchActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapPanel)
+        {
+            MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
+
+            return Create(args.Arguments, window, swapPanel);
+        }
     }
 }
