@@ -488,6 +488,8 @@ namespace Microsoft.Xna.Framework
 
 		public override void KeyDown (NSEvent theEvent)
 		{
+			OnKeyDownEvent(new NSEventArgs(theEvent));
+
 			Keys kk = KeyUtil.GetKeys (theEvent); 
 
 			if (!_keys.Contains (kk))
@@ -496,14 +498,38 @@ namespace Microsoft.Xna.Framework
 			UpdateKeyboardState ();
 		}
 
+		protected virtual void OnKeyDownEvent (NSEventArgs e)
+		{
+			if (e == null)
+				throw new ArgumentNullException("e", "'e' cannot be null (Nothing in Visual Basic)");
+
+			if (KeyDownEvent != null)
+				KeyDownEvent(this, e);
+		}
+
+		public event EventHandler<NSEventArgs> KeyDownEvent;
+
 		public override void KeyUp (NSEvent theEvent)
 		{
+			OnKeyUpEvent(new NSEventArgs(theEvent));
+
 			Keys kk = KeyUtil.GetKeys (theEvent); 
 
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
 		}
+
+		protected virtual void OnKeyUpEvent(NSEventArgs e)
+		{
+			if (e == null)
+				throw new ArgumentNullException("e", "'e' cannot be null (Nothing in Visual Basic)");
+
+			if (KeyUpEvent != null)
+				KeyUpEvent (this, e);
+		}
+
+		public event EventHandler<NSEventArgs> KeyUpEvent;
 
 		List<Keys> _flags = new List<Keys> ();
 
