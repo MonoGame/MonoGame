@@ -75,7 +75,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             uri = new Uri(basePath).MakeRelativeUri(uri);
             var str = Uri.UnescapeDataString(uri.ToString());
 
-            return NormalizeOS(str);
+            return Normalize(str);
         }
 
         /// <summary>

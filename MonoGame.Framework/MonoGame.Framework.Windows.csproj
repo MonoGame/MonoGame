@@ -98,6 +98,7 @@
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />

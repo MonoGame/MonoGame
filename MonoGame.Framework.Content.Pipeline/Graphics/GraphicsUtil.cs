@@ -16,8 +16,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public static class GraphicsUtil
     {
-        public static byte[] ConvertBitmap(Bitmap bmp)
+        public static byte[] GetData(this Bitmap bmp)
         {
+            // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
+            // swizzle the channels later
+            System.Diagnostics.Debug.Assert(bmp.PixelFormat == PixelFormat.Format32bppArgb);
+
             var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
                                     ImageLockMode.ReadOnly,
                                     bmp.PixelFormat);
@@ -32,20 +36,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
             // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RBGA.
+            // Because of this we flip the R and B channels.
 
-            switch (bitmapData.PixelFormat)
-            {
-                case PixelFormat.Format32bppArgb:
-                    BGRAtoRGBA(output);
-                    break;
-
-                case PixelFormat.Format32bppRgb:
-                    BGRtoRGBA(output);
-                    break;
-                    
-                default:
-                    throw new NotSupportedException("Unsupported pixel format.");
-            }
+            BGRAtoRGBA(output);
+  
             return output;
         }
 
@@ -59,59 +53,65 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        public static void BGRtoRGBA(byte[] data)
+        public static bool IsPowerOfTwo(int x)
         {
-            var output = new byte[(int)(data.LongLength * 4.0f / 3.0f)];
-            var counter = 0;
-            for (var x = 0; x < data.Length;)
-            {
-                output[counter++] = data[x + 2];
-                output[counter++] = data[x + 1];
-                output[counter++] = data[x];
-                output[counter++] = (byte)255;
-
-                x += 3;
-            }
+            return (x & (x - 1)) == 0;
         }
 
-
-        public static void PremultiplyAlpha(TextureContent content)
+        /// <summary>
+        /// Returns the next power of two. Returns same value if already is PoT.
+        /// </summary>
+        public static int GetNextPowerOfTwo(int value)
         {
-            var colorTex = content.Faces[0][0] as PixelBitmapContent<Color>;
-            if (colorTex != null)
-            {
-                for (var y = 0; y < colorTex.Height; y++)
-                {
-                    for (var x = 0; x < colorTex.Width; x++)
-                    {
-                        colorTex._pixelData[y][x] = Color.FromNonPremultiplied(colorTex._pixelData[y][x].R,
-                                                                            colorTex._pixelData[y][x].G,
-                                                                            colorTex._pixelData[y][x].B,
-                                                                            colorTex._pixelData[y][x].A);
-                    }
+            if (IsPowerOfTwo(value))
+                return value;
 
-                }
-            }
-            else
-            {
-                /*var vec4Tex = content.Faces[0][0] as PixelBitmapContent<Vector4>;
-                if (vec4Tex == null)
-                    throw new NotSupportedException();
+            var nearestPower = 1;
+            while (nearestPower < value)
+                nearestPower = nearestPower << 1;
 
-                for (int x = 0; x < vec4Tex.Height; x++)
-                {
-                    var row = vec4Tex.GetRow(x);
-                    for (int y = 0; y < row.Length; y++)
-                    {
-                        if (row[y].W < 1.0f)
-                        {
-                            row[y].X *= row[y].W;
-                            row[y].Y *= row[y].W;
-                            row[y].Z *= row[y].W;
-                        }
-                    }
-                }*/
+            return nearestPower;
+        }
+
+        /// <summary>
+        /// Compares a System.Drawing.Color to a Microsoft.Xna.Framework.Color
+        /// </summary>
+        internal static bool ColorsEqual(this System.Drawing.Color a, Color b)
+        {
+            if (a.A != b.A)
+                return false;
+
+            if (a.R != b.R)
+                return false;
+
+            if (a.G != b.G)
+                return false;
+
+            if (a.B != b.B)
+                return false;
+
+            return true;
+        }
+
+        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
+        {
+            var resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
+            {
+                graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
+
+                content._bitmap.Dispose();
+                content._bitmap = resizedBmp;
             }
+
+            var imageData = content._bitmap.GetData();
+
+            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
+            bitmapContent.SetPixelData(imageData);
+
+            content.Faces.Clear();
+            content.Faces.Add(new MipmapChain(bitmapContent));
         }
     }
 }

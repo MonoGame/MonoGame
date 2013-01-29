@@ -42,7 +42,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private ContentCompiler _compiler;
         private MethodInfo _compileMethod;
 
-        public PipelineBuildLogger Logger { get; private set; }
+        public ContentBuildLogger Logger { get; private set; }
 
         public List<string> Assemblies { get; private set; }
 
@@ -52,17 +52,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = projectDir + @"\";
-            OutputDirectory = outputDir + @"\";
-            IntermediateDirectory = intermediateDir + @"\";
+            ProjectDirectory = PathHelper.Normalize(projectDir + @"\");
+            OutputDirectory = PathHelper.Normalize(outputDir + @"\");
+            IntermediateDirectory = PathHelper.Normalize(intermediateDir + @"\");
         }
 
         public void AddAssembly(string assemblyFilePath)
         {
             if (assemblyFilePath == null)
-                throw new NullReferenceException("assemblyFilePath cannot be null!");
+                throw new ArgumentException("assemblyFilePath cannot be null!");
             if (!Path.IsPathRooted(assemblyFilePath))
-                throw new NullReferenceException("assemblyFilePath must be absolute!");
+                throw new ArgumentException("assemblyFilePath must be absolute!");
 
             // Make sure we're not adding the same assembly twice.
             assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
@@ -191,28 +191,32 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return null;
         }
 
-        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        public Type GetProcessorType(string name)
         {
             if (_processors == null)
                 ResolveAssemblies();
 
-            // Search for the processor.
-            IContentProcessor processor = null;
+            // Search for the processor type.
             foreach (var info in _processors)
             {
                 if (info.type.Name.Equals(name))
-                {
-                    processor = (IContentProcessor)Activator.CreateInstance(info.type);
-                    break;
-                }
+                    return info.type;
             }
 
-            // No processor found... exception?
-            if (processor == null)
+            return null;
+        }
+
+
+        public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
+        {
+            var processorType = GetProcessorType(name);
+            if (processorType == null)
                 return null;
 
+            // Create the processor.
+            var processor = (IContentProcessor)Activator.CreateInstance(processorType);
+
             // Convert and set the parameters on the processor.
-            var processorType = processor.GetType();
             foreach (var param in processorParameters)
             {
                 var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
@@ -237,7 +241,38 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return processor;
         }
 
-        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
+        {
+            var result = new OpaqueDataDictionary();
+
+            var processorType = GetProcessorType(name);
+            if (processorType == null || processorParameters == null)
+            {
+                return result;
+            }
+
+            foreach (var param in processorParameters)
+            {
+                var propInfo = processorType.GetProperty(param.Key, BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
+                if (propInfo == null || propInfo.GetSetMethod(false) == null)
+                    continue;
+
+                // Make sure we can assign the value.
+                if (!propInfo.PropertyType.IsInstanceOfType(param.Value))
+                {
+                    // Make sure we can convert the value.
+                    var typeConverter = TypeDescriptor.GetConverter(propInfo.PropertyType);
+                    if (!typeConverter.CanConvertFrom(param.Value.GetType()))
+                        continue;
+                }
+
+                result.Add(param.Key, param.Value);
+            }
+
+            return result;
+        }
+
+        private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
         {
             // If the output path is null... build it from the source file path.
             if (string.IsNullOrEmpty(outputFilepath))
@@ -262,6 +297,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     outputFilepath = Path.Combine(OutputDirectory, outputFilepath);
             }
 
+            outputFilepath = PathHelper.Normalize(outputFilepath);
+        }
+
+        private PipelineBuildEvent LoadBuildEvent(string destFile, out string eventFilepath)
+        {
+            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, destFile), ".content");
+            eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
+            return PipelineBuildEvent.Load(eventFilepath);
+        }
+
+        public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
+        {
+            sourceFilepath = PathHelper.Normalize(sourceFilepath);
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
                 importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
@@ -273,17 +323,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
             {
-                SourceFile = sourceFilepath,
+                SourceFile = PathHelper.Normalize(sourceFilepath),
                 DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processorName,
-                Parameters = processorParameters ?? new OpaqueDataDictionary(),
+                Parameters = ValidateProcessorParameters(processorName, processorParameters)
             };
 
             // Load the previous content event if it exists.
-            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, contentEvent.DestFile), ".content");
-            var eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
-            var cachedEvent = PipelineBuildEvent.Load(eventFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(contentEvent.DestFile, out eventFilepath);
 
             BuildContent(contentEvent, cachedEvent, eventFilepath);
 
@@ -292,15 +341,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
+            Logger.PushFile(pipelineEvent.SourceFile);            
+
             var rebuild = pipelineEvent.NeedsRebuild(cachedEvent);
             if (!rebuild)
             {
                 // While this asset doesn't need to be rebuilt the dependent assets might.
                 foreach (var asset in cachedEvent.BuildAsset)
-                {                    
-                    var assetPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, asset), ".content");
-                    var assetEventFilepath = Path.Combine(IntermediateDirectory, assetPath);
-                    var assetCachedEvent = PipelineBuildEvent.Load(assetEventFilepath);
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
 
                     // If we cannot find the cached event for the dependancy
                     // then we have to trigger a rebuild of the parent content.
@@ -327,6 +377,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Do we need to rebuild?
             if (rebuild)
             {
+                Logger.LogMessage("{0}", pipelineEvent.SourceFile);
+
                 // Make sure we can find the importer and processor.
                 var importer = CreateImporter(pipelineEvent.Importer);
                 if (importer == null)
@@ -334,7 +386,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 var processor = CreateProcessor(pipelineEvent.Processor, pipelineEvent.Parameters);
                 if (processor == null)
                     throw new PipelineException("Failed to create processor '{0}'", pipelineEvent.Processor);
-
+                
                 // Try importing the content.
                 object importedObject;
                 try
@@ -349,6 +401,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 catch (Exception inner)
                 {
                     throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
+                }
+
+                // Make sure the input type is valid.
+                if (!processor.InputType.IsAssignableFrom(importedObject.GetType()))
+                {
+                    throw new PipelineException(
+                        string.Format("The type '{0}' cannot be processed by {1} as a {2}!",
+                        importedObject.GetType().FullName, 
+                        pipelineEvent.Processor, 
+                        processor.InputType.FullName));
                 }
 
                 // Process the imported object.
@@ -373,12 +435,49 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 // Store the new event into the intermediate folder.
                 pipelineEvent.Save(eventFilepath);
             }
+            else
+            {
+                Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
+            }
+
+            Logger.PopFile();
+        }
+
+        public void CleanContent(string sourceFilepath, string outputFilepath = null)
+        {
+            // First try to load the event file.
+            ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+            string eventFilepath;
+            var cachedEvent = LoadBuildEvent(outputFilepath, out eventFilepath);
+
+            if (cachedEvent != null)
+            {
+                foreach (var asset in cachedEvent.BuildAsset)
+                {
+                    string assetEventFilepath;
+                    var assetCachedEvent = LoadBuildEvent(asset, out assetEventFilepath);
+
+                    if (assetCachedEvent == null)
+                    {
+                        File.Delete(asset);
+                        File.Delete(assetEventFilepath);
+                        continue;
+                    }
+
+                    // Give the asset a chance to rebuild.                    
+                    CleanContent(string.Empty, asset);
+                }                
+            }
+
+            File.Delete(outputFilepath);
+            File.Delete(eventFilepath);
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
         {
             // Make sure the output directory exists.
-            var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile) + @"\";
+            var outputFileDir = Path.GetDirectoryName(pipelineEvent.DestFile);
+
             Directory.CreateDirectory(outputFileDir);
 
             if (_compiler == null)
