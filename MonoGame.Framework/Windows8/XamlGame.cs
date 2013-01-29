@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+using Windows.ApplicationModel.Activation;
 
 namespace MonoGame.Framework
 {
