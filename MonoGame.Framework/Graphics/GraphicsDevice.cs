@@ -239,11 +239,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        readonly List<string> _extensions = new List<string>();
 
 #if OPENGL
         internal int glFramebuffer;
         internal int MaxVertexAttributes;        
+        internal readonly List<string> _extensions = new List<string>();
 #endif
         
         internal int MaxTextureSlots;
@@ -376,6 +376,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif // OPENGL
+
+            GraphicsCapabilities.Initialize(this);
 
 #if DIRECTX
 

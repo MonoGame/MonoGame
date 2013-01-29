@@ -123,6 +123,7 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Viewport.cs" />
