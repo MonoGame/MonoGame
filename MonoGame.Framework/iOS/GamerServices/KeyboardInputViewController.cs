@@ -79,14 +79,16 @@ namespace Microsoft.Xna.Framework {
 		private readonly string _descriptionText;
 		private readonly string _defaultText;
 		private readonly bool _usePasswordMode;
+        private UIViewController _gameViewController;
 
 		public KeyboardInputViewController (
-			string titleText, string descriptionText, string defaultText, bool usePasswordMode)
+			string titleText, string descriptionText, string defaultText, bool usePasswordMode, UIViewController gameViewController)
 		{
 			_titleText = titleText;
 			_descriptionText = descriptionText;
 			_defaultText = defaultText;
 			_usePasswordMode = usePasswordMode;
+            _gameViewController = gameViewController;
 		}
 
 		private readonly List<NSObject> _keyboardObservers = new List<NSObject> ();
@@ -120,6 +122,8 @@ namespace Microsoft.Xna.Framework {
 
 			NSNotificationCenter.DefaultCenter.RemoveObservers (_keyboardObservers);
 			_keyboardObservers.Clear ();
+
+            _gameViewController = null;
 		}
 
 		private void Keyboard_DidShow(NSNotification notification)
@@ -127,10 +131,10 @@ namespace Microsoft.Xna.Framework {
 			var keyboardSize = UIKeyboard.FrameBeginFromNotification (notification).Size;
 
 			if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
-			    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight) {
-				var temp = keyboardSize.Width;
-				keyboardSize.Width = keyboardSize.Height;
-				keyboardSize.Height = temp;
+			    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
+            {
+                keyboardSize.Width = Math.Max(keyboardSize.Height, keyboardSize.Width);
+                keyboardSize.Height = Math.Min(keyboardSize.Height, keyboardSize.Width);
 			}
 
 			var view = (KeyboardInputView)View;
@@ -151,22 +155,17 @@ namespace Microsoft.Xna.Framework {
         #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
-			var delegateController = ParentViewController ?? PresentingViewController;
-			if (delegateController != null)
-				return delegateController.ShouldAutorotateToInterfaceOrientation (
-					toInterfaceOrientation);
-			return toInterfaceOrientation == UIInterfaceOrientation.Portrait;
+            var requestedOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);
+            var supportedOrientations = (_gameViewController as iOSGameViewController).SupportedOrientations;
+
+            return (supportedOrientations & requestedOrientation) != 0;
 		}
         #endregion
 
         #region Autorotation for iOS 6 or newer
         public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
         {
-            var delegateController = ParentViewController ?? PresentingViewController;
-            if (delegateController != null)
-                return delegateController.GetSupportedInterfaceOrientations();
-            else
-                return UIInterfaceOrientationMask.Portrait;
+            return OrientationConverter.ToUIInterfaceOrientationMask((_gameViewController as iOSGameViewController).SupportedOrientations);
         }
         
         public override bool ShouldAutorotate ()
@@ -176,11 +175,7 @@ namespace Microsoft.Xna.Framework {
         
         public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
         {
-            var delegateController = ParentViewController ?? PresentingViewController;
-            if (delegateController != null)
-                return delegateController.PreferredInterfaceOrientationForPresentation();
-            else
-                return UIInterfaceOrientation.Portrait;
+            return _gameViewController.PreferredInterfaceOrientationForPresentation();
         }
         #endregion
 

@@ -317,18 +317,23 @@ namespace Microsoft.Xna.Framework
 			//        iOSGamePlatform.
 			var gdm = (GraphicsDeviceManager) Game.Services.GetService (typeof (IGraphicsDeviceManager));
 
+            TouchPanel.DisplayOrientation = orientation;
+
 			if (gdm != null)
 			{	
+
 				var presentParams = gdm.GraphicsDevice.PresentationParameters;
 				presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
 				presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
+
 				presentParams.DisplayOrientation = orientation;
 
-				// Recalculate our views.
+                // Recalculate our views.
+                ViewController.View.LayoutSubviews();
+				
                 gdm.ApplyChanges();
-				ViewController.View.LayoutSubviews();
 			}
-			TouchPanel.DisplayOrientation = orientation;
+			
 		}
 
 		public override void BeginScreenDeviceChange (bool willBeFullScreen)

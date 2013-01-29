@@ -1,14 +1,13 @@
 using System;
 using System.Diagnostics;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -16,8 +15,14 @@ using GLStencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
 #endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
+
+
 
 namespace Microsoft.Xna.Framework.Graphics
+
 {
 	public class DepthStencilState : GraphicsResource
     {
@@ -246,10 +251,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.StencilReadMask = (byte)StencilMask; // TODO: Should this instead grab the upper 8bits?
                 desc.StencilWriteMask = (byte)StencilWriteMask;
 
-                desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
-                desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
-                desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
-                desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                if (TwoSidedStencilMode)
+                {
+                    desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                }
+                else
+                {   //use same settings as frontFace 
+                    desc.BackFace.Comparison = GetComparison(StencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(StencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(StencilPass);
+                }
 
                 desc.FrontFace.Comparison = GetComparison(StencilFunction);
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);

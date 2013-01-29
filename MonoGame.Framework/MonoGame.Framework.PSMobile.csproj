@@ -39,6 +39,8 @@
     <Reference Include="Sce.PlayStation.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
+    <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
