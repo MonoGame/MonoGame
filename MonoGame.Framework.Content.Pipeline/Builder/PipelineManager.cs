@@ -302,7 +302,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         private PipelineBuildEvent LoadBuildEvent(string destFile, out string eventFilepath)
         {
-            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, destFile), ".content");
+            var contentPath = Path.ChangeExtension(PathHelper.GetRelativePath(OutputDirectory, destFile), PipelineBuildEvent.Extension);
             eventFilepath = Path.Combine(IntermediateDirectory, contentPath);
             return PipelineBuildEvent.Load(eventFilepath);
         }
@@ -459,6 +459,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                     if (assetCachedEvent == null)
                     {
+                        Logger.LogMessage("Cleaning {0}", asset);
                         File.Delete(asset);
                         File.Delete(assetEventFilepath);
                         continue;
@@ -469,6 +470,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }                
             }
 
+            Logger.LogMessage("Cleaning {0}", outputFilepath);
             File.Delete(outputFilepath);
             File.Delete(eventFilepath);
         }
