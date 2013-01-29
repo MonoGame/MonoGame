@@ -66,8 +66,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                                                    preMultipliedColor.B));
                     }
                 }
-
-                input.Faces[0][0].SetPixelData(GraphicsUtil.ConvertBitmap(input._bitmap));
             }
 
             if (GenerateMipmaps)
