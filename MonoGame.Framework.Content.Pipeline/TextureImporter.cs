@@ -30,11 +30,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public override TextureContent Import(string filename, ContentImporterContext context)
         {
             var output = new Texture2DContent();
-            var bmp = new Bitmap(filename);
+            output._bitmap = new Bitmap(filename);
 
-            var imageData = GraphicsUtil.ConvertBitmap(bmp);
+            // Force the input's pixelformat to ARGB32, so we can have a common pixel format to deal with.
+            if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+                output._bitmap = output._bitmap.Clone(new System.Drawing.Rectangle(System.Drawing.Point.Empty, output._bitmap.Size),
+                                                      System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            var bitmapContent = new PixelBitmapContent<Color>(bmp.Width, bmp.Height);
+            var imageData = output._bitmap.GetData();
+
+            var bitmapContent = new PixelBitmapContent<Color>(output._bitmap.Width, output._bitmap.Height);
             bitmapContent.SetPixelData(imageData);
 
             output.Faces.Add(new MipmapChain(bitmapContent));

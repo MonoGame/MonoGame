@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write('B');
             Write(targetPlatformIdentifiers[(int)targetPlatform]);
             Write(XnbFormatVersion);
-            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : 0) | (compressContent ? ContentCompressed : 0));
+            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : (byte)0) | (compressContent ? ContentCompressed : (byte)0));
             Write(flags);
         }
 

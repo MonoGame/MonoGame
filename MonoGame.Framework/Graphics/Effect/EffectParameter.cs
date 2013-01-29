@@ -122,7 +122,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Matrix GetValueMatrix ()
 		{
-			throw new NotImplementedException();
+			if (RowCount == 4 && ColumnCount == 4)
+            {
+                float[] floatData = (float[])Data;
+                return new Matrix(floatData[0], floatData[4], floatData[8], floatData[12],
+                    floatData[1], floatData[5], floatData[9], floatData[13],
+                    floatData[2], floatData[6], floatData[10], floatData[14],
+                    floatData[3], floatData[7], floatData[11], floatData[15]);
+            }
+            throw new Exception("Matrix data incorrect or missing!");
 		}
 
 		public Matrix[] GetValueMatrixArray (int count)

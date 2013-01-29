@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
 
-                Marshal.Copy(dataPtr, outputData, (formatSize * x * Height), (Width * formatSize));
+                Marshal.Copy(dataPtr, outputData, (formatSize * x * Width), (Width * formatSize));
 
                 dataHandle.Free();
             }
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
                 var dataPtr = (IntPtr)dataHandle.AddrOfPinnedObject().ToInt64();
 
-                Marshal.Copy(sourceData, (x * Height * size), dataPtr, Width * size);
+                Marshal.Copy(sourceData, (x * Width * size), dataPtr, Width * size);
 
                 dataHandle.Free();
             }
