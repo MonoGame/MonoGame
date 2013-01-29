@@ -43,8 +43,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         }
                     }
                 }
-
-                input.Faces[0][0].SetPixelData(GraphicsUtil.ConvertBitmap(input._bitmap));
             }
 
             var face = input.Faces[0][0];
@@ -68,12 +66,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                                                    preMultipliedColor.B));
                     }
                 }
-
-                input.Faces[0][0].SetPixelData(GraphicsUtil.ConvertBitmap(input._bitmap));
             }
 
             if (GenerateMipmaps)
                 throw new NotImplementedException();
+
+            // TODO: Set all mip level data
+            input.Faces[0][0].SetPixelData(input._bitmap.GetData());
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
