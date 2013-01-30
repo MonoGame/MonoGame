@@ -80,9 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Unfortunately non PoT texture support is patchy even on desktop systems and we can't
             // rely on the fact that GL2.0+ supposedly supports npot in the core.
             // Reference: http://aras-p.info/blog/2012/10/17/non-power-of-two-textures/
-            int maxTextureSize = 0;
-            GL.GetInteger(GetPName.MaxTextureSize, out maxTextureSize);
-            return maxTextureSize >= 8192;
+            return device._maxTextureSize >= 8192;
 #endif
 
 #else
