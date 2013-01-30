@@ -133,10 +133,10 @@ namespace Microsoft.Xna.Framework
             _mainWindow.AcceptsMouseMovedEvents = false;
             _mainWindow.Center();
 
-			if (GameWindow.Delegate == null)
+			if (GameWindow.CreateWindowDelegate == null)
             	_gameWindow = new GameWindow(Game, frame);
 			else
-				_gameWindow = GameWindow.Delegate(Game, frame);
+				_gameWindow = GameWindow.CreateWindowDelegate(Game, frame);
             Window = _gameWindow;
             _mainWindow.ContentView.AddSubview(_gameWindow);
         }
