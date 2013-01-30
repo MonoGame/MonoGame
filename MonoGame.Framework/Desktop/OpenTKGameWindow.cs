@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework
 
         private void OnMouseLeave(object sender, EventArgs e)
         {
-            if (_isMouseHidden)
+            if (_isMouseHidden && Mouse.GetState().LeftButton == ButtonState.Released)
             {
                 System.Windows.Forms.Cursor.Show();
                 _isMouseHidden = false;
