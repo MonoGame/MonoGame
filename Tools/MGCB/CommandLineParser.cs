@@ -28,7 +28,6 @@ namespace MGCB
         readonly Dictionary<string, MemberInfo> _optionalOptions = new Dictionary<string, MemberInfo>();
 
         readonly List<string> _requiredUsageHelp = new List<string>();
-        readonly List<string> _optionalUsageHelp = new List<string>();
 
         public CommandLineParser(object optionsObject)
         {
@@ -52,11 +51,6 @@ namespace MGCB
                 {
                     // Record an optional option.
                     _optionalOptions.Add(param.Name.ToLowerInvariant(), field);
-
-                    if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0}", param.Name));
-                    else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", param.Name));
                 }
             }
 
@@ -81,11 +75,6 @@ namespace MGCB
                 {
                     // Record an optional option.
                     _optionalOptions.Add(param.Name.ToLowerInvariant(), method);
-
-                    if (method.GetParameters().Length == 0)
-                        _optionalUsageHelp.Add(string.Format("/{0}", param.Name));
-                    else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", param.Name));
                 }
             }
         }
@@ -234,6 +223,11 @@ namespace MGCB
 
         public string Title { get; set; }
 
+        public void ShowUsage()
+        {
+            ShowError(null);
+        }
+
         public void ShowError(string message, params object[] args)
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
@@ -243,21 +237,37 @@ namespace MGCB
                 Console.Error.WriteLine(Title);
                 Console.Error.WriteLine();
             }
-            Console.Error.WriteLine(message, args);
-            Console.Error.WriteLine();
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                Console.Error.WriteLine(message, args);
+                Console.Error.WriteLine();
+            }
 
             Console.Error.WriteLine("Usage: {0} {1}{2}", 
                 name, 
                 string.Join(" ", _requiredUsageHelp), 
-                _optionalUsageHelp.Count > 0 ? " <Options>" : string.Empty);
+                _optionalOptions.Count > 0 ? " <Options>" : string.Empty);
 
-            if (_optionalUsageHelp.Count > 0)
+            if (_optionalOptions.Count > 0)
             {
                 Console.Error.WriteLine();
                 Console.Error.WriteLine("Options:\n");
 
-                foreach (string optional in _optionalUsageHelp)
-                    Console.Error.WriteLine("   {0}", optional);
+                foreach (var pair in _optionalOptions)
+                {
+                    var field = pair.Value as FieldInfo;
+                    var method = pair.Value as MethodInfo;
+                    var param = GetAttribute<CommandLineParameterAttribute>(pair.Value);
+
+                    var hasValue = (field != null && field.FieldType != typeof (bool)) ||
+                                   (method != null && method.GetParameters().Length != 0);
+
+                    if (hasValue)
+                        Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
+                    else
+                        Console.Error.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
+                }
             }
         }
 
@@ -272,14 +282,17 @@ namespace MGCB
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method)]
     public sealed class CommandLineParameterAttribute : Attribute
     {
-        public CommandLineParameterAttribute(string name, bool required = false)
+        public CommandLineParameterAttribute()
         {
-            Name = name;
-            Required = required;
+            ValueName = "value";
         }
 
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
-        public bool Required { get; private set; }
+        public bool Required { get; set; }
+
+        public string ValueName { get; set; }
+
+        public string Description { get; set; }        
     }
 }
