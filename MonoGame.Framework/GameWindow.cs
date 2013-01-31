@@ -94,6 +94,20 @@ namespace Microsoft.Xna.Framework {
 				}
 			}
 		}
+		
+        	/// <summary>
+        	/// Set the visibility of the window's border. Only the WindowsDX platform currently
+        	/// supports this property.
+        	/// </summary>
+        	/// <exception cref="System.NotImplementedException">
+        	/// Thrown when trying to use this property on
+        	/// all other non-WinDX platforms.
+        	/// </exception>
+        	public virtual bool IsBorderless
+        	{
+            		get { return false; }
+            		set { throw new NotImplementedException(); }
+        	}
 
 		#endregion Properties
 

@@ -59,6 +59,12 @@ namespace MonoGame.Framework
         private List<XnaKey> _keyState = new List<XnaKey>();
 
         private WinFormsGamePlatform _platform;
+        
+        private bool _isMouseHidden;
+
+        private bool _allowUserResizing;
+
+        private bool _isBorderless;
 
         #region Internal Properties
 
@@ -83,11 +89,42 @@ namespace MonoGame.Framework
 
         public override bool AllowUserResizing
         {
-            get { return _form.FormBorderStyle == FormBorderStyle.Sizable; }
+            get
+            {
+                return _allowUserResizing;
+            }
             set
             {
-                _form.FormBorderStyle = value ? FormBorderStyle.Sizable : FormBorderStyle.Fixed3D;
-                _form.MaximizeBox = value;
+                _allowUserResizing = value;
+                _form.MaximizeBox = _allowUserResizing;
+                if (!_isBorderless)
+                {
+                    if (_allowUserResizing)
+                        _form.FormBorderStyle = FormBorderStyle.Sizable;
+                    else
+                        _form.FormBorderStyle = FormBorderStyle.FixedSingle;
+                }
+            }
+        }
+
+        public override bool IsBorderless
+        {
+            get
+            {
+                return _isBorderless;
+            }
+            set
+            {
+                _isBorderless = value;
+                if (_isBorderless)
+                    _form.FormBorderStyle = FormBorderStyle.None;
+                else
+                {
+                    if (_allowUserResizing)
+                        _form.FormBorderStyle = FormBorderStyle.Sizable;
+                    else
+                        _form.FormBorderStyle = FormBorderStyle.FixedSingle;
+                }
             }
         }
 
@@ -122,6 +159,8 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseState;
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
+            _form.MouseEnter += OnMouseEnter;
+            _form.MouseLeave += OnMouseLeave;
             Keyboard.SetKeys(_keyState);
 
             _form.Activated += OnActivated;
@@ -161,6 +200,24 @@ namespace MonoGame.Framework
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
             _keyState.Remove(key);
+        }
+
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!_platform.IsMouseVisible && !_isMouseHidden)
+            {
+                Cursor.Hide();
+                _isMouseHidden = true;
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            if (_isMouseHidden)
+            {
+                Cursor.Show();
+                _isMouseHidden = false;
+            }
         }
 
         internal void Initialize()
