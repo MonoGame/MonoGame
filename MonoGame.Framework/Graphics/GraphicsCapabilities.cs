@@ -41,7 +41,9 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 #if OPENGL
-#if GLES
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif GLES
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
