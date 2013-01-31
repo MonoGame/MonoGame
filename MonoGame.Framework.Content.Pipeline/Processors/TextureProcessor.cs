@@ -77,8 +77,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
 
-            if (TextureFormat != TextureProcessorOutputFormat.Color)
-                throw new NotImplementedException();
+            if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed)
+                GraphicsUtil.CompressDXT(input);
 
             return input;
         }
