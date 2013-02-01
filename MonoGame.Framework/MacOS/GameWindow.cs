@@ -66,6 +66,12 @@ namespace Microsoft.Xna.Framework
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
 
+		public static Func<Game, RectangleF, GameWindow> CreateWindowDelegate 
+		{
+			get;
+			set;
+		}
+
 		#region GameWindow Methods
 		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
