@@ -12,8 +12,55 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
+using Nvidia.TextureTools;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    class DXTDataHandler
+    {
+        private TextureContent _content;
+        private int _currentMipLevel;
+        private int _levelWidth;
+        private int _levelHeight;
+        private Format _format;
+
+        public OutputOptions.WriteDataDelegate WriteData { get; private set; }
+        public OutputOptions.ImageDelegate BeginImage { get; private set; }
+
+        public DXTDataHandler(TextureContent content, Format format)
+        {
+            _content = content;
+
+            _currentMipLevel = 0;
+            _levelWidth = content.Faces[0][0].Width;
+            _levelHeight = content.Faces[0][0].Height;
+            _format = format;
+
+            WriteData = new OutputOptions.WriteDataDelegate(writeData);
+            BeginImage = new OutputOptions.ImageDelegate(beginImage);
+        }
+
+        public void beginImage(int size, int width, int height, int depth, int face, int miplevel)
+        {
+            _levelHeight = height;
+            _levelWidth = width;
+            _currentMipLevel = miplevel;
+        }
+
+        protected bool writeData(IntPtr data, int length)
+        {
+            var dataBuffer = new byte[length];
+
+            Marshal.Copy(data, dataBuffer, 0, length);
+
+            var texContent = new DXTBitmapContent(_format == Format.DXT1 ? 8 : 16, _levelWidth, _levelHeight);
+            _content.Faces[0][_currentMipLevel] = texContent;
+            _content.Faces[0][_currentMipLevel].SetPixelData(dataBuffer);
+
+            return true;
+        }
+    }
+
     public static class GraphicsUtil
     {
         public static byte[] GetData(this Bitmap bmp)
@@ -91,6 +138,84 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Compresses TextureContent in a format appropriate to the platform
+        /// </summary>
+        public static void CompressTexture(TextureContent content, TargetPlatform platform)
+        {
+            // TODO: At the moment, only DXT compression from windows machine is supported
+            // Add more here as they become available.
+            switch (platform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                case TargetPlatform.Ouya:
+                case TargetPlatform.Android:
+                case TargetPlatform.Linux: 
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.NativeClient:
+                case TargetPlatform.Xbox360:
+                    CompressDXT(content);
+                    break;
+
+                default:
+                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", platform));
+            }
+        }
+
+        private static void CompressDXT(TextureContent content)
+        {
+            var texData = content.Faces[0][0];
+
+            if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
+                throw new PipelineException("DXT Compressed textures width and height must be powers of two.");
+
+            var _dxtCompressor = new Compressor();
+            var inputOptions = new InputOptions();
+            inputOptions.SetAlphaMode(AlphaMode.Transparency);
+            inputOptions.SetTextureLayout(TextureType.Texture2D, texData.Width, texData.Height, 1);
+
+            var pixelData = texData.GetPixelData();
+            
+            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
+            // again here.
+            GraphicsUtil.BGRAtoRGBA(pixelData);
+            var dataHandle = GCHandle.Alloc(pixelData, GCHandleType.Pinned);
+            var dataPtr = dataHandle.AddrOfPinnedObject();
+
+            inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
+            inputOptions.SetMipmapGeneration(false);
+
+            var containsFracAlpha = ContainsFractionalAlpha(pixelData);
+            var outputOptions = new OutputOptions();
+            outputOptions.SetOutputHeader(false);
+
+            var outputFormat = containsFracAlpha ? Format.DXT5 : Format.DXT1;
+
+            var handler = new DXTDataHandler(content, outputFormat);
+            outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
+
+            var compressionOptions = new CompressionOptions();
+            compressionOptions.SetFormat(outputFormat);
+
+            _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+
+            dataHandle.Free();
+        }
+
+        internal static bool ContainsFractionalAlpha(byte[] data)
+        {
+            for (var x = 3; x < data.Length; x += 4)
+            {
+                if (data[x] != 0x0 && data[x] != 0xFF)
+                    return true;
+            }
+
+            return false;
         }
 
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
