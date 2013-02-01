@@ -5,13 +5,22 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace MGCB
 {
     class Program
     {
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern bool SetDllDirectory(string lpPathName);
+
         static int Main(string[] args)
         {
+            // Set the correct directory for our dependency files.
+            var is32Bit = IntPtr.Size == 4;
+            var directory = string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64");
+            SetDllDirectory(directory);
+
             var content = new BuildContent();
 
             // Parse the command line.
