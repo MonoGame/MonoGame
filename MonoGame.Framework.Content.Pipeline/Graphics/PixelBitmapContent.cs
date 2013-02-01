@@ -12,7 +12,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public class PixelBitmapContent<T> : BitmapContent where T : struct, IEquatable<T>
     {
         internal T[][] _pixelData;
-        protected SurfaceFormat _format = SurfaceFormat.Color;
+
+        internal SurfaceFormat _format = SurfaceFormat.Color;
 
         public PixelBitmapContent(int width, int height)
         {
@@ -77,7 +78,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = SurfaceFormat.Color;
+            format = _format;
             return true;
         }
 
