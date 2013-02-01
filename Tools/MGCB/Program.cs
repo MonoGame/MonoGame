@@ -16,10 +16,12 @@ namespace MGCB
 
         static int Main(string[] args)
         {
+#if WINDOWS
             // Set the correct directory for our dependency files.
             var is32Bit = IntPtr.Size == 4;
             var directory = string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64");
             SetDllDirectory(directory);
+#endif
 
             var content = new BuildContent();
 
