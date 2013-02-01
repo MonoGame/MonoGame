@@ -160,16 +160,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\Windows\x32\nvtt.dll">
-      <Link>Dependencies\x32\nvtt.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
       <Link>Dependencies\x64\nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>Dependencies\x86\nvtt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
