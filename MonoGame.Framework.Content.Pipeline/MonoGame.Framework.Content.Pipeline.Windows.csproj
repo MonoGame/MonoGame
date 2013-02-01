@@ -20,6 +20,7 @@
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -80,6 +85,7 @@
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />
     <Compile Include="Graphics\BoneWeightCollection.cs" />
+    <Compile Include="Graphics\DXTBitmapContent.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
@@ -130,14 +136,51 @@
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\Compiler\ArrayWriter.cs" />
+    <Compile Include="Serialization\Compiler\BooleanWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingBoxWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingFrustumWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingSphereWriter.cs" />
+    <Compile Include="Serialization\Compiler\BuiltInContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\ByteWriter.cs" />
+    <Compile Include="Serialization\Compiler\CharWriter.cs" />
+    <Compile Include="Serialization\Compiler\ColorWriter.cs" />
     <Compile Include="Serialization\Compiler\ContentCompiler.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriter.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriterAttribute.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
     <Compile Include="Serialization\Compiler\ContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\CurveWriter.cs" />
+    <Compile Include="Serialization\Compiler\DateTimeWriter.cs" />
+    <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
+    <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
+    <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
+    <Compile Include="Serialization\Compiler\EnumWriter.cs" />
+    <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
+    <Compile Include="Serialization\Compiler\Int16Writer.cs" />
+    <Compile Include="Serialization\Compiler\Int32Writer.cs" />
+    <Compile Include="Serialization\Compiler\Int64Writer.cs" />
+    <Compile Include="Serialization\Compiler\ListWriter.cs" />
+    <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
+    <Compile Include="Serialization\Compiler\NullableWriter.cs" />
+    <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
+    <Compile Include="Serialization\Compiler\PointWriter.cs" />
+    <Compile Include="Serialization\Compiler\QuaternionWriter.cs" />
+    <Compile Include="Serialization\Compiler\RayWriter.cs" />
+    <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
+    <Compile Include="Serialization\Compiler\SByteWriter.cs" />
+    <Compile Include="Serialization\Compiler\SingleWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\StringWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\TimeSpanWriter.cs" />
+    <Compile Include="Serialization\Compiler\UInt16Writer.cs" />
+    <Compile Include="Serialization\Compiler\UInt32Writer.cs" />
+    <Compile Include="Serialization\Compiler\UInt64Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
@@ -152,6 +195,18 @@
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
       <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
+      <Link>Dependencies\x64\nvtt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>Dependencies\x86\nvtt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
