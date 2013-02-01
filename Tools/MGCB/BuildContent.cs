@@ -5,7 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace MGCB
@@ -41,10 +43,33 @@ namespace MGCB
         public bool Clean;
 
         [CommandLineParameter(
+            Name = "incremental",
+            Description = "Skip cleaning files not included in the current build.")]
+        public bool Incremental;
+
+        [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
         public readonly List<string> References = new List<string>();
+
+        [CommandLineParameter(
+            Name = "platform",
+            ValueName = "targetPlatform",
+            Description = "Set the target platform for this build.  Defaults to Windows.")]
+        public TargetPlatform Platform;
+
+        [CommandLineParameter(
+            Name = "profile",
+            ValueName = "graphicsProfile",
+            Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
+        public GraphicsProfile Profile;
+
+        [CommandLineParameter(
+            Name = "config",
+            ValueName = "string",
+            Description = "The optional build config string from the build system.")]
+        public string Config = string.Empty;
 
         [CommandLineParameter(
             Name = "importer",
@@ -58,7 +83,7 @@ namespace MGCB
             Description = "Defines the class name of the content processor for processing imported content.")]
         public string Processor;
 
-        private OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
+        private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
 
         [CommandLineParameter(
             Name = "processorParam",
@@ -82,6 +107,16 @@ namespace MGCB
             Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
         {
+            // Make sure the source file is absolute.
+            if (!Path.IsPathRooted(sourceFile))
+                sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+
+            // Remove duplicates... keep this new one.
+            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            if (previous != -1)
+                _content.RemoveAt(previous);
+
+            // Create the item for processing later.
             var item = new ContentItem
             {
                 SourceFile = sourceFile, 
@@ -89,14 +124,13 @@ namespace MGCB
                 Processor = Processor,
                 ProcessorParams = new OpaqueDataDictionary()
             };
+            _content.Add(item);
 
             // Copy the current processor parameters blind as we
             // will validate and remove invalid parameters during
             // the build process later.
             foreach (var pair in _processorParams)
                 item.ProcessorParams.Add(pair.Key, pair.Value);
-
-            _content.Add(item);
         }
 
         public class ContentItem
@@ -123,48 +157,71 @@ namespace MGCB
             var intermediatePath = Path.Combine(projectDirectory, IntermediateDir);
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
 
-            foreach(var r in References)
+            // Feed all the assembly references to the pipeline manager
+            // so it can resolve importers, processors, writers, and types.
+            foreach (var r in References)
                 _manager.AddAssembly(r);
 
-            // TODO: We should be using the previously serialized list
-            // of input files to the intermediate folder so we can clean
-            // them here even if we don't build new content.
+            // Load the previously serialized list of built content.
+            var contentFile = Path.Combine(intermediatePath, PipelineBuildEvent.Extension);
+            var previousContent = SourceFileCollection.Read(contentFile);
 
+            // If the target changed in any way then we need to force
+            // a fuull rebuild even under incremental builds.
+            var targetChanged = previousContent.Config != Config ||
+                                previousContent.Platform != Platform ||
+                                previousContent.Profile != Profile;
+
+            // First clean previously built content.
+            foreach (var sourceFile in previousContent.SourceFiles)
+            {
+                var inContent = _content.Any(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+                var cleanOldContent = !inContent && !Incremental;
+                var cleanRebuiltContent = inContent && (Rebuild || Clean);
+                if (cleanRebuiltContent || cleanOldContent || targetChanged)
+                    _manager.CleanContent(sourceFile);                
+            }
+
+            var newContent = new SourceFileCollection
+            {
+                Profile = _manager.Profile = Profile,
+                Platform = _manager.Platform = Platform,
+                Config = _manager.Config = Config
+            };
             errorCount = 0;
             successCount = 0;
 
             foreach (var c in _content)
             {
-                var sourceFile = c.SourceFile;
-                if (!Path.IsPathRooted(sourceFile))
-                    sourceFile = Path.Combine(projectDirectory, c.SourceFile);
-
-                // Clean any cached file first if requested.
-                if (Clean || Rebuild)
-                    _manager.CleanContent(sourceFile);
-
                 try
                 {
-                    _manager.BuildContent(sourceFile,
+                    _manager.BuildContent(c.SourceFile,
                                           null,
                                           c.Importer,
                                           c.Processor,
                                           c.ProcessorParams);
 
+                    newContent.SourceFiles.Add(c.SourceFile);
+
                     ++successCount;
                 }
                 catch (PipelineException ex)
                 {
-                    Console.WriteLine("{0}: error: {1}", sourceFile, ex.Message);
+                    Console.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     ++errorCount;
                 }
             }
 
-            // TODO: If this isn't an incremental build we should
-            // clean old content that is no longer a build item.
+            // If this is an incremental build we merge the list
+            // of previous content with the new list.
+            if (Incremental && !targetChanged)
+                newContent.Merge(previousContent);
 
-            // TODO: We should be using serializing the list
-            // of input files we just built for use in cleaning
+            // Delete the old file and write the new content 
+            // list if we have any to serialize.
+            File.Delete(contentFile);
+            if (newContent.SourceFiles.Count > 0)
+                newContent.Write(contentFile);
         }
     }
 }
