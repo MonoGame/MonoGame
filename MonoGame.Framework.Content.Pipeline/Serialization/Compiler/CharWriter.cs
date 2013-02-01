@@ -2,22 +2,25 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using System;
+using TOutput = System.Char;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
+    /// <summary>
+    /// Writes the character value to the output.
+    /// </summary>
     [ContentTypeWriter]
-    class SongWriter : BuiltInContentWriter<SongContent>
+    class CharWriter : BuiltInContentWriter<TOutput>
     {
         /// <summary>
         /// Writes the value to the output.
         /// </summary>
         /// <param name="output">The output writer object.</param>
         /// <param name="value">The value to write to the output.</param>
-        protected internal override void Write(ContentWriter output, SongContent value)
+        protected internal override void Write(ContentWriter output, TOutput value)
         {
-            output.Write(value.fileName);
-            output.Write((int)value.duration.TotalMilliseconds);
+            output.Write(value);
         }
     }
 }
