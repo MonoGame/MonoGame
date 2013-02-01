@@ -207,7 +207,7 @@ namespace MGCB
                 }
                 catch (PipelineException ex)
                 {
-                    Console.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
                     ++errorCount;
                 }
             }
