@@ -7,11 +7,25 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class SpriteFontContent
+    public class SpriteFontContent : ContentItem
     {
+        public SpriteFontContent() { }
+
+        public SpriteFontContent(FontDescription desc)
+        {
+            FontName = desc.FontName;
+            Style = desc.Style;
+            FontSize = desc.Size;
+            CharacterMap = desc.Characters;
+            VerticalLineSpacing = (int)desc.Spacing; // temp
+            HorizontalSpacing = desc.Spacing; // temp
+
+            DefaultCharacter = desc.DefaultCharacter;
+        }
+
         public string FontName = string.Empty;
 
-        public string Style = string.Empty;
+        FontDescriptionStyle Style = FontDescriptionStyle.Regular;
 
         public float FontSize;
 

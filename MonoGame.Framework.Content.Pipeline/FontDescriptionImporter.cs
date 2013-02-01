@@ -4,6 +4,11 @@
 
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using System.Xml;
+using System.Drawing;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -28,7 +33,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override FontDescription Import(string filename, ContentImporterContext context)
         {
-            throw new NotImplementedException();
+            var xmldoc = XElement.Load(filename, LoadOptions.PreserveWhitespace);
+            xmldoc = xmldoc.Element("Asset");
+
+            var fontName = xmldoc.Element("FontName").Value;
+            var fontSize = float.Parse(xmldoc.Element("Size").Value);
+            var spacing = float.Parse(xmldoc.Element("Spacing").Value);
+            var useKerning = bool.Parse(xmldoc.Element("UseKerning").Value);
+
+            var styleVal = xmldoc.Element("Style").Value;
+
+            FontDescriptionStyle style = FontDescriptionStyle.Regular;
+            if (styleVal.Contains("Bold") && styleVal.Contains("Italic"))
+                style = FontDescriptionStyle.Bold | FontDescriptionStyle.Italic;
+            else
+                style = (FontDescriptionStyle)Enum.Parse(typeof(FontDescriptionStyle), styleVal, false);
+
+            char? defaultCharacter = null;
+            var defChar = xmldoc.Element("DefaultCharacter");
+            if (defChar != null)
+                defaultCharacter = defChar.Value[0];
+
+            var characters = new List<char>();
+
+            foreach (var region in xmldoc.Descendants("CharacterRegion"))
+            {
+                var Start = (int)region.Element("Start").Value[0];
+                var End = (int)region.Element("End").Value[0];
+
+                for (var x = Start; x <= End; x++)
+                    characters.Add((char)x);
+            }
+
+            return new FontDescription(fontName, fontSize, spacing, style, useKerning, characters);
         }
     }
 }

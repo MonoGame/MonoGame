@@ -124,7 +124,7 @@
     <Compile Include="Processors\SongProcessor.cs" />
     <Compile Include="Processors\SoundEffectContent.cs" />
     <Compile Include="Processors\SoundEffectProcessor.cs" />
-    <Compile Include="Processors\SpriteFontContent.cs" />
+    <Compile Include="Graphics\SpriteFontContent.cs" />
     <Compile Include="Processors\TextureProcessor.cs" />
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
@@ -135,8 +135,13 @@
     <Compile Include="Serialization\Compiler\ContentTypeWriterAttribute.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
     <Compile Include="Serialization\Compiler\ContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\ListWriter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
