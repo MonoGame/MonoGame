@@ -16,7 +16,7 @@ using Nvidia.TextureTools;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class DXTDataHandler
+    class DXTDataHandler
     {
         private TextureContent _content;
         private int _currentMipLevel;
