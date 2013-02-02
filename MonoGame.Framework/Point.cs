@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework
         
         #endregion Public Operators
         
-        #region Public methods
+        #region Public Methods
         
         /// <summary>
         /// Determines whether two <see cref="Point"/> instances are equal.
@@ -118,9 +118,9 @@ namespace Microsoft.Xna.Framework
             return ((X == other.X) && (Y == other.Y));
         }
         
-        #endregion Public methods
+        #endregion Public Methods
         
-        #region Object overrided methods
+        #region Object Overrided Methods
         
         /// <summary>
         /// Returns a value that indicates whether the current instance is equal to a specified object.
@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework
             return X ^ Y;
         }
 
-        #endregion Object overrided methods
+        #endregion Object Overrided Methods
     }
 }
 
