@@ -57,7 +57,7 @@ using MonoMac.AppKit;
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
-    /// Allows retrieval of position and button clicks from a mouse input device.
+    /// Allows reading position and button click information from mouse.
     /// </summary>
     public static class Mouse
     {
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Input
         #region Public interface
 
         /// <summary>
-        /// Gets the current state of the mouse, including mouse position and buttons pressed.
+        /// Gets mouse state information that includes position and button presses.
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState()
@@ -152,10 +152,10 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Sets the position of the mouse cursor relative to the upper-left corner of the window.
+        /// Sets mouse cursor's relative position to game-window.
         /// </summary>
-        /// <param name="x">The horizontal position of the mouse cursor, relative to the left edge of the game window.</param>
-        /// <param name="y">The vertical position of the mouse cursor, relative to the upper edge of the game window.</param>
+        /// <param name="x">Relative horizontal position of the cursor.</param>
+        /// <param name="y">Relative vertical position of the cursor.</param>
         public static void SetPosition(int x, int y)
         {
             UpdateStatePosition(x, y);
