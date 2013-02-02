@@ -11,8 +11,11 @@ namespace MGCB
 {
     class Program
     {
+
+#if WINDOWS
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern bool SetDllDirectory(string lpPathName);
+#endif
 
         static int Main(string[] args)
         {
