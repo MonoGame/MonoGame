@@ -45,7 +45,7 @@ using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
-    /// Allows retrieval of keystrokes from a keyboard input device.
+    /// Allows getting keystrokes from keyboard.
     /// </summary>
 	public static class Keyboard
 	{
@@ -61,9 +61,9 @@ namespace Microsoft.Xna.Framework.Input
 		}
 		
         /// <summary>
-        /// Returns the current keyboard state for the specified player.
+        /// Returns the current keyboard state for a given player.
         /// </summary>
-        /// <param name="playerIndex">Player index of the keyboard to query.</param>
+        /// <param name="playerIndex">Player index of the keyboard.</param>
         /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
