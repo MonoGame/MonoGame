@@ -44,111 +44,420 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Identifies a particular key on a keyboard.
+    /// </summary>
 	[Flags]
 	public enum Keys
 	{
-		None = 0,        // 	Reserved
-		Back = 8,        // 	BACKSPACE key
-		Tab = 9,        // 	TAB key
-		Enter = 13,        // 	ENTER key
-		CapsLock = 20,        // 	CAPS LOCK key
-		Escape = 27,        // 	ESC key
-		Space = 32,        // 	SPACEBAR
-		PageUp = 33,        // 	PAGE UP key
-		PageDown = 34,        // 	DOWN ARROW key
-		End = 35,        // 	END key
-		Home = 36,        // 	HOME key
-		Left = 37,        // 	LEFT ARROW key
-		Up = 38,        // 	UP ARROW key
-		Right = 39,        // 	RIGHT ARROW key
+        /// <summary>
+        /// Reserved
+        /// </summary>
+		None = 0,
+        /// <summary>
+        /// BACKSPACE key
+        /// </summary>
+		Back = 8,
+        /// <summary>
+        /// TAB key
+        /// </summary>
+		Tab = 9,
+        /// <summary>
+        /// ENTER key
+        /// </summary>
+		Enter = 13,
+        /// <summary>
+        /// CAPS LOCK key
+        /// </summary>
+		CapsLock = 20,
+        /// <summary>
+        /// ESC key
+        /// </summary>
+		Escape = 27,
+        /// <summary>
+        /// SPACEBAR
+        /// </summary>
+		Space = 32,
+        /// <summary>
+        /// PAGE UP key
+        /// </summary>
+		PageUp = 33,
+        /// <summary>
+        /// PAGE DOWN key
+        /// </summary>
+		PageDown = 34,
+        /// <summary>
+        /// END key
+        /// </summary>
+		End = 35,
+        /// <summary>
+        /// HOME key
+        /// </summary>
+		Home = 36,
+        /// <summary>
+        /// LEFT ARROW key
+        /// </summary>
+		Left = 37,
+        /// <summary>
+        /// UP ARROW key
+        /// </summary>
+		Up = 38,
+        /// <summary>
+        /// RIGHT ARROW key
+        /// </summary>
+		Right = 39,
+        /// <summary>
+        /// DOWN ARROW key
+        /// </summary>
 		Down = 40,
-		Select = 41,        // 	SELECT key
-		Print = 42,        // 	PRINT key
-		Execute = 43,        // 	EXECUTE key
-		PrintScreen = 44,        // 	PRINT SCREEN key
-		Insert = 45,        // 	INS key
-		Delete = 46,        // 	DEL key
-		Help = 47,        // 	HELP key
-		D0 = 48,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D1 = 49,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D2 = 50,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D3 = 51,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D4 = 52,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D5 = 53,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D6 = 54,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D7 = 55,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D8 = 56,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		D9 = 57,        // 	Used for miscellaneous characters; it can vary by keyboard.
-		A = 65,        // 	A key
-		B = 66,        // 	B key
-		C = 67,        // 	C key
-		D = 68,        // 	D key
-		E = 69,        // 	E key
-		F = 70,        // 	F key
-		G = 71,        // 	G key
-		H = 72,        // 	H key
-		I = 73,        // 	I key
-		J = 74,        // 	J key
-		K = 75,        // 	K key
-		L = 76,        // 	L key
-		M = 77,        // 	M key
-		N = 78,        // 	N key
-		O = 79,        // 	O key
-		P = 80,        // 	P key
-		Q = 81,        // 	Q key
-		R = 82,        // 	R key
-		S = 83,        // 	S key
-		T = 84,        // 	T key
-		U = 85,        // 	U key
-		V = 86,        // 	V key
-		W = 87,        // 	W key
-		X = 88,        // 	X key
-		Y = 89,        // 	Y key
-		Z = 90,        // 	Z key
-		LeftWindows = 91,        // 	Left Windows key
-		RightWindows = 92,        // 	Right Windows key
-		Apps = 93,        // 	Applications key
-		Sleep = 95,        // 	Computer Sleep key
-		NumPad0 = 96,        // 	Numeric keypad 0 key
-		NumPad1 = 97,        // 	Numeric keypad 1 key
-		NumPad2 = 98,        // 	Numeric keypad 2 key
-		NumPad3 = 99,        // 	Numeric keypad 3 key
-		NumPad4 = 100,        // 	Numeric keypad 4 key
-		NumPad5 = 101,        // 	Numeric keypad 5 key
-		NumPad6 = 102,        // 	Numeric keypad 6 key
-		NumPad7 = 103,        // 	Numeric keypad 7 key
-		NumPad8 = 104,        // 	Numeric keypad 8 key
-		NumPad9 = 105,        // 	Numeric keypad 9 key
-		Multiply = 106,        // 	Multiply key
-		Add = 107,        // 	Add key
-		Separator = 108,        // 	Separator key
-		Subtract = 109,        // 	Subtract key
-		Decimal = 110,        // 	Decimal key
-		Divide = 111,        // 	Divide key
-		F1 = 112,        // 	F1 key
-		F2 = 113,        // 	F2 key
-		F3 = 114,        // 	F3 key
-		F4 = 115,        // 	F4 key
-		F5 = 116,        // 	F5 key
-		F6 = 117,        // 	F6 key
-		F7 = 118,        // 	F7 key
-		F8 = 119,        // 	F8 key
-		F9 = 120,        // 	F9 key
-		F10 = 121,        // 	F10 key
-		F11 = 122,        // 	F11 key
-		F12 = 123,        // 	F12 key
-		F13 = 124,        // 	F13 key
-		F14 = 125,        // 	F14 key
-		F15 = 126,        // 	F15 key
-		F16 = 127,        // 	F16 key
-		F17 = 128,        // 	F17 key
-		F18 = 129,        // 	F18 key
-		F19 = 130,        // 	F19 key
-		F20 = 131,        // 	F20 key
-		F21 = 132,        // 	F21 key
-		F22 = 133,        // 	F22 key
-		F23 = 134,        // 	F23 key
-		F24 = 135,        // 	F24 key
+        /// <summary>
+        /// SELECT key
+        /// </summary>
+		Select = 41,
+        /// <summary>
+        /// PRINT key
+        /// </summary>
+		Print = 42,
+        /// <summary>
+        /// EXECUTE key
+        /// </summary>
+		Execute = 43,
+        /// <summary>
+        /// PRINT SCREEN key
+        /// </summary>
+		PrintScreen = 44,
+        /// <summary>
+        /// INS key
+        /// </summary>
+		Insert = 45,
+        /// <summary>
+        /// DEL key
+        /// </summary>
+		Delete = 46,
+        /// <summary>
+        /// HELP key
+        /// </summary>
+		Help = 47,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D0 = 48,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D1 = 49,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D2 = 50,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D3 = 51,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D4 = 52,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D5 = 53,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D6 = 54,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D7 = 55,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D8 = 56,
+        /// <summary>
+        /// Used for miscellaneous characters; it can vary by keyboard.
+        /// </summary>
+		D9 = 57,
+        /// <summary>
+        /// A key
+        /// </summary>
+		A = 65,
+        /// <summary>
+        /// B key
+        /// </summary>
+		B = 66,
+        /// <summary>
+        /// C key
+        /// </summary>
+		C = 67,
+        /// <summary>
+        /// D key
+        /// </summary>
+		D = 68,
+        /// <summary>
+        /// E key
+        /// </summary>
+		E = 69,
+        /// <summary>
+        /// F key
+        /// </summary>
+		F = 70,
+        /// <summary>
+        /// G key
+        /// </summary>
+		G = 71,
+        /// <summary>
+        /// H key
+        /// </summary>
+		H = 72,
+        /// <summary>
+        /// I key
+        /// </summary>
+		I = 73,
+        /// <summary>
+        /// J key
+        /// </summary>
+		J = 74,
+        /// <summary>
+        /// K key
+        /// </summary>
+		K = 75,
+        /// <summary>
+        /// L key
+        /// </summary>
+		L = 76,
+        /// <summary>
+        /// M key
+        /// </summary>
+		M = 77,
+        /// <summary>
+        /// N key
+        /// </summary>
+		N = 78,
+        /// <summary>
+        /// O key
+        /// </summary>
+		O = 79,
+        /// <summary>
+        /// P key
+        /// </summary>
+		P = 80,
+        /// <summary>
+        /// Q key
+        /// </summary>
+		Q = 81,
+        /// <summary>
+        /// R key
+        /// </summary>
+		R = 82,
+        /// <summary>
+        /// S key
+        /// </summary>
+		S = 83,
+        /// <summary>
+        /// T key
+        /// </summary>
+		T = 84,
+        /// <summary>
+        /// U key
+        /// </summary>
+		U = 85,
+        /// <summary>
+        /// V key
+        /// </summary>
+		V = 86,
+        /// <summary>
+        /// W key
+        /// </summary>
+		W = 87,
+        /// <summary>
+        /// X key
+        /// </summary>
+		X = 88,
+        /// <summary>
+        /// Y key
+        /// </summary>
+		Y = 89,
+        /// <summary>
+        /// Z key
+        /// </summary>
+		Z = 90,
+        /// <summary>
+        /// Left Windows key
+        /// </summary>
+		LeftWindows = 91,
+        /// <summary>
+        /// Right Windows key
+        /// </summary>
+		RightWindows = 92,
+        /// <summary>
+        /// Applications key
+        /// </summary>
+		Apps = 93,
+        /// <summary>
+        /// Computer Sleep key
+        /// </summary>
+		Sleep = 95,
+        /// <summary>
+        /// Numeric keypad 0 key
+        /// </summary>
+		NumPad0 = 96,
+        /// <summary>
+        /// Numeric keypad 1 key
+        /// </summary>
+		NumPad1 = 97,
+        /// <summary>
+        /// Numeric keypad 2 key
+        /// </summary>
+		NumPad2 = 98,
+        /// <summary>
+        /// Numeric keypad 3 key
+        /// </summary>
+		NumPad3 = 99,
+        /// <summary>
+        /// Numeric keypad 4 key
+        /// </summary>
+		NumPad4 = 100,
+        /// <summary>
+        /// Numeric keypad 5 key
+        /// </summary>
+		NumPad5 = 101,
+        /// <summary>
+        /// Numeric keypad 6 key
+        /// </summary>
+		NumPad6 = 102,
+        /// <summary>
+        /// Numeric keypad 7 key
+        /// </summary>
+		NumPad7 = 103,
+        /// <summary>
+        /// Numeric keypad 8 key
+        /// </summary>
+		NumPad8 = 104,
+        /// <summary>
+        /// Numeric keypad 9 key
+        /// </summary>
+		NumPad9 = 105,
+        /// <summary>
+        /// Multiply key
+        /// </summary>
+		Multiply = 106,
+        /// <summary>
+        /// Add key
+        /// </summary>
+		Add = 107,
+        /// <summary>
+        /// Separator key
+        /// </summary>
+		Separator = 108,
+        /// <summary>
+        /// Subtract key
+        /// </summary>
+		Subtract = 109,
+        /// <summary>
+        /// Decimal key
+        /// </summary>
+		Decimal = 110,
+        /// <summary>
+        /// Divide key
+        /// </summary>
+		Divide = 111,
+        /// <summary>
+        /// F1 key
+        /// </summary>
+		F1 = 112,
+        /// <summary>
+        /// F2 key
+        /// </summary>
+		F2 = 113,
+        /// <summary>
+        /// F3 key
+        /// </summary>
+		F3 = 114,
+        /// <summary>
+        /// F4 key
+        /// </summary>
+		F4 = 115,
+        /// <summary>
+        /// F5 key
+        /// </summary>
+		F5 = 116,
+        /// <summary>
+        /// F6 key
+        /// </summary>
+		F6 = 117,
+        /// <summary>
+        /// F7 key
+        /// </summary>
+		F7 = 118,
+        /// <summary>
+        /// F8 key
+        /// </summary>
+		F8 = 119,
+        /// <summary>
+        /// F9 key
+        /// </summary>
+		F9 = 120,
+        /// <summary>
+        /// F10 key
+        /// </summary>
+		F10 = 121,
+        /// <summary>
+        /// F11 key
+        /// </summary>
+		F11 = 122,
+        /// <summary>
+        /// F12 key
+        /// </summary>
+		F12 = 123,
+        /// <summary>
+        /// F13 key
+        /// </summary>
+		F13 = 124,
+        /// <summary>
+        /// F14 key
+        /// </summary>
+		F14 = 125,
+        /// <summary>
+        /// F15 key
+        /// </summary>
+		F15 = 126,
+        /// <summary>
+        /// F16 key
+        /// </summary>
+		F16 = 127,
+        /// <summary>
+        /// F17 key
+        /// </summary>
+		F17 = 128,
+        /// <summary>
+        /// F18 key
+        /// </summary>
+		F18 = 129,
+        /// <summary>
+        /// F19 key
+        /// </summary>
+		F19 = 130,
+        /// <summary>
+        /// F20 key
+        /// </summary>
+		F20 = 131,
+        /// <summary>
+        /// F21 key
+        /// </summary>
+		F21 = 132,
+        /// <summary>
+        /// F22 key
+        /// </summary>
+		F22 = 133,
+        /// <summary>
+        /// F23 key
+        /// </summary>
+		F23 = 134,
+        /// <summary>
+        /// F24 key
+        /// </summary>
+		F24 = 135,
 		NumLock = 144,        // 	NUM LOCK key
 		Scroll = 145,        // 	SCROLL LOCK key
 		LeftShift = 160,        // 	Left SHIFT key
