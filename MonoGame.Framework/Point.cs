@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework
             return ((X == other.X) && (Y == other.Y));
         }
         
-        #endregion
+        #endregion Public methods
         
         #region Object overrided methods
         
