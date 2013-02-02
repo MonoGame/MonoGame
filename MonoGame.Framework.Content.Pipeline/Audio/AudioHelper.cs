@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     class AudioHelper
     {
         // This array must remain in sync with the ConversionFormat enum.
-        static string[] conversionFormatExtensions = new[] { "wav", "wav", "wma", "xma", "mp4", "ogg" };
+        static string[] conversionFormatExtensions = new[] { "wav", "wav", "wma", "xma", "wav", "mp4", "ogg" };
 
         /// <summary>
         /// Gets the file extension for an audio format.

@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="NAudio">
+      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\AudioContent.cs" />
+    <Compile Include="Audio\AudioFileType.cs" />
+    <Compile Include="Audio\AudioFormat.cs" />
+    <Compile Include="Audio\AudioHelper.cs" />
+    <Compile Include="Audio\ConversionFormat.cs" />
+    <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Builder\PathHelper.cs" />
+    <Compile Include="Builder\PipelineBuildEvent.cs" />
+    <Compile Include="Builder\PipelineBuildLogger.cs" />
+    <Compile Include="Builder\PipelineImporterContext.cs" />
+    <Compile Include="Builder\PipelineManager.cs" />
+    <Compile Include="Builder\PipelineProcessorContext.cs" />
+    <Compile Include="Builder\TypeExtensions.cs" />
+    <Compile Include="Builder\XmlColor.cs" />
+    <Compile Include="ChildCollection.cs" />
+    <Compile Include="ContentBuildLogger.cs" />
+    <Compile Include="ContentIdentity.cs" />
+    <Compile Include="ContentImporter.cs" />
+    <Compile Include="ContentImporterAttribute.cs" />
+    <Compile Include="ContentImporterContext.cs" />
+    <Compile Include="ContentItem.cs" />
+    <Compile Include="ContentProcessor.cs" />
+    <Compile Include="ContentProcessorAttribute.cs" />
+    <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="EffectImporter.cs" />
+    <Compile Include="ExternalReference.cs" />
+    <Compile Include="FbxImporter.cs" />
+    <Compile Include="FontDescriptionImporter.cs" />
+    <Compile Include="Graphics\AnimationChannel.cs" />
+    <Compile Include="Graphics\AnimationChannelDictionary.cs" />
+    <Compile Include="Graphics\AnimationContent.cs" />
+    <Compile Include="Graphics\AnimationContentDictionary.cs" />
+    <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BitmapContent.cs" />
+    <Compile Include="Graphics\BoneContent.cs" />
+    <Compile Include="Graphics\BoneWeight.cs" />
+    <Compile Include="Graphics\BoneWeightCollection.cs" />
+    <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="Graphics\FontDescription.cs" />
+    <Compile Include="Graphics\FontDescriptionStyle.cs" />
+    <Compile Include="Graphics\GeometryContent.cs" />
+    <Compile Include="Graphics\GeometryContentCollection.cs" />
+    <Compile Include="Graphics\GraphicsUtil.cs" />
+    <Compile Include="Graphics\IndexCollection.cs" />
+    <Compile Include="Graphics\IndirectPositionCollection.cs" />
+    <Compile Include="Graphics\MaterialContent.cs" />
+    <Compile Include="Graphics\MeshContent.cs" />
+    <Compile Include="Graphics\MipmapChain.cs" />
+    <Compile Include="Graphics\MipmapChainCollection.cs" />
+    <Compile Include="Graphics\NodeContent.cs" />
+    <Compile Include="Graphics\NodeContentCollection.cs" />
+    <Compile Include="Graphics\PixelBitmapContent.cs" />
+    <Compile Include="Graphics\PositionCollection.cs" />
+    <Compile Include="Graphics\Texture2DContent.cs" />
+    <Compile Include="Graphics\TextureContent.cs" />
+    <Compile Include="Graphics\TextureReferenceDictionary.cs" />
+    <Compile Include="Graphics\VertexChannel.cs" />
+    <Compile Include="Graphics\VertexChannelCollection.cs" />
+    <Compile Include="Graphics\VertexChannelGeneric.cs" />
+    <Compile Include="Graphics\VertexChannelNames.cs" />
+    <Compile Include="Graphics\VertexContent.cs" />
+    <Compile Include="IContentImporter.cs" />
+    <Compile Include="IContentProcessor.cs" />
+    <Compile Include="InvalidContentException.cs" />
+    <Compile Include="Mp3Importer.cs" />
+    <Compile Include="NamedValueDictionary.cs" />
+    <Compile Include="OpaqueDataDictionary.cs" />
+    <Compile Include="PipelineComponentScanner.cs" />
+    <Compile Include="PipelineException.cs" />
+    <Compile Include="ProcessorParameter.cs" />
+    <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="Processors\CompiledEffectContent.cs" />
+    <Compile Include="Processors\EffectProcessor.cs" />
+    <Compile Include="Processors\EffectProcessorDebugMode.cs" />
+    <Compile Include="Processors\FontDescriptionProcessor.cs" />
+    <Compile Include="Processors\MaterialProcessor.cs" />
+    <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+    <Compile Include="Processors\SongContent.cs" />
+    <Compile Include="Processors\SongProcessor.cs" />
+    <Compile Include="Processors\SoundEffectContent.cs" />
+    <Compile Include="Processors\SoundEffectProcessor.cs" />
+    <Compile Include="Processors\SpriteFontContent.cs" />
+    <Compile Include="Processors\TextureProcessor.cs" />
+    <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
+    <Compile Include="Processors\VertexBufferContent.cs" />
+    <Compile Include="Processors\VertexDeclarationContent.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\Compiler\ContentCompiler.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriter.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriterAttribute.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
+    <Compile Include="Serialization\Compiler\ContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
+    <Compile Include="TargetPlatform.cs" />
+    <Compile Include="TextureImporter.cs" />
+    <Compile Include="VideoContent.cs" />
+    <Compile Include="WavImporter.cs" />
+    <Compile Include="WmaImporter.cs" />
+    <Compile Include="WmvImporter.cs" />
+    <Compile Include="XImporter.cs" />
+    <Compile Include="XmlImporter.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -7,93 +7,236 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+
+using Nvidia.TextureTools;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-
-    public static class ByteColorConverter
+    class DXTDataHandler
     {
-        /*public static void GetPixel<T>(this byte[] data, int startIndex, SurfaceFormat format, out T result) where T : struct
-        {
-            result = new Color();
-        }*/
+        private TextureContent _content;
+        private int _currentMipLevel;
+        private int _levelWidth;
+        private int _levelHeight;
+        private Format _format;
 
-        public static void GetPixel(this byte[] data, int startIndex, SurfaceFormat format, out Color result)
+        public OutputOptions.WriteDataDelegate WriteData { get; private set; }
+        public OutputOptions.ImageDelegate BeginImage { get; private set; }
+
+        public DXTDataHandler(TextureContent content, Format format)
         {
-            result = new Color();
+            _content = content;
+
+            _currentMipLevel = 0;
+            _levelWidth = content.Faces[0][0].Width;
+            _levelHeight = content.Faces[0][0].Height;
+            _format = format;
+
+            WriteData = new OutputOptions.WriteDataDelegate(writeData);
+            BeginImage = new OutputOptions.ImageDelegate(beginImage);
         }
 
-        public static void SetPixelData<T>(this byte[] data, PixelBitmapContent<T> bmpContent, int startIndex, SurfaceFormat format) where T : struct, IEquatable<T>
+        public void beginImage(int size, int width, int height, int depth, int face, int miplevel)
         {
+            _levelHeight = height;
+            _levelWidth = width;
+            _currentMipLevel = miplevel;
         }
 
-        public static void SetPixelData(this byte[] data, PixelBitmapContent<Color> bmpContent, SurfaceFormat format)
+        protected bool writeData(IntPtr data, int length)
         {
-            var formatSize = format.Size();
+            var dataBuffer = new byte[length];
 
-            for (int y = 0; y < bmpContent.Height; y++)
-            {
-                for (int x = 0; x < bmpContent.Width; x++)
-                {
-                    switch(format)
-                    {
-                        case SurfaceFormat.Vector4:
+            Marshal.Copy(data, dataBuffer, 0, length);
 
-                            var startIdx = (y * formatSize) + (x * formatSize);
-                            var vec4 = new Vector4( BitConverter.ToSingle(data, startIdx),
-                                                    BitConverter.ToSingle(data, startIdx + 4),
-                                                    BitConverter.ToSingle(data, startIdx + 8),
-                                                    BitConverter.ToSingle(data, startIdx + 12) );
+            var texContent = new DXTBitmapContent(_format == Format.DXT1 ? 8 : 16, _levelWidth, _levelHeight);
+            _content.Faces[0][_currentMipLevel] = texContent;
+            _content.Faces[0][_currentMipLevel].SetPixelData(dataBuffer);
 
-                            bmpContent._pixelData[y][x] = new Color(vec4);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-            }
+            return true;
         }
     }
 
     public static class GraphicsUtil
     {
-
-        public static void PremultiplyAlpha(TextureContent content)
+        public static byte[] GetData(this Bitmap bmp)
         {
-            var colorTex = content.Faces[0][0] as PixelBitmapContent<Color>;
-            if (colorTex != null)
-            {
-                for (int x = 0; x < colorTex.Height; x++)
-                {
-                    var row = colorTex.GetRow(x);
-                    for (int y = 0; y < row.Length; y++)
-                    {
-                        if (row[y].A < 0xff)
-                            row[y] = Color.FromNonPremultiplied(row[y].R, row[y].G, row[y].B, row[y].A);
-                    }
-                }
-            }
-            else
-            {
-                var vec4Tex = content.Faces[0][0] as PixelBitmapContent<Vector4>;
-                if (vec4Tex == null)
-                    throw new NotSupportedException();
+            // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
+            // swizzle the channels later
+            System.Diagnostics.Debug.Assert(bmp.PixelFormat == PixelFormat.Format32bppArgb);
 
-                for (int x = 0; x < vec4Tex.Height; x++)
-                {
-                    var row = vec4Tex.GetRow(x);
-                    for (int y = 0; y < row.Length; y++)
-                    {
-                        if (row[y].W < 1.0f)
-                        {
-                            row[y].X *= row[y].W;
-                            row[y].Y *= row[y].W;
-                            row[y].Z *= row[y].W;
-                        }
-                    }
-                }
+            var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                                    ImageLockMode.ReadOnly,
+                                    bmp.PixelFormat);
+
+            var length = bitmapData.Stride * bitmapData.Height;
+            var output = new byte[length];
+
+            // Copy bitmap to byte[]
+            Marshal.Copy(bitmapData.Scan0, output, 0, length);
+            bmp.UnlockBits(bitmapData);
+
+            // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
+            // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
+            // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RBGA.
+            // Because of this we flip the R and B channels.
+
+            BGRAtoRGBA(output);
+  
+            return output;
+        }
+
+        public static void BGRAtoRGBA(byte[] data)
+        {
+            for (var x = 0; x < data.Length; x += 4)
+            {
+                data[x] ^= data[x + 2];
+                data[x + 2] ^= data[x];
+                data[x] ^= data[x + 2];
             }
+        }
+
+        public static bool IsPowerOfTwo(int x)
+        {
+            return (x & (x - 1)) == 0;
+        }
+
+        /// <summary>
+        /// Returns the next power of two. Returns same value if already is PoT.
+        /// </summary>
+        public static int GetNextPowerOfTwo(int value)
+        {
+            if (IsPowerOfTwo(value))
+                return value;
+
+            var nearestPower = 1;
+            while (nearestPower < value)
+                nearestPower = nearestPower << 1;
+
+            return nearestPower;
+        }
+
+        /// <summary>
+        /// Compares a System.Drawing.Color to a Microsoft.Xna.Framework.Color
+        /// </summary>
+        internal static bool ColorsEqual(this System.Drawing.Color a, Color b)
+        {
+            if (a.A != b.A)
+                return false;
+
+            if (a.R != b.R)
+                return false;
+
+            if (a.G != b.G)
+                return false;
+
+            if (a.B != b.B)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Compresses TextureContent in a format appropriate to the platform
+        /// </summary>
+        public static void CompressTexture(TextureContent content, TargetPlatform platform)
+        {
+            // TODO: At the moment, only DXT compression from windows machine is supported
+            // Add more here as they become available.
+            switch (platform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                case TargetPlatform.Ouya:
+                case TargetPlatform.Android:
+                case TargetPlatform.Linux: 
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.NativeClient:
+                case TargetPlatform.Xbox360:
+                    CompressDXT(content);
+                    break;
+
+                default:
+                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", platform));
+            }
+        }
+
+        private static void CompressDXT(TextureContent content)
+        {
+            var texData = content.Faces[0][0];
+
+            if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
+                throw new PipelineException("DXT Compressed textures width and height must be powers of two.");
+
+            var _dxtCompressor = new Compressor();
+            var inputOptions = new InputOptions();
+            inputOptions.SetAlphaMode(AlphaMode.Transparency);
+            inputOptions.SetTextureLayout(TextureType.Texture2D, texData.Width, texData.Height, 1);
+
+            var pixelData = texData.GetPixelData();
+            
+            // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
+            // again here.
+            GraphicsUtil.BGRAtoRGBA(pixelData);
+            var dataHandle = GCHandle.Alloc(pixelData, GCHandleType.Pinned);
+            var dataPtr = dataHandle.AddrOfPinnedObject();
+
+            inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
+            inputOptions.SetMipmapGeneration(false);
+
+            var containsFracAlpha = ContainsFractionalAlpha(pixelData);
+            var outputOptions = new OutputOptions();
+            outputOptions.SetOutputHeader(false);
+
+            var outputFormat = containsFracAlpha ? Format.DXT5 : Format.DXT1;
+
+            var handler = new DXTDataHandler(content, outputFormat);
+            outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
+
+            var compressionOptions = new CompressionOptions();
+            compressionOptions.SetFormat(outputFormat);
+
+            _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+
+            dataHandle.Free();
+        }
+
+        internal static bool ContainsFractionalAlpha(byte[] data)
+        {
+            for (var x = 3; x < data.Length; x += 4)
+            {
+                if (data[x] != 0x0 && data[x] != 0xFF)
+                    return true;
+            }
+
+            return false;
+        }
+
+        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
+        {
+            var resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
+            {
+                graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
+
+                content._bitmap.Dispose();
+                content._bitmap = resizedBmp;
+            }
+
+            var imageData = content._bitmap.GetData();
+
+            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
+            bitmapContent.SetPixelData(imageData);
+
+            content.Faces.Clear();
+            content.Faces.Add(new MipmapChain(bitmapContent));
         }
     }
 }

@@ -110,7 +110,10 @@ namespace MonoGame.Framework
             _form = new Form();
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
             _form.MaximizeBox = false;
-            _form.FormBorderStyle = FormBorderStyle.Fixed3D;
+            _form.FormBorderStyle = FormBorderStyle.FixedSingle;
+            _form.StartPosition = FormStartPosition.CenterScreen;
+
+            Mouse.SetWindows(_form);
 
             // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
@@ -185,11 +188,6 @@ namespace MonoGame.Framework
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
             OnClientSizeChanged();
-
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (newWidth > 0 && newHeight > 0)
-                manager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
@@ -208,14 +206,30 @@ namespace MonoGame.Framework
         {
             // While there are no pending messages 
             // to be processed tick the game.
-            Message msg;
+            NativeMessage msg;
             while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
                 Game.Tick();
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NativeMessage
+        {
+            public IntPtr handle;
+            public uint msg;
+            public IntPtr wParam;
+            public IntPtr lParam;
+            public uint time;
+            public System.Drawing.Point p;
+        }
+
+        internal void ChangeClientSize(Size clientBounds)
+        {
+            this._form.ClientSize = clientBounds;
+        }
+
         [System.Security.SuppressUnmanagedCodeSecurity] // We won't use this maliciously
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        private static extern bool PeekMessage(out Message msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
+        private static extern bool PeekMessage(out NativeMessage msg, IntPtr hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
 
         #region Public Methods
 
