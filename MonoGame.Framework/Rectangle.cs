@@ -393,7 +393,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Methods
 
-        #region Object overrided methods
+        #region Object Overrided Methods
 
         /// <summary>
         /// Returns a value that indicates whether the current instance is equal to a specified object.
@@ -423,7 +423,7 @@ namespace Microsoft.Xna.Framework
             return (this.X ^ this.Y ^ this.Width ^ this.Height);
         }
 
-        #endregion Object overrided methods
+        #endregion Object Overrided Methods
     }
 }
 
