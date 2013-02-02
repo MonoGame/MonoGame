@@ -44,15 +44,27 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Allows retrieval of keystrokes from a keyboard input device.
+    /// </summary>
 	public static class Keyboard
 	{
         static List<Keys> _keys;
 
+        /// <summary>
+        /// Returns the current keyboard state.
+        /// </summary>
+        /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState()
 		{
             return new KeyboardState(_keys);
 		}
 		
+        /// <summary>
+        /// Returns the current keyboard state for the specified player.
+        /// </summary>
+        /// <param name="playerIndex">Player index of the keyboard to query.</param>
+        /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
             return new KeyboardState(_keys);
