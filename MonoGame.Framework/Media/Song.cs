@@ -46,6 +46,9 @@ using Microsoft.Xna.Framework.Audio;
 #if IOS
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
+#elif WINDOWS_MEDIA_SESSION
+using SharpDX;
+using SharpDX.MediaFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Media
@@ -56,19 +59,23 @@ namespace Microsoft.Xna.Framework.Media
 		private AVAudioPlayer _sound;
 #elif PSM
         private PSSuiteSong _sound;
-#elif !DIRECTX
+#elif WINDOWS_MEDIA_SESSION
+        private Topology _topology;
+#elif !WINDOWS_MEDIA_ENGINE
 		private SoundEffectInstance _sound;
 #endif
 		
 		private string _name;
 		private int _playCount = 0;
+        private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
 
         internal Song(string fileName, int durationMS)
             : this(fileName)
         {
-            _Duration = TimeSpan.FromMilliseconds(durationMS);
+            _duration = TimeSpan.FromMilliseconds(durationMS);
         }
+
 		internal Song(string fileName)
 		{			
 			_name = fileName;
@@ -79,17 +86,19 @@ namespace Microsoft.Xna.Framework.Media
             _sound.FinishedPlaying += OnFinishedPlaying;
 #elif PSM
             _sound = new PSSuiteSong(_name);
-#elif !DIRECTX
+#elif WINDOWS_MEDIA_SESSION 
+            GetTopology();      
+#elif !WINDOWS_MEDIA_ENGINE
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
-		}
+        }
 
         ~Song()
         {
             Dispose(false);
         }
 
-        public string FilePath
+        internal string FilePath
 		{
 			get { return _name; }
 		}
@@ -104,9 +113,18 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (!disposed)
             {
-#if !DIRECTX
                 if (disposing)
                 {
+#if WINDOWS_MEDIA_SESSION
+
+                    if (_topology != null)
+                    {
+                        _topology.Dispose();
+                        _topology = null;
+                    }
+
+#elif !WINDOWS_MEDIA_ENGINE
+
                     if (_sound != null)
                     {
 #if IOS
@@ -115,8 +133,9 @@ namespace Microsoft.Xna.Framework.Media
                         _sound.Dispose();
                         _sound = null;
                     }
-                }
 #endif
+                }
+
                 disposed = true;
             }
         }
@@ -160,7 +179,77 @@ namespace Microsoft.Xna.Framework.Media
 		  return ! (song1 == song2);
 		}
 
-#if !DIRECTX
+#if WINDOWS_MEDIA_SESSION
+
+        internal Topology GetTopology()
+        {
+            if (_topology == null)
+            {
+                MediaFactory.CreateTopology(out _topology);
+
+                SharpDX.MediaFoundation.MediaSource mediaSource;
+                {
+                    SourceResolver resolver;
+                    MediaFactory.CreateSourceResolver(out resolver);
+
+                    ObjectType otype;
+                    ComObject source;
+                    resolver.CreateObjectFromURL(FilePath, (int)SourceResolverFlags.MediaSource, null, out otype,
+                                                 out source);
+                    mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
+                    resolver.Dispose();
+                    source.Dispose();
+                }
+
+                PresentationDescriptor presDesc;
+                mediaSource.CreatePresentationDescriptor(out presDesc);
+
+                for (var i = 0; i < presDesc.StreamDescriptorCount; i++)
+                {
+                    Bool selected;
+                    StreamDescriptor desc;
+                    presDesc.GetStreamDescriptorByIndex(i, out selected, out desc);
+
+                    if (selected)
+                    {
+                        TopologyNode sourceNode;
+                        MediaFactory.CreateTopologyNode(TopologyType.SourceStreamNode, out sourceNode);
+
+                        sourceNode.Set(TopologyNodeAttributeKeys.Source, mediaSource);
+                        sourceNode.Set(TopologyNodeAttributeKeys.PresentationDescriptor, presDesc);
+                        sourceNode.Set(TopologyNodeAttributeKeys.StreamDescriptor, desc);
+
+                        TopologyNode outputNode;
+                        MediaFactory.CreateTopologyNode(TopologyType.OutputNode, out outputNode);
+
+                        var majorType = desc.MediaTypeHandler.MajorType;
+                        if (majorType != MediaTypeGuids.Audio)
+                            throw new NotSupportedException("The song contains video data!");
+
+                        Activate activate;
+                        MediaFactory.CreateAudioRendererActivate(out activate);
+                        outputNode.Object = activate;
+
+                        _topology.AddNode(sourceNode);
+                        _topology.AddNode(outputNode);
+                        sourceNode.ConnectOutput(0, outputNode, 0);
+
+                        sourceNode.Dispose();
+                        outputNode.Dispose();
+                    }
+
+                    desc.Dispose();
+                }
+
+                presDesc.Dispose();
+                mediaSource.Dispose();
+            }
+
+            return _topology;
+        }
+            
+#elif !WINDOWS_MEDIA_ENGINE
+
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 		event FinishedPlayingHandler DonePlaying;
 
@@ -238,26 +327,25 @@ namespace Microsoft.Xna.Framework.Media
 					_sound.Volume = value;
 			}			
 		}
+
+		internal TimeSpan Position
+        {
+            get
+            {
+                // TODO: Implement
+                return new TimeSpan(0);				
+            }
+        }
+
 #endif // !DIRECTX
 
-        // Returns the duration of song
         public TimeSpan Duration
         {
             get
             {
-                return _Duration;
+                return _duration;
             }
-        }
-        private TimeSpan _Duration = TimeSpan.Zero;
-		
-		// TODO: Implement
-		public TimeSpan Position
-        {
-            get
-            {
-                return new TimeSpan(0);				
-            }
-        }
+        }	
 
         public bool IsProtected
         {

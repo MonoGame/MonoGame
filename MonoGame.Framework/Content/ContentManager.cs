@@ -666,6 +666,8 @@ namespace Microsoft.Xna.Framework.Content
             {
 #if WINDOWS || LINUX || MACOS
 				return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RootDirectory);
+#elif WINRT
+                return Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, RootDirectory);
 #else
                 return RootDirectory;
 #endif
