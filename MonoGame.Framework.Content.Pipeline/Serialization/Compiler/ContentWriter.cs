@@ -232,7 +232,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         /// <param name="type">The type of the object to write.</param>
         /// <returns>The ContentTypeWriter for the type.</returns>
-        ContentTypeWriter GetTypeWriter(Type type)
+        internal ContentTypeWriter GetTypeWriter(Type type)
         {
             ContentTypeWriter typeWriter = null;
             if (!typeMap.TryGetValue(type, out typeWriter))
