@@ -88,9 +88,9 @@ namespace Microsoft.Xna.Framework.Content
 				path = input.ContentManager.RootDirectory + separator + path;
 			}
 			
-			/*int durationMS =*/ input.ReadObject<int>();
-			
-			return new Song(path); 
+			int durationMS = input.ReadObject<int>();
+
+            return new Song(path, durationMS); 
 		}
 	}
 }

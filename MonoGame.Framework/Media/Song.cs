@@ -64,6 +64,11 @@ namespace Microsoft.Xna.Framework.Media
 		private int _playCount = 0;
         bool disposed;
 
+        internal Song(string fileName, int durationMS)
+            : this(fileName)
+        {
+            _Duration = TimeSpan.FromMilliseconds(durationMS);
+        }
 		internal Song(string fileName)
 		{			
 			_name = fileName;
@@ -235,8 +240,6 @@ namespace Microsoft.Xna.Framework.Media
 		}
 #endif // !DIRECTX
 
-#if WINDOWS_MEDIA_ENGINE
-        private static SharpDX.MediaFoundation.MediaEngine _mediaEngineEx;
         // Returns the duration of a song
         private TimeSpan? _Duration = null;
         public TimeSpan Duration
@@ -248,6 +251,7 @@ namespace Microsoft.Xna.Framework.Media
                 else
                 {
                     TimeSpan r = TimeSpan.Zero;
+#if WINDOWS_MEDIA_ENGINE
                     if (MediaPlayer.State != MediaState.Stopped && MediaPlayer.Queue.ActiveSong.Name == Name && MediaPlayer._mediaEngineEx != null)
                     {
                         r = TimeSpan.FromSeconds(MediaPlayer._mediaEngineEx.Duration);
@@ -256,6 +260,7 @@ namespace Microsoft.Xna.Framework.Media
                     {
                         r = System.Threading.Tasks.Task.Run(() => _Duration_Get_Async().Result).Result;
                     }
+#endif
                     //
                     if (r != TimeSpan.Zero)
                         _Duration = r;
@@ -265,6 +270,8 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+#if WINDOWS_MEDIA_ENGINE
+        private static SharpDX.MediaFoundation.MediaEngine _mediaEngineEx;
         private async System.Threading.Tasks.Task<TimeSpan> _Duration_Get_Async()
         {
             return await System.Threading.Tasks.Task<TimeSpan>.Run(() =>
@@ -293,15 +300,6 @@ namespace Microsoft.Xna.Framework.Media
                     //
                     return r;
                 });
-        }
-#else
-        // TODO: Implement
-        public TimeSpan Duration
-        {
-            get
-            {
-                return new TimeSpan(0);
-            }
         }
 #endif
 		
