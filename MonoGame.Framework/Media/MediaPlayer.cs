@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Media
 		private static readonly MediaQueue _queue = new MediaQueue();
 
 #if WINDOWS_MEDIA_ENGINE
-        internal static readonly MediaEngine _mediaEngineEx;
+        private static readonly MediaEngine _mediaEngineEx;
         private static CoreDispatcher _dispatcher;
 #elif WINDOWS_MEDIA_SESSION
         private static readonly MediaSession _session;

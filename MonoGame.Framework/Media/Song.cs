@@ -235,66 +235,6 @@ namespace Microsoft.Xna.Framework.Media
 		}
 #endif // !DIRECTX
 
-#if WINDOWS_MEDIA_ENGINE
-        private static SharpDX.MediaFoundation.MediaEngine _mediaEngineEx;
-        // Returns the duration of a song
-        private TimeSpan? _Duration = null;
-        public TimeSpan Duration
-        {
-            get
-            {
-                if (_Duration != null)
-                    return _Duration.Value;
-                else
-                {
-                    TimeSpan r = TimeSpan.Zero;
-                    if (MediaPlayer.State != MediaState.Stopped && MediaPlayer.Queue.ActiveSong.Name == Name && MediaPlayer._mediaEngineEx != null)
-                    {
-                        r = TimeSpan.FromSeconds(MediaPlayer._mediaEngineEx.Duration);
-                    }
-                    else
-                    {
-                        r = System.Threading.Tasks.Task.Run(() => _Duration_Get_Async().Result).Result;
-                    }
-                    //
-                    if (r != TimeSpan.Zero)
-                        _Duration = r;
-                    //
-                    return r;
-                }
-            }
-        }
-
-        private async System.Threading.Tasks.Task<TimeSpan> _Duration_Get_Async()
-        {
-            return await System.Threading.Tasks.Task<TimeSpan>.Run(() =>
-                {
-                    TimeSpan r = TimeSpan.Zero;
-                    if (_mediaEngineEx == null)
-                    {
-                        using (var factory = new SharpDX.MediaFoundation.MediaEngineClassFactory())
-                        using (var attributes = new SharpDX.MediaFoundation.MediaEngineAttributes { AudioCategory = SharpDX.Multimedia.AudioStreamCategory.GameMedia })
-                        {
-                            var mediaEngine = new SharpDX.MediaFoundation.MediaEngine(factory, attributes, SharpDX.MediaFoundation.MediaEngineCreateFlags.AudioOnly);
-                            _mediaEngineEx = mediaEngine.QueryInterface<SharpDX.MediaFoundation.MediaEngineEx>();
-                        }
-                    }
-                    //
-                    var folder = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-                    var path = folder + "\\" + FilePath;
-                    var uri = new Uri(path);
-                    var converted = uri.AbsoluteUri;
-
-                    _mediaEngineEx.Source = converted;
-                    _mediaEngineEx.Load();
-                    while (_mediaEngineEx.Error != null || _mediaEngineEx.ReadyState != (short)SharpDX.MediaFoundation.MediaEngineReady.HaveEnoughData) ;
-                    if (!double.IsNaN(_mediaEngineEx.Duration))
-                        r = TimeSpan.FromSeconds(_mediaEngineEx.Duration);
-                    //
-                    return r;
-                });
-        }
-#else
         // TODO: Implement
         public TimeSpan Duration
         {
@@ -303,7 +243,6 @@ namespace Microsoft.Xna.Framework.Media
                 return new TimeSpan(0);
             }
         }
-#endif
 		
 		// TODO: Implement
 		public TimeSpan Position
