@@ -64,6 +64,11 @@ namespace Microsoft.Xna.Framework.Media
 		private int _playCount = 0;
         bool disposed;
 
+        internal Song(string fileName, int durationMS)
+            : this(fileName)
+        {
+            _Duration = TimeSpan.FromMilliseconds(durationMS);
+        }
 		internal Song(string fileName)
 		{			
 			_name = fileName;
@@ -235,14 +240,15 @@ namespace Microsoft.Xna.Framework.Media
 		}
 #endif // !DIRECTX
 
-        // TODO: Implement
+        // Returns the duration of song
         public TimeSpan Duration
         {
             get
             {
-                return new TimeSpan(0);
+                return _Duration;
             }
         }
+        private TimeSpan _Duration = TimeSpan.Zero;
 		
 		// TODO: Implement
 		public TimeSpan Position
