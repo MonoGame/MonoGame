@@ -9,16 +9,23 @@ namespace Microsoft.Xna.Framework.Media
     {
         static internal Android.Media.MediaPlayer _androidPlayer = null;
         private string _name;
-        private int _playCount;
+	    private readonly int _durationMs;
+	    private int _playCount;
         bool disposed;
 
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
         event FinishedPlayingHandler DonePlaying;
 
-        internal Song(string fileName)
+		internal Song(string fileName)
+			: this(fileName, 0)
+		{
+		}
+
+	    internal Song(string fileName, int durationMs)
         {
             _name = fileName;
-            if (_androidPlayer == null)
+	        _durationMs = durationMs;
+	        if (_androidPlayer == null)
             {
                 _androidPlayer = new Android.Media.MediaPlayer();
                 _androidPlayer.Completion += new EventHandler(_androidPlayer_Completion);
@@ -194,11 +201,11 @@ namespace Microsoft.Xna.Framework.Media
             {
                 if (_androidPlayer != null)
                 {
-                    return new TimeSpan(0, 0, (int)_androidPlayer.Duration);
+                    return TimeSpan.FromSeconds(_androidPlayer.Duration);
                 }
                 else
                 {
-                    return new TimeSpan(0);
+					return TimeSpan.FromMilliseconds(_durationMs);
                 }
             }
         }
