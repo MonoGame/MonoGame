@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Content
 				path = dst.LocalPath.Substring(1);
 				
 				// Adds the ContentManager's RootDirectory
-				path = input.ContentManager.RootDirectory + separator + path;
+                path = input.ContentManager.RootDirectoryFullPath + separator + path;
 			}
 			
 			int durationMS = input.ReadObject<int>();
