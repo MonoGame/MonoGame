@@ -152,6 +152,11 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.SourcePause (soundBuffer.SourceId);
 		}
 
+        public void ResumeSound(OALSoundBuffer soundBuffer)
+        {
+            AL.SourcePlay(soundBuffer.SourceId);
+        }
+
 		public bool IsState (OALSoundBuffer soundBuffer, int state)
 		{
 			int sourceState;
