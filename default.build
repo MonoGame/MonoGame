@@ -18,8 +18,7 @@
 	   
 	  <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
-		
-		<nant buildfile="Installers/default.build" target="build" />
+				
 		
 	</target>
   
@@ -27,10 +26,15 @@
     <if test="${os == 'Win32NT'}">
 			<exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />	
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />	
-      <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />	
+      <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
+	 <exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Clean /p:Configuration=Release" />	
+      </if>
+
       <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />	
-      <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="ARM"' />			
-      <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="x86"' />			
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.0\Microsoft.Cpp.WindowsPhone.8.0.targets')}">
+      	<exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="ARM"' />			
+      	<exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="x86"' />			
+      </if>
       <exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Clean /p:Configuration=Release" />	
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />			
 		</if>
@@ -64,12 +68,14 @@
     </target>
     
     <target name="buildandroid" description="Build Android">
-    <if test="${os == 'Win32NT'}">
+      <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
+                <if test="${os == 'Win32NT'}">
 			<exec program="msbuild " commandline="MonoGame.Framework.Android.sln /t:Build /p:Configuration=Release" />			
 		</if>
 		<if test="${os == 'Unix'}">
 			<exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Android.sln" />
 		</if>	
+      </if>
     </target>
 		
 	  <target name="buildwindows8" description="Build Windows 8">
@@ -79,11 +85,14 @@
 		</target>
   
     <target name="buildwindowsphone" description="Build Windows Phone">
+      <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.0\Microsoft.Cpp.WindowsPhone.8.0.targets')}">
+
     <if test="${os == 'Win32NT'}">
 			<exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="ARM"' />			
-      <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />			
+                        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />			
 		</if>
-		</target>
+             </if>
+     </target>
   
     <target name="buildtools" description="Build Tools">
     <if test="${os == 'Win32NT'}">

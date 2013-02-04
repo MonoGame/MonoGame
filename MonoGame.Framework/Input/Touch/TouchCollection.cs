@@ -48,6 +48,9 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Provides state information for a touch screen enabled device.
+    /// </summary>
     public struct TouchCollection : IList<TouchLocation>
 	{
         private TouchLocation[] _collection;
@@ -60,6 +63,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		#endregion
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
+        /// </summary>
+        /// <param name="touches"></param>
         public TouchCollection(TouchLocation[] touches)
         {
             _isConnected = true;
