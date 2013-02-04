@@ -14,6 +14,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 {
     public class PipelineBuildEvent
     {
+        public static readonly string Extension = ".mgcontent";
+
         public PipelineBuildEvent()
         {
             SourceFile = string.Empty;
@@ -21,13 +23,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Importer = string.Empty;
             Processor = string.Empty;
             Parameters = new OpaqueDataDictionary();
-            ParametersXML = new List<Pair>();
+            ParametersXml = new List<Pair>();
             Dependancies = new List<string>();
             BuildAsset = new List<string>();
         }
 
+        /// <summary>
+        /// Absolute path to the source file.
+        /// </summary>
         public string SourceFile { get; set; }
 
+        /// <summary>
+        /// Absolute path to the output file.
+        /// </summary>
         public string DestFile { get; set; }
 
         public DateTime DestTime { get; set; }
@@ -46,7 +54,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         [XmlElement("Parameters")]
-        public List<Pair> ParametersXML { get; set; }
+        public List<Pair> ParametersXml { get; set; }
 
         public List<string> Dependancies { get; set; }
 
@@ -54,11 +62,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public static PipelineBuildEvent Load(string filePath)
         {
+            var fullFilePath = Path.GetFullPath(filePath);
             var deserializer = new XmlSerializer(typeof (PipelineBuildEvent));
             PipelineBuildEvent pipelineEvent;
             try
             {
-                using (var textReader = new StreamReader(filePath))
+                using (var textReader = new StreamReader(fullFilePath))
                     pipelineEvent = (PipelineBuildEvent) deserializer.Deserialize(textReader);
             }
             catch (Exception)
@@ -67,29 +76,30 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             // Repopulate the parameters from the serialized state.            
-            foreach (var pair in pipelineEvent.ParametersXML)
+            foreach (var pair in pipelineEvent.ParametersXml)
                 pipelineEvent.Parameters.Add(pair.Key, pair.Value);
-            pipelineEvent.ParametersXML.Clear();
+            pipelineEvent.ParametersXml.Clear();
 
             return pipelineEvent;
         }
 
         public void Save(string filePath)
         {
+			var fullFilePath = Path.GetFullPath(filePath);
             // Make sure the directory exists.
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath) + @"\");
+            Directory.CreateDirectory(Path.GetDirectoryName(fullFilePath) + Path.DirectorySeparatorChar);
 
             // Convert the parameters into something we can serialize.
-            ParametersXML.Clear();
+            ParametersXml.Clear();
             foreach (var pair in Parameters)
             {
                 var converter = TypeDescriptor.GetConverter(pair.Value.GetType());
-                ParametersXML.Add(new Pair { Key = pair.Key, Value = converter.ConvertToString(pair.Value) });
+                ParametersXml.Add(new Pair { Key = pair.Key, Value = converter.ConvertToString(pair.Value) });
             }
 
             // Serialize our state.
             var serializer = new XmlSerializer(typeof (PipelineBuildEvent));
-            using (var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(false)))
+            using (var textWriter = new StreamWriter(fullFilePath, false, new UTF8Encoding(false)))
                 serializer.Serialize(textWriter, this);
         }
 

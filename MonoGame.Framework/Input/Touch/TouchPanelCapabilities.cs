@@ -44,6 +44,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Allows retrieval of capabilities information from touch panel device.
+    /// </summary>
     public struct TouchPanelCapabilities
     {
 		private bool hasPressure;
@@ -86,6 +89,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns true if a device is available for use.
+        /// </summary>
         public bool IsConnected
         {
             get
@@ -94,6 +100,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns the maximum number of touch locations tracked by the touch panel device.
+        /// </summary>
         public int MaximumTouchCount
         {
             get

@@ -126,6 +126,7 @@
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GameTimerEventArgs.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
