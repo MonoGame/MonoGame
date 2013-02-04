@@ -786,7 +786,25 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             waitEvent.Wait();
-
+#elif MONOMAC
+			var data = new byte[width * height * 4];
+			var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			GetData(data);
+			
+			// internal structure is BGR while bitmap expects RGB
+			for(int i = 0; i < data.Length; i += 4)
+			{
+				byte temp = data[i + 0];
+				data[i + 0] = data[i + 2];
+				data[i + 2] = temp;
+			}
+			
+			using (var bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.AddrOfPinnedObject()))
+			{
+				bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+			}
+			
+			handle.Free();
 #else
             throw new NotImplementedException();
 #endif
@@ -796,6 +814,25 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
+#elif MONOMAC 
+			var data = new byte[width * height * 4];
+			var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			GetData(data);
+
+			// internal structure is BGR while bitmap expects RGB
+			for(int i = 0; i < data.Length; i += 4)
+			{
+				byte temp = data[i + 0];
+				data[i + 0] = data[i + 2];
+				data[i + 2] = temp;
+			}
+
+			using (var bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.AddrOfPinnedObject()))
+			{
+				bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+			}
+
+			handle.Free();
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
