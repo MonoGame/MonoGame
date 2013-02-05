@@ -52,22 +52,22 @@ namespace Microsoft.Xna.Framework
         public const float Log2E = 1.442695f;
         
         /// <summary>
-        /// Represents the value of pi(3.14159274).
+        /// Represents the value of π(3.14159274).
         /// </summary>
         public const float Pi = (float)Math.PI;
         
         /// <summary>
-        /// Represents the value of pi divided by two(1.57079637).
+        /// Represents the value of π divided by two(1.57079637).
         /// </summary>
         public const float PiOver2 = (float)(Math.PI / 2.0);
         
         /// <summary>
-        /// Represents the value of pi divided by four(0.7853982).
+        /// Represents the value of π divided by four(0.7853982).
         /// </summary>
         public const float PiOver4 = (float)(Math.PI / 4.0);
         
         /// <summary>
-        /// Represents the value of pi times two(6.28318548).
+        /// Represents the value of π times two(6.28318548).
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
         
@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
-        /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
+        /// <returns><c>true</c> if <c>value</c> is powered by two; <c>false</c> otherwise.</returns>
 	public static bool IsPowerOfTwo(int value)
 	{
 	     return (value > 0) && ((value & (value - 1)) == 0);
