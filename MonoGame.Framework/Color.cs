@@ -266,8 +266,8 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Compares whether two <see cref="Color"/> instances are not equal.
         /// </summary>
-        /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
-        /// <param name="b"><see cref="Color"/> instance on the right of the equal sign.</param>
+        /// <param name="a"><see cref="Color"/> instance on the left of the not equal sign.</param>
+        /// <param name="b"><see cref="Color"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Color a, Color b)
         {
@@ -1064,7 +1064,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// LightGreen color (R:250,G:250,B:210,A:255).
+        /// LightGreen color (R:144,G:238,B:144,A:255).
         /// </summary>
         public static Color LightGreen
         {
