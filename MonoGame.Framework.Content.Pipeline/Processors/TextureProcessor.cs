@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed || 
                 TextureFormat == TextureProcessorOutputFormat.Compressed )
-                GraphicsUtil.CompressTexture(input, context.TargetPlatform);
+                GraphicsUtil.CompressTexture(input, context.TargetPlatform, PremultiplyAlpha);
 
             return input;
         }

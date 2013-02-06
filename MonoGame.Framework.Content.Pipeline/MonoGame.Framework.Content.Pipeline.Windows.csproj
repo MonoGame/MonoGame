@@ -102,6 +102,7 @@
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
+    <Compile Include="Graphics\PVRTCBitmapContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
@@ -205,6 +206,18 @@
   <ItemGroup>
     <None Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
       <Link>Dependencies\x86\nvtt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x64\PVRTexLibC.dll">
+      <Link>Dependencies\x64\PVRTexLibC.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x86\PVRTexLibC.dll">
+      <Link>Dependencies\x86\PVRTexLibC.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

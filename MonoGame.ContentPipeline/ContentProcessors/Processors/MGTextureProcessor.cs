@@ -16,7 +16,7 @@ namespace MonoGameContentProcessors.Processors
     public class MGTextureProcessor : TextureProcessor
     {
         [DllImport("PVRTexLibC.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr CompressTexture(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
+        public static extern IntPtr compressPVRTC(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
 
         private MGCompressionMode compressionMode = MGCompressionMode.PVRTCFourBitsPerPixel;
 
@@ -125,7 +125,7 @@ namespace MonoGameContentProcessors.Processors
         {
             IntPtr dataSizesPtr = IntPtr.Zero;
 
-            var texDataPtr = CompressTexture(sourceContent.Faces[0][0].GetPixelData(), 
+            var texDataPtr = compressPVRTC(sourceContent.Faces[0][0].GetPixelData(), 
                                             sourceContent.Faces[0][0].Height, 
                                             sourceContent.Faces[0][0].Width, 
                                             mipLevels, 
