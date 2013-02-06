@@ -45,9 +45,7 @@ namespace Microsoft.Xna.Framework
     {
 	// ARGB
         private uint _packedValue;
-	
-	private static Color _white = new Color(uint.MaxValue);
-	
+	  
         private Color(uint packedValue)
         {
             _packedValue = packedValue;
@@ -1818,7 +1816,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-               return _white;
+               return new Color(uint.MaxValue);
             }
         }
        
@@ -1856,7 +1854,7 @@ namespace Microsoft.Xna.Framework
         }
 	
 	/// <summary>
-        /// Perform linear interpolation of <see cref="Color"/>.
+        /// Performs linear interpolation of <see cref="Color"/>.
         /// </summary>
         /// <param name="value1">Source <see cref="Color"/>.</param>
         /// <param name="value2">Destination <see cref="Color"/>.</param>
