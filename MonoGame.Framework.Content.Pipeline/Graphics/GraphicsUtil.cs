@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, TargetPlatform platform)
+        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
@@ -162,9 +162,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     CompressDXT(content);
                     break;
 
+                case TargetPlatform.iOS:
+                    CompressPVRTC(content, premultipliedAlpha);
+                    break;
+
                 default:
                     throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", platform));
             }
+        }
+
+        [DllImport("PVRTexLibC", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr compressPVRTC(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
+
+        private static void CompressPVRTC(TextureContent content, bool premultipliedAlpha)
+        {
+            // Note: MipGeneration will be done by NVTT, rather than PVRTC's tool.
+            // This way we have the same implementation across platforms.
+
+            IntPtr dataSizesPtr = IntPtr.Zero;
+            var texDataPtr = compressPVRTC(content.Faces[0][0].GetPixelData(),
+                                            content.Faces[0][0].Height,
+                                            content.Faces[0][0].Width,
+                                            1,
+                                            premultipliedAlpha,
+                                            true,
+                                            ref dataSizesPtr);
+
+            // Store the size of each mipLevel
+            var dataSizesArray = new int[1];
+            Marshal.Copy(dataSizesPtr, dataSizesArray, 0, dataSizesArray.Length);
+
+            var levelSize = 0;
+            byte[] levelData;
+            var sourceWidth = content.Faces[0][0].Width;
+            var sourceHeight = content.Faces[0][0].Height;
+
+            content.Faces[0].Clear();
+
+            levelSize = dataSizesArray[0];
+            levelData = new byte[levelSize];
+
+            Marshal.Copy(texDataPtr, levelData, 0, levelSize);
+
+            var bmpContent = new PVRTCBitmapContent(4, sourceWidth, sourceHeight);
+            bmpContent.SetPixelData(levelData);
+            content.Faces[0].Add(bmpContent);
         }
 
         private static void CompressDXT(TextureContent content)
