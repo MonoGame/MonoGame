@@ -56,6 +56,9 @@ using MonoMac.AppKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Allows reading position and button click information from mouse.
+    /// </summary>
     public static class Mouse
     {
 		internal static MouseState State;
@@ -108,13 +111,15 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Gets an empty window handle. Purely for Xna compatibility.
         /// </summary>
-        /// <value>
-        /// The a zero window handle.
-        /// </value>
+        /// <returns>A zero window handle</returns>
         public static IntPtr WindowHandle { get { return IntPtr.Zero; } }
 
         #region Public interface
 
+        /// <summary>
+        /// Gets mouse state information that includes position and button presses.
+        /// </summary>
+        /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState()
         {
 #if MONOMAC
@@ -146,6 +151,11 @@ namespace Microsoft.Xna.Framework.Input
             return State;
         }
 
+        /// <summary>
+        /// Sets mouse cursor's relative position to game-window.
+        /// </summary>
+        /// <param name="x">Relative horizontal position of the cursor.</param>
+        /// <param name="y">Relative vertical position of the cursor.</param>
         public static void SetPosition(int x, int y)
         {
             UpdateStatePosition(x, y);
