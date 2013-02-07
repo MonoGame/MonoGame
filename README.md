@@ -14,7 +14,7 @@
 * PlayStation Mobile (currently 2D only)
 * [OUYA](http://ouya.tv), an Android-based gaming console
 
-## Quick start
+## Quick Start
 
 There are a few pre-requisites that you should be aware of for the various platforms. Please check them over [MonoGame](http://monogame.net/downloads) website.
 
@@ -23,7 +23,7 @@ There are three quick start options available:
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop3d.zip).
 * Clone the repo: `https://github.com/mono/MonoGame.git`.
 
-## Bug tracker
+## Bug Tracker
 
 Have a bug or a feature request? [Please open a new issue](https://github.com/mono/MonoGame/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines).
 
@@ -43,7 +43,7 @@ Please read our [contributers](https://github.com/mono/MonoGame/wiki/Contributin
 
 MonoGame is released under [Microsoft Public License (Ms-PL)](https://github.com/mono/MonoGame/blob/develop3d/LICENSE.txt).
 
-## Current RoadMap
+## Current Roadmap
 
 * The MonoGame 2.x series is now in maintenance mode.
 * MonoGame 3.0 will mark the start of full support for the entire XNA API.
