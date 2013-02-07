@@ -389,7 +389,7 @@
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Input\MouseState.cs" />
-    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\Playlist.cs" />
