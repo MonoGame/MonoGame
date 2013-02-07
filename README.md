@@ -1,4 +1,4 @@
-# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop3d/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16px' height'24px'></a>
+# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop3d/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16px' height'24px'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop3d/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop3d/)
 
 [MonoGame](http://monogame.net) is an Open Source implementation of the Microsoft XNA 4.x Framework. Our goal is to allow XNA developers on Xbox 360, Windows & Windows Phone 7 to port their games to the iOS, Android, Mac OS X, Linux and Windows 8 Metro. OUYA, Windows Phone 8, PlayStation Mobile and Raspberry PI are currently in development.
 
