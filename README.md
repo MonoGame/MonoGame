@@ -18,7 +18,7 @@
 
 There are a few pre-requisites that you should be aware of for the various platforms. Please check them over [MonoGame](http://monogame.net/downloads) website.
 
-There are three quick start options are available:
+There are three quick start options available:
 * Download the latest stable release over [our website](http://monogame.net/downloads).
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop3d.zip).
 * Clone the repo: `https://github.com/mono/MonoGame.git`.
