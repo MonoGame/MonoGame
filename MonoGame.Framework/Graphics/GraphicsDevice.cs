@@ -110,6 +110,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private RenderTargetBinding[] _currentRenderTargetBindings;
 
+#if OPENGL && !GLES
+        private DrawBuffersEnum[] _drawBuffers;
+#endif
+
         private static readonly RenderTargetBinding[] EmptyRenderTargetBinding = new RenderTargetBinding[0];
 
         public TextureCollection Textures { get; private set; }
@@ -326,7 +330,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
+            GraphicsExtensions.CheckGLError();
+
+            int maxDrawBuffers;
+            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+            for (int i = 0; i < maxDrawBuffers; i++)
+                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
@@ -1377,17 +1387,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 #if !GLES
-				var buffers = new DrawBuffersEnum[_currentRenderTargetBindings.Length];
 				for (int i = 0; i < _currentRenderTargetBindings.Length; i++)
 				{
 					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 					GraphicsExtensions.CheckGLError();
 					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 					GraphicsExtensions.CheckGLError();
-					buffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 				}
 
-				GL.DrawBuffers(buffers.Length, buffers);
+				GL.DrawBuffers(_currentRenderTargetBindings.Length, _drawBuffers);
 				GraphicsExtensions.CheckGLError();
 #endif
 
