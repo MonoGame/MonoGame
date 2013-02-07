@@ -1,8 +1,8 @@
-### Welcome to the MonoGame Project
+# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop3d/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16px' height'24px'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop3d/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop3d/)
 
-[MonoGame](http://monogame.net) is a free implementation of the XNA 4.0 Framework. It can be used with all Mono compilers and with Visual Studio.
+[MonoGame](http://monogame.net) is an Open Source implementation of the Microsoft XNA 4.x Framework. Our goal is to allow XNA developers on Xbox 360, Windows & Windows Phone 7 to port their games to the iOS, Android, Mac OS X, Linux and Windows 8 Metro. OUYA, Windows Phone 8, PlayStation Mobile and Raspberry PI are currently in development.
 
-Our goal is to allow XNA developers on Windows, Xbox 360 & Windows Phone 7 to port their games to other platforms with minimal hassle, and to provide a great managed framework for new developers on the supported platforms.  Platforms supported by MonoGame include
+## Supported Platforms
 
 * iOS (including Retina displays)
 * Android
@@ -14,9 +14,36 @@ Our goal is to allow XNA developers on Windows, Xbox 360 & Windows Phone 7 to po
 * PlayStation Mobile (currently 2D only)
 * [OUYA](http://ouya.tv), an Android-based gaming console
 
-For further information, visit the [MonoGame](http://monogame.net) website.
+## Quick Start
 
-### Current RoadMap
+There are a few pre-requisites that you should be aware of for the various platforms. Please check them over [MonoGame](http://monogame.net/downloads) website.
+
+There are three quick start options available:
+* Download the latest stable release over [our website](http://monogame.net/downloads).
+* Download the latest [source code](https://github.com/mono/MonoGame/archive/develop3d.zip).
+* Clone the repo: `https://github.com/mono/MonoGame.git`.
+
+## Bug Tracker
+
+Have a bug or a feature request? [Please open a new issue](https://github.com/mono/MonoGame/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines).
+
+## Community
+
+Keep track of development and community news.
+
+* Follow [@MonoGameTeam on Twitter](https://twitter.com/monogameteam).
+* Have a question that's not a feature request or bug report? [Ask on our discussions list.](http://monogame.codeplex.com/discussions)
+* Join us over IRC - [irc://irc.gnome.org/#monogame](http://mibbit.com/?server=irc.gnome.org&channel=%23monogame). 
+
+## Contributing
+
+Please read our [contributers](https://github.com/mono/MonoGame/wiki/Contributing-to-MonoGame) guide.
+
+## License
+
+MonoGame is released under [Microsoft Public License (Ms-PL)](https://github.com/mono/MonoGame/blob/develop3d/LICENSE.txt).
+
+## Current Roadmap
 
 * The MonoGame 2.x series is now in maintenance mode.
 * MonoGame 3.0 will mark the start of full support for the entire XNA API.
