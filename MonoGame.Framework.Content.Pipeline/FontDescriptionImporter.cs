@@ -4,11 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using System.Xml;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
