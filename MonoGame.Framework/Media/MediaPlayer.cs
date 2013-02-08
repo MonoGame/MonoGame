@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Media
 		
         public static void Pause()
         {
-            if (State == MediaState.Stopped)
+            if (State != MediaState.Playing || _queue.ActiveSong == null)
                 return;
 
 #if WINDOWS_MEDIA_ENGINE
