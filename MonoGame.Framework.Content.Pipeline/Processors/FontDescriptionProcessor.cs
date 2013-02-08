@@ -18,27 +18,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             ContentProcessorContext context)
         {
             var output = new SpriteFontContent(input);
-
             var font = new Font(input.FontName, input.Size);
 
             // Make sure that this font is installed on the system.
             // Creating a font object with a font that's not contained will default to MS Sans Serif:
             // http://msdn.microsoft.com/en-us/library/zet4c3fa.aspx
             if (font.FontFamily.Name == "Microsoft Sans Serif" && input.FontName != "Microsoft Sans Serif")
-                throw new Exception(string.Format("Font {0} is not installed on this computer.", input.FontName));
+                throw new PipelineException(string.Format("Font {0} is not installed on this computer.", input.FontName));
 
             var estimatedSurfaceArea = 0;
             var largestHeight = 0;
             var widthsAndHeights = new List<Point>();
-            // Calculate the bounds of each rect
-            var bmp = new Bitmap((int)(font.Size * 1.5), (int)(font.Size * 1.5));
-
+            
+            // Estimate the bounds of each rect to calculate the
+            // final texture size
+            var sf = StringFormat.GenericTypographic;
+            sf.Trimming = StringTrimming.None;
+            sf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+            
+            using (var bmp = new Bitmap((int)(font.Size), (int)(font.Size)))
             using (var temp = System.Drawing.Graphics.FromImage(bmp))
             {
                 // Calculate and save the size of each character
                 foreach (var ch in input.Characters)
                 {
-                    var charSize = temp.MeasureString(ch.ToString(), font);
+                    var charSize = temp.MeasureString(ch.ToString(), font, new PointF(0, 0), sf);
                     var width = (int)charSize.Width;
                     var height = (int)charSize.Height;
 
@@ -53,6 +57,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 estimatedSurfaceArea *= largestHeight;
             }
 
+            output.VerticalLineSpacing = largestHeight;
+
             // calculate the best height and width for our output texture.
             // TODO: GetMonoGamePlatform()
             var texBounds = calculateOutputTextureBounds(estimatedSurfaceArea, true);
@@ -61,29 +67,73 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var outputBitmap = new Bitmap(texBounds.X, texBounds.Y);
             using (var g = System.Drawing.Graphics.FromImage(outputBitmap))
             {
-                g.FillRectangle(Brushes.Magenta, new System.Drawing.Rectangle(0, 0, outputBitmap.Width, outputBitmap.Height));
+                g.FillRectangle(Brushes.Transparent, new System.Drawing.Rectangle(0, 0, outputBitmap.Width, outputBitmap.Height));
 
                 int x = 0;
                 int y = 0;
                 // Draw each glyph into the image.
-
                 for (int i = 0; i < input.Characters.Count; i++)
                 {
-                    var glyphWidth = widthsAndHeights[i].X;
-                    
-                    if (x + glyphWidth >= texBounds.X)
+                    var kernData = FontHelper.GetCharWidthABC(input.Characters[i], font, g);
+                    int charWidth = (int)(Math.Abs(kernData.abcA) + kernData.abcB + kernData.abcC);
+
+                    if (!input.UseKerning)
+                        charWidth = (int)kernData.abcB;
+
+                    if (x + charWidth >= texBounds.X)
                     {
                         x = 0;
                         y += largestHeight;
                     }
 
-                    output.Glyphs.Add(new Microsoft.Xna.Framework.Rectangle(x, y, widthsAndHeights[i].X, widthsAndHeights[i].Y));
-                    g.DrawString(input.Characters[i].ToString(), font, Brushes.White, new PointF(x, y));
+                    Rectangle rect = new Microsoft.Xna.Framework.Rectangle(x, y, charWidth, widthsAndHeights[i].Y);
+                    output.Glyphs.Add(rect);
 
-                    x += glyphWidth;
+                    // Characters with a negative a kerning value (like j) need to be adjusted,
+                    // so (in the case of j) the bottom curve doesn't render outside our source
+                    // rect.
+                    var renderPoint = new PointF(x, y);
+                    if (kernData.abcA < 0)
+                        renderPoint.X += Math.Abs(kernData.abcA);
+
+                    g.DrawString(input.Characters[i].ToString(), font, Brushes.White, renderPoint, sf);
+                    output.Cropping.Add(new Rectangle(0, 0, charWidth, output.Glyphs[i].Height));
+
+                    if (!input.UseKerning)
+                    {
+                        kernData.abcA = 0;
+                        kernData.abcC = 0;
+
+                    }
+                    output.Kerning.Add(new Vector3(kernData.abcA, kernData.abcB, kernData.abcC));
+
+                    // Add a 2 pixel spacing between characters
+                    x += charWidth + 2;
                 }
 
-                //outputBitmap.Save(@"C:\Projects\AdRotator\AdRotatorSharedModel\Model\Test.bmp", System.Drawing.Imaging.ImageFormat.Png);
+                // Drawing against a transparent black background blends
+                // the 'alpha' pixels against black, leaving a black outline.
+                // Interpolate between black and white
+                // based on it's intensity to covert this 'outline' to
+                // it's grayscale equivalent.
+                var transBlack = Color.TransparentBlack;
+                for (var i = 0; i < outputBitmap.Width; i++)
+                {
+                    //continue;
+                    for (var j = 0; j < outputBitmap.Height; j++)
+                    {
+                        var px = outputBitmap.GetPixel(i, j);
+
+                        if (px.ColorsEqual(transBlack))
+                            continue;
+
+                        var val = (px.R + px.B + px.G) / (255.0f * 3.0f);
+                        var col = Color.Lerp(Color.Transparent, Color.White, val);
+                        px = System.Drawing.Color.FromArgb(col.A, col.R, col.G, col.B);
+                        outputBitmap.SetPixel(i, j, px);
+                    }
+
+                }
 
                 var bitmapContent = new PixelBitmapContent<Color>(texBounds.X, texBounds.Y);
                 bitmapContent.SetPixelData(outputBitmap.GetData());

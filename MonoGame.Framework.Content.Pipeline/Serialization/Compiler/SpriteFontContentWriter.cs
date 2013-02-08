@@ -16,13 +16,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, SpriteFontContent value)
         {
+            // TODO:Temporary workaround. if we don't call GetTypeWriter() on the ContentWriter
+            // for generic types, they won't be saved to the XNB.
+            output.GetTypeWriter(typeof(Rectangle));
+            output.GetTypeWriter(typeof(char));
+            output.GetTypeWriter(typeof(Vector3));
+
             output.WriteObject(value.Texture);
             output.WriteObject(value.Glyphs);
-            output.WriteObject(new List<Rectangle>()); // Placeholder for cropping
+            output.WriteObject(value.Cropping);
             output.WriteObject(value.CharacterMap);
             output.Write(value.VerticalLineSpacing);
             output.Write(value.HorizontalSpacing);
-            output.WriteObject(new List<Vector3>()); //Placeholder for kerning.
+            output.WriteObject(value.Kerning);
             var hasDefChar = value.DefaultCharacter.HasValue;
             output.Write(hasDefChar);
             if (hasDefChar)
