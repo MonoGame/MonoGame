@@ -239,11 +239,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
-        readonly List<string> _extensions = new List<string>();
 
 #if OPENGL
         internal int glFramebuffer;
         internal int MaxVertexAttributes;        
+        internal readonly List<string> _extensions = new List<string>();
+        internal int _maxTextureSize = 0;
 #endif
         
         internal int MaxTextureSlots;
@@ -324,19 +325,29 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport.MaxDepth = 1.0f;
 
             MaxTextureSlots = 16;
+#if OPENGL
 #if GLES
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
+            GraphicsExtensions.CheckGLError();
+
+            GL.GetInteger(All.MaxTextureSize, ref _maxTextureSize);
+            GraphicsExtensions.CheckGLError();
 #elif OPENGL
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
             GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();            
+            GraphicsExtensions.CheckGLError();
+            
+            GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
+            GraphicsExtensions.CheckGLError();
 #endif
+            _extensions = GetGLExtensions();
+#endif // OPENGL
+
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
@@ -349,25 +360,26 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        internal void Initialize()
+#if OPENGL
+        List<string> GetGLExtensions()
         {
             // Setup extensions.
-#if OPENGL
+            List<string> extensions = new List<string>();
 #if GLES
             var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
 #else
-            var extstring = GL.GetString(StringName.Extensions);	
+            var extstring = GL.GetString(StringName.Extensions);
 #endif
             GraphicsExtensions.CheckGLError();
             if (!string.IsNullOrEmpty(extstring))
             {
-                _extensions.AddRange(extstring.Split(' '));
+                extensions.AddRange(extstring.Split(' '));
 #if ANDROID
                 Android.Util.Log.Debug("MonoGame", "Supported extensions:");
 #else
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
 #endif
-                foreach (string extension in _extensions)
+                foreach (string extension in extensions)
 #if ANDROID
                     Android.Util.Log.Debug("MonoGame", extension);
 #else
@@ -375,7 +387,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             }
 
+            return extensions;
+        }
 #endif // OPENGL
+
+        internal void Initialize()
+        {
+            GraphicsCapabilities.Initialize(this);
 
 #if DIRECTX
 

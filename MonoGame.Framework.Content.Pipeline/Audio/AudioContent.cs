@@ -5,9 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using NAudio.Wave;
 using System.IO;
-using System.Diagnostics;
+using NAudio.Wave;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -130,16 +129,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <param name="waveFormat">The WaveFormat to use for the conversion.</param>
         void ConvertWav(WaveFormat waveFormat)
         {
-            /*
-            reader.Position = 0;
-            using (var wavStream = new WaveFormatConversionStream(waveFormat, reader))
-            {
-                byte[] bytes = new byte[wavStream.Length];
-                wavStream.Read(bytes, 0, bytes.Length);
-                data = new List<byte>(bytes);
-                format = new AudioFormat(waveFormat);
-            }
-             */
             reader.Position = 0;
 #if WINDOWS
             //var mediaTypes = MediaFoundationEncoder.GetOutputMediaTypes(NAudio.MediaFoundation.AudioSubtypes.MFAudioFormat_PCM);
@@ -162,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 }
             }
 #else
-			throw new NotImplementedException();
+            throw new NotImplementedException();
 #endif
         }
 
@@ -209,7 +198,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     MediaFoundationEncoder.EncodeToAac(reader, targetFileName, QualityToBitRate(quality));
                     break;
 #else
-					throw new NotImplementedException();
+                    throw new NotImplementedException();
 #endif
 
                 case ConversionFormat.Vorbis:
@@ -259,7 +248,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             var read = reader.Read(bytes, 0, bytes.Length);
             data = new List<byte>(bytes);
 #else
-			throw new NotImplementedException();
+            throw new NotImplementedException();
 #endif
         }
     }

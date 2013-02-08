@@ -126,6 +126,7 @@
     <Compile Include="GamePlatform.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GameTimerEventArgs.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
@@ -396,7 +397,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
-    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Utilities\Hash.cs" />

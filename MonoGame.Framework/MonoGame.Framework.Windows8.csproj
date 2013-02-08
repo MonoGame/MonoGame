@@ -217,6 +217,7 @@
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\ImageEx.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
@@ -348,7 +349,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
-    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Utilities\Hash.cs" />
