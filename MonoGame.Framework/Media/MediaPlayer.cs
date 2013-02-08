@@ -103,7 +103,6 @@ namespace Microsoft.Xna.Framework.Media
         static MediaPlayer()
         {
 #if WINDOWS_MEDIA_ENGINE
-
             MediaManager.Startup(true);
             using (var factory = new MediaEngineClassFactory())
             using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
@@ -113,16 +112,13 @@ namespace Microsoft.Xna.Framework.Media
             }
 
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-
 #elif WINDOWS_MEDIA_SESSION
-
             MediaManager.Startup(true);
             MediaFactory.CreateMediaSession(null, out _session);
 #endif
         }
 
 #if WINDOWS_MEDIA_ENGINE
-        
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
             if (mediaEvent == MediaEngineEvent.Ended)
@@ -139,7 +135,7 @@ namespace Microsoft.Xna.Framework.Media
             get { return _isMuted; }
             set
             {
-				_isMuted = value;
+                _isMuted = value;
 
 #if WINDOWS_MEDIA_ENGINE
                 _mediaEngineEx.Muted = value;
@@ -150,9 +146,9 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaElement.IsMuted = value;
 #else
                 if (_queue.Count == 0)
-					return;
+                    return;
 				
-				var newVolume = value ? 0.0f : _volume;
+                var newVolume = value ? 0.0f : _volume;
                 _queue.SetVolume(newVolume);
 #endif
             }
@@ -190,11 +186,11 @@ namespace Microsoft.Xna.Framework.Media
             get
             {		
 #if WINDOWS_MEDIA_ENGINE
-                    return TimeSpan.FromSeconds(_mediaEngineEx.CurrentTime);
+                return TimeSpan.FromSeconds(_mediaEngineEx.CurrentTime);
 #elif WINDOWS_MEDIA_SESSION
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
 #elif WINDOWS_PHONE
-                    return _mediaElement.Position;
+                return _mediaElement.Position;
 #else
 				if (_queue.ActiveSong == null)
 					return TimeSpan.Zero;
@@ -260,9 +256,9 @@ namespace Microsoft.Xna.Framework.Media
         public static float Volume
         {
             get { return _volume; }
-			set 
-			{       
-				_volume = value;
+			      set 
+            {       
+                _volume = value;
 
 #if WINDOWS_MEDIA_ENGINE
                 _mediaEngineEx.Volume = value;       
@@ -273,7 +269,7 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaElement.Volume = value;
 #else
                 if (_queue.ActiveSong == null)
-					return;
+                    return;
 
                 _queue.SetVolume(_isMuted ? 0.0f : value);
 #endif
@@ -318,25 +314,24 @@ namespace Microsoft.Xna.Framework.Media
 		
 		public static void Play(SongCollection collection, int index = 0)
 		{
-            _queue.Clear();
-            _numSongsInQueuePlayed = 0;
+        _queue.Clear();
+        _numSongsInQueuePlayed = 0;
 
-			foreach(var song in collection)
-				_queue.Add(song);
+        foreach(var song in collection)
+            _queue.Add(song);
 			
-			_queue.ActiveSongIndex = index;
+         _queue.ActiveSongIndex = index;
 			
-			PlaySong(_queue.ActiveSong);
+        PlaySong(_queue.ActiveSong);
 		}
 
 		private static void PlaySong(Song song)
         {
 #if WINDOWS_MEDIA_ENGINE
-            _mediaEngineEx.Source = song.FilePath;            
+            _mediaEngineEx.Source = converted;            
             _mediaEngineEx.Load();
             _mediaEngineEx.Play();
 #elif WINDOWS_MEDIA_SESSION
-
             // Cleanup the last song first.
             if (State != MediaState.Stopped)
             {
@@ -373,11 +368,11 @@ namespace Microsoft.Xna.Framework.Media
             });
 #else
             song.SetEventHandler(OnSongFinishedPlaying);			
-			song.Volume = _isMuted ? 0.0f : _volume;
-			song.Play();
+            song.Volume = _isMuted ? 0.0f : _volume;
+            song.Play();
 #endif
             State = MediaState.Playing;
-        }
+		}
 		
 #if WINDOWS_PHONE
         internal static void OnSongFinishedPlaying(object sender, RoutedEventArgs args)
