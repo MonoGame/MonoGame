@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected override void Initialize(ContentCompiler compiler)
         {
             base.Initialize(compiler);
-
+            
             elementWriter = compiler.GetTypeWriter(typeof(T));
         }
 
@@ -37,7 +37,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 throw new ArgumentNullException("value");
             output.Write(value.Count);
             foreach (var element in value)
+            {
                 output.WriteObject(element, elementWriter);
+            }
+        }
+
+        /// <summary>
+        /// Gets the assembly qualified name of the runtime loader for this type.
+        /// </summary>
+        /// <param name="targetPlatform">Name of the platform.</param>
+        /// <returns>Name of the runtime loader.</returns>
+        public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        {
+            // Change "Writer" in this class name to "Reader" and use the runtime type namespace and assembly
+            string readerClassName = string.Format("{0}[[{1}]]",  this.GetType().Name.Replace("Writer", "Reader"), typeof(T).AssemblyQualifiedName);
+            string readerNamespace = typeof(ContentTypeReader).Namespace;
+            string assemblyName = typeof(ContentTypeReader).Assembly.FullName;
+            return readerNamespace + "." + readerClassName + ", " + assemblyName;
         }
     }
 }
