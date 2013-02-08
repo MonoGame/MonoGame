@@ -159,7 +159,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Pause ()
 		{
-			if (hasSourceId) {
+			if (hasSourceId && soundState == SoundState.Playing)
+            {
 				controller.PauseSound (soundBuffer);
 				soundState = SoundState.Paused;
 			}
@@ -191,15 +192,15 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public virtual void Play ()
 		{
-			int bufferId = soundBuffer.OpenALDataBuffer;
 			if (hasSourceId) {
 				return;
 			}
 			bool isSourceAvailable = controller.ReserveSource (soundBuffer);
-			if (!isSourceAvailable)
-				return;
+            if (!isSourceAvailable)
+                throw new InstancePlayLimitException();
 
-			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
+            int bufferId = soundBuffer.OpenALDataBuffer;
+            AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 			ApplyState ();
 
 			controller.PlaySound (soundBuffer);            
@@ -209,7 +210,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Resume ()
 		{
-			Play ();
+            if (hasSourceId)
+            {
+                if (soundState == SoundState.Paused)
+                {
+                    controller.ResumeSound(soundBuffer);
+                    soundState = SoundState.Playing;
+                }
+            }
+            else
+            {
+                Play();
+            }
 		}
 
 		public void Stop ()
