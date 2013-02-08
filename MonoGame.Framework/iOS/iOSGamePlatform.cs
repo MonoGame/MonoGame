@@ -73,6 +73,8 @@ using System.IO;
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+using MonoTouch.CoreAnimation;
+using MonoTouch.ObjCRuntime;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -88,8 +90,7 @@ namespace Microsoft.Xna.Framework
         private UIWindow _mainWindow;
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
-        private NSTimer _runTimer;
-        private bool _isExitPending;
+        private CADisplayLink _displayLink;
 
         public iOSGamePlatform(Game game) :
             base(game)
@@ -122,6 +123,23 @@ namespace Microsoft.Xna.Framework
 
             Guide.Initialise(game);
         }
+
+        public override void TargetElapsedTimeChanged ()
+        {
+            CreateDisplayLink();
+        }
+
+        private void CreateDisplayLink()
+        {
+            if (_displayLink != null)
+                _displayLink.RemoveFromRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+
+            _displayLink = UIScreen.MainScreen.CreateDisplayLink(_viewController.View as iOSGameView, new Selector("doTick"));
+            _displayLink.FrameInterval = (int)Math.Round(Game.TargetElapsedTime.TotalSeconds / (1.0f / 60.0f));
+
+            _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+        }
+
 
         public override GameRunBehavior DefaultRunBehavior
         {
@@ -181,10 +199,10 @@ namespace Microsoft.Xna.Framework
             BeginObservingUIApplication();
 
             _viewController.View.BecomeFirstResponder();
-            _runTimer = NSTimer.CreateRepeatingScheduledTimer(Game.TargetElapsedTime, Tick);
+            CreateDisplayLink();
         }
 
-        private void Tick()
+        public void Tick()
         {
             if (!Game.IsActive)
                 return;
