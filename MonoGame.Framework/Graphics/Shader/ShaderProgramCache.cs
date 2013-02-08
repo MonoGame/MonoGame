@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         ~ShaderProgramCache()
         {
-            Dispose(true);
+            Dispose(false);
         }
 
         /// <summary>

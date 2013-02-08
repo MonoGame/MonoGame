@@ -24,10 +24,10 @@ namespace Microsoft.Xna.Framework.Audio
 		int[] allSourcesArray;
 		const int MAX_NUMBER_OF_SOURCES = 32;
 		const double PREFERRED_MIX_RATE = 44100;
-		HashSet<int> availableSourcesCollection;
-		HashSet<OALSoundBuffer> inUseSourcesCollection;
-		HashSet<OALSoundBuffer> playingSourcesCollection;
-        HashSet<OALSoundBuffer> purgeMe;
+		List<int> availableSourcesCollection;
+		List<OALSoundBuffer> inUseSourcesCollection;
+		List<OALSoundBuffer> playingSourcesCollection;
+        List<OALSoundBuffer> purgeMe;
 
 		private OpenALSoundController ()
 		{
@@ -52,10 +52,10 @@ namespace Microsoft.Xna.Framework.Audio
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources (allSourcesArray);
 
-			availableSourcesCollection = new HashSet<int> ();
-			inUseSourcesCollection = new HashSet<OALSoundBuffer> ();
-			playingSourcesCollection = new HashSet<OALSoundBuffer> ();
-            purgeMe = new HashSet<OALSoundBuffer> ();
+			availableSourcesCollection = new List<int> ();
+			inUseSourcesCollection = new List<OALSoundBuffer> ();
+			playingSourcesCollection = new List<OALSoundBuffer> ();
+            purgeMe = new List<OALSoundBuffer> ();
 
 
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
@@ -133,24 +133,33 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		public void PlaySound (OALSoundBuffer soundBuffer)
-		{
-			playingSourcesCollection.Add (soundBuffer);
+        {
+            lock (playingSourcesCollection) {
+                playingSourcesCollection.Add (soundBuffer);
+            }
 			AL.SourcePlay (soundBuffer.SourceId);
 		}
 
 		public void StopSound (OALSoundBuffer soundBuffer)
-		{
-			AL.SourceStop (soundBuffer.SourceId);
+        {
+            AL.SourceStop (soundBuffer.SourceId);
 
-			AL.Source (soundBuffer.SourceId,ALSourcei.Buffer, 0);
-			playingSourcesCollection.Remove (soundBuffer);
-			RecycleSource (soundBuffer);
+            AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
+            lock (playingSourcesCollection) {
+                playingSourcesCollection.Remove (soundBuffer);
+            }
+            RecycleSource (soundBuffer);
 		}
 
 		public void PauseSound (OALSoundBuffer soundBuffer)
 		{
 			AL.SourcePause (soundBuffer.SourceId);
 		}
+
+        public void ResumeSound(OALSoundBuffer soundBuffer)
+        {
+            AL.SourcePlay(soundBuffer.SourceId);
+        }
 
 		public bool IsState (OALSoundBuffer soundBuffer, int state)
 		{
@@ -173,29 +182,26 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		public void Update ()
-		{
-            purgeMe.Clear();
+        {
+            purgeMe.Clear ();
 
-			ALSourceState state;
-			foreach (var soundBuffer in playingSourcesCollection) {
+            ALSourceState state;
+            lock (playingSourcesCollection) {
+                for (int i=playingSourcesCollection.Count-1; i >= 0; i--) {
+                    var soundBuffer = playingSourcesCollection [i];
+                    state = AL.GetSourceState (soundBuffer.SourceId);
+                    if (state == ALSourceState.Stopped) {
+                        purgeMe.Add (soundBuffer);
+                        playingSourcesCollection.RemoveAt (i);
+                    }
+                }
+            }
+            foreach (var soundBuffer in purgeMe) {
+                AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
+                RecycleSource (soundBuffer);
+            }
 
-				state = AL.GetSourceState (soundBuffer.SourceId);
-
-				if (state == ALSourceState.Stopped) {
-
-					AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
-					purgeMe.Add (soundBuffer);
-					//Console.WriteLine ("to be recycled: " + soundBuffer.SourceId);
-				}
-
-			}
-
-			foreach (var soundBuffer in purgeMe) {
-
-				playingSourcesCollection.Remove (soundBuffer);
-				RecycleSource (soundBuffer);
-			}
-		}
+        }
 
 #if MACOSX || IOS
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";

@@ -90,6 +90,7 @@
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerServicesComponent.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />

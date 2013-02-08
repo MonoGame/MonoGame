@@ -123,6 +123,7 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Viewport.cs" />
@@ -271,7 +272,7 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
-    <Compile Include="PSSuite\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />

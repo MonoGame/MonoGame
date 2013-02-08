@@ -14,6 +14,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 {
     public class PipelineBuildEvent
     {
+        public static readonly string Extension = ".mgcontent";
+
         public PipelineBuildEvent()
         {
             SourceFile = string.Empty;

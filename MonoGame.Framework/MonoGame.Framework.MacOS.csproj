@@ -160,6 +160,7 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
@@ -331,7 +332,7 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
-    <Compile Include="MacOS\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="MacOS\GamerServices\SigninController.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
