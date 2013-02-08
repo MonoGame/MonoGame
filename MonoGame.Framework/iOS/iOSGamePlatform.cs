@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework
             CreateDisplayLink();
         }
 
-        public void Tick()
+        internal void Tick()
         {
             if (!Game.IsActive)
                 return;
