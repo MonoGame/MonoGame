@@ -119,7 +119,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var transBlack = Color.TransparentBlack;
                 for (var i = 0; i < outputBitmap.Width; i++)
                 {
-                    //continue;
                     for (var j = 0; j < outputBitmap.Height; j++)
                     {
                         var px = outputBitmap.GetPixel(i, j);
@@ -132,7 +131,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         px = System.Drawing.Color.FromArgb(col.A, col.R, col.G, col.B);
                         outputBitmap.SetPixel(i, j, px);
                     }
-
                 }
 
                 var bitmapContent = new PixelBitmapContent<Color>(texBounds.X, texBounds.Y);
