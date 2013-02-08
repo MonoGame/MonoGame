@@ -62,7 +62,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 var End = (int)region.Element("End").Value[0];
 
                 for (var x = Start; x <= End; x++)
-                    characters.Add((char)x);
+                {
+                    var character = (char)x;
+                    if (characters.Contains(character))
+                        continue;
+
+                    characters.Add(character);
+                }
             }
 
             return new FontDescription(fontName, fontSize, spacing, style, useKerning, characters);
