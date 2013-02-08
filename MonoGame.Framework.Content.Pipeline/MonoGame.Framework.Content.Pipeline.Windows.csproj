@@ -212,13 +212,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Tools\PVRTexLibC\bin\Windows\x64\PVRTexLibC.dll">
+    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x64\PVRTexLibC.dll">
       <Link>Dependencies\x64\PVRTexLibC.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Tools\PVRTexLibC\bin\Windows\x86\PVRTexLibC.dll">
+    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x86\PVRTexLibC.dll">
       <Link>Dependencies\x86\PVRTexLibC.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
