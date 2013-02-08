@@ -73,12 +73,15 @@ using System.IO;
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+using MonoTouch.CoreAnimation;
+using MonoTouch.ObjCRuntime;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -88,8 +91,7 @@ namespace Microsoft.Xna.Framework
         private UIWindow _mainWindow;
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
-        private NSTimer _runTimer;
-        private bool _isExitPending;
+        private CADisplayLink _displayLink;
 
         public iOSGamePlatform(Game game) :
             base(game)
@@ -173,6 +175,22 @@ namespace Microsoft.Xna.Framework
             throw new NotSupportedException("The iOS platform does not support synchronous run loops");
         }
 
+        public override void TargetElapsedTimeChanged()
+        {
+            CreateDisplayLink();
+        }
+
+        private void CreateDisplayLink()
+        {
+            if (_displayLink != null)
+                _displayLink.RemoveFromRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+
+            _displayLink = UIScreen.MainScreen.CreateDisplayLink(_viewController.View as iOSGameView, new Selector("doTick"));
+            _displayLink.FrameInterval = (int)Math.Round(Game.TargetElapsedTime.TotalSeconds / (1.0f / 60.0f));
+            
+            _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
+        }
+
         public override void StartRunLoop()
         {
             // Show the window
@@ -181,10 +199,13 @@ namespace Microsoft.Xna.Framework
             BeginObservingUIApplication();
 
             _viewController.View.BecomeFirstResponder();
-            _runTimer = NSTimer.CreateRepeatingScheduledTimer(Game.TargetElapsedTime, Tick);
+            CreateDisplayLink();
         }
 
-        private void Tick()
+
+        double _bank = 0.0;
+        System.Diagnostics.Stopwatch _sw = new System.Diagnostics.Stopwatch();
+        public void Tick()
         {
             if (!Game.IsActive)
                 return;
@@ -192,16 +213,35 @@ namespace Microsoft.Xna.Framework
             if (IsPlayingVideo)
                 return;
 
+            // There's no way to disable vSync on iOS, so avoid missing it.
+            // Skip rendering the frame if it doesn't line up with the vertical sync.
+            // Technique discussed here: http://www.ananseproductions.com/game-loops-on-ios
+            var curTime = CAAnimation.CurrentMediaTime();
+            var timeToNext = Game.TargetElapsedTime.TotalSeconds - (curTime - _displayLink.Timestamp);
+
+            var dropFrame = _bank > timeToNext;
+            if (dropFrame)
+                Game.SuppressDraw();
+
+            _bank = 0.0;
+
+            _sw.Restart();
+
             // FIXME: Remove this call, and the whole Tick method, once
             //        GraphicsDevice is where platform-specific Present
             //        functionality is actually implemented.  At that
             //        point, it should be possible to pass Game.Tick
             //        directly to NSTimer.CreateRepeatingTimer.
             _viewController.View.MakeCurrent();
+
             Game.Tick ();
 
-            if (!IsPlayingVideo)
+            if (!dropFrame && !IsPlayingVideo)
                 _viewController.View.Present ();
+
+            _sw.Stop();
+
+            _bank += _sw.Elapsed.TotalSeconds - timeToNext;
         }
 
         public override bool BeforeDraw(GameTime gameTime)
