@@ -171,6 +171,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play ()
         {
+            // If an effect is already playing, we shouldn't start it all over again
+            if (State == SoundState.Playing)
+                return;
 #if DIRECTX
             if (_voice != null)
             {
