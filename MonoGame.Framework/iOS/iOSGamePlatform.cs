@@ -135,7 +135,11 @@ namespace Microsoft.Xna.Framework
                 _displayLink.RemoveFromRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
 
             _displayLink = UIScreen.MainScreen.CreateDisplayLink(_viewController.View as iOSGameView, new Selector("doTick"));
-            _displayLink.FrameInterval = (int)Math.Round(Game.TargetElapsedTime.TotalSeconds / (1.0f / 60.0f));
+
+            // FrameInterval represents how many frames must pass before the selector
+            // is called again. We calculate this by dividing our target elapsed time by
+            // the duration of a frame on iOS (Which is 1/60.0f at the time of writing this).
+            _displayLink.FrameInterval = (int)Math.Round(60f * Game.TargetElapsedTime.TotalSeconds);
 
             _displayLink.AddToRunLoop(NSRunLoop.Main, NSRunLoop.NSDefaultRunLoopMode);
         }
