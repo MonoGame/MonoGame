@@ -69,7 +69,7 @@
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
     <Compile Include="Android\ScreenReciever.cs" />
-    <Compile Include="Android\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentExtensions.cs" />

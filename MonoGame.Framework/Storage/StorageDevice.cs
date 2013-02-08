@@ -92,9 +92,10 @@ namespace Microsoft.Xna.Framework.Storage
 	// it will call asynchronously.
 	public delegate StorageContainer OpenContainerAsynchronous (string displayName);
 	
-	// Summary:
-	//     Represents a storage device for user data, such as a memory unit or hard
-	//     drive. Reference page contains links to related conceptual articles.
+    /// <summary>
+    /// Exposes a storage device for storing user data.
+    /// </summary>
+    /// <remarks>MSDN documentation contains related conceptual article: http://msdn.microsoft.com/en-us/library/bb200105.aspx</remarks>
 	public sealed class StorageDevice
 	{
 		
@@ -103,6 +104,12 @@ namespace Microsoft.Xna.Framework.Storage
 		int directoryCount;
 		StorageContainer storageContainer;
 		
+        /// <summary>
+        /// Creates a new <see cref="StorageDevice"/> instance.
+        /// </summary>
+        /// <param name="player">The playerIndex of the player.</param>
+        /// <param name="sizeInBytes">Size of the storage device.</param>
+        /// <param name="directoryCount"></param>
 		internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount) 
 		{
 			this.player = player;
@@ -110,8 +117,9 @@ namespace Microsoft.Xna.Framework.Storage
 			this.directoryCount = directoryCount;
 		}
 		
-		// Summary:
-		//     Gets the amount of free space on the device.
+        /// <summary>
+        /// Returns the amount of free space.
+        /// </summary>
 		public long FreeSpace { 
 			get { 
 				// I do not know if the DriveInfo is is implemented on Mac or not
@@ -129,9 +137,10 @@ namespace Microsoft.Xna.Framework.Storage
 				}
 			} 
 		}
-		//
-		// Summary:
-		//     Gets whether the device is connected.
+
+        /// <summary>
+        /// Returns true if device is connected, false otherwise.
+        /// </summary>
 		public bool IsConnected { 
 			get { 
 				// I do not know if the DriveInfo is is implemented on Mac or not
@@ -148,9 +157,10 @@ namespace Microsoft.Xna.Framework.Storage
 				}
 			} 
 		}
-		//
-		// Summary:
-		//     Gets the total amount of space on the device.
+
+        /// <summary>
+        /// Returns the total size of device.
+        /// </summary>
 		public long TotalSpace { 
 			get { 
 				
@@ -186,12 +196,12 @@ namespace Microsoft.Xna.Framework.Storage
 				}				
 			}
 		}
-		// Summary:
-		//     Occurs when a device is removed or inserted.
-		//
-		// Parameters:
-		//   :
+
 		// TODO: Implement DeviceChanged when we having the graphical implementation
+
+        /// <summary>
+        /// Fired when a device is removed or inserted.
+        /// </summary>
 		public static event EventHandler<EventArgs> DeviceChanged;
 
 		// Summary:
