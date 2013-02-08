@@ -17,8 +17,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Style = desc.Style;
             FontSize = desc.Size;
             CharacterMap = desc.Characters;
-            VerticalLineSpacing = (int)desc.Spacing; // temp
-            HorizontalSpacing = desc.Spacing; // temp
+            VerticalLineSpacing = (int)desc.Spacing; // Will be replaced in the pipeline.
+            HorizontalSpacing = desc.Spacing;
 
             DefaultCharacter = desc.DefaultCharacter;
         }
