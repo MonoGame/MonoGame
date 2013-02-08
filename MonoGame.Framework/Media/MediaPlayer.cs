@@ -59,15 +59,15 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
 using SharpDX.Win32;
-#endif
-
-#if WINRT
-using Windows.UI.Core;
 #elif WINDOWS_PHONE
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+#endif
+
+#if WINRT
+using Windows.UI.Core;
 #endif
 
 using System.Linq;
@@ -363,8 +363,8 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaElement.Play();
                 
                 // Ensure only one subscribe
-                if (this.OnSongFinishedPlaying == null)
-                    _mediaElement.MediaEnded += OnSongFinishedPlaying;
+                _mediaElement.MediaEnded -= OnSongFinishedPlaying;
+                _mediaElement.MediaEnded += OnSongFinishedPlaying;
             });
 #else
             song.SetEventHandler(OnSongFinishedPlaying);			
