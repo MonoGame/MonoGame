@@ -1,6 +1,8 @@
 # [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop3d/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop3d/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop3d/)
 
-[MonoGame](http://monogame.net) is an Open Source implementation of the Microsoft XNA 4.x Framework. Our goal is to allow XNA developers on Xbox 360, Windows & Windows Phone 7 to port their games to the iOS, Android, Mac OS X, Linux and Windows 8 Metro. OUYA, Windows Phone 8, PlayStation Mobile and Raspberry PI are currently in development.
+[MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework. 
+
+Our goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
 ## Supported Platforms
 
@@ -11,7 +13,7 @@
 * Linux
 * [Windows Store Apps](http://dev.windows.com) (for Windows 8 and Windows RT)
 * [Windows Phone 8](http://dev.windowsphone.com)
-* PlayStation Mobile (currently 2D only)
+* [PlayStation Mobile](https://psm.playstation.net/portal/en/index.html) (currently 2D only)
 * [OUYA](http://ouya.tv), an Android-based gaming console
 
 ## Quick Start
@@ -47,5 +49,6 @@ MonoGame is released under [Microsoft Public License (Ms-PL)](https://github.com
 
 * The MonoGame 2.x series is now in maintenance mode.
 * MonoGame 3.0 will mark the start of full support for the entire XNA API.
-* The Content Build Pipeline is currently under development. This will allow compiling of assets to optimized formats for the MonoGame supported platforms in Visual Studio or MonoDevelop without requiring XNA Game Studio 4.0 installed.
-* Add more platforms. SuperGiant Games have a version working in Google Chrome Native Client which we will merge back into our tree.  Raspberry Pi has been shown to be working, but still needs some work.
+* The Content Pipeline is currently under development. This will allow compiling of assets to optimized formats for the MonoGame supported platforms in Visual Studio or MonoDevelop without requiring XNA Game Studio 4.0 installed.
+* SuperGiant Games have a version working in Google Chrome Native Client which we will merge back into our tree.
+* Raspberry Pi has been shown to be working, but still needs some work.
