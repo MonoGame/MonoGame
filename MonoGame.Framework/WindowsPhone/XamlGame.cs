@@ -144,14 +144,13 @@ namespace MonoGame.Framework.WindowsPhone
                     mediaElement = (MediaElement)child;
             }
             if (mediaElement == null)
-                throw new NullReferenceException("The media element could not be found!");
+                throw new NullReferenceException("The media element could not be found! Add it to the GamePage.");
+            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
             WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
             WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
             WindowsPhoneGameWindow.Page = page;
-
-            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             // Construct the game.
             var game = new T();
