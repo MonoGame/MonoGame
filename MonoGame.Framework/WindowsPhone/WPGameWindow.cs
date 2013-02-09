@@ -52,7 +52,7 @@ namespace MonoGame.Framework.WindowsPhone
 {
     public class WindowsPhoneGameWindow : GameWindow
     {
-        private PageOrientation _supportedOrientations;
+        private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
         private Game _game;
@@ -92,13 +92,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            PageOrientation supported;
-            if (orientations == DisplayOrientation.Default)
-                supported = FromOrientation(DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight);
-            else
-                supported = FromOrientation(orientations);
-
-            _supportedOrientations = supported;
+            _supportedOrientations = orientations == DisplayOrientation.Default ? DisplayOrientation.Portrait : orientations;
         }
 
         #endregion
@@ -198,28 +192,15 @@ namespace MonoGame.Framework.WindowsPhone
             return result;
         }
 
-        private static PageOrientation FromOrientation(DisplayOrientation orientation)
-        {
-            PageOrientation result = (PageOrientation)0;
-            if ((orientation & DisplayOrientation.LandscapeLeft) != 0)
-                result |= PageOrientation.LandscapeLeft;
-            if ((orientation & DisplayOrientation.LandscapeRight) != 0)
-                result |= PageOrientation.LandscapeRight;
-            if ((orientation & DisplayOrientation.Portrait) != 0)
-                result |= PageOrientation.PortraitUp;
-            if ((orientation & DisplayOrientation.PortraitDown) != 0)
-                result |= PageOrientation.Portrait;
-
-            return result;
-        }
-
         private void Page_OrientationChanged(object sender, OrientationChangedEventArgs e)
         {
-            if ((e.Orientation & _supportedOrientations) == 0)
+            DisplayOrientation orientation = ToOrientation(e.Orientation);
+            // Don't change our orientation if it isn't supported
+            if ((orientation & _supportedOrientations) == 0)
                 return;
 
             // Set the new orientation.
-            _orientation = ToOrientation(e.Orientation);
+            _orientation = orientation;
 
             // Call the user callback.
             OnOrientationChanged();
