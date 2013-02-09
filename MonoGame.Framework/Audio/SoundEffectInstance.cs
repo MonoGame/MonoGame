@@ -171,6 +171,8 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play ()
         {
+            if (State == SoundState.Playing)
+                return;
 #if DIRECTX
             if (_voice != null)
             {
