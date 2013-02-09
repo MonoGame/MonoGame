@@ -92,7 +92,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            _supportedOrientations = orientations == DisplayOrientation.Default ? DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight : orientations;
+            _supportedOrientations = orientations == DisplayOrientation.Default ? DisplayOrientation.Portrait : orientations;
         }
 
         #endregion
