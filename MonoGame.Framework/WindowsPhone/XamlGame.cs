@@ -1,12 +1,15 @@
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input.Touch;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using SharpDX;
 using SharpDX.Direct3D11;
+using Microsoft.Phone.Controls;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input.Touch;
+using Windows.Graphics.Display;
 using Windows.Phone.Input.Interop;
 using Windows.UI.Core;
-using System.Windows.Controls;
-using Windows.Graphics.Display;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace MonoGame.Framework.WindowsPhone
@@ -101,6 +104,7 @@ namespace MonoGame.Framework.WindowsPhone
                 if (deviceChanged)
                     _game.GraphicsDevice.UpdateDevice(device, context);
                 _game.GraphicsDevice.UpdateTarget(renderTargetView);
+                _game.GraphicsDevice.ResetRenderTargets();
                 _game.Tick();
 
                 _host.RequestAdditionalFrame();
@@ -121,16 +125,33 @@ namespace MonoGame.Framework.WindowsPhone
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
         /// <param name="mediaElement">The XAML media element to use for playing music and video.</param>
         /// <returns></returns>
-        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface, MediaElement mediaElement)
+        /// 
+        static public T Create(string launchParameters, PhoneApplicationPage page)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
-            if (drawingSurface == null)
-                throw new NullReferenceException("The drawing surface cannot be null!");
+            if (page == null)
+                throw new NullReferenceException("The page parameter cannot be null!");
+            if (!(page.Content is DrawingSurfaceBackgroundGrid))
+                throw new NullReferenceException("The drawing surface could not be found!");
+            DrawingSurfaceBackgroundGrid drawingSurface = (DrawingSurfaceBackgroundGrid)page.Content;
+
+            MediaElement mediaElement = null;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(page.Content); i++)
+            {
+                var child = VisualTreeHelper.GetChild(page.Content, i);
+                if (child.GetType() == typeof(MediaElement))
+                    mediaElement = (MediaElement)child;
+            }
+            if (mediaElement == null)
+                throw new NullReferenceException("The media element could not be found!");
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
             WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
             WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
+            WindowsPhoneGameWindow.Page = page;
+
+            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             // Construct the game.
             var game = new T();
@@ -140,8 +161,6 @@ namespace MonoGame.Framework.WindowsPhone
             // Hookup the handlers for updates and touch.
             drawingSurface.SetBackgroundContentProvider(new SurfaceUpdateHandler(game));
             drawingSurface.SetBackgroundManipulationHandler(new SurfaceTouchHandler());
-
-            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             // Return the constructed, but not initialized game.
             return game;
