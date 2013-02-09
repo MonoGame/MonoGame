@@ -661,8 +661,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return -1;
         }
 
-		public Dictionary<string, SamplerState> SamplerStates { get; private set; }
-        
         public d3dx_parameter[] Objects { get; private set; }
 
         public d3dx_parameter[] Parameters { get; private set; }

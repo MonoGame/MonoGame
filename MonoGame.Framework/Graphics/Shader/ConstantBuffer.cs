@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#endif
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
@@ -39,6 +41,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private int _program = -1;
         private int _location;
+
+        static ConstantBuffer _lastConstantBufferApplied = null;
 
         /// <summary>
         /// A hash value which can be used to compare constant buffers.
@@ -271,6 +275,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _dirty = true;
             }
 
+            // If the shader program is the same, the effect may still be different and have different values in the buffer
+            if (!Object.ReferenceEquals(this, _lastConstantBufferApplied))
+                _dirty = true;
+
             // If the buffer content hasn't changed then we're
             // done... use the previously set uniform state.
             if (!_dirty)
@@ -288,6 +296,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the dirty flag.
             _dirty = false;
+
+            _lastConstantBufferApplied = this;
 #endif
             
 #if PSM

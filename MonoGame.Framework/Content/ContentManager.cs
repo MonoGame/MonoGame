@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectoryFullPath, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
 
 #if ANDROID
@@ -300,17 +300,17 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException)
+            catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 	
 				if (string.IsNullOrEmpty(assetName))
 				{
-					throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
 				}
 
                 result = ReadRawAsset<T>(assetName, originalAssetName);
@@ -381,7 +381,7 @@ namespace Microsoft.Xna.Framework.Content
                 //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
                 throw new NotImplementedException();
             }
-#if !WINRT
+#if !DIRECTX
             else if ((typeof(T) == typeof(Song)))
             {
                 return new Song(assetName);
@@ -616,7 +616,7 @@ namespace Microsoft.Xna.Framework.Content
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 
@@ -664,11 +664,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             get
             {
-#if WINDOWS || LINUX || MACOS
-				return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RootDirectory);
-#else
-                return RootDirectory;
-#endif
+                return Path.Combine(TitleContainer.Location, RootDirectory);
             }
         }
 		

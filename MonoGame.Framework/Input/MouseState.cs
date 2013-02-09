@@ -41,6 +41,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Input
 {    
+    /// <summary>
+    /// Represents a mouse state with cursor position and button press information.
+    /// </summary>
 	public struct MouseState
 	{
 		int _x, _y;
@@ -49,6 +52,18 @@ namespace Microsoft.Xna.Framework.Input
 		ButtonState _rightButton;
 		ButtonState _middleButton;
 		
+        /// <summary>
+        /// Initializes a new instance of the MouseState.
+        /// </summary>
+        /// <param name="x">Horizontal position of the mouse.</param>
+        /// <param name="y">Vertical position of the mouse.</param>
+        /// <param name="scrollWheel">Mouse scroll wheel's value.</param>
+        /// <param name="leftButton">Left mouse button's state.</param>
+        /// <param name="middleButton">Middle mouse button's state.</param>
+        /// <param name="rightButton">Right mouse button's state.</param>
+        /// <param name="xButton1">XBUTTON1's state.</param>
+        /// <param name="xButton2">XBUTTON2's state.</param>
+        /// <remarks>Normally <see cref="Mouse.GetState"/> should be used to get mouse current state. The constructor is provided for simulating mouse input.</remarks>
 		public MouseState (
 			int x,
 			int y,
@@ -67,6 +82,12 @@ namespace Microsoft.Xna.Framework.Input
 			_rightButton = rightButton;
 		}
 		
+        /// <summary>
+        /// Compares whether two MouseState instances are equal.
+        /// </summary>
+        /// <param name="left">MouseState instance on the left of the equal sign.</param>
+        /// <param name="right">MouseState instance  on the right of the equal sign.</param>
+        /// <returns>true if the instances are equal; false otherwise.</returns>
 		public static bool operator ==(MouseState left, MouseState right)
 		{
 			return left._x == right._x &&
@@ -77,11 +98,22 @@ namespace Microsoft.Xna.Framework.Input
                    left._scrollWheelValue == right._scrollWheelValue;
 		}
 		
+        /// <summary>
+        /// Compares whether two MouseState instances are not equal.
+        /// </summary>
+        /// <param name="left">MouseState instance on the left of the equal sign.</param>
+        /// <param name="right">MouseState instance  on the right of the equal sign.</param>
+        /// <returns>true if the objects are not equal; false otherwise.</returns>
 		public static bool operator !=(MouseState left, MouseState right)
 		{
 			return !(left == right);
 		}
 
+        /// <summary>
+        /// Compares whether current instance is equal to specified object.
+        /// </summary>
+        /// <param name="obj">The MouseState to compare.</param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (obj is MouseState)
@@ -89,11 +121,18 @@ namespace Microsoft.Xna.Framework.Input
             return false;
         }
 
+        /// <summary>
+        /// Gets the hash code for MouseState instance.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 
+        /// <summary>
+        /// Gets horizontal position of the cursor.
+        /// </summary>
 		public int X {
 			get {
 				return _x;
@@ -103,6 +142,9 @@ namespace Microsoft.Xna.Framework.Input
 			}
 		}
 
+        /// <summary>
+        /// Gets vertical position of the cursor.
+        /// </summary>
 		public int Y {
 			get {
 				return _y;
@@ -112,6 +154,9 @@ namespace Microsoft.Xna.Framework.Input
 			}
 		}
 
+        /// <summary>
+        /// Gets state of the left mouse button.
+        /// </summary>
 		public ButtonState LeftButton { 
 			get {
 				return _leftButton;
@@ -119,6 +164,9 @@ namespace Microsoft.Xna.Framework.Input
 			internal set { _leftButton = value; }
 		}
 
+        /// <summary>
+        /// Gets state of the middle mouse button.
+        /// </summary>
 		public ButtonState MiddleButton { 
 			get {
 				return _middleButton;
@@ -126,6 +174,9 @@ namespace Microsoft.Xna.Framework.Input
 			internal set { _middleButton = value; }			
 		}
 
+        /// <summary>
+        /// Gets state of the right mouse button.
+        /// </summary>
 		public ButtonState RightButton { 
 			get {
 				return _rightButton;
@@ -133,6 +184,9 @@ namespace Microsoft.Xna.Framework.Input
 			internal set { _rightButton = value; }
 		}
 
+        /// <summary>
+        /// Returns cumulative scroll wheel value since the game start.
+        /// </summary>
 		public int ScrollWheelValue { 
 			get {
 				return _scrollWheelValue;
@@ -140,12 +194,18 @@ namespace Microsoft.Xna.Framework.Input
 			internal set { _scrollWheelValue = value; }
 		}
 
+        /// <summary>
+        /// Gets state of the XButton1.
+        /// </summary>
 		public ButtonState XButton1 { 
 			get {
 				return ButtonState.Released;
 			}
 		}
 
+        /// <summary>
+        /// Gets state of the XButton2.
+        /// </summary>
 		public ButtonState XButton2 { 
 			get {
 				return ButtonState.Released;

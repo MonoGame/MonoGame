@@ -45,25 +45,29 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 #endif
 
+#if OPENGL
 #if WINDOWS || LINUX
 using MouseInfo = OpenTK.Input.Mouse;
 #elif MONOMAC
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 #endif
-
+#endif
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Allows reading position and button click information from mouse.
+    /// </summary>
     public static class Mouse
     {
 		internal static MouseState State;
 
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
 		private static OpenTK.Input.MouseDevice _mouse = null;			
 #endif
 
-#if WINDOWS
+#if (WINDOWS && OPENGL)
 
         static OpenTK.GameWindow Window;
 
@@ -71,6 +75,15 @@ namespace Microsoft.Xna.Framework.Input
         {
             Window = window;
             _mouse = window.Mouse;        
+        }
+
+#elif (WINDOWS && DIRECTX)
+
+        static System.Windows.Forms.Form Window;
+
+        internal static void SetWindows(System.Windows.Forms.Form window)
+        {
+            Window = window;
         }
         
 #elif LINUX         
@@ -98,25 +111,27 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Gets an empty window handle. Purely for Xna compatibility.
         /// </summary>
-        /// <value>
-        /// The a zero window handle.
-        /// </value>
+        /// <returns>A zero window handle</returns>
         public static IntPtr WindowHandle { get { return IntPtr.Zero; } }
 
         #region Public interface
 
+        /// <summary>
+        /// Gets mouse state information that includes position and button presses.
+        /// </summary>
+        /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState()
         {
 #if MONOMAC
             //We need to maintain precision...
             State.ScrollWheelValue = (int)ScrollWheelValue;
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
 
 			// maybe someone is tring to get mouse before initialize
 			if (_mouse == null)
                 return State;
 
-#if WINDOWS
+#if (WINDOWS && OPENGL)
             var p = new POINT();
             GetCursorPos(out p);
             var pc = Window.PointToClient(p.ToPoint());
@@ -136,16 +151,23 @@ namespace Microsoft.Xna.Framework.Input
             return State;
         }
 
+        /// <summary>
+        /// Sets mouse cursor's relative position to game-window.
+        /// </summary>
+        /// <param name="x">Relative horizontal position of the cursor.</param>
+        /// <param name="y">Relative vertical position of the cursor.</param>
         public static void SetPosition(int x, int y)
         {
             UpdateStatePosition(x, y);
-			
-#if WINDOWS || LINUX
-            ///correcting the coordinate system
-            ///Only way to set the mouse position !!!
-            System.Drawing.Point pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+
+#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX
+            // correcting the coordinate system
+            // Only way to set the mouse position !!!
+            var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
+#elif WINDOWS
+            var pt = new System.Drawing.Point(0, 0);
 #endif
-            
+
 #if WINDOWS
             SetCursorPos(pt.X, pt.Y);
 #elif LINUX
