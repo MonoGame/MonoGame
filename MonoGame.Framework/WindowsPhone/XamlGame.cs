@@ -101,6 +101,7 @@ namespace MonoGame.Framework.WindowsPhone
                 if (deviceChanged)
                     _game.GraphicsDevice.UpdateDevice(device, context);
                 _game.GraphicsDevice.UpdateTarget(renderTargetView);
+                _game.GraphicsDevice.ResetRenderTargets();
                 _game.Tick();
 
                 _host.RequestAdditionalFrame();
