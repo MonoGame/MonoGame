@@ -171,6 +171,8 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play ()
 		{
+            if (State == SoundState.Playing)
+                return;
 #if WINRT
             if (_voice != null)
             {
