@@ -52,7 +52,7 @@ namespace MonoGame.Framework.WindowsPhone
 {
     public class WindowsPhoneGameWindow : GameWindow
     {
-        private DisplayOrientation _supportedOrientations;
+        private PageOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
         private Game _game;
@@ -92,27 +92,13 @@ namespace MonoGame.Framework.WindowsPhone
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            // We don't want to trigger orientation changes 
-            // when no preference is being changed.
-            if (_supportedOrientations == orientations)
-                return;
-
-            _supportedOrientations = orientations;
-
-            SupportedPageOrientation supported;
+            PageOrientation supported;
             if (orientations == DisplayOrientation.Default)
-            {
-                // Make the decision based on the preferred backbuffer dimensions.
-                var manager = _game.graphicsDeviceManager;
-                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                    supported = FromOrientation(DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight);
-                else
-                    supported = FromOrientation(DisplayOrientation.Portrait | DisplayOrientation.PortraitDown);
-            }
+                supported = FromOrientation(DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight);
             else
                 supported = FromOrientation(orientations);
 
-            Page.SupportedOrientations = supported;
+            _supportedOrientations = supported;
         }
 
         #endregion
@@ -200,35 +186,38 @@ namespace MonoGame.Framework.WindowsPhone
         private static DisplayOrientation ToOrientation(PageOrientation orientations)
         {
             var result = DisplayOrientation.Default;
-            if ((orientations & PageOrientation.LandscapeLeft) != 0)
-                result |= DisplayOrientation.LandscapeLeft;
-            if ((orientations & PageOrientation.LandscapeRight) != 0)
-                result |= DisplayOrientation.LandscapeRight;
-            if ((orientations & PageOrientation.PortraitUp) != 0)
+            if ((orientations & (PageOrientation)0x0004) != 0)
                 result |= DisplayOrientation.Portrait;
-            if ((orientations & PageOrientation.PortraitDown) != 0)
+            if ((orientations & (PageOrientation)0x0008) != 0)
                 result |= DisplayOrientation.PortraitDown;
+            if ((orientations & (PageOrientation)0x0010) != 0)
+                result |= DisplayOrientation.LandscapeLeft;
+            if ((orientations & (PageOrientation)0x0020) != 0)
+                result |= DisplayOrientation.LandscapeRight;
 
             return result;
         }
 
-        private static SupportedPageOrientation FromOrientation(DisplayOrientation orientation)
+        private static PageOrientation FromOrientation(DisplayOrientation orientation)
         {
-            SupportedPageOrientation result = (SupportedPageOrientation)0;
+            PageOrientation result = (PageOrientation)0;
             if ((orientation & DisplayOrientation.LandscapeLeft) != 0)
-                result |= SupportedPageOrientation.Landscape;
+                result |= PageOrientation.LandscapeLeft;
             if ((orientation & DisplayOrientation.LandscapeRight) != 0)
-                result |= SupportedPageOrientation.Landscape;
+                result |= PageOrientation.LandscapeRight;
             if ((orientation & DisplayOrientation.Portrait) != 0)
-                result |= SupportedPageOrientation.Portrait;
+                result |= PageOrientation.PortraitUp;
             if ((orientation & DisplayOrientation.PortraitDown) != 0)
-                result |= SupportedPageOrientation.Portrait;
+                result |= PageOrientation.Portrait;
 
             return result;
         }
 
         private void Page_OrientationChanged(object sender, OrientationChangedEventArgs e)
         {
+            if ((e.Orientation & _supportedOrientations) == 0)
+                return;
+
             // Set the new orientation.
             _orientation = ToOrientation(e.Orientation);
 
