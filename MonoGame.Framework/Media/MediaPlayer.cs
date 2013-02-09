@@ -366,11 +366,7 @@ namespace Microsoft.Xna.Framework.Media
             State = MediaState.Playing;
         }
 
-#if WINDOWS_PHONE
-        internal static void OnSongFinishedPlaying(object sender, RoutedEventArgs args)
-#else
         internal static void OnSongFinishedPlaying(object sender, EventArgs args)
-#endif
 		{
 			// TODO: Check args to see if song sucessfully played
 			_numSongsInQueuePlayed++;
