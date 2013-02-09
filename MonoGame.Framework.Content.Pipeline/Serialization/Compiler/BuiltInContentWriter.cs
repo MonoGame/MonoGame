@@ -50,8 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
             string readerNamespace = typeof(ContentTypeReader).Namespace;
             // From looking at XNA-produced XNBs, it appears built-in type readers don't need assembly qualification
-            //string assemblyName = typeof(ContentTypeReader).Assembly.FullName;
-            return readerNamespace + "." + readerClassName; // +", " + assemblyName;
+            return readerNamespace + "." + readerClassName;
         }
     }
 }
