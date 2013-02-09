@@ -335,7 +335,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
-			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
+            // TODO: Add your own link
+			NSUrl url = new NSUrl("http://www.monogame.net");
 			if (!UIApplication.SharedApplication.OpenUrl(url)) {
 				// Error
 			}
