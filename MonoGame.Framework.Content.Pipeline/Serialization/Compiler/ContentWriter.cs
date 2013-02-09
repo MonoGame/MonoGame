@@ -242,6 +242,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 typeWriters.Add(typeWriter);
                 typeWriterMap.Add(typeWriter, index);
                 typeMap.Add(type, typeWriter);
+
+                var args = type.GetGenericArguments();
+                foreach (var arg in args)
+                    GetTypeWriter(arg);
             }
             return typeWriter;
         }
@@ -289,6 +293,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This method can be called recursively with a null value.</remarks>
         public void WriteObject<T>(T value)
         {
+            GetTypeWriter(typeof(Dictionary<int, List<string>>));
             WriteObject<T>(value, GetTypeWriter(value.GetType()));
         }
 
