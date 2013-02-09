@@ -37,21 +37,24 @@ purpose and non-infringement.
 */
 
 using System;
+using System.Windows;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+
 using Windows.UI.Core;
 using Windows.Graphics.Display;
-using Microsoft.Xna.Framework.Graphics;
-using System.Windows;
-using Microsoft.Xna.Framework.Input.Touch;
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace MonoGame.Framework.WindowsPhone
 {
     public class WindowsPhoneGameWindow : GameWindow
     {
+        private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
         private Rectangle _clientBounds;
+        private Game _game;
 
         #region Internal Properties
 
@@ -87,46 +90,37 @@ namespace MonoGame.Framework.WindowsPhone
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            /*
             // We don't want to trigger orientation changes 
             // when no preference is being changed.
             if (_supportedOrientations == orientations)
                 return;
-            
-            _supportedOrientations = orientations;
-            var supported = DisplayOrientations.None;
 
+            _supportedOrientations = orientations;
+
+            DisplayOrientations supported;
             if (orientations == DisplayOrientation.Default)
             {
                 // Make the decision based on the preferred backbuffer dimensions.
                 var manager = _game.graphicsDeviceManager;
                 if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
-                    supported = DisplayOrientations.Landscape | DisplayOrientations.LandscapeFlipped;
+                    supported = FromOrientation(DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight);
                 else
-                    supported = DisplayOrientations.Portrait | DisplayOrientations.PortraitFlipped;                    
+                    supported = FromOrientation(DisplayOrientation.Portrait | DisplayOrientation.PortraitDown);
             }
             else
-            {
-                if ((orientations & DisplayOrientation.LandscapeLeft) != 0)
-                    supported |= DisplayOrientations.Landscape;
-                if ((orientations & DisplayOrientation.LandscapeRight) != 0)
-                    supported |= DisplayOrientations.LandscapeFlipped;
-                if ((orientations & DisplayOrientation.Portrait) != 0)
-                    supported |= DisplayOrientations.Portrait;
-                if ((orientations & DisplayOrientation.PortraitUpsideDown) != 0)
-                    supported |= DisplayOrientations.PortraitFlipped;
-            }
+                supported = FromOrientation(orientations);
 
-            //DisplayProperties.AutoRotationPreferences = supported;
-            */
+            DisplayProperties.AutoRotationPreferences = supported;
         }
 
         #endregion
 
-        public WindowsPhoneGameWindow()
+        public WindowsPhoneGameWindow(Game game)
         {
-            //_orientation = ToOrientation(DisplayProperties.CurrentOrientation);
-            //DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
+            _game = game;
+
+            _orientation = ToOrientation(DisplayProperties.CurrentOrientation);
+            DisplayProperties.OrientationChanged += DisplayProperties_OrientationChanged;
 
             //inputElement.SizeChanged += Window_SizeChanged;
 
@@ -201,41 +195,36 @@ namespace MonoGame.Framework.WindowsPhone
         }
         */
 
-        private static DisplayOrientation ToOrientation(DisplayOrientations orientation)
+        private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
         {
-            var result = (DisplayOrientation)0;
-
-            if (DisplayProperties.NativeOrientation == orientation)
-                result |= DisplayOrientation.Default;
-
-            switch (orientation)
-            {
-                default:
-                case DisplayOrientations.None:
-                    result |= DisplayOrientation.Default;
-                    break;
-
-                case DisplayOrientations.Landscape:
-                    result |= DisplayOrientation.LandscapeLeft;
-                    break;
-
-                case DisplayOrientations.LandscapeFlipped:
-                    result |= DisplayOrientation.LandscapeRight;
-                    break;
-
-                case DisplayOrientations.Portrait:
-                    result |= DisplayOrientation.Portrait;
-                    break;
-
-                case DisplayOrientations.PortraitFlipped:
-                    result |= DisplayOrientation.PortraitUpsideDown;
-                    break;
-            }
+            var result = DisplayOrientation.Default;
+            if ((orientations & DisplayOrientations.Landscape) != 0)
+                result |= DisplayOrientation.LandscapeLeft;
+            if ((orientations & DisplayOrientations.LandscapeFlipped) != 0)
+                result |= DisplayOrientation.LandscapeRight;
+            if ((orientations & DisplayOrientations.Portrait) != 0)
+                result |= DisplayOrientation.Portrait;
+            if ((orientations & DisplayOrientations.PortraitFlipped) != 0)
+                result |= DisplayOrientation.PortraitDown;
 
             return result;
         }
 
-        /*
+        private static DisplayOrientations FromOrientation(DisplayOrientation orientation)
+        {
+            var result = DisplayOrientations.None;
+            if ((orientation & DisplayOrientation.LandscapeLeft) != 0)
+                result |= DisplayOrientations.Landscape;
+            if ((orientation & DisplayOrientation.LandscapeRight) != 0)
+                result |= DisplayOrientations.LandscapeFlipped;
+            if ((orientation & DisplayOrientation.Portrait) != 0)
+                result |= DisplayOrientations.Portrait;
+            if ((orientation & DisplayOrientation.PortraitDown) != 0)
+                result |= DisplayOrientations.PortraitFlipped;
+
+            return result;
+        }
+
         private void DisplayProperties_OrientationChanged(object sender)
         {
             // Set the new orientation.
@@ -245,10 +234,9 @@ namespace MonoGame.Framework.WindowsPhone
             OnOrientationChanged();
 
             // If we have a valid client bounds then update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                _game.graphicsDeviceManager.ApplyChanges();
+            //if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+            //    _game.graphicsDeviceManager.ApplyChanges();
         }
-        */
 
         protected override void SetTitle(string title)
         {
