@@ -332,7 +332,7 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
-    <Compile Include="MacOS\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="MacOS\GamerServices\SigninController.cs" />
     <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs" />
