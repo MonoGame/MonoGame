@@ -67,6 +67,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (array != null)
                 Data = array.Clone();
             StateKey = unchecked(NextStateKey++);
+            
+            InternalSet = cloneSource.InternalSet;
         }
 
 		public string Name { get; private set; }
