@@ -83,8 +83,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (format)
             {
+            case VertexElementFormat.Single:
+                return PssVertexFormat.Float;
+            case VertexElementFormat.Vector2:
+                return PssVertexFormat.Float2;
             case VertexElementFormat.Vector3:
                 return PssVertexFormat.Float3;
+            case VertexElementFormat.Vector4:
+                return PssVertexFormat.Float4;
             case VertexElementFormat.Color:
                 return PssVertexFormat.UByte4N;
             default:
