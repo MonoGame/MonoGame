@@ -97,6 +97,7 @@
     <target name="buildtools" description="Build Tools">
     <if test="${os == 'Win32NT'}">
 			<exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Build /p:Configuration=Release" />			
+                        <exec program="msbuild " commandline="Tools\MGCB\MGCB.sln /t:Build /p:Configuration=Release" />			
 		</if>
 		</target>
   
