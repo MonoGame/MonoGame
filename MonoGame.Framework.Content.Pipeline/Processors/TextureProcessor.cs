@@ -32,6 +32,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var width = input._bitmap.Size.Width;
 			var height = input._bitmap.Size.Height;
 #else
+			var width = input._bitmap.Width;
+			var height = input._bitmap.Height;
 #endif
             if (ColorKeyEnabled)
             {
