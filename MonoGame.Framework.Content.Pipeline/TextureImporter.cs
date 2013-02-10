@@ -5,7 +5,6 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using MonoMac.AppKit;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -31,25 +30,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public override TextureContent Import (string filename, ContentImporterContext context)
 		{
 			var output = new Texture2DContent ();
-#if MACOS
-			output._bitmap = new NSImage(filename);
-			var width = (int)output._bitmap.Size.Width;
-			var height = (int)output._bitmap.Size.Height;
-#else
 			output._bitmap = new Bitmap (filename);
 
 			var width = output._bitmap.Width;
 			var height = output._bitmap.Height;
 
 			// Force the input's pixelformat to ARGB32, so we can have a common pixel format to deal with.
-			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-				output._bitmap = output._bitmap.Clone (new System.Drawing.Rectangle (System.Drawing.Point.Empty, output._bitmap.Size),
-                                                      System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb) {
+
+				var bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				using ( var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
+					graphics.DrawImage(output._bitmap, 0,0, width, height);
+				}
+
+				output._bitmap = bitmap;
+			}
 
 			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb) {
 				throw new InvalidContentException("Bitmap is not ARGB32");
 			}
-#endif
             var imageData = output._bitmap.GetData();
 
             var bitmapContent = new PixelBitmapContent<Color>(width, height);

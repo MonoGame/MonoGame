@@ -28,14 +28,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-#if MACOS
-			var width = input._bitmap.Size.Width;
-			var height = input._bitmap.Size.Height;
-#else
 			var width = input._bitmap.Width;
 			var height = input._bitmap.Height;
-#endif
-            if (ColorKeyEnabled)
+
+			if (ColorKeyEnabled)
             {
                 var replaceColor = System.Drawing.Color.FromArgb(0);
                 for (var x = 0; x < width; x++)

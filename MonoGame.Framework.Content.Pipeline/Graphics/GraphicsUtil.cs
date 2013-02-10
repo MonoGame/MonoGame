@@ -9,12 +9,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using System.Runtime.InteropServices;
 using System.Drawing;
-#if MACOS
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-#else
 using System.Drawing.Imaging;
-#endif
 using System.IO;
 
 using Nvidia.TextureTools;
@@ -68,51 +63,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public static class GraphicsUtil
     {
-#if MACOS
-		public static System.Drawing.Color ToColor (this NSColor color)
-		{
-			float r,g,b,a;
-			color.GetRgba(out r, out g, out b, out a);
-			return System.Drawing.Color.FromArgb((int)a, (int)r, (int)g, (int)b);
-		}
 
-		public static NSColor ToNSColor (this System.Drawing.Color color)
-		{
-			return NSColor.FromDeviceRgba(color.R, color.G, color.B, color.A);
-		}
-
-		public static System.Drawing.Color GetPixel (this NSImage bmp, int x, int y)
-		{
-			using (var cgImage = bmp.AsCGImage(RectangleF.Empty, null, null)){
-				using (var data = new NSBitmapImageRep(cgImage)) {
-					return data.ColorAt (x, y).ToColor();
-				}	
-			}
-		}
-
-		public static void SetPixel (this NSImage bmp, int x, int y, System.Drawing.Color color)
-		{
-			using (var cgImage = bmp.AsCGImage(RectangleF.Empty, null, null)){
-				using (var data = new NSBitmapImageRep(cgImage)) {
-					data.SetColorAt(color.ToNSColor(), x, y);
-				}	
-			}
-		}
-
-		public static byte[] GetData (this NSImage bmp)
-		{
-			var cgImage = bmp.AsCGImage(RectangleF.Empty, null, null);
-			var width = cgImage.Width;
-			var height = cgImage.Height;
-			var output = new byte[width * height * 4];
-			var colorSpace = CGColorSpace.CreateDeviceRGB();
-			var bitmapContext = new CGBitmapContext(output, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
-			bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
-			bitmapContext.Dispose();
-			colorSpace.Dispose();
-			return output;
-		}
-#else
         public static byte[] GetData(this Bitmap bmp)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
@@ -139,7 +90,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
   
             return output;
         }
-#endif
 
         public static void BGRAtoRGBA(byte[] data)
         {
@@ -312,23 +262,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
-        {
-            
-#if MACOS
-			var resized = new NSImage(new System.Drawing.SizeF(newWidth, newHeight));
-			var rep = new NSImageRep(content._bitmap.Handle);
-		    resized.Draw(rep, new System.Drawing.RectangleF(0,0,newWidth, newHeight));
-			rep.Dispose();
-			content._bitmap.Dispose();
-			content._bitmap = resized;
-
-			var imageData = content._bitmap.GetData();
-			
-			var bitmapContent = new PixelBitmapContent<Color>((int)content._bitmap.Size.Width, (int)content._bitmap.Size.Height);
-			bitmapContent.SetPixelData(imageData);
-
-
-#else
+        {   
 			var resizedBmp = new Bitmap(newWidth, newHeight);
             
 			using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
@@ -343,7 +277,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			
 			var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
 			bitmapContent.SetPixelData(imageData);
-#endif
 
             content.Faces.Clear();
             content.Faces.Add(new MipmapChain(bitmapContent));
