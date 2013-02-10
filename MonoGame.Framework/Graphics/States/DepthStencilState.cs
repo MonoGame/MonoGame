@@ -409,12 +409,16 @@ namespace Microsoft.Xna.Framework.Graphics
             // FIXME: More advanced stencil attributes
             
             g.SetDepthFunc(
-                MapDepthCompareFunction[DepthBufferFunction],
+                DepthBufferEnable 
+                    ? MapDepthCompareFunction[DepthBufferFunction]
+                    : DepthFuncMode.Always,
                 DepthBufferWriteEnable
             );
             
             g.SetStencilFunc(
-                MapStencilCompareFunction[StencilFunction],
+                StencilEnable
+                    ? MapStencilCompareFunction[StencilFunction]
+                    : StencilFuncMode.Always,
                 ReferenceStencil, StencilMask, StencilWriteMask
             );
         }
