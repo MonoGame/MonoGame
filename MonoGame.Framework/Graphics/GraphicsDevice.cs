@@ -328,8 +328,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
-
+   
+#if PSM
+            MaxTextureSlots = 8;
+#else
             MaxTextureSlots = 16;
+#endif
+            
 #if OPENGL
 #if GLES
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
