@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         MipmapChainCollection faces;
         internal Bitmap _bitmap;
 
-		/// <summary>
+        /// <summary>
         /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
         /// </summary>
         public MipmapChainCollection Faces

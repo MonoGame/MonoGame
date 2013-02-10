@@ -28,15 +28,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-			var width = input._bitmap.Width;
-			var height = input._bitmap.Height;
-
-			if (ColorKeyEnabled)
+            if (ColorKeyEnabled)
             {
                 var replaceColor = System.Drawing.Color.FromArgb(0);
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < input._bitmap.Width; x++)
                 {
-                    for (var y = 0; y < height; y++)
+                    for (var y = 0; y < input._bitmap.Height; y++)
                     {
                         var col = input._bitmap.GetPixel(x, y);
 
@@ -57,9 +54,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (PremultiplyAlpha)
             {
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < input._bitmap.Width; x++)
                 {
-                    for (var y = 0; y < height; y++)
+                    for (var y = 0; y < input._bitmap.Height; y++)
                     {
                         var oldCol = input._bitmap.GetPixel(x, y);
                         var preMultipliedColor = Color.FromNonPremultiplied(oldCol.R, oldCol.G, oldCol.B, oldCol.A);

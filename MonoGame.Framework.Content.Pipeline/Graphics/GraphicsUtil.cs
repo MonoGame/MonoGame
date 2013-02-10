@@ -63,7 +63,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public static class GraphicsUtil
     {
-
         public static byte[] GetData(this Bitmap bmp)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
@@ -262,10 +261,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         internal static void Resize(this TextureContent content, int newWidth, int newHeight)
-        {   
-			var resizedBmp = new Bitmap(newWidth, newHeight);
-            
-			using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
+        {
+            var resizedBmp = new Bitmap(newWidth, newHeight);
+
+            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
             {
                 graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
 
@@ -273,10 +272,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content._bitmap = resizedBmp;
             }
 
-			var imageData = content._bitmap.GetData();
-			
-			var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
-			bitmapContent.SetPixelData(imageData);
+            var imageData = content._bitmap.GetData();
+
+            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
+            bitmapContent.SetPixelData(imageData);
 
             content.Faces.Clear();
             content.Faces.Add(new MipmapChain(bitmapContent));

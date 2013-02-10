@@ -46,10 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 				output._bitmap = bitmap;
 			}
 
-			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb) {
-				throw new InvalidContentException("Bitmap is not ARGB32");
-			}
-            var imageData = output._bitmap.GetData();
+			var imageData = output._bitmap.GetData();
 
             var bitmapContent = new PixelBitmapContent<Color>(width, height);
             bitmapContent.SetPixelData(imageData);
