@@ -4,7 +4,11 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+#if MACOS
+using MonoMac.AppKit;
+#else
 using System.Drawing;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -14,8 +18,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public abstract class TextureContent : ContentItem, IDisposable
     {
         MipmapChainCollection faces;
+#if MACOS
+		internal NSImage _bitmap;
+#else
         internal Bitmap _bitmap;
-
+#endif
         /// <summary>
         /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
         /// </summary>

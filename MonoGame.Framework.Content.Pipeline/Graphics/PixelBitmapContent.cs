@@ -57,9 +57,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
                 var dataPtr = (IntPtr)dataHandle.AddrOfPinnedObject().ToInt64();
 
-                Marshal.Copy(sourceData, (x * Width * size), dataPtr, Width * size);
+				Marshal.Copy(sourceData, (x * Width * size), dataPtr, Width * size);
 
-                dataHandle.Free();
+				dataHandle.Free();
             }
         }
 
