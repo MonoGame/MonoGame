@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
+#if PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     [DebuggerDisplay("{ParameterClass} {ParameterType} {Name} : {Semantic}")]
@@ -600,5 +604,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				Elements[i].SetValue (value[i]);
             StateKey = unchecked(NextStateKey++);
 		}
+        
+#if PSM        
+        internal delegate void InternalSetDelegate (EffectParameter parameter, ShaderProgram shaderProgram);
+        
+        internal InternalSetDelegate InternalSet = null;
+#endif
 	}
 }
