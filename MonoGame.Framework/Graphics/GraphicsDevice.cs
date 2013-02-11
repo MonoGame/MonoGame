@@ -2078,13 +2078,16 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
-			if (minVertexIndex > 0)
-				throw new NotImplementedException ("minVertexIndex > 0 is supported");
+            // NOTE: minVertexIndex and numVertices are only hints of the
+            // range of vertex data which will be indexed.
+            //
+            // They will only be used if the graphics API can use
+            // this range hint to optimize rendering.
 
 #if DIRECTX
 
