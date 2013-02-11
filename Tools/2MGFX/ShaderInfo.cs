@@ -58,7 +58,23 @@ namespace TwoMGFX
                     throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
             }
         }
-        
+
+	    private static Blend ToAlphaBlend(Blend blend)
+	    {
+	        switch (blend)
+	        {
+	            case Blend.SourceColor:
+	                return Blend.SourceAlpha;
+	            case Blend.InverseSourceColor:
+	                return Blend.InverseSourceAlpha;
+	            case Blend.DestinationColor:
+	                return Blend.DestinationAlpha;
+	            case Blend.InverseDestinationColor:
+	                return Blend.InverseDestinationAlpha;
+	        }
+	        return blend;
+	    }
+
         public void ParseRenderState(string name, string value)
         {
             Blend blend;
@@ -69,65 +85,65 @@ namespace TwoMGFX
                     if (!ParseTreeTools.ParseBool(value))
                     {
                         if (blendState == null)
-                            blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-                        blendState.AlphaSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-                        blendState.ColorSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-                        blendState.ColorDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
-                        blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
+                            blendState = new BlendState();
+                        blendState.ColorSourceBlend = Blend.One;
+                        blendState.AlphaSourceBlend = Blend.One;
+                        blendState.ColorDestinationBlend = Blend.Zero;
+                        blendState.AlphaDestinationBlend = Blend.Zero;
                     }
                     break;
                 case "srcblend":
                     blend = ParseTreeTools.ParseBlend(value);
                     if (blendState == null)
-                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-                    blendState.AlphaSourceBlend = blend;
+                        blendState = new BlendState();
                     blendState.ColorSourceBlend = blend;
+                    blendState.AlphaSourceBlend = ToAlphaBlend(blend);
                     break;
                 case "destblend":
                     blend = ParseTreeTools.ParseBlend(value);
                     if (blendState == null)
-                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-                    blendState.AlphaDestinationBlend = blend;
+                        blendState = new BlendState();
                     blendState.ColorDestinationBlend = blend;
+                    blendState.AlphaDestinationBlend = ToAlphaBlend(blend);
                     break;
                 case "blendop":
                     if (blendState == null)
-                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+                        blendState = new BlendState();
                     blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
                     break;
                 case "zenable":
                     if (depthStencilState == null)
-                        depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+                        depthStencilState = new DepthStencilState();
                     depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
                     break;
                 case "zwriteenable":
                     if (depthStencilState == null)
-                        depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+                        depthStencilState = new DepthStencilState();
                     depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
                     break;
                 case "depthbias":
                     if (rasterizerState == null)
-                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                        rasterizerState = new RasterizerState();
                     rasterizerState.DepthBias = float.Parse(value);
                     break;
                 case "cullmode":
                     if (rasterizerState == null)
-                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                        rasterizerState = new RasterizerState();
                     rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
                     break;
                 case "fillmode":
                     if (rasterizerState == null)
-                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                        rasterizerState = new RasterizerState();
                     rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
                     break;
                 case "multisampleantialias":
                     if (rasterizerState == null)
-                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                        rasterizerState = new RasterizerState();
                     rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
                     break;
                 case "slopescaledepthbias":
                     if (rasterizerState == null)
-                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                        rasterizerState = new RasterizerState();
                     rasterizerState.SlopeScaleDepthBias = float.Parse(value);
                     break;
             }            
