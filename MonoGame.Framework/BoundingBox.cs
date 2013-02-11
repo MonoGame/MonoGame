@@ -37,16 +37,16 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+#if WINRT
     [DataContract]
-    #else
+#else
     [Serializable]
-    #endif
+#endif
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 
         #region Public Fields
-  
+
 #if WINRT
         [DataMember]
 #endif
@@ -141,90 +141,90 @@ namespace Microsoft.Xna.Framework
             return ContainmentType.Contains;
         }
 
-      public ContainmentType Contains(BoundingSphere sphere)
-      {
-         if (sphere.Center.X - Min.X > sphere.Radius
-             && sphere.Center.Y - Min.Y > sphere.Radius
-             && sphere.Center.Z - Min.Z > sphere.Radius
-             && Max.X - sphere.Center.X > sphere.Radius
-             && Max.Y - sphere.Center.Y > sphere.Radius
-             && Max.Z - sphere.Center.Z > sphere.Radius)
-            return ContainmentType.Contains;
+        public ContainmentType Contains(BoundingSphere sphere)
+        {
+            if (sphere.Center.X - Min.X >= sphere.Radius
+                && sphere.Center.Y - Min.Y >= sphere.Radius
+                && sphere.Center.Z - Min.Z >= sphere.Radius
+                && Max.X - sphere.Center.X >= sphere.Radius
+                && Max.Y - sphere.Center.Y >= sphere.Radius
+                && Max.Z - sphere.Center.Z >= sphere.Radius)
+                return ContainmentType.Contains;
 
-         double dmin = 0;
+            double dmin = 0;
 
-         double e = sphere.Center.X - Min.X;
-         if (e < 0)
-         {
-            if (e < -sphere.Radius)
+            double e = sphere.Center.X - Min.X;
+            if (e < 0)
             {
-               return ContainmentType.Disjoint;
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
             }
-            dmin += e * e;
-         }
-         else
-         {
-            e = sphere.Center.X - Max.X;
-            if (e > 0)
+            else
             {
-               if (e > sphere.Radius)
-               {
-                  return ContainmentType.Disjoint;
-               }
-               dmin += e * e;
+                e = sphere.Center.X - Max.X;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
             }
-         }
 
-         e = sphere.Center.Y - Min.Y;
-         if (e < 0)
-         {
-            if (e < -sphere.Radius)
+            e = sphere.Center.Y - Min.Y;
+            if (e < 0)
             {
-               return ContainmentType.Disjoint;
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
             }
-            dmin += e * e;
-         }
-         else
-         {
-            e = sphere.Center.Y - Max.Y;
-            if (e > 0)
+            else
             {
-               if (e > sphere.Radius)
-               {
-                  return ContainmentType.Disjoint;
-               }
-               dmin += e * e;
+                e = sphere.Center.Y - Max.Y;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
             }
-         }
 
-         e = sphere.Center.Z - Min.Z;
-         if (e < 0)
-         {
-            if (e < -sphere.Radius)
+            e = sphere.Center.Z - Min.Z;
+            if (e < 0)
             {
-               return ContainmentType.Disjoint;
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
             }
-            dmin += e * e;
-         }
-         else
-         {
-            e = sphere.Center.Z - Max.Z;
-            if (e > 0)
+            else
             {
-               if (e > sphere.Radius)
-               {
-                  return ContainmentType.Disjoint;
-               }
-               dmin += e * e;
+                e = sphere.Center.Z - Max.Z;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
             }
-         }
 
-         if (dmin <= sphere.Radius * sphere.Radius)
-            return ContainmentType.Intersects;
+            if (dmin <= sphere.Radius * sphere.Radius)
+                return ContainmentType.Intersects;
 
-         return ContainmentType.Disjoint;
-      }
-	  
+            return ContainmentType.Disjoint;
+        }
+
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
             result = this.Contains(sphere);
@@ -498,7 +498,7 @@ namespace Microsoft.Xna.Framework
                 result = PlaneIntersectionType.Back;
                 return;
             }
-           
+
             result = PlaneIntersectionType.Intersecting;
         }
 
