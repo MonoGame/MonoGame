@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -51,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     {
                         // Find the content type this writer implements
                         Type baseType = type.BaseType;
-                        while ((baseType != null) && (baseType.Name != contentTypeWriterType.Name))
+                        while ((baseType != null) && (baseType.GetGenericTypeDefinition() != contentTypeWriterType))
                             baseType = baseType.BaseType;
                         if (baseType != null)
                             typeWriterMap.Add(baseType, type);
@@ -68,11 +69,57 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This should be called from the ContentTypeWriter.Initialize method.</remarks>
         public ContentTypeWriter GetTypeWriter(Type type)
         {
+            ContentTypeWriter result = null;
             var contentTypeWriterType = typeof(ContentTypeWriter<>).MakeGenericType(type);
             Type typeWriterType;
             if (!typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
-                throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
-            var result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            {
+                var inputTypeDef = type.GetGenericTypeDefinition();
+
+                Type chosen = null;
+                foreach (var kvp in typeWriterMap)
+                {
+                    var args = kvp.Key.GetGenericArguments();
+
+                    if (args.Length == 0)
+                        continue;
+
+                    if (!args[0].IsGenericType)
+                        continue;
+
+                    // Compare generic type definition
+                    var keyTypeDef = args[0].GetGenericTypeDefinition();
+                    if (inputTypeDef.Equals(keyTypeDef))
+                    {
+                        chosen = kvp.Value;
+                        break;
+                    }
+                }
+
+                try
+                {
+                    var concreteType = type.GetGenericArguments();
+                    result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+
+                    // save it for next time.
+                    typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                }
+                catch (Exception)
+                {
+                    throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
+                }
+            }
+            else
+            {
+                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            }
+
+            if (result != null)
+            {
+                MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
+                dynMethod.Invoke(result, new object[] { this });
+            }
+
             return result;
         }
 

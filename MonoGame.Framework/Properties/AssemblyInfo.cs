@@ -12,7 +12,11 @@ using System.Resources;
 #elif ANDROID
 [assembly: AssemblyDescription("MonoGame for Android")]
 #elif WINDOWS
+#if DIRECTX
+[assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
+#else
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (OpenGL)")]
+#endif
 #elif PSM
 [assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
 #elif LINUX
