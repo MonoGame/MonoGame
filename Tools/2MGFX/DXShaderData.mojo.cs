@@ -141,8 +141,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 SamplerStateInfo state;
                 if (samplerStates.TryGetValue(originalSamplerName, out state))
                 {
-                    sampler.state = state.state;
-                    sampler.parameterName = state.textureName ?? originalSamplerName;
+                    sampler.state = state.State;
+                    sampler.parameterName = state.TextureName ?? originalSamplerName;
                 }
 
                 // Store the sampler.
