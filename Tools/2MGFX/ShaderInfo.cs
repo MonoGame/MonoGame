@@ -58,6 +58,80 @@ namespace TwoMGFX
                     throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
             }
         }
+        
+        public void ParseRenderState(string name, string value)
+        {
+            Blend blend;
+
+            switch (name.ToLower())
+            {
+                case "alphablendenable":
+                    if (!ParseTreeTools.ParseBool(value))
+                    {
+                        if (blendState == null)
+                            blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+                        blendState.AlphaSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
+                        blendState.ColorSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
+                        blendState.ColorDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
+                        blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
+                    }
+                    break;
+                case "srcblend":
+                    blend = ParseTreeTools.ParseBlend(value);
+                    if (blendState == null)
+                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+                    blendState.AlphaSourceBlend = blend;
+                    blendState.ColorSourceBlend = blend;
+                    break;
+                case "destblend":
+                    blend = ParseTreeTools.ParseBlend(value);
+                    if (blendState == null)
+                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+                    blendState.AlphaDestinationBlend = blend;
+                    blendState.ColorDestinationBlend = blend;
+                    break;
+                case "blendop":
+                    if (blendState == null)
+                        blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
+                    blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
+                    break;
+                case "zenable":
+                    if (depthStencilState == null)
+                        depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+                    depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
+                    break;
+                case "zwriteenable":
+                    if (depthStencilState == null)
+                        depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
+                    depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
+                    break;
+                case "depthbias":
+                    if (rasterizerState == null)
+                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                    rasterizerState.DepthBias = float.Parse(value);
+                    break;
+                case "cullmode":
+                    if (rasterizerState == null)
+                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                    rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
+                    break;
+                case "fillmode":
+                    if (rasterizerState == null)
+                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                    rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
+                    break;
+                case "multisampleantialias":
+                    if (rasterizerState == null)
+                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                    rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
+                    break;
+                case "slopescaledepthbias":
+                    if (rasterizerState == null)
+                        rasterizerState = new Microsoft.Xna.Framework.Graphics.RasterizerState();
+                    rasterizerState.SlopeScaleDepthBias = float.Parse(value);
+                    break;
+            }            
+        }
 	}
 
 	public enum TextureFilterType
