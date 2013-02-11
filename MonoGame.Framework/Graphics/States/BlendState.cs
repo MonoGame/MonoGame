@@ -199,12 +199,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                                 AlphaDestinationBlend == Opaque.AlphaDestinationBlend);
 
                 targetDesc.BlendOperation = GetBlendOperation(ColorBlendFunction);
-                targetDesc.SourceBlend = GetBlendOption(ColorSourceBlend);
-                targetDesc.DestinationBlend = GetBlendOption(ColorDestinationBlend);
+                targetDesc.SourceBlend = GetBlendOption(ColorSourceBlend, false);
+                targetDesc.DestinationBlend = GetBlendOption(ColorDestinationBlend, false);
 
                 targetDesc.AlphaBlendOperation = GetBlendOperation(AlphaBlendFunction);
-                targetDesc.SourceAlphaBlend = GetBlendOption(AlphaSourceBlend);
-                targetDesc.DestinationAlphaBlend = GetBlendOption(AlphaDestinationBlend);
+                targetDesc.SourceAlphaBlend = GetBlendOption(AlphaSourceBlend, true);
+                targetDesc.DestinationAlphaBlend = GetBlendOption(AlphaDestinationBlend, true);
 
                 // Set the first 4 targets to the same settings.
                 desc.RenderTarget[0] = targetDesc;
@@ -263,7 +263,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        static private SharpDX.Direct3D11.BlendOption GetBlendOption(Blend blend)
+        static private SharpDX.Direct3D11.BlendOption GetBlendOption(Blend blend, bool alpha)
         {
             switch (blend)
             {
@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.DestinationAlpha;
 
                 case Blend.DestinationColor:
-                    return SharpDX.Direct3D11.BlendOption.DestinationColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.DestinationAlpha : SharpDX.Direct3D11.BlendOption.DestinationColor;
 
                 case Blend.InverseBlendFactor:
                     return SharpDX.Direct3D11.BlendOption.InverseBlendFactor;
@@ -283,13 +283,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.InverseDestinationAlpha;
 
                 case Blend.InverseDestinationColor:
-                    return SharpDX.Direct3D11.BlendOption.InverseDestinationColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.InverseDestinationAlpha : SharpDX.Direct3D11.BlendOption.InverseDestinationColor;
 
                 case Blend.InverseSourceAlpha:
                     return SharpDX.Direct3D11.BlendOption.InverseSourceAlpha;
 
                 case Blend.InverseSourceColor:
-                    return SharpDX.Direct3D11.BlendOption.InverseSourceColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.InverseSourceAlpha : SharpDX.Direct3D11.BlendOption.InverseSourceColor;
 
                 case Blend.One:
                     return SharpDX.Direct3D11.BlendOption.One;
@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.SourceAlphaSaturate;
 
                 case Blend.SourceColor:
-                    return SharpDX.Direct3D11.BlendOption.SourceColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.SourceAlpha : SharpDX.Direct3D11.BlendOption.SourceColor;
 
                 case Blend.Zero:
                     return SharpDX.Direct3D11.BlendOption.Zero;                    
