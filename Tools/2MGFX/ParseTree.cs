@@ -245,83 +245,12 @@ namespace TwoMGFX
 
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
         {
-            var pass = paramlist[0] as PassInfo;
-        	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0)) as string;
         	
-        	Microsoft.Xna.Framework.Graphics.Blend blend;
-        	
-        	switch (name.ToLower())
-        	{
-        		case "alphablendenable":
-        			if (!ParseTreeTools.ParseBool(value))
-        			{
-        				if (pass.blendState == null)
-        					pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        				pass.blendState.AlphaSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-        				pass.blendState.ColorSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-        				pass.blendState.ColorDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
-        				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
-        			}
-        			break;
-        		case "srcblend":
-        			blend = ParseTreeTools.ParseBlend(value);
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaSourceBlend = blend;
-        			pass.blendState.ColorSourceBlend = blend;
-        			break;
-        		case "destblend":
-        			blend = ParseTreeTools.ParseBlend(value);
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaDestinationBlend = blend;
-        			pass.blendState.ColorDestinationBlend = blend;
-        			break;
-        		case "blendop":
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
-        			break;
-        		case "zenable":
-        			if (pass.depthStencilState == null)
-        				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
-        			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "zwriteenable":
-        			if (pass.depthStencilState == null)
-        				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
-        			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "depthbias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.DepthBias = float.Parse(value);
-        			break;
-        		case "cullmode":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
-        			break;
-        		case "fillmode":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
-        			break;
-        		case "multisampleantialias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "slopescaledepthbias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.SlopeScaleDepthBias = float.Parse(value);
-        			break;
-        		default:
-        			break;
-        	}
-        	
+        	var pass = paramlist[0] as PassInfo;
+        	pass.ParseRenderState(name, value);
+        		
         	return null;
         }
 
