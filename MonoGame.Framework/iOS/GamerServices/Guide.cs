@@ -336,11 +336,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowMarketplace (PlayerIndex player)
 		{
-			AssertInitialised ();
+			AssertInitialised();
 
-            // TODO: Add your own link
-			NSUrl url = new NSUrl("http://www.monogame.net");
-			if (!UIApplication.SharedApplication.OpenUrl(url)) {
+			string bundleName = NSBundle.MainBundle.InfoDictionary[new NSString("CFBundleName")].ToString();
+			StringBuilder output = new StringBuilder();
+			foreach (char c in input)
+			{
+				// Ampersand gets converted to "and"!!
+				if (c == '&')
+					output.Append("and");
+
+				// All alphanumeric characters are added
+				if (char.IsLetterOrDigit(c))
+					output.Append(c);
+			}
+			NSUrl url = new NSUrl("itms-apps://itunes.com/app/" + output.ToString());
+			if (!UIApplication.SharedApplication.OpenUrl(url))
+			{
 				// Error
 			}
 		}
