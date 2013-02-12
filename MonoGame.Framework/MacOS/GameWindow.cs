@@ -284,7 +284,7 @@ namespace Microsoft.Xna.Framework
 							break;
 						}
 
-						case DisplayOrientation.PortraitDown :
+						case DisplayOrientation.PortraitUpsideDown :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
 							break;
@@ -316,7 +316,7 @@ namespace Microsoft.Xna.Framework
 							break;
 						}
 
-						case DisplayOrientation.PortraitDown :
+						case DisplayOrientation.PortraitUpsideDown :
 						{				
 							translatedPosition = new Vector2( ClientBounds.Width - position.X, ClientBounds.Height - position.Y );							
 							break;
