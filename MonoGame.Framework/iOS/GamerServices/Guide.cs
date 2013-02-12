@@ -337,7 +337,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			string bundleName = NSBundle.MainBundle.InfoDictionary[new NSString("CFBundleName")].ToString();
 			StringBuilder output = new StringBuilder();
-			foreach (char c in input)
+			foreach (char c in bundleName)
 			{
 				// Ampersand gets converted to "and"!!
 				if (c == '&')
