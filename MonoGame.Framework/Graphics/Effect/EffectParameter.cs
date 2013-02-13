@@ -552,7 +552,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Vector2 value)
 		{
-            if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Single)
+            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
 
             var fData = (float[])Data;
