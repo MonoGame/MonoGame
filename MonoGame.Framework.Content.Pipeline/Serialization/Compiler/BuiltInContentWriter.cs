@@ -30,9 +30,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             // Change "Writer" in this class name to "Reader" and use the runtime type namespace and assembly
             string readerClassName = this.GetType().Name.Replace("Writer", "Reader");
+
+            // Add generic arguments if they exist
+            var args = this.GetType().GetGenericArguments();
+            if (args.Length > 0)
+            {
+                readerClassName += "[";
+                for (int i = 0; i < args.Length; ++i)
+                {
+                    var arg = args[i];
+                    readerClassName += "[";
+                    readerClassName += arg.AssemblyQualifiedName;        
+                    readerClassName += "]";
+                    if (i < args.Length - 1)
+                        readerClassName += ", ";
+                }
+                readerClassName += "]";
+            }
+
             string readerNamespace = typeof(ContentTypeReader).Namespace;
-            string assemblyName = typeof(ContentTypeReader).Assembly.FullName;
-            return readerNamespace + "." + readerClassName + ", " + assemblyName;
+            // From looking at XNA-produced XNBs, it appears built-in type readers don't need assembly qualification
+            return readerNamespace + "." + readerClassName;
         }
     }
 }
