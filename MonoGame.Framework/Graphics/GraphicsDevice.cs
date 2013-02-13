@@ -2047,15 +2047,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             DynamicIndexBuffer buffer;
 
-            var indexSize = typeof(T) == typeof(short) ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
+            var indexType = typeof(T);
+            var indexSize = Marshal.SizeOf(indexType);
+            var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
-            if (!_userIndexBuffers.TryGetValue(indexSize, out buffer) || buffer.IndexCount < indexCount)
+            if (!_userIndexBuffers.TryGetValue(indexElementSize, out buffer) || buffer.IndexCount < indexCount)
             {
                 if (buffer != null)
                     buffer.Dispose();
 
-                buffer = new DynamicIndexBuffer(this, indexSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
-                _userIndexBuffers[indexSize] = buffer;
+                buffer = new DynamicIndexBuffer(this, indexElementSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
+                _userIndexBuffers[indexElementSize] = buffer;
             }
 
             var startIndex = buffer.UserOffset;
@@ -2063,7 +2065,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
             {
                 buffer.UserOffset += indexCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
+                buffer.SetData(startIndex * indexSize, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
