@@ -39,13 +39,14 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
@@ -142,12 +143,26 @@ namespace MonoGame.Framework
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
         {
+            var previousState = Mouse.State.LeftButton;
+            
             Mouse.State.X = mouseEventArgs.X;
             Mouse.State.Y = mouseEventArgs.Y;
             Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
+            
+            TouchLocationState? touchState = null;
+            if (Mouse.State.LeftButton == ButtonState.Pressed)
+                if (previousState == ButtonState.Released)
+                    touchState = TouchLocationState.Pressed;
+                else
+                    touchState = TouchLocationState.Moved;
+            else if (previousState == ButtonState.Pressed)
+                touchState = TouchLocationState.Released;
+
+            if (touchState.HasValue)
+                TouchPanel.AddEvent(0, touchState.Value, new Vector2(Mouse.State.X, Mouse.State.Y), true);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
