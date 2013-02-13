@@ -303,6 +303,7 @@
     <Compile Include="PSSuite\Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />

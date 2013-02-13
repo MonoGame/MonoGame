@@ -84,6 +84,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			);//(a, b) => ((int)(a.info.elements > 1))a.register_index.CompareTo(b.register_index));
 
+            // NOTE: It seems the latest versions of MojoShader only 
+            // output vec4 register sets.  We leave the code below, but
+            // the runtime has been optimized for this case.
+
 			// For whatever reason the register indexing is 
 			// incorrect from MojoShader.
 			{
