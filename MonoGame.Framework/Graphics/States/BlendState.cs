@@ -158,22 +158,40 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
         internal void ApplyState(GraphicsDevice device)
         {
-            GL.Enable(EnableCap.Blend);
+            var blendEnabled = !(this.ColorSourceBlend == Blend.One && 
+                                 this.ColorDestinationBlend == Blend.Zero &&
+                                 this.AlphaSourceBlend == Blend.One &&
+                                 this.AlphaDestinationBlend == Blend.Zero);
+            if (blendEnabled)
+                GL.Enable(All.Blend);
+            else
+                GL.Disable(All.Blend);
             GraphicsExtensions.CheckGLError();
 
-            // Set blending mode
-            var blendMode = ColorBlendFunction.GetBlendEquationMode();
-            GL.BlendEquation(blendMode);
+            GL.BlendColor(
+                this.BlendFactor.R / 255.0f,      
+                this.BlendFactor.G / 255.0f, 
+                this.BlendFactor.B / 255.0f, 
+                this.BlendFactor.A / 255.0f);
             GraphicsExtensions.CheckGLError();
 
-            // Set blending function
-            var bfs = ColorSourceBlend.GetBlendFactorSrc();
-            var bfd = ColorDestinationBlend.GetBlendFactorDest();
-#if IOS
-			GL.BlendFunc ((All)bfs, (All)bfd);
-#else
-            GL.BlendFunc(bfs, bfd);
-#endif
+            GL.BlendEquationSeparate(
+                this.ColorBlendFunction.GetBlendEquationMode(),
+                this.AlphaBlendFunction.GetBlendEquationMode());
+            GraphicsExtensions.CheckGLError();
+
+            GL.BlendFuncSeparate(
+                this.ColorSourceBlend.GetBlendFactorSrc(), 
+                this.ColorDestinationBlend.GetBlendFactorDest(), 
+                this.AlphaSourceBlend.GetBlendFactorSrc(), 
+                this.AlphaDestinationBlend.GetBlendFactorDest());
+            GraphicsExtensions.CheckGLError();
+
+            GL.ColorMask(
+                (this.ColorWriteChannels & ColorWriteChannels.Red) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Green) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Blue) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Alpha) != 0);
             GraphicsExtensions.CheckGLError();
         }
 

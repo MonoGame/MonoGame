@@ -22,7 +22,6 @@ using Sce.PlayStation.Core.Graphics;
 
 
 namespace Microsoft.Xna.Framework.Graphics
-
 {
 	public class DepthStencilState : GraphicsResource
     {
@@ -158,46 +157,61 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.Enable(EnableCap.StencilTest);
                 GraphicsExtensions.CheckGLError();
 
-                // Set color mask - not needed
-                //GL.ColorMask(false, false, false, false); //Disable drawing colors to the screen
                 // set function
-                GLStencilFunction func;
-                switch (StencilFunction)
+                if (this.TwoSidedStencilMode)
                 {
-                    default:
-                    case CompareFunction.Always:
-                        func = GLStencilFunction.Always;
-                        break;
-                    case CompareFunction.Equal:
-                        func = GLStencilFunction.Equal;
-                        break;
-                    case CompareFunction.Greater:
-                        func = GLStencilFunction.Greater;
-                        break;
-                    case CompareFunction.GreaterEqual:
-                        func = GLStencilFunction.Gequal;
-                        break;
-                    case CompareFunction.Less:
-                        func = GLStencilFunction.Less;
-                        break;
-                    case CompareFunction.LessEqual:
-                        func = GLStencilFunction.Lequal;
-                        break;
-                    case CompareFunction.Never:
-                        func = GLStencilFunction.Never;
-                        break;
-                    case CompareFunction.NotEqual:
-                        func = GLStencilFunction.Notequal;
-                        break;
+                    GL.StencilFuncSeparate((All)CullFaceMode.Front, GetStencilFunc(this.StencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilFuncSeparate((All)CullFaceMode.Back, GetStencilFunc(this.CounterClockwiseStencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate((All)CullFaceMode.Front, GetStencilOp(this.StencilFail), 
+                                         GetStencilOp(this.StencilDepthBufferFail), 
+                                         GetStencilOp(this.StencilPass));
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate((All)CullFaceMode.Back, GetStencilOp(this.CounterClockwiseStencilFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilDepthBufferFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilPass));
+                    GraphicsExtensions.CheckGLError();
+                }
+                else
+                {
+                    GL.StencilFunc(GetStencilFunc(this.StencilFunction), ReferenceStencil, StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    
+                    GL.StencilOp(GetStencilOp(StencilFail),
+                                 GetStencilOp(StencilDepthBufferFail),
+                                 GetStencilOp(StencilPass));
+                    GraphicsExtensions.CheckGLError();
                 }
 
-                GL.StencilFunc(func, ReferenceStencil, StencilMask);
-                GraphicsExtensions.CheckGLError();
+            }
+        }
 
-                GL.StencilOp(GetStencilOp(StencilFail),
-                                GetStencilOp(StencilDepthBufferFail),
-                                GetStencilOp(StencilPass));
-                GraphicsExtensions.CheckGLError();
+        private static GLStencilFunction GetStencilFunc(CompareFunction function)
+        {
+            GLStencilFunction func;
+            switch (function)
+            {
+            case CompareFunction.Always:
+                return GLStencilFunction.Always;
+            case CompareFunction.Equal:
+                return GLStencilFunction.Equal;
+            case CompareFunction.Greater:
+                return GLStencilFunction.Greater;
+            case CompareFunction.GreaterEqual:
+                return GLStencilFunction.Gequal;
+            case CompareFunction.Less:
+                return GLStencilFunction.Less;
+            case CompareFunction.LessEqual:
+                return GLStencilFunction.Lequal;
+            case CompareFunction.Never:
+                return GLStencilFunction.Never;
+            case CompareFunction.NotEqual:
+                return GLStencilFunction.Notequal;
+            default:
+                return GLStencilFunction.Always;
             }
         }
 
