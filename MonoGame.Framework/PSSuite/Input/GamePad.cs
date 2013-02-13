@@ -148,8 +148,8 @@ using Microsoft.Xna.Framework.Graphics;
 			}
 			
 			//Analog sticks
-			_leftStick = new Vector2(gamePadData.AnalogLeftX, gamePadData.AnalogLeftY);
-			_rightStick = new Vector2(gamePadData.AnalogRightX, gamePadData.AnalogRightY);
+			_leftStick = new Vector2(gamePadData.AnalogLeftX, -gamePadData.AnalogLeftY);
+			_rightStick = new Vector2(gamePadData.AnalogRightX, -gamePadData.AnalogRightY);
 		}
 
 		public static GamePadState GetState(PlayerIndex playerIndex)
