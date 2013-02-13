@@ -217,11 +217,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			return (Texture2D)Data;
 		}
 
-        // TODO: Add Texture3D support!
-		//		public Texture3D GetValueTexture3D ()
-		//		{
-		//			return new Texture3D ();
-		//		}
+#if !GLES
+	    public Texture3D GetValueTexture3D ()
+	    {
+            if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Texture3D)
+                throw new InvalidCastException();
+
+            return (Texture3D)Data;
+	    }
+#endif
 
 		public TextureCube GetValueTextureCube ()
 		{
@@ -535,11 +539,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         ParameterType != EffectParameterType.Texture2D)
                     throw new InvalidCastException();
             }
+#if !GLES
             else if (value is Texture3D)
             {
                 if (ParameterType != EffectParameterType.Texture3D)
                     throw new InvalidCastException();                
             }
+#endif
             else
 		    {
                 if (!(value is TextureCube) || ParameterType != EffectParameterType.TextureCube)

@@ -6,12 +6,6 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using PixelFormat = OpenTK.Graphics.ES20.All;
-using PixelInternalFormat = OpenTK.Graphics.ES20.All;
-using PixelType = OpenTK.Graphics.ES20.All;
 #endif
 #elif DIRECTX
 // TODO!
@@ -44,11 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
             
-#if IOS || ANDROID
-                GL.GenTextures(1, ref this.glTexture);
-#else
-                GL.GenTextures(1, out this.glTexture);
-#endif
+            GL.GenTextures(1, out this.glTexture);
             GraphicsExtensions.CheckGLError();
 
 			GL.BindTexture (glTarget, glTexture);
