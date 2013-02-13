@@ -7,6 +7,11 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
+using OpenTK.Graphics.ES20;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.All;
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
 #endif
 #elif DIRECTX
 // TODO!
@@ -38,13 +43,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
+            
+#if IOS || ANDROID
+                GL.GenTextures(1, ref this.glTexture);
+#else
+                GL.GenTextures(1, out this.glTexture);
+#endif
+            GraphicsExtensions.CheckGLError();
 
-			GL.GenTextures (1, out this.glTexture);
 			GL.BindTexture (glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
 
 			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
 
 			GL.TexImage3D (glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
+            GraphicsExtensions.CheckGLError();
 
 			if (mipMap) {
 					throw new NotImplementedException ();
@@ -52,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
 
 #endif
-		}
+        }
 		
 		public void SetData<T> (T[] data) where T : struct
 		{
@@ -77,11 +90,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             GL.BindTexture(glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
 			GL.TexSubImage3D(glTarget, level, left, top, front, right-left, bottom-top, back-front, glFormat, glType, dataPtr);
+            GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 
 #endif
-			dataHandle.Free ();
+            dataHandle.Free ();
 		}
 		
 
