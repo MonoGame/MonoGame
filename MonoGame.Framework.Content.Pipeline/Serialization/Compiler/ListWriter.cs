@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected override void Initialize(ContentCompiler compiler)
         {
             base.Initialize(compiler);
-
+            
             elementWriter = compiler.GetTypeWriter(typeof(T));
         }
 
@@ -37,7 +37,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 throw new ArgumentNullException("value");
             output.Write(value.Count);
             foreach (var element in value)
+            {
                 output.WriteObject(element, elementWriter);
+            }
         }
     }
 }
