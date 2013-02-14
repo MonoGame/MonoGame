@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class SpriteFontContent : ContentItem
+    public class SpriteFontContent
     {
         public SpriteFontContent() { }
 
