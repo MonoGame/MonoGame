@@ -26,6 +26,16 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.IO;
+
+#if ANDROID
+using System.Linq;
+using System.Collections.Generic;
+#endif
+
+#if WINRT
+using Windows.Storage;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -34,6 +44,12 @@ namespace Microsoft.Xna.Framework.Content
         #region Private Member Variables
 
         private Type targetType;
+#if ANDROID
+		// Keep this static so we only call Game.Activity.Assets.List() once
+		// No need to call it for each file if the list will never change.
+		// We do need one file list per folder though.
+		static Dictionary<string, string[]> filesInFolders = new Dictionary<string,string[]>();
+#endif
 
         #endregion Private Member Variables
 
@@ -73,6 +89,76 @@ namespace Microsoft.Xna.Framework.Content
         protected internal abstract object Read(ContentReader input, object existingInstance);
 
         #endregion Protected Methods
+
+        #region Internal Static Helper Methods
+#if ANDROID
+        internal static string Normalize(string fileName, string[] extensions)
+        {
+            int index = fileName.LastIndexOf(Path.DirectorySeparatorChar);
+            string path = string.Empty;
+            string file = fileName;
+            if (index >= 0)
+            {
+                file = fileName.Substring(index + 1, fileName.Length - index - 1);
+                path = fileName.Substring(0, index);
+            }
+
+            // Only read the assets file list once
+            string[] files = null;
+            if (!filesInFolders.TryGetValue(path, out files))
+            {
+                files = Game.Activity.Assets.List(path);
+                filesInFolders[path] = files;
+            }
+
+            if (files.Any(s => s == file))
+                return fileName;
+
+            // Check the file extension
+            if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
+            {
+                return null;
+            }
+
+			// FirstOrDefault returns null as the default if the file is not found. This crashed Path.Combine so check
+			// for it first.
+			string file2 = files.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (file.ToLower() + ext)));
+			if (String.IsNullOrEmpty(file2))
+				return null;
+            return Path.Combine(path, file2);
+        }
+#else
+		public static string Normalize(string fileName, string[] extensions)
+		{
+#if WINRT
+            if (MetroHelper.AppDataFileExists(fileName))
+                return fileName;
+#else
+            if (File.Exists(fileName))
+				return fileName;
+#endif
+			// Check the file extension
+			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
+				return null;
+			
+            foreach (string ext in extensions)
+            {
+			    // Concat the file name with valid extensions
+                string fileNamePlusExt = fileName + ext;
+
+#if WINRT
+                if (MetroHelper.AppDataFileExists(fileNamePlusExt))
+                    return fileNamePlusExt;
+#else
+			    if (File.Exists(fileNamePlusExt))
+				    return fileNamePlusExt;
+#endif
+            }
+			
+			return null;
+		}
+#endif
+        #endregion
     }
 
     public abstract class ContentTypeReader<T> : ContentTypeReader

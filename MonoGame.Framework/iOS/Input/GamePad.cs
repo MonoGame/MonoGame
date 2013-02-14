@@ -41,7 +41,6 @@
 	using Microsoft.Xna.Framework;
 	using System;
 	using Microsoft.Xna.Framework.Graphics;
-	using OpenTK.Graphics.ES11;
 	using MonoTouch.UIKit;
 	using System.Collections.Generic;
 	using MonoTouch.AudioToolbox;
@@ -176,14 +175,14 @@
 			private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
 			{
 				Rectangle buttonRect = new Rectangle((int) theButton.Position.X,(int)theButton.Position.Y,theButton.TextureRect.Width, theButton.TextureRect.Height);
-				return  buttonRect.Contains(location); 
+				return  buttonRect.Contains((int)location.X, (int)location.Y); 
 			}
 			
 			private bool CheckThumbStickHit(ThumbStickDefinition theStick, Vector2 location)
 			{
 				Vector2 stickPosition = theStick.Position + theStick.Offset;
 				Rectangle thumbRect = new Rectangle((int) stickPosition.X,(int)stickPosition.Y,theStick.TextureRect.Width, theStick.TextureRect.Height);
-				return  thumbRect.Contains(location); 
+				return  thumbRect.Contains((int)location.X, (int)location.Y); 
 			}
 			
 			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)

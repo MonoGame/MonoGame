@@ -44,76 +44,32 @@ namespace Microsoft.Xna.Framework
 {
     public class GameTime
     {
-        TimeSpan _elapsedTime;
-        TimeSpan _totalTime;
+        public TimeSpan TotalGameTime { get; set; }
+
+        public TimeSpan ElapsedGameTime { get; set; }
 
         public bool IsRunningSlowly { get; set; }
 
-        public TimeSpan ElapsedGameTime
-        {
-            get
-            {
-                return _elapsedTime;
-            }
-            internal set
-            {
-                _elapsedTime = value;
-            }
-        }
-
-        public TimeSpan ElapsedRealTime
-        {
-            get
-            {
-                return _elapsedTime;
-            }
-        }
-
-        public TimeSpan TotalGameTime
-        {
-            get
-            {
-                return _totalTime;
-            }
-        }
-
-        public TimeSpan TotalRealTime
-        {
-            get
-            {
-                return _totalTime;
-            }
-        }
-
         public GameTime()
         {
-            _elapsedTime = _totalTime = TimeSpan.Zero;
+            TotalGameTime = TimeSpan.Zero;
+            ElapsedGameTime = TimeSpan.Zero;
+            IsRunningSlowly = false;
         }
 
         public GameTime(TimeSpan totalGameTime, TimeSpan elapsedGameTime)
         {
-            _totalTime = totalGameTime;
-            _elapsedTime = elapsedGameTime;
+            TotalGameTime = totalGameTime;
+            ElapsedGameTime = elapsedGameTime;
+            IsRunningSlowly = false;
         }
 
 		public GameTime (TimeSpan totalRealTime, TimeSpan elapsedRealTime, bool isRunningSlowly)
 		{
-            _totalTime = totalRealTime;
-            _elapsedTime = elapsedRealTime;
+            TotalGameTime = totalRealTime;
+            ElapsedGameTime = elapsedRealTime;
 		    IsRunningSlowly = isRunningSlowly;
 		}
-
-        internal void Update(TimeSpan elapsed)
-        {
-		//Console.WriteLine("Update " + elapsed);
-            _elapsedTime = elapsed;
-            _totalTime += elapsed;
-        }				
-
-        internal void ResetElapsedTime()
-        {
-            _elapsedTime = TimeSpan.Zero;
-        }
     }
 }
 

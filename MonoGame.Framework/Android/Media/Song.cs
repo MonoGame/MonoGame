@@ -5,21 +5,50 @@ using Microsoft.Xna.Framework.Audio;
 ﻿
 namespace Microsoft.Xna.Framework.Media
 {
-    public class Song : IEquatable<Song>, IDisposable
+    public sealed class Song : IEquatable<Song>, IDisposable
     {
         static internal Android.Media.MediaPlayer _androidPlayer = null;
         private string _name;
         private int _playCount;
+        bool disposed;
 
-        internal Song(string fileName)
+        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
+        event FinishedPlayingHandler DonePlaying;
+
+		internal Song (string fileName, int durationMS)
+			:this(fileName)
+		{
+			_Duration = TimeSpan.FromMilliseconds(durationMS);
+		}
+		internal Song(string fileName)
         {
             _name = fileName;
             if (_androidPlayer == null)
+            {
                 _androidPlayer = new Android.Media.MediaPlayer();
+                _androidPlayer.Completion += new EventHandler(_androidPlayer_Completion);
+            }
+        }
+
+        ~Song()
+        {
+            Dispose(false);
         }
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                // ...
+
+                disposed = true;
+            }
         }
 
         private void Prepare()
@@ -35,6 +64,22 @@ namespace Microsoft.Xna.Framework.Media
                     _androidPlayer.Looping = true;
                 }
             }
+        }
+
+        void _androidPlayer_Completion(object sender, EventArgs e)
+        {
+            if (DonePlaying != null)
+                DonePlaying(sender, e);
+        }
+
+        /// <summary>
+        /// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
+        /// </summary>
+        internal void SetEventHandler(FinishedPlayingHandler handler)
+        {
+            if (DonePlaying != null)
+                return;
+            DonePlaying += handler;
         }
 
         public bool Equals(Song song)
@@ -103,6 +148,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_androidPlayer != null)
             {
                 _androidPlayer.Stop();
+                _playCount = 0;
             }
         }
 
@@ -151,16 +197,22 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_androidPlayer != null)
-                {
-                    return new TimeSpan(0, 0, (int)_androidPlayer.Duration);
-                }
-                else
-                {
-                    return new TimeSpan(0);
-                }
+				if(_Duration == TimeSpan.Zero)
+				{
+	                if (_androidPlayer != null)
+	                {
+	                    return new TimeSpan(0, 0, (int)_androidPlayer.Duration);
+	                }
+	                else
+	                {
+						return _Duration;
+	                }
+				}
+				else
+					return _Duration;
             }
         }
+		private TimeSpan _Duration = TimeSpan.Zero;
 
         public TimeSpan Position
         {

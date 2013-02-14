@@ -53,9 +53,7 @@ namespace Microsoft.Xna.Framework
 	{		
 		public void Dump()
 		{
-#if DEBUG
-			Console.WriteLine(ToString());
-#endif		
+			Debug.WriteLine(ToString());
 		}
 		
 		public override string ToString ()
@@ -73,30 +71,28 @@ namespace Microsoft.Xna.Framework
 	public static class PerformanceCounter
 	{
 		private static Dictionary<string,PerformanceItem> _list = new Dictionary<string, PerformanceItem>();
-		private static long _startTime = Environment.TickCount;
+		private static long _startTime = DateTime.Now.Ticks;
 		private static long _endTime;
 		
 		public static void Dump()
 		{
-			_endTime = Environment.TickCount;
-#if DEBUG			
-			Console.WriteLine("Performance count results");
-			Console.WriteLine("=========================");
-			Console.WriteLine("Execution Time: " + ElapsedTime + "ms.");
-#endif
+            _endTime = DateTime.Now.Ticks;
+
+            Debug.WriteLine("Performance count results");
+            Debug.WriteLine("=========================");
+            Debug.WriteLine("Execution Time: " + ElapsedTime + "ms.");
 			
 			foreach (PerformanceItem item in _list.Values)
 			{
 				item.Dump();
 			}
-#if DEBUG
-			Console.WriteLine("=========================");
-#endif
+			
+			Debug.WriteLine("=========================");
 		}
 		
 		public static void Begin()
 		{
-			_startTime = Environment.TickCount;
+            _startTime = DateTime.Now.Ticks;
 		}
 				
 		public static long ElapsedTime
@@ -113,25 +109,29 @@ namespace Microsoft.Xna.Framework
 			if (_list.ContainsKey(Name))
 			{
 				item = _list[Name];
-				item.PreviousTime = Environment.TickCount;			
+                item.PreviousTime = DateTime.Now.Ticks;		
 			}
 			else 
 			{
-    			StackTrace stackTrace = new StackTrace();
-    			StackFrame stackFrame = stackTrace.GetFrame(1);
+				item = new PerformanceItem();
+#if !WINRT
+    			var stackTrace = new StackTrace();
+    			var stackFrame = stackTrace.GetFrame(1);
     			MethodBase methodBase = stackFrame.GetMethod();
 
-				item = new PerformanceItem();
-				item.Name = "ID: " + Name+" In " + methodBase.ReflectedType.ToString()+"::"+methodBase.Name; 
-				item.PreviousTime = Environment.TickCount;			
-				_list.Add(Name,item);
+				item.Name = "ID: " + Name+" In " + methodBase.ReflectedType.ToString()+"::"+methodBase.Name;
+#else
+                item.Name = "ID: " + Name;
+#endif
+                item.PreviousTime = DateTime.Now.Ticks;
+                _list.Add(Name,item);
 			}			
 		}
 		
 		public static void EndMensure(string Name)
 		{
 			PerformanceItem item = _list[Name];
-			long elapsedTime = Environment.TickCount - item.PreviousTime;
+            var elapsedTime = DateTime.Now.Ticks - item.PreviousTime;
 			if (item.MaxTime < elapsedTime) 
 			{
 				item.MaxTime = elapsedTime;

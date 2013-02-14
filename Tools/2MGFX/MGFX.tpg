@@ -1,0 +1,148 @@
+// MonoGame Effect Parser
+//
+// For use with our fork of the "Tiny Parser Generator"
+// https://github.com/SickheadGames/TinyPG
+//
+
+<% @TinyPG Namespace="TwoMGFX" Language="C#"%>
+
+[Skip] BlockComment -> @"/\*([^*]|\*[^/])*\*/";
+[Skip] Comment -> @"//[^\n\r]*";
+[Skip] Whitespace -> @"[ \t\n\r]+";
+[FileAndLine] LinePragma -> @"^[ \t]*#line[ \t]*(?<Line>\d*)[ \t]*(\""(?<File>[^\""\\]*(?:\\.[^\""\\]*)*)\"")?\n";
+
+// TOKENS
+[IgnoreCase] Pass -> @"pass";
+[IgnoreCase] Technique -> @"technique";
+[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
+[IgnoreCase] SamplerState -> @"sampler_state";
+[IgnoreCase] VertexShader -> @"VertexShader";
+[IgnoreCase] PixelShader -> @"PixelShader";
+[IgnoreCase] Register -> @"register";
+Number -> @"[0-9]?\.?[0-9]+";
+Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
+OpenBracket -> @"{";
+CloseBracket -> @"}";
+Equals -> @"=";
+Colon -> @":";
+Comma -> @",";
+Semicolon -> @";";
+OpenParenthesis -> @"\(";
+CloseParenthesis -> @"\)";
+OpenSquareBracket -> @"\[";
+CloseSquareBracket -> @"\]";
+LessThan -> @"<";
+GreaterThan -> @">";
+[IgnoreCase] Compile -> @"compile";
+[IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+Code -> @"[\S]+";
+EndOfFile -> @"^$";
+
+// Productions
+Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
+{
+   var shader = new ShaderInfo();
+
+   foreach (var node in Nodes)
+      node.Eval(tree, shader);
+
+   return shader; 
+};
+
+Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ CloseBracket 
+{
+   var technique = new TechniqueInfo();
+   technique.name = $Identifier as string ?? string.Empty;
+   technique.startPos = Token.StartPos;
+   technique.length = Token.Length;
+
+   foreach (var node in Nodes)
+      node.Eval(tree, technique);
+   
+   // Make sure we have at least one pass.
+   if (technique.Passes.Count > 0)
+   {
+      var shaderInfo = paramlist[0] as ShaderInfo;
+      shaderInfo.Techniques.Add(technique);
+   }
+
+   return null;
+};
+
+Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
+{
+	var name = $Identifier[0] as string;
+	var value = ($Identifier[1] ?? $Number) as string;
+	
+	var pass = paramlist[0] as PassInfo;
+	pass.ParseRenderState(name, value);
+		
+	return null;
+};
+
+Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
+{ 
+   var pass = new PassInfo();
+   pass.name = $Identifier as string ?? string.Empty;
+
+   foreach (var node in Nodes)
+      node.Eval(tree, pass);
+
+   // We need to have a pixel or vertex shader to keep this pass.
+   if (!string.IsNullOrEmpty(pass.psFunction) || !string.IsNullOrEmpty(pass.vsFunction))
+   {
+      var technique = paramlist[0] as TechniqueInfo;
+      technique.Passes.Add(pass);
+   }
+
+   return null;
+};
+
+VertexShader_Pass_Expression -> VertexShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
+{
+   var pass = paramlist[0] as PassInfo;
+   pass.vsModel = $ShaderModel as string;
+   pass.vsFunction = $Identifier as string;
+   return null;
+};
+
+PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier OpenParenthesis CloseParenthesis Semicolon
+{
+   var pass = paramlist[0] as PassInfo;
+   pass.psModel = $ShaderModel as string;
+   pass.psFunction = $Identifier as string;
+   return null;
+};
+
+Sampler_State_Expression -> Identifier Equals (LessThan Identifier GreaterThan | Identifier | Number) Semicolon
+{
+	var name = $Identifier[0] as string;
+	var value = ($Identifier[1] ?? ($Identifier[2] ?? $Number[0])) as string;	
+
+	var sampler = paramlist[0] as SamplerStateInfo;
+	sampler.Parse(name, value);
+
+	return null;
+};
+
+Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma Identifier (OpenSquareBracket Number CloseSquareBracket)?)? CloseParenthesis
+{
+	return null;
+};
+
+Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+{
+	if ($SamplerState == null)
+		return null;
+	
+	var sampler = new SamplerStateInfo();
+	sampler.Name = $Identifier as string;
+	
+	foreach (ParseNode node in Nodes)
+		node.Eval(tree, sampler);
+
+	var shaderInfo = paramlist[0] as ShaderInfo;
+	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
+
+	return null;
+};

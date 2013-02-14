@@ -40,10 +40,15 @@ purpose and non-infringement.
 
 using Microsoft.Xna.Framework;
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	[SerializableAttribute]
+#if WINRT
+    [DataContract]
+#else
+    [Serializable]
+#endif
     public struct Viewport
     {
 		/// <summary>

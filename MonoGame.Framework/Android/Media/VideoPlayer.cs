@@ -65,12 +65,12 @@ namespace Microsoft.Xna.Framework.Media
 
         public void Pause()
         {
-			_video.media.Pause();
+			_video.Player.Pause();
         }
 
         public void Resume()
         {
-            _video.media.Start();
+            _video.Player.Start();
         }
 
 		public MediaState State
@@ -83,23 +83,21 @@ namespace Microsoft.Xna.Framework.Media
 
         public void Play(Microsoft.Xna.Framework.Media.Video video)
         {	
-            AndroidGamePlatform.IsPlayingVdeo = true;			
-			_video = video;			
-			_video.Player = this;			
-            _video.Prepare();
-			_video.media.Start();			
+			_video = video;
+
+            _video.Player.SetDisplay(_game.Window.Holder);
+            _video.Player.Start();
+
             _state = MediaState.Playing;
+            AndroidGamePlatform.IsPlayingVdeo = true;
         }
 
         public void Stop()
-        {			
-			_video.media.Stop();
+        {
+            _video.Player.Stop();
 			_state = MediaState.Stopped;
             AndroidGamePlatform.IsPlayingVdeo = false;
-			_video.media.SetOnCompletionListener(null);
-			_video.media.SetOnVideoSizeChangedListener(null);
-		    _video.media.SetDisplay(null);
-			_video.Player = null;			
+           _video.Player.SetDisplay(null);
         }
 
         public bool IsLooped
@@ -121,6 +119,5 @@ namespace Microsoft.Xna.Framework.Media
                 return _video;
             }
         }
-				
 	}
 }

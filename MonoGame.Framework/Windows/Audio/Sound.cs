@@ -31,21 +31,27 @@ using System.Threading;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using OpenTK.Audio.OpenAL;
 using System.IO;
+
+using OpenTK.Audio.OpenAL;
 using OpenTK.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
-{
+{    
+    /// <summary>
+    /// Note: This class is part of the OpenAL implementation of the XNA sound system
+    ///       and is not included in WinRT projects.
+    /// </summary>
     internal class Sound : IDisposable
     {
         private static AudioContext context = null;
-
-        private int bufferID;
         private int sourceID;
+        private int bufferID = -1;
+
         private bool looping;
         // when looping, to stop we must first disable looping then stop, but we still want to user to "believe" it has looping activated
         private bool loopingCtrl;
+        bool disposed;
 
         public double Duration
         {
@@ -63,6 +69,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.GetSource(sourceID, ALSourcef.SecOffset, out seconds);
                 return (double)seconds;
             }
+
             set
             {
                 AL.Source(sourceID, ALSourcef.SecOffset, (float)value);
@@ -98,6 +105,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 return AL.GetSourceState(sourceID) == ALSourceState.Playing;
             }
+
             set
             {
                 // just do something if it's really needed
@@ -132,7 +140,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{ 
 			get; 
 			set; 
-		}
+		}        
 
         public Sound(string filename, float volume, bool looping)
         {
@@ -180,11 +188,11 @@ namespace Microsoft.Xna.Framework.Audio
             s.Close();
 
             Initialize(data, format, size, freq, volume, looping);
-        }
+        }      
 		
 		~Sound()
 		{
-			Dispose();	
+			Dispose(false);	
 		}
 
         private static void InitilizeSoundServices()
@@ -229,14 +237,25 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            if (bufferID == -1)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            Stop();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
 
-            AL.DeleteSource(sourceID);
-            AL.DeleteBuffer(bufferID);
-            bufferID = -1;
+                }
+                Stop();
+                AL.DeleteSource(sourceID);
+                AL.DeleteBuffer(bufferID);
+                bufferID = -1;
+
+                disposed = true;
+            }
         }
 
         #region Buffer Info
@@ -259,6 +278,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return rv;
             }
         }
+
         /// <summary>
         /// Gets the size of buffer in bytes
         /// </summary>
@@ -271,6 +291,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return rv;
             }
         }
+
         /// <summary>
         /// Gets the bit depth of buffer
         /// </summary>
@@ -283,6 +304,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return rv;
             }
         }
+
         /// <summary>
         /// Gets the frequency of buffer in Hz
         /// </summary>
@@ -295,6 +317,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return rv;
             }
         }
+
         /// <summary>
         /// Gets the number of Samples by Size / GetSampleSize(Bits, Channels)
         /// </summary>
@@ -305,6 +328,7 @@ namespace Microsoft.Xna.Framework.Audio
                 return Size / GetSampleSize(Bits, Channels);
             }
         }
+
         /// <summary>
         /// Gets the seconds of play time in the buffer based on Samples / Frequency
         /// </summary>
@@ -358,10 +382,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         public static Sound CreateAndPlay(string url, float volume, bool looping)
         {
-            Sound sound = new Sound(url, volume, looping);
-
+            var sound = new Sound(url, volume, looping);
             sound.Play();
-
             return sound;
         }
     }

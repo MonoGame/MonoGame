@@ -42,126 +42,201 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
-{	
-	public class TouchCollection : List<TouchLocation>
+{
+    /// <summary>
+    /// Provides state information for a touch screen enabled device.
+    /// </summary>
+    public struct TouchCollection : IList<TouchLocation>
 	{
-		/// <summary>
-		/// Attributes 
-		/// </summary>
-		private bool isConnected;
-		
+        private TouchLocation[] _collection;
+
+        private bool _isConnected;
+
 		#region Properties
-		public bool IsConnected
-		{
-			get
-			{
-				return this.isConnected;
-			}
-		}
-		public bool IsReadOnly
-		{
-			get
-			{
-				return true;
-			}
-		}
+
+        /// <summary>
+        /// States if a touch screen is available.
+        /// </summary>
+		public bool IsConnected { get { return _isConnected; } }
+
 		#endregion
-		
-		public TouchCollection()
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
+        /// </summary>
+        /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
+        public TouchCollection(TouchLocation[] touches)
+        {
+            _isConnected = true;
+            _collection = touches;
+        }
+
+        /// <summary>
+        /// Returns <see cref="TouchLocation"/> specified by ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="touchLocation"></param>
+        /// <returns></returns>
+        public bool FindById(int id, out TouchLocation touchLocation)
 		{
-		}
-		
-		internal TouchCollection(IEnumerable<TouchLocation> locations)	: base (locations)
-		{
-			
-		}
-		
-		internal void Update()
-		{
-			//Console.WriteLine(">>> Touches: {0}", Count);
-			for (int i = this.Count - 1; i >= 0; --i)
-			{
-				TouchLocation t = this[i];
-				switch (t.State)
-				{
-					case TouchLocationState.Pressed:
-						t.State = TouchLocationState.Moved;
-						t.PrevPosition = t.Position;
-						this[i] = t;
-					break;
-					case TouchLocationState.Moved:
-						t.PrevState = TouchLocationState.Moved;
-						this[i] = t;
-					break;
-					case TouchLocationState.Released:
-					case TouchLocationState.Invalid:
-						RemoveAt(i);
-					break;
-				}
-			}
-			//Console.WriteLine("<<< Touches: {0}", Count);
+            for (var i = 0; i < _collection.Length; i++)
+            {
+                var location = _collection[i];
+                if (location.Id == id)
+                {
+                    touchLocation = location;
+                    return true;
+                }
+            }
+
+            touchLocation = default(TouchLocation);
+            return false;
 		}
 
-		public bool FindById(int id, out TouchLocation touchLocation)
-		{
-			int index = this.FindIndex((t) => { return t.Id == id; });
-			if (index >= 0)
-			{
-				touchLocation = this[index];
-				return true;
-			}
-			touchLocation = default(TouchLocation);
-			return false;
-		}
+        #region IList<TouchLocation>
 
-		internal int FindIndexById(int id, out TouchLocation touchLocation)
-		{
-			for (int i = 0; i < this.Count; i++)
-			{
-				TouchLocation location = this[i];
-				if (location.Id == id)
-				{
-					touchLocation = this[i];
-					return i;
-				}
-			}
-			touchLocation = default(TouchLocation);
-			return -1;
-		}
+        /// <summary>
+        /// States if touch collection is read only.
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get { return true; }
+        }
 
-		internal void Add(int id, Vector2 position) {
-			for (int i = 0; i < Count; i++) {
-				if (this[i].Id == id) {
-#if DEBUG
-					Console.WriteLine("Error: Attempted to re-add the same touch as a press.");
-#endif
-					Clear ();
-				}
-			}
-			Add(new TouchLocation(id, TouchLocationState.Pressed, position));
-		}
+        /// <summary>
+        /// Returns the index of the first occurrence of specified <see cref="TouchLocation"/> item in the collection.
+        /// </summary>
+        /// <param name="item"><see cref="TouchLocation"/> to query.</param>
+        /// <returns></returns>
+        public int IndexOf(TouchLocation item)
+        {
+            for (var i = 0; i < _collection.Length; i++)
+            {
+                if (item == _collection[i])
+                    return i;
+            }
 
-		internal void Update(int id, TouchLocationState state, Vector2 position)
-		{
-			if (state == TouchLocationState.Pressed)
-				throw new ArgumentException("Argument 'state' cannot be TouchLocationState.Pressed.");
+            return -1;
+        }
 
-			for (int i = 0; i < Count; i++) {
-				if (this[i].Id == id) {
-					var touchLocation = this[i];
-					touchLocation.Position = position;
-					touchLocation.State = state;
-					this[i] = touchLocation;
-					return;
-				}
-			}
-#if DEBUG			
-			Console.WriteLine("Error: Attempted to mark a non-existent touch {0} as {1}.", id, state);
-#endif
-			Clear ();
-		}
-	}
+        /// <summary>
+        /// Inserts a <see cref="TouchLocation"/> item into the indicated position.
+        /// </summary>
+        /// <param name="index">The position to insert into.</param>
+        /// <param name="item">The <see cref="TouchLocation"/> item to insert.</param>
+        public void Insert(int index, TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Removes the <see cref="TouchLocation"/> item at specified index.
+        /// </summary>
+        /// <param name="index">Index of the item that will be removed from collection.</param>
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Gets or sets the item at the specified index of the collection.
+        /// </summary>
+        /// <param name="index">Position of the item.</param>
+        /// <returns><see cref="TouchLocation"/></returns>
+        public TouchLocation this[int index]
+        {
+            get { return _collection[index]; }
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Adds a <see cref="TouchLocation"/> to the collection.
+        /// </summary>
+        /// <param name="item">The <see cref="TouchLocation"/> item to be added. </param>
+        public void Add(TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Clears all the items in collection.
+        /// </summary>
+        public void Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Returns true if specified <see cref="TouchLocation"/> item exists in the collection, false otherwise./>
+        /// </summary>
+        /// <param name="item">The <see cref="TouchLocation"/> item to query for.</param>
+        /// <returns>Returns true if queried item is found, false otherwise.</returns>
+        public bool Contains(TouchLocation item)
+        {
+            for (var i = 0; i < _collection.Length; i++)
+            {
+                if (item == _collection[i])
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Copies the <see cref="TouchLocation "/>collection to specified array starting from the given index.
+        /// </summary>
+        /// <param name="array">The array to copy <see cref="TouchLocation"/> items.</param>
+        /// <param name="arrayIndex">The starting index of the copy operation.</param>
+        public void CopyTo(TouchLocation[] array, int arrayIndex)
+        {
+            _collection.CopyTo(array, arrayIndex);
+        }
+
+        /// <summary>
+        /// Returns the number of <see cref="TouchLocation"/> items that exist in the collection.
+        /// </summary>
+        public int Count
+        {
+            get { return _collection.Length; }
+        }
+
+        /// <summary>
+        /// Removes the specified <see cref="TouchLocation"/> item from the collection.
+        /// </summary>
+        /// <param name="item">The <see cref="TouchLocation"/> item to remove.</param>
+        /// <returns></returns>
+        public bool Remove(TouchLocation item)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Returns an enumerator for the <see cref="TouchCollection"/>.
+        /// </summary>
+        /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
+        public IEnumerator<TouchLocation> GetEnumerator()
+        {
+            return _collection.AsEnumerable().GetEnumerator();
+        }
+
+
+        /// <summary>
+        /// Returns an enumerator for the <see cref="TouchCollection"/>.
+        /// </summary>
+        /// <returns>Enumerable list of objects.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _collection.GetEnumerator();
+        }
+
+        #endregion // IList<TouchLocation>
+    }
 }

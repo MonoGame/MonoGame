@@ -27,14 +27,27 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
-
+#if WINRT
+        [DataMember]
+#endif
         public Vector3 Direction;
+#if WINRT
+        [DataMember]
+#endif
         public Vector3 Position;
 
         #endregion
@@ -172,13 +185,32 @@ namespace Microsoft.Xna.Framework
 
         public float? Intersects(Plane plane)
         {
-            throw new NotImplementedException();
+            float? result;
+            Intersects(ref plane, out result);
+            return result;
         }
 
         public void Intersects(ref Plane plane, out float? result)
         {
-            throw new NotImplementedException();
-			
+            var den = Vector3.Dot(Direction, plane.Normal);
+            if (Math.Abs(den) < 0.00001f)
+            {
+                result = null;
+                return;
+            }
+
+            result = (-plane.D - Vector3.Dot(plane.Normal, Position)) / den;
+
+            if (result < 0.0f)
+            {
+                if (result < -0.00001f)
+                {
+                    result = null;
+                    return;
+                }
+
+                result = 0.0f;
+            }
         }
 
         public void Intersects(ref BoundingSphere sphere, out float? result)
