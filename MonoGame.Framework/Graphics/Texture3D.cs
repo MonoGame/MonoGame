@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif GLES
 #endif
 #elif DIRECTX
 // TODO!
@@ -38,13 +37,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
+            
+            GL.GenTextures(1, out this.glTexture);
+            GraphicsExtensions.CheckGLError();
 
-			GL.GenTextures (1, out this.glTexture);
 			GL.BindTexture (glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
 
 			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
 
 			GL.TexImage3D (glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
+            GraphicsExtensions.CheckGLError();
 
 			if (mipMap) {
 					throw new NotImplementedException ();
@@ -52,7 +55,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
 
 #endif
-		}
+        }
 		
 		public void SetData<T> (T[] data) where T : struct
 		{
@@ -77,11 +80,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
             GL.BindTexture(glTarget, glTexture);
+            GraphicsExtensions.CheckGLError();
 			GL.TexSubImage3D(glTarget, level, left, top, front, right-left, bottom-top, back-front, glFormat, glType, dataPtr);
+            GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 
 #endif
-			dataHandle.Free ();
+            dataHandle.Free ();
 		}
 		
 

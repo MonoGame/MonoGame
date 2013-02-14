@@ -431,10 +431,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
 			var collection = new EffectParameterCollection();
-			var count = (int)reader.ReadByte();			if (count == 0)				return collection;
+			var count = (int)reader.ReadByte();			
+            if (count == 0)				
+                return collection;
+
 			for (var i = 0; i < count; i++)
 			{
-				var class_ = (EffectParameterClass)reader.ReadByte();				var type = (EffectParameterType)reader.ReadByte();
+				var class_ = (EffectParameterClass)reader.ReadByte();				
+                var type = (EffectParameterType)reader.ReadByte();
 				var name = reader.ReadString();
 				var semantic = reader.ReadString();
 				var annotations = ReadAnnotations(reader);
@@ -448,14 +452,36 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (elements.Count == 0 && structMembers.Count == 0)
 				{
 					switch (type)
-					{						case EffectParameterType.Bool:						case EffectParameterType.Int32:							{								var buffer = new int[rowCount * columnCount];								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadInt32();								data = buffer;								break;							}
+					{						
+                        case EffectParameterType.Bool:
+                        case EffectParameterType.Int32:
+#if DIRECTX
+                            // Under DirectX we properly store integers and booleans
+                            // in an integer type.
+                            //
+                            // MojoShader on the otherhand stores everything in float
+                            // types which is why this code is disabled under OpenGL.
+					        {
+					            var buffer = new int[rowCount * columnCount];								
+                                for (var j = 0; j < buffer.Length; j++)
+                                    buffer[j] = reader.ReadInt32();
+                                data = buffer;
+                                break;
+					        }
+#endif
+
 						case EffectParameterType.Single:
 							{
 								var buffer = new float[rowCount * columnCount];
-								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadSingle();								data = buffer;								break;							}
+								for (var j = 0; j < buffer.Length; j++)
+                                    buffer[j] = reader.ReadSingle();
+                                data = buffer;
+                                break;							
+                            }
 						case EffectParameterType.String:
 							throw new NotImplementedException();
-					};				}
+					}
+                }
 				var param = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
 					annotations, elements, structMembers, data);
