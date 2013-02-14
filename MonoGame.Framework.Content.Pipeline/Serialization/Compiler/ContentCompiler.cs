@@ -7,7 +7,6 @@ using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -53,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     {
                         // Find the content type this writer implements
                         Type baseType = type.BaseType;
-                        while ((baseType != null) && (baseType.Name != contentTypeWriterType.Name))
+                        while ((baseType != null) && (baseType.GetGenericTypeDefinition() != contentTypeWriterType))
                             baseType = baseType.BaseType;
                         if (baseType != null)
                             typeWriterMap.Add(baseType, type);
@@ -70,6 +69,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This should be called from the ContentTypeWriter.Initialize method.</remarks>
         public ContentTypeWriter GetTypeWriter(Type type)
         {
+            ContentTypeWriter result = null;
             var contentTypeWriterType = typeof(ContentTypeWriter<>).MakeGenericType(type);
             Type typeWriterType;
             if (!typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
@@ -99,22 +99,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 try
                 {
                     var concreteType = type.GetGenericArguments();
-                    var output = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
-
-                    MethodInfo dynMethod = output.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
-                    dynMethod.Invoke(output, new object[] { this });
+                    result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
 
                     // save it for next time.
-                    typeWriterMap.Add(contentTypeWriterType, output.GetType());
-                    return output;
+                    typeWriterMap.Add(contentTypeWriterType, result.GetType());
                 }
                 catch (Exception)
                 {
                     throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
-                }                
+                }
             }
-                
-            var result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            else
+            {
+                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            }
+
+            if (result != null)
+            {
+                MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
+                dynMethod.Invoke(result, new object[] { this });
+            }
             return result;
         }
 

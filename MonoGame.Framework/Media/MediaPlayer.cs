@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Media
             get
             {		
 #if WINDOWS_MEDIA_ENGINE
-                return TimeSpan.Zero;
+                return TimeSpan.FromSeconds(_mediaEngineEx.CurrentTime);
 #elif WINDOWS_MEDIA_SESSION
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
 #else
