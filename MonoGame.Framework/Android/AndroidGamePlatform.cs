@@ -79,8 +79,10 @@ using Android.Views;
 using Android.Widget;
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Android.Hardware;
 
 namespace Microsoft.Xna.Framework
 {
@@ -99,14 +101,21 @@ namespace Microsoft.Xna.Framework
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
+		private bool _exiting = false;
 
         public override void Exit()
         {
             //TODO: Fix this
             try
             {
-                Net.NetworkSession.Exit();
-                Window.Close();
+				if (!_exiting)
+				{
+					_exiting = true;
+					Game.DoExiting();
+                    Net.NetworkSession.Exit();
+               	    Game.Activity.Finish();
+				    Window.Close();
+				}
             }
             catch
             {
@@ -136,21 +145,25 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+            PrimaryThreadLoader.DoLoads();
             return !IsPlayingVdeo;
         }
 
         public override void BeforeInitialize()
         {
+            // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
+            //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
+
             switch (Window.Context.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait);				
+                    Window.SetOrientation(DisplayOrientation.Portrait, false);				
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft);
+                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
             }			
             base.BeforeInitialize();
@@ -158,10 +171,8 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeRun()
         {
-            // Get the Accelerometer going
-            Accelerometer.SetupAccelerometer();
-            Window.Run(1 / Game.TargetElapsedTime.TotalSeconds);
-            //Window.Pause();
+            // Run it as fast as we can to allow for more response on threaded GPU resource creation
+            Window.Run();
 
             return false;
         }
@@ -176,12 +187,12 @@ namespace Microsoft.Xna.Framework
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            throw new NotImplementedException();
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            throw new NotImplementedException();
+            // Force the Viewport to be correctly set
+            Game.graphicsDeviceManager.ResetClientBounds();
         }
 
         // EnterForeground
@@ -191,9 +202,10 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
                 Window.Resume();
-                Accelerometer.Resume();
                 Sound.ResumeAll();
                 MediaPlayer.Resume();
+				if(!Window.IsFocused)
+		           Window.RequestFocus();
             }
         }
 
@@ -204,7 +216,7 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = false;
                 Window.Pause();
-                Accelerometer.Pause();
+				Window.ClearFocus();
                 Sound.PauseAll();
                 MediaPlayer.Pause();
             }
@@ -222,15 +234,16 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 		
-		public override void ResetElapsedTime ()
-		{
-			this.Window.ResetElapsedTime();			
-		}
-
         public override void Present()
         {
+			if (_exiting)
+                return;
             try
             {
+                var device = Game.GraphicsDevice;
+                if (device != null)
+                    device.Present();
+                    
                 Window.SwapBuffers();
             }
             catch (Exception ex)

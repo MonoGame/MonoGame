@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MgfxCompiler.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MgfxExePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\dev\games\ThirdParty\Tools\2mgfx.exe</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

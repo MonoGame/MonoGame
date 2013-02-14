@@ -41,13 +41,31 @@
 using System;
 using System.IO;
 
+#if IOS
+using MonoTouch.Foundation;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
 	public static class TitleContainer
 	{
 		public static Stream OpenStream (string name)
 		{
-			return new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.Read);
+#if IOS
+			return File.OpenRead (GetFilename (name));
+#elif ANDROID
+            return Game.Activity.Assets.Open(GetFilename(name));
+#endif
+		}
+		
+		internal static string GetFilename(string name)
+		{
+			// Replace Windows path separators with local path separators
+			name = name.Replace('\\', Path.DirectorySeparatorChar);
+#if IOS
+			name = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
+#endif
+			return name;
 		}
 	}
 }

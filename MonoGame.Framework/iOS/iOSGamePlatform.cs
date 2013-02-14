@@ -78,6 +78,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -106,15 +107,20 @@ namespace Microsoft.Xna.Framework
 
             // Create a full-screen window
             _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
+			//_mainWindow.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+			
             game.Services.AddService (typeof(UIWindow), _mainWindow);
 
             _viewController = new iOSGameViewController(this);
-            _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
             game.Services.AddService (typeof(UIViewController), _viewController);
             Window = new iOSGameWindow (_viewController);
 
             _mainWindow.RootViewController = _viewController;
             _mainWindow.Add (_viewController.View);
+
+            _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
+
+            Guide.Initialise(game);
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -158,18 +164,8 @@ namespace Microsoft.Xna.Framework
         public override void BeforeInitialize()
         {
             base.BeforeInitialize ();
-            _viewController.View.MakeCurrent ();
-            TouchPanel.Reset();
 
-            // HACK: Because GraphicsDevice doesn't know anything, we need to
-            //       tell it the current viewport size.  Once GraphicsDevice is
-            //       capable of querying PresentationParameters
-            //       DeviceWindowHandle for the size, this will no longer be
-            //       needed.
-            var gds = (IGraphicsDeviceService)Game.Services.GetService(typeof(IGraphicsDeviceService));
-            if (gds != null && gds.GraphicsDevice != null) {
-                gds.GraphicsDevice.Viewport = new Viewport(0, 0, Window.ClientBounds.Width, Window.ClientBounds.Height);
-            }
+            _viewController.View.LayoutSubviews();
         }
 
         public override void RunLoop()
@@ -182,7 +178,6 @@ namespace Microsoft.Xna.Framework
             // Show the window
             _mainWindow.MakeKeyAndVisible();
 
-            Accelerometer.SetupAccelerometer();
             BeginObservingUIApplication();
 
             _viewController.View.BecomeFirstResponder();
@@ -194,57 +189,29 @@ namespace Microsoft.Xna.Framework
             if (!Game.IsActive)
                 return;
 
-            try {
-                if (PerformPendingExit())
-                    return;
-                if (IsPlayingVideo)
-                    return;
+            if (IsPlayingVideo)
+                return;
 
-                // FIXME: Remove this call, and the whole Tick method, once
-                //        GraphicsDevice is where platform-specific Present
-                //        functionality is actually implemented.  At that
-                //        point, it should be possible to pass Game.Tick
-                //        directly to NSTimer.CreateRepeatingTimer.
-                _viewController.View.MakeCurrent();
-                Game.Tick ();
+            // FIXME: Remove this call, and the whole Tick method, once
+            //        GraphicsDevice is where platform-specific Present
+            //        functionality is actually implemented.  At that
+            //        point, it should be possible to pass Game.Tick
+            //        directly to NSTimer.CreateRepeatingTimer.
+            _viewController.View.MakeCurrent();
+            Game.Tick ();
 
-                if (!IsPlayingVideo)
-                    _viewController.View.Present ();
-
-                PerformPendingExit();
-            } catch (Exception ex) {
-#if DEBUG				
-                Console.WriteLine(
-                    "Error while processing the main game loop: {0}\n{1}",
-                    ex.Message, ex.StackTrace);
-#endif
-                Game.Exit ();
-            }
-        }
-
-        private bool PerformPendingExit()
-        {
-            if (!_isExitPending)
-                return false;
-
-            _isExitPending = false;
-            if (_runTimer != null) {
-                _runTimer.Invalidate ();
-                _runTimer.Dispose ();
-                _runTimer = null;
-            }
-            UIApplication.SharedApplication.SetStatusBarHidden(false, UIStatusBarAnimation.Fade);
-            StopObservingUIApplication ();
-            RaiseAsyncRunLoopEnded ();
-            return true;
+            if (!IsPlayingVideo)
+                _viewController.View.Present ();
         }
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-		// Update our OpenAL sound buffer pools
-		soundControllerInstance.Update();
+    		// Update our OpenAL sound buffer pools
+    		soundControllerInstance.Update();
+
             if (IsPlayingVideo)
                 return false;
+
             return true;
         }
 
@@ -252,6 +219,7 @@ namespace Microsoft.Xna.Framework
         {
             if (IsPlayingVideo)
                 return false;
+
             return true;
         }
 
@@ -267,7 +235,7 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            _isExitPending = true;
+            // Do Nothing: iOS games do not "exit" or shut down.
         }
 
         private void BeginObservingUIApplication()
@@ -298,12 +266,6 @@ namespace Microsoft.Xna.Framework
                 _applicationObservers.Add(NSNotificationCenter.DefaultCenter.AddObserver(entry.Item1, entry.Item2));
         }
 
-        private void StopObservingUIApplication()
-        {
-            NSNotificationCenter.DefaultCenter.RemoveObservers(_applicationObservers);
-            _applicationObservers.Clear();
-        }
-
         #region Notification Handling
 
         private void Application_WillEnterForeground(NSNotification notification)
@@ -319,7 +281,7 @@ namespace Microsoft.Xna.Framework
         private void Application_DidBecomeActive(NSNotification notification)
         {
             IsActive = true;
-            TouchPanel.Reset();
+            //TouchPanel.Reset();
         }
 
         private void Application_WillResignActive(NSNotification notification)
@@ -355,11 +317,16 @@ namespace Microsoft.Xna.Framework
 			//        iOSGamePlatform.
 			var gdm = (GraphicsDeviceManager) Game.Services.GetService (typeof (IGraphicsDeviceManager));
 
-			if (gdm != null) {
+			if (gdm != null)
+			{	
 				var presentParams = gdm.GraphicsDevice.PresentationParameters;
 				presentParams.BackBufferWidth = gdm.PreferredBackBufferWidth;
 				presentParams.BackBufferHeight = gdm.PreferredBackBufferHeight;
 				presentParams.DisplayOrientation = orientation;
+
+				// Recalculate our views.
+                gdm.ApplyChanges();
+				ViewController.View.LayoutSubviews();
 			}
 			TouchPanel.DisplayOrientation = orientation;
 		}

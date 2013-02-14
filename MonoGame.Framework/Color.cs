@@ -27,8 +27,17 @@ SOFTWARE.
 
 using System;
 
+#if WINRT
+using System.Runtime.Serialization;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Color : IEquatable<Color>
     {
 		// ARGB
@@ -122,18 +131,24 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 
+#if WINRT
+        [DataMember]
+#endif
         public byte B
         {
             get
             {
-                return (byte)this._packedValue;
+                return (byte)(this._packedValue >> 16);
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xffffff00) | value;
+                this._packedValue = (this._packedValue & 0xff00ffff) | (uint)(value << 16);
             }
         }
 
+#if WINRT
+        [DataMember]
+#endif
         public byte G
         {
             get
@@ -145,17 +160,25 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
             }
         }
+
+#if WINRT
+        [DataMember]
+#endif
         public byte R
         {
             get
             {
-                return (byte)(this._packedValue >> 16);
+                return (byte)(this._packedValue);
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xff00ffff) | ((uint)(value << 16 ));
+                this._packedValue = (this._packedValue & 0xffffff00) | value;
             }
         }
+
+#if WINRT
+        [DataMember]
+#endif
         public byte A
         {
             get
@@ -167,11 +190,6 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
             }
         }
-		
-		public uint GLPackedValue
-		{
-			get { return (_packedValue & 0xff00ff00) | ((_packedValue & 0x000000ff) << 16) | ((_packedValue & 0x00ff0000) >> 16); }  
-		}
 		
 		
         public static bool operator ==(Color a, Color b)
@@ -204,999 +222,993 @@ namespace Microsoft.Xna.Framework
                 return new Color(0);
             }
         }
-		public static Color Transparent
-		{
-			get{
-				return new Color(0);
-			}
-		}
-        public static Color TransparentWhite
-        {
-            get
-            {
-                return new Color(0xffffff);
-            }
-        }
-        public static Color AliceBlue
-        {
-            get
-            {
-                return new Color(0xfff0f8ff);
-            }
-        }
-        public static Color AntiqueWhite
-        {
-            get
-            {
-                return new Color(0xfffaebd7);
-            }
-        }
-        public static Color Aqua
-        {
-            get
-            {
-                return new Color(0xff00ffff);
-            }
-        }
-        public static Color Aquamarine
-        {
-            get
-            {
-                return new Color(0xff7fffd4);
-            }
-        }
-        public static Color Azure
-        {
-            get
-            {
-                return new Color(0xfff0ffff);
-            }
-        }
-        public static Color Beige
-        {
-            get
-            {
-                return new Color(0xfff5f5dc);
-            }
-        }
-        public static Color Bisque
-        {
-            get
-            {
-                return new Color(0xffffe4c4);
-            }
-        }
-        public static Color Black
-        {
-            get
-            {
-                return new Color(0xff000000);
-            }
-        }
-        public static Color BlanchedAlmond
-        {
-            get
-            {
-                return new Color(0xffffebcd);
-            }
-        }
-        public static Color Blue
-        {
-            get
-            {
-                return new Color(0xff0000ff);
-            }
-        }
-        public static Color BlueViolet
-        {
-            get
-            {
-                return new Color(0xff8a2be2);
-            }
-        }
-        public static Color Brown
-        {
-            get
-            {
-                return new Color(0xffa52a2a);
-            }
-        }
-        public static Color BurlyWood
-        {
-            get
-            {
-                return new Color(0xffdeb887);
-            }
-        }
-        public static Color CadetBlue
-        {
-            get
-            {
-                return new Color(0xff5f9ea0);
-            }
-        }
-        public static Color Chartreuse
-        {
-            get
-            {
-                return new Color(0xff7fff00);
-            }
-        }
-        public static Color Chocolate
-        {
-            get
-            {
-                return new Color(0xffd2691e);
-            }
-        }
-        public static Color Coral
-        {
-            get
-            {
-                return new Color(0xffff7f50);
-            }
-        }
-        public static Color CornflowerBlue
-        {
-            get
-            {
-                return new Color(0xff6495ed);
-            }
-        }
-        public static Color Cornsilk
-        {
-            get
-            {
-                return new Color(0xfffff8dc);
-            }
-        }
-        public static Color Crimson
-        {
-            get
-            {
-                return new Color(0xffdc143c);
-            }
-        }
-        public static Color Cyan
-        {
-            get
-            {
-                return new Color(0xff00ffff);
-            }
-        }
-        public static Color DarkBlue
-        {
-            get
-            {
-                return new Color(0xff00008b);
-            }
-        }
-        public static Color DarkCyan
-        {
-            get
-            {
-                return new Color(0xff008b8b);
-            }
-        }
-        public static Color DarkGoldenrod
-        {
-            get
-            {
-                return new Color(0xffb8860b);
-            }
-        }
-        public static Color DarkGray
-        {
-            get
-            {
-                return new Color(0xffa9a9a9);
-            }
-        }
-        public static Color DarkGreen
-        {
-            get
-            {
-                return new Color(0xff006400);
-            }
-        }
-        public static Color DarkKhaki
-        {
-            get
-            {
-                return new Color(0xffbdb76b);
-            }
-        }
-        public static Color DarkMagenta
-        {
-            get
-            {
-                return new Color(0xff8b008b);
-            }
-        }
-        public static Color DarkOliveGreen
-        {
-            get
-            {
-                return new Color(0xff556b2f);
-            }
-        }
-        public static Color DarkOrange
-        {
-            get
-            {
-                return new Color(0xffff8c00);
-            }
-        }
-        public static Color DarkOrchid
-        {
-            get
-            {
-                return new Color(0xff9932cc);
-            }
-        }
-        public static Color DarkRed
-        {
-            get
-            {
-                return new Color(0xff8b0000);
-            }
-        }
-        public static Color DarkSalmon
-        {
-            get
-            {
-                return new Color(0xffe9967a);
-            }
-        }
-        public static Color DarkSeaGreen
-        {
-            get
-            {
-                return new Color(0xff8fbc8b);
-            }
-        }
-        public static Color DarkSlateBlue
-        {
-            get
-            {
-                return new Color(0xff483d8b);
-            }
-        }
-        public static Color DarkSlateGray
-        {
-            get
-            {
-                return new Color(0xff2f4f4f);
-            }
-        }
-        public static Color DarkTurquoise
-        {
-            get
-            {
-                return new Color(0xff00ced1);
-            }
-        }
-        public static Color DarkViolet
-        {
-            get
-            {
-                return new Color(0xff9400d3);
-            }
-        }
-        public static Color DeepPink
-        {
-            get
-            {
-                return new Color(0xffff1493);
-            }
-        }
-        public static Color DeepSkyBlue
-        {
-            get
-            {
-                return new Color(0xff00bfff);
-            }
-        }
-        public static Color DimGray
-        {
-            get
-            {
-                return new Color(0xff696969);
-            }
-        }
-        public static Color DodgerBlue
-        {
-            get
-            {
-                return new Color(0xff1e90ff);
-            }
-        }
-        public static Color Firebrick
-        {
-            get
-            {
-                return new Color(0xffb22222);
-            }
-        }
-        public static Color FloralWhite
-        {
-            get
-            {
-                return new Color(0xfffffaf0);
-            }
-        }
-        public static Color ForestGreen
-        {
-            get
-            {
-                return new Color(0xff228b22);
-            }
-        }
-        public static Color Fuchsia
-        {
-            get
-            {
-                return new Color(0xffff00ff);
-            }
-        }
-        public static Color Gainsboro
-        {
-            get
-            {
-                return new Color(0xffdcdcdc);
-            }
-        }
-        public static Color GhostWhite
-        {
-            get
-            {
-                return new Color(0xfff8f8ff);
-            }
-        }
-        public static Color Gold
-        {
-            get
-            {
-                return new Color(0xffffd700);
-            }
-        }
-        public static Color Goldenrod
-        {
-            get
-            {
-                return new Color(0xffdaa520);
-            }
-        }
-        public static Color Gray
-        {
-            get
-            {
-                return new Color(0xff808080);
-            }
-        }
-        public static Color Green
-        {
-            get
-            {
-                return new Color(0xff008000);
-            }
-        }
-        public static Color GreenYellow
-        {
-            get
-            {
-                return new Color(0xffadff2f);
-            }
-        }
-        public static Color Honeydew
-        {
-            get
-            {
-                return new Color(0xfff0fff0);
-            }
-        }
-        public static Color HotPink
-        {
-            get
-            {
-                return new Color(0xffff69b4);
-            }
-        }
-        public static Color IndianRed
-        {
-            get
-            {
-                return new Color(0xffcd5c5c);
-            }
-        }
-        public static Color Indigo
-        {
-            get
-            {
-                return new Color(0xff4b0082);
-            }
-        }
-        public static Color Ivory
-        {
-            get
-            {
-                return new Color(0xfffffff0);
-            }
-        }
-        public static Color Khaki
-        {
-            get
-            {
-                return new Color(0xfff0e68c);
-            }
-        }
-        public static Color Lavender
-        {
-            get
-            {
-                return new Color(0xffe6e6fa);
-            }
-        }
-        public static Color LavenderBlush
-        {
-            get
-            {
-                return new Color(0xfffff0f5);
-            }
-        }
-        public static Color LawnGreen
-        {
-            get
-            {
-                return new Color(0xff7cfc00);
-            }
-        }
-        public static Color LemonChiffon
-        {
-            get
-            {
-                return new Color(0xfffffacd);
-            }
-        }
-        public static Color LightBlue
-        {
-            get
-            {
-                return new Color(0xffadd8e6);
-            }
-        }
-        public static Color LightCoral
-        {
-            get
-            {
-                return new Color(0xfff08080);
-            }
-        }
-        public static Color LightCyan
-        {
-            get
-            {
-                return new Color(0xffe0ffff);
-            }
-        }
-        public static Color LightGoldenrodYellow
-        {
-            get
-            {
-                return new Color(0xfffafad2);
-            }
-        }
-        public static Color LightGreen
-        {
-            get
-            {
-                return new Color(0xff90ee90);
-            }
-        }
-        public static Color LightGray
-        {
-            get
-            {
-                return new Color(0xffd3d3d3);
-            }
-        }
-        public static Color LightPink
-        {
-            get
-            {
-                return new Color(0xffffb6c1);
-            }
-        }
-        public static Color LightSalmon
-        {
-            get
-            {
-                return new Color(0xffffa07a);
-            }
-        }
-        public static Color LightSeaGreen
-        {
-            get
-            {
-                return new Color(0xff20b2aa);
-            }
-        }
-        public static Color LightSkyBlue
-        {
-            get
-            {
-                return new Color(0xff87cefa);
-            }
-        }
-        public static Color LightSlateGray
-        {
-            get
-            {
-                return new Color(0xff778899);
-            }
-        }
-        public static Color LightSteelBlue
-        {
-            get
-            {
-                return new Color(0xffb0c4de);
-            }
-        }
-        public static Color LightYellow
-        {
-            get
-            {
-                return new Color(0xffffffe0);
-            }
-        }
-        public static Color Lime
-        {
-            get
-            {
-                return new Color(0xff00ff00);
-            }
-        }
-        public static Color LimeGreen
-        {
-            get
-            {
-                return new Color(0xff32cd32);
-            }
-        }
-        public static Color Linen
-        {
-            get
-            {
-                return new Color(0xfffaf0e6);
-            }
-        }
-        public static Color Magenta
-        {
-            get
-            {
-                return new Color(0xffff00ff);
-            }
-        }
-        public static Color Maroon
-        {
-            get
-            {
-                return new Color(0xff800000);
-            }
-        }
-        public static Color MediumAquamarine
-        {
-            get
-            {
-                return new Color(0xff66cdaa);
-            }
-        }
-        public static Color MediumBlue
-        {
-            get
-            {
-                return new Color(0xff0000cd);
-            }
-        }
-        public static Color MediumOrchid
-        {
-            get
-            {
-                return new Color(0xffba55d3);
-            }
-        }
-        public static Color MediumPurple
-        {
-            get
-            {
-                return new Color(0xff9370db);
-            }
-        }
-        public static Color MediumSeaGreen
-        {
-            get
-            {
-                return new Color(0xff3cb371);
-            }
-        }
-        public static Color MediumSlateBlue
-        {
-            get
-            {
-                return new Color(0xff7b68ee);
-            }
-        }
-        public static Color MediumSpringGreen
-        {
-            get
-            {
-                return new Color(0xff00fa9a);
-            }
-        }
-        public static Color MediumTurquoise
-        {
-            get
-            {
-                return new Color(0xff48d1cc);
-            }
-        }
-        public static Color MediumVioletRed
-        {
-            get
-            {
-                return new Color(0xffc71585);
-            }
-        }
-        public static Color MidnightBlue
-        {
-            get
-            {
-                return new Color(0xff191970);
-            }
-        }
-        public static Color MintCream
-        {
-            get
-            {
-                return new Color(0xfff5fffa);
-            }
-        }
-        public static Color MistyRose
-        {
-            get
-            {
-                return new Color(0xffffe4e1);
-            }
-        }
-        public static Color Moccasin
-        {
-            get
-            {
-                return new Color(0xffffe4b5);
-            }
-        }
-        public static Color NavajoWhite
-        {
-            get
-            {
-                return new Color(0xffffdead);
-            }
-        }
-        public static Color Navy
-        {
-            get
-            {
-                return new Color(0xff000080);
-            }
-        }
-        public static Color OldLace
-        {
-            get
-            {
-                return new Color(0xfffdf5e6);
-            }
-        }
-        public static Color Olive
-        {
-            get
-            {
-                return new Color(0xff808000);
-            }
-        }
-        public static Color OliveDrab
-        {
-            get
-            {
-                return new Color(0xff6b8e23);
-            }
-        }
-        public static Color Orange
-        {
-            get
-            {
-                return new Color(0xffffa500);
-            }
-        }
-        public static Color OrangeRed
-        {
-            get
-            {
-                return new Color(0xffff4500);
-            }
-        }
-        public static Color Orchid
-        {
-            get
-            {
-                return new Color(0xffda70d6);
-            }
-        }
-        public static Color PaleGoldenrod
-        {
-            get
-            {
-                return new Color(0xffeee8aa);
-            }
-        }
-        public static Color PaleGreen
-        {
-            get
-            {
-                return new Color(0xff98fb98);
-            }
-        }
-        public static Color PaleTurquoise
-        {
-            get
-            {
-                return new Color(0xffafeeee);
-            }
-        }
-        public static Color PaleVioletRed
-        {
-            get
-            {
-                return new Color(0xffdb7093);
-            }
-        }
-        public static Color PapayaWhip
-        {
-            get
-            {
-                return new Color(0xffffefd5);
-            }
-        }
-        public static Color PeachPuff
-        {
-            get
-            {
-                return new Color(0xffffdab9);
-            }
-        }
-        public static Color Peru
-        {
-            get
-            {
-                return new Color(0xffcd853f);
-            }
-        }
-        public static Color Pink
-        {
-            get
-            {
-                return new Color(0xffffc0cb);
-            }
-        }
-        public static Color Plum
-        {
-            get
-            {
-                return new Color(0xffdda0dd);
-            }
-        }
-        public static Color PowderBlue
-        {
-            get
-            {
-                return new Color(0xffb0e0e6);
-            }
-        }
-        public static Color Purple
-        {
-            get
-            {
-                return new Color(0xff800080);
-            }
-        }
-        public static Color Red
-        {
-            get
-            {
-                return new Color(0xffff0000);
-            }
-        }
-        public static Color RosyBrown
-        {
-            get
-            {
-                return new Color(0xffbc8f8f);
-            }
-        }
-        public static Color RoyalBlue
-        {
-            get
-            {
-                return new Color(0xff4169e1);
-            }
-        }
-        public static Color SaddleBrown
-        {
-            get
-            {
-                return new Color(0xff8b4513);
-            }
-        }
-        public static Color Salmon
-        {
-            get
-            {
-                return new Color(0xfffa8072);
-            }
-        }
-        public static Color SandyBrown
-        {
-            get
-            {
-                return new Color(0xfff4a460);
-            }
-        }
-        public static Color SeaGreen
-        {
-            get
-            {
-                return new Color(0xff2e8b57);
-            }
-        }
-        public static Color SeaShell
-        {
-            get
-            {
-                return new Color(0xfffff5ee);
-            }
-        }
-        public static Color Sienna
-        {
-            get
-            {
-                return new Color(0xffa0522d);
-            }
-        }
-        public static Color Silver
-        {
-            get
-            {
-                return new Color(0xffc0c0c0);
-            }
-        }
-        public static Color SkyBlue
-        {
-            get
-            {
-                return new Color(0xff87ceeb);
-            }
-        }
-        public static Color SlateBlue
-        {
-            get
-            {
-                return new Color(0xff6a5acd);
-            }
-        }
-        public static Color SlateGray
-        {
-            get
-            {
-                return new Color(0xff708090);
-            }
-        }
-        public static Color Snow
-        {
-            get
-            {
-                return new Color(0xfffffafa);
-            }
-        }
-        public static Color SpringGreen
-        {
-            get
-            {
-                return new Color(0xff00ff7f);
-            }
-        }
-        public static Color SteelBlue
-        {
-            get
-            {
-                return new Color(0xff4682b4);
-            }
-        }
-        public static Color Tan
-        {
-            get
-            {
-                return new Color(0xffd2b48c);
-            }
-        }
-        public static Color Teal
-        {
-            get
-            {
-                return new Color(0xff008080);
-            }
-        }
-        public static Color Thistle
-        {
-            get
-            {
-                return new Color(0xffd8bfd8);
-            }
-        }
-        public static Color Tomato
-        {
-            get
-            {
-                return new Color(0xffff6347);
-            }
-        }
-        public static Color Turquoise
-        {
-            get
-            {
-                return new Color(0xff40e0d0);
-            }
-        }
-        public static Color Violet
-        {
-            get
-            {
-                return new Color(0xffee82ee);
-            }
-        }
-        public static Color Wheat
-        {
-            get
-            {
-                return new Color(0xfff5deb3);
-            }
-        }
-        public static Color White
-        {
-            get
-            {
-                return new Color(uint.MaxValue);
-            }
-        }
-        public static Color WhiteSmoke
-        {
-            get
-            {
-                return new Color(0xfff5f5f5);
-            }
-        }
-        public static Color Yellow
-        {
-            get
-            {
-                return new Color(0xffffff00);
-            }
-        }
-        public static Color YellowGreen
-        {
-            get
-            {
-                return new Color(0xff9acd32);
-            }
-        }
+         public static Color Transparent
+	    {
+	        get
+	        {
+	            return new Color(0);
+	        }
+	    }
+	    public static Color AliceBlue
+	    {
+	        get
+	        {
+	            return new Color(0xfffff8f0);
+	        }
+	    }
+	    public static Color AntiqueWhite
+	    {
+	        get
+	        {
+	            return new Color(0xffd7ebfa);
+	        }
+	    }
+	    public static Color Aqua
+	    {
+	        get
+	        {
+	            return new Color(0xffffff00);
+	        }
+	    }
+	    public static Color Aquamarine
+	    {
+	        get
+	        {
+	            return new Color(0xffd4ff7f);
+	        }
+	    }
+	    public static Color Azure
+	    {
+	        get
+	        {
+	            return new Color(0xfffffff0);
+	        }
+	    }
+	    public static Color Beige
+	    {
+	        get
+	        {
+	            return new Color(0xffdcf5f5);
+	        }
+	    }
+	    public static Color Bisque
+	    {
+	        get
+	        {
+	            return new Color(0xffc4e4ff);
+	        }
+	    }
+	    public static Color Black
+	    {
+	        get
+	        {
+	            return new Color(0xff000000);
+	        }
+	    }
+	    public static Color BlanchedAlmond
+	    {
+	        get
+	        {
+	            return new Color(0xffcdebff);
+	        }
+	    }
+	    public static Color Blue
+	    {
+	        get
+	        {
+	            return new Color(0xffff0000);
+	        }
+	    }
+	    public static Color BlueViolet
+	    {
+	        get
+	        {
+	            return new Color(0xffe22b8a);
+	        }
+	    }
+	    public static Color Brown
+	    {
+	        get
+	        {
+	            return new Color(0xff2a2aa5);
+	        }
+	    }
+	    public static Color BurlyWood
+	    {
+	        get
+	        {
+	            return new Color(0xff87b8de);
+	        }
+	    }
+	    public static Color CadetBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffa09e5f);
+	        }
+	    }
+	    public static Color Chartreuse
+	    {
+	        get
+	        {
+	            return new Color(0xff00ff7f);
+	        }
+	    }
+	    public static Color Chocolate
+	    {
+	        get
+	        {
+	            return new Color(0xff1e69d2);
+	        }
+	    }
+	    public static Color Coral
+	    {
+	        get
+	        {
+	            return new Color(0xff507fff);
+	        }
+	    }
+	    public static Color CornflowerBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffed9564);
+	        }
+	    }
+	    public static Color Cornsilk
+	    {
+	        get
+	        {
+	            return new Color(0xffdcf8ff);
+	        }
+	    }
+	    public static Color Crimson
+	    {
+	        get
+	        {
+	            return new Color(0xff3c14dc);
+	        }
+	    }
+	    public static Color Cyan
+	    {
+	        get
+	        {
+	            return new Color(0xffffff00);
+	        }
+	    }
+	    public static Color DarkBlue
+	    {
+	        get
+	        {
+	            return new Color(0xff8b0000);
+	        }
+	    }
+	    public static Color DarkCyan
+	    {
+	        get
+	        {
+	            return new Color(0xff8b8b00);
+	        }
+	    }
+	    public static Color DarkGoldenrod
+	    {
+	        get
+	        {
+	            return new Color(0xff0b86b8);
+	        }
+	    }
+	    public static Color DarkGray
+	    {
+	        get
+	        {
+	            return new Color(0xffa9a9a9);
+	        }
+	    }
+	    public static Color DarkGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff006400);
+	        }
+	    }
+	    public static Color DarkKhaki
+	    {
+	        get
+	        {
+	            return new Color(0xff6bb7bd);
+	        }
+	    }
+	    public static Color DarkMagenta
+	    {
+	        get
+	        {
+	            return new Color(0xff8b008b);
+	        }
+	    }
+	    public static Color DarkOliveGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff2f6b55);
+	        }
+	    }
+	    public static Color DarkOrange
+	    {
+	        get
+	        {
+	            return new Color(0xff008cff);
+	        }
+	    }
+	    public static Color DarkOrchid
+	    {
+	        get
+	        {
+	            return new Color(0xffcc3299);
+	        }
+	    }
+	    public static Color DarkRed
+	    {
+	        get
+	        {
+	            return new Color(0xff00008b);
+	        }
+	    }
+	    public static Color DarkSalmon
+	    {
+	        get
+	        {
+	            return new Color(0xff7a96e9);
+	        }
+	    }
+	    public static Color DarkSeaGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff8bbc8f);
+	        }
+	    }
+	    public static Color DarkSlateBlue
+	    {
+	        get
+	        {
+	            return new Color(0xff8b3d48);
+	        }
+	    }
+	    public static Color DarkSlateGray
+	    {
+	        get
+	        {
+	            return new Color(0xff4f4f2f);
+	        }
+	    }
+	    public static Color DarkTurquoise
+	    {
+	        get
+	        {
+	            return new Color(0xffd1ce00);
+	        }
+	    }
+	    public static Color DarkViolet
+	    {
+	        get
+	        {
+	            return new Color(0xffd30094);
+	        }
+	    }
+	    public static Color DeepPink
+	    {
+	        get
+	        {
+	            return new Color(0xff9314ff);
+	        }
+	    }
+	    public static Color DeepSkyBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffffbf00);
+	        }
+	    }
+	    public static Color DimGray
+	    {
+	        get
+	        {
+	            return new Color(0xff696969);
+	        }
+	    }
+	    public static Color DodgerBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffff901e);
+	        }
+	    }
+	    public static Color Firebrick
+	    {
+	        get
+	        {
+	            return new Color(0xff2222b2);
+	        }
+	    }
+	    public static Color FloralWhite
+	    {
+	        get
+	        {
+	            return new Color(0xfff0faff);
+	        }
+	    }
+	    public static Color ForestGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff228b22);
+	        }
+	    }
+	    public static Color Fuchsia
+	    {
+	        get
+	        {
+	            return new Color(0xffff00ff);
+	        }
+	    }
+	    public static Color Gainsboro
+	    {
+	        get
+	        {
+	            return new Color(0xffdcdcdc);
+	        }
+	    }
+	    public static Color GhostWhite
+	    {
+	        get
+	        {
+	            return new Color(0xfffff8f8);
+	        }
+	    }
+	    public static Color Gold
+	    {
+	        get
+	        {
+	            return new Color(0xff00d7ff);
+	        }
+	    }
+	    public static Color Goldenrod
+	    {
+	        get
+	        {
+	            return new Color(0xff20a5da);
+	        }
+	    }
+	    public static Color Gray
+	    {
+	        get
+	        {
+	            return new Color(0xff808080);
+	        }
+	    }
+	    public static Color Green
+	    {
+	        get
+	        {
+	            return new Color(0xff008000);
+	        }
+	    }
+	    public static Color GreenYellow
+	    {
+	        get
+	        {
+	            return new Color(0xff2fffad);
+	        }
+	    }
+	    public static Color Honeydew
+	    {
+	        get
+	        {
+	            return new Color(0xfff0fff0);
+	        }
+	    }
+	    public static Color HotPink
+	    {
+	        get
+	        {
+	            return new Color(0xffb469ff);
+	        }
+	    }
+	    public static Color IndianRed
+	    {
+	        get
+	        {
+	            return new Color(0xff5c5ccd);
+	        }
+	    }
+	    public static Color Indigo
+	    {
+	        get
+	        {
+	            return new Color(0xff82004b);
+	        }
+	    }
+	    public static Color Ivory
+	    {
+	        get
+	        {
+	            return new Color(0xfff0ffff);
+	        }
+	    }
+	    public static Color Khaki
+	    {
+	        get
+	        {
+	            return new Color(0xff8ce6f0);
+	        }
+	    }
+	    public static Color Lavender
+	    {
+	        get
+	        {
+	            return new Color(0xfffae6e6);
+	        }
+	    }
+	    public static Color LavenderBlush
+	    {
+	        get
+	        {
+	            return new Color(0xfff5f0ff);
+	        }
+	    }
+	    public static Color LawnGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff00fc7c);
+	        }
+	    }
+	    public static Color LemonChiffon
+	    {
+	        get
+	        {
+	            return new Color(0xffcdfaff);
+	        }
+	    }
+	    public static Color LightBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffe6d8ad);
+	        }
+	    }
+	    public static Color LightCoral
+	    {
+	        get
+	        {
+	            return new Color(0xff8080f0);
+	        }
+	    }
+	    public static Color LightCyan
+	    {
+	        get
+	        {
+	            return new Color(0xffffffe0);
+	        }
+	    }
+	    public static Color LightGoldenrodYellow
+	    {
+	        get
+	        {
+	            return new Color(0xffd2fafa);
+	        }
+	    }
+	    public static Color LightGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff90ee90);
+	        }
+	    }
+	    public static Color LightGray
+	    {
+	        get
+	        {
+	            return new Color(0xffd3d3d3);
+	        }
+	    }
+	    public static Color LightPink
+	    {
+	        get
+	        {
+	            return new Color(0xffc1b6ff);
+	        }
+	    }
+	    public static Color LightSalmon
+	    {
+	        get
+	        {
+	            return new Color(0xff7aa0ff);
+	        }
+	    }
+	    public static Color LightSeaGreen
+	    {
+	        get
+	        {
+	            return new Color(0xffaab220);
+	        }
+	    }
+	    public static Color LightSkyBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffface87);
+	        }
+	    }
+	    public static Color LightSlateGray
+	    {
+	        get
+	        {
+	            return new Color(0xff998877);
+	        }
+	    }
+	    public static Color LightSteelBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffdec4b0);
+	        }
+	    }
+	    public static Color LightYellow
+	    {
+	        get
+	        {
+	            return new Color(0xffe0ffff);
+	        }
+	    }
+	    public static Color Lime
+	    {
+	        get
+	        {
+	            return new Color(0xff00ff00);
+	        }
+	    }
+	    public static Color LimeGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff32cd32);
+	        }
+	    }
+	    public static Color Linen
+	    {
+	        get
+	        {
+	            return new Color(0xffe6f0fa);
+	        }
+	    }
+	    public static Color Magenta
+	    {
+	        get
+	        {
+	            return new Color(0xffff00ff);
+	        }
+	    }
+	    public static Color Maroon
+	    {
+	        get
+	        {
+	            return new Color(0xff000080);
+	        }
+	    }
+	    public static Color MediumAquamarine
+	    {
+	        get
+	        {
+	            return new Color(0xffaacd66);
+	        }
+	    }
+	    public static Color MediumBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffcd0000);
+	        }
+	    }
+	    public static Color MediumOrchid
+	    {
+	        get
+	        {
+	            return new Color(0xffd355ba);
+	        }
+	    }
+	    public static Color MediumPurple
+	    {
+	        get
+	        {
+	            return new Color(0xffdb7093);
+	        }
+	    }
+	    public static Color MediumSeaGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff71b33c);
+	        }
+	    }
+	    public static Color MediumSlateBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffee687b);
+	        }
+	    }
+	    public static Color MediumSpringGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff9afa00);
+	        }
+	    }
+	    public static Color MediumTurquoise
+	    {
+	        get
+	        {
+	            return new Color(0xffccd148);
+	        }
+	    }
+	    public static Color MediumVioletRed
+	    {
+	        get
+	        {
+	            return new Color(0xff8515c7);
+	        }
+	    }
+	    public static Color MidnightBlue
+	    {
+	        get
+	        {
+	            return new Color(0xff701919);
+	        }
+	    }
+	    public static Color MintCream
+	    {
+	        get
+	        {
+	            return new Color(0xfffafff5);
+	        }
+	    }
+	    public static Color MistyRose
+	    {
+	        get
+	        {
+	            return new Color(0xffe1e4ff);
+	        }
+	    }
+	    public static Color Moccasin
+	    {
+	        get
+	        {
+	            return new Color(0xffb5e4ff);
+	        }
+	    }
+	    public static Color NavajoWhite
+	    {
+	        get
+	        {
+	            return new Color(0xffaddeff);
+	        }
+	    }
+	    public static Color Navy
+	    {
+	        get
+	        {
+	            return new Color(0xff800000);
+	        }
+	    }
+	    public static Color OldLace
+	    {
+	        get
+	        {
+	            return new Color(0xffe6f5fd);
+	        }
+	    }
+	    public static Color Olive
+	    {
+	        get
+	        {
+	            return new Color(0xff008080);
+	        }
+	    }
+	    public static Color OliveDrab
+	    {
+	        get
+	        {
+	            return new Color(0xff238e6b);
+	        }
+	    }
+	    public static Color Orange
+	    {
+	        get
+	        {
+	            return new Color(0xff00a5ff);
+	        }
+	    }
+	    public static Color OrangeRed
+	    {
+	        get
+	        {
+	            return new Color(0xff0045ff);
+	        }
+	    }
+	    public static Color Orchid
+	    {
+	        get
+	        {
+	            return new Color(0xffd670da);
+	        }
+	    }
+	    public static Color PaleGoldenrod
+	    {
+	        get
+	        {
+	            return new Color(0xffaae8ee);
+	        }
+	    }
+	    public static Color PaleGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff98fb98);
+	        }
+	    }
+	    public static Color PaleTurquoise
+	    {
+	        get
+	        {
+	            return new Color(0xffeeeeaf);
+	        }
+	    }
+	    public static Color PaleVioletRed
+	    {
+	        get
+	        {
+	            return new Color(0xff9370db);
+	        }
+	    }
+	    public static Color PapayaWhip
+	    {
+	        get
+	        {
+	            return new Color(0xffd5efff);
+	        }
+	    }
+	    public static Color PeachPuff
+	    {
+	        get
+	        {
+	            return new Color(0xffb9daff);
+	        }
+	    }
+	    public static Color Peru
+	    {
+	        get
+	        {
+	            return new Color(0xff3f85cd);
+	        }
+	    }
+	    public static Color Pink
+	    {
+	        get
+	        {
+	            return new Color(0xffcbc0ff);
+	        }
+	    }
+	    public static Color Plum
+	    {
+	        get
+	        {
+	            return new Color(0xffdda0dd);
+	        }
+	    }
+	    public static Color PowderBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffe6e0b0);
+	        }
+	    }
+	    public static Color Purple
+	    {
+	        get
+	        {
+	            return new Color(0xff800080);
+	        }
+	    }
+	    public static Color Red
+	    {
+	        get
+	        {
+	            return new Color(0xff0000ff);
+	        }
+	    }
+	    public static Color RosyBrown
+	    {
+	        get
+	        {
+	            return new Color(0xff8f8fbc);
+	        }
+	    }
+	    public static Color RoyalBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffe16941);
+	        }
+	    }
+	    public static Color SaddleBrown
+	    {
+	        get
+	        {
+	            return new Color(0xff13458b);
+	        }
+	    }
+	    public static Color Salmon
+	    {
+	        get
+	        {
+	            return new Color(0xff7280fa);
+	        }
+	    }
+	    public static Color SandyBrown
+	    {
+	        get
+	        {
+	            return new Color(0xff60a4f4);
+	        }
+	    }
+	    public static Color SeaGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff578b2e);
+	        }
+	    }
+	    public static Color SeaShell
+	    {
+	        get
+	        {
+	            return new Color(0xffeef5ff);
+	        }
+	    }
+	    public static Color Sienna
+	    {
+	        get
+	        {
+	            return new Color(0xff2d52a0);
+	        }
+	    }
+	    public static Color Silver
+	    {
+	        get
+	        {
+	            return new Color(0xffc0c0c0);
+	        }
+	    }
+	    public static Color SkyBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffebce87);
+	        }
+	    }
+	    public static Color SlateBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffcd5a6a);
+	        }
+	    }
+	    public static Color SlateGray
+	    {
+	        get
+	        {
+	            return new Color(0xff908070);
+	        }
+	    }
+	    public static Color Snow
+	    {
+	        get
+	        {
+	            return new Color(0xfffafaff);
+	        }
+	    }
+	    public static Color SpringGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff7fff00);
+	        }
+	    }
+	    public static Color SteelBlue
+	    {
+	        get
+	        {
+	            return new Color(0xffb48246);
+	        }
+	    }
+	    public static Color Tan
+	    {
+	        get
+	        {
+	            return new Color(0xff8cb4d2);
+	        }
+	    }
+	    public static Color Teal
+	    {
+	        get
+	        {
+	            return new Color(0xff808000);
+	        }
+	    }
+	    public static Color Thistle
+	    {
+	        get
+	        {
+	            return new Color(0xffd8bfd8);
+	        }
+	    }
+	    public static Color Tomato
+	    {
+	        get
+	        {
+	            return new Color(0xff4763ff);
+	        }
+	    }
+	    public static Color Turquoise
+	    {
+	        get
+	        {
+	            return new Color(0xffd0e040);
+	        }
+	    }
+	    public static Color Violet
+	    {
+	        get
+	        {
+	            return new Color(0xffee82ee);
+	        }
+	    }
+	    public static Color Wheat
+	    {
+	        get
+	        {
+	            return new Color(0xffb3def5);
+	        }
+	    }
+	    public static Color White
+	    {
+	        get
+	        {
+	            return new Color(uint.MaxValue);
+	        }
+	    }
+	    public static Color WhiteSmoke
+	    {
+	        get
+	        {
+	            return new Color(0xfff5f5f5);
+	        }
+	    }
+	    public static Color Yellow
+	    {
+	        get
+	        {
+	            return new Color(0xff00ffff);
+	        }
+	    }
+	    public static Color YellowGreen
+	    {
+	        get
+	        {
+	            return new Color(0xff32cd9a);
+	        }
+	    }
 
         public static Color Lerp(Color value1, Color value2, Single amount)
         {
@@ -1210,10 +1222,10 @@ namespace Microsoft.Xna.Framework
 		
 		public static Color Multiply( Color value, float scale)
 		{
-			byte Red = (byte)(value.R * scale);
-			byte Green = (byte)(value.G * scale);
-			byte Blue = (byte)(value.B * scale);
-			byte Alpha = (byte)(value.A * scale);
+            byte Red = (byte)(MathHelper.Clamp(value.R * scale, Byte.MinValue, Byte.MaxValue));
+            byte Green = (byte)(MathHelper.Clamp(value.G * scale, Byte.MinValue, Byte.MaxValue));
+            byte Blue = (byte)(MathHelper.Clamp(value.B * scale, Byte.MinValue, Byte.MaxValue));
+            byte Alpha = (byte)(MathHelper.Clamp(value.A * scale, Byte.MinValue, Byte.MaxValue));
 			
 			return new Color( Red, Green, Blue, Alpha );
 		}
@@ -1258,7 +1270,7 @@ namespace Microsoft.Xna.Framework
 
         public bool Equals(Color other)
         {
-			return this.GLPackedValue == other.GLPackedValue;
+			return this.PackedValue == other.PackedValue;
         }
 
         #endregion

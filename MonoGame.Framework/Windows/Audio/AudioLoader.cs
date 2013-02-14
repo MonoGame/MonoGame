@@ -80,11 +80,6 @@ namespace Microsoft.Xna.Framework.Audio
             int block_align = reader.ReadInt16();  // 14
             int bits_per_sample = reader.ReadInt16(); // 16
 
-            if (audio_format != 1)
-            {
-                throw new NotSupportedException("Wave compression is not supported.");
-            }
-
             // reads residual bytes
             if (format_chunk_size > 16)
                 reader.ReadBytes(format_chunk_size - 16);
@@ -106,6 +101,15 @@ namespace Microsoft.Xna.Framework.Audio
             format = GetSoundFormat(num_channels, bits_per_sample);
             audioData = reader.ReadBytes((int)reader.BaseStream.Length);
             size = data_chunk_size;
+
+
+            // WAV compression is not supported. Warn our user and 
+            // Set size to 0 So that nothing is played.
+            if (audio_format != 1)
+            {
+                Console.WriteLine("Wave compression is not supported.");
+                size = 0;
+            }
 
             return audioData;
         }

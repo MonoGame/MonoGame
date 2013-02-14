@@ -41,10 +41,10 @@
 #region Using Statements
 using System;
 
-#if IPHONE || WINDOWS
-using OpenTK.Audio.OpenAL;
-#elif MONOMAC
+#if MONOMAC
 using MonoMac.OpenAL;
+#else
+using OpenTK.Audio.OpenAL;
 #endif
 
 using Microsoft.Xna.Framework;
@@ -53,7 +53,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
+	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 		private SoundState soundState = SoundState.Stopped;
@@ -64,31 +64,46 @@ namespace Microsoft.Xna.Framework.Audio
 		float _volume = 1.0f;
 		bool _looped = false;
 		float _pan = 0;
-		float _pitch = 1.0f;
+		float _pitch = 0f;
 
 		bool hasSourceId = false;
 		int sourceId;
+
+        public SoundEffectInstance()
+        {
+            InitializeSound();
+        }
+
+        ~SoundEffectInstance()
+        {
+            Dispose();
+        }
 
 		public SoundEffectInstance (SoundEffect parent)
 		{
 			this.soundEffect = parent;
 			InitializeSound ();
+            BindDataBuffer(soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
 		}
 
 		private void InitializeSound ()
 		{
 			controller = OpenALSoundController.GetInstance;
-			soundBuffer = new OALSoundBuffer ();
-			soundBuffer.BindDataBuffer (soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
+			soundBuffer = new OALSoundBuffer ();			
 			soundBuffer.Reserved += HandleSoundBufferReserved;
-			soundBuffer.Recycled += HandleSoundBufferRecycled;
-
+			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
 		}
+
+        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        {
+            soundBuffer.BindDataBuffer(data, format, size, rate);
+        }
 
 		void HandleSoundBufferRecycled (object sender, EventArgs e)
 		{
 			sourceId = 0;
 			hasSourceId = false;
+			soundState = SoundState.Stopped;
 			//Console.WriteLine ("recycled: " + soundEffect.Name);
 		}
 
@@ -99,12 +114,16 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		public void Dispose ()
-		{
-			soundBuffer.Reserved -= HandleSoundBufferReserved;
-			soundBuffer.Recycled -= HandleSoundBufferRecycled;
-			soundBuffer.Dispose ();
-			soundBuffer = null;
-			isDisposed = true;
+        {
+            if (!isDisposed)
+            {
+                this.Stop(true);
+                soundBuffer.Reserved -= HandleSoundBufferReserved;
+                soundBuffer.Recycled -= HandleSoundBufferRecycled;
+                soundBuffer.Dispose();
+                soundBuffer = null;
+                isDisposed = true;
+            }
 		}
 		
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
@@ -146,6 +165,13 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        private float XnaPitchToAlPitch(float pitch)
+        {
+            // pitch is different in XNA and OpenAL. XNA has a pitch between -1 and 1 for one octave down/up.
+            // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default. The default value of 0 would make it completely silent.
+            return (float)Math.Exp(0.69314718 * pitch);
+        }
+
 		private void ApplyState ()
 		{
 			if (!hasSourceId)
@@ -156,14 +182,14 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pan
 			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
 			// Volume
-			AL.Source (sourceId, ALSourcef.Gain, _volume);
+			AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 			// Looping
 			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
 			// Pitch
-			AL.Source (sourceId, ALSourcef.Pitch, _pitch);
+			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 		}
 
-		public void Play ()
+		public virtual void Play ()
 		{
 			int bufferId = soundBuffer.OpenALDataBuffer;
 			if (hasSourceId) {
@@ -176,7 +202,7 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 			ApplyState ();
 
-			controller.PlaySound (soundBuffer);
+			controller.PlaySound (soundBuffer);            
 			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
 		}
@@ -206,7 +232,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-		public bool IsLooped {
+		public virtual bool IsLooped {
 			get {
 				return _looped;
 			}
@@ -243,7 +269,7 @@ namespace Microsoft.Xna.Framework.Audio
 				_pitch = value;
 				if (hasSourceId) {
 					// Pitch
-					AL.Source (sourceId, ALSourcef.Pitch, _pitch);
+					AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 				}
 
 			}
@@ -276,7 +302,7 @@ namespace Microsoft.Xna.Framework.Audio
 				_volume = value;
 				if (hasSourceId) {
 					// Volume
-					AL.Source (sourceId, ALSourcef.Gain, _volume);
+					AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 				}
 
 			}

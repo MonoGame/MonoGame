@@ -45,9 +45,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public sealed class DirectionalLight
 	{
-		EffectParameter diffuseColorParameter;
-		EffectParameter directionParameter;
-		EffectParameter specularColorParameter;
+		internal EffectParameter diffuseColorParameter;
+		internal EffectParameter directionParameter;
+		internal EffectParameter specularColorParameter;
 		
 		Vector3 diffuseColor;
 		Vector3 direction;
@@ -56,11 +56,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public DirectionalLight (EffectParameter directionParameter, EffectParameter diffuseColorParameter, EffectParameter specularColorParameter, DirectionalLight cloneSource)
 		{
+			this.diffuseColorParameter = diffuseColorParameter;
+			this.directionParameter = directionParameter;
+			this.specularColorParameter = specularColorParameter;
 			if (cloneSource != null) {
-				this.diffuseColorParameter = cloneSource.diffuseColorParameter;
-				this.directionParameter = cloneSource.directionParameter;
-				this.specularColorParameter = cloneSource.specularColorParameter;
-				
 				this.diffuseColor = cloneSource.diffuseColor;
 				this.direction = cloneSource.direction;
 				this.specularColor = cloneSource.specularColor;
@@ -78,7 +77,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				diffuseColor = value;
-				diffuseColorParameter.SetValue (diffuseColor);
+				if (this.enabled && this.diffuseColorParameter != null)
+					diffuseColorParameter.SetValue (diffuseColor);
 			}
 		}
 		
@@ -88,7 +88,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				direction = value;
-				directionParameter.SetValue (direction);
+				if (this.directionParameter != null)
+					directionParameter.SetValue (direction);
 			}
 		}
 		
@@ -98,16 +99,42 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			set {
 				specularColor = value;
-				specularColorParameter.SetValue (specularColor);
+				if (this.enabled && this.specularColorParameter != null)
+					specularColorParameter.SetValue (specularColor);
 			}
 		}
-		
-		public bool Enabled {
+		public bool Enabled 
+		{
 			get { return enabled; }
-			set {
-				
-				enabled = value;
-				// no set value here for effect parameter
+			set 
+			{
+				if (this.enabled != value)
+				{
+				    this.enabled = value;
+				    if (this.enabled)
+				    {
+				        if (this.diffuseColorParameter != null)
+				        {
+				            this.diffuseColorParameter.SetValue(this.diffuseColor);
+				        }
+				        if (this.specularColorParameter != null)
+				        {
+				            this.specularColorParameter.SetValue(this.specularColor);
+				        }
+				    }
+				    else
+				    {
+				        if (this.diffuseColorParameter != null)
+				        {
+				            this.diffuseColorParameter.SetValue(Vector3.Zero);
+				        }
+				        if (this.specularColorParameter != null)
+				        {
+				            this.specularColorParameter.SetValue(Vector3.Zero);
+				        }
+				    }
+				}
+
 			}
 		}
 	}

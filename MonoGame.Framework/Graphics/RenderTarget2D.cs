@@ -39,77 +39,162 @@
 #endregion License
 
 using System;
-using GL11 = OpenTK.Graphics.ES11.GL;
-using GL20 = OpenTK.Graphics.ES20.GL;
-using ALL11 = OpenTK.Graphics.ES11.All;
-using ALL20 = OpenTK.Graphics.ES20.All;
 
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// modified to inherit directly from Texture2D as per
-	// http://blogs.msdn.com/b/shawnhar/archive/2010/03/26/rendertarget-changes-in-xna-game-studio-4-0.aspx
-	// 	and
-	// http://msdn.microsoft.com/en-us/library/bb198676.aspx
-	//
 	public class RenderTarget2D : Texture2D
-	{		
-		// OpenGL ES 2.0 frameBuffer reference.
-		internal int frameBuffer;
-		
-		public RenderTargetUsage RenderTargetUsage { get; internal set; }
-		public DepthFormat DepthStencilFormat { get; internal set; }
-		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height)
-			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None) 
-		{}
-		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
-			:this (graphicsDevice, width, height, mipMap, preferredFormat, 
-				DepthFormat.None, 0, RenderTargetUsage.PreserveContents) 
-		{}
-		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, 
-			SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-			:base (graphicsDevice, width, height, mipMap, preferredFormat)
-		{
-
-
-#if IPHONE
-			if(GraphicsDevice.OpenGLESVersion == MonoTouch.OpenGLES.EAGLRenderingAPI.OpenGLES2)
-
-			{
-				GL20.GenFramebuffers(1, ref frameBuffer);
-			}
-			else
-			{
-				RenderTargetUsage = usage;
-				DepthStencilFormat = preferredDepthFormat;
-			}
-#elif ANDROID
-            if (GraphicsDevice.OpenGLESVersion == OpenTK.Graphics.GLContextVersion.Gles2_0)
-            {
-                GL20.GenFramebuffers(1, ref frameBuffer);
-            }
-            else
-            {
-                RenderTargetUsage = usage;
-                DepthStencilFormat = preferredDepthFormat;
-            }
-#else
-				RenderTargetUsage = usage;
-				DepthStencilFormat = preferredDepthFormat;
+	{
+#if GLES
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.Renderbuffer;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24Oes;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8Oes;
+#elif OPENGL
+		const RenderbufferTarget GLRenderbuffer = RenderbufferTarget.RenderbufferExt;
+		const RenderbufferStorage GLDepthComponent16 = RenderbufferStorage.DepthComponent16;
+		const RenderbufferStorage GLDepthComponent24 = RenderbufferStorage.DepthComponent24;
+		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 #endif
 
+#if DIRECTX
+        internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+#elif OPENGL
+		internal uint glDepthStencilBuffer;
+        internal uint glFramebuffer;
+#endif
 
+		public DepthFormat DepthStencilFormat { get; private set; }
+		
+		public int MultiSampleCount { get; private set; }
+		
+		public RenderTargetUsage RenderTargetUsage { get; private set; }
+		
+		public bool IsContentLost { get { return false; } }
+		
+		public virtual event EventHandler<EventArgs> ContentLost;
+		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
+		{
+			DepthStencilFormat = preferredDepthFormat;
+			MultiSampleCount = preferredMultiSampleCount;
+			RenderTargetUsage = usage;
+
+#if DIRECTX
+            // Create a view interface on the rendertarget to use on bind.
+            _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(graphicsDevice._d3dDevice, _texture);
+#endif
+
+            // If we don't need a depth buffer then we're done.
+            if (preferredDepthFormat == DepthFormat.None)
+                return;
+
+#if DIRECTX
+
+            // Setup the multisampling description.
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if ( preferredMultiSampleCount > 1 )
+            {
+                multisampleDesc.Count = preferredMultiSampleCount;
+                multisampleDesc.Quality = (int)SharpDX.Direct3D11.StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
+            // Create a descriptor for the depth/stencil buffer.
+            // Allocate a 2-D surface as the depth/stencil buffer.
+            // Create a DepthStencil view on this surface to use on bind.
+            using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, new SharpDX.Direct3D11.Texture2DDescription()
+            {
+                Format = SharpDXHelper.ToFormat(preferredDepthFormat),
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = width,
+                Height = height,
+                SampleDescription = multisampleDesc,
+                BindFlags = SharpDX.Direct3D11.BindFlags.DepthStencil,
+            }))
+
+            // Create the view for binding to the device.
+            _depthStencilView = new SharpDX.Direct3D11.DepthStencilView(graphicsDevice._d3dDevice, depthBuffer,
+                new SharpDX.Direct3D11.DepthStencilViewDescription() 
+                { 
+                    Format = SharpDXHelper.ToFormat(preferredDepthFormat),
+                    Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D 
+                });
+
+#elif OPENGL
+
+#if GLES
+			GL.GenRenderbuffers(1, ref glDepthStencilBuffer);
+#else
+			GL.GenRenderbuffers(1, out glDepthStencilBuffer);
+#endif
+            GraphicsExtensions.CheckGLError();
+            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, this.glDepthStencilBuffer);
+            GraphicsExtensions.CheckGLError();
+            var glDepthStencilFormat = GLDepthComponent16;
+			switch (preferredDepthFormat)
+			{
+			case DepthFormat.Depth16: glDepthStencilFormat = GLDepthComponent16; break;
+			case DepthFormat.Depth24: glDepthStencilFormat = GLDepthComponent24; break;
+			case DepthFormat.Depth24Stencil8: glDepthStencilFormat = GLDepth24Stencil8; break;
+			}
+			GL.RenderbufferStorage(GLRenderbuffer, glDepthStencilFormat, this.width, this.height);
+            GraphicsExtensions.CheckGLError();
+#endif
         }
 		
-		public override void Dispose ()
+		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
+		{}
+		
+		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height)
+			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
+		{}
+
+		protected override void Dispose(bool disposing)
 		{
-			base.Dispose ();
-			
-			GL20.DeleteFramebuffers(1, ref frameBuffer);
+            if (!IsDisposed)
+            {
+#if DIRECTX
+                if (disposing)
+                {
+                    if (_renderTargetView != null)
+                    {
+                        _renderTargetView.Dispose();
+                        _renderTargetView = null;
+                    }
+                    if (_depthStencilView != null)
+                    {
+                        _depthStencilView.Dispose();
+                        _depthStencilView = null;
+                    }
+                }
+#elif OPENGL
+                GraphicsDevice.AddDisposeAction(() =>
+                    {
+                        GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
+                        GraphicsExtensions.CheckGLError();
+
+                        if (this.glFramebuffer > 0)
+                        {
+                            GL.DeleteFramebuffers(1, ref this.glFramebuffer);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                    });
+#endif
+            }
+            base.Dispose(disposing);
 		}
 	}
 }

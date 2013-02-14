@@ -76,6 +76,7 @@ using MonoMac.Foundation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
@@ -106,19 +107,22 @@ namespace Microsoft.Xna.Framework
 
             InitializeMainWindow();
 
-            // We set the current directory to the ResourcePath on Mac
-            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+            var path = NSBundle.MainBundle.ResourcePath;
+            if (Directory.Exists(path)) {
+                // We set the current directory to the ResourcePath on Mac
+                Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+            }
         }
 
         private void InitializeMainWindow()
         {
             RectangleF frame = new RectangleF(
                 0, 0,
-                PresentationParameters._defaultBackBufferWidth,
-                PresentationParameters._defaultBackBufferHeight);
+                GraphicsDeviceManager.DefaultBackBufferWidth,
+                GraphicsDeviceManager.DefaultBackBufferHeight);
 
             _mainWindow = new MacGameNSWindow(
-                frame, NSWindowStyle.Titled | NSWindowStyle.Closable,
+				frame, NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable,
                 NSBackingStore.Buffered, true);
 
             _mainWindow.WindowController = new NSWindowController(_mainWindow);
@@ -256,6 +260,7 @@ namespace Microsoft.Xna.Framework
 
             if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
                 return false;
+
             return true;
         }
 
@@ -298,8 +303,10 @@ namespace Microsoft.Xna.Framework
                 //        Hopefully this does not cause excessive havoc.
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
-                _mainWindow.HidesOnDeactivate = true;
-                Mouse.ResetMouse();
+                _mainWindow.HidesOnDeactivate = true;   
+                Mouse.State.LeftButton = ButtonState.Released;
+                Mouse.State.RightButton = ButtonState.Released;
+                Mouse.State.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }
@@ -323,7 +330,7 @@ namespace Microsoft.Xna.Framework
                 string oldTitle = _gameWindow.Title;
 
                 NSMenu.MenuBarVisible = true;
-                _mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable;
+				_mainWindow.StyleMask = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
                 if (_wasResizeable)
                     _mainWindow.StyleMask |= NSWindowStyle.Resizable;
 
@@ -340,7 +347,9 @@ namespace Microsoft.Xna.Framework
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = false;
-                Mouse.ResetMouse();
+                Mouse.State.LeftButton = ButtonState.Released;
+                Mouse.State.RightButton = ButtonState.Released;
+                Mouse.State.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }
@@ -485,6 +494,11 @@ namespace Microsoft.Xna.Framework
                 NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
                     _owner.State = MacGamePlatform.RunState.Exited);
             }
+
+			public override bool ShouldZoom (NSWindow window, RectangleF newFrame)
+			{
+				return _owner.AllowUserResizing;
+			}
         }
     }
 }

@@ -60,6 +60,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			isTargetCube = false;
 		}
 
+        public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
+        {
+            RenderTargetBinding RenderTargetBinding = new RenderTargetBinding(renderTarget);
+            return RenderTargetBinding;
+        }
+
+
 		public Texture RenderTarget {
 			get {
 				return _renderTarget;

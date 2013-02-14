@@ -25,7 +25,7 @@ SOFTWARE.
 */
 #endregion License
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework

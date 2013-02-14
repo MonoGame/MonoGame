@@ -42,33 +42,17 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework
 {
 	internal class SoundEffectReader
 	{
+        private static string[] _extensions = new string[] { ".aiff", ".wav", ".ac3", ".mp3" };
+
 		public static string Normalize(string FileName)
         {
-            if (File.Exists(FileName))
-                return FileName;
-
-            // Check the file extension
-            if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-            {
-                return null;
-            }
-
-            // Concat the file name with valid extensions
-            if (File.Exists(FileName + ".aiff"))
-                return FileName + ".aiff";
-            if (File.Exists(FileName + ".wav"))
-                return FileName + ".wav";
-            if (File.Exists(FileName + ".ac3"))
-                return FileName + ".ac3";
-            if (File.Exists(FileName + ".mp3"))
-                return FileName + ".mp3";
-			
-			return null;
+            return ContentTypeReader.Normalize(FileName, _extensions);
 		}
 	}
 }

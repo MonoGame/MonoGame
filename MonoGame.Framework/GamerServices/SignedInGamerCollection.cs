@@ -37,7 +37,7 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.GamerServices

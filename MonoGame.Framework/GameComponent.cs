@@ -44,39 +44,14 @@ namespace Microsoft.Xna.Framework
 {   
     public class GameComponent : IGameComponent, IUpdateable, IComparable<GameComponent>, IDisposable
     {
-        Game _game;
+        bool _enabled = true;
         int _updateOrder;
-        bool _enabled;
-        public event EventHandler<EventArgs> UpdateOrderChanged;
-        public event EventHandler<EventArgs> EnabledChanged;
-        public GameComponent(Game game)
-        {
-            _game = game;
-            Enabled = true;
-        }
 
-        public Game Game 
-        {
-            get 
-            {
-                return _game;
-            }
-        }
+        public Game Game { get; private set; }
 
-        public virtual void Initialize()
-        {
-        }
-
-        public virtual void Update(GameTime gameTime)
-        {
-        }
-        
         public Graphics.GraphicsDevice GraphicsDevice
         {
-            get 
-            {
-                return _game.GraphicsDevice;
-            }
+            get { return this.Game.GraphicsDevice; }
         }
 
         public bool Enabled
@@ -84,9 +59,13 @@ namespace Microsoft.Xna.Framework
             get { return _enabled; }
             set
             {
-                _enabled = value;
-                Raise(EnabledChanged, EventArgs.Empty);
-                OnEnabledChanged(this, null);
+                if (_enabled != value)
+                {
+                    _enabled = value;
+                    if (this.EnabledChanged != null)
+                        this.EnabledChanged(this, EventArgs.Empty);
+                    OnEnabledChanged(this, null);
+                }
             }
         }
 
@@ -95,43 +74,53 @@ namespace Microsoft.Xna.Framework
             get { return _updateOrder; }
             set
             {
-                _updateOrder = value;
-                Raise(UpdateOrderChanged, EventArgs.Empty);
-                OnUpdateOrderChanged(this, null);
+                if (_updateOrder != value)
+                {
+                    _updateOrder = value;
+                    if (this.UpdateOrderChanged != null)
+                        this.UpdateOrderChanged(this, EventArgs.Empty);
+                    OnUpdateOrderChanged(this, null);
+                }
             }
         }
 
-        private void Raise(EventHandler<EventArgs> handler, EventArgs e)
+        public event EventHandler<EventArgs> EnabledChanged;
+        public event EventHandler<EventArgs> UpdateOrderChanged;
+
+        public GameComponent(Game game)
         {
-            if (handler != null)
-                handler(this, e);
+            this.Game = game;
         }
 
-        protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
+        ~GameComponent()
         {
+            Dispose(false);
         }
 
-        protected virtual void OnEnabledChanged(object sender, EventArgs args)
-        {
-        }
+        public virtual void Initialize() { }
+
+        public virtual void Update(GameTime gameTime) { }
+
+        protected virtual void OnUpdateOrderChanged(object sender, EventArgs args) { }
+
+        protected virtual void OnEnabledChanged(object sender, EventArgs args) { }
 
         /// <summary>
         /// Shuts down the component.
         /// </summary>
-        protected virtual void Dispose(bool disposing)
-        {
-        }
+        protected virtual void Dispose(bool disposing) { }
         
         /// <summary>
         /// Shuts down the component.
         /// </summary>
-        public virtual void Dispose()
+        public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
-        
-        #region IComparable<GameComponent> Members
 
+        #region IComparable<GameComponent> Members
+        // TODO: Should be removed, as it is not part of XNA 4.0
         public int CompareTo(GameComponent other)
         {
             return other.UpdateOrder - this.UpdateOrder;
