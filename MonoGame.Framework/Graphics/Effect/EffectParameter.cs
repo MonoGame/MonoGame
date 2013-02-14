@@ -530,28 +530,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetValue (Texture value)
 		{
-            if (ParameterClass != EffectParameterClass.Object)
-                throw new InvalidCastException();
+			if(value != null) {
+				if (ParameterClass != EffectParameterClass.Object)
+					throw new InvalidCastException();
 
-            if (value is Texture2D)
-            {
-                if (    ParameterType != EffectParameterType.Texture1D &&
-                        ParameterType != EffectParameterType.Texture2D)
-                    throw new InvalidCastException();
-            }
-#if !GLES
-            else if (value is Texture3D)
-            {
-                if (ParameterType != EffectParameterType.Texture3D)
-                    throw new InvalidCastException();                
-            }
-#endif
-            else
-		    {
-                if (!(value is TextureCube) || ParameterType != EffectParameterType.TextureCube)
-                    throw new InvalidCastException();                		        
-		    }               
-
+				if (value is Texture2D)
+				{
+					if (    ParameterType != EffectParameterType.Texture1D &&
+							ParameterType != EffectParameterType.Texture2D)
+						throw new InvalidCastException();
+				}
+	#if !GLES
+				else if (value is Texture3D)
+				{
+					if (ParameterType != EffectParameterType.Texture3D)
+						throw new InvalidCastException();                
+				}
+	#endif
+				else
+				{
+					if (!(value is TextureCube) || ParameterType != EffectParameterType.TextureCube)
+						throw new InvalidCastException();                		        
+				}               
+			}
 			Data = value;
             StateKey = unchecked(NextStateKey++);
 		}
