@@ -171,10 +171,6 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            var device = Game.GraphicsDevice;
-            if (device != null)
-                device.ResetRenderTargets();
-
             return true;
         }
 

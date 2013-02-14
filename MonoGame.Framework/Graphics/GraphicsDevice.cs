@@ -2047,15 +2047,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             DynamicIndexBuffer buffer;
 
-            var indexSize = typeof(T) == typeof(short) ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
+            var indexType = typeof(T);
+            var indexSize = Marshal.SizeOf(indexType);
+            var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
-            if (!_userIndexBuffers.TryGetValue(indexSize, out buffer) || buffer.IndexCount < indexCount)
+            if (!_userIndexBuffers.TryGetValue(indexElementSize, out buffer) || buffer.IndexCount < indexCount)
             {
                 if (buffer != null)
                     buffer.Dispose();
 
-                buffer = new DynamicIndexBuffer(this, indexSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
-                _userIndexBuffers[indexSize] = buffer;
+                buffer = new DynamicIndexBuffer(this, indexElementSize, Math.Max(indexCount, 6000), BufferUsage.WriteOnly);
+                _userIndexBuffers[indexElementSize] = buffer;
             }
 
             var startIndex = buffer.UserOffset;
@@ -2063,7 +2065,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
             {
                 buffer.UserOffset += indexCount;
-                buffer.SetData(startIndex * 2, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
+                buffer.SetData(startIndex * indexSize, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
             }
             else
             {
@@ -2078,13 +2080,26 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
-        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numbVertices, int startIndex, int primitiveCount)
+        /// <summary>
+        /// Draw geometry by indexing into the vertex buffer.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
+        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
+        /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
+        public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
-			if (minVertexIndex > 0)
-				throw new NotImplementedException ("minVertexIndex > 0 is supported");
+            // NOTE: minVertexIndex and numVertices are only hints of the
+            // range of vertex data which will be indexed.
+            //
+            // They will only be used if the graphics API can use
+            // this range hint to optimize rendering.
 
 #if DIRECTX
 

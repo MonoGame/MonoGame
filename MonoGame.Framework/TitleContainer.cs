@@ -41,32 +41,100 @@
 using System;
 using System.IO;
 
-#if IOS
+#if WINRT
+using System.Threading.Tasks;
+#elif IOS
 using MonoTouch.Foundation;
+#elif MACOS
+using MonoMac.Foundation;
+#elif PSM
+using Sce.PlayStation.Core;
 #endif
 
 namespace Microsoft.Xna.Framework
 {
-	public static class TitleContainer
-	{
-		public static Stream OpenStream (string name)
-		{
-#if IOS
-			return File.OpenRead (GetFilename (name));
+    public static class TitleContainer
+    {
+        static TitleContainer() 
+        {
+#if WINDOWS || LINUX
+            Location = AppDomain.CurrentDomain.BaseDirectory;
+#elif WINRT
+            Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+#elif IOS || MACOS
+			Location = NSBundle.MainBundle.ResourcePath;
+#elif PSM
+			Location = "/Application";
+#else
+            Location = string.Empty;
+#endif                    
+        }
+
+        static internal string Location { get; private set; }
+
+#if WINRT
+
+        private static async Task<Stream> OpenStreamAsync(string name)
+        {
+            var package = Windows.ApplicationModel.Package.Current;
+
+            try
+            {
+                var storageFile = await package.InstalledLocation.GetFileAsync(name);
+                var randomAccessStream = await storageFile.OpenReadAsync();
+                return randomAccessStream.AsStreamForRead();
+            }
+            catch (IOException)
+            {
+                // The file must not exist... return a null stream.
+                return null;
+            }
+        }
+
+#endif // WINRT
+
+        /// <summary>
+        /// Returns an open stream to an exsiting file in the title storage area.
+        /// </summary>
+        /// <param name="name">The filepath relative to the title storage area.</param>
+        /// <returns>A open stream or null if the file is not found.</returns>
+        public static Stream OpenStream(string name)
+        {
+            // Normalize the file path.
+            var safeName = GetFilename(name);
+
+            // We do not accept absolute paths here.
+            if (Path.IsPathRooted(safeName))
+                throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.");
+
+#if WINRT
+            var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;
+            if (stream == null)
+                throw new FileNotFoundException(name);
+
+            return stream;
 #elif ANDROID
-            return Game.Activity.Assets.Open(GetFilename(name));
+            return Game.Activity.Assets.Open(safeName);
+#else
+            var absolutePath = Path.Combine(Location, safeName);
+            return File.OpenRead(absolutePath);
 #endif
-		}
-		
-		internal static string GetFilename(string name)
-		{
-			// Replace Windows path separators with local path separators
-			name = name.Replace('\\', Path.DirectorySeparatorChar);
-#if IOS
-			name = Path.Combine(NSBundle.MainBundle.ResourcePath, name);
+        }
+
+        // TODO: This is just path normalization.  Remove this
+        // and replace it with a proper utility function.  I'm sure
+        // this same logic is duplicated all over the code base.
+        internal static string GetFilename(string name)
+        {
+#if WINRT
+            // Replace non-windows seperators.
+            name = name.Replace('/', '\\');
+#else
+            // Replace Windows path separators with local path separators
+            name = name.Replace('\\', Path.DirectorySeparatorChar);
 #endif
-			return name;
-		}
-	}
+            return name;
+        }
+    }
 }
 
