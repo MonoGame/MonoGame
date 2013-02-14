@@ -166,11 +166,19 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+		/// <summary>
+		/// Adjusts the pitch of the sound effect to match XNA using pitch shifting to adjust
+		/// for the pitch supported in OpenAL. See the OpenAL 1.1 Specification, ppg 36 and 37.
+		/// </summary>
         private float XnaPitchToAlPitch(float pitch)
         {
             // pitch is different in XNA and OpenAL. XNA has a pitch between -1 and 1 for one octave down/up.
-            // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default. The default value of 0 would make it completely silent.
-            return (float)Math.Exp(0.69314718 * pitch);
+            // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default, meaning no change 
+			// in the pitch. The XNA default value of 0 is not supported by OpenAL. The pitch shift range
+			// is (0.0,+inf] (see openAL spec 1.1, pg 37 "Frequency Shift by Pitch" table column "Values".
+			//
+			// TODO: What is 0.69314718? Where did this magic number come from?
+            return (float)Math.Pow(2, 0.69314718 * pitch);
         }
 
 		private void ApplyState ()
