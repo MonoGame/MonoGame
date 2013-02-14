@@ -44,64 +44,101 @@ using System.IO;
 
 using Microsoft.Xna.Framework.Audio;
 
+#if WINRT
+using SharpDX.XAudio2;
+#endif
+
 namespace Microsoft.Xna.Framework.Content
 {
 	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
 	{
-		public static string Normalize(string FileName)
-		{
-			if (File.Exists(FileName))
-				return FileName;
-			
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(FileName)))
-			{
-				return null;
-			}
-			
-			// Concat the file name with valid extensions
-			if (File.Exists(FileName+".aiff"))
-				return FileName+".aiff";
-			if (File.Exists(FileName+".wav"))
-				return FileName+".wav";
-			if (File.Exists(FileName+".ac3"))
-				return FileName+".ac3";
-			if (File.Exists(FileName+".mp3"))
-				return FileName+".mp3";
-			if (File.Exists(FileName+".xnb"))
-				return FileName+".xnb";
-			
-			return null;
-		}
-		
+#if ANDROID
+        static string[] supportedExtensions = new string[] { ".wav", ".mp3", ".ogg", ".mid" };
+#else
+        static string[] supportedExtensions = new string[] { ".wav", ".aiff", ".ac3", ".mp3" };
+#endif
+
+        internal static string Normalize(string fileName)
+        {
+            return Normalize(fileName, supportedExtensions);
+        }
+
 		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
-		{                    
+		{         
+             // NXB format for SoundEffect...
+            //            
+            // Byte [format size]	Format	WAVEFORMATEX structure
+            // UInt32	Data size	
+            // Byte [data size]	Data	Audio waveform data
+            // Int32	Loop start	In bytes (start must be format block aligned)
+            // Int32	Loop length	In bytes (length must be format block aligned)
+            // Int32	Duration	In milliseconds
+
+            // WAVEFORMATEX structure...
+            //
+            //typedef struct {
+            //  WORD  wFormatTag;       // byte[0]  +2
+            //  WORD  nChannels;        // byte[2]  +2
+            //  DWORD nSamplesPerSec;   // byte[4]  +4
+            //  DWORD nAvgBytesPerSec;  // byte[8]  +4
+            //  WORD  nBlockAlign;      // byte[12] +2
+            //  WORD  wBitsPerSample;   // byte[14] +2
+            //  WORD  cbSize;           // byte[16] +2
+            //} WAVEFORMATEX;
+            
 			byte[] header = input.ReadBytes(input.ReadInt32());
 			byte[] data = input.ReadBytes(input.ReadInt32());
 			int loopStart = input.ReadInt32();
 			int loopLength = input.ReadInt32();
 			int num = input.ReadInt32();
-			
-			MemoryStream mStream = new MemoryStream(20+header.Length+8+data.Length);
-			BinaryWriter writer = new BinaryWriter(mStream);
-			
-			writer.Write("RIFF".ToCharArray());
-			writer.Write((int)(20+header.Length+data.Length));
-			writer.Write("WAVE".ToCharArray());
-			
-			//header can be written as-is
-			writer.Write("fmt ".ToCharArray());
-			writer.Write(header.Length);
-			writer.Write(header);
-			
-			writer.Write("data".ToCharArray());
-			writer.Write((int)data.Length);
-			writer.Write(data);
-			
-			writer.Close();
-			mStream.Close();
-			
-			return new SoundEffect(input.AssetName, mStream.ToArray());
+
+#if WINRT            
+            var count = data.Length;
+            var format = (int)BitConverter.ToUInt16(header, 0);
+            var sampleRate = (int)BitConverter.ToUInt16(header, 4);
+            var channels = BitConverter.ToUInt16(header, 2);
+            //var avgBPS = (int)BitConverter.ToUInt16(header, 8);
+            var blockAlignment = (int)BitConverter.ToUInt16(header, 12);
+            //var bps = (int)BitConverter.ToUInt16(header, 14);
+
+            SharpDX.Multimedia.WaveFormat waveFormat;
+            if (format == 1)
+                waveFormat = new SharpDX.Multimedia.WaveFormat(sampleRate, channels);
+            else if (format == 2)
+                waveFormat = new SharpDX.Multimedia.WaveFormatAdpcm(sampleRate, channels, blockAlignment);
+            else
+                throw new NotImplementedException("Unsupported wave format!");
+
+            return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength)
+            {
+                Name = input.AssetName,
+            };
+#else
+            byte[] soundData = null;
+            // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream
+            MemoryStream mStream = new MemoryStream(20 + header.Length + 8 + data.Length);
+            using (BinaryWriter writer = new BinaryWriter(mStream))
+            {
+                writer.Write("RIFF".ToCharArray());
+                writer.Write((int)(20 + header.Length + data.Length));
+                writer.Write("WAVE".ToCharArray());
+
+                //header can be written as-is
+                writer.Write("fmt ".ToCharArray());
+                writer.Write(header.Length);
+                writer.Write(header);
+
+                writer.Write("data".ToCharArray());
+                writer.Write((int)data.Length);
+                writer.Write(data);
+
+                // Copy the data to an array before disposing the stream
+                soundData = mStream.ToArray();
+            }
+            if (soundData == null)
+                throw new ContentLoadException("Failed to load SoundEffect");
+			return new SoundEffect(input.AssetName, soundData);
+#endif
 		}
 	}
 }

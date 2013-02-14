@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework
 
 
 
-        public static Microsoft.Xna.Framework.BatteryChargeStatus BatteryChargeStatus
+        public static BatteryChargeStatus BatteryChargeStatus
         {
             get
             {
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (_batteryStatus == BatteryManager.BatteryStatusCharging || _batteryStatus == BatteryManager.BatteryStatusFull) ? PowerLineStatus.Online : PowerLineStatus.Offline;
+                return (_batteryStatus == BatteryStatus.Charging || _batteryStatus == BatteryStatus.Full) ? PowerLineStatus.Online : PowerLineStatus.Offline;
             }
         }
     }

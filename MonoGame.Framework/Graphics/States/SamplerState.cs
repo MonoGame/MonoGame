@@ -39,61 +39,74 @@
 // #endregion License
 // 
 using System;
+using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#else
+#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif WINRT
+// TODO
+#elif GLES
+using OpenTK.Graphics.ES20;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
+using TextureParameterName = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class SamplerState : GraphicsResource
 	{
-		static SamplerState () {
-			AnisotropicClamp = new SamplerState () {
-				Filter = TextureFilter.Anisotropic,
+#if DIRECTX
+        private SharpDX.Direct3D11.SamplerState _state;
+#endif
 
+		static SamplerState () 
+        {
+			AnisotropicClamp = new SamplerState () 
+            {
+				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			AnisotropicWrap = new SamplerState () {
+			AnisotropicWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Anisotropic,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
 			};
 			
-			LinearClamp = new SamplerState () {
+			LinearClamp = new SamplerState () 
+            {
 				Filter = TextureFilter.Linear,
-
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			LinearWrap = new SamplerState () {
+			LinearWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Linear,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
 			};
 			
-			PointClamp = new SamplerState () {
+			PointClamp = new SamplerState () 
+            {
 				Filter = TextureFilter.Point,
-
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
 				AddressW = TextureAddressMode.Clamp,
 			};
 			
-			PointWrap = new SamplerState () {
+			PointWrap = new SamplerState () 
+            {
 				Filter = TextureFilter.Point,
-
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
 				AddressW = TextureAddressMode.Wrap,
@@ -116,32 +129,144 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int MaxMipLevel { get; set; }
 		public float MipMapLevelOfDetailBias { get; set; }
 		
-		internal void Activate()
+#if DIRECTX
+
+        internal SharpDX.Direct3D11.SamplerState GetState(GraphicsDevice device)
+        {
+            if (_state == null)
+            {
+                // We're now bound to a device... no one should
+                // be changing the state of this object now!
+                GraphicsDevice = device;
+
+                // Build the description.
+                var desc = new SharpDX.Direct3D11.SamplerStateDescription();
+
+                desc.AddressU = GetAddressMode(AddressU);
+                desc.AddressV = GetAddressMode(AddressV);
+                desc.AddressW = GetAddressMode(AddressW);
+
+                desc.Filter = GetFilter(Filter);
+                desc.MaximumAnisotropy = MaxAnisotropy;
+                desc.MipLodBias = MipMapLevelOfDetailBias;
+
+                // TODO: How do i do these?
+                desc.MinimumLod = 0.0f;
+                desc.BorderColor = new SharpDX.Color4(0, 0, 0, 0);
+
+                // To support feature level 9.1 these must 
+                // be set to these exact values.
+                desc.MaximumLod = float.MaxValue;
+                desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
+
+                // Create the state.
+                _state = new SharpDX.Direct3D11.SamplerState(GraphicsDevice._d3dDevice, ref desc);
+            }
+
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
+
+            return _state;
+        }
+
+        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter)
+        {
+            switch (filter)
+            {
+                case TextureFilter.Anisotropic:
+                    return SharpDX.Direct3D11.Filter.Anisotropic;
+
+                case TextureFilter.Linear:
+                    return SharpDX.Direct3D11.Filter.MinMagMipLinear;
+
+                case TextureFilter.LinearMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinMagLinearMipPoint;
+
+                case TextureFilter.MinLinearMagPointMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinLinearMagPointMipLinear;
+
+                case TextureFilter.MinLinearMagPointMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinLinearMagMipPoint;
+
+                case TextureFilter.MinPointMagLinearMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinPointMagMipLinear;
+
+                case TextureFilter.MinPointMagLinearMipPoint:
+                    return SharpDX.Direct3D11.Filter.MinPointMagLinearMipPoint;
+
+                case TextureFilter.Point:
+                    return SharpDX.Direct3D11.Filter.MinMagMipPoint;
+
+                case TextureFilter.PointMipLinear:
+                    return SharpDX.Direct3D11.Filter.MinMagPointMipLinear;
+
+                default:
+                    throw new NotImplementedException("Invalid texture filter!");
+            }
+        }
+
+        private static SharpDX.Direct3D11.TextureAddressMode GetAddressMode(TextureAddressMode mode)
+        {
+            switch (mode)
+            {
+                case TextureAddressMode.Clamp:
+                    return SharpDX.Direct3D11.TextureAddressMode.Clamp;
+
+                case TextureAddressMode.Mirror:
+                    return SharpDX.Direct3D11.TextureAddressMode.Mirror;
+
+                case TextureAddressMode.Wrap:
+                    return SharpDX.Direct3D11.TextureAddressMode.Wrap;
+
+                default:
+                    throw new NotImplementedException("Invalid texture address mode!");
+            }
+        }
+
+#endif // DIRECTX
+
+
+#if OPENGL
+
+		internal void Activate(TextureTarget target, bool useMipmaps = false)
 		{
-			// Set up texture sample filtering.
-			bool useMipmaps = MaxMipLevel > 0;
 			switch(Filter)
 			{
 			case TextureFilter.Point:
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
+                GraphicsExtensions.CheckGLError();
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                GraphicsExtensions.CheckGLError();
 				break;
 			case TextureFilter.Linear:
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+                GraphicsExtensions.CheckGLError();
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
 				break;
 			case TextureFilter.Anisotropic:
 				// TODO: Requires EXT_texture_filter_anisotropic. Use linear filtering for now.
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+                GraphicsExtensions.CheckGLError();
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
 				break;
+			case TextureFilter.PointMipLinear:
+				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapNearest : TextureMinFilter.Nearest));
+                GraphicsExtensions.CheckGLError();
+				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                GraphicsExtensions.CheckGLError();
+				break;
+			default:
+				throw new NotImplementedException();
 			}
 
 			// Set up texture addressing.
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
-		}
-		
+			GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
+            GraphicsExtensions.CheckGLError();
+            GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
+            GraphicsExtensions.CheckGLError();
+        }
+
 		private int GetWrapMode(TextureAddressMode textureAddressMode)
 		{
 			switch(textureAddressMode)
@@ -156,6 +281,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new NotImplementedException("No support for " + textureAddressMode);
 			}
 		}
-	}
+
+#endif // OPENGL
+
+    }
 }
 

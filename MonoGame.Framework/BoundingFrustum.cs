@@ -141,55 +141,64 @@ namespace Microsoft.Xna.Framework
 
         public void Contains(ref BoundingBox box, out ContainmentType result)
         {
-            // FIXME: Is this a bug?
-            // If the bounding box is of W * D * H = 0, then return disjoint
-            if (box.Min == box.Max)
+            var intersects = false;
+
+            PlaneIntersectionType type;
+            box.Intersects(ref near, out type);
+            if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            int i;
-            ContainmentType contained;
-            Vector3[] corners = box.GetCorners();
-
-            // First we assume completely disjoint. So if we find a point that is contained, we break out of this loop
-            for (i = 0; i < corners.Length; i++)
-            {
-                this.Contains(ref corners[i], out contained);
-                if (contained != ContainmentType.Disjoint)
-                    break;
-            }
-
-            if (i == corners.Length) // This means we checked all the corners and they were all disjoint
+            box.Intersects(ref left, out type);
+            if ( type == PlaneIntersectionType.Front )
             {
                 result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            if (i != 0)             // if i is not equal to zero, we can fastpath and say that this box intersects
-            {                       // because we know at least one point is outside and one is inside.
-                result = ContainmentType.Intersects;
+            box.Intersects(ref right, out type);
+            if ( type == PlaneIntersectionType.Front )
+            {
+                result = ContainmentType.Disjoint;
                 return;
             }
+            if ( type == PlaneIntersectionType.Intersecting )
+                intersects = true;
 
-            // If we get here, it means the first (and only) point we checked was actually contained in the frustum.
-            // So we assume that all other points will also be contained. If one of the points is disjoint, we can
-            // exit immediately saying that the result is Intersects
-            i++;
-            for (; i < corners.Length; i++)
+            box.Intersects(ref top, out type);
+            if (type == PlaneIntersectionType.Front)
             {
-                this.Contains(ref corners[i], out contained);
-                if (contained != ContainmentType.Contains)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
+                result = ContainmentType.Disjoint;
+                return;
             }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
 
-            // If we get here, then we know all the points were actually contained, therefore result is Contains
-            result = ContainmentType.Contains;
-            return;
+            box.Intersects(ref bottom, out type);
+            if (type == PlaneIntersectionType.Front)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
+
+            box.Intersects(ref far, out type);
+            if (type == PlaneIntersectionType.Front)
+            {
+                result = ContainmentType.Disjoint;
+                return;
+            }
+            if (type == PlaneIntersectionType.Intersecting)
+                intersects = true;
+
+            result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
         // TODO: Implement this
@@ -210,71 +219,68 @@ namespace Microsoft.Xna.Framework
 
         public void Contains(ref BoundingSphere sphere, out ContainmentType result)
         {
-            float val;
-            ContainmentType contained;
+            float dist;
+			result = ContainmentType.Contains;
+			
+            Vector3.Dot(ref bottom.Normal, ref sphere.Center, out dist);
+			dist += bottom.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
+			
+            Vector3.Dot(ref top.Normal, ref sphere.Center, out dist);
+			dist += top.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
+			
+			Vector3.Dot(ref near.Normal, ref sphere.Center, out dist);
+			dist += near.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
+			
+			Vector3.Dot(ref far.Normal, ref sphere.Center, out dist);
+			dist += far.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
+			
+			Vector3.Dot(ref left.Normal, ref sphere.Center, out dist);
+			dist += left.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
 
-            // We first check if the sphere is inside the frustum
-            this.Contains(ref sphere.Center, out contained);
-
-            // The sphere is inside. Now we need to check if it's fully contained or not
-            // So we see if the perpendicular distance to each plane is less than or equal to the sphere's radius.
-            // If the perpendicular distance is less, just return Intersects.
-            if (contained == ContainmentType.Contains)
-            {
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.bottom);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.far);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.left);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.near);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.right);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                val = PlaneHelper.PerpendicularDistance(ref sphere.Center, ref this.top);
-                if (val < sphere.Radius)
-                {
-                    result = ContainmentType.Intersects;
-                    return;
-                }
-
-                // If we get here, the sphere is fully contained
-                result = ContainmentType.Contains;
-                return;
-            }
-            //duff idea : test if all corner is in same side of a plane if yes and outside it is disjoint else intersect
-            // issue is that we can have some times when really close aabb 
-
-
-
-            // If we're here, the the sphere's centre was outside of the frustum. This makes things hard :(
-            // We can't use perpendicular distance anymore. I'm not sure how to code this.
-            throw new NotImplementedException();
+			Vector3.Dot(ref right.Normal, ref sphere.Center, out dist);
+			dist += right.D;
+			if (dist > sphere.Radius)
+			{
+				result = ContainmentType.Disjoint;
+				return;
+			}
+			if (Math.Abs(dist) < sphere.Radius)
+				result = ContainmentType.Intersects;
         }
 
         public ContainmentType Contains(Vector3 point)
@@ -444,7 +450,6 @@ namespace Microsoft.Xna.Framework
 
         #region Private Methods
 
-#warning Move this to the PlaneHelper class
         private void CreateCorners()
         {
             this.corners = new Vector3[8];

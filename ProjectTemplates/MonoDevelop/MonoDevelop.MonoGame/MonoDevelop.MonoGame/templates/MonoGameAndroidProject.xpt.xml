@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame for Android Application</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<Icon>monogame-project-android</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates an MonoGame for Android Project </_Description>
+	</TemplateConfiguration>
+	
+	<Actions>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "MonoDroid">
+			<Options
+				AndroidApplication="true"
+				AndroidResgenFile="Resources/Resource.designer.cs"
+				AndroidResgenClass="Resource" />
+			<References>
+				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />				
+				<Reference type="Gac" refto="Mono.Android" />
+				<Reference type="Gac" refto="OpenTK" />
+				<Reference type="Gac" refto="MonoGame.Framework.Android" />
+				<Reference type="Gac" refto="Lidgren.Network.Android" />
+			</References>
+			<Files>
+				<File name="Activity1.cs" src="MonoGameApplication/Activity1.cs" />
+				<File name="Game1.cs" src="MonoGameApplication/Game1.cs" />
+				<Directory name="Resources">
+					<File name="Resource.designer.cs" src="MonoGameApplication/Resource.cs" />
+					<RawFile name="AboutResources.txt" src="MonoGameApplication/AboutResources.txt" />					
+					<Directory name="drawable">
+						<RawFile name="Icon.png" src="MonoGameApplication/Icon-md.png" />
+						<RawFile name="Splash.png" src="MonoGameApplication/Splash.png" />
+					</Directory>
+					<Directory name="values">
+						<RawFile name="Styles.xml" src="MonoGameApplication/Styles.xml" />					
+					</Directory>
+				</Directory>
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" src="MonoGameApplication/AndroidAssemblyInfo.cs" />
+				</Directory>
+				<Directory name="Assets">
+					<RawFile name="AboutAssets.txt" src="MonoGameApplication/AboutAssets.txt" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>

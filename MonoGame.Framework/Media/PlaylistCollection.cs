@@ -41,14 +41,14 @@ purpose and non-infringement.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-﻿
+
 namespace Microsoft.Xna.Framework.Media
 {
 
     public sealed class PlaylistCollection : ICollection<Playlist>, IEnumerable<Playlist>, IEnumerable, IDisposable
     {
 		private bool isReadOnly = false;
-		private List<Playlist> innerlist;
+		private List<Playlist> innerlist = new List<Playlist>();
 		
         public void Dispose()
         {

@@ -83,12 +83,45 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    class GuideAlreadyVisibleException : Exception
+    {
+        public GuideAlreadyVisibleException (string message)
+            : base(message)
+        { }
+    }
+
 	class GuideViewController : UIViewController
 	{
+        UIViewController _parent;
+
+        public GuideViewController(UIViewController parent)
+        {
+            _parent = parent;
+        }
+
+        #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			return this.ParentViewController.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
+            return _parent.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
 		}
+        #endregion
+
+        #region Autorotation for iOS 6 or newer
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+        {
+            return _parent.GetSupportedInterfaceOrientations();
+        }
+        
+        public override bool ShouldAutorotate ()
+        {
+            return _parent.ShouldAutorotate();
+        }
+        
+        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
+        {
+            return _parent.PreferredInterfaceOrientationForPresentation();
+        }
+        #endregion
 
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
@@ -114,17 +147,19 @@ namespace Microsoft.Xna.Framework.GamerServices
 	{
 		private static int _showKeyboardInputRequestCount;
 
-		private static bool isMessageBoxShowing = false;
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
 		private static GKPeerPickerController peerPickerController;
 		private static GKMatchmakerViewController matchmakerViewController;
+        private static KeyboardInputViewController keyboardViewController;
 		private static GuideViewController viewController = null;
 		private static GestureType prevGestures;
 
 		private static bool _isInitialised;
 		private static UIWindow _window;
 		private static UIViewController _gameViewController;
+
+        public static GKMatch Match { get; private set; }
 
 		internal static void Initialise(Game game)
 		{
@@ -161,18 +196,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			set { isTrialMode = value; }
 		}
 
-		private static bool isVisible;
-		public static bool IsVisible {
-			get {
-				AssertInitialised ();
-				return isVisible;
-			}
-			set {
-				AssertInitialised ();
-				// FIXME: Need to hide any visible UI here.
-				isVisible = value;
-			}
-		}
+        public static bool IsVisible { get; internal set; }
 
 		public static bool SimulateTrialMode { get; set; }
 
@@ -206,6 +230,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
+            if (keyboardViewController != null)
+                return null;
+
 			int requestCount = Interlocked.Increment (ref _showKeyboardInputRequestCount);
 			if (requestCount != 1) {
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
@@ -213,27 +240,31 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return null;
 			}
 
-			isVisible = true;
-			var viewController = new KeyboardInputViewController(
+			IsVisible = true;
+
+			keyboardViewController = new KeyboardInputViewController(
 				title, description, defaultText, usePasswordMode);
-			_gameViewController.PresentViewController (viewController, true, () => {});
 
-			viewController.View.InputAccepted += (sender, e) => {
-				_gameViewController.DismissViewController (true, () => {});
+			_gameViewController.PresentModalViewController (keyboardViewController, true);
+
+			keyboardViewController.View.InputAccepted += (sender, e) => {
+                _gameViewController.DismissModalViewControllerAnimated(true);
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
 			};
 
-			viewController.View.InputCanceled += (sender, e) => {
-				_gameViewController.DismissViewController (true, () => {});
+			keyboardViewController.View.InputCanceled += (sender, e) => {
+                _gameViewController.DismissModalViewControllerAnimated(true);
 				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
 			};
 
-			return new KeyboardInputAsyncResult (viewController, callback, state);
+			return new KeyboardInputAsyncResult (keyboardViewController, callback, state);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
 			AssertInitialised ();
+
+            keyboardViewController = null;
 
 			if (!(result is KeyboardInputAsyncResult))
 				throw new ArgumentException ("result");
@@ -249,35 +280,26 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			Nullable<int> result = null;
 			
-			if ( !isMessageBoxShowing )
-			{
-				isMessageBoxShowing = true;	
-	
-				UIAlertView alert = new UIAlertView();
-				alert.Title = title;
-				foreach( string btn in buttons )
-				{
-					alert.AddButton(btn);
-				}
-				alert.Message = text;
-				alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
-								{ 
-									result = e.ButtonIndex;
-									isMessageBoxShowing = false;
-								};
-				alert.Clicked += delegate(object sender, UIButtonEventArgs e) 
-								{ 
-									result = e.ButtonIndex; 
-									isMessageBoxShowing = false;
-								};
-				
-				UIApplication.SharedApplication.InvokeOnMainThread(delegate {
-					alert.Show();
-				});
-				
-			}
-			
-			isVisible = isMessageBoxShowing;
+            IsVisible = true;
+            EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+
+			UIApplication.SharedApplication.InvokeOnMainThread(delegate {
+                UIAlertView alert = new UIAlertView();
+                alert.Title = title;
+                foreach( string btn in buttons )
+                {
+                    alert.AddButton(btn);
+                }
+                alert.Message = text;
+                alert.Dismissed += delegate(object sender, UIButtonEventArgs e) 
+                { 
+                    result = e.ButtonIndex;
+                    waitHandle.Set();
+                };
+                alert.Show();
+			});
+            waitHandle.WaitOne();
+            IsVisible = false;
 
 			return result;
 		}
@@ -286,6 +308,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 			PlayerIndex player, string title, string text, IEnumerable<string> buttons, int focusButton,
 			MessageBoxIcon icon, AsyncCallback callback, Object state)
 		{	
+            if (IsVisible)
+                throw new GuideAlreadyVisibleException("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
+            
+            IsVisible = true;
+
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
 			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
@@ -301,18 +328,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static Nullable<int> EndShowMessageBox (IAsyncResult result)
 		{
-			try
-			{
-				ShowMessageBoxDelegate smbd = (ShowMessageBoxDelegate)result.AsyncState; 
-
-				return smbd.EndInvoke(result);
-			} 
-			finally 
-			{
-				isVisible = false;
-			}
+            return (result.AsyncState as ShowMessageBoxDelegate).EndInvoke(result);
 		}
-
 
 		public static void ShowMarketplace (PlayerIndex player)
 		{
@@ -361,23 +378,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 					leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
 					{
 						leaderboardController.DismissModalViewControllerAnimated(true);
-						isVisible = false;
+						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
  					};
 
 					if (_window != null)
-					{						
+					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+							viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
 						
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
-						viewController.PresentModalViewController(leaderboardController, true);
-						isVisible = true;
+                        viewController.PresentModalViewController(leaderboardController, true);
+						IsVisible = true;
 					}
 			    }
 			}
@@ -406,7 +423,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					achievementController.DidFinish += delegate(object sender, EventArgs e) 
 					{									 
 						achievementController.DismissModalViewControllerAnimated(true);
-						isVisible = false;
+						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
@@ -414,7 +431,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+                            viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -422,7 +439,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
 						viewController.PresentModalViewController(achievementController, true);						
-						isVisible = true;
+						IsVisible = true;
 					}
 			    }
 			}
@@ -454,9 +471,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    }
 			}
 		}
-		
-		
-		public static void ShowMatchMaker()
+
+        /// <summary>
+        /// Displays the iOS matchmaker to the player.
+        /// </summary>
+        /// <remarks>
+        /// Note this is not overloaded in derived classes on purpose.  This is
+        /// only a reason this exists is for caching effects.
+        /// </remarks>
+        /// <param name="minPlayers">Minimum players to find</param>
+        /// <param name="maxPlayers">Maximum players to find</param>
+        /// <param name="playersToInvite">Players to invite/param>
+        public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
 		{
 			AssertInitialised ();
 
@@ -465,19 +491,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// Lazy load it
 				if ( matchmakerViewController == null )
 				{
-					matchmakerViewController = new GKMatchmakerViewController();
+					matchmakerViewController = new GKMatchmakerViewController(new GKMatchRequest());
 				}
 
 			    if (matchmakerViewController != null)		
-			    {			
+			    {		
+                    matchmakerViewController.MatchRequest.MinPlayers = minPlayers;
+                    matchmakerViewController.MatchRequest.MaxPlayers = maxPlayers;
+                    matchmakerViewController.MatchRequest.PlayersToInvite = playersToInvite;
+
 					matchmakerViewController.DidFailWithError += delegate(object sender, GKErrorEventArgs e) {
 						matchmakerViewController.DismissModalViewControllerAnimated(true);
-						isVisible = false;
+						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 					
 					matchmakerViewController.DidFindMatch += delegate(object sender, GKMatchEventArgs e) {
-						
+                        Guide.Match = e.Match;
 					};
 						
 					matchmakerViewController.DidFindPlayers += delegate(object sender, GKPlayersEventArgs e) {
@@ -486,7 +516,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					
 					matchmakerViewController.WasCancelled += delegate(object sender, EventArgs e) {
 						matchmakerViewController.DismissModalViewControllerAnimated(true);
-						isVisible = false;
+						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
 
@@ -494,7 +524,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController();
+                            viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -502,11 +532,25 @@ namespace Microsoft.Xna.Framework.GamerServices
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
 						viewController.PresentModalViewController(matchmakerViewController, true);						
-						isVisible = true;
+						IsVisible = true;
 					}				
 			    }
 			}
 		}
+
+        /// <summary>
+        /// Displays the iOS matchmaker to the player.
+        /// </summary>
+        /// <remarks>
+        /// Note this is not overloaded in derived classes on purpose.  This is
+        /// only a reason this exists is for caching effects.
+        /// </remarks>
+        /// <param name="minPlayers">Minimum players to find</param>
+        /// <param name="maxPlayers">Maximum players to find</param>
+        public static void ShowMatchMaker(int minPlayers, int maxPlayers)
+        {
+            ShowMatchMaker(minPlayers, maxPlayers, null);
+        }
 
 		public static IAsyncResult BeginShowStorageDeviceSelector( AsyncCallback callback, Object state )
 		{

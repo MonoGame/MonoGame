@@ -39,12 +39,33 @@
 // #endregion License
 // 
 using System;
+using System.Diagnostics;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using EnableCap = OpenTK.Graphics.ES20.All;
+using BlendEquationMode = OpenTK.Graphics.ES20.All;
+using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
+using BlendingFactorDest = OpenTK.Graphics.ES20.All;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
 	public class BlendState : GraphicsResource
 	{
-		public float Alpha { get; set; }
+#if DIRECTX
+        SharpDX.Direct3D11.BlendState _state;
+#endif
+
+        // TODO: We should be asserting if the state has
+        // been changed after it has been bound to the device!
+
 		public BlendFunction AlphaBlendFunction { get; set; }
 		public Blend AlphaDestinationBlend { get; set; }
 		public Blend AlphaSourceBlend { get; set; }
@@ -57,43 +78,252 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ColorWriteChannels ColorWriteChannels2 { get; set; }
 		public ColorWriteChannels ColorWriteChannels3 { get; set; }
 		public int MultiSampleMask { get; set; }
-		
-		static BlendState additiveState;
-		
+
 		public static readonly BlendState Additive;
 		public static readonly BlendState AlphaBlend;
 		public static readonly BlendState NonPremultiplied;
 		public static readonly BlendState Opaque;
 		
-		static BlendState () {
-			Additive = new BlendState () {
+		public BlendState() 
+        {
+			AlphaBlendFunction = BlendFunction.Add;
+			AlphaDestinationBlend = Blend.Zero;
+			AlphaSourceBlend = Blend.One;
+			BlendFactor = Color.White;
+			ColorBlendFunction = BlendFunction.Add;
+			ColorDestinationBlend = Blend.Zero;
+			ColorSourceBlend = Blend.One;
+			ColorWriteChannels = ColorWriteChannels.All;
+			ColorWriteChannels1 = ColorWriteChannels.All;
+			ColorWriteChannels2 = ColorWriteChannels.All;
+			ColorWriteChannels3 = ColorWriteChannels.All;
+			MultiSampleMask = Int32.MaxValue;
+		}
+		
+		static BlendState() 
+        {
+			Additive = new BlendState() 
+            {
 				ColorSourceBlend = Blend.SourceAlpha,
 				AlphaSourceBlend = Blend.SourceAlpha,
     			ColorDestinationBlend = Blend.One,	
 				AlphaDestinationBlend = Blend.One
 			};
 			
-			AlphaBlend = new BlendState () {
+			AlphaBlend = new BlendState()
+            {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
 			};
 			
-			NonPremultiplied = new BlendState () {
+			NonPremultiplied = new BlendState() 
+            {
 				ColorSourceBlend = Blend.SourceAlpha,
 				AlphaSourceBlend = Blend.SourceAlpha,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
 			};
 			
-			Opaque = new BlendState () {
+			Opaque = new BlendState()
+            {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,			    
 				ColorDestinationBlend = Blend.Zero,
 				AlphaDestinationBlend = Blend.Zero
 			};
-		}				
+		}
+
+        public override string ToString ()
+        {
+            string blendStateName;
+
+            if(this == BlendState.Additive)
+                blendStateName = "Additive";
+            else if (this == BlendState.AlphaBlend)
+                blendStateName = "AlphaBlend";
+            else if (this == BlendState.NonPremultiplied)
+                blendStateName = "NonPremultiplied";
+            else
+                blendStateName = "Opaque";
+
+
+            return string.Format("{0}.{1}", base.ToString(), blendStateName);
+        }
+
+
+#if OPENGL
+        internal void ApplyState(GraphicsDevice device)
+        {
+            GL.Enable(EnableCap.Blend);
+            GraphicsExtensions.CheckGLError();
+
+            // Set blending mode
+            var blendMode = ColorBlendFunction.GetBlendEquationMode();
+            GL.BlendEquation(blendMode);
+            GraphicsExtensions.CheckGLError();
+
+            // Set blending function
+            var bfs = ColorSourceBlend.GetBlendFactorSrc();
+            var bfd = ColorDestinationBlend.GetBlendFactorDest();
+#if IOS
+			GL.BlendFunc ((All)bfs, (All)bfd);
+#else
+            GL.BlendFunc(bfs, bfd);
+#endif
+            GraphicsExtensions.CheckGLError();
+        }
+
+#elif DIRECTX
+
+        internal void ApplyState(GraphicsDevice device)
+        {
+            if (_state == null)
+            {
+                // We're now bound to a device... no one should
+                // be changing the state of this object now!
+                GraphicsDevice = device;
+
+                // Build the description.
+                var desc = new SharpDX.Direct3D11.BlendStateDescription();
+
+                var targetDesc = new SharpDX.Direct3D11.RenderTargetBlendDescription();
+
+                // We're blending if we're not in the opaque state.
+                targetDesc.IsBlendEnabled = !(  ColorSourceBlend == Opaque.ColorSourceBlend &&
+                                                ColorDestinationBlend == Opaque.ColorDestinationBlend &&
+                                                AlphaSourceBlend == Opaque.AlphaSourceBlend &&
+                                                AlphaDestinationBlend == Opaque.AlphaDestinationBlend);
+
+                targetDesc.BlendOperation = GetBlendOperation(ColorBlendFunction);
+                targetDesc.SourceBlend = GetBlendOption(ColorSourceBlend);
+                targetDesc.DestinationBlend = GetBlendOption(ColorDestinationBlend);
+
+                targetDesc.AlphaBlendOperation = GetBlendOperation(AlphaBlendFunction);
+                targetDesc.SourceAlphaBlend = GetBlendOption(AlphaSourceBlend);
+                targetDesc.DestinationAlphaBlend = GetBlendOption(AlphaDestinationBlend);
+
+                // Set the first 4 targets to the same settings.
+                desc.RenderTarget[0] = targetDesc;
+                desc.RenderTarget[1] = targetDesc;
+                desc.RenderTarget[2] = targetDesc;
+                desc.RenderTarget[3] = targetDesc;
+ 
+                // Set the color write controls per-target.
+                desc.RenderTarget[0].RenderTargetWriteMask = GetColorWriteMask(ColorWriteChannels);
+                desc.RenderTarget[1].RenderTargetWriteMask = GetColorWriteMask(ColorWriteChannels1);
+                desc.RenderTarget[2].RenderTargetWriteMask = GetColorWriteMask(ColorWriteChannels2);
+                desc.RenderTarget[3].RenderTargetWriteMask = GetColorWriteMask(ColorWriteChannels3);
+
+                // These are new DX11 features we should consider exposing
+                // as part of the extended MonoGame API.
+                desc.AlphaToCoverageEnable = false;
+                desc.IndependentBlendEnable = false;
+
+                // Create the state.
+                _state = new SharpDX.Direct3D11.BlendState(GraphicsDevice._d3dDevice, desc);
+            }
+
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
+
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+
+            // Apply the state!
+            var d3dContext = device._d3dContext;
+            d3dContext.OutputMerger.BlendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
+            d3dContext.OutputMerger.BlendSampleMask = -1;
+            d3dContext.OutputMerger.BlendState = _state;
+        }
+
+        static private SharpDX.Direct3D11.BlendOperation GetBlendOperation(BlendFunction blend)
+        {
+            switch (blend)
+            {
+                case BlendFunction.Add:
+                    return SharpDX.Direct3D11.BlendOperation.Add;
+
+                case BlendFunction.Max:
+                    return SharpDX.Direct3D11.BlendOperation.Maximum;
+
+                case BlendFunction.Min:
+                    return SharpDX.Direct3D11.BlendOperation.Minimum;
+
+                case BlendFunction.ReverseSubtract:
+                    return SharpDX.Direct3D11.BlendOperation.ReverseSubtract;
+
+                case BlendFunction.Subtract:
+                    return SharpDX.Direct3D11.BlendOperation.Subtract;
+
+                default:
+                    throw new NotImplementedException("Invalid blend function!");
+            }
+        }
+
+        static private SharpDX.Direct3D11.BlendOption GetBlendOption(Blend blend)
+        {
+            switch (blend)
+            {
+                case Blend.BlendFactor:
+                    return SharpDX.Direct3D11.BlendOption.BlendFactor;
+
+                case Blend.DestinationAlpha:
+                    return SharpDX.Direct3D11.BlendOption.DestinationAlpha;
+
+                case Blend.DestinationColor:
+                    return SharpDX.Direct3D11.BlendOption.DestinationColor;
+
+                case Blend.InverseBlendFactor:
+                    return SharpDX.Direct3D11.BlendOption.InverseBlendFactor;
+
+                case Blend.InverseDestinationAlpha:
+                    return SharpDX.Direct3D11.BlendOption.InverseDestinationAlpha;
+
+                case Blend.InverseDestinationColor:
+                    return SharpDX.Direct3D11.BlendOption.InverseDestinationColor;
+
+                case Blend.InverseSourceAlpha:
+                    return SharpDX.Direct3D11.BlendOption.InverseSourceAlpha;
+
+                case Blend.InverseSourceColor:
+                    return SharpDX.Direct3D11.BlendOption.InverseSourceColor;
+
+                case Blend.One:
+                    return SharpDX.Direct3D11.BlendOption.One;
+
+                case Blend.SourceAlpha:
+                    return SharpDX.Direct3D11.BlendOption.SourceAlpha;
+
+                case Blend.SourceAlphaSaturation:
+                    return SharpDX.Direct3D11.BlendOption.SourceAlphaSaturate;
+
+                case Blend.SourceColor:
+                    return SharpDX.Direct3D11.BlendOption.SourceColor;
+
+                case Blend.Zero:
+                    return SharpDX.Direct3D11.BlendOption.Zero;                    
+
+                default:
+                    throw new NotImplementedException("Invalid blend!");
+            }
+        }
+
+        static private SharpDX.Direct3D11.ColorWriteMaskFlags GetColorWriteMask(ColorWriteChannels mask)
+        {
+            return  ((mask & ColorWriteChannels.Red) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Red : 0) |
+                    ((mask & ColorWriteChannels.Green) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Green : 0) |
+                    ((mask & ColorWriteChannels.Blue) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Blue : 0) |
+                    ((mask & ColorWriteChannels.Alpha) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Alpha : 0);
+        }
+
+#endif // DIRECTX	
+#if PSM
+        internal void ApplyState(GraphicsDevice device)
+        {
+            #warning Unimplemented
+        }
+#endif
 	}
 }
 

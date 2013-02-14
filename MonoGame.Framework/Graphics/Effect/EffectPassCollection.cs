@@ -7,43 +7,35 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPassCollection : IEnumerable<EffectPass>
     {
-		// Modified to be a list instead of dictionary object because a dictionary does not guarantee
-		// the order is kept as it is a hash key.
-		internal List<EffectPass> _passes = new List<EffectPass>();
-        //Dictionary<string, EffectPass> _passes = new Dictionary<string, EffectPass>();
-        private EffectTechnique _effectTechnique;
+		private List<EffectPass> _passes = new List<EffectPass>();
 
-        public EffectPassCollection(EffectTechnique effectTechnique)
+        internal EffectPassCollection()
         {
-            _effectTechnique = effectTechnique;
-			
+        }
+
+        internal EffectPassCollection(Effect effect, EffectPassCollection cloneSource)
+        {
+            foreach (var pass in cloneSource)
+                Add(new EffectPass(effect, pass));
         }
 
         public EffectPass this[int index]
         {
             get { return _passes[index]; }
-            set { 
-				_passes[index] = value; 
-			}
         }
 
         public EffectPass this[string name]
         {
-            get {
-				foreach (EffectPass pass in _passes) {
+            get 
+            {
+                // TODO: Add a name to pass lookup table.
+				foreach (var pass in _passes) 
+                {
 					if (pass.Name == name)
 						return pass;
 				}
 				return null;
-		}
-            set {
-
-				var pass = this[name];
-				if (pass != null)
-					pass = value;
-				else
-					_passes.Add(value);
-			}
+		    }
         }
 
         public int Count
@@ -51,7 +43,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _passes.Count; }
         }
 
-        public IEnumerator<EffectPass> GetEnumerator()
+        public List<EffectPass>.Enumerator GetEnumerator()
+        {
+            return this._passes.GetEnumerator();
+        }
+
+        IEnumerator<EffectPass> System.Collections.Generic.IEnumerable<EffectPass>.GetEnumerator()
         {
             return _passes.GetEnumerator();
         }
@@ -59,6 +56,11 @@ namespace Microsoft.Xna.Framework.Graphics
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _passes.GetEnumerator();
+        }
+
+        internal void Add(EffectPass pass)
+        {
+            _passes.Add(pass);
         }
     }
 }

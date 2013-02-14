@@ -47,7 +47,7 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if IPHONE
+#if IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AudioUnit;
 
@@ -58,6 +58,8 @@ using MonoMac.AudioUnit;
 
 using MonoMac.OpenAL;
 #endif
+
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -111,6 +113,15 @@ namespace Microsoft.Xna.Framework.Audio
 
 		}
 
+        internal SoundEffect(Stream s)
+        {
+            var data = new byte[s.Length];
+            s.Read(data, 0, (int)s.Length);
+
+            _data = data;
+            LoadAudioStream(_data);
+        }
+
 		public SoundEffect (byte[] buffer, int sampleRate, AudioChannels channels)
 		{
 			//buffer should contain 16-bit PCM wave data
@@ -145,7 +156,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 			LoadAudioStream (_data);
 
-		}
+		}        
 
 		void LoadAudioStream (byte[] audiodata)
 		{
@@ -171,7 +182,18 @@ namespace Microsoft.Xna.Framework.Audio
 			if (asbd.ChannelsPerFrame == 1) {
 				if (asbd.BitsPerChannel == 8) {
 					Format = ALFormat.Mono8;
-				} else {
+				}
+				else if (asbd.BitsPerChannel == 0) // This shouldn't happen. hackking around bad data for now.
+				{
+				//TODO: Remove this when sound's been fixed on iOS and other devices.
+					Format = ALFormat.Mono16;
+					Debug.WriteLine("Warning, bad decoded audio packet in SoundEffect.HandlePacketDecoded. Squelching sound.");
+					_duration = TimeSpan.Zero;
+					_data = audioData;
+					return;
+				}
+				else 
+				{
 					Format = ALFormat.Mono16;
 				}
 			} else {
@@ -182,6 +204,7 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			}
 			_data = audioData;
+
 
 			var _dblDuration = (e.Bytes / ((asbd.BitsPerChannel / 8) * asbd.ChannelsPerFrame)) / asbd.SampleRate;
 			_duration = TimeSpan.FromSeconds (_dblDuration);
@@ -331,7 +354,12 @@ namespace Microsoft.Xna.Framework.Audio
 			set {
 				speedOfSound = value;
 			}
-		}		
+		}
+
+        public static SoundEffect FromStream(Stream stream)
+        {
+            return new SoundEffect(stream);
+        }
 	}
 }
 

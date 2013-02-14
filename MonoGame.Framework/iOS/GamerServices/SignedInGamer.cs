@@ -86,35 +86,25 @@ namespace Microsoft.Xna.Framework.GamerServices
 					osVersion = parts[0] + "." + parts[1];
 				}
 				
-				if (double.Parse(osVersion) > 4.1)
+				if (double.Parse(osVersion, System.Globalization.CultureInfo.InvariantCulture) > 4.1)
 				{
-					
-					lp = GKLocalPlayer.LocalPlayer;
-			        if (lp != null)
-					{
-						Guide.IsVisible = true;
-						lp.Authenticate( delegate(NSError error) 
-						                	{  							              
-												try 
-												{
-													if ( error != null )
-													{
-#if DEBUG									
-														Console.WriteLine(error);
+                    UIApplication.SharedApplication.BeginInvokeOnMainThread(
+                    delegate 
+                    {
+                        lp = GKLocalPlayer.LocalPlayer;
+                        
+    			        if (lp != null)
+    					{
+    						lp.Authenticate( delegate(NSError error) 
+    						                	{  	
+#if DEBUG
+    												if ( error != null )								
+    													Console.WriteLine(error);
 #endif
-													}
-													else
-													{
-														
-													}
-												} 
-												finally 
-												{
-													Guide.IsVisible = false;
-												}
-											}
-						                );
-					}
+    											}
+    						                );
+    					}
+                    } );
 				}
 			}
 			catch (Exception ex) 
@@ -270,7 +260,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 		
 		delegate void AwardAchievementDelegate(string achievementId, double percentageComplete);
-		
+
+        public IAsyncResult BeginAwardAchievement(string achievementId, AsyncCallback callback, Object state)
+        {
+            return BeginAwardAchievement(achievementId, 100.0, callback, state);
+        }
+
 		public IAsyncResult BeginAwardAchievement(
          string achievementId,
 		 double percentageComplete,
@@ -414,6 +409,15 @@ namespace Microsoft.Xna.Framework.GamerServices
             get
             {
                 return _privileges;
+            }
+        }
+
+        LeaderboardWriter _leaderboardWriter = new LeaderboardWriter();
+        public LeaderboardWriter LeaderboardWriter
+        {
+            get
+            {
+                return _leaderboardWriter;
             }
         }
 		#endregion

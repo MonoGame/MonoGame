@@ -68,28 +68,40 @@ non-infringement.
 
 using System;
 
+#if WINRT
+using Windows.UI.ViewManagement;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
     abstract class GamePlatform : IDisposable
     {
-        #region
+        #region Fields
+
         protected TimeSpan _inactiveSleepTime = TimeSpan.FromMilliseconds(20.0);
         protected bool _needsToResetElapsedTime = false;
+        bool disposed;
+        protected bool IsDisposed { get { return disposed; } }
+
         #endregion
 
         #region Construction/Destruction
         public static GamePlatform Create(Game game)
         {
-#if IPHONE
+#if IOS
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
-#elif WINDOWS
-            return new WindowsGamePlatform(game);
+#elif WINDOWS || LINUX
+            return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
-#elif LINUX
-            return new LinuxGamePlatform(game);
+#elif PSM
+			return new PSSGamePlatform(game);
+#elif WINDOWS_PHONE
+            return new MonoGame.Framework.WindowsPhone.WindowsPhoneGamePlatform(game);
+#elif WINRT
+            return new MetroGamePlatform(game);
 #endif
         }
 
@@ -127,7 +139,7 @@ namespace Microsoft.Xna.Framework
         public bool IsActive
         {
             get { return _isActive; }
-            protected set
+            internal set
             {
                 if (_isActive != value)
                 {
@@ -151,18 +163,50 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+#if WINDOWS_STOREAPP
+        private ApplicationViewState _viewState;
+        public ApplicationViewState ViewState
+        {
+            get { return _viewState; }
+            set
+            {
+                if (_viewState == value)
+                    return;
+
+                Raise(ViewStateChanged, new ViewStateChangedEventArgs(value));
+
+                _viewState = value;
+            }
+        }
+#endif
+
 #if ANDROID
         public AndroidGameWindow Window
         {
             get; protected set;
         }
+#elif PSM
+		public PSSGameWindow Window
+		{
+			get; protected set;
+		}
 #else
         public GameWindow Window
         {
             get; protected set;
         }
 #endif
-
+  
+        public virtual bool VSyncEnabled
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set {
+            }
+        }
+        
         #endregion
 
         #region Events
@@ -170,6 +214,10 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> AsyncRunLoopEnded;
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
+
+#if WINDOWS_STOREAPP
+        public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
+#endif
 
         private void Raise<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs e)
             where TEventArgs : EventArgs
@@ -201,6 +249,14 @@ namespace Microsoft.Xna.Framework
         public virtual void BeforeInitialize()
         {
             IsActive = true;
+            if (this.Game.GraphicsDevice == null) 
+            {
+                var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
+                graphicsDeviceManager.CreateDevice();
+#if ANDROID
+                Window.TouchEnabled = true;
+#endif
+            }
         }
 
         /// <summary>
@@ -304,6 +360,12 @@ namespace Microsoft.Xna.Framework
         /// Game.TargetElapsedTime has been set.
         /// </summary>
         public virtual void TargetElapsedTimeChanged() {}
+
+        /// <summary>
+        /// MSDN: Use this method if your game is recovering from a slow-running state, and ElapsedGameTime is too large to be useful.
+        /// Frame timing is generally handled by the Game class, but some platforms still handle it elsewhere. Once all platforms
+        /// rely on the Game class's functionality, this method and any overrides should be removed.
+        /// </summary>
         public virtual void ResetElapsedTime() {}
 
         protected virtual void OnIsMouseVisibleChanged() {}
@@ -319,9 +381,16 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing) {}
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                disposed = true;
+            }
+        }
 		
 		/// <summary>
 		/// Log the specified Message.

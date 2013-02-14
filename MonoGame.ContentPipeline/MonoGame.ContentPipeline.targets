@@ -1,0 +1,33 @@
+<!--
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  
+  <Target Name="MonoGamePlatform" BeforeTargets="BuildContentProjects">
+
+      <!-- If the MonoGamePlatform property is unset then report an error. -->
+      <Error Text="The MonoGamePlatform property must be set to Windows, Windows8, iOS, Android, Linux, OSX, or PSM or left blank if not processing content for MonoGame." 
+             Condition="'$(MonoGamePlatform)' != '' And
+                        '$(MonoGamePlatform)' != 'Windows' And
+                        '$(MonoGamePlatform)' != 'Windows8' And
+                        '$(MonoGamePlatform)' != 'iOS' And
+                        '$(MonoGamePlatform)' != 'Android' And
+                        '$(MonoGamePlatform)' != 'Linux' And
+                        '$(MonoGamePlatform)' != 'OSX' And
+                        '$(MonoGamePlatform)' != 'PSM'" />
+    
+      <!-- Set a user level environment variable that the content processors can pick up. -->
+      <Message Importance="high" Text="MonoGame Platform $(MonoGamePlatform)" Condition="'$(MonoGamePlatform)' != ''"/>
+      <Exec Command='SETX MONOGAME_PLATFORM "$(MonoGamePlatform)" > NUL'/>
+    
+  </Target>
+  
+  <Target Name="MonoGamePlatformCleanup" AfterTargets="BuildContentProjects">
+    
+    <!-- Clear the previously set user environment variable. -->
+    <Exec Command='SETX MONOGAME_PLATFORM "" > NUL'/>
+    
+  </Target>
+  
+</Project>

@@ -28,6 +28,7 @@ SOFTWARE.
 using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -40,8 +41,12 @@ namespace Microsoft.Xna.Framework.Content
 		
 		static ContentTypeReaderManager()
 		{
+#if WINRT
+            assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
+#else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
-		}
+#endif
+        }
 
         public ContentTypeReaderManager(ContentReader reader)
         {
@@ -80,6 +85,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hRectangleArrayReader = new ArrayReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();
                 var hStringListReader = new ListReader<StringReader>();
+				var hIntListReader = new ListReader<Int32>();
                 var hSpriteFontReader = new SpriteFontReader();
                 var hTexture2DReader = new Texture2DReader();
                 var hCharReader = new CharReader();
@@ -95,6 +101,15 @@ namespace Microsoft.Xna.Framework.Content
                 var hBasicEffectReader = new BasicEffectReader();
                 var hVertexBufferReader = new VertexBufferReader();
                 var hAlphaTestEffectReader = new AlphaTestEffectReader();
+                var hEnumSpriteEffectsReader = new EnumReader<Graphics.SpriteEffects>();
+                var hArrayFloatReader = new ArrayReader<float>();
+                var hArrayVector2Reader = new ArrayReader<Vector2>();
+                var hListVector2Reader = new ListReader<Vector2>();
+                var hArrayMatrixReader = new ArrayReader<Matrix>();
+                var hEnumBlendReader = new EnumReader<Graphics.Blend>();
+                var hNullableRectReader = new NullableReader<Rectangle>();
+				var hEffectMaterialReader = new EffectMaterialReader();
+				var hExternalReferenceReader = new ExternalReferenceReader();
             }
 #pragma warning restore 0219, 0649
 
@@ -111,19 +126,41 @@ namespace Microsoft.Xna.Framework.Content
                 // This string tells us what reader we need to decode the following data
                 // string readerTypeString = reader.ReadString();
 				string originalReaderTypeString = _reader.ReadString();
- 
-				// Need to resolve namespace differences
-				string readerTypeString = originalReaderTypeString;
-								
-				readerTypeString = PrepareType(readerTypeString);
 
-				Type l_readerType = Type.GetType(readerTypeString);
-				
-            	if(l_readerType !=null)
-					contentReaders[i] = (ContentTypeReader)Activator.CreateInstance(l_readerType,true);
-            	else
-					throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
-				
+                Func<ContentTypeReader> readerFunc;
+                if (typeCreators.TryGetValue(originalReaderTypeString, out readerFunc))
+                {
+                    contentReaders[i] = readerFunc();
+                }
+                else
+                {
+                    //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+
+    				// Need to resolve namespace differences
+    				string readerTypeString = originalReaderTypeString;
+
+    				readerTypeString = PrepareType(readerTypeString);
+
+    				var l_readerType = Type.GetType(readerTypeString);
+                    if (l_readerType != null)
+                    {
+                        try
+                        {
+                            contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            // If you are getting here, the Mono runtime is most likely not able to JIT the type.
+                            // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
+                            throw new InvalidOperationException(
+                                "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
+                                "with the following failed type string: " + originalReaderTypeString);
+                        }
+                    }
+                    else
+                        throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                }
+
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
                 int typeReaderVersion = _reader.ReadInt32();
@@ -159,11 +196,36 @@ namespace Microsoft.Xna.Framework.Content
 			//Handle non generic types
 			if(preparedType.Contains("PublicKeyToken"))
 				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
-			
+
+			// TODO: For WinRT this is most likely broken!
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
 			
 			return preparedType;
 		}
+
+        // Static map of type names to creation functions. Required as iOS requires all types at compile time
+        private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
+
+        /// <summary>
+        /// Adds the type creator.
+        /// </summary>
+        /// <param name='typeString'>
+        /// Type string.
+        /// </param>
+        /// <param name='createFunction'>
+        /// Create function.
+        /// </param>
+        public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
+        {
+            if (!typeCreators.ContainsKey(typeString))
+                typeCreators.Add(typeString, createFunction);
+        }
+
+        public static void ClearTypeCreators()
+        {
+            typeCreators.Clear();
+        }
+
     }
 }
