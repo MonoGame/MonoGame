@@ -119,7 +119,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
                 dynMethod.Invoke(result, new object[] { this });
             }
-
             return result;
         }
 
