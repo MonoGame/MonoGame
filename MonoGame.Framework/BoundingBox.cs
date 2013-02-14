@@ -37,16 +37,16 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+#if WINRT
     [DataContract]
-    #else
+#else
     [Serializable]
-    #endif
+#endif
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 
         #region Public Fields
-  
+
 #if WINRT
         [DataMember]
 #endif
@@ -143,28 +143,81 @@ namespace Microsoft.Xna.Framework
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
-            if (sphere.Center.X - Min.X > sphere.Radius
-                && sphere.Center.Y - Min.Y > sphere.Radius
-                && sphere.Center.Z - Min.Z > sphere.Radius
-                && Max.X - sphere.Center.X > sphere.Radius
-                && Max.Y - sphere.Center.Y > sphere.Radius
-                && Max.Z - sphere.Center.Z > sphere.Radius)
+            if (sphere.Center.X - Min.X >= sphere.Radius
+                && sphere.Center.Y - Min.Y >= sphere.Radius
+                && sphere.Center.Z - Min.Z >= sphere.Radius
+                && Max.X - sphere.Center.X >= sphere.Radius
+                && Max.Y - sphere.Center.Y >= sphere.Radius
+                && Max.Z - sphere.Center.Z >= sphere.Radius)
                 return ContainmentType.Contains;
 
             double dmin = 0;
 
-            if (sphere.Center.X - Min.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Min.X) * (sphere.Center.X - Min.X);
-            else if (Max.X - sphere.Center.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Max.X) * (sphere.Center.X - Max.X);
-            if (sphere.Center.Y - Min.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Min.Y) * (sphere.Center.Y - Min.Y);
-            else if (Max.Y - sphere.Center.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Max.Y) * (sphere.Center.Y - Max.Y);
-            if (sphere.Center.Z - Min.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Min.Z) * (sphere.Center.Z - Min.Z);
-            else if (Max.Z - sphere.Center.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Max.Z) * (sphere.Center.Z - Max.Z);
+            double e = sphere.Center.X - Min.X;
+            if (e < 0)
+            {
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
+            }
+            else
+            {
+                e = sphere.Center.X - Max.X;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
+            }
+
+            e = sphere.Center.Y - Min.Y;
+            if (e < 0)
+            {
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
+            }
+            else
+            {
+                e = sphere.Center.Y - Max.Y;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
+            }
+
+            e = sphere.Center.Z - Min.Z;
+            if (e < 0)
+            {
+                if (e < -sphere.Radius)
+                {
+                    return ContainmentType.Disjoint;
+                }
+                dmin += e * e;
+            }
+            else
+            {
+                e = sphere.Center.Z - Max.Z;
+                if (e > 0)
+                {
+                    if (e > sphere.Radius)
+                    {
+                        return ContainmentType.Disjoint;
+                    }
+                    dmin += e * e;
+                }
+            }
 
             if (dmin <= sphere.Radius * sphere.Radius)
                 return ContainmentType.Intersects;
@@ -445,7 +498,7 @@ namespace Microsoft.Xna.Framework
                 result = PlaneIntersectionType.Back;
                 return;
             }
-           
+
             result = PlaneIntersectionType.Intersecting;
         }
 
@@ -477,4 +530,3 @@ namespace Microsoft.Xna.Framework
         #endregion Public Methods
     }
 }
-
