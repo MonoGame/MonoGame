@@ -163,9 +163,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                  this.AlphaSourceBlend == Blend.One &&
                                  this.AlphaDestinationBlend == Blend.Zero);
             if (blendEnabled)
-                GL.Enable(All.Blend);
+                GL.Enable(EnableCap.Blend);
             else
-                GL.Disable(All.Blend);
+                GL.Disable(EnableCap.Blend);
             GraphicsExtensions.CheckGLError();
 
             GL.BlendColor(

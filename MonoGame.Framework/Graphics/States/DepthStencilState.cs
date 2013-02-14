@@ -160,17 +160,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 // set function
                 if (this.TwoSidedStencilMode)
                 {
-                    GL.StencilFuncSeparate((All)CullFaceMode.Front, GetStencilFunc(this.StencilFunction), 
+#if GLES
+                    var cullFaceModeFront = (All)CullFaceMode.Front;
+                    var cullFaceModeBack = (All)CullFaceMode.Back;
+                    var stencilFaceFront = (All)CullFaceMode.Front;
+                    var stencilFaceBack = (All)CullFaceMode.Back;
+#else
+                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
+                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
+                    var stencilFaceFront = StencilFace.Front;
+                    var stencilFaceBack = StencilFace.Back;
+#endif
+
+                    GL.StencilFuncSeparate(cullFaceModeFront, GetStencilFunc(this.StencilFunction), 
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
-                    GL.StencilFuncSeparate((All)CullFaceMode.Back, GetStencilFunc(this.CounterClockwiseStencilFunction), 
+                    GL.StencilFuncSeparate(cullFaceModeBack, GetStencilFunc(this.CounterClockwiseStencilFunction), 
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
-                    GL.StencilOpSeparate((All)CullFaceMode.Front, GetStencilOp(this.StencilFail), 
+                    GL.StencilOpSeparate(stencilFaceFront, GetStencilOp(this.StencilFail), 
                                          GetStencilOp(this.StencilDepthBufferFail), 
                                          GetStencilOp(this.StencilPass));
                     GraphicsExtensions.CheckGLError();
-                    GL.StencilOpSeparate((All)CullFaceMode.Back, GetStencilOp(this.CounterClockwiseStencilFail), 
+                    GL.StencilOpSeparate(stencilFaceBack, GetStencilOp(this.CounterClockwiseStencilFail), 
                                          GetStencilOp(this.CounterClockwiseStencilDepthBufferFail), 
                                          GetStencilOp(this.CounterClockwiseStencilPass));
                     GraphicsExtensions.CheckGLError();
