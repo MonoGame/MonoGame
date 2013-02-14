@@ -16,12 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, SpriteFontContent value)
         {
-            // TODO:Temporary workaround. if we don't call GetTypeWriter() on the ContentWriter
-            // for generic types, they won't be saved to the XNB.
-            output.GetTypeWriter(typeof(Rectangle));
-            output.GetTypeWriter(typeof(char));
-            output.GetTypeWriter(typeof(Vector3));
-
             output.WriteObject(value.Texture);
             output.WriteObject(value.Glyphs);
             output.WriteObject(value.Cropping);
