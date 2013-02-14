@@ -319,18 +319,24 @@ namespace Microsoft.Xna.Framework
 
         public PlaneIntersectionType Intersects(Plane plane)
         {
-			float distance = Vector3.Dot(plane.Normal, this.Center) + plane.D;
-			if (distance > this.Radius)
-				return PlaneIntersectionType.Front;
-			if (distance < -this.Radius)
-				return PlaneIntersectionType.Back;
-			//else it intersect
-			return PlaneIntersectionType.Intersecting;
+            var result = default(PlaneIntersectionType);
+            // TODO: we might want to inline this for performance reasons
+            this.Intersects(ref plane, out result);
+            return result;
         }
 
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-			result = Intersects(plane);
+            var distance = default(float);
+            // TODO: we might want to inline this for performance reasons
+            Vector3.Dot(ref plane.Normal, ref this.Center, out distance);
+            distance += plane.D;
+            if (distance > this.Radius)
+                result = PlaneIntersectionType.Front;
+            else if (distance < -this.Radius)
+                result = PlaneIntersectionType.Back;
+            else
+                result = PlaneIntersectionType.Intersecting;
         }
 
         public Nullable<float> Intersects(Ray ray)
