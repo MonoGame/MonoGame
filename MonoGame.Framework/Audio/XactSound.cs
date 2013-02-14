@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Audio
 				uint extraDataLen = soundReader.ReadUInt16 ();
 				//TODO: Parse RPC+DSP stuff
 				
-				soundReader.BaseStream.Seek (extraDataLen, SeekOrigin.Current);
+				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
 			}
 			
 			if (complexSound) {
