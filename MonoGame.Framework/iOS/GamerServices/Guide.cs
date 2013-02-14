@@ -98,6 +98,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             _parent = parent;
         }
+
         #region Autorotation for iOS 5 or older
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
@@ -332,10 +333,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowMarketplace (PlayerIndex player)
 		{
-			AssertInitialised ();
+			AssertInitialised();
 
-            NSUrl url = new NSUrl("http://getipad.rumrungame.com");
-			if (!UIApplication.SharedApplication.OpenUrl(url)) {
+			string bundleName = NSBundle.MainBundle.InfoDictionary[new NSString("CFBundleName")].ToString();
+			StringBuilder output = new StringBuilder();
+			foreach (char c in bundleName)
+			{
+				// Ampersand gets converted to "and"!!
+				if (c == '&')
+					output.Append("and");
+
+				// All alphanumeric characters are added
+				if (char.IsLetterOrDigit(c))
+					output.Append(c);
+			}
+			NSUrl url = new NSUrl("itms-apps://itunes.com/app/" + output.ToString());
+			if (!UIApplication.SharedApplication.OpenUrl(url))
+			{
 				// Error
 			}
 		}
@@ -382,7 +396,7 @@ namespace Microsoft.Xna.Framework.GamerServices
  					};
 
 					if (_window != null)
-					{						
+					{
 						if(viewController == null)
 						{
 							viewController = new GuideViewController(_gameViewController);
@@ -392,7 +406,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
-						viewController.PresentModalViewController(leaderboardController, true);
+                        viewController.PresentModalViewController(leaderboardController, true);
 						IsVisible = true;
 					}
 			    }
@@ -430,7 +444,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController(_gameViewController);
+                            viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
@@ -523,7 +537,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					{
 						if(viewController == null)
 						{
-							viewController = new GuideViewController(_gameViewController);
+                            viewController = new GuideViewController(_gameViewController);
 							_window.Add(viewController.View);
 							viewController.View.Hidden = true;
 						}
