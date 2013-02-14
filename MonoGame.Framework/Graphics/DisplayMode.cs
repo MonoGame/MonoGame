@@ -30,10 +30,15 @@ SOFTWARE.
 
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+#if WINRT
+    [DataContract]
+#else
     [Serializable]
+#endif
     public class DisplayMode
     {
         #region Fields

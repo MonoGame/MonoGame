@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-#if IPHONE
+#if IOS
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.CoreFoundation;
@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Audio
 #if DEBUG				
 				Console.WriteLine ("Unsupported Format: Channel count [0] is greater than stereo.", fileFormat.ChannelsPerFrame);
 #endif
+                audioDescription = new AudioStreamBasicDescription();
 				return null;
 			}
 

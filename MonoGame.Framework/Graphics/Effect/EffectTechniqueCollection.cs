@@ -7,34 +7,38 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectTechniqueCollection : IEnumerable<EffectTechnique>
     {
-		// Modified to be a list instead of dictionary object because a dictionary does not guarantee
-		// the order is kept as it is a hash key.
-		internal List <EffectTechnique> _techniques = new List<EffectTechnique> ();
-        //Dictionary<string, EffectTechnique> _techniques = new Dictionary<string, EffectTechnique>();
+		private List <EffectTechnique> _techniques = new List<EffectTechnique>();
+
+        public int Count { get { return _techniques.Count; } }
+
+        internal EffectTechniqueCollection()
+        {
+        }
+
+        internal EffectTechniqueCollection(Effect effect, EffectTechniqueCollection cloneSource)
+        {
+            foreach (var technique in cloneSource)
+                Add(new EffectTechnique(effect, technique));
+        }
 
         public EffectTechnique this[int index]
         {
             get { return _techniques [index]; }
-            set { _techniques [index] = value; }
         }
 
         public EffectTechnique this[string name]
         {
-            get {
-				foreach (EffectTechnique technique in _techniques) {
+            get 
+            {
+                // TODO: Add a name to technique lookup table.
+				foreach (var technique in _techniques) 
+                {
 					if (technique.Name == name)
 						return technique;
-				}
-				return null;
-		}
-            set {
+			    }
 
-				var technique = this[name];
-				if (technique != null)
-					technique = value;
-				else
-					_techniques.Add(value);
-			}
+			    return null;
+		    }
         }
 
         public IEnumerator<EffectTechnique> GetEnumerator()
@@ -45,6 +49,11 @@ namespace Microsoft.Xna.Framework.Graphics
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _techniques.GetEnumerator();
+        }
+
+        internal void Add(EffectTechnique technique)
+        {
+            _techniques.Add(technique);
         }
     }
 }

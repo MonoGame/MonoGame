@@ -1,12 +1,32 @@
 using System;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
 	public struct VertexElementColor
 	{
+#if WINRT
+        [DataMember]
+#endif
 		byte R;
+#if WINRT
+        [DataMember]
+#endif
 		byte G;
+#if WINRT
+        [DataMember]
+#endif
 		byte B;
+#if WINRT
+        [DataMember]
+#endif
 		byte A;
 
 		public VertexElementColor (Color color)
@@ -44,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			c.R = typ.R;
 			c.G = typ.G;
 			c.B = typ.B;
-			c.R = typ.A;
+			c.A = typ.A;
 			return c;
 		}
 
@@ -76,6 +96,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			return (this == ((VertexElementColor)obj));
 		}
+
+        public override int GetHashCode()
+        {
+            return (int)PackedValue;
+        }
 
         public UInt32 PackedValue
         {

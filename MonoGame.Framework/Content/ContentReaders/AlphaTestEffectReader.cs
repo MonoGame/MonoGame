@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Content
 
             effect.Texture = input.ReadExternalReference<Texture>() as Texture2D;
             effect.AlphaFunction = (CompareFunction)input.ReadInt32();
+            effect.ReferenceAlpha = (int)input.ReadUInt32();
             effect.DiffuseColor = input.ReadVector3();
             effect.Alpha = input.ReadSingle();
             effect.VertexColorEnabled = input.ReadBoolean();
