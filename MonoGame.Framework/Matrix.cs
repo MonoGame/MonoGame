@@ -26,9 +26,17 @@ SOFTWARE.
 #endregion License
 
 using System;
+#if WINRT
+using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
+    #if WINRT
+    [DataContract]
+    #else
+    [Serializable]
+    #endif
     public struct Matrix : IEquatable<Matrix>
     {
         #region Public Constructors
@@ -58,22 +66,69 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-
+#if WINRT
+        [DataMember]
+#endif
         public float M11;
+#if WINRT
+        [DataMember]
+#endif
         public float M12;
+#if WINRT
+        [DataMember]
+#endif
         public float M13;
+#if WINRT
+        [DataMember]
+#endif
         public float M14;
+#if WINRT
+        [DataMember]
+#endif
         public float M21;
+#if WINRT
+        [DataMember]
+#endif
         public float M22;
+#if WINRT
+        [DataMember]
+#endif
         public float M23;
+#if WINRT
+        [DataMember]
+#endif
         public float M24;
+#if WINRT
+        [DataMember]
+#endif
         public float M31;
+#if WINRT
+        [DataMember]
+#endif
         public float M32;
+#if WINRT
+        [DataMember]
+#endif
         public float M33;
+#if WINRT
+        [DataMember]
+#endif
         public float M34;
+#if WINRT
+        [DataMember]
+#endif
         public float M41;
+#if WINRT
+        [DataMember]
+#endif
         public float M42;
+#if WINRT
+        [DataMember]
+#endif
         public float M43;
+#if WINRT
+        [DataMember]
+#endif
         public float M44;
 
         #endregion Public Fields
@@ -141,6 +196,8 @@ namespace Microsoft.Xna.Framework
 
 		
 		// required for OpenGL 2.0 projection matrix stuff
+        // TODO: have this work correctly for 3x3 Matrices. Needs to return
+        // a float[9] for a 3x3, and a float[16] for a 4x4
 		public static float[] ToFloatArray(Matrix mat)
         {
 			float [] matarray = {
@@ -1277,6 +1334,63 @@ namespace Microsoft.Xna.Framework
 			result.M44 = 1;
         }
 
+        public static Matrix CreateReflection(Plane value)
+        {
+            Matrix matrix;
+            value.Normalize();
+            float x = value.Normal.X;
+            float y = value.Normal.Y;
+            float z = value.Normal.Z;
+            float num3 = -2f * x;
+            float num2 = -2f * y;
+            float num = -2f * z;
+            matrix.M11 = (num3 * x) + 1f;
+            matrix.M12 = num2 * x;
+            matrix.M13 = num * x;
+            matrix.M14 = 0f;
+            matrix.M21 = num3 * y;
+            matrix.M22 = (num2 * y) + 1f;
+            matrix.M23 = num * y;
+            matrix.M24 = 0f;
+            matrix.M31 = num3 * z;
+            matrix.M32 = num2 * z;
+            matrix.M33 = (num * z) + 1f;
+            matrix.M34 = 0f;
+            matrix.M41 = num3 * value.D;
+            matrix.M42 = num2 * value.D;
+            matrix.M43 = num * value.D;
+            matrix.M44 = 1f;
+            return matrix;
+        }
+
+        public static void CreateReflection(ref Plane value, out Matrix result)
+        {
+            Plane plane;
+            Plane.Normalize(ref value, out plane);
+            value.Normalize();
+            float x = plane.Normal.X;
+            float y = plane.Normal.Y;
+            float z = plane.Normal.Z;
+            float num3 = -2f * x;
+            float num2 = -2f * y;
+            float num = -2f * z;
+            result.M11 = (num3 * x) + 1f;
+            result.M12 = num2 * x;
+            result.M13 = num * x;
+            result.M14 = 0f;
+            result.M21 = num3 * y;
+            result.M22 = (num2 * y) + 1f;
+            result.M23 = num * y;
+            result.M24 = 0f;
+            result.M31 = num3 * z;
+            result.M32 = num2 * z;
+            result.M33 = (num * z) + 1f;
+            result.M34 = 0f;
+            result.M41 = num3 * plane.D;
+            result.M42 = num2 * plane.D;
+            result.M43 = num * plane.D;
+            result.M44 = 1f;
+        }
 
         public static Matrix CreateWorld(Vector3 position, Vector3 forward, Vector3 up)
         {
@@ -2105,7 +2219,6 @@ namespace Microsoft.Xna.Framework
                 
                 rotation = Quaternion.CreateFromRotationMatrix(m1);
                 return true;
-        }
-			
+        }			
     }
 }

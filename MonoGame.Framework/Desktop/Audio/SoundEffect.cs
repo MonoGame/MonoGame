@@ -37,7 +37,7 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-﻿
+
 using System;
 using System.IO;
 
@@ -114,7 +114,12 @@ namespace Microsoft.Xna.Framework.Audio
             _data = LoadAudioStream(s, 1.0f, false);
 
 		}
-		
+
+        internal SoundEffect(Stream s)
+        {
+            _data = LoadAudioStream(s, 1.0f, false);
+        }
+
 		public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
 		{
 			//buffer should contain 16-bit PCM wave data
@@ -155,8 +160,8 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 			//_sound = new Sound(_data, 1.0f, false);
-		}
-		
+		}        
+
         byte[] LoadAudioStream(Stream s, float volume, bool looping)
         {
             ALFormat format;
@@ -179,7 +184,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-            return Play(MasterVolume, 1.0f, 0.0f);
+            return Play(MasterVolume, 0.0f, 0.0f);
         }
 
         public bool Play(float volume, float pitch, float pan)
@@ -223,6 +228,11 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #region IDisposable Members
+
+        public bool IsDisposed
+        {
+            get { return false; }
+        }
 
         public void Dispose()
         {
@@ -296,7 +306,12 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 speedOfSound = value;
             }
-        }		
+        }
+
+        public static SoundEffect FromStream(Stream stream)
+        {
+            return new SoundEffect(stream);
+        }
     }
 }
 

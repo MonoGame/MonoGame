@@ -44,6 +44,8 @@
 #endregion
 
 using System;
+using System.Diagnostics;
+
 namespace Microsoft.Xna.Framework.Content
 {
 	using System.IO;
@@ -220,9 +222,8 @@ namespace Microsoft.Xna.Framework.Content
 				     * remaining - in this boundary case they aren't really part of
 				     * the compressed data)
 					 */
-#if DEBUG					
-					Console.WriteLine("WTF");
-#endif
+					//Debug.WriteLine("WTF");
+
 					if(inData.Position > (startpos+inLen+2) || bitbuf.GetBitsLeft() < 16) return -1; //TODO throw proper exception
 				}
 				
@@ -447,7 +448,7 @@ namespace Microsoft.Xna.Framework.Content
 						if((inData.Position + this_run) > endpos) return -1; //TODO throw proper exception
 						byte[] temp_buffer = new byte[this_run];
 						inData.Read(temp_buffer, 0, this_run);
-						temp_buffer.CopyTo(window, window_posn);
+						temp_buffer.CopyTo(window, (int)window_posn);
 						window_posn += (uint)this_run;
 						break;
 						
@@ -481,7 +482,7 @@ namespace Microsoft.Xna.Framework.Content
 					int dataend = outLen - 10;
 					uint curpos = (uint)m_state.intel_curpos;
 					uint filesize = (uint)m_state.intel_filesize;
-					uint abs_off, rel_off;
+					//uint abs_off, rel_off;
 					
 					m_state.intel_curpos = (int)curpos + outLen;
 					

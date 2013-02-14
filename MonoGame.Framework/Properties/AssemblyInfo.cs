@@ -1,16 +1,39 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MonoGame.Framework")]
-[assembly: AssemblyDescription("")]
+#if OUYA
+[assembly: AssemblyDescription("MonoGame for OUYA")]
+#elif ANDROID
+[assembly: AssemblyDescription("MonoGame for Android")]
+#elif WINDOWS
+#if DIRECTX
+[assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
+#else
+[assembly: AssemblyDescription("MonoGame for Windows Desktop (OpenGL)")]
+#endif
+#elif PSM
+[assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
+#elif LINUX
+[assembly: AssemblyDescription("MonoGame for Linux")]
+#elif MAC
+[assembly: AssemblyDescription("MonoGame for Mac OS X")]
+#elif IOS
+[assembly: AssemblyDescription("MonoGame for iOS")]
+#elif WINDOWS_STOREAPP
+[assembly: AssemblyDescription("MonoGame for Windows Store")]
+#elif WINDOWS_PHONE
+[assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MonoGame.Framework")]
-[assembly: AssemblyCopyright("Copyright ©  20011")]
+[assembly: AssemblyCopyright("Copyright © 2011-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +55,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.5.0.0")]
-[assembly: AssemblyFileVersion("2.5.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: NeutralResourcesLanguageAttribute("en-US")]

@@ -99,6 +99,7 @@ namespace Microsoft.Xna.Framework.Input
             Triggers = triggers;
             Buttons = buttons;
             DPad = dPad;
+			IsConnected = true;
         }
         //
         // Summary:

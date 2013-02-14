@@ -5,6 +5,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Hardware;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -19,7 +20,15 @@ namespace Microsoft.Xna.Framework
         public static Game Game { get; set; }
 		
 		private OrientationListener o;		
-		
+		private ScreenReceiver screenReceiver;
+
+		/// <summary>
+		/// OnCreate called when the activity is launched from cold or after the app
+		/// has been killed due to a higher priority app needing the memory
+		/// </summary>
+		/// <param name='savedInstanceState'>
+		/// Saved instance state.
+		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
 			base.OnCreate (savedInstanceState);
@@ -28,6 +37,14 @@ namespace Microsoft.Xna.Framework
 			{
 				o.Enable();				
 			}					
+
+			IntentFilter filter = new IntentFilter();
+		    filter.AddAction(Intent.ActionScreenOff);
+		    filter.AddAction(Intent.ActionScreenOn);
+		    filter.AddAction(Intent.ActionUserPresent);
+		    
+		    screenReceiver = new ScreenReceiver();
+		    RegisterReceiver(screenReceiver, filter);
 
             RequestWindowFeature(WindowFeatures.NoTitle);
 		}
@@ -45,11 +62,7 @@ namespace Microsoft.Xna.Framework
             base.OnPause();
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
-            Game.GraphicsDevice.ResourcesLost = true;
-			if (Game.Window != null && Game.Window.Parent != null && (Game.Window.Parent is FrameLayout))
-			{				
-              ((FrameLayout)Game.Window.Parent).RemoveAllViews();
-			}
+
         }
 
         public static event EventHandler Resumed;
@@ -64,60 +77,14 @@ namespace Microsoft.Xna.Framework
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
             Game.Window.RequestFocus();
-            Game.GraphicsDevice.Initialize(Game.Platform);
         }
 
+		protected override void OnDestroy ()
+		{
+            UnregisterReceiver(screenReceiver);
+			base.OnDestroy ();
+		}
     }
-	
-	internal class OrientationListener : OrientationEventListener
-	{
-		AndroidGameActivity activity;
-		
-		public OrientationListener(AndroidGameActivity activity) : base(activity, 1)
-		{
-			this.activity = activity;
-		}
-		
-		private bool inprogress = false;
-		
-		 public override void OnOrientationChanged (int orientation)
-		{
-			if (!inprogress) 
-			{			
-				inprogress = true;
-				// Divide by 90 into an int to round, then multiply out to one of 5 positions, either 0,90,180,270,360. 
-				int ort = (90*(int)Math.Round(orientation/90f)) % 360;
-				
-				// Convert 360 to 0
-				if(ort == 360)
-				{
-				    ort = 0;
-				}
-										
-				var disporientation = DisplayOrientation.Unknown;
-				
-				switch (ort) {
-					case 90 : disporientation = DisplayOrientation.LandscapeRight;
-						break;
-			    	case 270 : disporientation = DisplayOrientation.LandscapeLeft;
-						break;
-			    	case 0 : disporientation = DisplayOrientation.Portrait;
-						break;
-					default:
-						disporientation = DisplayOrientation.LandscapeLeft;
-						break;
-				}
-				
-				if (AndroidGameActivity.Game.Window.CurrentOrientation != disporientation)
-				{
-				AndroidGameActivity.Game.Window.SetOrientation(disporientation);
-				}
-				inprogress = false;
-			}
-			
-
-		}
-	}
 	
 	public static class ActivityExtensions
     {

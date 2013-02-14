@@ -29,16 +29,19 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+#if WINRT
+using System.Reflection;
+#endif
 
 using Microsoft.Xna.Framework.Content;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class ListReader<T> : ContentTypeReader<List<T>>
+    public class ListReader<T> : ContentTypeReader<List<T>>
     {
         ContentTypeReader elementReader;
 
-        internal ListReader()
+        public ListReader()
         {
         }
 
@@ -59,7 +62,11 @@ namespace Microsoft.Xna.Framework.Content
                 // list.Add(input.ReadObject<T>(elementReader));
 				
 				Type objectType = typeof(T);
-				if(objectType.IsValueType)
+#if WINRT
+                if (objectType.GetTypeInfo().IsValueType)
+#else
+                if (objectType.IsValueType)
+#endif
 				{
                 	list.Add(input.ReadObject<T>(elementReader));
 				}

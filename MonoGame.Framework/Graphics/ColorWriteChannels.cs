@@ -40,7 +40,7 @@
 // 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Graphics
 {
 	[Flags]
 	public enum ColorWriteChannels

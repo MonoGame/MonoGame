@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework
     public static class PowerStatus
     {
         private static BroadcastReceiver _batteryStatusReceiver;
-        private static int _batteryStatus = BatteryManager.BatteryStatusUnknown;
+        private static BatteryStatus _batteryStatus = BatteryStatus.Unknown;
         private static int _batteryLevel;
         private static int _batteryLevelScale = 100;
 
@@ -64,23 +64,23 @@ namespace Microsoft.Xna.Framework
             {
                 _batteryLevel = intent.GetIntExtra("level", 0);
                 _batteryLevelScale = intent.GetIntExtra("scale", 100);
-                _batteryStatus = intent.GetIntExtra("status", BatteryManager.BatteryStatusUnknown);
+                _batteryStatus = (BatteryStatus)intent.GetIntExtra("status", (int)BatteryStatus.Unknown);
             }
         }
 
 
 
-        public static Microsoft.Xna.Framework.BatteryChargeStatus BatteryChargeStatus
+        public static BatteryChargeStatus BatteryChargeStatus
         {
             get
             {
                 switch (_batteryStatus)
                 {
-                    case BatteryManager.BatteryStatusCharging:
+                    case BatteryStatus.Charging:
                         return BatteryChargeStatus.Charging;
-                    case BatteryManager.BatteryStatusFull:
+                    case BatteryStatus.Full:
                         return BatteryChargeStatus.High;
-                    case BatteryManager.BatteryStatusUnknown:
+                    case BatteryStatus.Unknown:
                         return BatteryChargeStatus.Unknown;
                     default:
                         if (BatteryLifePercent >= 60.0f)
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (_batteryStatus == BatteryManager.BatteryStatusCharging || _batteryStatus == BatteryManager.BatteryStatusFull) ? PowerLineStatus.Online : PowerLineStatus.Offline;
+                return (_batteryStatus == BatteryStatus.Charging || _batteryStatus == BatteryStatus.Full) ? PowerLineStatus.Online : PowerLineStatus.Offline;
             }
         }
     }

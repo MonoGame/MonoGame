@@ -27,6 +27,9 @@ SOFTWARE.
 
 using System;
 using System.IO;
+
+using Microsoft.Xna.Framework;
+
 namespace Microsoft.Xna.Framework.Audio
 {
     public class WaveBank : IDisposable
@@ -100,8 +103,17 @@ namespace Microsoft.Xna.Framework.Audio
             // Check for windows-style directory separator character
             nonStreamingWaveBankFilename = nonStreamingWaveBankFilename.Replace('\\',Path.DirectorySeparatorChar);
 
+#if !ANDROID
             BinaryReader reader = new BinaryReader(new FileStream(nonStreamingWaveBankFilename, FileMode.Open));
-            reader.ReadBytes(4);
+#else 
+			Stream stream = Game.Activity.Assets.Open(nonStreamingWaveBankFilename);
+			MemoryStream ms = new MemoryStream();
+			stream.CopyTo( ms );
+			stream.Close();
+			ms.Position = 0;
+			BinaryReader reader = new BinaryReader(ms);
+#endif
+			reader.ReadBytes(4);
 
             wavebankheader.Version = reader.ReadInt32();
 
@@ -194,8 +206,8 @@ namespace Microsoft.Xna.Framework.Audio
                     wavebankentry.PlayRegion.Length = (len >> 21) & ((1 << 11) - 1);
 
                     // workaround because I don't know how to handke the deviation length
-
                     reader.BaseStream.Seek(wavebank_offset + wavebankdata.EntryMetaDataElementSize, SeekOrigin.Begin);
+
                     //MYFSEEK(wavebank_offset + wavebankdata.dwEntryMetaDataElementSize); // seek to the next
                     if (current_entry == (wavebankdata.EntryCount - 1))
                     {              // the last track
@@ -345,9 +357,9 @@ namespace Microsoft.Xna.Framework.Audio
                                         
                     writer.Close();
                     mStream.Close();
-					
-                    sounds[current_entry] = new SoundEffect(mStream.ToArray(), rate, AudioChannels.Mono).CreateInstance();
-					
+                    
+                    sounds[current_entry] = new SoundEffect(null, mStream.ToArray()).CreateInstance();
+                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
                     
@@ -391,9 +403,8 @@ namespace Microsoft.Xna.Framework.Audio
                         } else if (isM4a) {
                             filename = filename.Replace(".tmp", ".m4a");
                         }
-                        FileStream audioFile = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
-                        audioFile.Write(audiodata, 0, audiodata.Length);
-                        audioFile.Close();
+                        using (var audioFile = File.Create(filename))
+                            audioFile.Write(audiodata, 0, audiodata.Length);
                         
                         sounds[current_entry] = new SoundEffect(filename).CreateInstance();
                     } else {
@@ -408,6 +419,14 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			audioEngine.Wavebanks[BankName] = this;
         }
+		
+		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
+			: this(audioEngine, streamingWaveBankFilename)
+		{
+			if (offset != 0) {
+				throw new NotImplementedException();
+			}
+		}
 
 		#region IDisposable implementation
 		public void Dispose ()

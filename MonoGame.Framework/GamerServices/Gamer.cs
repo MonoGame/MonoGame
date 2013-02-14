@@ -46,8 +46,8 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         static SignedInGamerCollection _signedInGamers = new SignedInGamerCollection();
         string _gamer = "MonoGame";
-        bool _isDisposed;
         Object _tag;
+        bool disposed;
 
         #region Methods
         public IAsyncResult BeginGetProfile( AsyncCallback callback, Object asyncState )
@@ -69,22 +69,12 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             return _gamer;
         }
-		
-		public void Dispose(bool disposing)
-		{
-			if (disposing) {
-				_isDisposed = true;
-				/*foreach (var gamer in _signedInGamers) {
-					gamer.Dispose();
-				}*/
-			}
-		}
-		
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+
+        internal void Dispose()
+        {
+            disposed = true;
+        }
+
         #endregion
         #region Properties
 		public string DisplayName 
@@ -106,11 +96,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
         }
 
-        public bool IsDisposed 
+        public bool IsDisposed
         {
             get
             {
-                return _isDisposed;
+                return IsDisposed;
             }
         }
 
