@@ -3,21 +3,30 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class EffectTechnique
 	{
-        internal Effect _effect;
+        public EffectPassCollection Passes { get; private set; }
 
-        public EffectPassCollection Passes { get; set; }
+        public EffectAnnotationCollection Annotations { get; private set; }
 
-        public EffectTechnique(Effect effect)
+        public string Name { get; private set; }
+
+        internal EffectTechnique(Effect effect, EffectTechnique cloneSource)
         {
-            Passes = new EffectPassCollection(this);
-            _effect = effect;
+            // Share all the immutable types.
+            Name = cloneSource.Name;
+            Annotations = cloneSource.Annotations;
+
+            // Clone the mutable types.
+            Passes = new EffectPassCollection(effect, cloneSource.Passes);
         }
-		
-		public string Name 
-		{ 
-			get; 
-			set;
-		}
-	}
+
+        internal EffectTechnique(Effect effect, string name, EffectPassCollection passes, EffectAnnotationCollection annotations)
+        {
+            Name = name;
+            Passes = passes;
+            Annotations = annotations;
+        }
+    }
+
+
 }
 

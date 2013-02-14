@@ -27,11 +27,16 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
 	// TODO [TypeConverter(ExpandableObjectConverter)]
-	[Serializable]
+#if WINRT
+    [DataContract]
+#else
+    [Serializable]
+#endif
     public class Curve
     {
         #region Private Fields
@@ -177,14 +182,80 @@ namespace Microsoft.Xna.Framework
 
 		public void ComputeTangents (CurveTangent tangentType )
 		{
-			throw new NotImplementedException();
+		    ComputeTangents(tangentType, tangentType);
 		}
 		
-		public void ComputeTangents( CurveTangent tangentInType, CurveTangent tangentOutType )
+		public void ComputeTangents(CurveTangent tangentInType, CurveTangent tangentOutType)
 		{
-			throw new NotImplementedException();
+            for (var i = 0; i < Keys.Count; i++)
+                ComputeTangent(i, tangentInType, tangentOutType);
 		}
-        #endregion Public Methods
+
+        public void ComputeTangent(int keyIndex, CurveTangent tangentType)
+        {
+            ComputeTangent(keyIndex, tangentType, tangentType);
+        }
+
+        public void ComputeTangent(int keyIndex, CurveTangent tangentInType, CurveTangent tangentOutType)
+        {
+            // See http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.curvetangent.aspx
+
+            var key = keys[keyIndex];
+
+            float p0, p, p1;
+            p0 = p = p1 = key.Position;
+
+            float v0, v, v1;
+            v0 = v = v1 = key.Value;
+
+            if ( keyIndex > 0 )
+            {
+                p0 = keys[keyIndex - 1].Position;
+                v0 = keys[keyIndex - 1].Value;
+            }
+
+            if (keyIndex < keys.Count-1)
+            {
+                p1 = keys[keyIndex + 1].Position;
+                v1 = keys[keyIndex + 1].Value;
+            }
+
+            switch (tangentInType)
+            {
+                case CurveTangent.Flat:
+                    key.TangentIn = 0;
+                    break;
+                case CurveTangent.Linear:
+                    key.TangentIn = v - v0;
+                    break;
+                case CurveTangent.Smooth:
+                    var pn = p1 - p0;
+                    if (Math.Abs(pn) < float.Epsilon)
+                        key.TangentIn = 0;
+                    else
+                        key.TangentIn = (v1 - v0) * ((p - p0) / pn);
+                    break;
+            }
+
+            switch (tangentOutType)
+            {
+                case CurveTangent.Flat:
+                    key.TangentOut = 0;
+                    break;
+                case CurveTangent.Linear:
+                    key.TangentOut = v1 - v;
+                    break;
+                case CurveTangent.Smooth:
+                    var pn = p1 - p0;
+                    if (Math.Abs(pn) < float.Epsilon)
+                        key.TangentOut = 0;
+                    else
+                        key.TangentOut = (v1 - v0) * ((p1 - p) / pn);
+                    break;
+            }
+        }
+
+	    #endregion Public Methods
 
 
         #region Private Methods

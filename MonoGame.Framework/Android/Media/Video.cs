@@ -36,9 +36,6 @@
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
 // */
-using Android.Widget;
-
-
 #endregion License 
 
 using System;
@@ -49,21 +46,25 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed class Video : Java.Lang.Object, IDisposable, Android.Media.MediaPlayer.IOnCompletionListener,
-	  Android.Media.MediaPlayer.IOnVideoSizeChangedListener
+    public sealed class Video : IDisposable
     {
-        internal VideoPlayer Player;
-		internal Android.Media.MediaPlayer media;
+        internal Android.Media.MediaPlayer Player;
 		private string _fileName;
 		private Color _backColor = Color.Black;
-       
-		
-		internal Video(string FileName)
+        bool disposed;
+
+        internal Video(string FileName)
 		{
-			_fileName = FileName;			
+			_fileName = FileName;
+			Prepare();
 		}
-				
-		public Color BackgroundColor
+
+        ~Video()
+        {
+            Dispose(false);
+        }
+
+        public Color BackgroundColor
 		{
 			set
 			{
@@ -120,55 +121,35 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal void Prepare()
 		{
-			
-			media = new Android.Media.MediaPlayer();//.Create(Game.Activity,Android.Net.Uri.Parse("file://android_asset/Content/sintel_trailer.mp4"), Game.Instance.Window.Holder);						
-			if (media != null )
+            Player = new Android.Media.MediaPlayer();
+			if (Player != null )
 			{
-				var afd = Game.Activity.Assets.OpenFd(_fileName);				
+				var afd = Game.Activity.Assets.OpenFd(_fileName);
 				if (afd != null)
-				{					
-					media.SetOnCompletionListener(this);			
-					media.SetOnVideoSizeChangedListener(this);
-					VideoView vv = (VideoView)Game.Activity.FindViewById(MonoGame.Android.Media.VideoViewId);			
-					if (vv == null) throw new InvalidOperationException("you must attach a VideoView in a framelayout with its Id set to MonoGame.Android.Media.VideoViewId");
-					media.SetDisplay(vv.Holder);							
-		            media.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);						
-		            media.Prepare();								
+				{
+		            Player.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);						
+		            Player.Prepare();
 				}
 			}
 		}
 		
-		
 		public void Dispose()
 		{
-            if (media != null)
-			{
-				media.Dispose();
-				media = null;
-			}
+            Dispose(true);
+            GC.SuppressFinalize(this);
 		}
 
-		#region IOnCompletionListener implementation
-		public void OnCompletion (Android.Media.MediaPlayer mp)
-		{
-			if  (Player != null) Player.Stop();
-		}
-		#endregion
-
-		#region IOnVideoSizeChangedListener implementation
-		public void OnVideoSizeChanged (Android.Media.MediaPlayer mp, int width, int height)
-		{
-#if DEBUG			
-			Android.Util.Log.Info("MonoGameInfo", string.Format("Video Size : {0}x{1}", width, height));
-#endif			
-		}
-		#endregion
+        void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (Player != null)
+                {
+                    Player.Dispose();
+                    Player = null;
+                }
+                disposed = true;
+            }
+        }
     }
-}
-namespace MonoGame.Android
-{
-	public class Media
-	{	
-	    public const int VideoViewId = 243252;
-	}
 }

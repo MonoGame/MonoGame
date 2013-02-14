@@ -63,29 +63,35 @@ namespace Microsoft.Xna.Framework.Media
 			for(; songs.Count > 0; )
 			{
 				song = songs[0];
+#if !DIRECTX
 				song.Stop();
+#endif
 				songs.Remove(song);
 			}	
 		}
 
+#if !DIRECTX
         internal void SetVolume(float volume)
         {
             int count = songs.Count;
             for (int i = 0; i < count; ++i)
                 songs[i].Volume = volume;
         }
+#endif
 
         internal void Add(Song song)
         {
             songs.Add(song);
         }
 
+#if !DIRECTX
         internal void Stop()
         {
             int count = songs.Count;
             for (int i = 0; i < count; ++i)
                 songs[i].Stop();
         }
+#endif
 	}
 }
 

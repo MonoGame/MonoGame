@@ -15,6 +15,9 @@ namespace System.Drawing
 		     new float[] {0, 0, 0, 0, 1}
 	      };
 
+#if WINRT
+
+#else
         internal static void RGBToBGR(this Image bmp)
         {
             System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
@@ -26,5 +29,7 @@ namespace System.Drawing
                 g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
             }
         }
+#endif
+
     }
 }

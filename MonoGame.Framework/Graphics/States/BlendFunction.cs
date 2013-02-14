@@ -41,14 +41,14 @@
 
 using System;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Graphics
 {
 	public enum BlendFunction
 	{
-		Add, 
-		Max, 	
-		Min, 	
-		ReverseSubtract, 	
-		Subtract, 	
+		Add,
+		Subtract,
+		ReverseSubtract,
+		Max,
+		Min,
 	}
 }

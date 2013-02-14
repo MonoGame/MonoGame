@@ -25,20 +25,18 @@ SOFTWARE.
 */
 #endregion License
 
-
 using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Microsoft.Xna.Framework.Content;
+#if WINRT
+using System.Reflection;
+#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class ArrayReader<T> : ContentTypeReader<T[]>
+    public class ArrayReader<T> : ContentTypeReader<T[]>
     {
         ContentTypeReader elementReader;
 
-        internal ArrayReader()
+        public ArrayReader()
         {
         }
 
@@ -54,8 +52,12 @@ namespace Microsoft.Xna.Framework.Content
             T[] array = existingInstance;
             if (array == null)
                 array = new T[count];
-			Type objectType = typeof(T);
-			if(objectType.IsValueType)
+
+#if WINRT
+            if (typeof(T).GetTypeInfo().IsValueType)
+#else
+            if (typeof(T).IsValueType)
+#endif
 			{
                 for (uint i = 0; i < count; i++)
                 {

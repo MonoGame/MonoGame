@@ -42,7 +42,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    class BasicEffectReader : ContentTypeReader<BasicEffect>
+    internal class BasicEffectReader : ContentTypeReader<BasicEffect>
     {
         protected internal override BasicEffect Read(ContentReader input, BasicEffect existingInstance)
         {
@@ -55,9 +55,9 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             effect.DiffuseColor = input.ReadVector3();
-            /*effect.EmissiveColor =*/ input.ReadVector3();
-            /*effect.SpecularColor =*/ input.ReadVector3();
-            /*effect.SpecularPower =*/ input.ReadSingle();
+            effect.EmissiveColor = input.ReadVector3();
+            effect.SpecularColor = input.ReadVector3();
+            effect.SpecularPower = input.ReadSingle();
             effect.Alpha = input.ReadSingle();
             effect.VertexColorEnabled = input.ReadBoolean();
             return effect;

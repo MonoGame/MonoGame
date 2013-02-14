@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.MonoGame.Linux", "MonoDevelop.MonoGame\MonoDevelop.MonoGame.Linux.csproj", "{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.MonoGame.MacOS", "MonoDevelop.MonoGame\MonoDevelop.MonoGame.MacOS.csproj", "{77DC780A-F423-46CA-BAB2-612A87432E74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.MonoGame", "MonoDevelop.MonoGame\MonoDevelop.MonoGame.csproj", "{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseLinux|Any CPU = ReleaseLinux|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77DC780A-F423-46CA-BAB2-612A87432E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77DC780A-F423-46CA-BAB2-612A87432E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77DC780A-F423-46CA-BAB2-612A87432E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77DC780A-F423-46CA-BAB2-612A87432E74}.ReleaseLinux|Any CPU.ActiveCfg = ReleaseLinux|Any CPU
+		{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEFFDDB9-F86B-452F-B1B2-6379DB6D10EA}.ReleaseLinux|Any CPU.ActiveCfg = ReleaseLinux|Any CPU
+		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.ReleaseLinux|Any CPU.ActiveCfg = ReleaseLinux|Any CPU
+		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.ReleaseLinux|Any CPU.Build.0 = ReleaseLinux|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = MonoDevelop.MonoGame\MonoDevelop.MonoGame.Linux.csproj
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

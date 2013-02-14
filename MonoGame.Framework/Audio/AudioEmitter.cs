@@ -48,16 +48,29 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		public AudioEmitter ()
 		{
-			DopplerScale = 1.0f;
+            _dopplerScale = 1.0f;
 			Forward = Vector3.Forward;
 			Position = Vector3.Zero;
 			Up = Vector3.Up;
 			Velocity = Vector3.Zero;
 		}
+
+        private float _dopplerScale;
 		
-		public float DopplerScale {
-			get;
-			set;
+		public float DopplerScale 
+        {
+            get
+            {
+                return _dopplerScale;
+            }
+
+            set
+            {
+                if (value < 0.0f)
+                    throw new ArgumentOutOfRangeException("AudioEmitter.DopplerScale must be greater than or equal to 0.0f");
+
+                _dopplerScale = value;
+            }
 		}
 
 		public Vector3 Forward {

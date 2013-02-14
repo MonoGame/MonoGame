@@ -37,114 +37,180 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
-
-﻿using System;
+using System;
 
 namespace Microsoft.Xna.Framework.Input
 {    
-    public struct MouseState
-    {
-		int _x,_y;
+    /// <summary>
+    /// Represents a mouse state with cursor position and button press information.
+    /// </summary>
+	public struct MouseState
+	{
+		int _x, _y;
+		int _scrollWheelValue;
 		ButtonState _leftButton;
-		ButtonState _middleButton;
 		ButtonState _rightButton;
+		ButtonState _middleButton;
 		
-		internal MouseState(int x, int y)
+        /// <summary>
+        /// Initializes a new instance of the MouseState.
+        /// </summary>
+        /// <param name="x">Horizontal position of the mouse.</param>
+        /// <param name="y">Vertical position of the mouse.</param>
+        /// <param name="scrollWheel">Mouse scroll wheel's value.</param>
+        /// <param name="leftButton">Left mouse button's state.</param>
+        /// <param name="middleButton">Middle mouse button's state.</param>
+        /// <param name="rightButton">Right mouse button's state.</param>
+        /// <param name="xButton1">XBUTTON1's state.</param>
+        /// <param name="xButton2">XBUTTON2's state.</param>
+        /// <remarks>Normally <see cref="Mouse.GetState"/> should be used to get mouse current state. The constructor is provided for simulating mouse input.</remarks>
+		public MouseState (
+			int x,
+			int y,
+			int scrollWheel,
+			ButtonState leftButton,
+			ButtonState middleButton,
+			ButtonState rightButton,
+			ButtonState xButton1,
+			ButtonState xButton2)
 		{
 			_x = x;
 			_y = y;
-			_leftButton = ButtonState.Released;
-			_middleButton = ButtonState.Released;
-			_rightButton = ButtonState.Released;
+			_scrollWheelValue = scrollWheel;
+			_leftButton = leftButton;
+			_middleButton = middleButton;
+			_rightButton = rightButton;
 		}
 		
-        public int X
+        /// <summary>
+        /// Compares whether two MouseState instances are equal.
+        /// </summary>
+        /// <param name="left">MouseState instance on the left of the equal sign.</param>
+        /// <param name="right">MouseState instance  on the right of the equal sign.</param>
+        /// <returns>true if the instances are equal; false otherwise.</returns>
+		public static bool operator ==(MouseState left, MouseState right)
+		{
+			return left._x == right._x &&
+				   left._y == right._y &&
+				   left._leftButton == right._leftButton &&
+				   left._middleButton == right._middleButton &&
+				   left._rightButton == right._rightButton &&
+                   left._scrollWheelValue == right._scrollWheelValue;
+		}
+		
+        /// <summary>
+        /// Compares whether two MouseState instances are not equal.
+        /// </summary>
+        /// <param name="left">MouseState instance on the left of the equal sign.</param>
+        /// <param name="right">MouseState instance  on the right of the equal sign.</param>
+        /// <returns>true if the objects are not equal; false otherwise.</returns>
+		public static bool operator !=(MouseState left, MouseState right)
+		{
+			return !(left == right);
+		}
+
+        /// <summary>
+        /// Compares whether current instance is equal to specified object.
+        /// </summary>
+        /// <param name="obj">The MouseState to compare.</param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
         {
-            get
-            {
-                return _x;
-            }
-			
-			internal set
-			{
-				_x = value;
-			}	           
+            if (obj is MouseState)
+                return this == (MouseState)obj;
+            return false;
         }
-        public int Y
+
+        /// <summary>
+        /// Gets the hash code for MouseState instance.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
+        public override int GetHashCode()
         {
-            get
-            {
-                return _y;
-            }
-			
-			internal set
-			{
+            return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets horizontal position of the cursor.
+        /// </summary>
+		public int X {
+			get {
+				return _x;
+			}
+			internal set {
+				_x = value;
+			}
+		}
+
+        /// <summary>
+        /// Gets vertical position of the cursor.
+        /// </summary>
+		public int Y {
+			get {
+				return _y;
+			}
+			internal set {
 				_y = value;
 			}
-        }
-		
-		public ButtonState LeftButton 
-		{ 
-			get
-			{
-				return _leftButton;	
-			}
-			
-			internal set
-			{
-				_leftButton = value;
-			}
 		}
-		
-		public ButtonState MiddleButton 
-		{ 
-			get
-			{
-				return _middleButton;	
+
+        /// <summary>
+        /// Gets state of the left mouse button.
+        /// </summary>
+		public ButtonState LeftButton { 
+			get {
+				return _leftButton;
 			}
-			
-			internal set
-			{
-				_middleButton = value;
-			}
+			internal set { _leftButton = value; }
 		}
-		
-		public ButtonState RightButton 
-		{ 
-			get
-			{
-				return _rightButton;	
+
+        /// <summary>
+        /// Gets state of the middle mouse button.
+        /// </summary>
+		public ButtonState MiddleButton { 
+			get {
+				return _middleButton;
 			}
-			
-			internal set
-			{
-				_rightButton = value;
-			}
+			internal set { _middleButton = value; }			
 		}
-		
-		public int ScrollWheelValue 
-		{ 
-			get
-			{
-				return 0;
+
+        /// <summary>
+        /// Gets state of the right mouse button.
+        /// </summary>
+		public ButtonState RightButton { 
+			get {
+				return _rightButton;
 			}
+			internal set { _rightButton = value; }
 		}
-		
-		public ButtonState XButton1
-		{ 
-			get
-			{
+
+        /// <summary>
+        /// Returns cumulative scroll wheel value since the game start.
+        /// </summary>
+		public int ScrollWheelValue { 
+			get {
+				return _scrollWheelValue;
+			}
+			internal set { _scrollWheelValue = value; }
+		}
+
+        /// <summary>
+        /// Gets state of the XButton1.
+        /// </summary>
+		public ButtonState XButton1 { 
+			get {
 				return ButtonState.Released;
 			}
 		}
-		
-		public ButtonState XButton2
-		{ 
-			get
-			{
+
+        /// <summary>
+        /// Gets state of the XButton2.
+        /// </summary>
+		public ButtonState XButton2 { 
+			get {
 				return ButtonState.Released;
 			}
 		}
-    }
+	}
 }
 
