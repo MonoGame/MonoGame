@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Audio
 				uint extraDataLen = soundReader.ReadUInt16 ();
 				//TODO: Parse RPC+DSP stuff
 				
+				// extraDataLen - 2, we need to account for extraDataLen itself!
 				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
 			}
 			
