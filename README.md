@@ -1,4 +1,4 @@
-# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop3d/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop3d/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop3d/)
+# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop/)
 
 [MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework. 
 
@@ -22,7 +22,7 @@ There are a few pre-requisites that you should be aware of for the various platf
 
 There are three quick start options available:
 * Download the latest stable release over [our website](http://monogame.net/downloads).
-* Download the latest [source code](https://github.com/mono/MonoGame/archive/develop3d.zip).
+* Download the latest [source code](https://github.com/mono/MonoGame/archive/develop.zip).
 * Clone the repo: `https://github.com/mono/MonoGame.git`.
 
 ## Bug Tracker

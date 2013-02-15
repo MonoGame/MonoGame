@@ -83,6 +83,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			this.soundEffect = parent;
 			InitializeSound ();
+			EffectData = soundEffect._data;
             BindDataBuffer(soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
 		}
 
@@ -96,6 +97,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
+			EffectData = data;
             soundBuffer.BindDataBuffer(data, format, size, rate);
         }
 

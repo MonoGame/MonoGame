@@ -114,8 +114,16 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.Disable(EnableCap.ScissorTest);
             GraphicsExtensions.CheckGLError();
 
-            // TODO: What about DepthBias, SlopeScaleDepthBias, and
-            // MultiSampleAntiAlias... we're not handling these!
+            if (this.DepthBias != 0 || this.SlopeScaleDepthBias != 0)
+            {   
+                GL.Enable(EnableCap.PolygonOffsetFill);
+                GL.PolygonOffset(this.SlopeScaleDepthBias, this.DepthBias);
+            }
+            else
+                GL.Disable(EnableCap.PolygonOffsetFill);
+            GraphicsExtensions.CheckGLError();
+
+            // TODO: Implement MultiSampleAntiAlias
         }
 
 #elif DIRECTX
