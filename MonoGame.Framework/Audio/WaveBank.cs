@@ -411,6 +411,16 @@ namespace Microsoft.Xna.Framework.Audio
                         //An xWMA or XMA2 file. Can't be played atm :(
                         throw new NotImplementedException();
                     }
+#if !DIRECTX
+                /* DirectX platforms can use XAudio2 to stream MSADPCM natively.
+                 * This code is cross-platform, but the problem is that it just
+                 * decodes ALL of the wavedata here. For XAudio2 in particular,
+                 * this is probably ludicrous.
+                 *
+                 * You need to write a DIRECTX ADPCM reader that just loads this
+                 * into the SoundEffect. No decoding should be necessary.
+                 * -flibit
+                 */
                 } else if (codec == MiniFormatTag_ADPCM) {
                     MemoryStream dataStream = new MemoryStream(audiodata);
                     BinaryReader source = new BinaryReader(dataStream);
@@ -421,6 +431,7 @@ namespace Microsoft.Xna.Framework.Audio
                     ).CreateInstance();
                     source.Close();
                     dataStream.Close();
+#endif
                 } else {
                     throw new NotImplementedException();
                 }
