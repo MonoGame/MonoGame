@@ -96,8 +96,6 @@ namespace Microsoft.Xna.Framework.Media
         {
 #if WINDOWS_MEDIA_ENGINE
 
-            try
-            {
                 MediaManager.Startup(true);
                 using (var factory = new MediaEngineClassFactory())
                 using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
@@ -120,12 +118,6 @@ namespace Microsoft.Xna.Framework.Media
 #else
                 _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 #endif
-                
-            }
-            catch (Exception e)
-            {
-
-            }
 
 #elif WINDOWS_MEDIA_SESSION
 
