@@ -439,6 +439,7 @@
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

@@ -372,6 +372,7 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
