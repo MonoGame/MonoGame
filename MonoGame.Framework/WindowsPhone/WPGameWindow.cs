@@ -43,6 +43,7 @@ using Windows.UI.Core;
 using Windows.Graphics.Display;
 using Microsoft.Xna.Framework.Graphics;
 using System.Windows;
+using Microsoft.Xna.Framework.Input.Touch;
 
 
 namespace MonoGame.Framework.WindowsPhone
@@ -156,6 +157,13 @@ namespace MonoGame.Framework.WindowsPhone
             _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
         }
 
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
+        {
+            SetClientBounds(clientWidth, clientHeight);
+            TouchPanel.DisplayHeight = ClientBounds.Height;
+            TouchPanel.DisplayWidth = ClientBounds.Width;
+        }
+
         /*
         private void Window_SizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
@@ -257,11 +265,6 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-        }
-
-        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
-        {
-
         }
 
         #endregion

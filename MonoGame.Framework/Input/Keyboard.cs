@@ -40,23 +40,39 @@
 // 
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
 {
-
-
+    /// <summary>
+    /// Allows getting keystrokes from keyboard.
+    /// </summary>
 	public static class Keyboard
 	{
+        static List<Keys> _keys;
+
+        /// <summary>
+        /// Returns the current keyboard state.
+        /// </summary>
+        /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState()
 		{
-            return State; // TODO Not used on iPhone or Zune
+            return new KeyboardState(_keys);
 		}
 		
+        /// <summary>
+        /// Returns the current keyboard state for a given player.
+        /// </summary>
+        /// <param name="playerIndex">Player index of the keyboard.</param>
+        /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
-            return State;  // TODO Not used on iPhone or Zune
+            return new KeyboardState(_keys);
 		}
 
-        internal static KeyboardState State { private get; set; }
+        internal static void SetKeys(List<Keys> keys)
+        {
+            _keys = keys;
+        }
 	}
 }

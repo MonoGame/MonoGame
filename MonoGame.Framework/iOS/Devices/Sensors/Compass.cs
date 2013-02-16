@@ -86,7 +86,7 @@ namespace Microsoft.Devices.Sensors
             this.IsDataValid = error == null;
             if (this.IsDataValid)
             {
-                reading.MagnetometerReading = new Vector3((float)motionManager.DeviceMotion.MagneticField.Field.Y, (float)-motionManager.DeviceMotion.MagneticField.Field.X, (float)motionManager.DeviceMotion.MagneticField.Field.Z);
+                reading.MagnetometerReading = new Vector3((float)data.MagneticField.Field.Y, (float)-data.MagneticField.Field.X, (float)data.MagneticField.Field.Z);
                 reading.TrueHeading = Math.Atan2(reading.MagnetometerReading.Y, reading.MagnetometerReading.X) / Math.PI * 180;
                 reading.MagneticHeading = reading.TrueHeading;
                 switch (data.MagneticField.Accuracy)
@@ -115,7 +115,6 @@ namespace Microsoft.Devices.Sensors
                 reading.Timestamp = DateTime.Now;
                 this.CurrentValue = reading;
             }
-            FireOnCurrentValueChanged(this, new SensorReadingEventArgs<CompassReading>(reading));
         }
 
         private void UpdateInterval(object sender, EventArgs args)

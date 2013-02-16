@@ -190,8 +190,21 @@ namespace Microsoft.Xna.Framework
             // If we haven't calculated the back buffer scale then do it now.
             if (_backBufferScale == Vector2.Zero)
             {
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth/(float)_clientBounds.Width, 
-                                                manager.PreferredBackBufferHeight/(float)_clientBounds.Height);
+                // Make sure the scale is calculated in terms of the same orientation as the preferred back buffer
+                float clientWidth;
+                float clientHeight;
+                if (manager.PreferredBackBufferWidth > manager.PreferredBackBufferHeight)
+                {
+                    clientWidth = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                    clientHeight = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                }
+                else
+                {
+                    clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
+                    clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
+                }
+                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
+                                                manager.PreferredBackBufferHeight / clientHeight);
             }
 
             // Set the new client bounds.

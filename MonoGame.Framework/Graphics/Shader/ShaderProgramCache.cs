@@ -13,7 +13,7 @@ using Sce.PlayStation.Core.Graphics;
 
 #else
 using OpenTK.Graphics.ES20;
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ProgramParameter = OpenTK.Graphics.ES20.All;
@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         ~ShaderProgramCache()
         {
-            Dispose(true);
+            Dispose(false);
         }
 
         /// <summary>
@@ -143,7 +143,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!disposed)
             {
-                Clear();
+                if (disposing)
+                    Clear();
                 disposed = true;
             }
         }

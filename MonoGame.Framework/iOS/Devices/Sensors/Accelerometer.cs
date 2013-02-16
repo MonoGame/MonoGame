@@ -84,12 +84,11 @@ namespace Microsoft.Devices.Sensors
             if (this.IsDataValid)
             {
                 this.IsDataValid = true;
-                reading.Acceleration = new Vector3((float)motionManager.AccelerometerData.Acceleration.X, (float)motionManager.AccelerometerData.Acceleration.Y, (float)motionManager.AccelerometerData.Acceleration.Z);
+                reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
                 reading.Timestamp = DateTime.Now;
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
             }
-            FireOnCurrentValueChanged(this, new SensorReadingEventArgs<AccelerometerReading>(reading));
 		}
 
 		private void UpdateInterval(object sender, EventArgs args)

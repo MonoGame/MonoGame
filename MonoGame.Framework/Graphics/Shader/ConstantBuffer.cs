@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
+#endif
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
@@ -39,6 +41,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private int _program = -1;
         private int _location;
+
+        static ConstantBuffer _lastConstantBufferApplied = null;
 
         /// <summary>
         /// A hash value which can be used to compare constant buffers.
@@ -115,55 +119,53 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void SetData(int offset, int rows, int columns, object data)
         {
-            // TODO: Should i pass the element size in?
+            // Shader registers are always 4 bytes and all the
+            // incoming data objects should be 4 bytes per element.
             const int elementSize = 4;
             const int rowSize = elementSize * 4;
 
-            // Take care of a single data type.
+            // Take care of a single element.
             if (rows == 1 && columns == 1)
             {
-                // TODO: Consider storing all data in arrays to avoid
-                // having to generate this temp array on every set.
-                byte[] bytes;
-
-                if (data is float)
-                    bytes = BitConverter.GetBytes((float)data);
-                else if (data is int)
-					// Integer values are treated as floats after the shader is converted, so we convert them.
-					bytes = BitConverter.GetBytes((float)((int)data));
-				else
-                    bytes = BitConverter.GetBytes(((float[])data)[0]);
-
-                Buffer.BlockCopy(bytes, 0, _buffer, offset, elementSize);
+                // EffectParameter stores all values in arrays by default.             
+                if (data is Array)
+                    Buffer.BlockCopy(data as Array, 0, _buffer, offset, elementSize);
+                else
+                {
+                    // TODO: When we eventually expose the internal Shader 
+                    // API then we will need to deal with non-array elements.
+                    throw new NotImplementedException();   
+                }
             }
 
             // Take care of the single copy case!
             else if (rows == 1 || (rows == 4 && columns == 4))
-                Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows * columns * elementSize);
+                Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows*columns*elementSize);
             else
             {
                 var source = data as Array;
 
-                var stride = (columns * elementSize);
+                var stride = (columns*elementSize);
                 for (var y = 0; y < rows; y++)
-                    Buffer.BlockCopy(source, stride * y, _buffer, offset + (rowSize * y), columns * elementSize);
+                    Buffer.BlockCopy(source, stride*y, _buffer, offset + (rowSize*y), columns*elementSize);
             }
         }
 
-        private void SetParameter(int offset, EffectParameter param)
+        private int SetParameter(int offset, EffectParameter param)
         {
             const int elementSize = 4;
             const int rowSize = elementSize * 4;
+
+            int rowsUsed = 0;
 
             if (param.Elements.Count > 0)
             {
                 foreach (var subparam in param.Elements)
                 {
-                    SetParameter(offset, subparam);
+                    int rowsUsedSubParam = SetParameter(offset, subparam);
 
-                    //TODO: Sometimes directx decides to transpose matricies
-                    //to fit in fewer registers.
-                    offset += subparam.RowCount * rowSize;
+                    offset += rowsUsedSubParam * rowSize;
+                    rowsUsed += rowsUsedSubParam;
                 }
             }
             else if (param.Data != null)
@@ -172,12 +174,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     case EffectParameterType.Single:
 					case EffectParameterType.Int32:
-						SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                    case EffectParameterType.Bool:
+                        // HLSL assumes matrices are column-major, whereas in-memory we use row-major.
+                        // TODO: HLSL can be told to use row-major. We should handle that too.
+                        if (param.ParameterClass == EffectParameterClass.Matrix)
+                        {
+                            rowsUsed = param.ColumnCount;
+                            SetData(offset, param.ColumnCount, param.RowCount, param.Data);
+                        }
+                        else
+                        {
+                            rowsUsed = param.RowCount;
+                            SetData(offset, param.RowCount, param.ColumnCount, param.Data);
+                        }
                         break;
                     default:
                         throw new NotImplementedException("Not supported!");
                 }
             }
+
+            return rowsUsed;
         }
 
         public void Update(EffectParameterCollection parameters)
@@ -257,6 +273,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 _dirty = true;
             }
 
+            // If the shader program is the same, the effect may still be different and have different values in the buffer
+            if (!Object.ReferenceEquals(this, _lastConstantBufferApplied))
+                _dirty = true;
+
             // If the buffer content hasn't changed then we're
             // done... use the previously set uniform state.
             if (!_dirty)
@@ -274,6 +294,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the dirty flag.
             _dirty = false;
+
+            _lastConstantBufferApplied = this;
 #endif
             
 #if PSM

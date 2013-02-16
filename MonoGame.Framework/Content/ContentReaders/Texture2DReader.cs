@@ -84,11 +84,22 @@ namespace Microsoft.Xna.Framework.Content
 			int width = (reader.ReadInt32 ());
 			int height = (reader.ReadInt32 ());
 			int levelCount = (reader.ReadInt32 ());
+            int levelCountOutput = levelCount;
+
+            // If the system does not fully support Power of Two textures,
+            // skip any mip maps supplied with any non PoT textures.
+            if (levelCount > 1 && !GraphicsCapabilities.NonPowerOfTwo &&
+                (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
+            {
+                levelCountOutput = 1;
+                System.Diagnostics.Debug.WriteLine(
+                    "Device does not support non Power of Two textures. Skipping mipmaps.");
+            }
 
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
 			{
-#if IPHONE
+#if IOS
 		        // At the moment. If a DXT Texture comes in on iOS, it's really a PVR compressed
 				// texture. We need to use this hack until the content pipeline is implemented.
 				// For now DXT5 means we're using 4bpp PVRCompression and DXT3 means 2bpp. Look at
@@ -112,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
             if (existingInstance == null)
-			    texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+                texture = new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
             else
                 texture = existingInstance;
 			
@@ -122,6 +133,12 @@ namespace Microsoft.Xna.Framework.Content
 				byte[] levelData = reader.ReadBytes (levelDataSizeInBytes);
                 int levelWidth = width >> level;
                 int levelHeight = height >> level;
+
+                if (level >= levelCountOutput)
+                {
+                    continue;
+                }
+
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{

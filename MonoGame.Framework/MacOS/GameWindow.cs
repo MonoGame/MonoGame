@@ -66,6 +66,12 @@ namespace Microsoft.Xna.Framework
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
 
+		public static Func<Game, RectangleF, GameWindow> CreateWindowDelegate 
+		{
+			get;
+			set;
+		}
+
 		#region GameWindow Methods
 		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
@@ -475,8 +481,7 @@ namespace Microsoft.Xna.Framework
 			_keyStates.Clear ();
 			_keyStates.AddRange (_flags);
 			_keyStates.AddRange (_keys);
-			var kbs = new KeyboardState (_keyStates.ToArray ());
-			Keyboard.State = kbs;
+			Keyboard.SetKeys(_keyStates);
 		}
 		
 		// This method should only be called when necessary like when the Guide is displayed

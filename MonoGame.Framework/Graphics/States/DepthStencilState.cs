@@ -1,14 +1,13 @@
 using System;
 using System.Diagnostics;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -16,6 +15,11 @@ using GLStencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
 #endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
+
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -153,46 +157,73 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.Enable(EnableCap.StencilTest);
                 GraphicsExtensions.CheckGLError();
 
-                // Set color mask - not needed
-                //GL.ColorMask(false, false, false, false); //Disable drawing colors to the screen
                 // set function
-                GLStencilFunction func;
-                switch (StencilFunction)
+                if (this.TwoSidedStencilMode)
                 {
-                    default:
-                    case CompareFunction.Always:
-                        func = GLStencilFunction.Always;
-                        break;
-                    case CompareFunction.Equal:
-                        func = GLStencilFunction.Equal;
-                        break;
-                    case CompareFunction.Greater:
-                        func = GLStencilFunction.Greater;
-                        break;
-                    case CompareFunction.GreaterEqual:
-                        func = GLStencilFunction.Gequal;
-                        break;
-                    case CompareFunction.Less:
-                        func = GLStencilFunction.Less;
-                        break;
-                    case CompareFunction.LessEqual:
-                        func = GLStencilFunction.Lequal;
-                        break;
-                    case CompareFunction.Never:
-                        func = GLStencilFunction.Never;
-                        break;
-                    case CompareFunction.NotEqual:
-                        func = GLStencilFunction.Notequal;
-                        break;
+#if GLES
+                    var cullFaceModeFront = (All)CullFaceMode.Front;
+                    var cullFaceModeBack = (All)CullFaceMode.Back;
+                    var stencilFaceFront = (All)CullFaceMode.Front;
+                    var stencilFaceBack = (All)CullFaceMode.Back;
+#else
+                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
+                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
+                    var stencilFaceFront = StencilFace.Front;
+                    var stencilFaceBack = StencilFace.Back;
+#endif
+
+                    GL.StencilFuncSeparate(cullFaceModeFront, GetStencilFunc(this.StencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilFuncSeparate(cullFaceModeBack, GetStencilFunc(this.CounterClockwiseStencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate(stencilFaceFront, GetStencilOp(this.StencilFail), 
+                                         GetStencilOp(this.StencilDepthBufferFail), 
+                                         GetStencilOp(this.StencilPass));
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate(stencilFaceBack, GetStencilOp(this.CounterClockwiseStencilFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilDepthBufferFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilPass));
+                    GraphicsExtensions.CheckGLError();
+                }
+                else
+                {
+                    GL.StencilFunc(GetStencilFunc(this.StencilFunction), ReferenceStencil, StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    
+                    GL.StencilOp(GetStencilOp(StencilFail),
+                                 GetStencilOp(StencilDepthBufferFail),
+                                 GetStencilOp(StencilPass));
+                    GraphicsExtensions.CheckGLError();
                 }
 
-                GL.StencilFunc(func, ReferenceStencil, StencilMask);
-                GraphicsExtensions.CheckGLError();
+            }
+        }
 
-                GL.StencilOp(GetStencilOp(StencilFail),
-                                GetStencilOp(StencilDepthBufferFail),
-                                GetStencilOp(StencilPass));
-                GraphicsExtensions.CheckGLError();
+        private static GLStencilFunction GetStencilFunc(CompareFunction function)
+        {
+            GLStencilFunction func;
+            switch (function)
+            {
+            case CompareFunction.Always:
+                return GLStencilFunction.Always;
+            case CompareFunction.Equal:
+                return GLStencilFunction.Equal;
+            case CompareFunction.Greater:
+                return GLStencilFunction.Greater;
+            case CompareFunction.GreaterEqual:
+                return GLStencilFunction.Gequal;
+            case CompareFunction.Less:
+                return GLStencilFunction.Less;
+            case CompareFunction.LessEqual:
+                return GLStencilFunction.Lequal;
+            case CompareFunction.Never:
+                return GLStencilFunction.Never;
+            case CompareFunction.NotEqual:
+                return GLStencilFunction.Notequal;
+            default:
+                return GLStencilFunction.Always;
             }
         }
 
@@ -203,13 +234,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 case StencilOperation.Keep:
                     return StencilOp.Keep;
                 case StencilOperation.Decrement:
-                    return StencilOp.Decr;
-                case StencilOperation.DecrementSaturation:
                     return StencilOp.DecrWrap;
+                case StencilOperation.DecrementSaturation:
+                    return StencilOp.Decr;
                 case StencilOperation.IncrementSaturation:
-                    return StencilOp.IncrWrap;
-                case StencilOperation.Increment:
                     return StencilOp.Incr;
+                case StencilOperation.Increment:
+                    return StencilOp.IncrWrap;
                 case StencilOperation.Invert:
                     return StencilOp.Invert;
                 case StencilOperation.Replace:
@@ -246,10 +277,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.StencilReadMask = (byte)StencilMask; // TODO: Should this instead grab the upper 8bits?
                 desc.StencilWriteMask = (byte)StencilWriteMask;
 
-                desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
-                desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
-                desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
-                desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                if (TwoSidedStencilMode)
+                {
+                    desc.BackFace.Comparison = GetComparison(CounterClockwiseStencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
+                }
+                else
+                {   //use same settings as frontFace 
+                    desc.BackFace.Comparison = GetComparison(StencilFunction);
+                    desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
+                    desc.BackFace.FailOperation = GetStencilOp(StencilFail);
+                    desc.BackFace.PassOperation = GetStencilOp(StencilPass);
+                }
 
                 desc.FrontFace.Comparison = GetComparison(StencilFunction);
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
@@ -257,7 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.FrontFace.PassOperation = GetStencilOp(StencilPass);
 
                 // Create the state.
-                _state = new SharpDX.Direct3D11.DepthStencilState(GraphicsDevice._d3dDevice, ref desc);
+                _state = new SharpDX.Direct3D11.DepthStencilState(GraphicsDevice._d3dDevice, desc);
             }
 
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
@@ -266,6 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
+            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
         }
 

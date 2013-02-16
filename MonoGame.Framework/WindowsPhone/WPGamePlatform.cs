@@ -171,10 +171,6 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            var device = Game.GraphicsDevice;
-            if (device != null)
-                device.ResetRenderTargets();
-
             return true;
         }
 
@@ -185,13 +181,15 @@ namespace MonoGame.Framework.WindowsPhone
         public override void ExitFullScreen()
         {
         }
-        
+
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+            Window.EndScreenDeviceChange(screenDeviceName, clientWidth, clientHeight);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+            Window.BeginScreenDeviceChange(willBeFullScreen);
         }
 
         public override void Log(string message)

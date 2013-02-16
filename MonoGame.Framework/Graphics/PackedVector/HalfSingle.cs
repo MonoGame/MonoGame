@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         public HalfSingle(float single)
         {
-            packedValue = HalfTypeHelper.convert(single);
+            packedValue = HalfTypeHelper.Convert(single);
         }
 
         public ushort PackedValue
@@ -25,12 +25,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         public float ToSingle()
         {
-            return HalfTypeHelper.convert(this.packedValue);
+            return HalfTypeHelper.Convert(this.packedValue);
         }
 
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
-            this.packedValue = HalfTypeHelper.convert(vector.X);
+            this.packedValue = HalfTypeHelper.Convert(vector.X);
         }
 
         Vector4 IPackedVector.ToVector4()

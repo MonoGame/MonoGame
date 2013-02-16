@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>MonoGame Windows Phone 8 Game</Name>
-    <Description>A XAML-based MonoGame project for Windows Phone 8.</Description>
+    <Name>MonoGame Windows Phone 8 Project</Name>
+    <Description>A MonoGame game project for Windows Phone 8.</Description>
     <Icon>__TemplateIcon.png</Icon>
     <PreviewImage>__PreviewImage.png</PreviewImage>
     <TemplateID>MonoGame.CS.WinRT.Game</TemplateID>
@@ -10,7 +10,7 @@
     <ProjectType>CSharp</ProjectType>
     <SortOrder>40</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>XamlPhoneGame</DefaultName>
+    <DefaultName>GameName</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
