@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -197,6 +197,7 @@ namespace Microsoft.Xna.Framework {
 			AssertValidContext ();
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
+            GraphicsExtensions.CheckGLError();
 			
 			// HACK:  GraphicsDevice itself should be calling
 			//        glViewport, so we shouldn't need to do it
@@ -208,19 +209,30 @@ namespace Microsoft.Xna.Framework {
 
 			int previousRenderbuffer = 0;
 			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
+            GraphicsExtensions.CheckGLError();
 			
 			_glapi.GenFramebuffers (1, ref _framebuffer);
+            GraphicsExtensions.CheckGLError();
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
+            GraphicsExtensions.CheckGLError();
 			
 			// Create our Depth buffer. Color buffer must be the last one bound
 			GL.GenRenderbuffers(1, ref _depthbuffer);
+            GraphicsExtensions.CheckGLError();
 			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
+            GraphicsExtensions.CheckGLError();
+			GL.RenderbufferStorage(All.Renderbuffer, All.Depth24Stencil8Oes, viewportWidth, viewportHeight);
+            GraphicsExtensions.CheckGLError();
 			
 			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
+            GraphicsExtensions.CheckGLError();
+            GL.FramebufferRenderbuffer(All.Framebuffer, All.StencilAttachment, All.Renderbuffer, _depthbuffer);
+            GraphicsExtensions.CheckGLError();
 
-			_glapi.GenRenderbuffers (2, ref _colorbuffer);
+			_glapi.GenRenderbuffers(1, ref _colorbuffer);
+            GraphicsExtensions.CheckGLError();
 			_glapi.BindRenderbuffer (All.Renderbuffer, _colorbuffer);
+            GraphicsExtensions.CheckGLError();
 
 			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 
@@ -229,6 +241,7 @@ namespace Microsoft.Xna.Framework {
 			//       works.  Still, it would be nice to know why it
 			//       claims to have failed.
 			ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
+            GraphicsExtensions.CheckGLError();
 			
 			_glapi.FramebufferRenderbuffer ( All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
 			
@@ -238,7 +251,9 @@ namespace Microsoft.Xna.Framework {
 					"Framebuffer was not created correctly: " + status);
 
 			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
+            GraphicsExtensions.CheckGLError();
             _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
+            GraphicsExtensions.CheckGLError();
 
 			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService(
 				typeof (IGraphicsDeviceService));
@@ -318,10 +333,12 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
-			__renderbuffergraphicsContext.MakeCurrent (null);
-
-			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			ctx.EAGLContext.PresentRenderBuffer ((uint) All.Renderbuffer);
+			__renderbuffergraphicsContext.MakeCurrent(null);
+            GraphicsExtensions.CheckGLError();
+            GL.BindRenderbuffer(All.Renderbuffer, this._colorbuffer);
+            GraphicsExtensions.CheckGLError();
+            __renderbuffergraphicsContext.SwapBuffers();
+            GraphicsExtensions.CheckGLError();
 		}
 
 		// FIXME: This functionality belongs iMakeCurrentn GraphicsDevice.
@@ -332,6 +349,7 @@ namespace Microsoft.Xna.Framework {
 			AssertValidContext ();
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
+            GraphicsExtensions.CheckGLError();
 		}
 
 		public override void LayoutSubviews ()

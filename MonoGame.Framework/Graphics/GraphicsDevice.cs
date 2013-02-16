@@ -56,6 +56,7 @@ using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureUnit = OpenTK.Graphics.ES20.All;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 using DrawElementsType = OpenTK.Graphics.ES20.All;
@@ -242,6 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         internal int glFramebuffer;
+        internal int glRenderTargetFramebuffer;
         internal int MaxVertexAttributes;        
         internal readonly List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
@@ -1171,16 +1173,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
         }
-
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
 		
         public void Dispose()
         {
@@ -1588,17 +1580,19 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
 
 #elif OPENGL
-				if (renderTarget.glFramebuffer == 0)
+                // Only generate one FBO for all rendertargets and swap out 
+                // the attachements accordingly (also allows multiple rendertargets)
+				if (this.glRenderTargetFramebuffer == 0)
 				{
 #if GLES
-					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
+                    GL.GenFramebuffers(1, ref this.glRenderTargetFramebuffer);
 #else
-					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
+                    GL.GenFramebuffers(1, out this.glRenderTargetFramebuffer);
 #endif
                     GraphicsExtensions.CheckGLError();
                 }
 
-				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
+				GL.BindFramebuffer(GLFramebuffer, this.glRenderTargetFramebuffer);
                 GraphicsExtensions.CheckGLError();
                 GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
@@ -1614,18 +1608,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 
 				var status = GL.CheckFramebufferStatus(GLFramebuffer);
-				if (status != GLFramebufferComplete)
-				{
-					string message = "Framebuffer Incomplete.";
-					switch (status)
-					{
-					case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
-					case FramebufferErrorCode.FramebufferIncompleteMissingAttachment : message = "No images are attached to the framebuffer."; break;
-					case FramebufferErrorCode.FramebufferUnsupported : message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
-					//case FramebufferErrorCode.FramebufferIncompleteDimensions : message = "Not all attached images have the same width and height."; break;
-					}
-					throw new InvalidOperationException(message);
-				}
+                if (status != GLFramebufferComplete)
+                {
+                    string message = "Framebuffer Incomplete.";
+                    switch (status)
+                    {
+                    case FramebufferErrorCode.FramebufferIncompleteAttachment: message = "Not all framebuffer attachment points are framebuffer attachment complete."; break;
+                    case FramebufferErrorCode.FramebufferIncompleteMissingAttachment : message = "No images are attached to the framebuffer."; break;
+                    case FramebufferErrorCode.FramebufferUnsupported : message = "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions."; break;
+#if GLES
+                    case FramebufferErrorCode.FramebufferIncompleteDimensions : message = "Not all attached images have the same width and height."; break;
+#else
+                    case FramebufferErrorCode.FramebufferIncompleteDimensionsExt: message = "Not all attached images have the same width and height."; break;
+#endif
+
+                    }
+                    throw new InvalidOperationException(message);
+                }
                                 
 #endif
                 // Set the viewport to the size of the first render target.
@@ -1648,13 +1647,18 @@ namespace Microsoft.Xna.Framework.Graphics
 					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
 					if (renderTarget.LevelCount > 1)
 					{
-						throw new NotImplementedException();
-						/*
 						GL.ActiveTexture(TextureUnit.Texture0);
-						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
-						GL.GenerateMipmap(TextureTarget.Texture2D);
-						GL.BindTexture(TextureTarget.Texture2D, 0);
-                        */
+                        GraphicsExtensions.CheckGLError();
+                        GL.BindTexture(renderTarget.glTarget, renderTarget.glTexture);
+                        GraphicsExtensions.CheckGLError();
+#if GLES
+                        GL.GenerateMipmap(renderTarget.glTarget);
+#else
+                        GL.GenerateMipmap((GenerateMipmapTarget)renderTarget.glTarget);
+#endif
+                        GraphicsExtensions.CheckGLError();
+                        GL.BindTexture(renderTarget.glTarget, 0);
+                        GraphicsExtensions.CheckGLError();
 					}
 				}
 			}
