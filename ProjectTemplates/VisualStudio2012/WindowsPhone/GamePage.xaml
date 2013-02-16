@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <MediaElement x:Name="XnaMediaElement" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
         <!-- LOCALIZATION NOTE:
             To localize the displayed strings copy their values to appropriately named

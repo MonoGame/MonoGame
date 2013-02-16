@@ -120,8 +120,9 @@ namespace MonoGame.Framework.WindowsPhone
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
+        /// <param name="mediaElement">The XAML media element to use for playing music and video.</param>
         /// <returns></returns>
-        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface)
+        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface, MediaElement mediaElement)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
@@ -140,6 +141,8 @@ namespace MonoGame.Framework.WindowsPhone
             // Hookup the handlers for updates and touch.
             drawingSurface.SetBackgroundContentProvider(new SurfaceUpdateHandler(game));
             drawingSurface.SetBackgroundManipulationHandler(new SurfaceTouchHandler());
+
+            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             // Return the constructed, but not initialized game.
             return game;
