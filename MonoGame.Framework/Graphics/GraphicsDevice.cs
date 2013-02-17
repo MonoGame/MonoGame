@@ -355,44 +355,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
-        public GraphicsDevice (GraphicsAdapter adapater, GraphicsProfile profile, PresentationParameters parameters)
-        {
-            // Initialize the main viewport
-            _viewport = new Viewport(0, 0,
-                                     DisplayMode.Width, DisplayMode.Height);
-            _viewport.MaxDepth = 1.0f;
-
-            MaxTextureSlots = 16;
-#if OPENGL
-#if GLES
-            GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(All.MaxVertexAttribs, ref MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(All.MaxTextureSize, ref _maxTextureSize);
-            GraphicsExtensions.CheckGLError();
-#elif OPENGL
-            GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(GetPName.MaxVertexAttribs, out MaxVertexAttributes);
-            GraphicsExtensions.CheckGLError();
-
-            GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
-            GraphicsExtensions.CheckGLError();
-#endif
-            _extensions = GetGLExtensions();
-#endif // OPENGL
-
-            Textures = new TextureCollection(MaxTextureSlots);
-            SamplerStates = new SamplerStateCollection(MaxTextureSlots);
-
-            PresentationParameters = parameters;
-            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
-        }
-
         ~GraphicsDevice()
         {
             Dispose(false);
@@ -1424,7 +1386,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Reset(PresentationParameters presentationParameters)
         {
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Reset(PresentationParameters presentationParameters, GraphicsAdapter graphicsAdapter)
@@ -1494,10 +1456,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         _d3dContext.Rasterizer.SetViewports(viewport);
                 }
 #elif OPENGL
-                //if (IsRenderTargetBound)
+                if (IsRenderTargetBound)
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
-                //else
-                //    GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
+                else
+                    GL.Viewport(value.X, PresentationParameters.BackBufferHeight - value.Y - value.Height, value.Width, value.Height);
                 GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
 #if GLES
                 GL.DepthRange(value.MinDepth, value.MaxDepth);
