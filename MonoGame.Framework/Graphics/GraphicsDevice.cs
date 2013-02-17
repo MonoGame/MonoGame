@@ -2267,10 +2267,11 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+            GL.DrawElementsBaseVertex(PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedShort,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))),
+                                vertexOffset);
             GraphicsExtensions.CheckGLError();
 
             // Release the handles.
@@ -2323,10 +2324,11 @@ namespace Microsoft.Xna.Framework.Graphics
             vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
-            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
+            GL.DrawElementsBaseVertex(PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedInt,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))),
+                                vertexOffset);
             GraphicsExtensions.CheckGLError();
 
             // Release the handles.
