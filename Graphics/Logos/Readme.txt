@@ -15,6 +15,13 @@ NOTES ABOUT THE MONOGAME LOGO AND LOGOTYPE
 11. Template bugs for platform identification are placed in the upper left of the 
     template icon. The bug height is no larger than 40 pixels.
 12. All pixel measurements are based upon screen pitch of 72 dpi.
+13. The "Transparent" directory contains versions of the logo with a transparent background.
+    All versions of the logo (logo and logotype) are supported here.
+14. The "DarkBackground" directory contains the logotype imagery for use on a dark
+    background. Only the Mono Game text is altered in these files. The alteration is to
+    set the foreground of the text to be white with a transparent image background.
+14. Dark background imagery only goes down to 96x96 because the Mono Game logotype
+    does not convery to smaller sizes. Use the transparent graphics for smaller sizes.
 
 The template splash screens are 480 x 800 to match the default screen format
 of the XNA devices, e.g. Windows 7 and Windows 8 phone devices. A landscape format
@@ -61,6 +68,8 @@ http://www.apple.com/legal/trademark/guidelinesfor3rdparties.html
 
 Microsoft:
 http://www.microsoft.com/about/legal/en/us/intellectualproperty/trademarks/usage/windows.aspx
+NOTE: Use of the windows logo is not allowed because MonoGame has not passed any
+      Windows Logo Testing certifications.
 
 Linux:
 http://www.linuxfoundation.org/about/linux-foundation-trademark-usage-guidelines

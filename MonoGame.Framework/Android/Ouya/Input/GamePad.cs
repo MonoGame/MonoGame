@@ -169,8 +169,8 @@ namespace Microsoft.Xna.Framework.Input
 			if (e.Action != MotionEventActions.Move)
 				return false;
 
-			gamePad._leftStick = new Vector2(e.GetAxisValue(Axis.X), e.GetAxisValue(Axis.Y));
-			gamePad._rightStick = new Vector2(e.GetAxisValue(Axis.Z), e.GetAxisValue(Axis.Rz));
+			gamePad._leftStick = new Vector2(e.GetAxisValue(Axis.X), -e.GetAxisValue(Axis.Y));
+			gamePad._rightStick = new Vector2(e.GetAxisValue(Axis.Z), -e.GetAxisValue(Axis.Rz));
 			gamePad._leftTrigger = e.GetAxisValue(Axis.Ltrigger);
 			gamePad._rightTrigger = e.GetAxisValue(Axis.Rtrigger);
 

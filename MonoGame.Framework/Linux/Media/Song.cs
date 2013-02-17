@@ -57,7 +57,12 @@ namespace Microsoft.Xna.Framework.Media
 		private int _volume; // in SDL units from 0 to 128
 
 		internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-		
+
+        internal Song(string fileName, int durationMS)
+            : this(fileName)
+        {
+            _Duration = TimeSpan.FromMilliseconds(durationMS);
+        }
 		internal Song(string fileName)
 		{			
 			_name = fileName;
@@ -174,14 +179,14 @@ namespace Microsoft.Xna.Framework.Media
 			}			
 		}
 		
-		// TODO: Implement
-		public TimeSpan Duration
+        // Returns the duration of song
+        public TimeSpan Duration
 		{
 			get {
-				// sdl doesn't seem to provide this..
-				return new TimeSpan(0);
+				return _Duration;
 			}
 		}
+        private TimeSpan _Duration = TimeSpan.Zero;
 		
 		// TODO: Implement
 		public TimeSpan Position
