@@ -2262,16 +2262,17 @@ namespace Microsoft.Xna.Framework.Graphics
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
 
+            var vertexAddr = (IntPtr)(vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset);
+
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
+            vertexDeclaration.Apply(_vertexShader, vertexAddr);
 
             //Draw
-            GL.DrawElementsBaseVertex(PrimitiveTypeGL(primitiveType),
+            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedShort,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))),
-                                vertexOffset);
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(short))));
             GraphicsExtensions.CheckGLError();
 
             // Release the handles.
@@ -2319,16 +2320,17 @@ namespace Microsoft.Xna.Framework.Graphics
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
             var ibHandle = GCHandle.Alloc(indexData, GCHandleType.Pinned);
 
+            var vertexAddr = (IntPtr)(vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset);
+
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
+            vertexDeclaration.Apply(_vertexShader, vertexAddr);
 
             //Draw
-            GL.DrawElementsBaseVertex(PrimitiveTypeGL(primitiveType),
+            GL.DrawElements(    PrimitiveTypeGL(primitiveType),
                                 GetElementCountArray(primitiveType, primitiveCount),
                                 DrawElementsType.UnsignedInt,
-                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))),
-                                vertexOffset);
+                                (IntPtr)(ibHandle.AddrOfPinnedObject().ToInt64() + (indexOffset * sizeof(int))));
             GraphicsExtensions.CheckGLError();
 
             // Release the handles.
