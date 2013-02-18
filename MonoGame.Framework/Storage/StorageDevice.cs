@@ -204,6 +204,12 @@ namespace Microsoft.Xna.Framework.Storage
         /// </summary>
 		public static event EventHandler<EventArgs> DeviceChanged;
 
+#if WINRT
+        // Dirty trick to avoid the need to get the delegate from the IAsyncResult (can't be done in WinRT)
+        static Delegate showDelegate;
+        static Delegate containerDelegate;
+#endif
+
 		// Summary:
 		//     Begins the process for opening a StorageContainer containing any files for
 		//     the specified title.
@@ -228,7 +234,10 @@ namespace Microsoft.Xna.Framework.Storage
 		{
 			try {
 				OpenContainerAsynchronous AsynchronousOpen = new OpenContainerAsynchronous (Open);
-				return AsynchronousOpen.BeginInvoke (displayName, callback, state);
+#if WINRT
+                containerDelegate = AsynchronousOpen;
+#endif
+                return AsynchronousOpen.BeginInvoke (displayName, callback, state);
 			} finally {
 			}
 		}
@@ -301,8 +310,13 @@ namespace Microsoft.Xna.Framework.Storage
 		public static IAsyncResult BeginShowSelector (int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
 			var del = new ShowSelectorAsynchronousShowNoPlayer (Show);
+
+#if WINRT
+            showDelegate = del;
+#endif
 			return del.BeginInvoke(sizeInBytes, directoryCount, callback, state);
 		}
+
 		
 		//
 		// Summary:
@@ -332,8 +346,11 @@ namespace Microsoft.Xna.Framework.Storage
 		public static IAsyncResult BeginShowSelector (PlayerIndex player, int sizeInBytes, int directoryCount, AsyncCallback callback, object state)
 		{
 			var del = new ShowSelectorAsynchronousShow (Show);
-			return del.BeginInvoke(player, sizeInBytes, directoryCount, callback, state);
-		}
+#if WINRT
+            showDelegate = del;
+#endif
+            return del.BeginInvoke(player, sizeInBytes, directoryCount, callback, state);
+        }
 	
 		// Private method to handle the creation of the StorageDevice
 		private static StorageDevice Show (PlayerIndex player, int sizeInBytes, int directoryCount)
@@ -370,7 +387,7 @@ namespace Microsoft.Xna.Framework.Storage
 			try {
 #if WINRT
                 // AsyncResult does not exist in WinRT
-                var asyncResult = result.AsyncState as OpenContainerAsynchronous;
+                var asyncResult = containerDelegate as OpenContainerAsynchronous;
 				if (asyncResult != null)
 				{
 					// Wait for the WaitHandle to become signaled.
@@ -379,6 +396,7 @@ namespace Microsoft.Xna.Framework.Storage
 					// Call EndInvoke to retrieve the results.
     				returnValue = asyncResult.EndInvoke(result);
 				}
+                containerDelegate = null;
 #else
 				// Retrieve the delegate.
 				AsyncResult asyncResult = result as AsyncResult;
@@ -414,24 +432,26 @@ namespace Microsoft.Xna.Framework.Storage
 		//     The IAsyncResult returned from BeginShowSelector.
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
-#if WINRT
-            throw new NotImplementedException();
-#else
-
-
-			// Retrieve the delegate.
-			AsyncResult asyncResult = (AsyncResult)result;
 
 			if (!result.IsCompleted) {
 				// Wait for the WaitHandle to become signaled.
 				try {
 					result.AsyncWaitHandle.WaitOne ();
 				} finally {
+#if !WINRT
 					result.AsyncWaitHandle.Close ();
+#endif
 				}
 			}
+#if WINRT
+            var del = showDelegate;
+            showDelegate = null;
+#else
+			// Retrieve the delegate.
+			AsyncResult asyncResult = (AsyncResult)result;
 
-			var del = asyncResult.AsyncDelegate;
+            var del = asyncResult.AsyncDelegate;
+#endif
 
 			if (del is ShowSelectorAsynchronousShow)
 				return (del as ShowSelectorAsynchronousShow).EndInvoke (result);
@@ -439,7 +459,6 @@ namespace Microsoft.Xna.Framework.Storage
 				return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke (result);
 			else
 				throw new ArgumentException ("result");
-#endif
 		}
 		
 		internal static string StorageRoot
