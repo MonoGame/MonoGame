@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework
             _view.Game = game;
             this.Window = _view;
 
-            this.IsMouseVisible = true;
+            this.IsMouseVisible = false;
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
