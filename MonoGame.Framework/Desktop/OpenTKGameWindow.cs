@@ -58,6 +58,9 @@ namespace Microsoft.Xna.Framework
     {
         private bool _isResizable;
         private bool _isBorderless;
+#if WINDOWS
+        private bool _isMouseHidden;
+#endif
         private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle = IntPtr.Zero;
         private OpenTK.GameWindow window;
@@ -272,6 +275,28 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(keys);
         }
 
+#if WINDOWS
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!game.IsMouseVisible && !_isMouseHidden)
+            {
+                _isMouseHidden = true;
+                System.Windows.Forms.Cursor.Hide();
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            //There is a bug in OpenTK where the MouseLeave event is raised when the mouse button
+            //is down while the cursor is still in the window bounds.
+            if (_isMouseHidden && Mouse.GetState().LeftButton == ButtonState.Released)
+            {
+                _isMouseHidden = false;
+                System.Windows.Forms.Cursor.Show();
+            }
+        }
+#endif
+
         #endregion
 
         private void Initialize()
@@ -284,7 +309,11 @@ namespace Microsoft.Xna.Framework
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);                        
+            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+#if WINDOWS
+            window.MouseEnter += OnMouseEnter;
+            window.MouseLeave += OnMouseLeave;
+#endif
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
