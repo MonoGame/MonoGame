@@ -249,15 +249,16 @@ namespace Microsoft.Xna.Framework
         {
             
         }
-  
+#if LINUX
         protected override void OnIsMouseVisibleChanged()
         {
             MouseState oldState = Mouse.GetState();
             _view.Window.CursorVisible = IsMouseVisible;
-            // IsMouseVisible changes the location of the cursor on Linux (and Windows?) and we have to manually set it back to the correct position
+            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
             System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
             OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
         }
+#endif
         
         public override void Log(string Message)
         {
