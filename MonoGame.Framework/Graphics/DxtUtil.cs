@@ -339,12 +339,12 @@ namespace Microsoft.Xna.Framework.Graphics
             byte alpha0 = imageReader.ReadByte();
             byte alpha1 = imageReader.ReadByte();
 
-            ulong alphaMask = 0;
-
-            for (int i = 0; i < 6; i++)
-            {
-                alphaMask += ((ulong)imageReader.ReadByte()) << i * 8;
-            }
+            ulong alphaMask = (ulong)imageReader.ReadByte();
+            alphaMask += (ulong)imageReader.ReadByte() << 8;
+            alphaMask += (ulong)imageReader.ReadByte() << 16;
+            alphaMask += (ulong)imageReader.ReadByte() << 24;
+            alphaMask += (ulong)imageReader.ReadByte() << 32;
+            alphaMask += (ulong)imageReader.ReadByte() << 40;
 
             ushort c0 = imageReader.ReadUInt16();
             ushort c1 = imageReader.ReadUInt16();
