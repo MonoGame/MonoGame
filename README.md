@@ -1,4 +1,4 @@
-# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://sickie.sickheadgames.com:8080/job/develop/badge/icon)](http://sickie.sickheadgames.com:8080/job/develop/)
+# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://build.monogame.net/job/develop-win/badge/icon)](http://build.monogame.net/job/develop-win/)
 
 [MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework. 
 
