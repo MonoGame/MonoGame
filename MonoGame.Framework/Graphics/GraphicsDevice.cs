@@ -2461,31 +2461,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
-
-		/// <summary>
-		/// 	Gets the size of the max texture.
-		/// </summary>
-		/// <value>
-		/// 	The size of the max texture.
-		/// </value>
-		/// <remarks>
-		/// 	On Windows with DirectX the limit is based on the <see cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsProfile"/>. If it's set to <see cref="Microsoft.Xna.Framework.Graphics.GraphicsProfile.Reach"/> the value is 2024, if set to <see cref="Microsoft.Xna.Framework.Graphics.Graphics.GraphicsProfile.HiDef"/> then the value is 4096. On all other platforms it returns the lesser of the screen width or height.
-		/// </remarks>			
-		public int MaxTextureSize
-		{
-			get
-			{
-#if WINDOWS && DIRECTX
-				if (GraphicsProfile == GraphicsProfile.Reach)
-				{
-					return 2048;
-				}
-				return 4096;
-#else
-				return Math.Min(DisplayMode.Width, DisplayMode.Height);
-#endif
-			}
-		}
-
+		
     }
 }
