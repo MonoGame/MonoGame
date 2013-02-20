@@ -1508,9 +1508,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
+#if PSM
+                _graphics.SetFrameBuffer(null);
+#else
                 SetRenderTargets(null);
+#endif
 			else
+#if PSM
+                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
+#else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
+#endif
 		}
 		
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 

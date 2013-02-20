@@ -4,6 +4,7 @@ using PssMatrix4 = Sce.PlayStation.Core.Matrix4;
 using PssPixelFormat = Sce.PlayStation.Core.Graphics.PixelFormat;
 using PssVertexFormat = Sce.PlayStation.Core.Graphics.VertexFormat;
 using PssDrawMode = Sce.PlayStation.Core.Graphics.DrawMode;
+using Sce.PlayStation.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -29,6 +30,52 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PssDrawMode.TriangleStrip;
             }
 
+            throw new NotImplementedException();
+        }
+        
+        public static BlendFuncFactor ToBlendFuncFactor(Blend format)
+        {
+            switch(format)
+            {
+                case Blend.DestinationAlpha :
+                    return BlendFuncFactor.DstAlpha;
+                case Blend.DestinationColor :
+                    return BlendFuncFactor.DstColor;
+                case Blend.InverseBlendFactor :
+                    throw new NotSupportedException();
+                case Blend.InverseDestinationAlpha :
+                    return BlendFuncFactor.OneMinusDstAlpha;
+                case Blend.InverseDestinationColor :
+                    return BlendFuncFactor.OneMinusDstColor;
+                case Blend.InverseSourceAlpha :
+                    return BlendFuncFactor.OneMinusSrcAlpha;
+                case Blend.InverseSourceColor :
+                    return BlendFuncFactor.OneMinusSrcColor;
+                case Blend.One :
+                    return BlendFuncFactor.One;
+                case Blend.SourceAlpha :
+                    return BlendFuncFactor.SrcAlpha;
+                case Blend.SourceAlphaSaturation :
+                    return BlendFuncFactor.SrcAlphaSaturate;
+                case Blend.SourceColor :
+                    return BlendFuncFactor.SrcColor;
+                case Blend.Zero :
+                    return BlendFuncFactor.Zero;
+            }
+            throw new NotImplementedException();
+        }
+        
+        public static BlendFuncMode ToBlendFuncMode(BlendFunction format)
+        {
+            switch(format)
+            {
+                case BlendFunction.Add  :
+                    return BlendFuncMode.Add;
+                case BlendFunction.ReverseSubtract  :
+                    return BlendFuncMode.ReverseSubtract;
+                case BlendFunction.Subtract  :
+                    return BlendFuncMode.Subtract;    
+            }
             throw new NotImplementedException();
         }
         

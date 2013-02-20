@@ -80,6 +80,7 @@ using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
+using Sce.PlayStation.Core.Graphics;
 
 #if WINRT
 #if WINDOWS_PHONE
@@ -170,7 +171,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSM
-			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+            PixelBufferOption option = PixelBufferOption.None;
+            if (renderTarget)
+			    option = PixelBufferOption.Renderable;
+             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;

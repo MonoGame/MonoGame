@@ -39,6 +39,7 @@
 #endregion License
 
 using System;
+using Sce.PlayStation.Core.Graphics;
 
 #if OPENGL
 #if MONOMAC
@@ -74,6 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 		internal uint glDepthStencilBuffer;
         internal uint glFramebuffer;
+#elif PSM
+        internal FrameBuffer _frameBuffer;
 #endif
 
 		public DepthFormat DepthStencilFormat { get; private set; }
@@ -96,6 +99,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             // Create a view interface on the rendertarget to use on bind.
             _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(graphicsDevice._d3dDevice, _texture);
+#elif PSM
+            _frameBuffer = new FrameBuffer();     
+            _frameBuffer.SetColorTarget(_texture2D,0);
 #endif
 
             // If we don't need a depth buffer then we're done.
@@ -133,7 +139,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     Format = SharpDXHelper.ToFormat(preferredDepthFormat),
                     Dimension = SharpDX.Direct3D11.DepthStencilViewDimension.Texture2D 
                 });
-
+#elif PSM
+            throw new NotImplementedException();
 #elif OPENGL
 
 #if GLES
@@ -182,6 +189,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _depthStencilView = null;
                     }
                 }
+#elif PSM
+                _frameBuffer.Dispose();
 #elif OPENGL
                 GraphicsDevice.AddDisposeAction(() =>
                     {
