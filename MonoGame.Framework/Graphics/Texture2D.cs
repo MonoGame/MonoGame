@@ -410,18 +410,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if IOS 
-			throw new NotImplementedException();
-#elif ANDROID
-			if (data == null)
-            {
+            if (data == null || data.Length == 0)
                 throw new ArgumentException("data cannot be null");
-            }
-
             if (data.Length < startIndex + elementCount)
-            {
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
-            }
+
+#if IOS
+
+            // Reading back a texture from GPU memory is unsupported
+            // in OpenGL ES 2.0 and no work around has been implemented.           
+            throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
+
+#elif ANDROID
 
             Rectangle r;
             if (rect != null)
@@ -537,7 +537,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("GetData not implemented for type.");
             }
 #elif PSM
+
             throw new NotImplementedException();
+
 #elif DIRECTX
 
             // Create a temp staging resource for copying the data.
