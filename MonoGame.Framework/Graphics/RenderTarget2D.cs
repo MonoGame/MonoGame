@@ -39,8 +39,9 @@
 #endregion License
 
 using System;
+#if PSM
 using Sce.PlayStation.Core.Graphics;
-
+#endif
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -74,7 +75,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 #elif OPENGL
 		internal uint glDepthStencilBuffer;
-        internal uint glFramebuffer;
 #elif PSM
         internal FrameBuffer _frameBuffer;
 #endif
@@ -196,12 +196,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         GL.DeleteRenderbuffers(1, ref this.glDepthStencilBuffer);
                         GraphicsExtensions.CheckGLError();
-
-                        if (this.glFramebuffer > 0)
-                        {
-                            GL.DeleteFramebuffers(1, ref this.glFramebuffer);
-                            GraphicsExtensions.CheckGLError();
-                        }
                     });
 #endif
             }
