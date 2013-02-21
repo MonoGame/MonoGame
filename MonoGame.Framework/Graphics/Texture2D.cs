@@ -41,6 +41,8 @@ purpose and non-infringement.
 using System;
 #if !PSM
 using System.Drawing;
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -80,7 +82,6 @@ using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
-using Sce.PlayStation.Core.Graphics;
 
 #if WINRT
 #if WINDOWS_PHONE
