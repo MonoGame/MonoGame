@@ -7,9 +7,9 @@
   <target name="checkos" description="check the operating system">
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
   <if test="${os == 'Unix'}">
-      <if test="${directory::exists('/Application') and directory::exists('/Library')}">
+      <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
         <property name="os" value="MacOS"/>
-        <if test="!${file::exists{mdtool}}">
+        <if test="${not directory::exists(mdtooldir)}">
           <property name="mdtooldir" value="/Applications/Xamarin\ Studio.app/Contents/MacOS"/>
         </if>
       </if>
