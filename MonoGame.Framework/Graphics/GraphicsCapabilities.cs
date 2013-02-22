@@ -65,9 +65,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal static bool NonPowerOfTwo { get; private set; }
 
+        /// <summary>
+        /// Whether the device supports anisotropic texture filtering
+        /// </summary>
+        internal static bool TextureFilterAnisotric { get; private set; }
+
         internal static void Initialize(GraphicsDevice device)
         {
             NonPowerOfTwo = GetNonPowerOfTwo(device);
+
+#if GLES
+            TextureFilterAnisotric = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
+#else
+            TextureFilterAnisotric = true;
+#endif
         }
 
         static bool GetNonPowerOfTwo(GraphicsDevice device)
