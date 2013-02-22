@@ -45,6 +45,7 @@ using System.IO;
 using System.Threading.Tasks;
 #elif IOS
 using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 #elif MACOS
 using MonoMac.Foundation;
 #elif PSM
@@ -63,6 +64,7 @@ namespace Microsoft.Xna.Framework
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
 #elif IOS || MACOS
 			Location = NSBundle.MainBundle.ResourcePath;
+            SupportRetina = UIScreen.MainScreen.Scale == 2.0f;
 #elif PSM
 			Location = "/Application";
 #else
@@ -71,6 +73,9 @@ namespace Microsoft.Xna.Framework
         }
 
         static internal string Location { get; private set; }
+#if IOS
+        static internal bool SupportRetina { get; private set; }
+#endif
 
 #if WINRT
 
@@ -115,6 +120,19 @@ namespace Microsoft.Xna.Framework
             return stream;
 #elif ANDROID
             return Game.Activity.Assets.Open(safeName);
+#elif IOS
+            var absolutePath = Path.Combine(Location, safeName);
+            if (SupportRetina)
+            {
+                // Insert the @2x immediately prior to the extension. If this file exists
+                // and we are on a Retina device, return this file instead.
+                var absolutePath2x = Path.Combine(Path.GetDirectoryName(absolutePath),
+                                                  Path.GetFileNameWithoutExtension(absolutePath)
+                                                  + "@2x" + Path.GetExtension(absolutePath));
+                if (File.Exists(absolutePath2x))
+                    return File.OpenRead(absolutePath2x);
+            }
+            return File.OpenRead(absolutePath);
 #else
             var absolutePath = Path.Combine(Location, safeName);
             return File.OpenRead(absolutePath);
