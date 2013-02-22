@@ -1513,6 +1513,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
 		}
 		
+        public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
+        {
+            if (renderTarget == null)
+                SetRenderTarget(null);
+            else
+                SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
+        }
+		
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{
             // If the default swap chain is already set then do nothing.
@@ -1527,7 +1535,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
                 {
-                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget)
+                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
+                        _currentRenderTargetBindings[i].CubeMapFace != renderTargets[i].CubeMapFace)
                     {
                         isEqual = false;
                         break;
@@ -1574,9 +1583,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
-
 #if DIRECTX
+                var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
+
                 // Set the new render targets.
                 _currentRenderTargets[0] = null;
                 _currentRenderTargets[1] = null;
@@ -1586,19 +1595,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var b = 0; b < _currentRenderTargetBindings.Length; b++)
                 {
-                    var target = _currentRenderTargetBindings[b]._renderTarget as RenderTarget2D;
-                    _currentRenderTargets[b] = target._renderTargetView;
+                    var binding = _currentRenderTargetBindings[b];
+                    var target = (IRenderTarget)binding.RenderTarget;
+                    var arraySlice = (int)binding.CubeMapFace;
+                    _currentRenderTargets[b] = target.GetRenderTargetView(arraySlice);
+                }
 
                     // Use the depth from the first target.
-                    if (b == 0)
-                        _currentDepthStencilView = target._depthStencilView;
-                }
+                _currentDepthStencilView = renderTarget.GetDepthStencilView();
 
                 // Set the targets.
                 lock (_d3dContext)
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
-
 #elif OPENGL
+                if (_currentRenderTargetBindings[0].RenderTarget is RenderTargetCube)
+                    throw new NotImplementedException("RenderTargetCube not yet implemented.");
+
+                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				if (this.glRenderTargetFrameBuffer == 0)
 				{
 #if GLES
@@ -1652,6 +1665,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
                                 
 #endif
+
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
@@ -1684,7 +1698,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 #if OPENGL
-			// Reset the raster state because we flip verticies
+			// Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
 #endif
