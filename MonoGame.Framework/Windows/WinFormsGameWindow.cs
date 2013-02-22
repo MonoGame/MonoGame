@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -39,13 +39,14 @@ purpose and non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
@@ -59,6 +60,12 @@ namespace MonoGame.Framework
         private List<XnaKey> _keyState = new List<XnaKey>();
 
         private WinFormsGamePlatform _platform;
+
+        private bool _isResizable;
+
+        private bool _isBorderless;
+
+        private bool _isMouseHidden;
 
         #region Internal Properties
 
@@ -83,11 +90,19 @@ namespace MonoGame.Framework
 
         public override bool AllowUserResizing
         {
-            get { return _form.FormBorderStyle == FormBorderStyle.Sizable; }
+            get { return _isResizable; }
             set
             {
-                _form.FormBorderStyle = value ? FormBorderStyle.Sizable : FormBorderStyle.Fixed3D;
-                _form.MaximizeBox = value;
+                if (_isResizable != value)
+                {
+                    _isResizable = value;
+                    _form.MaximizeBox = _isResizable;
+                }
+                else
+                    return;
+                if (_isBorderless)
+                    return;
+                _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
         }
 
@@ -98,6 +113,22 @@ namespace MonoGame.Framework
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
+        }
+
+        public override bool IsBorderless
+        {
+            get { return _isBorderless; }
+            set
+            {
+                if (_isBorderless != value)
+                    _isBorderless = value;
+                else
+                    return;
+                if (_isBorderless)
+                    _form.FormBorderStyle = FormBorderStyle.None;
+                else
+                    _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
+            }
         }
 
         #endregion
@@ -122,6 +153,8 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseState;
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
+            _form.MouseEnter += OnMouseEnter;
+            _form.MouseLeave += OnMouseLeave;
             Keyboard.SetKeys(_keyState);
 
             _form.Activated += OnActivated;
@@ -142,12 +175,26 @@ namespace MonoGame.Framework
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
         {
+            var previousState = Mouse.State.LeftButton;
+            
             Mouse.State.X = mouseEventArgs.X;
             Mouse.State.Y = mouseEventArgs.Y;
             Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
+            
+            TouchLocationState? touchState = null;
+            if (Mouse.State.LeftButton == ButtonState.Pressed)
+                if (previousState == ButtonState.Released)
+                    touchState = TouchLocationState.Pressed;
+                else
+                    touchState = TouchLocationState.Moved;
+            else if (previousState == ButtonState.Pressed)
+                touchState = TouchLocationState.Released;
+
+            if (touchState.HasValue)
+                TouchPanel.AddEvent(0, touchState.Value, new Vector2(Mouse.State.X, Mouse.State.Y), true);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
@@ -161,6 +208,24 @@ namespace MonoGame.Framework
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
             _keyState.Remove(key);
+        }
+
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!_platform.IsMouseVisible && !_isMouseHidden)
+            {
+                _isMouseHidden = true;
+                Cursor.Hide();
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            if (_isMouseHidden)
+            {
+                _isMouseHidden = false;
+                Cursor.Show();
+            }
         }
 
         internal void Initialize()

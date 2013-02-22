@@ -123,6 +123,7 @@
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\Viewport.cs" />
@@ -271,7 +272,7 @@
     <Compile Include="Net\MonoGamerPeer.cs" />
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
-    <Compile Include="PSSuite\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
     <Compile Include="Content\ContentReaders\Vector2Reader.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="PSSuite\Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Effect\EffectParameter.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
@@ -370,6 +372,7 @@
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

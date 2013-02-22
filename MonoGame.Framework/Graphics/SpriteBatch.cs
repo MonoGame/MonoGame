@@ -87,7 +87,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
-
+#if PSM   
+            GraphicsDevice.BlendState = _blendState;
+            _blendState.ApplyState(GraphicsDevice);
+#endif
+            
             _batcher.DrawBatch(_sortMode);
         }
 		
@@ -228,8 +232,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			      sourceRectangle,
 			      color,
 			      rotation,
-			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)texture.Width),
-                              origin.Y * ((float)destinationRectangle.Height / (float)texture.Height)),
+			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
+                        			origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
 			      effect,
 			      depth);
 		}

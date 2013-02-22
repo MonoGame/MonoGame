@@ -3,31 +3,28 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     [ContentTypeWriter]
-    public class TextureContentWriter : ContentTypeWriter<TextureContent>
+    class Texture2DWriter : BuiltInContentWriter<Texture2DContent>
     {
-        protected internal override void Write(ContentWriter output, TextureContent value)
+        protected internal override void Write(ContentWriter output, Texture2DContent value)
         {
             SurfaceFormat format;
             var bmpContent = value.Faces[0][0];
-            if (bmpContent.TryGetFormat(out format))
+            if (!bmpContent.TryGetFormat(out format))
                 throw new Exception("Couldn't get Format for TextureContent.");
 
-            output.WriteObject((int)format);
-            output.WriteObject(bmpContent.Width);
-            output.WriteObject(bmpContent.Height);
+            output.Write((int)format);
+            output.Write(bmpContent.Width);
+            output.Write(bmpContent.Height);
 
             // TODO: is this correct?
             var mipCount = value.Faces.Count * value.Faces[0].Count;
-            output.WriteObject(mipCount); 
+            output.Write(mipCount); 
 
             foreach(var chain in value.Faces)
             {
@@ -38,16 +35,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     output.Write(faceData);
                 }
             }
-        }
-
-        public override string GetRuntimeReader(TargetPlatform targetPlatform)
-        {
-            return typeof(TextureReader).AssemblyQualifiedName;
-        }
-
-        public override string GetRuntimeType(TargetPlatform targetPlatform)
-        {
-            return typeof(TextureReader).AssemblyQualifiedName;
         }
     }
 }

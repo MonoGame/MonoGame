@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Android\AndroidCompatibility.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
     <Compile Include="Android\ScreenReciever.cs" />
-    <Compile Include="Android\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
@@ -414,6 +415,7 @@
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">

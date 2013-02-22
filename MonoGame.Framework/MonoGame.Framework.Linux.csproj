@@ -11,26 +11,26 @@
     <AssemblyName>MonoGame.Framework</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Linux\Debug</OutputPath>
     <DefineConstants>DEBUG;LINUX;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>False</ConsolePause>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Linux\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>False</ConsolePause>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>LINUX;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -135,6 +135,7 @@
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Content\ContentReader.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
@@ -385,10 +386,11 @@
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Input\MouseState.cs" />
-    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\Playlist.cs" />
@@ -401,6 +403,8 @@
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
+    <Compile Include="Media\VideoSoundtrackType.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">

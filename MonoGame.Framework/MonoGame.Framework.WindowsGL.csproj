@@ -99,6 +99,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
@@ -447,7 +448,7 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
-    <Compile Include="Desktop\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
@@ -461,6 +462,7 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

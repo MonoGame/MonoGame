@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// <summary>
     /// Processes a string representation to a platform-specific compiled effect.
     /// </summary>
-    [ContentProcessor(DisplayName = "Effect Processor - MonoGame")]
+    [ContentProcessor(DisplayName = "Effect - MonoGame")]
     public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectContent>
     {
         EffectProcessorDebugMode debugMode;

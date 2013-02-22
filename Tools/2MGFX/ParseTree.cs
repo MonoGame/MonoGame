@@ -245,83 +245,12 @@ namespace TwoMGFX
 
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
         {
-            var pass = paramlist[0] as PassInfo;
-        	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+            var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0)) as string;
         	
-        	Microsoft.Xna.Framework.Graphics.Blend blend;
-        	
-        	switch (name.ToLower())
-        	{
-        		case "alphablendenable":
-        			if (!ParseTreeTools.ParseBool(value))
-        			{
-        				if (pass.blendState == null)
-        					pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        				pass.blendState.AlphaSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-        				pass.blendState.ColorSourceBlend = Microsoft.Xna.Framework.Graphics.Blend.One;
-        				pass.blendState.ColorDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
-        				pass.blendState.AlphaDestinationBlend = Microsoft.Xna.Framework.Graphics.Blend.Zero;
-        			}
-        			break;
-        		case "srcblend":
-        			blend = ParseTreeTools.ParseBlend(value);
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaSourceBlend = blend;
-        			pass.blendState.ColorSourceBlend = blend;
-        			break;
-        		case "destblend":
-        			blend = ParseTreeTools.ParseBlend(value);
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaDestinationBlend = blend;
-        			pass.blendState.ColorDestinationBlend = blend;
-        			break;
-        		case "blendop":
-        			if (pass.blendState == null)
-        				pass.blendState = new Microsoft.Xna.Framework.Graphics.BlendState();
-        			pass.blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
-        			break;
-        		case "zenable":
-        			if (pass.depthStencilState == null)
-        				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
-        			pass.depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "zwriteenable":
-        			if (pass.depthStencilState == null)
-        				pass.depthStencilState = new Microsoft.Xna.Framework.Graphics.DepthStencilState();
-        			pass.depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "depthbias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.DepthBias = float.Parse(value);
-        			break;
-        		case "cullmode":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
-        			break;
-        		case "fillmode":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
-        			break;
-        		case "multisampleantialias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
-        			break;
-        		case "slopescaledepthbias":
-        			if (pass.rasterizerState == null)
-        				pass.rasterizerState= new Microsoft.Xna.Framework.Graphics.RasterizerState();
-        			pass.rasterizerState.SlopeScaleDepthBias = float.Parse(value);
-        			break;
-        		default:
-        			break;
-        	}
-        	
+        	var pass = paramlist[0] as PassInfo;
+        	pass.ParseRenderState(name, value);
+        		
         	return null;
         }
 
@@ -361,47 +290,11 @@ namespace TwoMGFX
 
         protected virtual object EvalSampler_State_Expression(ParseTree tree, params object[] paramlist)
         {
-            var sampler = paramlist[0] as SamplerStateInfo;
-        	var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0))) as string;
-        	switch (name.ToLower())
-        	{
-        		case "texture":
-        			sampler.textureName = value;
-        			break;
-        		case "minfilter":
-        			sampler.MinFilter = ParseTreeTools.ParseTextureFilterType(value);
-        			break;
-        		case "magfilter":
-        			sampler.MagFilter = ParseTreeTools.ParseTextureFilterType(value);
-        			break;
-        		case "mipfilter":
-        			sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
-        			break;
-        		case "filter":
-        			sampler.MinFilter = sampler.MagFilter = sampler.MipFilter = ParseTreeTools.ParseTextureFilterType(value);
-        			break;
-        		case "addressu":
-        			sampler.state.AddressU = ParseTreeTools.ParseAddressMode(value);
-        			break;
-        		case "addressv":
-        			sampler.state.AddressV = ParseTreeTools.ParseAddressMode(value);
-        			break;
-        		case "addressw":
-        			sampler.state.AddressW = ParseTreeTools.ParseAddressMode(value);
-        			break;
-        		case "maxanisotropy":
-        			sampler.state.MaxAnisotropy = int.Parse(value);
-        			break;
-        		case "maxlod":
-        			sampler.state.MaxMipLevel = int.Parse(value);
-        			break;
-        		case "miplodbias":
-        			sampler.state.MipMapLevelOfDetailBias = float.Parse(value);
-        			break;
-        		default:
-        			break;
-        	}
+            var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
+        	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0))) as string;	
+        
+        	var sampler = paramlist[0] as SamplerStateInfo;
+        	sampler.Parse(name, value);
         
         	return null;
         }
@@ -417,34 +310,13 @@ namespace TwoMGFX
         		return null;
         	
         	var sampler = new SamplerStateInfo();
-        	sampler.name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	sampler.state = new Microsoft.Xna.Framework.Graphics.SamplerState();	
+        	sampler.Name = this.GetValue(tree, TokenType.Identifier, 0) as string;
         	
         	foreach (ParseNode node in Nodes)
         		node.Eval(tree, sampler);
-        	
-        	// Figure out what kind of filter to set based on each individual min, mag, and mip filter
-        	if (sampler.MinFilter == TextureFilterType.Anisotropic)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Anisotropic;
-        	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Linear;
-        	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.LinearMipPoint;
-        	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinLinearMagPointMipLinear;
-        	else if (sampler.MinFilter == TextureFilterType.Linear && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinLinearMagPointMipPoint;
-        	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Linear)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinPointMagLinearMipLinear;
-        	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Linear && sampler.MipFilter == TextureFilterType.Point)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.MinPointMagLinearMipPoint;
-        	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Point)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.Point;
-        	else if (sampler.MinFilter == TextureFilterType.Point && sampler.MagFilter == TextureFilterType.Point && sampler.MipFilter == TextureFilterType.Linear)
-        		sampler.state.Filter = Microsoft.Xna.Framework.Graphics.TextureFilter.PointMipLinear;
         
         	var shaderInfo = paramlist[0] as ShaderInfo;
-        	shaderInfo.SamplerStates.Add(sampler.name, sampler);
+        	shaderInfo.SamplerStates.Add(sampler.Name, sampler);
         
         	return null;
         }

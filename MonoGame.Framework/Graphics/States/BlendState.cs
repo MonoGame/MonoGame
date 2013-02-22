@@ -158,22 +158,40 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
         internal void ApplyState(GraphicsDevice device)
         {
-            GL.Enable(EnableCap.Blend);
+            var blendEnabled = !(this.ColorSourceBlend == Blend.One && 
+                                 this.ColorDestinationBlend == Blend.Zero &&
+                                 this.AlphaSourceBlend == Blend.One &&
+                                 this.AlphaDestinationBlend == Blend.Zero);
+            if (blendEnabled)
+                GL.Enable(EnableCap.Blend);
+            else
+                GL.Disable(EnableCap.Blend);
             GraphicsExtensions.CheckGLError();
 
-            // Set blending mode
-            var blendMode = ColorBlendFunction.GetBlendEquationMode();
-            GL.BlendEquation(blendMode);
+            GL.BlendColor(
+                this.BlendFactor.R / 255.0f,      
+                this.BlendFactor.G / 255.0f, 
+                this.BlendFactor.B / 255.0f, 
+                this.BlendFactor.A / 255.0f);
             GraphicsExtensions.CheckGLError();
 
-            // Set blending function
-            var bfs = ColorSourceBlend.GetBlendFactorSrc();
-            var bfd = ColorDestinationBlend.GetBlendFactorDest();
-#if IOS
-			GL.BlendFunc ((All)bfs, (All)bfd);
-#else
-            GL.BlendFunc(bfs, bfd);
-#endif
+            GL.BlendEquationSeparate(
+                this.ColorBlendFunction.GetBlendEquationMode(),
+                this.AlphaBlendFunction.GetBlendEquationMode());
+            GraphicsExtensions.CheckGLError();
+
+            GL.BlendFuncSeparate(
+                this.ColorSourceBlend.GetBlendFactorSrc(), 
+                this.ColorDestinationBlend.GetBlendFactorDest(), 
+                this.AlphaSourceBlend.GetBlendFactorSrc(), 
+                this.AlphaDestinationBlend.GetBlendFactorDest());
+            GraphicsExtensions.CheckGLError();
+
+            GL.ColorMask(
+                (this.ColorWriteChannels & ColorWriteChannels.Red) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Green) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Blue) != 0,
+                (this.ColorWriteChannels & ColorWriteChannels.Alpha) != 0);
             GraphicsExtensions.CheckGLError();
         }
 
@@ -199,12 +217,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                                 AlphaDestinationBlend == Opaque.AlphaDestinationBlend);
 
                 targetDesc.BlendOperation = GetBlendOperation(ColorBlendFunction);
-                targetDesc.SourceBlend = GetBlendOption(ColorSourceBlend);
-                targetDesc.DestinationBlend = GetBlendOption(ColorDestinationBlend);
+                targetDesc.SourceBlend = GetBlendOption(ColorSourceBlend, false);
+                targetDesc.DestinationBlend = GetBlendOption(ColorDestinationBlend, false);
 
                 targetDesc.AlphaBlendOperation = GetBlendOperation(AlphaBlendFunction);
-                targetDesc.SourceAlphaBlend = GetBlendOption(AlphaSourceBlend);
-                targetDesc.DestinationAlphaBlend = GetBlendOption(AlphaDestinationBlend);
+                targetDesc.SourceAlphaBlend = GetBlendOption(AlphaSourceBlend, true);
+                targetDesc.DestinationAlphaBlend = GetBlendOption(AlphaDestinationBlend, true);
 
                 // Set the first 4 targets to the same settings.
                 desc.RenderTarget[0] = targetDesc;
@@ -263,7 +281,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        static private SharpDX.Direct3D11.BlendOption GetBlendOption(Blend blend)
+        static private SharpDX.Direct3D11.BlendOption GetBlendOption(Blend blend, bool alpha)
         {
             switch (blend)
             {
@@ -274,7 +292,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.DestinationAlpha;
 
                 case Blend.DestinationColor:
-                    return SharpDX.Direct3D11.BlendOption.DestinationColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.DestinationAlpha : SharpDX.Direct3D11.BlendOption.DestinationColor;
 
                 case Blend.InverseBlendFactor:
                     return SharpDX.Direct3D11.BlendOption.InverseBlendFactor;
@@ -283,13 +301,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.InverseDestinationAlpha;
 
                 case Blend.InverseDestinationColor:
-                    return SharpDX.Direct3D11.BlendOption.InverseDestinationColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.InverseDestinationAlpha : SharpDX.Direct3D11.BlendOption.InverseDestinationColor;
 
                 case Blend.InverseSourceAlpha:
                     return SharpDX.Direct3D11.BlendOption.InverseSourceAlpha;
 
                 case Blend.InverseSourceColor:
-                    return SharpDX.Direct3D11.BlendOption.InverseSourceColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.InverseSourceAlpha : SharpDX.Direct3D11.BlendOption.InverseSourceColor;
 
                 case Blend.One:
                     return SharpDX.Direct3D11.BlendOption.One;
@@ -301,7 +319,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.SourceAlphaSaturate;
 
                 case Blend.SourceColor:
-                    return SharpDX.Direct3D11.BlendOption.SourceColor;
+                    return alpha ? SharpDX.Direct3D11.BlendOption.SourceAlpha : SharpDX.Direct3D11.BlendOption.SourceColor;
 
                 case Blend.Zero:
                     return SharpDX.Direct3D11.BlendOption.Zero;                    
@@ -323,7 +341,27 @@ namespace Microsoft.Xna.Framework.Graphics
 #if PSM
         internal void ApplyState(GraphicsDevice device)
         {
-            #warning Unimplemented
+            if (device.BlendState == BlendState.Additive)
+            {
+                device._graphics.Enable(EnableMode.Blend);    
+                device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.One);
+            }
+            else if (device.BlendState == BlendState.AlphaBlend)
+            {
+                device._graphics.Enable(EnableMode.Blend);     
+                device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcAlpha, BlendFuncFactor.OneMinusSrcAlpha);
+            }
+            else if (device.BlendState == BlendState.NonPremultiplied)
+            {
+                device._graphics.Enable(EnableMode.Blend);     
+                device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.SrcColor, BlendFuncFactor.OneMinusSrcColor);
+            }
+            else if (device.BlendState == BlendState.Opaque)
+            {
+                device._graphics.Enable(EnableMode.Blend);     
+                device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.Zero);
+            }
+            else device._graphics.Disable(EnableMode.Blend);           
         }
 #endif
 	}

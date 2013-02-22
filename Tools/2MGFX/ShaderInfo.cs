@@ -58,6 +58,96 @@ namespace TwoMGFX
                     throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
             }
         }
+
+	    private static Blend ToAlphaBlend(Blend blend)
+	    {
+	        switch (blend)
+	        {
+	            case Blend.SourceColor:
+	                return Blend.SourceAlpha;
+	            case Blend.InverseSourceColor:
+	                return Blend.InverseSourceAlpha;
+	            case Blend.DestinationColor:
+	                return Blend.DestinationAlpha;
+	            case Blend.InverseDestinationColor:
+	                return Blend.InverseDestinationAlpha;
+	        }
+	        return blend;
+	    }
+
+        public void ParseRenderState(string name, string value)
+        {
+            Blend blend;
+
+            switch (name.ToLower())
+            {
+                case "alphablendenable":
+                    if (!ParseTreeTools.ParseBool(value))
+                    {
+                        if (blendState == null)
+                            blendState = new BlendState();
+                        blendState.ColorSourceBlend = Blend.One;
+                        blendState.AlphaSourceBlend = Blend.One;
+                        blendState.ColorDestinationBlend = Blend.Zero;
+                        blendState.AlphaDestinationBlend = Blend.Zero;
+                    }
+                    break;
+                case "srcblend":
+                    blend = ParseTreeTools.ParseBlend(value);
+                    if (blendState == null)
+                        blendState = new BlendState();
+                    blendState.ColorSourceBlend = blend;
+                    blendState.AlphaSourceBlend = ToAlphaBlend(blend);
+                    break;
+                case "destblend":
+                    blend = ParseTreeTools.ParseBlend(value);
+                    if (blendState == null)
+                        blendState = new BlendState();
+                    blendState.ColorDestinationBlend = blend;
+                    blendState.AlphaDestinationBlend = ToAlphaBlend(blend);
+                    break;
+                case "blendop":
+                    if (blendState == null)
+                        blendState = new BlendState();
+                    blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
+                    break;
+                case "zenable":
+                    if (depthStencilState == null)
+                        depthStencilState = new DepthStencilState();
+                    depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
+                    break;
+                case "zwriteenable":
+                    if (depthStencilState == null)
+                        depthStencilState = new DepthStencilState();
+                    depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
+                    break;
+                case "depthbias":
+                    if (rasterizerState == null)
+                        rasterizerState = new RasterizerState();
+                    rasterizerState.DepthBias = float.Parse(value);
+                    break;
+                case "cullmode":
+                    if (rasterizerState == null)
+                        rasterizerState = new RasterizerState();
+                    rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
+                    break;
+                case "fillmode":
+                    if (rasterizerState == null)
+                        rasterizerState = new RasterizerState();
+                    rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
+                    break;
+                case "multisampleantialias":
+                    if (rasterizerState == null)
+                        rasterizerState = new RasterizerState();
+                    rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
+                    break;
+                case "slopescaledepthbias":
+                    if (rasterizerState == null)
+                        rasterizerState = new RasterizerState();
+                    rasterizerState.SlopeScaleDepthBias = float.Parse(value);
+                    break;
+            }            
+        }
 	}
 
 	public enum TextureFilterType
@@ -67,12 +157,213 @@ namespace TwoMGFX
 
 	public class SamplerStateInfo
 	{
-		public string name;
-        public string textureName;
-		public SamplerState state;
-		public TextureFilterType MinFilter;
-		public TextureFilterType MagFilter;
-		public TextureFilterType MipFilter;
+        private SamplerState _state;
+        
+        private bool _dirty;
+
+        private TextureFilterType _minFilter;
+        private TextureFilterType _magFilter;
+        private TextureFilterType _mipFilter;
+
+        private TextureAddressMode _addressU;
+        private TextureAddressMode _addressV;
+        private TextureAddressMode _addressW;
+
+	    private int _maxAnisotropy;
+        private int _maxMipLevel;
+	    private float _mipMapLevelOfDetailBias;
+
+        public string Name { get; set; }
+
+        public string TextureName { get; set; }
+
+	    public TextureFilterType MinFilter
+	    {
+            set
+            {
+                if (_minFilter == value) 
+                    return;
+                _minFilter = value;
+                _dirty = true;
+            }
+	    }
+
+        public TextureFilterType MagFilter
+        {
+            set
+            {
+                if (_magFilter == value) 
+                    return;
+                _magFilter = value;
+                _dirty = true;
+            }
+        }
+
+        public TextureFilterType MipFilter
+        {
+            set
+            {
+                if (_mipFilter == value) 
+                    return;
+                _mipFilter = value;
+                _dirty = true;
+            }
+        }
+
+        public TextureAddressMode AddressU
+        {
+            set
+            {
+                if (_addressU == value)
+                    return;
+                _addressU = value;
+                _dirty = true;
+            }
+        }
+
+        public TextureAddressMode AddressV
+        {
+            set
+            {
+                if (_addressV == value)
+                    return;
+                _addressV = value;
+                _dirty = true;
+            }
+        }
+
+        public TextureAddressMode AddressW
+        {
+            set
+            {
+                if (_addressW == value)
+                    return;
+                _addressW = value;
+                _dirty = true;
+            }
+        }
+
+        public int MaxAnisotropy
+        {
+            set
+            {
+                if (_maxAnisotropy == value)
+                    return;
+                _maxAnisotropy = value;
+                _dirty = true;
+            }
+        }
+
+        public int MaxMipLevel
+        {
+            set
+            {
+                if (_maxMipLevel == value)
+                    return;
+                _maxMipLevel = value;
+                _dirty = true;
+            }
+        }
+
+        public float MipMapLevelOfDetailBias
+        {
+            set
+            {
+                if (_mipMapLevelOfDetailBias == value)
+                    return;
+                _mipMapLevelOfDetailBias = value;
+                _dirty = true;
+            }
+        }
+
+        private void UpdateSamplerState()
+        {
+            // Get the existing state or create it.
+            if (_state == null)
+                _state = new SamplerState();
+
+            _state.AddressU = _addressU;
+            _state.AddressV = _addressV;
+            _state.AddressW = _addressW;
+
+            _state.MaxAnisotropy = _maxAnisotropy;
+            _state.MaxMipLevel = _maxMipLevel;
+            _state.MipMapLevelOfDetailBias = _mipMapLevelOfDetailBias;
+
+            // Figure out what kind of filter to set based on each
+            // individual min, mag, and mip filter settings.
+            if (_minFilter == TextureFilterType.Anisotropic)
+                _state.Filter = TextureFilter.Anisotropic;
+            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Linear)
+                _state.Filter = TextureFilter.Linear;
+            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Point)
+                _state.Filter = TextureFilter.LinearMipPoint;
+            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
+                _state.Filter = TextureFilter.MinLinearMagPointMipLinear;
+            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Point)
+                _state.Filter = TextureFilter.MinLinearMagPointMipPoint;
+            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Linear)
+                _state.Filter = TextureFilter.MinPointMagLinearMipLinear;
+            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Point)
+                _state.Filter = TextureFilter.MinPointMagLinearMipPoint;
+            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Point)
+                _state.Filter = TextureFilter.Point;
+            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
+                _state.Filter = TextureFilter.PointMipLinear;
+
+            _dirty = false;
+        }
+
+        public void Parse(string name, string value)
+        {
+            switch (name.ToLower())
+            {
+                case "texture":
+                    TextureName = value;
+                    break;
+                case "minfilter":
+                    MinFilter = ParseTreeTools.ParseTextureFilterType(value);
+                    break;
+                case "magfilter":
+                    MagFilter = ParseTreeTools.ParseTextureFilterType(value);
+                    break;
+                case "mipfilter":
+                    MipFilter = ParseTreeTools.ParseTextureFilterType(value);
+                    break;
+                case "filter":
+                    MinFilter = MagFilter = MipFilter = ParseTreeTools.ParseTextureFilterType(value);
+                    break;
+                case "addressu":
+                    AddressU = ParseTreeTools.ParseAddressMode(value);
+                    break;
+                case "addressv":
+                    AddressV = ParseTreeTools.ParseAddressMode(value);
+                    break;
+                case "addressw":
+                    AddressW = ParseTreeTools.ParseAddressMode(value);
+                    break;
+                case "maxanisotropy":
+                    MaxAnisotropy = int.Parse(value);
+                    break;
+                case "maxlod":
+                    MaxMipLevel = int.Parse(value);
+                    break;
+                case "miplodbias":
+                    MipMapLevelOfDetailBias = float.Parse(value);
+                    break;
+            }            
+        }
+
+        public SamplerState State
+	    {
+	        get
+	        {
+	            if (_dirty)
+                    UpdateSamplerState();
+
+	            return _state;
+	        }
+	    }
 	}
 
 	public class TechniqueInfo

@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -16,11 +17,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         readonly Dictionary<Type, Type> typeWriterMap = new Dictionary<Type, Type>();
 
+        /// <summary>
+        /// Initializes a new instance of ContentCompiler.
+        /// </summary>
         internal ContentCompiler()
         {
             GetTypeWriters();
         }
 
+        /// <summary>
+        /// Iterates through all loaded assemblies and finds the content type writers.
+        /// </summary>
         void GetTypeWriters()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -36,13 +43,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     continue;
                 }
 
+                var contentTypeWriterType = typeof(ContentTypeWriter<>);
                 foreach (var type in exportedTypes)
                 {
                     if (type.IsAbstract)
                         continue;
                     if (Attribute.IsDefined(type, typeof(ContentTypeWriterAttribute)))
                     {
-                        typeWriterMap.Add(type.BaseType, type);
+                        // Find the content type this writer implements
+                        Type baseType = type.BaseType;
+                        while ((baseType != null) && (baseType.GetGenericTypeDefinition() != contentTypeWriterType))
+                            baseType = baseType.BaseType;
+                        if (baseType != null)
+                            typeWriterMap.Add(baseType, type);
                     }
                 }
             }
@@ -56,11 +69,56 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This should be called from the ContentTypeWriter.Initialize method.</remarks>
         public ContentTypeWriter GetTypeWriter(Type type)
         {
-            Type contentType = typeof(ContentTypeWriter<>).MakeGenericType(type);
+            ContentTypeWriter result = null;
+            var contentTypeWriterType = typeof(ContentTypeWriter<>).MakeGenericType(type);
             Type typeWriterType;
-            if (!typeWriterMap.TryGetValue(contentType, out typeWriterType))
-                throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
-            var result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            if (!typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
+            {
+                var inputTypeDef = type.GetGenericTypeDefinition();
+
+                Type chosen = null;
+                foreach (var kvp in typeWriterMap)
+                {
+                    var args = kvp.Key.GetGenericArguments();
+
+                    if (args.Length == 0)
+                        continue;
+
+                    if (!args[0].IsGenericType)
+                        continue;
+
+                    // Compare generic type definition
+                    var keyTypeDef = args[0].GetGenericTypeDefinition();
+                    if (inputTypeDef.Equals(keyTypeDef))
+                    {
+                        chosen = kvp.Value;
+                        break;
+                    }
+                }
+
+                try
+                {
+                    var concreteType = type.GetGenericArguments();
+                    result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+
+                    // save it for next time.
+                    typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                }
+                catch (Exception)
+                {
+                    throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
+                }
+            }
+            else
+            {
+                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            }
+
+            if (result != null)
+            {
+                MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
+                dynMethod.Invoke(result, new object[] { this });
+            }
             return result;
         }
 

@@ -58,11 +58,12 @@
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
     <Compile Include="Android\OrientationListener.cs" />
     <Compile Include="Android\ScreenReciever.cs" />
-    <Compile Include="Android\TitleContainer.cs" />
+    <Compile Include="TitleContainer.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
@@ -412,6 +413,7 @@
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">

@@ -15,53 +15,88 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	internal sealed class OpenALSoundController : IDisposable
 	{
-		static OpenALSoundController _instance = null;
-		IntPtr _device;
-		ContextHandle _context;
+        private static OpenALSoundController _instance = null;
+        private IntPtr _device;
+        private ContextHandle _context;
 		//int outputSource;
 		//int[] buffers;
-		AlcError _lastOpenALError;
-		int[] allSourcesArray;
-		const int MAX_NUMBER_OF_SOURCES = 32;
-		const double PREFERRED_MIX_RATE = 44100;
-		HashSet<int> availableSourcesCollection;
-		HashSet<OALSoundBuffer> inUseSourcesCollection;
-		HashSet<OALSoundBuffer> playingSourcesCollection;
-        HashSet<OALSoundBuffer> purgeMe;
+        private AlcError _lastOpenALError;
+        private int[] allSourcesArray;
+        private const int MAX_NUMBER_OF_SOURCES = 32;
+        private const double PREFERRED_MIX_RATE = 44100;
+        private List<int> availableSourcesCollection;
+        private List<OALSoundBuffer> inUseSourcesCollection;
+        private List<OALSoundBuffer> playingSourcesCollection;
+        private List<OALSoundBuffer> purgeMe;
+        private bool _bSoundAvailable = false;
 
+        /// <summary>
+        /// Sets up the hardware resources used by the controller.
+        /// </summary>
 		private OpenALSoundController ()
 		{
-#if MACOSX || IOS
-			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
-#endif
-			_device = Alc.OpenDevice (string.Empty);
-			CheckALError ("Could not open AL device");
-			if (_device != IntPtr.Zero) {
-				int[] attribute = new int[0];
-				_context = Alc.CreateContext (_device, attribute);
-				CheckALError ("Could not open AL context");
+            if (!OpenSoundController())
+            {
+                return;
+            }
+            // We have hardware here and it is ready
+            _bSoundAvailable = true;
 
-				if (_context != ContextHandle.Zero) {
-					Alc.MakeContextCurrent (_context);
-					CheckALError ("Could not make AL context current");
-				}
-			} else {
-				return;
-			}
 
 			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
 			AL.GenSources (allSourcesArray);
 
-			availableSourcesCollection = new HashSet<int> ();
-			inUseSourcesCollection = new HashSet<OALSoundBuffer> ();
-			playingSourcesCollection = new HashSet<OALSoundBuffer> ();
-            purgeMe = new HashSet<OALSoundBuffer> ();
+			availableSourcesCollection = new List<int> ();
+			inUseSourcesCollection = new List<OALSoundBuffer> ();
+			playingSourcesCollection = new List<OALSoundBuffer> ();
+            purgeMe = new List<OALSoundBuffer> ();
 
 
 			for (int x=0; x < MAX_NUMBER_OF_SOURCES; x++) {
 				availableSourcesCollection.Add (allSourcesArray [x]);
 			}
 		}
+
+        /// <summary>
+        /// Open the sound device, sets up an audio context, and makes the new context
+        /// the current context. Note that this method will stop the playback of
+        /// music that was running prior to the game start. If any error occurs, then
+        /// the state of the controller is reset.
+        /// </summary>
+        /// <returns>True if the sound controller was setup, and false if not.</returns>
+        private bool OpenSoundController()
+        {
+#if MACOSX || IOS
+			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
+#endif
+            _device = Alc.OpenDevice(string.Empty);
+            if (CheckALError("Could not open AL device"))
+            {
+                return(false);
+            }
+            if (_device != IntPtr.Zero)
+            {
+                int[] attribute = new int[0];
+                _context = Alc.CreateContext(_device, attribute);
+                if (CheckALError("Could not open AL context"))
+                {
+                    CleanUpOpenAL();
+                    return(false);
+                }
+
+                if (_context != ContextHandle.Zero)
+                {
+                    Alc.MakeContextCurrent(_context);
+                    if (CheckALError("Could not make AL context current"))
+                    {
+                        CleanUpOpenAL();
+                        return(false);
+                    }
+                    return (true);
+                }
+            }
+            return (false);
+        }
 
 		public static OpenALSoundController GetInstance {
 			get {
@@ -72,12 +107,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 		}
 
-		public void CheckALError (string operation)
+        /// <summary>
+        /// Checks the error state of the OpenAL driver. If a value that is not AlcError.NoError
+        /// is returned, then the operation message and the error code is output to the console.
+        /// </summary>
+        /// <param name="operation">the operation message</param>
+        /// <returns>true if an error occurs, and false if not.</returns>
+		public bool CheckALError (string operation)
 		{
 			_lastOpenALError = Alc.GetError (_device);
 
 			if (_lastOpenALError == AlcError.NoError) {
-				return;
+				return(false);
 			}
 
 			string errorFmt = "OpenAL Error: {0}";
@@ -85,8 +126,12 @@ namespace Microsoft.Xna.Framework.Audio
 							operation,
 							//string.Format (errorFmt, Alc.GetString (_device, _lastOpenALError))));
 							string.Format (errorFmt, _lastOpenALError)));
+            return (true);
 		}
 
+        /// <summary>
+        /// Destroys the AL context and closes the device, when they exist.
+        /// </summary>
 		private void CleanUpOpenAL ()
 		{
 			Alc.MakeContextCurrent (ContextHandle.Zero);
@@ -98,6 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
 				Alc.CloseDevice (_device);
 				_device = IntPtr.Zero;
 			}
+            _bSoundAvailable = false;
 		}
 
 		public void Dispose ()
@@ -105,8 +151,19 @@ namespace Microsoft.Xna.Framework.Audio
 			CleanUpOpenAL ();
 		}
 
+        /// <summary>
+        /// Reserves the given sound buffer. If there are no available sources then false is
+        /// returned, otherwise true will be returned and the sound buffer can be played. If
+        /// the controller was not able to setup the hardware, then false will be returned.
+        /// </summary>
+        /// <param name="soundBuffer">The sound buffer you want to play</param>
+        /// <returns>True if the buffer can be played, and false if not.</returns>
 		public bool ReserveSource (OALSoundBuffer soundBuffer)
 		{
+            if (!_bSoundAvailable)
+            {
+                return (false);
+            }
 			int sourceNumber;
 			if (availableSourcesCollection.Count == 0) {
 
@@ -127,30 +184,52 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void RecycleSource (OALSoundBuffer soundBuffer)
 		{
+            if (!_bSoundAvailable)
+            {
+                return;
+            }
 			inUseSourcesCollection.Remove (soundBuffer);
 			availableSourcesCollection.Add (soundBuffer.SourceId);
 			soundBuffer.RecycleSoundBuffer();
 		}
 
 		public void PlaySound (OALSoundBuffer soundBuffer)
-		{
-			playingSourcesCollection.Add (soundBuffer);
+        {
+            if (!_bSoundAvailable)
+            {
+                return;
+            }
+            lock (playingSourcesCollection)
+            {
+                playingSourcesCollection.Add (soundBuffer);
+            }
 			AL.SourcePlay (soundBuffer.SourceId);
 		}
 
 		public void StopSound (OALSoundBuffer soundBuffer)
-		{
-			AL.SourceStop (soundBuffer.SourceId);
+        {
+            if (!_bSoundAvailable)
+            {
+                return;
+            }
+            AL.SourceStop(soundBuffer.SourceId);
 
-			AL.Source (soundBuffer.SourceId,ALSourcei.Buffer, 0);
-			playingSourcesCollection.Remove (soundBuffer);
-			RecycleSource (soundBuffer);
+            AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
+            lock (playingSourcesCollection) {
+                playingSourcesCollection.Remove (soundBuffer);
+            }
+            RecycleSource (soundBuffer);
 		}
 
 		public void PauseSound (OALSoundBuffer soundBuffer)
 		{
 			AL.SourcePause (soundBuffer.SourceId);
 		}
+
+        public void ResumeSound(OALSoundBuffer soundBuffer)
+        {
+            AL.SourcePlay(soundBuffer.SourceId);
+        }
 
 		public bool IsState (OALSoundBuffer soundBuffer, int state)
 		{
@@ -172,30 +251,36 @@ namespace Microsoft.Xna.Framework.Audio
 			return pos;
 		}
 
+        /// <summary>
+        /// Called repeatedly, this method cleans up the state of the management lists. This method
+        /// will also lock on the playingSourcesCollection. Sources that are stopped will be recycled
+        /// using the RecycleSource method.
+        /// </summary>
 		public void Update ()
-		{
+        {
+            if (!_bSoundAvailable)
+            {
+                return;
+            }
             purgeMe.Clear();
 
-			ALSourceState state;
-			foreach (var soundBuffer in playingSourcesCollection) {
+            ALSourceState state;
+            lock (playingSourcesCollection) {
+                for (int i=playingSourcesCollection.Count-1; i >= 0; i--) {
+                    var soundBuffer = playingSourcesCollection [i];
+                    state = AL.GetSourceState (soundBuffer.SourceId);
+                    if (state == ALSourceState.Stopped) {
+                        purgeMe.Add (soundBuffer);
+                        playingSourcesCollection.RemoveAt (i);
+                    }
+                }
+            }
+            foreach (var soundBuffer in purgeMe) {
+                AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
+                RecycleSource (soundBuffer);
+            }
 
-				state = AL.GetSourceState (soundBuffer.SourceId);
-
-				if (state == ALSourceState.Stopped) {
-
-					AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, 0);
-					purgeMe.Add (soundBuffer);
-					//Console.WriteLine ("to be recycled: " + soundBuffer.SourceId);
-				}
-
-			}
-
-			foreach (var soundBuffer in purgeMe) {
-
-				playingSourcesCollection.Remove (soundBuffer);
-				RecycleSource (soundBuffer);
-			}
-		}
+        }
 
 #if MACOSX || IOS
 		public const string OpenALLibrary = "/System/Library/Frameworks/OpenAL.framework/OpenAL";

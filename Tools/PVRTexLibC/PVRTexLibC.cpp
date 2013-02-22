@@ -8,7 +8,7 @@
 
 using namespace pvrtexture;
 
-extern void* __cdecl CompressTexture(unsigned char* data, int height, int width, int mipLevels, bool preMultiplied, bool fourbppCompression, int** dataSizes)
+extern void* __cdecl compressPVRTC(unsigned char* data, int height, int width, int mipLevels, bool preMultiplied, bool fourbppCompression, int** dataSizes)
 {   
    PVRTextureHeaderV3 pvrHeader; 
 

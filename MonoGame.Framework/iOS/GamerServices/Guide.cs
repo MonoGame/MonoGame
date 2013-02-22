@@ -71,6 +71,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Threading;
 
 using MonoTouch.Foundation;
@@ -243,7 +244,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			IsVisible = true;
 
 			keyboardViewController = new KeyboardInputViewController(
-				title, description, defaultText, usePasswordMode);
+				title, description, defaultText, usePasswordMode, _gameViewController);
 
 			_gameViewController.PresentModalViewController (keyboardViewController, true);
 
@@ -333,10 +334,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 		public static void ShowMarketplace (PlayerIndex player)
 		{
-			AssertInitialised ();
+			AssertInitialised();
 
-			NSUrl url = new NSUrl("http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=306469222&mt=8");
-			if (!UIApplication.SharedApplication.OpenUrl(url)) {
+			string bundleName = NSBundle.MainBundle.InfoDictionary[new NSString("CFBundleName")].ToString();
+			StringBuilder output = new StringBuilder();
+			foreach (char c in bundleName)
+			{
+				// Ampersand gets converted to "and"!!
+				if (c == '&')
+					output.Append("and");
+
+				// All alphanumeric characters are added
+				if (char.IsLetterOrDigit(c))
+					output.Append(c);
+			}
+			NSUrl url = new NSUrl("itms-apps://itunes.com/app/" + output.ToString());
+			if (!UIApplication.SharedApplication.OpenUrl(url))
+			{
 				// Error
 			}
 		}
