@@ -39,11 +39,11 @@ Keep track of development and community news.
 
 ## Contributing
 
-Please read our [contributers](https://github.com/mono/MonoGame/wiki/Contributing-to-MonoGame) guide.
+Please read our [contributing](https://github.com/mono/MonoGame/blob/develop/CONTRIBUTING.md) guide.
 
 ## License
 
-MonoGame is released under [Microsoft Public License (Ms-PL)](https://github.com/mono/MonoGame/blob/develop3d/LICENSE.txt).
+MonoGame is released under [Microsoft Public License (Ms-PL)](https://github.com/mono/MonoGame/blob/develop/LICENSE.txt).
 
 ## Current Roadmap
 
