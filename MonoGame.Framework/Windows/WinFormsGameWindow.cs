@@ -228,10 +228,9 @@ namespace MonoGame.Framework
             }
         }
 
-        internal void Initialize()
-        {
-            var manager = Game.graphicsDeviceManager;
-            _form.ClientSize = new Size(manager.PreferredBackBufferWidth, manager.PreferredBackBufferHeight);
+        internal void Initialize(int width, int height)
+        {            
+            _form.ClientSize = new Size(width, height);
             _form.Show();
         }
 

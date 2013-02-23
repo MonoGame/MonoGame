@@ -95,7 +95,7 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            _window.Initialize();
+            _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
 
             base.BeforeInitialize();
         }

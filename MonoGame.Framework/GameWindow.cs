@@ -165,5 +165,14 @@ namespace Microsoft.Xna.Framework {
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
-	}
+
+#if DIRECTX && WINDOWS
+        public static GameWindow CreateWindow(Game game, int width, int height)
+        {
+            var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
+            window.Initialize(width, height);
+            return window;
+        }
+#endif
+    }
 }
