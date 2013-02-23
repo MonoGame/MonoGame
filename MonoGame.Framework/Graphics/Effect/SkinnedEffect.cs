@@ -50,6 +50,9 @@ namespace Microsoft.Xna.Framework.Graphics
         Matrix world = Matrix.Identity;
         Matrix view = Matrix.Identity;
         Matrix projection = Matrix.Identity;
+#if WINDOWS_PHONE
+        Matrix _orientedProjection;
+#endif
 
         Matrix worldView;
 
@@ -119,11 +122,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public Matrix Projection
         {
             get { return projection; }
-            
+
             set
             {
                 projection = value;
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
+
+#if WINDOWS_PHONE
+                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+#endif
             }
         }
 
@@ -496,7 +503,25 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
-            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+#if WINDOWS_PHONE
+            if (OrientationChanged())
+                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+#endif
+
+            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
+                ref world,
+                ref view,
+#if WINDOWS_PHONE
+ ref _orientedProjection,
+#else
+                ref projection,
+#endif
+ ref worldView,
+                fogEnabled,
+                fogStart,
+                fogEnd,
+                worldViewProjParam,
+                fogVectorParam);  
 
             // Recompute the world inverse transpose and eye position?
             dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);

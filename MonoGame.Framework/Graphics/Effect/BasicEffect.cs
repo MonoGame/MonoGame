@@ -50,6 +50,9 @@ namespace Microsoft.Xna.Framework.Graphics
         Matrix world = Matrix.Identity;
         Matrix view = Matrix.Identity;
         Matrix projection = Matrix.Identity;
+#if WINDOWS_PHONE
+        Matrix _orientedProjection;
+#endif
 
         Matrix worldView;
 
@@ -124,6 +127,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 projection = value;
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
+
+                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
             }
         }
 
@@ -472,8 +477,26 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
-            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
-            
+#if WINDOWS_PHONE
+            if (OrientationChanged())
+                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+#endif
+
+            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
+                ref world,
+                ref view, 
+#if WINDOWS_PHONE
+                ref _orientedProjection, 
+#else
+                ref projection,
+#endif
+                ref worldView,
+                fogEnabled,
+                fogStart,
+                fogEnd,
+                worldViewProjParam,
+                fogVectorParam);    
+      
             // Recompute the diffuse/emissive/alpha material color parameters?
             if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0)
             {

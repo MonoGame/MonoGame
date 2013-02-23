@@ -275,21 +275,41 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if WINDOWS_PHONE
+
+        /// <summary>
+        /// Flag that allows effects to check if they need to update their projection matrices.
+        /// </summary>
+        internal ulong OrientationChangedFlag { get; private set; }
+
         // The following matrices append a rotation and/or translation to
         // an effect's projection matrix to align it with the device's orientation.
+        private Matrix _deviceOrientation2D = Matrix.Identity;
+        private Matrix _deviceOrientation3D = Matrix.Identity;
 
-        public Matrix _deviceOrientation2D = Matrix.Identity;
+        /// <summary>
+        /// A 2D matrix representing the transformation to the device's current orientation.
+        /// </summary>
         public Matrix DeviceOrientation2D
         {
             get { return _deviceOrientation2D; }
-            internal set { _deviceOrientation2D = value; }
+            internal set
+            {
+                _deviceOrientation2D = value;
+                OrientationChangedFlag = unchecked(OrientationChangedFlag + 1);
+            }
         }
 
-        public Matrix _deviceOrientation3D = Matrix.Identity;
+        /// <summary>
+        /// A 3D matrix representing the rotation to the device's current orientation.
+        /// </summary>
         public Matrix DeviceOrientation3D
         {
             get { return _deviceOrientation3D; }
-            internal set { _deviceOrientation3D = value; }
+            internal set
+            {
+                _deviceOrientation3D = value;
+                OrientationChangedFlag = unchecked(OrientationChangedFlag + 1);
+            }
         }
 #endif
 

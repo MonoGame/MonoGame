@@ -66,6 +66,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    private readonly bool _isClone;
 
+        private ulong _orientationChangedFlag = 0;
+
+        /// <summary>
+        /// Returns true if the orientation has changed from the last time this was called.
+        /// Updates internal variable used to check for the change.
+        /// </summary>
+        public bool OrientationChanged()
+        {
+            if (GraphicsDevice.OrientationChangedFlag == _orientationChangedFlag)
+                return false;
+
+            _orientationChangedFlag = GraphicsDevice.OrientationChangedFlag;
+
+            return true;
+        }
+
         internal Effect(GraphicsDevice graphicsDevice)
 		{
 			if (graphicsDevice == null)
