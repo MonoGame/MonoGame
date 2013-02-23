@@ -66,6 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    private readonly bool _isClone;
 
+#if WINDOWS_PHONE
         private ulong _orientationChangedFlag = 0;
 
         /// <summary>
@@ -81,6 +82,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return true;
         }
+
+#endif
 
         internal Effect(GraphicsDevice graphicsDevice)
 		{
