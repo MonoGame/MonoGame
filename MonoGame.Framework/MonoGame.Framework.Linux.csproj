@@ -46,6 +46,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
+    <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
