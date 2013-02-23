@@ -36,6 +36,7 @@
 // purpose and non-infringement.
 #endregion License
 
+using System;
 #if DIRECTX
 using SharpDX.DXGI;
 using SharpDX.Direct3D11;
@@ -133,15 +134,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _renderTargetViews[i] = new RenderTargetView(graphicsDevice._d3dDevice, _texture, renderTargetViewDescription);
             }
-#else
-            throw new NotImplementedException();
-#endif
 
             // If we don't need a depth buffer then we're done.
             if (preferredDepthFormat == DepthFormat.None)
                 return;
-        
-#if DIRECTX
+
             var sampleDescription = new SampleDescription(1, 0);
             if (preferredMultiSampleCount > 1)
             {
@@ -152,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var depthStencilDescription = new Texture2DDescription
             {
                 Format = SharpDXHelper.ToFormat(preferredDepthFormat),
-                ArraySize = 1, 
+                ArraySize = 1,
                 MipLevels = 1,
                 Width = size,
                 Height = size,
@@ -171,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #else
             throw new NotImplementedException();
-#endif
+#endif            
         }
 
         /// <summary>
