@@ -274,6 +274,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif
 
+#if WINDOWS_PHONE
+        public Matrix RotationMatrix2D = Matrix.Identity;
+        public Matrix RotationMatrix3D = Matrix.Identity;
+
+#endif
+
 
 #if OPENGL
 

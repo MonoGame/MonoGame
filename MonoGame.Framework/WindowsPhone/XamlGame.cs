@@ -8,6 +8,7 @@ using Windows.UI.Core;
 using System.Windows.Controls;
 using Windows.Graphics.Display;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Microsoft.Phone.Controls;
 
 namespace MonoGame.Framework.WindowsPhone
 {
@@ -121,7 +122,7 @@ namespace MonoGame.Framework.WindowsPhone
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
         /// <returns></returns>
-        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface)
+        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface, PhoneApplicationPage page)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
@@ -131,6 +132,7 @@ namespace MonoGame.Framework.WindowsPhone
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
             WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
             WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
+            WindowsPhoneGameWindow.AppPage = page;
 
             // Construct the game.
             var game = new T();
