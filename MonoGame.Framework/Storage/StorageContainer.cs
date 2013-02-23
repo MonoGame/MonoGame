@@ -118,9 +118,13 @@ namespace Microsoft.Xna.Framework.Storage
 			_playerIndex = playerIndex;
 			
 			// From the examples the root is based on MyDocuments folder
+#if WINDOWS_STOREAPP
+            var saved = "";
+#else
 			var root = StorageDevice.StorageRoot;
 			var saved = Path.Combine(root,"SavedGames");
-			_storagePath = Path.Combine(saved,name);
+#endif
+            _storagePath = Path.Combine(saved, name);
 			
 			var playerSave = string.Empty;
 			if (playerIndex.HasValue) {
@@ -133,7 +137,8 @@ namespace Microsoft.Xna.Framework.Storage
             // Create the "device" if need be
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            folder.CreateFolderAsync(_storagePath, CreationCollisionOption.OpenIfExists).GetResults();
+            var task = folder.CreateFolderAsync(_storagePath, CreationCollisionOption.OpenIfExists);
+            task.AsTask().Wait();
 #else
 			if (!Directory.Exists(_storagePath))
 				Directory.CreateDirectory(_storagePath);			
@@ -182,7 +187,8 @@ namespace Microsoft.Xna.Framework.Storage
             // Now let's try to create it
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            folder.CreateFolderAsync(dirPath, CreationCollisionOption.OpenIfExists).GetResults();
+            var task = folder.CreateFolderAsync(dirPath, CreationCollisionOption.OpenIfExists);
+            task.AsTask().Wait();
 #else
             Directory.CreateDirectory(dirPath);
 #endif			
@@ -226,8 +232,8 @@ namespace Microsoft.Xna.Framework.Storage
             // Now let's try to delete itd
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var deleteFolder = folder.GetFolderAsync(dirPath).GetResults();
-            deleteFolder.DeleteAsync().GetResults();
+            var deleteFolder = folder.GetFolderAsync(dirPath).AsTask().GetAwaiter().GetResult();
+            deleteFolder.DeleteAsync().AsTask().Wait();
 #else
             Directory.Delete(dirPath);
 #endif
@@ -247,8 +253,8 @@ namespace Microsoft.Xna.Framework.Storage
 
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var deleteFile = folder.GetFileAsync(filePath).GetResults();
-            deleteFile.DeleteAsync().GetResults();
+            var deleteFile = folder.GetFileAsync(filePath).AsTask().GetAwaiter().GetResult();
+            deleteFile.DeleteAsync().AsTask().Wait();
 #else
             // Now let's try to delete it
 			File.Delete(filePath);		
@@ -271,9 +277,17 @@ namespace Microsoft.Xna.Framework.Storage
 
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var result = folder.GetFolderAsync(dirPath).GetResults();
+
+            try
+            {
+                var result = folder.GetFolderAsync(dirPath).GetResults();
             return result != null;
-#else
+            }
+            catch
+            {
+                return false;
+            }
+#else            
             return Directory.Exists(dirPath);
 #endif
 		}	
@@ -303,8 +317,16 @@ namespace Microsoft.Xna.Framework.Storage
 
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var existsFile = folder.GetFileAsync(filePath).GetResults();
-            return existsFile != null;
+            // GetFile returns an exception if the file doesn't exist, so we catch it here and return the boolean.
+            try
+            {
+                var existsFile = folder.GetFileAsync(filePath).GetAwaiter().GetResult();
+                return existsFile != null;
+            }
+            catch
+            {
+                return false;
+            }
 #else
             // return A new file with read/write access.
 			return File.Exists(filePath);		
@@ -319,7 +341,7 @@ namespace Microsoft.Xna.Framework.Storage
         {
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var results = folder.GetFoldersAsync().GetResults();
+            var results = folder.GetFoldersAsync().AsTask().GetAwaiter().GetResult();
             return results.Select<StorageFolder, string>(e => e.Name).ToArray();
 #else
             return Directory.GetDirectories(_storagePath);
@@ -344,7 +366,7 @@ namespace Microsoft.Xna.Framework.Storage
         {
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var results = folder.GetFilesAsync().GetResults();
+            var results = folder.GetFilesAsync().AsTask().GetAwaiter().GetResult();
             return results.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
             return Directory.GetFiles(_storagePath);
@@ -365,7 +387,7 @@ namespace Microsoft.Xna.Framework.Storage
             var folder = ApplicationData.Current.LocalFolder;
             var options = new QueryOptions( CommonFileQuery.DefaultQuery, new [] { searchPattern } );
             var query = folder.CreateFileQueryWithOptions(options);
-            var files = query.GetFilesAsync().GetResults();
+            var files = query.GetFilesAsync().AsTask().GetAwaiter().GetResult();
             return files.Select<StorageFile, string>(e => e.Name).ToArray();
 #else
             return Directory.GetFiles(_storagePath, searchPattern);
@@ -420,10 +442,14 @@ namespace Microsoft.Xna.Framework.Storage
             }
             else if (fileMode == FileMode.OpenOrCreate)
             {
-                if ( fileAccess == FileAccess.Read )
+                if (fileAccess == FileAccess.Read)
                     return folder.OpenStreamForReadAsync(filePath).GetAwaiter().GetResult();
                 else
-                    return folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.OpenIfExists).GetAwaiter().GetResult();
+                {
+                    // Not using OpenStreamForReadAsync because the stream position is placed at the end of the file, instead of the beginning
+                    var f = folder.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
+                    return f.OpenAsync(FileAccessMode.ReadWrite).AsTask().GetAwaiter().GetResult().AsStream();
+                }
             }
             else if (fileMode == FileMode.Truncate)
             {
@@ -432,7 +458,10 @@ namespace Microsoft.Xna.Framework.Storage
             else
             {
                 //if (fileMode == FileMode.Append)
-                return folder.OpenStreamForWriteAsync(filePath, CreationCollisionOption.OpenIfExists).GetAwaiter().GetResult();
+                // Not using OpenStreamForReadAsync because the stream position is placed at the end of the file, instead of the beginning
+                folder.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult().OpenAsync(FileAccessMode.ReadWrite).AsTask().GetAwaiter().GetResult().AsStream();
+                var f = folder.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
+                return f.OpenAsync(FileAccessMode.ReadWrite).AsTask().GetAwaiter().GetResult().AsStream();
             }
 #else
             return File.Open(filePath, fileMode, fileAccess, fileShare);
