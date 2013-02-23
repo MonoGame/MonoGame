@@ -210,9 +210,9 @@ namespace MonoGame.Framework.WindowsPhone
             if (orientation == DisplayOrientation.LandscapeLeft ||
                 orientation == DisplayOrientation.LandscapeRight)
             {
-                vp.Width ^= vp.Height;
-                vp.Height ^= vp.Width;
-                vp.Width ^= vp.Height;
+                var temp = vp.Width;
+                vp.Width = vp.Height;
+                vp.Height = temp;
             }
 
             // Set the new orientation.
@@ -225,14 +225,14 @@ namespace MonoGame.Framework.WindowsPhone
             switch (_orientation)
             {
                 case DisplayOrientation.Portrait:
-                    device.RotationMatrix2D = device.RotationMatrix3D = Matrix.Identity;
+                    device.DeviceOrientation2D = device.DeviceOrientation3D = Matrix.Identity;
                     break;
 
                 case DisplayOrientation.LandscapeLeft:
-                    device.RotationMatrix2D = Matrix.Multiply(
+                    device.DeviceOrientation2D = Matrix.Multiply(
                         Matrix.CreateRotationZ(MathHelper.PiOver2),
                         Matrix.CreateTranslation(vp.Height, 0, 0));
-                    device.RotationMatrix3D = new Matrix(
+                    device.DeviceOrientation3D = new Matrix(
                         0.0f, -1.0f, 0.0f, 0.0f,
                         1.0f, 0.0f, 0.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f,
@@ -240,10 +240,10 @@ namespace MonoGame.Framework.WindowsPhone
                     break;
 
                 case DisplayOrientation.LandscapeRight:
-                    device.RotationMatrix2D = Matrix.Multiply(
+                    device.DeviceOrientation2D = Matrix.Multiply(
                         Matrix.CreateRotationZ(3 * MathHelper.PiOver2),
                         Matrix.CreateTranslation(0, vp.Width, 0));
-                    device.RotationMatrix3D = new Matrix(
+                    device.DeviceOrientation3D = new Matrix(
                         0.0f, 1.0f, 0.0f, 0.0f,
                         -1.0f, 0.0f, 0.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f,
@@ -251,7 +251,7 @@ namespace MonoGame.Framework.WindowsPhone
                     break;
 
                 default:
-                    device.RotationMatrix2D = device.RotationMatrix3D = Matrix.Identity;
+                    device.DeviceOrientation2D = device.DeviceOrientation3D = Matrix.Identity;
                     break;
             }
 

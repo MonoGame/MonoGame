@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
 
 #if WINDOWS_PHONE
-            projection = GraphicsDevice.RotationMatrix2D * projection;
+            projection = GraphicsDevice.DeviceOrientation2D * projection;
 #endif
             var transform = _matrix * projection;
 #else

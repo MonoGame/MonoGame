@@ -275,18 +275,21 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if WINDOWS_PHONE
-        public Matrix _rotationMatrix2D = Matrix.Identity;
-        public Matrix RotationMatrix2D
+        // The following matrices append a rotation and/or translation to
+        // an effect's projection matrix to align it with the device's orientation.
+
+        public Matrix _deviceOrientation2D = Matrix.Identity;
+        public Matrix DeviceOrientation2D
         {
-            get { return _rotationMatrix2D; }
-            internal set { _rotationMatrix2D = value; }
+            get { return _deviceOrientation2D; }
+            internal set { _deviceOrientation2D = value; }
         }
 
-        public Matrix _rotationMatrix3D = Matrix.Identity;
-        public Matrix RotationMatrix3D
+        public Matrix _deviceOrientation3D = Matrix.Identity;
+        public Matrix DeviceOrientation3D
         {
-            get { return _rotationMatrix3D; }
-            internal set { _rotationMatrix3D = value; }
+            get { return _deviceOrientation3D; }
+            internal set { _deviceOrientation3D = value; }
         }
 #endif
 
