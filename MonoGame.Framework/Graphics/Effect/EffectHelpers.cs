@@ -79,8 +79,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 Matrix worldViewProj;
                 
                 Matrix.Multiply(ref world, ref view, out worldView);
+
+#if WINDOWS_PHONE
+                var proj = Game.Instance.GraphicsDevice.RotationMatrix3D * projection;
+                Matrix.Multiply(ref worldView, ref proj, out worldViewProj);
+#else
                 Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
-                
+#endif
+
+
+
                 worldViewProjParam.SetValue(worldViewProj);
                 
                 dirtyFlags &= ~EffectDirtyFlags.WorldViewProj;
