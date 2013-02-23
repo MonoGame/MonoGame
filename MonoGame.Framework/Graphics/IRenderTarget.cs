@@ -1,5 +1,4 @@
-// #region License
-// /*
+﻿#region License
 // Microsoft Public License (Ms-PL)
 // MonoGame - Copyright © 2009 The MonoGame Team
 // 
@@ -35,54 +34,53 @@
 // or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
 // permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
 // purpose and non-infringement.
-// */
-// #endregion License
-//
-// Author: Kenneth James Pouncey
+#endregion License
 
-using System;
+#if DIRECTX
+using SharpDX.Direct3D11;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// http://msdn.microsoft.com/en-us/library/ff434403.aspx
-	public struct RenderTargetBinding
-	{
-        private Texture _renderTarget;
-        private CubeMapFace _cubeMapFace;
+    /// <summary>
+    /// Represents a render target.
+    /// </summary>
+    internal interface IRenderTarget
+    {
+        /// <summary>
+        /// Gets the width of the render target in pixels
+        /// </summary>
+        /// <value>The width of the render target in pixels.</value>
+        int Width { get; }
 
-		public Texture RenderTarget 
-        {
-			get { return _renderTarget; }
-		}
+        /// <summary>
+        /// Gets the height of the render target in pixels
+        /// </summary>
+        /// <value>The height of the render target in pixels.</value>
+        int Height { get; }
 
-        public CubeMapFace CubeMapFace
-        {
-            get { return _cubeMapFace; }
-        }
+        /// <summary>
+        /// Gets the usage mode of the render target.
+        /// </summary>
+        /// <value>The usage mode of the render target.</value>
+        RenderTargetUsage RenderTargetUsage { get; }
 
-		public RenderTargetBinding(RenderTarget2D renderTarget)
-		{
-			if (renderTarget == null) 
-				throw new ArgumentNullException("renderTarget");
+#if DIRECTX
+        /// <summary>
+        /// Gets the <see cref="RenderTargetView"/> for the specified array slice.
+        /// </summary>
+        /// <param name="arraySlice">The array slice.</param>
+        /// <returns>The <see cref="RenderTargetView"/>.</returns>
+        /// <remarks>
+        /// For texture cubes: The array slice is the index of the cube map face.
+        /// </remarks>
+        RenderTargetView GetRenderTargetView(int arraySlice);
 
-			_renderTarget = renderTarget;
-            _cubeMapFace = CubeMapFace.PositiveX;
-		}
-
-        public RenderTargetBinding(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
-        {
-            if (renderTarget == null)
-                throw new ArgumentNullException("renderTarget");
-            if (cubeMapFace < CubeMapFace.PositiveX || cubeMapFace > CubeMapFace.NegativeZ)
-                throw new ArgumentOutOfRangeException("cubeMapFace");
-
-            _renderTarget = renderTarget;
-            _cubeMapFace = cubeMapFace;
-        }
-
-        public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
-        {
-            return new RenderTargetBinding(renderTarget);
-        }
-	}
+        /// <summary>
+        /// Gets the <see cref="DepthStencilView"/>.
+        /// </summary>
+        /// <returns>The <see cref="DepthStencilView"/>. Can be <see langword="null"/>.</returns>
+        DepthStencilView GetDepthStencilView();
+#endif
+    }
 }
