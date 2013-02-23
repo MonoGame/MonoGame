@@ -275,8 +275,19 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if WINDOWS_PHONE
-        internal Matrix RotationMatrix2D = Matrix.Identity;
-        internal Matrix RotationMatrix3D = Matrix.Identity;
+        public Matrix _rotationMatrix2D = Matrix.Identity;
+        public Matrix RotationMatrix2D
+        {
+            get { return _rotationMatrix2D; }
+            internal set { _rotationMatrix2D = value; }
+        }
+
+        public Matrix _rotationMatrix3D = Matrix.Identity;
+        public Matrix RotationMatrix3D
+        {
+            get { return _rotationMatrix3D; }
+            internal set { _rotationMatrix3D = value; }
+        }
 #endif
 
 #if OPENGL
