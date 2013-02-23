@@ -128,7 +128,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 projection = value;
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
 
+#if WINDOWS_PHONE
                 _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+#endif
             }
         }
 
