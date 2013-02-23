@@ -257,7 +257,7 @@ namespace MonoGame.Framework.WindowsPhone
 
             // If we have a valid client bounds then update the graphics device.
             //if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-              //  Platform.Game.graphicsDeviceManager.ApplyChanges();
+            //    _game.graphicsDeviceManager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)

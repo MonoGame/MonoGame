@@ -86,9 +86,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 Matrix.Multiply(ref worldView, ref projection, out worldViewProj);
 #endif
-
-
-
                 worldViewProjParam.SetValue(worldViewProj);
                 
                 dirtyFlags &= ~EffectDirtyFlags.WorldViewProj;

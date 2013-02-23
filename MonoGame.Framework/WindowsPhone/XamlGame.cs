@@ -11,7 +11,6 @@ using Windows.Graphics.Display;
 using Windows.Phone.Input.Interop;
 using Windows.UI.Core;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Microsoft.Phone.Controls;
 
 namespace MonoGame.Framework.WindowsPhone
 {
