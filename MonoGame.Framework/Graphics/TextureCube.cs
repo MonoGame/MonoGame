@@ -203,6 +203,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 yOffset = 0;
                 width = Math.Max(1, this.size >> level);
                 height = Math.Max(1, this.size >> level);
+
+#if DIRECTX
+                // For DXT textures the width and height of each level is a multiply of 4.
+                if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                {
+                    width = ((width + 3) / 4) * 4;
+                    height = ((height + 3) / 4) * 4;
+                }
+#endif
             }
 
 #if DIRECTX
