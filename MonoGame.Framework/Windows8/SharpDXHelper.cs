@@ -32,6 +32,33 @@ namespace Microsoft.Xna.Framework
             return effect;
         }
 
+        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentInterval presentInterval)
+        {
+            SharpDX.DXGI.SwapEffect effect;
+
+            switch (presentInterval)
+            {
+                case PresentInterval.One:
+                case PresentInterval.Two:
+                default:
+#if WINRT
+                    effect = SharpDX.DXGI.SwapEffect.FlipSequential;
+#else
+                    effect = SharpDX.DXGI.SwapEffect.Discard;
+#endif
+                    break;
+
+                case PresentInterval.Immediate:
+                    effect = SharpDX.DXGI.SwapEffect.Sequential;
+                    break;
+            }
+
+            //if (present.RenderTargetUsage != RenderTargetUsage.PreserveContents && present.MultiSampleCount == 0)
+            //effect = SharpDX.DXGI.SwapEffect.Discard;
+
+            return effect;
+        }
+
         static public SharpDX.DXGI.Format ToFormat(DepthFormat format)
         {
             switch (format)
