@@ -71,11 +71,18 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _currentOrientation;
         private AndroidTouchEventManager _touchManager = null;
         private bool _contextWasLost = false;
+        private IResumeManager _resumer;
+        private bool _isResuming;
 
         public bool TouchEnabled
         {
             get { return _touchManager.Enabled; }
             set { _touchManager.Enabled = value; }
+        }
+
+        public void SetResumer(IResumeManager resumer)
+        {
+            _resumer = resumer;
         }
 
         public AndroidGameWindow(Context context, Game game) : base(context)
@@ -173,15 +180,30 @@ namespace Microsoft.Xna.Framework
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
                 _game.GraphicsDevice.Initialize();
-                Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
-                // DeviceReset events
-                _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                _game.GraphicsDevice.OnDeviceReset();
+                _isResuming = true;
+                if (_resumer != null)
+                {
+                    _resumer.LoadContent();
+                }
 
-                _contextWasLost = false;
+                // Reload textures on a different thread so the resumer can be drawn
+                System.Threading.Thread bgThread = new System.Threading.Thread(
+                    o =>
+                    {
+                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+                        // DeviceReset events
+                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                        _game.GraphicsDevice.OnDeviceReset();
+
+                        _contextWasLost = false;
+                        _isResuming = false;
+                    });
+
+                bgThread.Start();
             }
 
             MakeCurrent();
@@ -219,9 +241,6 @@ namespace Microsoft.Xna.Framework
         {
             base.OnUpdateFrame(e);
 
-            if (_contextWasLost)
-                return;
-
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
@@ -229,13 +248,17 @@ namespace Microsoft.Xna.Framework
 
             if (_game != null)
             {
-				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+                if (!_isResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
 				{
 					_game.Tick();
 				}
 				else if (_game.GraphicsDevice != null)
-				{ 
+				{
 					_game.GraphicsDevice.Clear(Color.Black);
+                    if (_isResuming && _resumer != null)
+                    {
+                        _resumer.Draw();
+                    }
 					_game.Platform.Present();
 				}
             }
