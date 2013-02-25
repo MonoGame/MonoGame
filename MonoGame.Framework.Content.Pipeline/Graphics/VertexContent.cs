@@ -51,7 +51,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         internal VertexContent()
         {
-
+            channels = new VertexChannelCollection(this);
+            positionIndices = new VertexChannel<int>("PositionIndices");
+            positions = new IndirectPositionCollection();
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Index of the new entry. This can be added to the Indices member of the parent.</returns>
         public int Add(int positionIndex)
         {
-            throw new NotImplementedException();
+            return positionIndices.Items.Add(positionIndex);
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndexCollection">Index into the Positions member of the parent.</param>
         public void AddRange(IEnumerable<int> positionIndexCollection)
         {
-            throw new NotImplementedException();
+            positionIndices.InsertRange(positionIndices.Items.Count, positionIndexCollection);
         }
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndex">Position of new vertex index in the collection.</param>
         public void Insert(int index, int positionIndex)
         {
-            throw new NotImplementedException();
+            positionIndices.Items.Insert(index, positionIndex);
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="positionIndexCollection">Position of the first element of the inserted range in the collection.</param>
         public void InsertRange(int index, IEnumerable<int> positionIndexCollection)
         {
-            throw new NotImplementedException();
+            positionIndices.InsertRange(index, positionIndexCollection);
         }
 
         /// <summary>
@@ -113,7 +115,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="index">Index of the vertex to be removed.</param>
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            positionIndices.Items.RemoveAt(index);
+
+            foreach (var channel in channels)
+                channel.Items.RemoveAt(index);
         }
 
         /// <summary>
@@ -123,7 +128,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="count">Number of indices to remove.</param>
         public void RemoveRange(int index, int count)
         {
-            throw new NotImplementedException();
+            for (var i = index; i < index + count; i++)
+                RemoveAt(i);
         }
     }
 }

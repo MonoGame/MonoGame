@@ -64,15 +64,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 // Geometry vertices reference 1:1 with the MeshContent parent,
                 // no indirection is necessary.
+                geom.Vertices.Positions.AddRange(mesh.Positions);
                 geom.Vertices.AddRange(Enumerable.Range(0, sceneMesh.VertexCount));
                 geom.Indices.AddRange(sceneMesh.GetIntIndices());
 
                 // Individual channels go here
                 if (sceneMesh.HasNormals)
-                    geom.Vertices.Channels.Add(VertexChannelNames.Normal(), typeof(Vector3), ToXna(sceneMesh.Normals));
+                    geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(sceneMesh.Normals));
 
                 for (var i = 0; i < sceneMesh.TextureCoordsChannelCount; i++)
-                    geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i), typeof(Vector2),
+                    geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i),
                                                ToXnaVector2(sceneMesh.GetTextureCoords(i)));
 
                 mesh.Geometry.Add(geom);
