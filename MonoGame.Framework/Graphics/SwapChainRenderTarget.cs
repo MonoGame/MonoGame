@@ -128,12 +128,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Present()
         {
-            try
+            lock (GraphicsDevice._d3dContext)
             {
-                _swapChain.Present(1, PresentFlags.None);
-            }
-            catch (SharpDX.SharpDXException)
-            {
+                try
+                {
+                    _swapChain.Present(1, PresentFlags.None);
+                }
+                catch (SharpDX.SharpDXException)
+                {
+                }
             }
         }
     } 
