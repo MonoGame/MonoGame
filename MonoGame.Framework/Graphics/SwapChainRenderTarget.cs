@@ -15,16 +15,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS && DIRECTX
     public class SwapChainRenderTarget : RenderTarget2D
     {
-        private SharpDX.DXGI.SwapChain _sdxSwapChain;
+        private SharpDX.DXGI.SwapChain _swapChain;
 
-        public SwapChainRenderTarget(IntPtr deviceWindowHandle,
-                                     GraphicsDevice graphicsDevice,
+        public SwapChainRenderTarget(GraphicsDevice graphicsDevice,
+                                     IntPtr windowHandle,                                     
                                      int width,
                                      int height,
                                      bool mipMap,
                                      PresentInterval presentInterval,
-                                     SurfaceFormat preferredSurfaceFormat,
-                                     DepthFormat preferredDepthFormat,
+                                     SurfaceFormat surfaceFormat,
+                                     DepthFormat depthFormat,
                                      int preferredMultiSampleCount,
                                      RenderTargetUsage usage)
             : base(
@@ -32,15 +32,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 width,
                 height,
                 mipMap,
-                preferredSurfaceFormat,
-                preferredDepthFormat,
+                surfaceFormat,
+                depthFormat,
                 preferredMultiSampleCount,
                 usage,
                 true)
         {
-            var format = preferredSurfaceFormat == SurfaceFormat.Color
+            var dxgiFormat = surfaceFormat == SurfaceFormat.Color
                              ? SharpDX.DXGI.Format.B8G8R8A8_UNorm
-                             : SharpDXHelper.ToFormat(preferredSurfaceFormat);
+                             : SharpDXHelper.ToFormat(surfaceFormat);
 
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (preferredMultiSampleCount > 1)
@@ -54,13 +54,13 @@ namespace Microsoft.Xna.Framework.Graphics
                            {
                                ModeDescription =
                                    {
-                                       Format = format,
+                                       Format = dxgiFormat,
                                        Scaling = DisplayModeScaling.Stretched,
                                        Width = width,
                                        Height = height,
                                    },
 
-                               OutputHandle = deviceWindowHandle,
+                               OutputHandle = windowHandle,
                                SampleDescription = multisampleDesc,
                                Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                                BufferCount = 2,
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
             using (var dxgiAdapter = dxgiDevice.Adapter)
             using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
             {
-                _sdxSwapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
+                _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
 
                 // Ensure that DXGI does not queue more than one frame at a time. This 
                 // both reduces latency and ensures that the application will only render 
@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
-            using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_sdxSwapChain, 0))
+            using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
             {
                 // Create a view interface on the rendertarget to use on bind.
                 _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(d3dDevice, backBuffer);
@@ -98,16 +98,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Create the depth buffer if we need it.
-            if (preferredDepthFormat != DepthFormat.None)
+            if (depthFormat != DepthFormat.None)
             {
-                var depthFormat = SharpDXHelper.ToFormat(preferredDepthFormat);
+                dxgiFormat = SharpDXHelper.ToFormat(depthFormat);
 
                 // Allocate a 2-D surface as the depth/stencil buffer.
                 using (
                     var depthBuffer = new SharpDX.Direct3D11.Texture2D(d3dDevice,
                                                                        new SharpDX.Direct3D11.Texture2DDescription()
                                                                            {
-                                                                               Format = depthFormat,
+                                                                               Format = dxgiFormat,
                                                                                ArraySize = 1,
                                                                                MipLevels = 1,
                                                                                Width = targetSize.X,
@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             try
             {
-                _sdxSwapChain.Present(1, PresentFlags.None);
+                _swapChain.Present(1, PresentFlags.None);
             }
             catch (SharpDX.SharpDXException)
             {
