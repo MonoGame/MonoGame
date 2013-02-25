@@ -41,6 +41,8 @@ purpose and non-infringement.
 using System;
 #if !PSM
 using System.Drawing;
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -169,7 +171,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSM
-			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+            PixelBufferOption option = PixelBufferOption.None;
+            if (renderTarget)
+			    option = PixelBufferOption.Renderable;
+             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;
