@@ -138,17 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.width = width;
             this.height = height;
             this.format = format;
-            this.levelCount = 1;
-
-            if (mipmap)
-            {
-                int size = Math.Max(this.width, this.height);
-                while (size > 1)
-                {
-                    size = size / 2;
-                    this.levelCount++;
-                }
-            }
+            this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
 #if DIRECTX
 
@@ -167,7 +157,16 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
             if (renderTarget)
+            {
                 desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
+                if (mipmap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
@@ -322,7 +321,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif PSM
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
-
 
 #elif OPENGL
 

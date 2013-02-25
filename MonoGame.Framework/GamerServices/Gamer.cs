@@ -100,7 +100,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             get
             {
-                return IsDisposed;
+                return disposed;
             }
         }
 
