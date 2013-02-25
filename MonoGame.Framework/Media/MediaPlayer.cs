@@ -76,7 +76,11 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINDOWS_MEDIA_ENGINE
         private static readonly MediaEngine _mediaEngineEx;
+#if WINDOWS_PHONE
+        private static System.Windows.Threading.Dispatcher _dispatcher;
+#else
         private static CoreDispatcher _dispatcher;
+#endif
 #elif WINDOWS_MEDIA_SESSION
 
         private static readonly MediaSession _session;
@@ -92,15 +96,28 @@ namespace Microsoft.Xna.Framework.Media
         {
 #if WINDOWS_MEDIA_ENGINE
 
-            MediaManager.Startup(true);
-            using (var factory = new MediaEngineClassFactory())
-            using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
-            {
-                var mediaEngine = new MediaEngine(factory, attributes, MediaEngineCreateFlags.AudioOnly, MediaEngineExOnPlaybackEvent);
-                _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
-            }
+                MediaManager.Startup(true);
+                using (var factory = new MediaEngineClassFactory())
+                using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
+                {
+                    var creationFlags = MediaEngineCreateFlags.AudioOnly;
 
-            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+#if WINDOWS_PHONE
+                    // Frame-Server mode (The default) is the only one supported on WP8.
+                    // http://msdn.microsoft.com/en-us/library/windowsphone/develop/jj681688(v=vs.105).aspx
+                    // http://msdn.microsoft.com/en-us/library/windows/desktop/hh447921(v=vs.85).aspx
+
+                    creationFlags = MediaEngineCreateFlags.None;
+#endif
+                    var mediaEngine = new MediaEngine(factory, attributes, creationFlags, MediaEngineExOnPlaybackEvent);
+                    _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
+                }
+
+#if WINDOWS_PHONE
+                _dispatcher = System.Windows.Deployment.Current.Dispatcher;
+#else
+                _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+#endif
 
 #elif WINDOWS_MEDIA_SESSION
 
@@ -113,8 +130,14 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void MediaEngineExOnPlaybackEvent(MediaEngineEvent mediaEvent, long param1, int param2)
         {
-            if (mediaEvent == MediaEngineEvent.Ended)
-                _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
+            if (mediaEvent != MediaEngineEvent.Ended)
+                return;
+
+#if WINDOWS_PHONE
+            _dispatcher.BeginInvoke(() => OnSongFinishedPlaying(null, null));
+#else
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
+#endif
         }
 
 #endif

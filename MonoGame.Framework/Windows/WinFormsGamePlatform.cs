@@ -86,8 +86,6 @@ namespace MonoGame.Framework
         {
             _window = new WinFormsGameWindow(this);
             Window = _window;
-
-            this.IsMouseVisible = true;
         }
 
         public override GameRunBehavior DefaultRunBehavior
@@ -159,14 +157,6 @@ namespace MonoGame.Framework
             var device = Game.GraphicsDevice;
             if ( device != null )
                 device.Present();
-        }
-
-        protected override void OnIsMouseVisibleChanged() 
-        {
-            if (IsMouseVisible)
-                Cursor.Show();
-            else
-                Cursor.Hide();
         }
 		
         protected override void Dispose(bool disposing)
