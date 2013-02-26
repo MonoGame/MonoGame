@@ -60,6 +60,7 @@ namespace Microsoft.Xna.Framework
         private bool _isBorderless;
 #if WINDOWS
         private bool _isMouseHidden;
+        private bool _isMouseInBounds;
 #endif
         private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle = IntPtr.Zero;
@@ -278,6 +279,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS
         private void OnMouseEnter(object sender, EventArgs e)
         {
+            _isMouseInBounds = true;
             if (!game.IsMouseVisible && !_isMouseHidden)
             {
                 _isMouseHidden = true;
@@ -289,10 +291,14 @@ namespace Microsoft.Xna.Framework
         {
             //There is a bug in OpenTK where the MouseLeave event is raised when the mouse button
             //is down while the cursor is still in the window bounds.
-            if (_isMouseHidden && Mouse.GetState().LeftButton == ButtonState.Released)
+            if (Mouse.GetState().LeftButton == ButtonState.Released)
             {
-                _isMouseHidden = false;
-                System.Windows.Forms.Cursor.Show();
+                _isMouseInBounds = false;
+                if (_isMouseHidden)
+                {
+                    _isMouseHidden = false;
+                    System.Windows.Forms.Cursor.Show();
+                }
             }
         }
 #endif
@@ -431,7 +437,7 @@ namespace Microsoft.Xna.Framework
                     _isMouseHidden = false;
                 }
             }
-            else if (!_isMouseHidden)
+            else if (!_isMouseHidden && _isMouseInBounds)
             {
                 System.Windows.Forms.Cursor.Hide();
                 _isMouseHidden = true;
