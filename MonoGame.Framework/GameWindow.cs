@@ -78,6 +78,14 @@ namespace Microsoft.Xna.Framework {
 
 		public abstract Rectangle ClientBounds { get; }
 
+#if WINDOWS && DIRECTX
+        /// <summary>
+        /// The location of this window on the desktop, eg: global coordinate space
+        /// which stretches across all screens.
+        /// </summary>
+        public abstract Point Position { get; set; }
+#endif
+
 		public abstract DisplayOrientation CurrentOrientation { get; }
 
 		public abstract IntPtr Handle { get; }
@@ -167,7 +175,7 @@ namespace Microsoft.Xna.Framework {
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS
-        public static GameWindow CreateWindow(Game game, int width, int height)
+        public static GameWindow Create(Game game, int width, int height)
         {
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
             window.Initialize(width, height);

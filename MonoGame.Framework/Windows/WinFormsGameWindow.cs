@@ -50,6 +50,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
+using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
@@ -109,6 +110,12 @@ namespace MonoGame.Framework
         public override DisplayOrientation CurrentOrientation
         {
             get { return DisplayOrientation.Default; }
+        }
+
+        public override XnaPoint Position
+        {
+            get { return _form.DesktopLocation.ToPoint(); }
+            set { _form.DesktopLocation = value.ToPoint(); }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -220,7 +227,7 @@ namespace MonoGame.Framework
         }
 
         private void OnMouseLeave(object sender, EventArgs e)
-        {
+        {            
             if (_isMouseHidden)
             {
                 _isMouseHidden = false;
