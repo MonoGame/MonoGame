@@ -315,6 +315,23 @@ namespace MonoGame.Framework
         {
         }
 
+        public void MouseVisibleToggled()
+        {
+            if (_platform.IsMouseVisible)
+            {
+                if (_isMouseHidden)
+                {
+                    Cursor.Show();
+                    _isMouseHidden = false;
+                }
+            }
+            else if (!_isMouseHidden)
+            {
+                Cursor.Hide();
+                _isMouseHidden = true;
+            }
+        }
+
         #endregion
     }
 }
