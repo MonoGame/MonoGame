@@ -56,9 +56,7 @@ namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
-        private Form _form;
-
-        private List<XnaKey> _keyState = new List<XnaKey>();
+        internal Form _form;
 
         private WinFormsGamePlatform _platform;
 
@@ -140,6 +138,12 @@ namespace MonoGame.Framework
 
         #endregion
 
+        #region Non-Public Properties
+
+        internal List<XnaKey> KeyState { get; set; }
+
+        #endregion
+
         internal WinFormsGameWindow(WinFormsGamePlatform platform)
         {
             _platform = platform;
@@ -149,9 +153,7 @@ namespace MonoGame.Framework
             _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
-            _form.StartPosition = FormStartPosition.CenterScreen;
-
-            Mouse.SetWindows(_form);
+            _form.StartPosition = FormStartPosition.CenterScreen;           
 
             // Capture mouse and keyboard events.
             _form.MouseDown += OnMouseState;
@@ -161,8 +163,7 @@ namespace MonoGame.Framework
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
             _form.MouseEnter += OnMouseEnter;
-            _form.MouseLeave += OnMouseLeave;
-            Keyboard.SetKeys(_keyState);
+            _form.MouseLeave += OnMouseLeave;            
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
@@ -177,7 +178,9 @@ namespace MonoGame.Framework
         private void OnDeactivate(object sender, EventArgs eventArgs)
         {
             _platform.IsActive = false;
-            _keyState.Clear();
+
+            if (KeyState != null)
+                KeyState.Clear();
         }
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
@@ -207,14 +210,17 @@ namespace MonoGame.Framework
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
-            if (!_keyState.Contains(key))
-                _keyState.Add(key);
+
+            if (KeyState != null && !KeyState.Contains(key))
+                KeyState.Add(key);
         }
 
         private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
-            _keyState.Remove(key);
+
+            if (KeyState != null)
+                KeyState.Remove(key);
         }
 
         private void OnMouseEnter(object sender, EventArgs e)
@@ -258,8 +264,6 @@ namespace MonoGame.Framework
                 if (manager.GraphicsDevice == null)
                     return;
             }
-
-
 
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
