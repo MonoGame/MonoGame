@@ -236,17 +236,23 @@ namespace MonoGame.Framework
 
         private void OnClientSizeChanged(object sender, EventArgs eventArgs)
         {
-            var manager = Game.graphicsDeviceManager;
+            if (Game.Window == this)
+            {
+                var manager = Game.graphicsDeviceManager;
 
-            // Set the default new back buffer size and viewport, but this
-            // can be overloaded by the two events below.
-            
-            var newWidth = _form.ClientRectangle.Width;
-            var newHeight = _form.ClientRectangle.Height;
-            manager.PreferredBackBufferWidth = newWidth;
-            manager.PreferredBackBufferHeight = newHeight;
-            if (manager.GraphicsDevice == null)
-                return;
+                // Set the default new back buffer size and viewport, but this
+                // can be overloaded by the two events below.
+
+                var newWidth = _form.ClientRectangle.Width;
+                var newHeight = _form.ClientRectangle.Height;
+                manager.PreferredBackBufferWidth = newWidth;
+                manager.PreferredBackBufferHeight = newHeight;
+
+                if (manager.GraphicsDevice == null)
+                    return;
+            }
+
+
 
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
