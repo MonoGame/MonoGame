@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 depthFormat,
                 preferredMultiSampleCount,
                 usage,
-                true)
+                SurfaceType.SwapChainRenderTarget)
         {
             var dxgiFormat = surfaceFormat == SurfaceFormat.Color
                              ? SharpDX.DXGI.Format.B8G8R8A8_UNorm
@@ -87,15 +87,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
             Point targetSize;
-            using (var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0))
-            {
-                // Create a view interface on the rendertarget to use on bind.
-                _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(d3dDevice, backBuffer);
+            var backBuffer = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(_swapChain, 0);
 
-                // Get the rendertarget dimensions for later.
-                var backBufferDesc = backBuffer.Description;
-                targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
-            }
+            // Create a view interface on the rendertarget to use on bind.
+            _renderTargetView = new SharpDX.Direct3D11.RenderTargetView(d3dDevice, backBuffer);
+
+            // Get the rendertarget dimensions for later.
+            var backBufferDesc = backBuffer.Description;
+            targetSize = new Point(backBufferDesc.Width, backBufferDesc.Height);
+
+            _texture = backBuffer;
 
             // Create the depth buffer if we need it.
             if (depthFormat != DepthFormat.None)
