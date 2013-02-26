@@ -54,7 +54,23 @@ namespace Microsoft.Xna.Framework.Graphics
                         var rdesc = refelect.GetResourceBindingDescription(i);
                         if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
                         {
-                            var sampler = new Sampler {index = rdesc.BindPoint, parameterName = rdesc.Name };
+                            var sampler = new Sampler
+                            {
+                                textureSlot = rdesc.BindPoint,
+                                samplerSlot = rdesc.BindPoint,
+                                parameterName = rdesc.Name
+                            };
+
+                            // Find sampler slot, which can be different from the texture slot.
+                            for (int j = 0; j < refelect.Description.BoundResources; j++)
+                            {
+                                var samplerrdesc = refelect.GetResourceBindingDescription(j);
+                                if (samplerrdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Sampler && samplerrdesc.Name == rdesc.Name)
+                                {
+                                    sampler.samplerSlot = samplerrdesc.BindPoint;
+                                    break;
+                                }
+                            }
 
                             switch (rdesc.Dimension)
                             {

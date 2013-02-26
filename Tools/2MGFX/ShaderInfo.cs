@@ -159,7 +159,7 @@ namespace TwoMGFX
 	{
         private SamplerState _state;
         
-        private bool _dirty;
+        private bool _dirty = true;
 
         private TextureFilterType _minFilter;
         private TextureFilterType _magFilter;
