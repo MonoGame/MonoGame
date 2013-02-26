@@ -420,6 +420,25 @@ namespace Microsoft.Xna.Framework
 
         }
 
+#if WINDOWS
+        public void MouseVisibleToggled()
+        {
+            if (game.IsMouseVisible)
+            {
+                if (_isMouseHidden)
+                {
+                    System.Windows.Forms.Cursor.Show();
+                    _isMouseHidden = false;
+                }
+            }
+            else if (!_isMouseHidden)
+            {
+                System.Windows.Forms.Cursor.Hide();
+                _isMouseHidden = true;
+            }
+        }
+#endif
+
         #endregion
     }
 }
