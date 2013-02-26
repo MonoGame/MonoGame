@@ -28,7 +28,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
-    <DefineConstants>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
