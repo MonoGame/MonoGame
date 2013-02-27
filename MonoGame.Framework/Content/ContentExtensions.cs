@@ -25,7 +25,11 @@ namespace Microsoft.Xna.Framework.Content
         public static PropertyInfo[] GetAllProperties(this Type type)
         {
 #if WINRT
-            return type.GetTypeInfo().DeclaredProperties.ToArray();
+            PropertyInfo[] infos= type.GetTypeInfo().DeclaredProperties.ToArray();
+            var nonStaticPropertyInfos = from p in infos
+                                         where (p.GetMethod != null) && (!p.GetMethod.IsStatic)
+                                         select p;
+            return nonStaticPropertyInfos.ToArray();
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             return type.GetProperties(attrs);
@@ -36,7 +40,11 @@ namespace Microsoft.Xna.Framework.Content
         public static FieldInfo[] GetAllFields(this Type type)
         {
 #if WINRT
-            return type.GetTypeInfo().DeclaredFields.ToArray();
+            FieldInfo[] fields= type.GetTypeInfo().DeclaredFields.ToArray();
+            var nonStaticFields = from field in fields
+                    where !field.IsStatic
+                    select field;
+            return nonStaticFields.ToArray();
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             return type.GetFields(attrs);
