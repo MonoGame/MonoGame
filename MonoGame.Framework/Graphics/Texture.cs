@@ -162,7 +162,11 @@ namespace Microsoft.Xna.Framework.Graphics
         internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, _texture);
+            {
+                if (_texture != null)
+                    _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, _texture);
+                else return null;
+            }
 
             return _resourceView;
         }
