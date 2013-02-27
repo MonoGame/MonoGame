@@ -509,12 +509,10 @@ namespace TwoMGFX
             }
 
             
-            tok = scanner.LookAhead(TokenType.LessThan, TokenType.Identifier, TokenType.Number);
+            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis, TokenType.Identifier, TokenType.Number);
             switch (tok.Type)
             {
                 case TokenType.LessThan:
-
-                    
                     tok = scanner.Scan(TokenType.LessThan);
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
@@ -541,6 +539,36 @@ namespace TwoMGFX
                     node.Nodes.Add(n);
                     if (tok.Type != TokenType.GreaterThan) {
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.GreaterThan.ToString(), 0x1001, tok));
+                        return;
+                    }
+                    break;
+                case TokenType.OpenParenthesis:
+                    tok = scanner.Scan(TokenType.OpenParenthesis);
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.OpenParenthesis) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.OpenParenthesis.ToString(), 0x1001, tok));
+                        return;
+                    }
+
+                    
+                    tok = scanner.Scan(TokenType.Identifier);
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.Identifier) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Identifier.ToString(), 0x1001, tok));
+                        return;
+                    }
+
+                    
+                    tok = scanner.Scan(TokenType.CloseParenthesis);
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.CloseParenthesis) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CloseParenthesis.ToString(), 0x1001, tok));
                         return;
                     }
                     break;
@@ -712,8 +740,6 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Sampler_Declaration), "Sampler_Declaration");
             parent.Nodes.Add(node);
 
-
-            
             tok = scanner.Scan(TokenType.Sampler);
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
