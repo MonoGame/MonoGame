@@ -27,6 +27,7 @@ namespace MonoGameContentProcessors.Processors
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
             options.DX11Profile = platform == MonoGamePlatform.Windows8 ? true : false;
+            options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
             // Parse the MGFX file expanding includes, macros, and returning the techniques.

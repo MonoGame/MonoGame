@@ -91,6 +91,8 @@ namespace Microsoft.Xna.Framework {
 		private int _depthbuffer;
 		private int _framebuffer;
 
+        public bool PreserveFrameBuffer = false;
+
 		#region Construction/Destruction
 		public iOSGameView (iOSGamePlatform platform, RectangleF frame)
 			: base(frame)
@@ -196,6 +198,9 @@ namespace Microsoft.Xna.Framework {
 			AssertNotDisposed ();
 			AssertValidContext ();
 
+            if (PreserveFrameBuffer)
+                return;
+
 			__renderbuffergraphicsContext.MakeCurrent (null);
 			
 			// HACK:  GraphicsDevice itself should be calling
@@ -251,8 +256,8 @@ namespace Microsoft.Xna.Framework {
 
                 if (this.NextResponder is iOSGameViewController)
                 {
-                    var displayOrientation = _platform.Game.Window.CurrentOrientation;
-                    if (displayOrientation == DisplayOrientation.LandscapeLeft || displayOrientation == DisplayOrientation.LandscapeRight)
+                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
+                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
                     {
                         height = Math.Min(viewportHeight, viewportWidth);
                         width = Math.Max(viewportHeight, viewportWidth);
@@ -283,6 +288,9 @@ namespace Microsoft.Xna.Framework {
 
 		private void DestroyFramebuffer ()
 		{
+            if (PreserveFrameBuffer)
+                return;
+
 			AssertNotDisposed ();
 			AssertValidContext ();
 
@@ -353,17 +361,25 @@ namespace Microsoft.Xna.Framework {
 
 		#region UIWindow Notifications
 
+		public override void WillMoveToWindow (UIWindow window)
+		{
+			base.WillMoveToWindow (window);
+
+			if (_framebuffer + _colorbuffer + _depthbuffer != 0)
+				DestroyFramebuffer();
+		}
+
 		[Export ("didMoveToWindow")]
 		public virtual void DidMoveToWindow ()
 		{
 
-            if (Window != null) {
-                
-                if (__renderbuffergraphicsContext == null)
-                    CreateContext ();
-                if (_framebuffer * _colorbuffer * _depthbuffer == 0)
-                    CreateFramebuffer ();
-            }
+			if (Window != null) {
+				
+				if (__renderbuffergraphicsContext == null)
+					CreateContext ();
+				if (_framebuffer * _colorbuffer * _depthbuffer == 0)
+					CreateFramebuffer ();
+			}
 		}
 
 		#endregion UIWindow Notifications

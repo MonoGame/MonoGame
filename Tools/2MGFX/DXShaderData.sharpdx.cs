@@ -83,8 +83,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             SamplerStateInfo state;
                             if (samplerStates.TryGetValue(rdesc.Name, out state))
                             {
-                                sampler.parameterName = state.textureName ?? rdesc.Name;
-                                sampler.state = state.state;
+                                sampler.parameterName = state.TextureName ?? rdesc.Name;
+                                sampler.state = state.State;
                             }
 
                             samplers.Add(sampler);
