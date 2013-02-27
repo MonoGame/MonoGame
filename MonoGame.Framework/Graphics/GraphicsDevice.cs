@@ -1535,6 +1535,25 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_currentRenderTargetBindings == null && renderTargets == null)
                 return;
 
+#if OPENGL
+            if (_currentRenderTargetBindings != null && renderTargets == null) 
+            {
+
+                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
+                {
+                    var renderTarget = _currentRenderTargetBindings[i].RenderTarget as RenderTarget2D;
+                    if (renderTarget != null && renderTarget.DepthStencilFormat != DepthFormat.None)
+                    {
+                        GL.DeleteRenderbuffers(1, ref renderTarget.glDepthStencilBuffer);
+                        GraphicsExtensions.CheckGLError();
+                    }
+
+                }
+
+                _currentRenderTargetBindings = null;
+            }
+#endif
+
             // If the bindings are the same then early out as well.
             if (    _currentRenderTargetBindings != null && renderTargets != null &&
                     _currentRenderTargetBindings.Length == renderTargets.Length )
