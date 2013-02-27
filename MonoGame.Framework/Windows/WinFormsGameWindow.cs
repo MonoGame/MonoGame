@@ -67,6 +67,8 @@ namespace MonoGame.Framework
 
         private bool _isMouseHidden;
 
+        private bool _isMouseInBounds;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -212,6 +214,7 @@ namespace MonoGame.Framework
 
         private void OnMouseEnter(object sender, EventArgs e)
         {
+            _isMouseInBounds = true;
             if (!_platform.IsMouseVisible && !_isMouseHidden)
             {
                 _isMouseHidden = true;
@@ -221,6 +224,7 @@ namespace MonoGame.Framework
 
         private void OnMouseLeave(object sender, EventArgs e)
         {
+            _isMouseInBounds = false;
             if (_isMouseHidden)
             {
                 _isMouseHidden = false;
@@ -313,6 +317,23 @@ namespace MonoGame.Framework
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+        }
+
+        public void MouseVisibleToggled()
+        {
+            if (_platform.IsMouseVisible)
+            {
+                if (_isMouseHidden)
+                {
+                    Cursor.Show();
+                    _isMouseHidden = false;
+                }
+            }
+            else if (!_isMouseHidden && _isMouseInBounds)
+            {
+                Cursor.Hide();
+                _isMouseHidden = true;
+            }
         }
 
         #endregion
