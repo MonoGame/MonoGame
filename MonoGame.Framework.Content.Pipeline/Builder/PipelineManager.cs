@@ -185,7 +185,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Search for the importer.
             foreach (var info in _importers)
             {
-                if (info.attribue.FileExtensions.Contains(ext))
+                if (info.attribue.FileExtensions.Count(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)) != 0)
                     return info.type.Name;
             }
 
