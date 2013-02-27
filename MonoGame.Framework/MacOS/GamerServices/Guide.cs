@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool simulateTrialMode;
 		
 		internal static void Initialise(Game game) {
-			
+			Guide.Window = game.Window;
 		}
 		delegate string ShowKeyboardInputDelegate (
 			PlayerIndex player, 
@@ -200,7 +200,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 //			}
 			if (isVisible)
 				return;
-			
+			isVisible = true;
 			// We clear the key cache state here to prevent any extraneous keys from
 			// corrupting the key states from the time we call the method
 			// to the time it is actually shown.  This seems to be caused because

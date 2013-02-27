@@ -52,12 +52,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Android\AndroidCompatibility.cs" />
     <Compile Include="Android\AndroidGamePlatform.cs" />
     <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Android\IResumeManager.cs" />
+    <Compile Include="Android\ResumeManager.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
@@ -413,6 +417,7 @@
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">

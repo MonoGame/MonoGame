@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -56,7 +56,11 @@ namespace Microsoft.Xna.Framework
 {
     public class OpenTKGameWindow : GameWindow, IDisposable
     {
-        private bool _allowUserResizing;
+        private bool _isResizable;
+        private bool _isBorderless;
+#if WINDOWS
+        private bool _isMouseHidden;
+#endif
         private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle = IntPtr.Zero;
         private OpenTK.GameWindow window;
@@ -99,14 +103,16 @@ namespace Microsoft.Xna.Framework
         // TODO: this is buggy on linux - report to opentk team
         public override bool AllowUserResizing
         {
-            get { return _allowUserResizing; }
+            get { return _isResizable; }
             set
             {
-                _allowUserResizing = value;
-                if (_allowUserResizing)
-                    window.WindowBorder = WindowBorder.Resizable;
+                if (_isResizable != value)
+                    _isResizable = value;
                 else
-                    window.WindowBorder = WindowBorder.Fixed; // OTK's buggy here, let's wait for 1.1
+                    return;
+                if (_isBorderless)
+                    return;
+                window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
             }
         }
 
@@ -118,6 +124,24 @@ namespace Microsoft.Xna.Framework
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
             // Do nothing.  Desktop platforms don't do orientation.
+        }
+
+        public override bool IsBorderless
+        {
+            get { return _isBorderless; }
+            set
+            {
+                if (_isBorderless != value)
+                    _isBorderless = value;
+                else
+                    return;
+                if (_isBorderless)
+                {
+                    window.WindowBorder = WindowBorder.Hidden;
+                }
+                else
+                    window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+            }
         }
 
         #endregion
@@ -220,7 +244,11 @@ namespace Microsoft.Xna.Framework
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
                 
                 // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
-                WindowBorder desired = AllowUserResizing ? WindowBorder.Resizable : WindowBorder.Fixed;
+                WindowBorder desired;
+                if (_isBorderless)
+                    desired = WindowBorder.Hidden;
+                else
+                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
                 if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
                     window.WindowBorder = desired;
             }
@@ -247,6 +275,28 @@ namespace Microsoft.Xna.Framework
             Keyboard.SetKeys(keys);
         }
 
+#if WINDOWS
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            if (!game.IsMouseVisible && !_isMouseHidden)
+            {
+                _isMouseHidden = true;
+                System.Windows.Forms.Cursor.Hide();
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            //There is a bug in OpenTK where the MouseLeave event is raised when the mouse button
+            //is down while the cursor is still in the window bounds.
+            if (_isMouseHidden && Mouse.GetState().LeftButton == ButtonState.Released)
+            {
+                _isMouseHidden = false;
+                System.Windows.Forms.Cursor.Show();
+            }
+        }
+#endif
+
         #endregion
 
         private void Initialize()
@@ -259,7 +309,11 @@ namespace Microsoft.Xna.Framework
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
-            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);                        
+            window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+#if WINDOWS
+            window.MouseEnter += OnMouseEnter;
+            window.MouseLeave += OnMouseLeave;
+#endif
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);

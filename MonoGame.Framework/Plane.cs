@@ -210,7 +210,7 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref BoundingBox box, out PlaneIntersectionType result)
         {
-            result = Intersects(box);
+            box.Intersects (ref this, out result);
         }
 
         public PlaneIntersectionType Intersects(BoundingFrustum frustum)
@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref BoundingSphere sphere, out PlaneIntersectionType result)
         {
-            result = Intersects(sphere);
+            sphere.Intersects(ref this, out result);
         }
 
         public override string ToString()
