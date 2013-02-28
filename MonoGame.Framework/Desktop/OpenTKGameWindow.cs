@@ -378,7 +378,7 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            if (!updateClientBounds)
+            if (this.clientBounds != clientBounds)
             {
                 updateClientBounds = true;
                 this.clientBounds = clientBounds;
