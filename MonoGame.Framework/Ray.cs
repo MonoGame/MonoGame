@@ -88,8 +88,7 @@ namespace Microsoft.Xna.Framework
         {
             const float Epsilon = 1e-6f;
 
-            float tMin = float.MaxValue,
-                  tMax = float.MinValue;
+            float? tMin = null, tMax = null;
 
             if (Math.Abs(Direction.X) < Epsilon)
             {
@@ -126,11 +125,11 @@ namespace Microsoft.Xna.Framework
                     tMaxY = temp;
                 }
 
-                if (tMin > tMaxY || tMinY > tMax)
+                if ((tMin.HasValue && tMin > tMaxY) || (tMax.HasValue && tMinY > tMax))
                     return null;
 
-                if (tMinY > tMin) tMin = tMinY;
-                if (tMaxY < tMax) tMax = tMaxY;
+                if (!tMin.HasValue || tMinY > tMin) tMin = tMinY;
+                if (!tMax.HasValue || tMaxY < tMax) tMax = tMaxY;
             }
 
             if (Math.Abs(Direction.Z) < Epsilon)
@@ -150,11 +149,16 @@ namespace Microsoft.Xna.Framework
                     tMaxZ = temp;
                 }
 
-                if (tMin > tMaxZ || tMinZ > tMax)
+                if ((tMin.HasValue && tMin > tMaxZ) || (tMax.HasValue && tMinZ > tMax))
                     return null;
 
-                if (tMinZ > tMin) tMin = tMinZ;
+                if (!tMin.HasValue || tMinZ > tMin) tMin = tMinZ;
+                if (!tMax.HasValue || tMaxZ < tMax) tMax = tMaxZ;
             }
+
+            // having a positive tMin and a negative tMax means the ray is inside the box
+            // we expect the intesection distance to be 0 in that case
+            if ((tMin.HasValue && tMin < 0) && tMax > 0) return 0;
 
             // a negative tMin means that the intersection point is behind the ray's origin
             // we discard these as not hitting the AABB
