@@ -156,6 +156,10 @@ namespace Microsoft.Xna.Framework
                 if (tMinZ > tMin) tMin = tMinZ;
             }
 
+            // a negative tMin means that the intersection point is behind the ray's origin
+            // we discard these as not hitting the AABB
+            if (tMin < 0) return null;
+
             return tMin;
         }
 
