@@ -1663,11 +1663,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    GraphicsExtensions.CheckGLError();
+                    // http://www.songho.ca/opengl/gl_fbo.html
+                    // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                    // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                    //GraphicsExtensions.CheckGLError();
                     if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
 					{
 						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                        GraphicsExtensions.CheckGLError();
+                        // http://www.songho.ca/opengl/gl_fbo.html
+                        // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                        // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                        //GraphicsExtensions.CheckGLError();
                     }
 				}
 
