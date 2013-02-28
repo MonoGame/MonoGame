@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework
             var winWidth = window.ClientRectangle.Width;
             var winHeight = window.ClientRectangle.Height;
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
-            
+
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
             if (winWidth <= 1 || winHeight <= 1)
@@ -229,10 +229,9 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds)
             {
+                updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
                                      clientBounds.Y, clientBounds.Width, clientBounds.Height);
-
-                updateClientBounds = false;
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
