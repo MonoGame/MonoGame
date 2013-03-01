@@ -83,78 +83,88 @@ namespace Microsoft.Xna.Framework
             return Position.GetHashCode() ^ Direction.GetHashCode();
         }
 
-        
+        // adapted from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
         public float? Intersects(BoundingBox box)
         {
-			//first test if start in box
-			if (Position.X >= box.Min.X
-				&& Position.X <= box.Max.X
-				&& Position.Y >= box.Min.Y
-				&& Position.Y <= box.Max.Y
-				&& Position.Z >= box.Min.Z
-				&& Position.Z <= box.Max.Z)
-				return 0.0f;// here we concidere cube is full and origine is in cube so intersect at origine
+            const float Epsilon = 1e-6f;
 
-			//Second we check each face
-			Vector3 maxT = new Vector3(-1.0f);
-			//Vector3 minT = new Vector3(-1.0f);
-			//calcul intersection with each faces
-			if (Position.X < box.Min.X && Direction.X != 0.0f)
-				maxT.X = (box.Min.X - Position.X) / Direction.X;
-			else if (Position.X > box.Max.X && Direction.X != 0.0f)
-				maxT.X = (box.Max.X - Position.X) / Direction.X;
-			if (Position.Y < box.Min.Y && Direction.Y != 0.0f)
-				maxT.Y = (box.Min.Y - Position.Y) / Direction.Y;
-			else if (Position.Y > box.Max.Y && Direction.Y != 0.0f)
-				maxT.Y = (box.Max.Y - Position.Y) / Direction.Y;
-			if (Position.Z < box.Min.Z && Direction.Z != 0.0f)
-				maxT.Z = (box.Min.Z - Position.Z) / Direction.Z;
-			else if (Position.Z > box.Max.Z && Direction.Z != 0.0f)
-				maxT.Z = (box.Max.Z - Position.Z) / Direction.Z;
+            float? tMin = null, tMax = null;
 
-			//get the maximum maxT
-			if (maxT.X > maxT.Y && maxT.X > maxT.Z)
-			{
-				if (maxT.X < 0.0f)
-					return null;// ray go on opposite of face
-				//coordonate of hit point of face of cube
-				float coord = Position.Z + maxT.X * Direction.Z;
-				// if hit point coord ( intersect face with ray) is out of other plane coord it miss 
-				if (coord < box.Min.Z || coord > box.Max.Z)
-					return null;
-				coord = Position.Y + maxT.X * Direction.Y;
-				if (coord < box.Min.Y || coord > box.Max.Y)
-					return null;
-				return maxT.X;
-			}
-			if (maxT.Y > maxT.X && maxT.Y > maxT.Z)
-			{
-				if (maxT.Y < 0.0f)
-					return null;// ray go on opposite of face
-				//coordonate of hit point of face of cube
-				float coord = Position.Z + maxT.Y * Direction.Z;
-				// if hit point coord ( intersect face with ray) is out of other plane coord it miss 
-				if (coord < box.Min.Z || coord > box.Max.Z)
-					return null;
-				coord = Position.X + maxT.Y * Direction.X;
-				if (coord < box.Min.X || coord > box.Max.X)
-					return null;
-				return maxT.Y;
-			}
-			else //Z
-			{
-				if (maxT.Z < 0.0f)
-					return null;// ray go on opposite of face
-				//coordonate of hit point of face of cube
-				float coord = Position.X + maxT.Z * Direction.X;
-				// if hit point coord ( intersect face with ray) is out of other plane coord it miss 
-				if (coord < box.Min.X || coord > box.Max.X)
-					return null;
-				coord = Position.Y + maxT.Z * Direction.Y;
-				if (coord < box.Min.Y || coord > box.Max.Y)
-					return null;
-				return maxT.Z;
-			}
+            if (Math.Abs(Direction.X) < Epsilon)
+            {
+                if (Position.X < box.Min.X || Position.X > box.Max.X)
+                    return null;
+            }
+            else
+            {
+                tMin = (box.Min.X - Position.X) / Direction.X;
+                tMax = (box.Max.X - Position.X) / Direction.X;
+
+                if (tMin > tMax)
+                {
+                    var temp = tMin;
+                    tMin = tMax;
+                    tMax = temp;
+                }
+            }
+
+            if (Math.Abs(Direction.Y) < Epsilon)
+            {
+                if (Position.Y < box.Min.Y || Position.Y > box.Max.Y)
+                    return null;
+            }
+            else
+            {
+                var tMinY = (box.Min.Y - Position.Y) / Direction.Y;
+                var tMaxY = (box.Max.Y - Position.Y) / Direction.Y;
+
+                if (tMinY > tMaxY)
+                {
+                    var temp = tMinY;
+                    tMinY = tMaxY;
+                    tMaxY = temp;
+                }
+
+                if ((tMin.HasValue && tMin > tMaxY) || (tMax.HasValue && tMinY > tMax))
+                    return null;
+
+                if (!tMin.HasValue || tMinY > tMin) tMin = tMinY;
+                if (!tMax.HasValue || tMaxY < tMax) tMax = tMaxY;
+            }
+
+            if (Math.Abs(Direction.Z) < Epsilon)
+            {
+                if (Position.Z < box.Min.Z || Position.Z > box.Max.Z)
+                    return null;
+            }
+            else
+            {
+                var tMinZ = (box.Min.Z - Position.Z) / Direction.Z;
+                var tMaxZ = (box.Max.Z - Position.Z) / Direction.Z;
+
+                if (tMinZ > tMaxZ)
+                {
+                    var temp = tMinZ;
+                    tMinZ = tMaxZ;
+                    tMaxZ = temp;
+                }
+
+                if ((tMin.HasValue && tMin > tMaxZ) || (tMax.HasValue && tMinZ > tMax))
+                    return null;
+
+                if (!tMin.HasValue || tMinZ > tMin) tMin = tMinZ;
+                if (!tMax.HasValue || tMaxZ < tMax) tMax = tMaxZ;
+            }
+
+            // having a positive tMin and a negative tMax means the ray is inside the box
+            // we expect the intesection distance to be 0 in that case
+            if ((tMin.HasValue && tMin < 0) && tMax > 0) return 0;
+
+            // a negative tMin means that the intersection point is behind the ray's origin
+            // we discard these as not hitting the AABB
+            if (tMin < 0) return null;
+
+            return tMin;
         }
 
 
