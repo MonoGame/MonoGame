@@ -667,6 +667,9 @@ namespace Microsoft.Xna.Framework
 			Mouse.State.Y = (int)(ClientBounds.Height - location.Y);			
 		}
 
+		internal void SetSupportedOrientations(DisplayOrientation orientations)
+		{
+		}
 	}
 }
 
