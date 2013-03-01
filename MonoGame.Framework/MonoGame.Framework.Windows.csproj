@@ -45,25 +45,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.MediaFoundation.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">
-      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.XInput.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
