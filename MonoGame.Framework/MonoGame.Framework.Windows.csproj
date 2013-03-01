@@ -77,7 +77,7 @@
   <ItemGroup>
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
-    <Compile Include="CharInputEventArgs.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
