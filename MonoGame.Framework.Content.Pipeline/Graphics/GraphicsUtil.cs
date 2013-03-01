@@ -171,16 +171,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        [DllImport("PVRTexLibC", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr compressPVRTC(byte[] data, int height, int width, int mipLevels, bool preMultiplied, bool pvrtc4bppCompression, ref IntPtr dataSizes);
-
         private static void CompressPVRTC(TextureContent content, bool premultipliedAlpha)
         {
             // Note: MipGeneration will be done by NVTT, rather than PVRTC's tool.
             // This way we have the same implementation across platforms.
 
             IntPtr dataSizesPtr = IntPtr.Zero;
-            var texDataPtr = compressPVRTC(content.Faces[0][0].GetPixelData(),
+            var texDataPtr = ManagedPVRTC.ManagedPVRTC.CompressTexture(content.Faces[0][0].GetPixelData(),
                                             content.Faces[0][0].Height,
                                             content.Faces[0][0].Width,
                                             1,
