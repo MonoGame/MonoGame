@@ -547,14 +547,21 @@ namespace Microsoft.Xna.Framework.Graphics
             var resource = _renderTargetView.Resource;
             using (var texture2D = new SharpDX.Direct3D11.Texture2D(resource.NativePointer))
             {
-                var currentWidth = PresentationParameters.BackBufferWidth;
-                var currentHeight = PresentationParameters.BackBufferHeight;
+                var currentWidth = Math.Min(PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+                var currentHeight = Math.Max(PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
 
                 if (currentWidth != texture2D.Description.Width &&
                     currentHeight != texture2D.Description.Height)
                 {
-                    PresentationParameters.BackBufferWidth = texture2D.Description.Width;
-                    PresentationParameters.BackBufferHeight = texture2D.Description.Height;
+
+                    var isLandscape = PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight ||
+                                      PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft;
+
+                    var w = isLandscape ? texture2D.Description.Height : texture2D.Description.Width;
+                    var h = isLandscape ? texture2D.Description.Width : texture2D.Description.Height;
+
+                    PresentationParameters.BackBufferWidth = w;
+                    PresentationParameters.BackBufferHeight = h;
 
                     ComObject.Dispose(ref _depthStencilView);
 
@@ -562,8 +569,8 @@ namespace Microsoft.Xna.Framework.Graphics
                         _d3dDevice,
                         new Texture2DDescription()
                         {
-                            Width = PresentationParameters.BackBufferWidth,
-                            Height = PresentationParameters.BackBufferHeight,
+                            Width = texture2D.Description.Width,
+                            Height = texture2D.Description.Height,
                             ArraySize = 1,
                             BindFlags = BindFlags.DepthStencil,
                             CpuAccessFlags = CpuAccessFlags.None,
@@ -575,7 +582,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         }))
                         _depthStencilView = new DepthStencilView(_d3dDevice, depthTexture);
 
-                    Viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+                    Viewport = new Viewport(0, 0, w, h);
                 }
             }
         }
@@ -1499,8 +1506,26 @@ namespace Microsoft.Xna.Framework.Graphics
                 _viewport = value;
 #if DIRECTX
                 if (_d3dContext != null)
+
                 {
-                    var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                    var vp = _viewport.Bounds;
+#if WINDOWS_PHONE
+                    // WP8 viewports are always portrait oriented. Flip the bounds if we're in landscape
+                    if (PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft ||
+                        PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
+                    {
+                        var temp = vp.X;
+                        vp.X = vp.Y;
+                        vp.Y = temp;
+
+                        temp = vp.Width;
+                        vp.Width = vp.Height;
+                        vp.Height = temp;
+                    }
+#endif
+                    var viewport = new SharpDX.ViewportF(vp.X, vp.Y,
+                                                        vp.Width, vp.Height,
+                                                        _viewport.MinDepth, _viewport.MaxDepth);
                     lock (_d3dContext)
                         _d3dContext.Rasterizer.SetViewports(viewport);
                 }
@@ -1735,9 +1760,26 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 lock (_d3dContext)
                 {
-                    var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
-                                                          _viewport.Width, _viewport.Height, 
-                                                          _viewport.MinDepth, _viewport.MaxDepth);
+
+                    var vp = _viewport.Bounds;
+#if WINDOWS_PHONE
+                    // WP8 viewports are always portrait oriented. Flip the bounds if we're in landscape
+                    if (PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeLeft ||
+                        PresentationParameters.DisplayOrientation == DisplayOrientation.LandscapeRight)
+                    {
+                        var temp = vp.X;
+                        vp.X = vp.Y;
+                        vp.Y = temp;
+
+                        temp = vp.Width;
+                        vp.Width = vp.Height;
+                        vp.Height = temp;
+                    }
+#endif
+                    var viewport = new SharpDX.ViewportF(vp.X, vp.Y,
+                                                        vp.Width, vp.Height,
+                                                        _viewport.MinDepth, _viewport.MaxDepth);
+                    
                     _d3dContext.Rasterizer.SetViewports(viewport);
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
                 }

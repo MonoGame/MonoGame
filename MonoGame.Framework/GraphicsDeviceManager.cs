@@ -215,6 +215,65 @@ namespace Microsoft.Xna.Framework
                 return;
 
 #if WINDOWS_PHONE
+            // Set our orientation if we aren't in a supported one.
+            // Trigger an orientation change if our supported orientation
+            // does not match our current one.
+            var currentOrientation = _game.Window.CurrentOrientation;
+            DisplayOrientation newOrientation = DisplayOrientation.Default;
+            if ((currentOrientation & _supportedOrientations) == 0)
+            {
+                // If we only support 'default', Check which orientaton we should be in.
+                if (_supportedOrientations == DisplayOrientation.Default)
+                {
+                    if (_preferredBackBufferHeight >= _preferredBackBufferWidth)
+                        newOrientation = DisplayOrientation.Portrait;
+                    else
+                        newOrientation = DisplayOrientation.LandscapeLeft;
+                }
+                else
+                {
+                    // Not default. Pick the appropriate orientation
+                    switch (currentOrientation)
+                    {
+                        case DisplayOrientation.Portrait:
+                            if ((DisplayOrientation.LandscapeLeft & _supportedOrientations) != 0)
+                                newOrientation = DisplayOrientation.LandscapeLeft;
+                            else
+                                newOrientation = DisplayOrientation.LandscapeRight;
+                            break;
+
+                        case DisplayOrientation.LandscapeLeft:
+                            if ((DisplayOrientation.Portrait & _supportedOrientations) != 0)
+                                newOrientation = DisplayOrientation.Portrait;
+                            else
+                                newOrientation = DisplayOrientation.LandscapeRight;
+                            break;
+
+                        case DisplayOrientation.LandscapeRight:
+                            if ((DisplayOrientation.Portrait & _supportedOrientations) != 0)
+                                newOrientation = DisplayOrientation.Portrait;
+                            else
+                                newOrientation = DisplayOrientation.LandscapeLeft;
+                            break;
+                    }
+                }
+
+                System.Diagnostics.Debug.Assert(newOrientation != DisplayOrientation.Default, "Incompatible orientation setup.");
+
+                (_game.Window as MonoGame.Framework.WindowsPhone.WindowsPhoneGameWindow).SetOrientation(newOrientation); 
+            }
+            // Ensure the presentation parameter orientation and buffer size matches the window
+            _graphicsDevice.PresentationParameters.DisplayOrientation = _game.Window.CurrentOrientation;
+
+            // Set the presentation parameters' actual buffer size to match the orientation
+            bool isLandscape = (0 != (_game.Window.CurrentOrientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)));
+            int w = isLandscape ? Math.Max(_preferredBackBufferWidth, _preferredBackBufferHeight) : Math.Min(_preferredBackBufferWidth, _preferredBackBufferHeight);
+            int h = isLandscape ? Math.Min(_preferredBackBufferWidth, _preferredBackBufferHeight) : Math.Max(_preferredBackBufferWidth, _preferredBackBufferHeight);
+
+            _graphicsDevice.PresentationParameters.BackBufferWidth = w;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = h;
+            _graphicsDevice.Viewport = new Viewport(0, 0, w, h);
+            _graphicsDevice.ScissorRectangle = _graphicsDevice.Viewport.Bounds;
 
 #elif WINDOWS_STOREAPP
 
@@ -314,8 +373,8 @@ namespace Microsoft.Xna.Framework
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth == 0 ? DefaultBackBufferWidth : _preferredBackBufferWidth;
+            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight == 0 ? DefaultBackBufferHeight : _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
@@ -341,6 +400,11 @@ namespace Microsoft.Xna.Framework
 #endif
 
             _graphicsDevice.Initialize();
+
+#if WINDOWS_PHONE
+            //TODO: Temporary workaround to sync up orientation
+            ApplyChanges();
+#endif
 #else
 
 #if MONOMAC

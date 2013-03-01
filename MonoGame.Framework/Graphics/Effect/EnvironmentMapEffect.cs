@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
 
 #if WINDOWS_PHONE
-                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+                _orientedProjection = projection * GraphicsDevice.DeviceOrientation3D;
 #endif
             }
         }
@@ -479,7 +479,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Recompute the world+view+projection matrix or fog vector?
 #if WINDOWS_PHONE
             if (OrientationChanged())
-                _orientedProjection = GraphicsDevice.DeviceOrientation3D * projection;
+                _orientedProjection = projection * GraphicsDevice.DeviceOrientation3D;
 #endif
 
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
