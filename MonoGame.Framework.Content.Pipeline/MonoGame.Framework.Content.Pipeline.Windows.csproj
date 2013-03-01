@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
     <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
@@ -212,14 +215,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x64\PVRTexLibC.dll">
-      <Link>Dependencies\x64\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x86\PVRTexLibC.dll">
-      <Link>Dependencies\x86\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
