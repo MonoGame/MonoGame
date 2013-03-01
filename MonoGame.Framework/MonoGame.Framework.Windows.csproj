@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,25 +45,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.MediaFoundation.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XInput.dll</HintPath>
+      <HintPath>..\..\..\Libs\SharpDX\Bin\Standard-net40\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="CharInputEventArgs.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
