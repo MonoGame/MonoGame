@@ -162,6 +162,8 @@ namespace MonoGame.Framework
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
             _form.ClientSizeChanged += OnClientSizeChanged;
+
+            _form.KeyPress += OnKeyPress;
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -230,6 +232,11 @@ namespace MonoGame.Framework
                 _isMouseHidden = false;
                 Cursor.Show();
             }
+        }
+
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
         }
 
         internal void Initialize()
