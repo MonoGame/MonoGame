@@ -44,7 +44,8 @@ namespace Microsoft.Xna.Framework.Graphics
     internal struct SamplerInfo
     {
         public SamplerType type;
-        public int index;
+        public int textureSlot;
+        public int samplerSlot;
         public string name;
 		public SamplerState state;
 
@@ -109,7 +110,8 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var s = 0; s < samplerCount; s++)
             {
                 Samplers[s].type = (SamplerType)reader.ReadByte();
-                Samplers[s].index = reader.ReadByte();
+                Samplers[s].textureSlot = reader.ReadByte();
+                Samplers[s].samplerSlot = reader.ReadByte();
 
 				if (reader.ReadBoolean())
 				{
@@ -256,7 +258,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 if (loc != -1)
                 {
-                    GL.Uniform1(loc, sampler.index);
+                    GL.Uniform1(loc, sampler.textureSlot);
                     GraphicsExtensions.CheckGLError();
                 }
             }

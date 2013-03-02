@@ -138,7 +138,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // By default use the original sampler name for the parameter name.
                     parameterName = originalSamplerName,
 
-                    index = samplers[i].index,
+                    textureSlot = samplers[i].index,
+                    samplerSlot = samplers[i].index,
                     type = samplers[i].type,
                 };
 
