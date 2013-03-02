@@ -263,10 +263,10 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-            _game.ResizeWindow(false);
+            _game.ResizeWindow();
 
 #elif WINDOWS || LINUX
-            _game.ResizeWindow(false);
+            _game.ResizeWindow();
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
@@ -579,7 +579,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = newClientBounds.Width;
             _graphicsDevice.PresentationParameters.BackBufferHeight = newClientBounds.Height;
 
-            // Set the veiwport so the (potentially) resized client bounds are drawn in the middle of the screen
+            // Set the viewport so the (potentially) resized client bounds are drawn in the middle of the screen
             _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
 
             _game.Window.ClientBounds = newClientBounds;
@@ -590,7 +590,6 @@ namespace Microsoft.Xna.Framework
 
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif
-        }
-
+		}
     }
 }

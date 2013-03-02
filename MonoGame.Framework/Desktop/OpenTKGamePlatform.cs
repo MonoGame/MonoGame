@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
             _view.Window.Run(0);
         }
 
@@ -173,15 +173,15 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
-        internal void ResetWindowBounds(bool toggleFullScreen)
+        internal void ResetWindowBounds()
         {
             Rectangle bounds;
 
