@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
-    class TextInputEventArgs : EventArgs
+    public class TextInputEventArgs : EventArgs
     {
         char character;
         public TextInputEventArgs(char character)
