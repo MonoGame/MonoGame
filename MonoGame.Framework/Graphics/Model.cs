@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (effectMatricies == null) {
 						throw new InvalidOperationException();
 					}
-                    effectMatricies.World = boneTransforms[mesh.ParentBone.Index] * world;
+                    effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;
                     effectMatricies.Projection = projection;
                 }
