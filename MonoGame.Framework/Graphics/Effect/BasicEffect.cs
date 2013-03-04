@@ -40,6 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Fields
 
+
         bool lightingEnabled;
         bool preferPerPixelLighting;
         bool oneLight;
@@ -472,8 +473,24 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
-            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
-            
+#if WINDOWS_PHONE
+            // Save the WVP param in case we need to rotate it to the device's orientation
+            // when drawn to the back buffer.
+            if (OrientationChanged() || (dirtyFlags & EffectDirtyFlags.WorldViewProj) != 0)
+                GraphicsDevice.CurrentWVP = worldViewProjParam;
+#endif
+
+            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
+                ref world,
+                ref view,
+                ref projection, 
+                ref worldView,
+                fogEnabled,
+                fogStart,
+                fogEnd,
+                worldViewProjParam,
+                fogVectorParam);    
+      
             // Recompute the diffuse/emissive/alpha material color parameters?
             if ((dirtyFlags & EffectDirtyFlags.MaterialColor) != 0)
             {

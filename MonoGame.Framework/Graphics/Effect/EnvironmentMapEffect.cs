@@ -124,6 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
             }
         }
+        
 
 
         /// <summary>
@@ -469,7 +470,23 @@ namespace Microsoft.Xna.Framework.Graphics
         protected internal override bool OnApply()
         {
             // Recompute the world+view+projection matrix or fog vector?
-            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags, ref world, ref view, ref projection, ref worldView, fogEnabled, fogStart, fogEnd, worldViewProjParam, fogVectorParam);
+#if WINDOWS_PHONE
+            // Save the WVP param in case we need to rotate it to the device's orientation
+            // when drawn to the back buffer.
+            if (OrientationChanged() || (dirtyFlags & EffectDirtyFlags.WorldViewProj) != 0)
+                GraphicsDevice.CurrentWVP = worldViewProjParam;
+#endif
+
+            dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
+                ref world,
+                ref view,
+                ref projection,
+                ref worldView,
+                fogEnabled,
+                fogStart,
+                fogEnd,
+                worldViewProjParam,
+                fogVectorParam);  
 
             // Recompute the world inverse transpose and eye position?
             dirtyFlags = EffectHelpers.SetLightingMatrices(dirtyFlags, ref world, ref view, worldParam, worldInverseTransposeParam, eyePositionParam);

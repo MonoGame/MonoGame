@@ -108,7 +108,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // GL requires a half pixel offset where as DirectX and PSS does not.
 #if PSM || DIRECTX
+#if WINDOWS_PHONE
+            
+            // Create our projection matrix off the unoriented viewport
+            // which matches the render target
+            var min = Math.Min(vp.Height, vp.Width);
+            var max = Math.Max(vp.Height, vp.Width);
+
+            vp.Width = min;
+            vp.Height = max;
+#endif
             var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
+
+#if WINDOWS_PHONE
+            projection = GraphicsDevice.DeviceOrientation2D * projection;
+#endif
             var transform = _matrix * projection;
 #else
             var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);

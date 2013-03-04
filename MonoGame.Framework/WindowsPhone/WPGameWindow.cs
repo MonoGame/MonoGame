@@ -47,6 +47,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Phone.Controls;
 
 namespace MonoGame.Framework.WindowsPhone
 {
@@ -90,9 +91,11 @@ namespace MonoGame.Framework.WindowsPhone
 
         private static WindowsPhoneGamePlatform Platform { get { return Game.Instance.Platform as WindowsPhoneGamePlatform; } }
 
+        public static PhoneApplicationPage AppPage;
+
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            _supportedOrientations = orientations == DisplayOrientation.Default ? DisplayOrientation.Portrait : orientations;
+            _supportedOrientations = orientations;
         }
 
         #endregion
@@ -192,12 +195,31 @@ namespace MonoGame.Framework.WindowsPhone
             return result;
         }
 
-        private void Page_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        public void SetOrientation(DisplayOrientation orientation)
         {
-            DisplayOrientation orientation = ToOrientation(e.Orientation);
-            // Don't change our orientation if it isn't supported
-            if ((orientation & _supportedOrientations) == 0)
+            // Don't change our orientation if it isn't supported, or if it's the same
+            if ((orientation & _supportedOrientations) == 0 || 
+                orientation == _orientation || 
+                _game.graphicsDeviceManager.GraphicsDevice == null)
                 return;
+
+            var gdm = _game.graphicsDeviceManager;
+            var device = gdm.GraphicsDevice;
+            var bbSize = new Vector2(gdm.PreferredBackBufferWidth, gdm.PreferredBackBufferHeight);
+
+            var w = 0;
+            var h = 0;
+
+            if ((orientation & (DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight)) != 0)
+            {
+                w = (int)Math.Max(bbSize.X, bbSize.Y);
+                h = (int)Math.Min(bbSize.X, bbSize.Y);
+            }
+            else
+            {
+                w = (int)Math.Min(bbSize.X, bbSize.Y);
+                h = (int)Math.Max(bbSize.X, bbSize.Y);
+            }
 
             // Set the new orientation.
             _orientation = orientation;
@@ -205,9 +227,48 @@ namespace MonoGame.Framework.WindowsPhone
             // Call the user callback.
             OnOrientationChanged();
 
+            // Calculate new rotation matrices.
+            switch (_orientation)
+            {
+                case DisplayOrientation.Portrait:
+                    device.DeviceOrientation2D = device.DeviceOrientation3D = Matrix.Identity;
+                    break;
+
+                case DisplayOrientation.LandscapeLeft:
+                    device.DeviceOrientation2D = Matrix.Multiply(
+                        Matrix.CreateRotationZ(MathHelper.PiOver2),
+                        Matrix.CreateTranslation(h, 0, 0));
+                    device.DeviceOrientation3D = new Matrix(
+                        0.0f, -1.0f, 0.0f, 0.0f,
+                        1.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f);
+                    break;
+
+                case DisplayOrientation.LandscapeRight:
+                    device.DeviceOrientation2D = Matrix.Multiply(
+                        Matrix.CreateRotationZ(3 * MathHelper.PiOver2),
+                        Matrix.CreateTranslation(0, w, 0));
+                    device.DeviceOrientation3D = new Matrix(
+                        0.0f, 1.0f, 0.0f, 0.0f,
+                        -1.0f, 0.0f, 0.0f, 0.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f,
+                        0.0f, 0.0f, 0.0f, 1.0f);
+                    break;
+
+                default:
+                    device.DeviceOrientation2D = device.DeviceOrientation3D = Matrix.Identity;
+                    break;
+            }
+        }
+
+        private void Page_OrientationChanged(object sender, OrientationChangedEventArgs e)
+        {			
+            SetOrientation(ToOrientation(e.Orientation));
+
             // If we have a valid client bounds then update the graphics device.
-            //if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-            //    _game.graphicsDeviceManager.ApplyChanges();
+            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
