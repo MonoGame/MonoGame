@@ -184,7 +184,7 @@ namespace MonoGame.Framework
             Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
+            Mouse.State.ScrollWheelValue += mouseEventArgs.Delta;
             
             TouchLocationState? touchState = null;
             if (Mouse.State.LeftButton == ButtonState.Pressed)

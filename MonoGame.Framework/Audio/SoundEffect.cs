@@ -461,11 +461,11 @@ namespace Microsoft.Xna.Framework.Audio
 #if !WINRT && DEBUG
             flags |= XAudio2Flags.DebugEngine;
 #endif
-            // This cannot fail.
-            Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
-
             try
             {
+                // This cannot fail.
+                Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
+
                 Device.StartEngine();
 
                 // Just use the default device.
@@ -491,8 +491,12 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 // Release the device and null it as
                 // we have no audio support.
-                Device.Dispose();
-                Device = null;
+                if (Device != null)
+                {
+                    Device.Dispose();
+                    Device = null;
+                }
+
                 MasterVoice = null;
             }
 
