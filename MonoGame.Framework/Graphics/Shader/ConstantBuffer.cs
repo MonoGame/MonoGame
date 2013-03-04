@@ -223,6 +223,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var offset = _offsets[p];
                 _dirty = true;
 
+#if WINDOWS_PHONE
+                // Save the offset in case we need to rotate
+                // the WVP to the device's orientation when drawn
+                if (param == GraphicsDevice.CurrentWVP)
+                    GraphicsDevice.WVPParamOffset = offset;
+#endif
+
                 SetParameter(offset, param);
             }
 
@@ -236,6 +243,21 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var d3dContext = GraphicsDevice._d3dContext;
+
+#if WINDOWS_PHONE
+            // Recalculate device-oriented WVP if we're rendering to the back buffer.
+            if (!GraphicsDevice.IsRenderTargetBound && 
+                (GraphicsDevice.CurrentWVP != null && GraphicsDevice.WVPParamOffset != -1))
+            {
+                var wvp = GraphicsDevice.CurrentWVP.GetValueMatrix();
+                GraphicsDevice.CurrentWVP.SetValue(wvp * device.DeviceOrientation3D);
+
+                SetParameter(GraphicsDevice.WVPParamOffset, GraphicsDevice.CurrentWVP);
+
+                GraphicsDevice.CurrentWVP = null;
+                GraphicsDevice.WVPParamOffset = -1;
+            }
+#endif
 
             // Update the hardware buffer.
             if (_dirty)

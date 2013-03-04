@@ -311,6 +311,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 OrientationChangedFlag = unchecked(OrientationChangedFlag + 1);
             }
         }
+
+        public EffectParameter CurrentWVP = null;
+        public int WVPParamOffset = -1;
 #endif
 
 #if OPENGL

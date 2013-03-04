@@ -50,9 +50,6 @@ namespace Microsoft.Xna.Framework.Graphics
         Matrix world = Matrix.Identity;
         Matrix view = Matrix.Identity;
         Matrix projection = Matrix.Identity;
-#if WINDOWS_PHONE
-        Matrix _orientedProjection;
-#endif
 
         Matrix worldView;
 
@@ -127,10 +124,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 projection = value;
                 dirtyFlags |= EffectDirtyFlags.WorldViewProj;
-
-#if WINDOWS_PHONE
-                _orientedProjection = projection * GraphicsDevice.DeviceOrientation3D;
-#endif
             }
         }
 
@@ -504,19 +497,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Recompute the world+view+projection matrix or fog vector?
 #if WINDOWS_PHONE
-            if (OrientationChanged())
-                _orientedProjection = projection * GraphicsDevice.DeviceOrientation3D;
+            // Save the WVP param in case we need to rotate it to the device's orientation
+            // when drawn to the back buffer.
+            if (OrientationChanged() || (dirtyFlags & EffectDirtyFlags.WorldViewProj) != 0)
+                GraphicsDevice.CurrentWVP = worldViewProjParam;
 #endif
 
             dirtyFlags = EffectHelpers.SetWorldViewProjAndFog(dirtyFlags,
                 ref world,
                 ref view,
-#if WINDOWS_PHONE
- ref _orientedProjection,
-#else
                 ref projection,
-#endif
- ref worldView,
+                ref worldView,
                 fogEnabled,
                 fogStart,
                 fogEnd,
