@@ -322,8 +322,20 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public GraphicsDevice ()
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
+        /// </summary>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="presentationParameters">The presentation options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="presentationParameters"/> is <see langword="null"/>.
+        /// </exception>
+        public GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
 		{
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
@@ -363,8 +375,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
-			PresentationParameters = new PresentationParameters ();
-			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            GraphicsProfile = graphicsProfile;
+            PresentationParameters = presentationParameters;
+
+            Initialize();
         }
 
         ~GraphicsDevice()
@@ -403,7 +417,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif // OPENGL
 
-        internal void Initialize()
+        private void Initialize()
         {
             GraphicsCapabilities.Initialize(this);
 
@@ -2517,6 +2531,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
-		
+
+#if DIRECTX		
+        /// <summary>
+        /// Sends queued-up commands in the command buffer to the graphics processing unit (GPU).
+        /// </summary>
+        public void Flush()
+        {
+            _d3dContext.Flush();
+        }
+#endif
     }
 }

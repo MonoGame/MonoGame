@@ -125,11 +125,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, false)
+            : this(graphicsDevice, width, height, mipmap, format, false, false)
         {
         }
-		
-		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget)
+
+        internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget, bool shared)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -167,6 +167,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
                 }
             }
+
+            if (shared)
+                desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
@@ -251,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 				
 		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false, false)
 		{			
 		}
 
