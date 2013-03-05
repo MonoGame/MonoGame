@@ -1,8 +1,8 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Users\Dean\Desktop\MonoGameMaster\"
 !define VERSION "3.0"
-!define REVISION "0.0"
+!define REVISION "1"
+!define BUILD "0"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
@@ -12,18 +12,18 @@ SetCompressor /SOLID /FINAL lzma
 !include "MUI2.nsh"
 !include "InstallOptions.nsh"
 
-!define MUI_ICON "${FrameworkPath}Installers\monogame.ico"
+!define MUI_ICON "..\monogame.ico"
 
-!define MUI_UNICON "${FrameworkPath}Installers\monogame.ico"
+!define MUI_UNICON "..\monogame.ico"
 
-Name '${APPNAME} ${VERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${VERSION}.exe'
+Name '${APPNAME} ${VERSION}.${REVISION}'
+OutFile '${INSTALLERFILENAME}Installer-${VERSION}.${REVISION}.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
-VIProductVersion "${VERSION}.${REVISION}"
+VIProductVersion "${VERSION}.${REVISION}.${BUILD}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development Tools"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}.${REVISION}.${BUILD}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}.${REVISION}.${BUILD}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2013"
 
@@ -33,10 +33,10 @@ RequestExecutionLevel admin
 ;Interface Configuration
 
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${FrameworkPath}Installers\monogame.bmp"
+!define MUI_HEADERIMAGE_BITMAP "..\monogame.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEFINISHPAGE_BITMAP "${FrameworkPath}Installers\panel.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "..\panel.bmp"
 ;Languages
 
 !insertmacro MUI_PAGE_WELCOME
@@ -190,45 +190,6 @@ Section "OpenAL" OpenAL
   File '..\..\ThirdParty\Libs\oalinst.exe'
   ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
-
-Section "MonoDevelop Templates" MonoDevelop
-
-; Set output path to the installation directory.
-  SetOutPath $INSTDIR
-  ; check pre-requsites
-  ReadRegStr $0 HKLM 'SOFTWARE\Wow6432Node\Xamarin\MonoDevelop' "Path"
-  ${If} $0 == "" ; check on 32 bit machines just in case
-  ReadRegStr $0 HKLM 'SOFTWARE\Xamarin\MonoDevelop' "Path"
-  ${EndIf}
-
-  ${If} $0 == ""
-  DetailPrint "MonoDevelop Not Found."
-  ${Else}
-  DetailPrint "MonoDevelop Found at $0"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame"
-  ; install the Templates for MonoDevelop
-;  File '..\..\ProjectTemplates\MonoDevelop.MonoGame.${VERSION}\*.*'
-  File '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\bin\Release\MonoDevelop.MonoGame.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\icons"
-  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\icons\*.*'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\templates"
-  File /r '..\..\ProjectTemplates\MonoDevelop\MonoDevelop.MonoGame\MonoDevelop.MonoGame\templates\*.*'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\WindowsGL"
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Android"
-  File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\OUYA"
-  File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
-  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\Linux"
-  File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\MacOS"
-  SetOutPath "$0AddIns\MonoDevelop.MonoGame\assemblies\iOS"
-  ${EndIf}
-  
-SectionEnd
-
 
 Section "Visual Studio 2010 Templates" VS2010
 
