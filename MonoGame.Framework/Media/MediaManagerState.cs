@@ -78,19 +78,39 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     internal sealed class MediaManagerState
     {
-        private static readonly Lazy<MediaManagerState> lazy = new Lazy<MediaManagerState>(() => new MediaManagerState());
-
-        private MediaManagerState()
-        {
-            MediaManager.Startup(true);
-        }
+        private static readonly Lazy<Starter> lazyStartup = new Lazy<Starter>(() => new Starter());
+        private static readonly Lazy<Stopper> lazyShutdown = new Lazy<Stopper>(() => new Stopper());
 
         /// <summary>
         /// Ensures that the MediaManager has been initialised.
         /// </summary>
         public static void CheckStartup()
         {
-            var state = lazy.Value;
+            var state = lazyStartup.Value;
+        }
+
+        /// <summary>
+        /// Ensures that the MediaManager has been shutdown.
+        /// </summary>
+        public static void CheckShutdown()
+        {
+            var state = lazyShutdown.Value;
+        }
+
+        private class Starter
+        {
+            public Starter()
+            {
+                MediaManager.Startup(true);
+            }
+        }
+
+        private class Stopper
+        {
+            public Stopper()
+            {
+                MediaManager.Shutdown();
+            }
         }
     }
 }
