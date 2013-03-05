@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
                         break;
                     case 0: disporientation = DisplayOrientation.Portrait;
                         break;
-                    case 180: disporientation = DisplayOrientation.PortraitUpsideDown;
+                    case 180: disporientation = DisplayOrientation.PortraitDown;
                         break;
                     default:
                         disporientation = DisplayOrientation.LandscapeLeft;

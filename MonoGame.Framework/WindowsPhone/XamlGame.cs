@@ -1,12 +1,15 @@
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input.Touch;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using SharpDX;
 using SharpDX.Direct3D11;
+using Microsoft.Phone.Controls;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input.Touch;
+using Windows.Graphics.Display;
 using Windows.Phone.Input.Interop;
 using Windows.UI.Core;
-using System.Windows.Controls;
-using Windows.Graphics.Display;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace MonoGame.Framework.WindowsPhone
@@ -121,16 +124,20 @@ namespace MonoGame.Framework.WindowsPhone
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
         /// <returns></returns>
-        static public T Create(string launchParameters, DrawingSurfaceBackgroundGrid drawingSurface)
+        static public T Create(string launchParameters, PhoneApplicationPage page)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
-            if (drawingSurface == null)
-                throw new NullReferenceException("The drawing surface cannot be null!");
+            if (page == null)
+                throw new NullReferenceException("The page parameter cannot be null!");
+            if (!(page.Content is DrawingSurfaceBackgroundGrid))
+                throw new NullReferenceException("The drawing surface could not be found!");
+            DrawingSurfaceBackgroundGrid drawingSurface = (DrawingSurfaceBackgroundGrid)page.Content;
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
             WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
             WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
+            WindowsPhoneGameWindow.Page = page;
 
             // Construct the game.
             var game = new T();

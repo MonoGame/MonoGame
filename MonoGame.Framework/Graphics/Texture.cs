@@ -83,6 +83,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return levelCount; }
 		}
 
+        internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
+        {
+            int levels = 1;
+            int size = Math.Max(Math.Max(width, height), depth);
+            while (size > 1)
+            {
+                size = size / 2;
+                levels++;
+            }
+            return levels;
+        }
+
         internal int GetPitch(int width)
         {
             Debug.Assert(width > 0, "The width is negative!");

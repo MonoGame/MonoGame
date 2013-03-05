@@ -246,6 +246,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         internal int glFramebuffer;
+        internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
         internal readonly List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
@@ -1182,16 +1183,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
         }
-
-        public void Clear(ClearOptions options, Color color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Clear(ClearOptions options, Vector4 color, float depth, int stencil, Rectangle[] regions)
-        {
-            throw new NotImplementedException();
-        }
 		
         public void Dispose()
         {
@@ -1278,6 +1269,15 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
                     // Free all the cached shader programs.
                     _programCache.Dispose();
+
+                    GraphicsDevice.AddDisposeAction(() =>
+                                                    {
+                        if (this.glRenderTargetFrameBuffer > 0)
+                        {
+                            GL.DeleteFramebuffers(1, ref this.glRenderTargetFrameBuffer);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                    });
 #endif
 
 #if PSM
@@ -1508,10 +1508,26 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
+#if PSM
+                _graphics.SetFrameBuffer(null);
+#else
                 SetRenderTargets(null);
+#endif
 			else
+#if PSM
+                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
+#else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
+#endif
 		}
+		
+        public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
+        {
+            if (renderTarget == null)
+                SetRenderTarget(null);
+            else
+                SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
+        }
 		
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{
@@ -1519,6 +1535,32 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_currentRenderTargetBindings == null && renderTargets == null)
                 return;
 
+#if OPENGL
+            
+            // if there are render target bindings and we are asked to initialize the bindings
+            // we need to delete the Render Buffers if there were any attached.  If not then
+            // we may run into problems with render targets later being added with different 
+            // sizes which is not allowed.
+            if (_currentRenderTargetBindings != null && renderTargets == null) 
+            {
+                
+                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
+                {
+                    
+                    var renderTarget = _currentRenderTargetBindings[i].RenderTarget as RenderTarget2D;
+                    if (renderTarget != null && renderTarget.DepthStencilFormat != DepthFormat.None)
+                    {
+                        // Delete the render buffers
+                        GL.DeleteRenderbuffers(1, ref renderTarget.glDepthStencilBuffer);
+                        GraphicsExtensions.CheckGLError();
+                    }
+                }
+                
+                _currentRenderTargetBindings = null;
+                
+            }
+            
+#endif
             // If the bindings are the same then early out as well.
             if (    _currentRenderTargetBindings != null && renderTargets != null &&
                     _currentRenderTargetBindings.Length == renderTargets.Length )
@@ -1527,7 +1569,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
                 {
-                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget)
+                    if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
+                        _currentRenderTargetBindings[i].CubeMapFace != renderTargets[i].CubeMapFace)
                     {
                         isEqual = false;
                         break;
@@ -1574,9 +1617,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
-
 #if DIRECTX
+                var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
+
                 // Set the new render targets.
                 _currentRenderTargets[0] = null;
                 _currentRenderTargets[1] = null;
@@ -1586,41 +1629,51 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var b = 0; b < _currentRenderTargetBindings.Length; b++)
                 {
-                    var target = _currentRenderTargetBindings[b]._renderTarget as RenderTarget2D;
-                    _currentRenderTargets[b] = target._renderTargetView;
+                    var binding = _currentRenderTargetBindings[b];
+                    var target = (IRenderTarget)binding.RenderTarget;
+                    var arraySlice = (int)binding.CubeMapFace;
+                    _currentRenderTargets[b] = target.GetRenderTargetView(arraySlice);
+                }
 
                     // Use the depth from the first target.
-                    if (b == 0)
-                        _currentDepthStencilView = target._depthStencilView;
-                }
+                _currentDepthStencilView = renderTarget.GetDepthStencilView();
 
                 // Set the targets.
                 lock (_d3dContext)
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
-
 #elif OPENGL
-				if (renderTarget.glFramebuffer == 0)
+                if (_currentRenderTargetBindings[0].RenderTarget is RenderTargetCube)
+                    throw new NotImplementedException("RenderTargetCube not yet implemented.");
+
+                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
+				if (this.glRenderTargetFrameBuffer == 0)
 				{
 #if GLES
-					GL.GenFramebuffers(1, ref renderTarget.glFramebuffer);
+                    GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
 #else
-					GL.GenFramebuffers(1, out renderTarget.glFramebuffer);
+                    GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
 #endif
                     GraphicsExtensions.CheckGLError();
                 }
 
-				GL.BindFramebuffer(GLFramebuffer, renderTarget.glFramebuffer);
+                GL.BindFramebuffer(GLFramebuffer, this.glRenderTargetFrameBuffer);
                 GraphicsExtensions.CheckGLError();
                 GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
                 if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    GraphicsExtensions.CheckGLError();
+                    // http://www.songho.ca/opengl/gl_fbo.html
+                    // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                    // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                    //GraphicsExtensions.CheckGLError();
                     if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
 					{
 						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                        GraphicsExtensions.CheckGLError();
+                        // http://www.songho.ca/opengl/gl_fbo.html
+                        // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                        // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                        //GraphicsExtensions.CheckGLError();
                     }
 				}
 
@@ -1652,11 +1705,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
                                 
 #endif
+    
+#if !PSM                
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+#endif
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
@@ -1684,7 +1740,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 #if OPENGL
-			// Reset the raster state because we flip verticies
+			// Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
 #endif
