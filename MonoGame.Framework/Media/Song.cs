@@ -185,6 +185,8 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_topology == null)
             {
+                MediaManagerState.CheckStartup();
+
                 MediaFactory.CreateTopology(out _topology);
 
                 SharpDX.MediaFoundation.MediaSource mediaSource;
