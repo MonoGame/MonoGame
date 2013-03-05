@@ -18,6 +18,7 @@
 	   
 	  <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
+    <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
 		
 		<nant buildfile="Installers/default.build" target="build" />
 		
