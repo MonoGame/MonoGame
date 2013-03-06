@@ -38,6 +38,12 @@ purpose and non-infringement.
 */
 #endregion License
 
+#if WINDOWS_PHONE
+extern alias MicrosoftXnaFramework;
+using MsXna_MediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaPlayer;
+#endif
+
+
 using System;
 
 using Microsoft.Xna.Framework.Audio;
@@ -248,6 +254,14 @@ namespace Microsoft.Xna.Framework.Media
 				return true;
 			} 
 		}
+#elif WINDOWS_PHONE
+        public static bool GameHasControl
+        {
+            get
+            {
+                return State == MediaState.Playing || MsXna_MediaPlayer.GameHasControl;
+            }
+        }
 #else
         // TODO: Fix me!
 		public static bool GameHasControl { get { return true; } }
