@@ -312,6 +312,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
+    <Compile Include="WindowsPhone\GamePad.cs" />
     <Compile Include="WindowsPhone\WPGamePlatform.cs" />
     <Compile Include="WindowsPhone\WPGameWindow.cs" />
     <Compile Include="WindowsPhone\XamlGame.cs" />
@@ -421,7 +422,7 @@
     <Reference Include="Microsoft.Xna.Framework">
       <SpecificVersion>False</SpecificVersion>
       <Aliases>MicrosoftXnaFramework</Aliases>
-    </Reference>    
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <Reference Include="SharpDX">
