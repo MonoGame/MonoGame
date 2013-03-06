@@ -255,19 +255,7 @@ namespace Microsoft.Xna.Framework.Content
             var boxed = (object)obj;
 
             foreach (var property in properties)
-            {
-#if WINRT
-                var getter = property.GetMethod;
-                var baseDef = getter.GetRuntimeBaseDefinition();
-#else
-                var getter = property.GetGetMethod();
-                var baseDef = getter.GetBaseDefinition();
-#endif
-                if (baseDef != getter)
-                    continue;
-
                 Read(boxed, input, property);
-            }
 
             foreach (var field in fields)
                 Read(boxed, input, field);
