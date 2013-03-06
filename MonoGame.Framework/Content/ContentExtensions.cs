@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
+using System.Linq;
 
 #if WINRT
 using System.Reflection.Emit;
-using System.Linq;
 #endif
 
 namespace Microsoft.Xna.Framework.Content
@@ -24,15 +24,25 @@ namespace Microsoft.Xna.Framework.Content
 
         public static PropertyInfo[] GetAllProperties(this Type type)
         {
+
+            // Sometimes, overridden properties of abstract classes can show up even with 
+            // BindingFlags.DeclaredOnly is passed to GetProperties. Make sure that
+            // all properties in this list are defined in this class by comparing
+            // its get method with that of it's base class. If they're the same
+            // Then it's an overridden property.
 #if WINRT
             PropertyInfo[] infos= type.GetTypeInfo().DeclaredProperties.ToArray();
             var nonStaticPropertyInfos = from p in infos
-                                         where (p.GetMethod != null) && (!p.GetMethod.IsStatic)
+                                         where (p.GetMethod != null) && (!p.GetMethod.IsStatic) &&
+                                         (p.GetMethod == p.GetMethod.GetRuntimeBaseDefinition())
                                          select p;
             return nonStaticPropertyInfos.ToArray();
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            return type.GetProperties(attrs);
+            var allProps = type.GetProperties(attrs).ToList();
+
+            var props = allProps.FindAll(p => p.GetGetMethod() == p.GetGetMethod().GetBaseDefinition()).ToArray();
+            return props;
 #endif
         }
 

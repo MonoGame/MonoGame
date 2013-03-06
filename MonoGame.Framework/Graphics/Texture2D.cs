@@ -41,6 +41,8 @@ purpose and non-infringement.
 using System;
 #if !PSM
 using System.Drawing;
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -169,7 +171,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSM
-			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+            PixelBufferOption option = PixelBufferOption.None;
+            if (renderTarget)
+			    option = PixelBufferOption.Renderable;
+             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;
@@ -295,6 +300,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     y = 0;
                     w = Math.Max(width >> level, 1);
                     h = Math.Max(height >> level, 1);
+
+#if DIRECTX
+                    // For DXT textures the width and height of each level is a multiply of 4.
+                    if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                    {
+                        w = ((w + 3) / 4) * 4;
+                        h = ((h + 3) / 4) * 4;
+                    }
+#endif
                 }
 
 #if DIRECTX
