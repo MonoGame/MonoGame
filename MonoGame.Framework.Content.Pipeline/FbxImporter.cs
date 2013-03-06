@@ -26,8 +26,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var identity = new ContentIdentity(filename, GetType().Name);
             var importer = new AssimpImporter();
             var scene = importer.ImportFile(filename,
-                                            PostProcessSteps.FlipUVs // So far appears necessary
+                                            PostProcessSteps.FlipUVs | // So far appears necessary
+                                            PostProcessSteps.JoinIdenticalVertices |
+                                            PostProcessSteps.Triangulate |
+                                            PostProcessSteps.SortByPrimitiveType |
+                                            PostProcessSteps.FindInvalidData
                 );
+
+            // TODO: Materials
+            // TODO: Hierarchy
+            // TODO: Bones
 
             var rootNode = new NodeContent
             {

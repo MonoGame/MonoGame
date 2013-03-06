@@ -85,6 +85,7 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />

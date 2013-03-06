@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -18,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         internal ModelContent(ModelBoneContent root, IList<ModelBoneContent> bones, IList<ModelMeshContent> meshes)
         {
             _root = root;
-            _bones = new ModelBoneContentCollection(bones);
+            _bones = bones != null ? new ModelBoneContentCollection(bones) : null;
             _meshes = new ModelMeshContentCollection(meshes);
         }
 
