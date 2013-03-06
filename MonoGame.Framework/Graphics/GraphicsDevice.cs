@@ -417,7 +417,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif // OPENGL
 
-        private void Initialize()
+        internal void Initialize()
         {
             GraphicsCapabilities.Initialize(this);
 
