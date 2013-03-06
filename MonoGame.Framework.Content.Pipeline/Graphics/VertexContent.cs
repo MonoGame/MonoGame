@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -84,7 +85,70 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <exception cref="InvalidContentException">One or more of the vertex channel types are invalid or an unrecognized name was passed to VertexElementUsage.</exception>
         public VertexBufferContent CreateVertexBuffer()
         {
-            throw new NotImplementedException();
+            var vertexBuffer = new VertexBufferContent(positions.Count);
+            var stride = SetupVertexDeclaration(vertexBuffer);
+
+            // TODO: Verify enough elements in channels to match positions?
+
+            // Write out data in an interleaved fashion each channel at a time, for example:
+            //    |------------------------------------------------------------|
+            //    |POSITION[0] | NORMAL[0]  |TEX0[0] | POSITION[1]| NORMAL[1]  |
+            //    |-----------------------------------------------|------------|
+            // #0 |111111111111|____________|________|111111111111|____________|
+            // #1 |111111111111|111111111111|________|111111111111|111111111111|
+            // #2 |111111111111|111111111111|11111111|111111111111|111111111111|
+
+            // #0: Write position vertices using stride to skip over the other channels:
+            vertexBuffer.Write(0, stride, positions);
+
+            var channelOffset = VertexBufferContent.SizeOf(typeof(Vector3));
+            foreach (var channel in Channels)
+            {
+                // #N: Fill in the channel within each vertex
+                var channelType = channel.ElementType;
+                vertexBuffer.Write(channelOffset, stride, channelType, channel);
+                channelOffset += VertexBufferContent.SizeOf(channelType);
+            }
+
+            return vertexBuffer;
+        }
+
+        private int SetupVertexDeclaration(VertexBufferContent result)
+        {
+            var offset = 0;
+
+            // We always have a position channel
+            result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, VertexElementFormat.Vector3,
+                                                                          VertexElementUsage.Position, 0));
+            offset += VertexElementFormat.Vector3.GetTypeSize();
+
+            // Optional channels
+            foreach (var channel in Channels)
+            {
+                VertexElementFormat format;
+                VertexElementUsage usage;
+
+                // Try to determine the vertex format
+                // TODO: Add support for additional formats as they become testable
+                if (channel.ElementType == typeof(Vector3))
+                    format = VertexElementFormat.Vector3;
+                else if (channel.ElementType == typeof(Vector2))
+                    format = VertexElementFormat.Vector2;
+                else
+                    throw new InvalidContentException("Unrecognized vertex content type.");
+
+                // Try to determine the vertex usage
+                if (!VertexChannelNames.TryDecodeUsage(channel.Name, out usage))
+                    throw new InvalidContentException("Unknown vertex element usage.");
+
+                // Try getting the usage index
+                var usageIndex = VertexChannelNames.DecodeUsageIndex(channel.Name);
+
+                result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, format, usage, usageIndex));
+                offset += format.GetTypeSize();
+                result.VertexDeclaration.VertexStride = offset;
+            }
+            return offset;
         }
 
         /// <summary>
