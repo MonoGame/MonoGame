@@ -81,7 +81,7 @@ namespace MonoGame.Framework.WindowsPhone
             : base(game)
         {
             // Setup the game window.
-            Window = new WindowsPhoneGameWindow();
+            Window = new WindowsPhoneGameWindow(game);
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
@@ -161,7 +161,7 @@ namespace MonoGame.Framework.WindowsPhone
         
         public override void Exit()
         {
-            throw new System.NotImplementedException();
+            System.Windows.Application.Current.Terminate();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
