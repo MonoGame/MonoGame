@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 3;
+        private const int Version = 4;
 
         /// <summary>
         /// Writes the effect for loading later.

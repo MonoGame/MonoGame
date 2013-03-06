@@ -2130,25 +2130,29 @@ namespace Microsoft.Xna.Framework
         
         public static void Transpose(ref Matrix matrix, out Matrix result)
         {
-            result.M11 = matrix.M11;
-            result.M12 = matrix.M21;
-            result.M13 = matrix.M31;
-            result.M14 = matrix.M41;
+            Matrix ret;
+            
+            ret.M11 = matrix.M11;
+            ret.M12 = matrix.M21;
+            ret.M13 = matrix.M31;
+            ret.M14 = matrix.M41;
 
-            result.M21 = matrix.M12;
-            result.M22 = matrix.M22;
-            result.M23 = matrix.M32;
-            result.M24 = matrix.M42;
+            ret.M21 = matrix.M12;
+            ret.M22 = matrix.M22;
+            ret.M23 = matrix.M32;
+            ret.M24 = matrix.M42;
 
-            result.M31 = matrix.M13;
-            result.M32 = matrix.M23;
-            result.M33 = matrix.M33;
-            result.M34 = matrix.M43;
+            ret.M31 = matrix.M13;
+            ret.M32 = matrix.M23;
+            ret.M33 = matrix.M33;
+            ret.M34 = matrix.M43;
 
-            result.M41 = matrix.M14;
-            result.M42 = matrix.M24;
-            result.M43 = matrix.M34;
-            result.M44 = matrix.M44;
+            ret.M41 = matrix.M14;
+            ret.M42 = matrix.M24;
+            ret.M43 = matrix.M34;
+            ret.M44 = matrix.M44;
+            
+            result = ret;
         }
         #endregion Public Methods
 		

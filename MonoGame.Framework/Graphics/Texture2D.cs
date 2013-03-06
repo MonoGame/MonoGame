@@ -41,6 +41,8 @@ purpose and non-infringement.
 using System;
 #if !PSM
 using System.Drawing;
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -136,17 +138,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.width = width;
             this.height = height;
             this.format = format;
-            this.levelCount = 1;
-
-            if (mipmap)
-            {
-                int size = Math.Max(this.width, this.height);
-                while (size > 1)
-                {
-                    size = size / 2;
-                    this.levelCount++;
-                }
-            }
+            this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
 #if DIRECTX
 
@@ -165,12 +157,24 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
             if (renderTarget)
+            {
                 desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
+                if (mipmap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
 
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
 
 #elif PSM
-			_texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format));
+            PixelBufferOption option = PixelBufferOption.None;
+            if (renderTarget)
+			    option = PixelBufferOption.Renderable;
+             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;
@@ -296,6 +300,15 @@ namespace Microsoft.Xna.Framework.Graphics
                     y = 0;
                     w = Math.Max(width >> level, 1);
                     h = Math.Max(height >> level, 1);
+
+#if DIRECTX
+                    // For DXT textures the width and height of each level is a multiply of 4.
+                    if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                    {
+                        w = ((w + 3) / 4) * 4;
+                        h = ((h + 3) / 4) * 4;
+                    }
+#endif
                 }
 
 #if DIRECTX
@@ -317,7 +330,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif PSM
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
-
 
 #elif OPENGL
 
@@ -410,18 +422,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void GetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if IOS 
-			throw new NotImplementedException();
-#elif ANDROID
-			if (data == null)
-            {
+            if (data == null || data.Length == 0)
                 throw new ArgumentException("data cannot be null");
-            }
-
             if (data.Length < startIndex + elementCount)
-            {
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
-            }
+
+#if IOS
+
+            // Reading back a texture from GPU memory is unsupported
+            // in OpenGL ES 2.0 and no work around has been implemented.           
+            throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
+
+#elif ANDROID
 
             Rectangle r;
             if (rect != null)
@@ -537,7 +549,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("GetData not implemented for type.");
             }
 #elif PSM
+
             throw new NotImplementedException();
+
 #elif DIRECTX
 
             // Create a temp staging resource for copying the data.

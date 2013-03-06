@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
     <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
@@ -89,6 +92,7 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
+    <Compile Include="Graphics\FontHelper.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
     <Compile Include="Graphics\GraphicsUtil.cs" />
@@ -173,6 +177,7 @@
     <Compile Include="Serialization\Compiler\SingleWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
     <Compile Include="Serialization\Compiler\StringWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
     <Compile Include="Serialization\Compiler\TimeSpanWriter.cs" />
@@ -210,14 +215,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x64\PVRTexLibC.dll">
-      <Link>Dependencies\x64\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x86\PVRTexLibC.dll">
-      <Link>Dependencies\x86\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

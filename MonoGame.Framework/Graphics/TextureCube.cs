@@ -16,7 +16,8 @@ using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 #endif
 #elif DIRECTX
-// TODO
+using SharpDX;
+using SharpDX.Direct3D11;
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
@@ -27,6 +28,10 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		protected int size;
 
+        /// <summary>
+        /// Gets the width and height of the cube map face in pixels.
+        /// </summary>
+        /// <value>The width and height of a cube map face in pixels.</value>
         public int Size
         {
             get
@@ -46,18 +51,47 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 		
 		public TextureCube (GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, size, mipMap, format, false)
 		{
+        }
+
+        internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
+        {
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("graphicsDevice");
 			
+            this.GraphicsDevice = graphicsDevice;
 			this.size = size;
-			this.levelCount = 1;
+            this.format = format;
+            this.levelCount = mipMap ? CalculateMipLevels(size) : 1;
 
 #if DIRECTX
+            var description = new Texture2DDescription
+            {
+                Width = size,
+                Height = size,
+                MipLevels = levelCount,
+                ArraySize = 6, // A texture cube is a 2D texture array with 6 textures.
+                Format = SharpDXHelper.ToFormat(format),
+                BindFlags = BindFlags.ShaderResource,
+                CpuAccessFlags = CpuAccessFlags.None,
+                SampleDescription = { Count = 1, Quality = 0 },
+                Usage = ResourceUsage.Default,
+                OptionFlags = ResourceOptionFlags.TextureCube
+            };
 
+            if (renderTarget)
+            {
+                description.BindFlags |= BindFlags.RenderTarget;
+                if (mipMap)
+                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+            }
+
+            _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, description);
 #elif PSM
 			//TODO
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
-
 #if IOS || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
 #else
@@ -82,12 +116,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
 			
-			for (int i=0; i<6; i++) {
+			for (int i=0; i<6; i++) 
+            {
 				TextureTarget target = GetGLCubeFace((CubeMapFace)i);
 
-				if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
+				if (glFormat == (PixelFormat)All.CompressedTextureFormats) 
+                {
 					throw new NotImplementedException();
-				} else {
+				} 
+                else 
+                {
 #if IOS || ANDROID
 					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #else
@@ -105,13 +143,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
                 GraphicsExtensions.CheckGLError();
-
-				int v = this.size;
-				while (v > 1)
-				{
-					v /= 2;
-					this.levelCount++;
-				}
 			}
 #endif
         }
@@ -141,17 +172,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
 		{
-			SetData<T> (face, 0, null, data, 0, data.Length);
+            SetData(face, 0, null, data, 0, data.Length);
 		}
 
-		public void SetData<T> (CubeMapFace face, T[] data,
-								int startIndex, int elementCount) where T : struct
+        public void SetData<T>(CubeMapFace face, T[] data, int startIndex, int elementCount) where T : struct
 		{
-			SetData<T> (face, 0, null, data, startIndex, elementCount);
+            SetData(face, 0, null, data, startIndex, elementCount);
 		}
 		
-		public void SetData<T>(CubeMapFace face, int level, Rectangle? rect,
-		                       T[] data, int startIndex, int elementCount) where T : struct
+        public void SetData<T>(CubeMapFace face, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
 		{
             if (data == null) 
                 throw new ArgumentNullException("data");
@@ -160,11 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 			
-			var xOffset = 0;
-			var yOffset = 0;
-			var width = Math.Max (1, this.size >> level);
-			var height = Math.Max (1, this.size >> level);
-			
+            int xOffset, yOffset, width, height;
 			if (rect.HasValue)
 			{
 				xOffset = rect.Value.X;
@@ -172,9 +197,41 @@ namespace Microsoft.Xna.Framework.Graphics
 				width = rect.Value.Width;
 				height = rect.Value.Height;
             }
+            else
+            {
+                xOffset = 0;
+                yOffset = 0;
+                width = Math.Max(1, this.size >> level);
+                height = Math.Max(1, this.size >> level);
 
 #if DIRECTX
+                // For DXT textures the width and height of each level is a multiply of 4.
+                if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                {
+                    width = ((width + 3) / 4) * 4;
+                    height = ((height + 3) / 4) * 4;
+                }
+#endif
+            }
 
+#if DIRECTX
+            var box = new DataBox(dataPtr, GetPitch(width), 0);
+
+            int subresourceIndex = (int)face * levelCount + level;
+
+            var region = new ResourceRegion
+            {
+                Top = yOffset,
+                Front = 0,
+                Back = 1,
+                Bottom = yOffset + height,
+                Left = xOffset,
+                Right = xOffset + width
+            };
+
+            var d3dContext = GraphicsDevice._d3dContext;
+            lock (d3dContext)
+                d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
 #elif PSM
 			//TODO
 #else
@@ -182,9 +239,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
 			TextureTarget target = GetGLCubeFace(face);
-			if (glFormat == (PixelFormat)All.CompressedTextureFormats) {
+			if (glFormat == (PixelFormat)All.CompressedTextureFormats) 
+            {
 				throw new NotImplementedException();
-			} else {
+			} 
+            else 
+            {
 				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
                 GraphicsExtensions.CheckGLError();
             }
@@ -193,8 +253,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 #if OPENGL
-		private TextureTarget GetGLCubeFace(CubeMapFace face) {
-			switch (face) {
+		private TextureTarget GetGLCubeFace(CubeMapFace face) 
+        {
+			switch (face) 
+            {
 			case CubeMapFace.PositiveX: return TextureTarget.TextureCubeMapPositiveX;
 			case CubeMapFace.NegativeX: return TextureTarget.TextureCubeMapNegativeX;
 			case CubeMapFace.PositiveY: return TextureTarget.TextureCubeMapPositiveY;

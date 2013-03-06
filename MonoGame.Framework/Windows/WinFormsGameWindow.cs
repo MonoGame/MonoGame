@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -61,6 +61,14 @@ namespace MonoGame.Framework
 
         private WinFormsGamePlatform _platform;
 
+        private bool _isResizable;
+
+        private bool _isBorderless;
+
+        private bool _isMouseHidden;
+
+        private bool _isMouseInBounds;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -84,11 +92,19 @@ namespace MonoGame.Framework
 
         public override bool AllowUserResizing
         {
-            get { return _form.FormBorderStyle == FormBorderStyle.Sizable; }
+            get { return _isResizable; }
             set
             {
-                _form.FormBorderStyle = value ? FormBorderStyle.Sizable : FormBorderStyle.Fixed3D;
-                _form.MaximizeBox = value;
+                if (_isResizable != value)
+                {
+                    _isResizable = value;
+                    _form.MaximizeBox = _isResizable;
+                }
+                else
+                    return;
+                if (_isBorderless)
+                    return;
+                _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
         }
 
@@ -99,6 +115,22 @@ namespace MonoGame.Framework
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
+        }
+
+        public override bool IsBorderless
+        {
+            get { return _isBorderless; }
+            set
+            {
+                if (_isBorderless != value)
+                    _isBorderless = value;
+                else
+                    return;
+                if (_isBorderless)
+                    _form.FormBorderStyle = FormBorderStyle.None;
+                else
+                    _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
+            }
         }
 
         #endregion
@@ -123,11 +155,15 @@ namespace MonoGame.Framework
             _form.MouseWheel += OnMouseState;
             _form.KeyDown += OnKeyDown;
             _form.KeyUp += OnKeyUp;
+            _form.MouseEnter += OnMouseEnter;
+            _form.MouseLeave += OnMouseLeave;
             Keyboard.SetKeys(_keyState);
 
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
             _form.ClientSizeChanged += OnClientSizeChanged;
+
+            _form.KeyPress += OnKeyPress;
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -150,7 +186,7 @@ namespace MonoGame.Framework
             Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
             Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.State.ScrollWheelValue = mouseEventArgs.Delta;
+            Mouse.State.ScrollWheelValue += mouseEventArgs.Delta;
             
             TouchLocationState? touchState = null;
             if (Mouse.State.LeftButton == ButtonState.Pressed)
@@ -176,6 +212,31 @@ namespace MonoGame.Framework
         {
             var key = (XnaKey)keyEventArgs.KeyCode;
             _keyState.Remove(key);
+        }
+
+        private void OnMouseEnter(object sender, EventArgs e)
+        {
+            _isMouseInBounds = true;
+            if (!_platform.IsMouseVisible && !_isMouseHidden)
+            {
+                _isMouseHidden = true;
+                Cursor.Hide();
+            }
+        }
+
+        private void OnMouseLeave(object sender, EventArgs e)
+        {
+            _isMouseInBounds = false;
+            if (_isMouseHidden)
+            {
+                _isMouseHidden = false;
+                Cursor.Show();
+            }
+        }
+
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
         }
 
         internal void Initialize()
@@ -263,6 +324,23 @@ namespace MonoGame.Framework
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+        }
+
+        public void MouseVisibleToggled()
+        {
+            if (_platform.IsMouseVisible)
+            {
+                if (_isMouseHidden)
+                {
+                    Cursor.Show();
+                    _isMouseHidden = false;
+                }
+            }
+            else if (!_isMouseHidden && _isMouseInBounds)
+            {
+                Cursor.Hide();
+                _isMouseHidden = true;
+            }
         }
 
         #endregion
