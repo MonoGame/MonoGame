@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         internal ModelContent(ModelBoneContent root, IList<ModelBoneContent> bones, IList<ModelMeshContent> meshes)
         {
             _root = root;
-            _bones = bones != null ? new ModelBoneContentCollection(bones) : null;
+            _bones = new ModelBoneContentCollection(bones);
             _meshes = new ModelMeshContentCollection(meshes);
         }
 

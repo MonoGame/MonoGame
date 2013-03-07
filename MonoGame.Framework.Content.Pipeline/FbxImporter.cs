@@ -57,18 +57,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             //    });
             //}
 
+            var meshes = new Dictionary<Mesh, MeshContent>();
             foreach (var sceneMesh in scene.Meshes)
             {
                 if (!sceneMesh.HasVertices)
                     continue;
 
-                var mesh = new MeshContent { Name = sceneMesh.Name };
+                var mesh = new MeshContent
+                    {
+                        Name = sceneMesh.Name
+                    };
 
                 // Position vertices are shared at the mesh level
                 foreach (var vert in sceneMesh.Vertices)
                     mesh.Positions.Add(new Vector3(vert.X, vert.Y, vert.Z));
 
-                var geom = new GeometryContent { Name = string.Empty /*Material = materials[sceneMesh.MaterialIndex]*/ };
+                var geom = new GeometryContent
+                    {
+                        Name = string.Empty,
+                        //Material = materials[sceneMesh.MaterialIndex]
+                    };
 
                 // Geometry vertices reference 1:1 with the MeshContent parent,
                 // no indirection is necessary.
@@ -86,6 +94,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 mesh.Geometry.Add(geom);
                 rootNode.Children.Add(mesh);
+                meshes.Add(sceneMesh, mesh);
+            }
+
+            // Hierarchy
+            var bones = new Dictionary<Node, BoneContent>();
+            var hierarchyNodes = scene.RootNode.AsEnumerable().SelectDeep(n => n.Children).ToList();
+            foreach (var node in hierarchyNodes)
+            {
+                var bone = new BoneContent
+                    {
+                        Name = node.Name,
+                        Transform = ToXna(node.Transform)
+                    };
+
+                // Parent bone
+                if (node.Parent == null)
+                {
+                    rootNode.Children.Add(bone);
+                }
+                else
+                {
+                    var parent = bones[node.Parent];
+                    parent.Children.Add(bone);
+                }
+
+                bones.Add(node, bone);
             }
 
             return rootNode;
@@ -143,6 +177,50 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 result[i] = new Vector3(vectors[i].X, vectors[i].Y, vectors[i].Z);
 
             return result;
+        }
+    }
+
+    public static class EnumerableExtensions
+    {
+        /// <summary>
+        /// Returns each element of a tree structure in heriarchical order.
+        /// </summary>
+        /// <typeparam name="T">The enumerated type.</typeparam>
+        /// <param name="source">The enumeration to traverse.</param>
+        /// <param name="selector">A function which returns the children of the element.</param>
+        /// <returns>An IEnumerable whose elements are in tree structure heriarchical order.</returns>
+        public static IEnumerable<T> SelectDeep<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> selector)
+        {
+            var stack = new Stack<T>(source.Reverse());
+            while (stack.Count > 0)
+            {
+                // Return the next item on the stack.
+                var item = stack.Pop();
+                yield return item;
+
+                // Get the children from this item.
+                var children = selector(item);
+
+                // If we have no children then skip it.
+                if (children == null)
+                    continue;
+
+                // We're using a stack, so we need to push the
+                // children on in reverse to get the correct order.
+                foreach (var child in children.Reverse())
+                    stack.Push(child);
+            }
+        }
+
+        /// <summary>
+        /// Returns an enumerable from a single element.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> AsEnumerable<T>(this T item)
+        {
+            yield return item;
         }
     }
 }

@@ -42,12 +42,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         private void WriteBones(ContentWriter output, ModelBoneContentCollection bones)
         {
-            if (bones == null)
-            {
-                output.Write(0u);
-                return;
-            }
-
             output.Write((uint)bones.Count);
 
             // Bone properties
@@ -62,6 +56,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 WriteBoneReference(output, bone.Parent, bones);
 
+                output.Write((uint)bone.Children.Count);
                 foreach (var child in bone.Children)
                     WriteBoneReference(output, child, bones);
             }

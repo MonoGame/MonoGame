@@ -116,7 +116,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 ProcessGeometryUsingMaterial(material, geomsWithMaterial, context);
             }
 
-            return new ModelContent(null, null, _meshes);
+            // Hierarchy
+            var bones = nodes.OfType<BoneContent>().ToList();
+            var modelBones = new List<ModelBoneContent>();
+            for (var i = 0; i < bones.Count; i++)
+            {
+                var bone = bones[i];
+
+                // Find the parent
+                var parentIndex = bones.IndexOf(bone.Parent as BoneContent);
+                ModelBoneContent parent = null;
+                if (parentIndex > -1)
+                    parent = modelBones[parentIndex];
+
+                modelBones.Add(new ModelBoneContent(bone.Name, i, bone.Transform, parent));
+            }
+
+            foreach (var bone in modelBones)
+                bone.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == bone));
+
+            return new ModelContent(modelBones[0], modelBones, _meshes);
         }
 
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
