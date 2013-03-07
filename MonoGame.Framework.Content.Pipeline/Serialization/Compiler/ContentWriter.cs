@@ -477,5 +477,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.Z);
             Write(value.W);
         }
+
+        internal void Write(BoundingSphere value)
+        {
+            Write(value.Center);
+            Write(value.Radius);
+        }
     }
 }

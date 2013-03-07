@@ -172,11 +172,13 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
+    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
     <Compile Include="Serialization\Compiler\Int32Writer.cs" />
     <Compile Include="Serialization\Compiler\Int64Writer.cs" />
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
+    <Compile Include="Serialization\Compiler\ModelWriter.cs" />
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
@@ -197,6 +199,8 @@
     <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
+    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />

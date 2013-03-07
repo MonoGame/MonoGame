@@ -30,6 +30,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <value>The associated VertexDeclarationContent object.</value>
         public VertexDeclarationContent VertexDeclaration { get; private set; }
 
+        internal int VertexCount { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of VertexBufferContent.
         /// </summary>
@@ -114,6 +116,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var next = stream.Position + stride;
                 writer.Write(item.X);
                 writer.Write(item.Y);
+
+                VertexCount++;
                 stream.Seek(next, SeekOrigin.Begin);
             }
         }
@@ -127,6 +131,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 writer.Write(item.X);
                 writer.Write(item.Y);
                 writer.Write(item.Z);
+
+                VertexCount++;
                 stream.Seek(next, SeekOrigin.Begin);
             }
         }
@@ -141,6 +147,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 writer.Write(item.Y);
                 writer.Write(item.Z);
                 writer.Write(item.W);
+
+                VertexCount++;
                 stream.Seek(next, SeekOrigin.Begin);
             }
         }
