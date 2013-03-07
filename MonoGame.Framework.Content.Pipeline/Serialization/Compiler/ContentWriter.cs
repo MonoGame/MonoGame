@@ -294,7 +294,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         public void WriteObject<T>(T value)
         {
             GetTypeWriter(typeof(Dictionary<int, List<string>>));
-            WriteObject<T>(value, GetTypeWriter(value.GetType()));
+            var writer = value != null
+                ? GetTypeWriter(value.GetType())
+                : new BuiltInContentWriter<object>();
+
+            WriteObject<T>(value, writer);
         }
 
         /// <summary>
