@@ -25,6 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var identity = new ContentIdentity(filename, GetType().Name);
             var importer = new AssimpImporter();
+            importer.AttachLogStream(new LogStream((msg, userData) => context.Logger.LogMessage(msg)));
             var scene = importer.ImportFile(filename,
                                             PostProcessSteps.FlipUVs | // So far appears necessary
                                             PostProcessSteps.JoinIdenticalVertices |
@@ -33,10 +34,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                                             PostProcessSteps.FindInvalidData
                 );
 
-            // TODO: Materials
-            // TODO: Hierarchy
-            // TODO: Bones
-
             var rootNode = new NodeContent
             {
                 Name = scene.RootNode.Name,
@@ -44,19 +41,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 Transform = ToXna(scene.RootNode.Transform)
             };
 
-            //var materials = new List<MaterialContent>();
-            //foreach (var sceneMaterial in scene.Materials)
-            //{
-            //    var diffuse = sceneMaterial.GetTexture(TextureType.Diffuse, 0);
+            // TODO: Materials
+            var materials = new List<MaterialContent>();
+            foreach (var sceneMaterial in scene.Materials)
+            {
+                var diffuse = sceneMaterial.GetTexture(TextureType.Diffuse, 0);
 
-            //    materials.Add(new BasicMaterialContent()
-            //    {
-            //        Name = sceneMaterial.Name,
-            //        Identity = identity,
-            //        Texture = new ExternalReference<TextureContent>(diffuse.FilePath, identity)
-            //    });
-            //}
+                materials.Add(new BasicMaterialContent()
+                {
+                    Name = sceneMaterial.Name,
+                    Identity = identity,
+                    Texture = new ExternalReference<TextureContent>(diffuse.FilePath, identity)
+                });
+            }
 
+            // Meshes
             var meshes = new Dictionary<Mesh, MeshContent>();
             foreach (var sceneMesh in scene.Meshes)
             {
@@ -97,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 meshes.Add(sceneMesh, mesh);
             }
 
-            // Hierarchy
+            // Bones
             var bones = new Dictionary<Node, BoneContent>();
             var hierarchyNodes = scene.RootNode.Children.SelectDeep(n => n.Children).ToList();
             foreach (var node in hierarchyNodes)
@@ -105,14 +104,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 var bone = new BoneContent
                     {
                         Name = node.Name,
-                        Transform = ToXna(node.Transform)
+                        Transform = Matrix.Transpose(ToXna(node.Transform))
                     };
-
-                //// Parent bone
-                //var inParent = hierarchyNodes.FirstOrDefault(n => n == node.Parent);
-                //BoneContent outParent = null;
-                //if (inParent != null && bones.TryGetValue(inParent, out outParent))
-                //    bone.Parent = outParent;
 
                 if (node.Parent == scene.RootNode)
                     rootNode.Children.Add(bone);
@@ -121,6 +114,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     var parent = bones[node.Parent];
                     parent.Children.Add(bone);
                 }
+
+                // Copy the bone's name to the MeshContent - this appears to be
+                // the way it comes out of XNA's FBXImporter.
+                foreach (var meshIndex in node.MeshIndices)
+                    meshes[scene.Meshes[meshIndex]].Name = node.Name;
 
                 bones.Add(node, bone);
             }
