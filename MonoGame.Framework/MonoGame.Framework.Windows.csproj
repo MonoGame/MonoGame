@@ -92,6 +92,7 @@
     <Compile Include="Content\ContentReaders\BoundingBoxReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
+    <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
     <Compile Include="Content\ContentReaders\TextureReader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
@@ -99,8 +100,10 @@
     <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
+    <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
@@ -251,6 +254,7 @@
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />

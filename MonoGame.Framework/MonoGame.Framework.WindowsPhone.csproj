@@ -90,6 +90,9 @@
     <NoWarn>0436</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
+    <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
@@ -309,6 +312,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
+    <Compile Include="WindowsPhone\GamePad.cs" />
     <Compile Include="WindowsPhone\WPGamePlatform.cs" />
     <Compile Include="WindowsPhone\WPGameWindow.cs" />
     <Compile Include="WindowsPhone\XamlGame.cs" />
@@ -418,7 +422,7 @@
     <Reference Include="Microsoft.Xna.Framework">
       <SpecificVersion>False</SpecificVersion>
       <Aliases>MicrosoftXnaFramework</Aliases>
-    </Reference>    
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <Reference Include="SharpDX">

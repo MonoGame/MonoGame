@@ -93,6 +93,11 @@ namespace MonoGame.Framework
             get { return GameRunBehavior.Synchronous; }
         }
 
+        protected override void OnIsMouseVisibleChanged()
+        {
+            _window.MouseVisibleToggled();
+        }
+
         public override void BeforeInitialize()
         {
             _window.Initialize();

@@ -1,9 +1,6 @@
 [submodule "ThirdParty/Libs"]
 	path = ThirdParty/Libs
 	url = https://github.com/kungfubanana/MonoGame-Dependencies.git
-[submodule "Tests"]
-	path = Tests
-	url = https://github.com/kungfubanana/MonoGame-Tests.git
 [submodule "Samples"]
 	path = Samples
 	url = https://github.com/CartBlanche/MonoGame-Samples.git

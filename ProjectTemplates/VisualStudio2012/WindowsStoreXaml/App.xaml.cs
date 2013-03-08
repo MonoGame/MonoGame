@@ -36,7 +36,7 @@ namespace $safeprojectname$
             if (gamePage == null)
             {
                 // Create a main GamePage
-                gamePage = new GamePage(args.Arguments);
+                gamePage = new GamePage(args);
 
                 if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

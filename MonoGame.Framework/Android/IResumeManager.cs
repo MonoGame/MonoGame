@@ -1,7 +1,7 @@
 #region License
 /*
 Microsoft Public License (Ms-PL)
-XnaTouch - Copyright Â© 2009 The XnaTouch Team
+MonoGame - Copyright © 2012 The MonoGame Team
 
 All rights reserved.
 
@@ -42,15 +42,22 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
-    [Flags]
-    public enum DisplayOrientation
+    /// <summary>
+    /// Interface for a class that handles resuming after a device lost event.
+    /// In particular, this allows the game to draw something to the screen whilst
+    /// graphics content is reloaded - a potentially lengthy operation.
+    /// </summary>
+    public interface IResumeManager
     {
-        Default = 0,
-        LandscapeLeft = 1,
-        LandscapeRight = 2,
-        Portrait = 4,
-        PortraitDown = 8,
-        Unknown = 16
+        /// <summary>
+        /// Called at the start of the resume process. Textures should always be reloaded here.
+        /// If using a ContentManager, it should be disposed and recreated.
+        /// </summary>
+        void LoadContent();
+
+        /// <summary>
+        /// Called whilst the game is resuming. Draw something to the screen here.
+        /// </summary>
+        void Draw();
     }
 }
-
