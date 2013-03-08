@@ -163,8 +163,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                  primitiveCount / 3)
                     };
 
+                var parent = geometry.Parent;
                 var bounds = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions);
-                _meshes.Add(new ModelMeshContent(geometry.Name, geometry.Parent, null, bounds, parts));
+                _meshes.Add(new ModelMeshContent(parent.Name, geometry.Parent, null, bounds, parts));
             }
         }
 

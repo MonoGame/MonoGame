@@ -13,21 +13,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             WriteBones(output, value.Bones);
 
-            output.Write(value.Meshes.Count);
+            output.Write((uint)value.Meshes.Count);
             foreach (var mesh in value.Meshes)
             {
-                output.Write(mesh.Name);
+                output.WriteObject(mesh.Name);
                 WriteBoneReference(output, mesh.ParentBone, value.Bones);
                 output.Write(mesh.BoundingSphere);
                 output.WriteObject(mesh.Tag);
 
-                output.Write(mesh.MeshParts.Count);
+                output.Write((uint)mesh.MeshParts.Count);
                 foreach (var part in mesh.MeshParts)
                 {
-                    output.Write(part.VertexOffset);
-                    output.Write(part.NumVertices);
-                    output.Write(part.StartIndex);
-                    output.Write(part.PrimitiveCount);
+                    output.Write((uint)part.VertexOffset);
+                    output.Write((uint)part.NumVertices);
+                    output.Write((uint)part.StartIndex);
+                    output.Write((uint)part.PrimitiveCount);
                     output.WriteObject(part.Tag);
 
                     output.WriteSharedResource(part.VertexBuffer);
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             // Bone properties
             foreach (var bone in bones)
             {
-                output.Write(bone.Name);
+                output.WriteObject(bone.Name);
                 output.Write(bone.Transform);
             }
 

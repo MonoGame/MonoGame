@@ -13,14 +13,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             // If fpr whatever reason there isn't a vertex stride defined, it's going to
             // cause problems after reading it in, so better to fail early here.
-            output.Write(value.VertexStride.Value);
-            output.Write(value.VertexElements.Count);
+            output.Write((uint)value.VertexStride.Value);
+            output.Write((uint)value.VertexElements.Count);
             foreach (var element in value.VertexElements)
             {
-                output.Write(element.Offset);
+                output.Write((uint)element.Offset);
                 output.Write((int)element.VertexElementFormat);
                 output.Write((int)element.VertexElementUsage);
-                output.Write(element.UsageIndex);
+                output.Write((uint)element.UsageIndex);
             }
         }
     }

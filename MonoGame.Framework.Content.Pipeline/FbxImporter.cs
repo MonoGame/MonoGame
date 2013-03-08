@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Hierarchy
             var bones = new Dictionary<Node, BoneContent>();
-            var hierarchyNodes = scene.RootNode.AsEnumerable().SelectDeep(n => n.Children).ToList();
+            var hierarchyNodes = scene.RootNode.Children.SelectDeep(n => n.Children).ToList();
             foreach (var node in hierarchyNodes)
             {
                 var bone = new BoneContent
@@ -108,11 +108,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         Transform = ToXna(node.Transform)
                     };
 
-                // Parent bone
-                if (node.Parent == null)
-                {
+                //// Parent bone
+                //var inParent = hierarchyNodes.FirstOrDefault(n => n == node.Parent);
+                //BoneContent outParent = null;
+                //if (inParent != null && bones.TryGetValue(inParent, out outParent))
+                //    bone.Parent = outParent;
+
+                if (node.Parent == scene.RootNode)
                     rootNode.Children.Add(bone);
-                }
                 else
                 {
                     var parent = bones[node.Parent];
