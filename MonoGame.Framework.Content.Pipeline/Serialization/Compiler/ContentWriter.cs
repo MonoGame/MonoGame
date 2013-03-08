@@ -293,12 +293,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This method can be called recursively with a null value.</remarks>
         public void WriteObject<T>(T value)
         {
-            GetTypeWriter(typeof(Dictionary<int, List<string>>));
-            var writer = value != null
-                ? GetTypeWriter(value.GetType())
-                : new BuiltInContentWriter<object>();
-
-            WriteObject<T>(value, writer);
+            if (value == null)
+                Write7BitEncodedInt(0);
+            else
+                WriteObject<T>(value, GetTypeWriter(value.GetType()));
         }
 
         /// <summary>
