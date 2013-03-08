@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected internal override void Write(ContentWriter output, VertexBufferContent value)
         {
             output.WriteRawObject(value.VertexDeclaration);
-            output.Write((uint)value.VertexCount);
+            output.Write((uint)(value.VertexData.Length / value.VertexDeclaration.VertexStride));
             output.Write(value.VertexData);
         }
     }
