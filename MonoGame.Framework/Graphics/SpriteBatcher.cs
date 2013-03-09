@@ -51,6 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	internal class SpriteBatcher
 	{
+        /*
+         * Note that this class is fundamental to high performance for SpriteBatch games. Please exercise
+         * caution when making changes to this class.
+         */
+
         /// <summary>
         /// Initialization size for the batch item list and queue.
         /// </summary>
@@ -93,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			_batchItemList = new List<SpriteBatchItem>(InitialBatchSize);
 			_freeBatchItemQueue = new Queue<SpriteBatchItem>(InitialBatchSize);
 
-            EnsureIndexBufferCapacity(InitialBatchSize);
+            EnsureArrayCapacity(InitialBatchSize);
 		}
 
         /// <summary>
@@ -116,10 +121,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Resize and recreate the missing indices for the index and vertex position color buffers.
         /// </summary>
         /// <param name="numBatchItems"></param>
-        private void EnsureIndexBufferCapacity(int numBatchItems)
+        private void EnsureArrayCapacity(int numBatchItems)
         {
             int neededCapacity = 6 * numBatchItems;
-            if (_index != null && neededCapacity < _index.Length)
+            if (_index != null && neededCapacity <= _index.Length)
             {
                 // Short circuit out of here because we have enough capacity.
                 return;
@@ -232,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     numBatchesToProcess = MaxBatchSize;
                 }
-                EnsureIndexBufferCapacity(numBatchesToProcess);
+                EnsureArrayCapacity(numBatchesToProcess);
                 // Draw the batches
                 for(int i = 0; i < numBatchesToProcess; i++, batchIndex++) 
                 {
