@@ -338,9 +338,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
         {
-            Shader vertexShader = null;
-            Shader pixelShader = null;
-
             var collection = new EffectPassCollection();
 
             var count = (int)reader.ReadByte();
@@ -350,21 +347,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
-                
-                // Assign these to the default shaders at this point? or do that in the effect pass.
                 // Get the vertex shader.
+                Shader vertexShader = null;
                 var shaderIndex = (int)reader.ReadByte();
                 if (shaderIndex != 255)
-                {
                     vertexShader = shaders[shaderIndex];
-                }
 
                 // Get the pixel shader.
+                Shader pixelShader = null;
                 shaderIndex = (int)reader.ReadByte();
                 if (shaderIndex != 255)
-                {
                     pixelShader = shaders[shaderIndex];
-                }
 
 				BlendState blend = null;
 				DepthStencilState depth = null;
