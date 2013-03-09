@@ -62,7 +62,6 @@ using MonoTouch.Foundation;
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #elif WINDOWS || LINUX
-using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
@@ -80,6 +79,9 @@ using ErrorCode = OpenTK.Graphics.ES20.All;
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #endif
 
+#if WINDOWS || LINUX || MONOMAC
+using System.Drawing.Imaging;
+#endif
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
@@ -800,7 +802,8 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             waitEvent.Wait();
-
+#elif MONOMAC
+			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
 #endif
@@ -810,12 +813,73 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
+#elif MONOMAC
+			SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
             throw new NotImplementedException();
 #endif
         }
+
+#if MONOMAC
+		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+		{
+			if (stream == null)
+			{
+				throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
+			}
+			if (width <= 0)
+			{
+				throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
+			}
+			if (height <= 0)
+			{
+				throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
+			}
+			if (format == null)
+			{
+				throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
+			}
+			
+			byte[] data = null;
+			GCHandle? handle = null;
+			Bitmap bitmap = null;
+			try 
+			{
+				data = new byte[width * height * 4];
+				handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+				GetData(data);
+				
+				// internal structure is BGR while bitmap expects RGB
+				for(int i = 0; i < data.Length; i += 4)
+				{
+					byte temp = data[i + 0];
+					data[i + 0] = data[i + 2];
+					data[i + 2] = temp;
+				}
+				
+				bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.Value.AddrOfPinnedObject());
+				
+				bitmap.Save(stream, format);
+			} 
+			finally 
+			{
+				if (bitmap != null)
+				{
+					bitmap.Dispose();
+				}
+				if (handle.HasValue)
+				{
+					handle.Value.Free();
+				}
+				if (data != null)
+				{
+					data = null;
+				}
+			}
+		}
+#endif
 
 #if WINDOWS_STOREAPP
 
