@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -14,27 +15,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// <remarks>This type directly corresponds to the runtime VertexBuffer class, and when a VertexBufferContent object is passed to the content compiler, the vertex data deserializes directly into a VertexBuffer at runtime. VertexBufferContent objects are not directly created by importers. The preferred method is to store vertex data in the more flexible VertexContent class.</remarks>
     public class VertexBufferContent : ContentItem
     {
-        byte[] vertexData;
-        VertexDeclarationContent vertexDeclarationContent;
+        MemoryStream stream;
+        BinaryWriter writer;
 
         /// <summary>
         /// Gets the array containing the raw bytes of the packed vertex data. Use this method to get and set the contents of the vertex buffer.
         /// </summary>
         /// <value>Raw data of the packed vertex data.</value>
-        public byte[] VertexData { get { return vertexData; } }
+        public byte[] VertexData { get { return stream.ToArray(); } }
 
         /// <summary>
         /// Gets the associated VertexDeclarationContent object.
         /// </summary>
         /// <value>The associated VertexDeclarationContent object.</value>
-        public VertexDeclarationContent VertexDeclaration { get { return vertexDeclarationContent; } set { vertexDeclarationContent = value; } }
+        public VertexDeclarationContent VertexDeclaration { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of VertexBufferContent.
         /// </summary>
         public VertexBufferContent()
         {
-
+            stream = new MemoryStream();
+            writer = new BinaryWriter(stream);
+            VertexDeclaration = new VertexDeclarationContent();
         }
 
         /// <summary>
@@ -44,7 +47,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public VertexBufferContent(int size)
             : base()
         {
-
+            stream = new MemoryStream(size);
+            writer = new BinaryWriter(stream);
+            VertexDeclaration = new VertexDeclarationContent();
         }
 
         /// <summary>
@@ -56,6 +61,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <exception cref="NotSupportedException">type is not a valid value type</exception>
         public static int SizeOf(Type type)
         {
+            if (type == typeof(Vector2))
+                return 8;
+
+            if (type == typeof(Vector3))
+                return 12;
+
+            if (type == typeof(Vector4))
+                return 16;
+
             throw new NotSupportedException();
         }
 
@@ -69,7 +83,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <exception cref="NotSupportedException">The specified data type cannot be packed into a vertex buffer.</exception>
         public void Write<T>(int offset, int stride, IEnumerable<T> data)
         {
-            throw new NotSupportedException();
+            Write(offset, stride, typeof(T), data);
         }
 
         /// <summary>
@@ -82,7 +96,53 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <exception cref="NotSupportedException">The specified data type cannot be packed into a vertex buffer.</exception>
         public void Write(int offset, int stride, Type dataType, IEnumerable data)
         {
-            throw new NotSupportedException();
+            if (dataType == typeof(Vector2))
+                Write(offset, stride, data as IEnumerable<Vector2>);
+            else if (dataType == typeof(Vector3))
+                Write(offset, stride, data as IEnumerable<Vector3>);
+            else if (dataType == typeof(Vector4))
+                Write(offset, stride, data as IEnumerable<Vector4>);
+            else
+                throw new NotSupportedException();
+        }
+
+        private void Write(int offset, int stride, IEnumerable<Vector2> data)
+        {
+            stream.Seek(offset, SeekOrigin.Begin);
+            foreach (var item in data)
+            {
+                var next = stream.Position + stride;
+                writer.Write(item.X);
+                writer.Write(item.Y);
+                stream.Seek(next, SeekOrigin.Begin);
+            }
+        }
+
+        private void Write(int offset, int stride, IEnumerable<Vector3> data)
+        {
+            stream.Seek(offset, SeekOrigin.Begin);
+            foreach (var item in data)
+            {
+                var next = stream.Position + stride;
+                writer.Write(item.X);
+                writer.Write(item.Y);
+                writer.Write(item.Z);
+                stream.Seek(next, SeekOrigin.Begin);
+            }
+        }
+
+        private void Write(int offset, int stride, IEnumerable<Vector4> data)
+        {
+            stream.Seek(offset, SeekOrigin.Begin);
+            foreach (var item in data)
+            {
+                var next = stream.Position + stride;
+                writer.Write(item.X);
+                writer.Write(item.Y);
+                writer.Write(item.Z);
+                writer.Write(item.W);
+                stream.Seek(next, SeekOrigin.Begin);
+            }
         }
     }
 }
