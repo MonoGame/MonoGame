@@ -16,7 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
             foreach (var sampler in _samplers)
             {
                 writer.Write((byte)sampler.type);
-                writer.Write((byte)sampler.index);
+                writer.Write((byte)sampler.textureSlot);
+                writer.Write((byte)sampler.samplerSlot);
 
 				if (sampler.state != null)
 				{

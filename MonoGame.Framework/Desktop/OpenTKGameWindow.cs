@@ -72,6 +72,7 @@ namespace Microsoft.Xna.Framework
         // we need this variables to make changes beetween threads
         private WindowState windowState;
         private Rectangle clientBounds;
+        private Rectangle targetBounds;
         private bool updateClientBounds;
         bool disposed;
 
@@ -192,7 +193,7 @@ namespace Microsoft.Xna.Framework
             var winWidth = window.ClientRectangle.Width;
             var winHeight = window.ClientRectangle.Height;
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
-            
+
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
             if (winWidth <= 1 || winHeight <= 1)
@@ -207,7 +208,7 @@ namespace Microsoft.Xna.Framework
 
             Game.GraphicsDevice.Viewport = new Viewport(0, 0, winWidth, winHeight);
 
-            ChangeClientBounds(winRect);
+            clientBounds = winRect;
 
             OnClientSizeChanged();
         }
@@ -229,10 +230,9 @@ namespace Microsoft.Xna.Framework
             // we should wait until window's not fullscreen to resize
             if (updateClientBounds)
             {
-                window.ClientRectangle = new System.Drawing.Rectangle(clientBounds.X,
-                                     clientBounds.Y, clientBounds.Width, clientBounds.Height);
-
                 updateClientBounds = false;
+                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
+                                     targetBounds.Y, targetBounds.Width, targetBounds.Height);
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
@@ -249,7 +249,16 @@ namespace Microsoft.Xna.Framework
                 if (_isBorderless)
                     desired = WindowBorder.Hidden;
                 else
+#if LINUX
+                    // OpenTK on Linux currently does not allow the window to be resized if the border is fixed.
+                    // We get the resize event for the intended size, then immediately get a resize event for the original size.
+                    // This was preventing GraphicsDeviceManager.PreferredBackBufferWidth and PreferredBackBufferHeight from
+                    // having any effect.
+                    // http://www.opentk.com/node/3132
+                    desired = WindowBorder.Resizable;
+#else
                     desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+#endif
                 if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
                     window.WindowBorder = desired;
             }
@@ -303,6 +312,11 @@ namespace Microsoft.Xna.Framework
         }
 #endif
 
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
+        }
+        
         #endregion
 
         private void Initialize()
@@ -316,10 +330,15 @@ namespace Microsoft.Xna.Framework
             window.Resize += OnResize;
             window.Keyboard.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
             window.Keyboard.KeyUp += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyUp);
+#if LINUX
+            window.WindowBorder = WindowBorder.Resizable;
+#endif
 #if WINDOWS
             window.MouseEnter += OnMouseEnter;
             window.MouseLeave += OnMouseLeave;
 #endif
+
+            window.KeyPress += OnKeyPress;
             
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
@@ -378,10 +397,10 @@ namespace Microsoft.Xna.Framework
 
         internal void ChangeClientBounds(Rectangle clientBounds)
         {
-            if (!updateClientBounds)
+            if (this.clientBounds != clientBounds)
             {
                 updateClientBounds = true;
-                this.clientBounds = clientBounds;
+                targetBounds = clientBounds;
             }
         }
 

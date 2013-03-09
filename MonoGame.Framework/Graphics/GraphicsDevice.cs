@@ -1535,6 +1535,32 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_currentRenderTargetBindings == null && renderTargets == null)
                 return;
 
+#if OPENGL
+            
+            // if there are render target bindings and we are asked to initialize the bindings
+            // we need to delete the Render Buffers if there were any attached.  If not then
+            // we may run into problems with render targets later being added with different 
+            // sizes which is not allowed.
+            if (_currentRenderTargetBindings != null && renderTargets == null) 
+            {
+                
+                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
+                {
+                    
+                    var renderTarget = _currentRenderTargetBindings[i].RenderTarget as RenderTarget2D;
+                    if (renderTarget != null && renderTarget.DepthStencilFormat != DepthFormat.None)
+                    {
+                        // Delete the render buffers
+                        GL.DeleteRenderbuffers(1, ref renderTarget.glDepthStencilBuffer);
+                        GraphicsExtensions.CheckGLError();
+                    }
+                }
+                
+                _currentRenderTargetBindings = null;
+                
+            }
+            
+#endif
             // If the bindings are the same then early out as well.
             if (    _currentRenderTargetBindings != null && renderTargets != null &&
                     _currentRenderTargetBindings.Length == renderTargets.Length )
@@ -1637,11 +1663,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (renderTarget.DepthStencilFormat != DepthFormat.None)
 				{
 					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    GraphicsExtensions.CheckGLError();
+                    // http://www.songho.ca/opengl/gl_fbo.html
+                    // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                    // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                    //GraphicsExtensions.CheckGLError();
                     if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
 					{
 						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                        GraphicsExtensions.CheckGLError();
+                        // http://www.songho.ca/opengl/gl_fbo.html
+                        // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
+                        // below.  If we check for GLError here we could be catching errors from previous commands and not this.
+                        //GraphicsExtensions.CheckGLError();
                     }
 				}
 

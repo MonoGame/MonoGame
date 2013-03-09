@@ -31,6 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet, Version=3.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
     <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
@@ -81,6 +88,7 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />
@@ -128,6 +136,14 @@
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+    <Compile Include="Processors\ModelBoneContent.cs" />
+    <Compile Include="Processors\ModelBoneContentCollection.cs" />
+    <Compile Include="Processors\ModelContent.cs" />
+    <Compile Include="Processors\ModelMeshContent.cs" />
+    <Compile Include="Processors\ModelMeshContentCollection.cs" />
+    <Compile Include="Processors\ModelMeshPartContent.cs" />
+    <Compile Include="Processors\ModelMeshPartContentCollection.cs" />
+    <Compile Include="Processors\ModelProcessor.cs" />
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
     <Compile Include="Processors\SoundEffectContent.cs" />
@@ -159,11 +175,13 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
+    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
     <Compile Include="Serialization\Compiler\Int32Writer.cs" />
     <Compile Include="Serialization\Compiler\Int64Writer.cs" />
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
+    <Compile Include="Serialization\Compiler\ModelWriter.cs" />
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
@@ -184,6 +202,8 @@
     <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
+    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
@@ -212,16 +232,26 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x64\PVRTexLibC.dll">
-      <Link>Dependencies\x64\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\PVRTexLibC\Windows\x86\PVRTexLibC.dll">
-      <Link>Dependencies\x86\PVRTexLibC.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+      <Link>Assimp32.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

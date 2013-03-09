@@ -114,7 +114,7 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
    return null;
 };
 
-Sampler_State_Expression -> Identifier Equals (LessThan Identifier GreaterThan | Identifier | Number) Semicolon
+Sampler_State_Expression -> Identifier Equals ((LessThan|OpenParenthesis) Identifier (GreaterThan|CloseParenthesis) | Identifier | Number) Semicolon
 {
 	var name = $Identifier[0] as string;
 	var value = ($Identifier[1] ?? ($Identifier[2] ?? $Number[0])) as string;	

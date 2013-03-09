@@ -1,0 +1,653 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="MonoGame.Tests.Windows" total="92" errors="14" failures="16" not-run="1" inconclusive="0" ignored="1" skipped="0" invalid="0" date="2012-03-08" time="11:13:04">
+  <environment nunit-version="2.6.0.12051" clr-version="4.0.30319.261" os-version="Microsoft Windows NT 6.1.7601 Service Pack 1" platform="Win32NT" cwd="C:\Users\chris\projects\monogame\Tests\bin\Debug-CLI" machine-name="CHRIS-WIN7" user="chris" user-domain="chris-win7" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="Project" name="MonoGame.Tests.Windows" executed="True" result="Failure" success="False" time="41.909" asserts="0">
+    <results>
+      <test-suite type="Assembly" name="C:\Users\chris\projects\monogame\Tests\bin\Debug-CLI\MonoGame.Tests.Windows.exe" executed="True" result="Failure" success="False" time="41.896" asserts="0">
+        <properties>
+          <property name="APARTMENT_STATE" value="STA" />
+        </properties>
+        <results>
+          <test-suite type="Namespace" name="MonoGame" executed="True" result="Failure" success="False" time="41.896" asserts="0">
+            <results>
+              <test-suite type="Namespace" name="Tests" executed="True" result="Failure" success="False" time="41.896" asserts="0">
+                <results>
+                  <test-suite type="TestFixture" name="GameTest+Behaviors" executed="True" result="Failure" success="False" time="1.608" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Behaviors.Fixed_time_step_skips_draw_when_update_is_slow" executed="False" result="Ignored">
+                        <properties>
+                          <property name="APARTMENT_STATE" value="STA" />
+                        </properties>
+                        <reason>
+                          <message><![CDATA[]]></message>
+                        </reason>
+                      </test-case>
+                      <test-case name="MonoGame.Tests.GameTest+Behaviors.Nongraphical_run_succeeds" executed="True" result="Error" success="False" time="1.595" asserts="0">
+                        <properties>
+                          <property name="APARTMENT_STATE" value="STA" />
+                        </properties>
+                        <failure>
+                          <message><![CDATA[System.InvalidOperationException : No Graphics Device Manager]]></message>
+                          <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_graphicsDeviceManager() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 606
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 325
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.GameTest.Behaviors.Nongraphical_run_succeeds() in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 210
+]]></stack-trace>
+                        </failure>
+                      </test-case>
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Disposal" executed="True" result="Failure" success="False" time="3.875" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Method_does_not_throw_after_Dispose" executed="True" result="Failure" success="False" time="2.244" asserts="0">
+                        <properties>
+                          <property name="APARTMENT_STATE" value="STA" />
+                        </properties>
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;Tick&quot;)" executed="True" result="Failure" success="False" time="0.706" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: null
+  But was:  <System.ObjectDisposedException: The MockGame object was used after being Disposed.
+Object name: 'MockGame'.
+   at MonoGame.Tests.GameTest.Disposal.RunAndUnpackException(Action action) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 167
+   at MonoGame.Tests.GameTest.Disposal.<>c__DisplayClassd.<Method_does_not_throw_after_Dispose>b__b() in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 150
+   at MonoGame.Tests.GameTest.Disposal.AssertDoesNotThrow[T](TestDelegate code) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 195>
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Disposal.AssertDoesNotThrow[T](TestDelegate code) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 197
+at MonoGame.Tests.GameTest.Disposal.Method_does_not_throw_after_Dispose(String methodName) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 149
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;Dispose&quot;)" executed="True" result="Success" success="True" time="0.075" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;Exit&quot;)" executed="True" result="Success" success="True" time="0.084" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;ResetElapsedTime&quot;)" executed="True" result="Success" success="True" time="0.093" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;Run&quot;)" executed="True" result="Failure" success="False" time="0.636" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: null
+  But was:  <System.ObjectDisposedException: The MockGame object was used after being Disposed.
+Object name: 'MockGame'.
+   at MonoGame.Tests.GameTest.Disposal.RunAndUnpackException(Action action) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 167
+   at MonoGame.Tests.GameTest.Disposal.<>c__DisplayClassd.<Method_does_not_throw_after_Dispose>b__b() in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 150
+   at MonoGame.Tests.GameTest.Disposal.AssertDoesNotThrow[T](TestDelegate code) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 195>
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Disposal.AssertDoesNotThrow[T](TestDelegate code) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 197
+at MonoGame.Tests.GameTest.Disposal.Method_does_not_throw_after_Dispose(String methodName) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 149
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;RunOneFrame&quot;)" executed="True" result="Failure" success="False" time="0.313" asserts="0">
+                            <failure>
+                              <message><![CDATA[Method 'RunOneFrame' not found]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Disposal.Method_does_not_throw_after_Dispose(String methodName) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 146
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Method_does_not_throw_after_Dispose(&quot;SuppressDraw&quot;)" executed="True" result="Failure" success="False" time="0.330" asserts="0">
+                            <failure>
+                              <message><![CDATA[Method 'SuppressDraw' not found]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Disposal.Method_does_not_throw_after_Dispose(String methodName) in C:\Users\chris\projects\monogame\Tests\GameTest.cs:line 146
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="ParameterizedTest" name="Property_does_not_throws_after_Dispose" executed="True" result="Success" success="True" time="1.630" asserts="0">
+                        <properties>
+                          <property name="APARTMENT_STATE" value="STA" />
+                        </properties>
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;IsMouseVisible&quot;)" executed="True" result="Success" success="True" time="0.092" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;TargetElapsedTime&quot;)" executed="True" result="Success" success="True" time="0.104" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;Window&quot;)" executed="True" result="Success" success="True" time="0.078" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;InactiveSleepTime&quot;)" executed="True" result="Success" success="True" time="0.403" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;IsActive&quot;)" executed="True" result="Success" success="True" time="0.082" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;IsFixedTimeStep&quot;)" executed="True" result="Success" success="True" time="0.101" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;Content&quot;)" executed="True" result="Success" success="True" time="0.084" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;LaunchParameters&quot;)" executed="True" result="Success" success="True" time="0.103" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;Services&quot;)" executed="True" result="Success" success="True" time="0.093" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;GraphicsDevice&quot;)" executed="True" result="Success" success="True" time="0.390" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Disposal.Property_does_not_throws_after_Dispose(&quot;Components&quot;)" executed="True" result="Success" success="True" time="0.097" asserts="0" />
+                        </results>
+                      </test-suite>
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Methods+Run" executed="True" result="Failure" success="False" time="0.305" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Methods+Run.Can_only_be_called_once" executed="True" result="Error" success="False" time="0.304" asserts="0">
+                        <failure>
+                          <message><![CDATA[System.InvalidOperationException : No Graphics Device Manager]]></message>
+                          <stack-trace><![CDATA[at Microsoft.Xna.Framework.Game.get_graphicsDeviceManager() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 606
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 325
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.GameTest.Methods.Run.Can_only_be_called_once() in C:\Users\chris\projects\monogame\Tests\GameTest+Methods.cs:line 84
+]]></stack-trace>
+                        </failure>
+                      </test-case>
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+Components" executed="True" result="Success" success="True" time="0.198" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Components.Is_available_before_Run" executed="True" result="Success" success="True" time="0.098" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Components.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.098" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+Content" executed="True" result="Failure" success="False" time="0.771" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.092" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+Content.Can_set_legal_value(Microsoft.Xna.Framework.Content.ContentManager)" executed="True" result="Success" success="True" time="0.092" asserts="0" />
+                        </results>
+                      </test-suite>
+                      <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Failure" success="False" time="0.348" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+Content.Cannot_set_illegal_value((, System.ArgumentNullException))" executed="True" result="Failure" success="False" time="0.348" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: <System.ArgumentNullException>
+  But was:  null
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Cannot_set_illegal_value(Tuple`2 valueAndException) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 465
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Content.Is_available_before_Run" executed="True" result="Success" success="True" time="0.102" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Content.Is_not_provided_as_a_service" executed="True" result="Success" success="True" time="0.115" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Content.ReadWritePropertyFixtureBase`1.Is_read_write" executed="True" result="Success" success="True" time="0.112" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+GraphicsDevice_" executed="True" result="Success" success="True" time="0.542" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+GraphicsDevice_.Is_invalid_without_IGraphicsDeviceService" executed="True" result="Success" success="True" time="0.202" asserts="2" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+GraphicsDevice_.Is_not_available_in_graphical_game_before_Run" executed="True" result="Success" success="True" time="0.098" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+GraphicsDevice_.Is_valid_with_IGraphicsDeviceService" executed="True" result="Success" success="True" time="0.113" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+GraphicsDevice_.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.126" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+InactiveSleepTime" executed="True" result="Failure" success="False" time="4.700" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Failure" success="False" time="2.751" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:00)" executed="True" result="Failure" success="False" time="0.691" asserts="0">
+                            <failure>
+                              <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Can_set_legal_value(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 457
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:00)" executed="True" result="Failure" success="False" time="0.681" asserts="0">
+                            <failure>
+                              <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Can_set_legal_value(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 457
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(00:00:01)" executed="True" result="Failure" success="False" time="0.680" asserts="0">
+                            <failure>
+                              <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Can_set_legal_value(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 457
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Can_set_legal_value(10675199.02:48:05.4775807)" executed="True" result="Failure" success="False" time="0.697" asserts="0">
+                            <failure>
+                              <message><![CDATA[Unexpected exception: System.NotImplementedException
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Can_set_legal_value(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 457
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Failure" success="False" time="1.362" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Cannot_set_illegal_value((-00:00:01, System.ArgumentOutOfRangeException))" executed="True" result="Failure" success="False" time="0.683" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: <System.ArgumentOutOfRangeException>
+  But was:  <System.NotImplementedException> (The method or operation is not implemented.)
+   at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.set_ThisProperty(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 419
+   at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.<>c__DisplayClass4.<Cannot_set_illegal_value>b__3() in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 465
+   at NUnit.Framework.Assert.Throws(IResolveConstraint expression, TestDelegate code, String message, Object[] args)
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Cannot_set_illegal_value(Tuple`2 valueAndException) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 465
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.Cannot_set_illegal_value((-10675199.02:48:05.4775808, System.ArgumentOutOfRangeException))" executed="True" result="Failure" success="False" time="0.679" asserts="1">
+                            <failure>
+                              <message><![CDATA[  Expected: <System.ArgumentOutOfRangeException>
+  But was:  <System.NotImplementedException> (The method or operation is not implemented.)
+   at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.set_ThisProperty(PropertyT value) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 419
+   at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.<>c__DisplayClass4.<Cannot_set_illegal_value>b__3() in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 465
+   at NUnit.Framework.Assert.Throws(IResolveConstraint expression, TestDelegate code, String message, Object[] args)
+]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.ReadWritePropertyFixtureBase`1.Cannot_set_illegal_value(Tuple`2 valueAndException) in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 465
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.PropertyFixtureBase`1.Has_correct_default_value" executed="True" result="Error" success="False" time="0.468" asserts="1">
+                        <failure>
+                          <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NotImplementedException : The method or operation is not implemented.]]></message>
+                          <stack-trace><![CDATA[at System.RuntimeMethodHandle._InvokeMethodFast(IRuntimeMethodInfo method, Object target, Object[] arguments, SignatureStruct& sig, MethodAttributes methodAttributes, RuntimeType typeOwner)
+at System.RuntimeMethodHandle.InvokeMethodFast(IRuntimeMethodInfo method, Object target, Object[] arguments, Signature sig, MethodAttributes methodAttributes, RuntimeType typeOwner)
+at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture, Boolean skipVisibilityChecks)
+at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+at System.Reflection.RuntimePropertyInfo.GetValue(Object obj, Object[] index)
+at NUnit.Framework.Constraints.PropertyConstraint.Matches(Object actual)
+at MonoGame.Tests.GameTest.Properties.PropertyFixtureBase`1.Has_correct_default_value() in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 360
+--NotImplementedException
+at Microsoft.Xna.Framework.Game.get_InactiveSleepTime() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 194
+]]></stack-trace>
+                        </failure>
+                      </test-case>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+InactiveSleepTime.ReadWritePropertyFixtureBase`1.Is_read_write" executed="True" result="Success" success="True" time="0.117" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+IsActive" executed="True" result="Success" success="True" time="0.279" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsActive.PropertyFixtureBase`1.Has_correct_default_value" executed="True" result="Success" success="True" time="0.137" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsActive.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.141" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+IsFixedTimeStep" executed="True" result="Success" success="True" time="0.548" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.271" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+IsFixedTimeStep.Can_set_legal_value(True)" executed="True" result="Success" success="True" time="0.139" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Properties+IsFixedTimeStep.Can_set_legal_value(False)" executed="True" result="Success" success="True" time="0.132" asserts="0" />
+                        </results>
+                      </test-suite>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsFixedTimeStep.PropertyFixtureBase`1.Has_correct_default_value" executed="True" result="Success" success="True" time="0.142" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsFixedTimeStep.ReadWritePropertyFixtureBase`1.Is_read_write" executed="True" result="Success" success="True" time="0.133" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+IsMouseVisible" executed="True" result="Success" success="True" time="0.548" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.267" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+IsMouseVisible.Can_set_legal_value(True)" executed="True" result="Success" success="True" time="0.141" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Properties+IsMouseVisible.Can_set_legal_value(False)" executed="True" result="Success" success="True" time="0.126" asserts="0" />
+                        </results>
+                      </test-suite>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsMouseVisible.PropertyFixtureBase`1.Has_correct_default_value" executed="True" result="Success" success="True" time="0.139" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+IsMouseVisible.ReadWritePropertyFixtureBase`1.Is_read_write" executed="True" result="Success" success="True" time="0.141" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+LaunchParameters_" executed="True" result="Success" success="True" time="0.260" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+LaunchParameters_.Is_available_before_Run" executed="True" result="Success" success="True" time="0.124" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+LaunchParameters_.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.133" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+Services" executed="True" result="Success" success="True" time="0.281" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Services.Is_available_before_Run" executed="True" result="Success" success="True" time="0.139" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Services.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.142" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+TargetElapsedTime" executed="True" result="Failure" success="False" time="2.106" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="Can_set_legal_value" executed="True" result="Success" success="True" time="0.276" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.Can_set_legal_value(00:00:01)" executed="True" result="Success" success="True" time="0.141" asserts="0" />
+                          <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.Can_set_legal_value(10675199.02:48:05.4775807)" executed="True" result="Success" success="True" time="0.135" asserts="0" />
+                        </results>
+                      </test-suite>
+                      <test-suite type="ParameterizedTest" name="Cannot_set_illegal_value" executed="True" result="Success" success="True" time="1.339" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((00:00:00, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.451" asserts="1" />
+                          <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((-00:00:01, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.440" asserts="1" />
+                          <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.Cannot_set_illegal_value((-10675199.02:48:05.4775808, System.ArgumentOutOfRangeException))" executed="True" result="Success" success="True" time="0.447" asserts="1" />
+                        </results>
+                      </test-suite>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.PropertyFixtureBase`1.Has_correct_default_value" executed="True" result="Failure" success="False" time="0.374" asserts="1">
+                        <failure>
+                          <message><![CDATA[  Expected: property TargetElapsedTime equal to 00:00:00.0166667
+  But was:  00:00:00.0170000
+]]></message>
+                          <stack-trace><![CDATA[at MonoGame.Tests.GameTest.Properties.PropertyFixtureBase`1.Has_correct_default_value() in C:\Users\chris\projects\monogame\Tests\GameTest+Properties.cs:line 360
+]]></stack-trace>
+                        </failure>
+                      </test-case>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+TargetElapsedTime.ReadWritePropertyFixtureBase`1.Is_read_write" executed="True" result="Success" success="True" time="0.116" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="GameTest+Properties+Window" executed="True" result="Success" success="True" time="0.421" asserts="0">
+                    <results>
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Window.Is_available_before_Run" executed="True" result="Success" success="True" time="0.141" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Window.Is_available_in_non_graphical_game" executed="True" result="Success" success="True" time="0.148" asserts="1" />
+                      <test-case name="MonoGame.Tests.GameTest+Properties+Window.ReadOnlyPropertyFixtureBase`1.Is_read_only" executed="True" result="Success" success="True" time="0.129" asserts="0" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="Namespace" name="Visual" executed="True" result="Failure" success="False" time="25.450" asserts="0">
+                    <results>
+                      <test-suite type="TestFixture" name="MiscellaneousTests" executed="True" result="Failure" success="False" time="7.069" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.Visual.MiscellaneousTests.Clear" executed="True" result="Success" success="True" time="3.116" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.MiscellaneousTests.Colored3DCube" executed="True" result="Error" success="False" time="0.631" asserts="0">
+                            <failure>
+                              <message><![CDATA[System.ArgumentException : vertexType
+Parameter name: Must be value type]]></message>
+                              <stack-trace><![CDATA[at Microsoft.Xna.Framework.Graphics.VertexDeclaration.FromType(Type vertexType) in C:\Users\chris\projects\monogame\MonoGame.Framework\Desktop\Graphics\Vertices\VertexDeclaration.cs:line 72
+at Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType primitiveType, Int32 baseVertex, Int32 minVertexIndex, Int32 numbVertices, Int32 startIndex, Int32 primitiveCount) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\Graphics\GraphicsDevice.cs:line 409
+at MonoGame.Tests.Components.Colored3DCubeComponent.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Components\Colored3DCubeComponent.cs:line 136
+at Microsoft.Xna.Framework.Game.<.cctor>b__18(IDrawable drawable, GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 454
+at Microsoft.Xna.Framework.Game.SortingFilteringCollection`1.ForEachFilteredItem[TUserData](Action`2 action, TUserData userData) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 732
+at Microsoft.Xna.Framework.Game.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 473
+at MonoGame.Tests.TestGameBase.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 267
+at MonoGame.Tests.Visual.VisualTestGame.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestGame.cs:line 97
+at Microsoft.Xna.Framework.Game.DoDraw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 574
+at Microsoft.Xna.Framework.WindowsGameWindow.OnRenderFrame(Object sender, FrameEventArgs e) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGameWindow.cs:line 550
+at OpenTK.GameWindow.OnRenderFrame(FrameEventArgs e)
+at OpenTK.GameWindow.OnRenderFrameInternal(FrameEventArgs e)
+at OpenTK.GameWindow.RaiseRenderFrame(Stopwatch render_watch, Double& next_render, FrameEventArgs render_args)
+at OpenTK.GameWindow.DispatchUpdateAndRenderFrame(Object sender, EventArgs e)
+at OpenTK.GameWindow.Run(Double updates_per_second, Double frames_per_second)
+at OpenTK.GameWindow.Run(Double updateRate)
+at Microsoft.Xna.Framework.WindowsGamePlatform.RunLoop() in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGamePlatform.cs:line 117
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 340
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.MiscellaneousTests.Colored3DCube() in C:\Users\chris\projects\monogame\Tests\Visual\MiscellaneousTests.cs:line 118
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.MiscellaneousTests.DrawOrder_falls_back_to_order_of_addition_to_Game" executed="True" result="Success" success="True" time="2.315" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.MiscellaneousTests.TexturedQuad_lighting" executed="True" result="Error" success="False" time="0.554" asserts="0">
+                            <failure>
+                              <message><![CDATA[System.AccessViolationException : Attempted to read or write protected memory. This is often an indication that other memory is corrupt.]]></message>
+                              <stack-trace><![CDATA[at OpenTK.Graphics.OpenGL.GL.DrawElements[T3](BeginMode mode, Int32 count, DrawElementsType type, T3[] indices)
+at Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives[T](PrimitiveType primitiveType, T[] vertexData, Int32 vertexOffset, Int32 vertexCount, Int16[] indexData, Int32 indexOffset, Int32 primitiveCount) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\Graphics\GraphicsDevice.cs:line 473
+at MonoGame.Tests.Components.TexturedQuadComponent.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Components\TexturedQuadComponent.cs:line 206
+at Microsoft.Xna.Framework.Game.<.cctor>b__18(IDrawable drawable, GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 454
+at Microsoft.Xna.Framework.Game.SortingFilteringCollection`1.ForEachFilteredItem[TUserData](Action`2 action, TUserData userData) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 732
+at Microsoft.Xna.Framework.Game.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 473
+at MonoGame.Tests.TestGameBase.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 267
+at MonoGame.Tests.Visual.VisualTestGame.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestGame.cs:line 97
+at Microsoft.Xna.Framework.Game.DoDraw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 574
+at Microsoft.Xna.Framework.WindowsGameWindow.OnRenderFrame(Object sender, FrameEventArgs e) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGameWindow.cs:line 550
+at OpenTK.GameWindow.OnRenderFrame(FrameEventArgs e)
+at OpenTK.GameWindow.OnRenderFrameInternal(FrameEventArgs e)
+at OpenTK.GameWindow.RaiseRenderFrame(Stopwatch render_watch, Double& next_render, FrameEventArgs render_args)
+at OpenTK.GameWindow.DispatchUpdateAndRenderFrame(Object sender, EventArgs e)
+at OpenTK.GameWindow.Run(Double updates_per_second, Double frames_per_second)
+at OpenTK.GameWindow.Run(Double updateRate)
+at Microsoft.Xna.Framework.WindowsGamePlatform.RunLoop() in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGamePlatform.cs:line 117
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 340
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.MiscellaneousTests.TexturedQuad_lighting() in C:\Users\chris\projects\monogame\Tests\Visual\MiscellaneousTests.cs:line 132
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.MiscellaneousTests.TexturedQuad_no_lighting" executed="True" result="Error" success="False" time="0.449" asserts="0">
+                            <failure>
+                              <message><![CDATA[System.AccessViolationException : Attempted to read or write protected memory. This is often an indication that other memory is corrupt.]]></message>
+                              <stack-trace><![CDATA[at OpenTK.Graphics.OpenGL.GL.DrawElements[T3](BeginMode mode, Int32 count, DrawElementsType type, T3[] indices)
+at Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives[T](PrimitiveType primitiveType, T[] vertexData, Int32 vertexOffset, Int32 vertexCount, Int16[] indexData, Int32 indexOffset, Int32 primitiveCount) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\Graphics\GraphicsDevice.cs:line 473
+at MonoGame.Tests.Components.TexturedQuadComponent.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Components\TexturedQuadComponent.cs:line 206
+at Microsoft.Xna.Framework.Game.<.cctor>b__18(IDrawable drawable, GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 454
+at Microsoft.Xna.Framework.Game.SortingFilteringCollection`1.ForEachFilteredItem[TUserData](Action`2 action, TUserData userData) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 732
+at Microsoft.Xna.Framework.Game.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 473
+at MonoGame.Tests.TestGameBase.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 267
+at MonoGame.Tests.Visual.VisualTestGame.Draw(GameTime gameTime) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestGame.cs:line 97
+at Microsoft.Xna.Framework.Game.DoDraw(GameTime gameTime) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 574
+at Microsoft.Xna.Framework.WindowsGameWindow.OnRenderFrame(Object sender, FrameEventArgs e) in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGameWindow.cs:line 550
+at OpenTK.GameWindow.OnRenderFrame(FrameEventArgs e)
+at OpenTK.GameWindow.OnRenderFrameInternal(FrameEventArgs e)
+at OpenTK.GameWindow.RaiseRenderFrame(Stopwatch render_watch, Double& next_render, FrameEventArgs render_args)
+at OpenTK.GameWindow.DispatchUpdateAndRenderFrame(Object sender, EventArgs e)
+at OpenTK.GameWindow.Run(Double updates_per_second, Double frames_per_second)
+at OpenTK.GameWindow.Run(Double updateRate)
+at Microsoft.Xna.Framework.WindowsGamePlatform.RunLoop() in C:\Users\chris\projects\monogame\MonoGame.Framework\Windows\WindowsGamePlatform.cs:line 117
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 340
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.MiscellaneousTests.TexturedQuad_no_lighting() in C:\Users\chris\projects\monogame\Tests\Visual\MiscellaneousTests.cs:line 125
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="ShaderTest" executed="True" result="Failure" success="False" time="4.129" asserts="0">
+                        <results>
+                          <test-suite type="ParameterizedTest" name="Shader" executed="True" result="Failure" success="False" time="4.128" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;ColorFlip&quot;)" executed="True" result="Error" success="False" time="0.424" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\ColorFlip asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;Invert&quot;)" executed="True" result="Error" success="False" time="0.608" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\Invert asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;NoEffect&quot;)" executed="True" result="Error" success="False" time="0.444" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\NoEffect asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;RainbowH&quot;)" executed="True" result="Error" success="False" time="0.880" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\RainbowH asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;HighContrast&quot;)" executed="True" result="Error" success="False" time="0.433" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\HighContrast asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;BlackOut&quot;)" executed="True" result="Error" success="False" time="0.470" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\BlackOut asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;Bevels&quot;)" executed="True" result="Error" success="False" time="0.419" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\Bevels asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                              <test-case name="MonoGame.Tests.Visual.ShaderTest.Shader(&quot;Grayscale&quot;)" executed="True" result="Error" success="False" time="0.442" asserts="0">
+                                <failure>
+                                  <message><![CDATA[Microsoft.Xna.Framework.Content.ContentLoadException : Could not load .\Effects\Grayscale asset!]]></message>
+                                  <stack-trace><![CDATA[at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 242
+at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName) in C:\Users\chris\projects\monogame\MonoGame.Framework\Content\ContentManager.cs:line 173
+at MonoGame.Tests.Visual.ShaderTest.<>c__DisplayClass3.<Shader>b__0(Object sender, FrameInfoEventArgs e) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 104
+at MonoGame.Tests.TestGameBase.SafeRaise(EventHandler`1 handler) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 141
+at MonoGame.Tests.TestGameBase.LoadContent() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 154
+at Microsoft.Xna.Framework.Game.Initialize() in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 449
+at MonoGame.Tests.TestGameBase.Initialize() in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 147
+at Microsoft.Xna.Framework.Game.Run(GameRunBehavior runBehavior) in C:\Users\chris\projects\monogame\MonoGame.Framework\Game.cs:line 329
+at MonoGame.Tests.TestGameBase.Run(Predicate`1 until) in C:\Users\chris\projects\monogame\Tests\TestGameBase.cs:line 182
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 167
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ShaderTest.Shader(String effectName) in C:\Users\chris\projects\monogame\Tests\Visual\ShaderTest.cs:line 125
+]]></stack-trace>
+                                </failure>
+                              </test-case>
+                            </results>
+                          </test-suite>
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="SpriteFontTest" executed="True" result="Failure" success="False" time="11.504" asserts="0">
+                        <results>
+                          <test-suite type="ParameterizedTest" name="Draw_with_SpriteEffects" executed="True" result="Success" success="True" time="2.229" asserts="0">
+                            <results>
+                              <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Draw_with_SpriteEffects(FlipHorizontally, FlipVertically)" executed="True" result="Success" success="True" time="0.695" asserts="0" />
+                              <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Draw_with_SpriteEffects(FlipHorizontally)" executed="True" result="Success" success="True" time="0.754" asserts="0" />
+                              <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Draw_with_SpriteEffects(FlipVertically)" executed="True" result="Success" success="True" time="0.776" asserts="0" />
+                            </results>
+                          </test-suite>
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Font_spacing_is_respected" executed="True" result="Success" success="True" time="0.833" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Hullabaloo" executed="True" result="Success" success="True" time="0.825" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Hullabaloo2" executed="True" result="Success" success="True" time="0.799" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Multiline" executed="True" result="Failure" success="False" time="1.990" asserts="0">
+                            <failure>
+                              <message><![CDATA[1 of 1 frames failed the similarity test.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(IEnumerable`1 results, Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 207
+at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 180
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 170
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.SpriteFontTest.Multiline() in C:\Users\chris\projects\monogame\Tests\Visual\SpriteFontTest.cs:line 280
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Origins_rotated" executed="True" result="Success" success="True" time="0.741" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Origins_scaled" executed="True" result="Success" success="True" time="0.833" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Plain" executed="True" result="Success" success="True" time="0.845" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Rotated" executed="True" result="Success" success="True" time="0.858" asserts="0" />
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Scaled" executed="True" result="Failure" success="False" time="0.989" asserts="0">
+                            <failure>
+                              <message><![CDATA[1 of 1 frames failed the similarity test.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(IEnumerable`1 results, Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 207
+at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 180
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 170
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.SpriteFontTest.Scaled() in C:\Users\chris\projects\monogame\Tests\Visual\SpriteFontTest.cs:line 148
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.SpriteFontTest.Throws_when_drawing_unavailable_characters" executed="True" result="Success" success="True" time="0.555" asserts="1" />
+                        </results>
+                      </test-suite>
+                      <test-suite type="TestFixture" name="ViewportTest" executed="True" result="Failure" success="False" time="2.748" asserts="0">
+                        <results>
+                          <test-case name="MonoGame.Tests.Visual.ViewportTest.Affects_draw_origin" executed="True" result="Failure" success="False" time="0.998" asserts="0">
+                            <failure>
+                              <message><![CDATA[1 of 1 frames failed the similarity test.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(IEnumerable`1 results, Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 207
+at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 180
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 170
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ViewportTest.Affects_draw_origin() in C:\Users\chris\projects\monogame\Tests\Visual\ViewportTest.cs:line 39
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.ViewportTest.Clips_SpriteBatch_draws" executed="True" result="Failure" success="False" time="1.019" asserts="0">
+                            <failure>
+                              <message><![CDATA[1 of 1 frames failed the similarity test.]]></message>
+                              <stack-trace><![CDATA[at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(IEnumerable`1 results, Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 207
+at MonoGame.Tests.Visual.VisualTestFixtureBase.AssertFrameComparisonPassed(Single similarity, Int32 expectedCount) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 180
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunMultiFrameTest(Int32 captureCount, Int32 captureStride, Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 170
+at MonoGame.Tests.Visual.VisualTestFixtureBase.RunSingleFrameTest(Single similarity, Boolean writeDiffs) in C:\Users\chris\projects\monogame\Tests\Visual\VisualTestFixtureBase.cs:line 123
+at MonoGame.Tests.Visual.ViewportTest.Clips_SpriteBatch_draws() in C:\Users\chris\projects\monogame\Tests\Visual\ViewportTest.cs:line 87
+]]></stack-trace>
+                            </failure>
+                          </test-case>
+                          <test-case name="MonoGame.Tests.Visual.ViewportTest.Does_not_clip_device_clear" executed="True" result="Success" success="True" time="0.729" asserts="0" />
+                        </results>
+                      </test-suite>
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
