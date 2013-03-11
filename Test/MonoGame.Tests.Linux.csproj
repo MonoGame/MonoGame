@@ -58,19 +58,19 @@
       <HintPath>Libs\Moq.dll</HintPath>
     </Reference>
     <Reference Include="NDesk.Options">
-      <HintPath>Libs\NDesk.Options.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\Tests\NDesk.Options.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core">
-      <HintPath>Libs\nunit.core.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core.interfaces">
-      <HintPath>Libs\nunit.core.interfaces.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.interfaces.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>Libs\nunit.framework.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\Tests\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.util">
-      <HintPath>Libs\nunit.util.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\Tests\nunit.util.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
