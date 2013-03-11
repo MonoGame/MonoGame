@@ -152,6 +152,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create a view interface on the rendertarget to use on bind.
             _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, _texture);
 
+            // If we don't need a depth buffer then we're done.
+            if (DepthStencilFormat == DepthFormat.None)
+                return;
+
             // Setup the multisampling description.
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (MultiSampleCount > 1)
