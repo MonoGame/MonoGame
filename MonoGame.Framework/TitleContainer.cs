@@ -46,7 +46,7 @@ using System.Threading.Tasks;
 #elif IOS
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-#elif MACOS
+#elif MONOMAC
 using MonoMac.Foundation;
 #elif PSM
 using Sce.PlayStation.Core;
@@ -62,15 +62,18 @@ namespace Microsoft.Xna.Framework
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-#elif IOS || MACOS
+#elif IOS || MONOMAC
 			Location = NSBundle.MainBundle.ResourcePath;
-            SupportRetina = UIScreen.MainScreen.Scale == 2.0f;
 #elif PSM
 			Location = "/Application";
 #else
             Location = string.Empty;
-#endif                    
-        }
+#endif
+
+#if IOS
+			SupportRetina = UIScreen.MainScreen.Scale == 2.0f;
+#endif
+		}
 
         static internal string Location { get; private set; }
 #if IOS
