@@ -98,8 +98,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			RenderTargetUsage = usage;
 
 #if DIRECTX
-            // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(graphicsDevice._d3dDevice, _texture);
 #elif PSM
             _frameBuffer = new FrameBuffer();     
             _frameBuffer.SetColorTarget(_texture2D,0);
@@ -110,37 +108,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
 #if DIRECTX
-
-            // Setup the multisampling description.
-            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if ( preferredMultiSampleCount > 1 )
-            {
-                multisampleDesc.Count = preferredMultiSampleCount;
-                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
-            }
-
-            // Create a descriptor for the depth/stencil buffer.
-            // Allocate a 2-D surface as the depth/stencil buffer.
-            // Create a DepthStencil view on this surface to use on bind.
-            using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, new Texture2DDescription
-            {
-                Format = SharpDXHelper.ToFormat(preferredDepthFormat),
-                ArraySize = 1,
-                MipLevels = 1,
-                Width = width,
-                Height = height,
-                SampleDescription = multisampleDesc,
-                BindFlags = BindFlags.DepthStencil,
-            }))
-            {
-            // Create the view for binding to the device.
-                _depthStencilView = new DepthStencilView(graphicsDevice._d3dDevice, depthBuffer,
-                    new DepthStencilViewDescription()
-                { 
-                    Format = SharpDXHelper.ToFormat(preferredDepthFormat),
-                        Dimension = DepthStencilViewDimension.Texture2D
-                });
-            }
 #elif PSM
             throw new NotImplementedException();
 #elif OPENGL
@@ -173,6 +140,60 @@ namespace Microsoft.Xna.Framework.Graphics
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
 
+#if DIRECTX
+
+        private void GenerateIfRequired()
+        {
+            if (_renderTargetView != null)
+                return;
+
+            GenerateTextureIfRequired();
+
+            // Create a view interface on the rendertarget to use on bind.
+            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, _texture);
+
+            // Setup the multisampling description.
+            var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
+            if (MultiSampleCount > 1)
+            {
+                multisampleDesc.Count = MultiSampleCount;
+                multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            }
+
+            // Create a descriptor for the depth/stencil buffer.
+            // Allocate a 2-D surface as the depth/stencil buffer.
+            // Create a DepthStencil view on this surface to use on bind.
+            using (var depthBuffer = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, new Texture2DDescription
+            {
+                Format = SharpDXHelper.ToFormat(DepthStencilFormat),
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = width,
+                Height = height,
+                SampleDescription = multisampleDesc,
+                BindFlags = BindFlags.DepthStencil,
+            }))
+            {
+                // Create the view for binding to the device.
+                _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer,
+                    new DepthStencilViewDescription()
+                    {
+                        Format = SharpDXHelper.ToFormat(DepthStencilFormat),
+                        Dimension = DepthStencilViewDimension.Texture2D
+                    });
+            }
+        }
+
+#endif
+
+        protected internal override void GraphicsDeviceResetting()
+        {
+            SharpDX.Utilities.Dispose(ref _renderTargetView);
+            SharpDX.Utilities.Dispose(ref _depthStencilView);
+
+            base.GraphicsDeviceResetting();
+        }
+
 		protected override void Dispose(bool disposing)
 		{
             if (!IsDisposed)
@@ -180,16 +201,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
                 if (disposing)
                 {
-                    if (_renderTargetView != null)
-                    {
-                        _renderTargetView.Dispose();
-                        _renderTargetView = null;
-                    }
-                    if (_depthStencilView != null)
-                    {
-                        _depthStencilView.Dispose();
-                        _depthStencilView = null;
-                    }
+                    SharpDX.Utilities.Dispose(ref _renderTargetView);
+                    SharpDX.Utilities.Dispose(ref _depthStencilView);
                 }
 #elif PSM
                 _frameBuffer.Dispose();
@@ -207,12 +220,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
 	    RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
 	    {
+            GenerateIfRequired();
 	        return _renderTargetView;
 	    }
 
 	    DepthStencilView IRenderTarget.GetDepthStencilView()
 	    {
-	        return _depthStencilView;
+            GenerateIfRequired();
+            return _depthStencilView;
 	    }
 #endif
 	}

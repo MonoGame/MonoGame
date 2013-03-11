@@ -1074,7 +1074,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-        private void GenerateTextureIfRequired()
+        protected void GenerateTextureIfRequired()
         {
             if (_texture != null)
                 return;
