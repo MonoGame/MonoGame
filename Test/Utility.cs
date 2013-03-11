@@ -148,7 +148,7 @@ namespace MonoGame.Tests {
 
 		public static void SetStandardWorkingDirectory()
 		{
-			var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var directory = AppDomain.CurrentDomain.BaseDirectory;
 			Directory.SetCurrentDirectory(directory);
 		}
 	}
