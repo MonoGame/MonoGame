@@ -481,23 +481,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINDOWS_PHONE
 
-        internal void UpdateDevice(Device device, DeviceContext context)
+        private void UpdateDevice(Device device, DeviceContext context)
         {
             // TODO: Lost device logic!
-
-            if (_d3dDevice != null)
-            {
-                _d3dDevice.Dispose();
-                _d3dDevice = null;
-            }
+            SharpDX.Utilities.Dispose(ref _d3dDevice);
             _d3dDevice = device;
 
-            if (_d3dContext != null)
-            {
-                _d3dContext.Dispose();
-                _d3dContext = null;
-            }
+            SharpDX.Utilities.Dispose(ref _d3dContext);
             _d3dContext = context;
+
+            SharpDX.Utilities.Dispose(ref _depthStencilView);
         }
 
         internal void UpdateTarget(RenderTargetView renderTargetView)
@@ -512,13 +505,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var currentWidth = PresentationParameters.BackBufferWidth;
                 var currentHeight = PresentationParameters.BackBufferHeight;
 
-                if (currentWidth != texture2D.Description.Width &&
-                    currentHeight != texture2D.Description.Height)
+                if (_depthStencilView == null || (currentWidth != texture2D.Description.Width &&
+                    currentHeight != texture2D.Description.Height))
                 {
                     PresentationParameters.BackBufferWidth = texture2D.Description.Width;
                     PresentationParameters.BackBufferHeight = texture2D.Description.Height;
 
-                    ComObject.Dispose(ref _depthStencilView);
+                    SharpDX.Utilities.Dispose(ref _depthStencilView);
 
                     using (var depthTexture = new SharpDX.Direct3D11.Texture2D(
                         _d3dDevice,
@@ -1763,6 +1756,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Textures.Dirty();
             SamplerStates.Dirty();
+            _inputLayouts.Clear();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
             _indexBufferDirty = true;
@@ -1997,7 +1991,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
 #if DIRECTX
                     _d3dContext.InputAssembler.SetIndexBuffer(
-                        _indexBuffer._buffer,
+                        _indexBuffer.Buffer,
                         _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ? 
                             SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
                         0);
@@ -2014,7 +2008,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 #if DIRECTX
                 if (_vertexBuffer != null)
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
+                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer.Binding);
                 else
                     _d3dContext.InputAssembler.SetVertexBuffers(0);
 #elif OPENGL
@@ -2034,7 +2028,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX 
 
             if (_vertexShaderDirty)
-                _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
+                _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
 
             if (_vertexShaderDirty || _vertexBufferDirty)
             {
@@ -2044,7 +2038,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_pixelShaderDirty)
             {
-                _d3dContext.PixelShader.Set(_pixelShader._pixelShader);
+                _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
                 _pixelShaderDirty = false;
             }
 

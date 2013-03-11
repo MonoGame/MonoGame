@@ -76,11 +76,39 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
-        internal VertexShader _vertexShader;
-
-        internal PixelShader _pixelShader;
+        private VertexShader _vertexShader;
+        private PixelShader _pixelShader;
+        private byte[] _shaderBytecode;
 
         public byte[] Bytecode { get; private set; }
+
+        internal VertexShader VertexShader
+        {
+            get
+            {
+                if (_vertexShader == null)
+                {
+                    System.Diagnostics.Debug.Assert(Stage == ShaderStage.Vertex);
+                    _vertexShader = new VertexShader(GraphicsDevice._d3dDevice, _shaderBytecode, null);
+                }
+
+                return _vertexShader;
+            }
+        }
+
+        internal PixelShader PixelShader
+        {
+            get
+            {
+                if (_pixelShader == null)
+                {
+                    System.Diagnostics.Debug.Assert(Stage == ShaderStage.Pixel);
+                    _pixelShader = new PixelShader(GraphicsDevice._d3dDevice, _shaderBytecode);
+                }
+
+                return _pixelShader;
+            }
+        }
 
 #endif
 
@@ -138,19 +166,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-            var d3dDevice = device._d3dDevice;
-            if (isVertexShader)
-            {
-                _vertexShader = new VertexShader(d3dDevice, shaderBytecode, null);
+            _shaderBytecode = shaderBytecode;
 
-                // We need the bytecode later for allocating the
-                // input layout from the vertex declaration.
-                Bytecode = shaderBytecode;
+            // We need the bytecode later for allocating the
+            // input layout from the vertex declaration.
+            Bytecode = shaderBytecode;
                 
-                HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
-            }
-            else
-                _pixelShader = new PixelShader(d3dDevice, shaderBytecode);
+            HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
 
 #endif // DIRECTX
 
@@ -279,6 +301,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 _shaderHandle = -1;
             }
 #endif
+
+#if DIRECTX
+
+            SharpDX.Utilities.Dispose(ref _vertexShader);
+            SharpDX.Utilities.Dispose(ref _pixelShader);
+
+#endif
         }
 
         protected override void Dispose(bool disposing)
@@ -298,6 +327,12 @@ namespace Microsoft.Xna.Framework.Graphics
                             _shaderHandle = -1;
                         }
                     });
+#endif
+
+#if DIRECTX
+
+                GraphicsDeviceResetting();
+
 #endif
             }
 

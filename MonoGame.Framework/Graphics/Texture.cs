@@ -175,6 +175,13 @@ namespace Microsoft.Xna.Framework.Graphics
             this.glTexture = -1;
             this.glLastSamplerState = null;
 #endif
+
+#if DIRECTX
+
+            SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref _texture);
+
+#endif
         }
 
         protected override void Dispose(bool disposing)
@@ -184,17 +191,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
                 if (disposing)
                 {
-                    if (_resourceView != null)
-                    {
-                        _resourceView.Dispose();
-                        _resourceView = null;
-                    }
-
-                    if (_texture != null)
-                    {
-                        _texture.Dispose();
-                        _texture = null;
-                    }
+                    SharpDX.Utilities.Dispose(ref _resourceView);
+                    SharpDX.Utilities.Dispose(ref _texture);
                 }
 #elif OPENGL
                 GraphicsDevice.AddDisposeAction(() =>
