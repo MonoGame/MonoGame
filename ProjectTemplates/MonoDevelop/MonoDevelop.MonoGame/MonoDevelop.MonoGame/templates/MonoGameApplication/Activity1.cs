@@ -3,6 +3,7 @@ using System;
 using Android.App;
 using Android.Content;
 using Android.Runtime;
+using Android.Content.PM;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
@@ -16,10 +17,10 @@ namespace ${Namespace}
 	           Icon = "@drawable/icon",
 	           Theme = "@style/Theme.Splash",
                 AlwaysRetainTaskState=true,
-	           LaunchMode=Android.Content.PM.LaunchMode.SingleInstance,
-	           ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | 
-	                                  Android.Content.PM.ConfigChanges.KeyboardHidden | 
-	                                  Android.Content.PM.ConfigChanges.Keyboard)]
+	           LaunchMode=LaunchMode.SingleInstance,
+	           ConfigurationChanges = ConfigChanges.Orientation | 
+	                                  ConfigChanges.KeyboardHidden | 
+	                                  ConfigChanges.Keyboard)]
 	public class Activity1 : AndroidGameActivity
 	{
 		protected override void OnCreate (Bundle bundle)
