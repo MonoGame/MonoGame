@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             writer.Write(IsVertexShader);
 
-            writer.Write((ushort)ShaderCode.Length);
+            writer.Write(ShaderCode.Length);
             writer.Write(ShaderCode);
 
             writer.Write((byte)_samplers.Length);
