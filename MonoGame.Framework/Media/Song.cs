@@ -276,7 +276,10 @@ namespace Microsoft.Xna.Framework.Media
 		{	
 			if ( _sound == null )
 				return;
-			
+
+#if IOS
+            _sound.CurrentTime = 0.0;
+#endif
 			_sound.Play();
 
             _playCount++;
