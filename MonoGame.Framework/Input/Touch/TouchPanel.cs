@@ -392,10 +392,23 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 		
+        private static GestureType m_enabledGestures;
+        
         /// <summary>
         /// Gets or sets enabled gestures.
         /// </summary>
-        public static GestureType EnabledGestures { get; set; }
+        public static GestureType EnabledGestures
+        {
+            get { return m_enabledGestures; }
+            set
+            {
+                if (m_enabledGestures != value)
+                {
+                    m_enabledGestures = value;
+                    ReleaseAllTouches();
+                }
+            }
+        }
 
         public static bool EnableMouseTouchPoint { get; set; }
 
