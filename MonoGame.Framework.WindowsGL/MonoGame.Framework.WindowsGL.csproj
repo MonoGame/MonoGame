@@ -1,0 +1,795 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{77EBD3FC-0D63-4FAB-8DB9-29B3528184B3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+    <AssemblyName>MonoGame.Framework.WindowsGL</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\build\WindowsGL\Debug\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\build\WindowsGL\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\build\WindowsGL\Debug\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\build\WindowsGL\Release\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Graphics\IRenderTarget.cs">
+      <Link>Graphics\IRenderTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\RenderTargetCube.cs">
+      <Link>Graphics\RenderTargetCube.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexColorTexture.cs">
+      <Link>Graphics\Vertices\VertexColorTexture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Audio\OALSoundBuffer.cs">
+      <Link>Desktop\Audio\OALSoundBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Audio\OpenALSoundController.cs">
+      <Link>Desktop\Audio\OpenALSoundController.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Audio\SoundEffect.cs">
+      <Link>Desktop\Audio\SoundEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Audio\SoundEffectInstance.cs">
+      <Link>Desktop\Audio\SoundEffectInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Axis.cs">
+      <Link>Desktop\Input\Axis.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Capabilities.cs">
+      <Link>Desktop\Input\Capabilities.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\DPad.cs">
+      <Link>Desktop\Input\DPad.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\GamePad.cs">
+      <Link>Desktop\Input\GamePad.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Input.cs">
+      <Link>Desktop\Input\Input.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Joystick.cs">
+      <Link>Desktop\Input\Joystick.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\PadConfig.cs">
+      <Link>Desktop\Input\PadConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Settings.cs">
+      <Link>Desktop\Input\Settings.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\Input\Stick.cs">
+      <Link>Desktop\Input\Stick.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\OpenTKGamePlatform.cs">
+      <Link>Desktop\OpenTKGamePlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Desktop\OpenTKGameWindow.cs">
+      <Link>Desktop\OpenTKGameWindow.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\AudioCategory.cs">
+      <Link>Audio\AudioCategory.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\AudioEngine.cs">
+      <Link>Audio\AudioEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\Cue.cs">
+      <Link>Audio\Cue.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\InstancePlayLimitException.cs">
+      <Link>Audio\InstancePlayLimitException.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\NoAudioHardwareException.cs">
+      <Link>Audio\NoAudioHardwareException.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\SoundBank.cs">
+      <Link>Audio\SoundBank.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\WaveBank.cs">
+      <Link>Audio\WaveBank.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\XactClip.cs">
+      <Link>Audio\XactClip.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\XactSound.cs">
+      <Link>Audio\XactSound.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
+      <Link>Content\ContentExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentManager.cs">
+      <Link>Content\ContentManager.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReader.cs">
+      <Link>Content\ContentReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\AlphaTestEffectReader.cs">
+      <Link>Content\ContentReaders\AlphaTestEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ArrayReader.cs">
+      <Link>Content\ContentReaders\ArrayReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\BasicEffectReader.cs">
+      <Link>Content\ContentReaders\BasicEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\BooleanReader.cs">
+      <Link>Content\ContentReaders\BooleanReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\BoundingBoxReader.cs">
+      <Link>Content\ContentReaders\BoundingBoxReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\BoundingFrustumReader.cs">
+      <Link>Content\ContentReaders\BoundingFrustumReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\BoundingSphereReader.cs">
+      <Link>Content\ContentReaders\BoundingSphereReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ByteReader.cs">
+      <Link>Content\ContentReaders\ByteReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\CharReader.cs">
+      <Link>Content\ContentReaders\CharReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ColorReader.cs">
+      <Link>Content\ContentReaders\ColorReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\CurveReader.cs">
+      <Link>Content\ContentReaders\CurveReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\DateTimeReader.cs">
+      <Link>Content\ContentReaders\DateTimeReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\DecimalReader.cs">
+      <Link>Content\ContentReaders\DecimalReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\DictionaryReader.cs">
+      <Link>Content\ContentReaders\DictionaryReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\DoubleReader.cs">
+      <Link>Content\ContentReaders\DoubleReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\DualTextureEffectReader.cs">
+      <Link>Content\ContentReaders\DualTextureEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\EffectMaterialReader.cs">
+      <Link>Content\ContentReaders\EffectMaterialReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\EffectReader.cs">
+      <Link>Content\ContentReaders\EffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\EnumReader.cs">
+      <Link>Content\ContentReaders\EnumReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\EnvironmentMapEffectReader.cs">
+      <Link>Content\ContentReaders\EnvironmentMapEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ExternalReferenceReader.cs">
+      <Link>Content\ContentReaders\ExternalReferenceReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\IndexBufferReader.cs">
+      <Link>Content\ContentReaders\IndexBufferReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Int16Reader.cs">
+      <Link>Content\ContentReaders\Int16Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Int32Reader.cs">
+      <Link>Content\ContentReaders\Int32Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Int64Reader.cs">
+      <Link>Content\ContentReaders\Int64Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ListReader.cs">
+      <Link>Content\ContentReaders\ListReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\MatrixReader.cs">
+      <Link>Content\ContentReaders\MatrixReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ModelReader.cs">
+      <Link>Content\ContentReaders\ModelReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\NullableReader.cs">
+      <Link>Content\ContentReaders\NullableReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\PlaneReader.cs">
+      <Link>Content\ContentReaders\PlaneReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\PointReader.cs">
+      <Link>Content\ContentReaders\PointReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\QuaternionReader.cs">
+      <Link>Content\ContentReaders\QuaternionReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\RayReader.cs">
+      <Link>Content\ContentReaders\RayReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\RectangleReader.cs">
+      <Link>Content\ContentReaders\RectangleReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\ReflectiveReader.cs">
+      <Link>Content\ContentReaders\ReflectiveReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SByteReader.cs">
+      <Link>Content\ContentReaders\SByteReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SingleReader.cs">
+      <Link>Content\ContentReaders\SingleReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SkinnedEffectReader.cs">
+      <Link>Content\ContentReaders\SkinnedEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SongReader.cs">
+      <Link>Content\ContentReaders\SongReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SoundEffectReader.cs">
+      <Link>Content\ContentReaders\SoundEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\SpriteFontReader.cs">
+      <Link>Content\ContentReaders\SpriteFontReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\StringReader.cs">
+      <Link>Content\ContentReaders\StringReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Texture2DReader.cs">
+      <Link>Content\ContentReaders\Texture2DReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\TextureCubeReader.cs">
+      <Link>Content\ContentReaders\TextureCubeReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\TextureReader.cs">
+      <Link>Content\ContentReaders\TextureReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\TimeSpanReader.cs">
+      <Link>Content\ContentReaders\TimeSpanReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\UInt16Reader.cs">
+      <Link>Content\ContentReaders\UInt16Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\UInt32Reader.cs">
+      <Link>Content\ContentReaders\UInt32Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\UInt64Reader.cs">
+      <Link>Content\ContentReaders\UInt64Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Vector2Reader.cs">
+      <Link>Content\ContentReaders\Vector2Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Vector3Reader.cs">
+      <Link>Content\ContentReaders\Vector3Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\Vector4Reader.cs">
+      <Link>Content\ContentReaders\Vector4Reader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\VertexBufferReader.cs">
+      <Link>Content\ContentReaders\VertexBufferReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\VertexDeclarationReader.cs">
+      <Link>Content\ContentReaders\VertexDeclarationReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentReaders\VideoReader.cs">
+      <Link>Content\ContentReaders\VideoReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentTypeReader.cs">
+      <Link>Content\ContentTypeReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentTypeReaderManager.cs">
+      <Link>Content\ContentTypeReaderManager.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ResourceContentManager.cs">
+      <Link>Content\ResourceContentManager.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\DrawableGameComponent.cs">
+      <Link>DrawableGameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Game.cs">
+      <Link>Game.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GameComponent.cs">
+      <Link>GameComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GameComponentCollection.cs">
+      <Link>GameComponentCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamePlatform.cs">
+      <Link>GamePlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendCollection.cs">
+      <Link>GamerServices\FriendCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendGamer.cs">
+      <Link>GamerServices\FriendGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\Gamer.cs">
+      <Link>GamerServices\Gamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerCollection.cs">
+      <Link>GamerServices\GamerCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerProfile.cs">
+      <Link>GamerServices\GamerProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerServicesComponent.cs">
+      <Link>GamerServices\GamerServicesComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\MonoLive.cs">
+      <Link>GamerServices\MonoLive.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\MonoLiveClient.cs">
+      <Link>GamerServices\MonoLiveClient.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\SignedInGamerCollection.cs">
+      <Link>GamerServices\SignedInGamerCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GameServiceContainer.cs">
+      <Link>GameServiceContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GraphicsDeviceInformation.cs">
+      <Link>GraphicsDeviceInformation.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GraphicsDeviceManager.cs">
+      <Link>GraphicsDeviceManager.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\DirectionalLight.cs">
+      <Link>Graphics\DirectionalLight.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\AlphaTestEffect.cs">
+      <Link>Graphics\Effect\AlphaTestEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\BasicEffect.cs">
+      <Link>Graphics\Effect\BasicEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\DualTextureEffect.cs">
+      <Link>Graphics\Effect\DualTextureEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\Effect.cs">
+      <Link>Graphics\Effect\Effect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectAnnotation.cs">
+      <Link>Graphics\Effect\EffectAnnotation.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectAnnotationCollection.cs">
+      <Link>Graphics\Effect\EffectAnnotationCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectHelpers.cs">
+      <Link>Graphics\Effect\EffectHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectMaterial.cs">
+      <Link>Graphics\Effect\EffectMaterial.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectParameter.cs">
+      <Link>Graphics\Effect\EffectParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectParameterCollection.cs">
+      <Link>Graphics\Effect\EffectParameterCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectPass.cs">
+      <Link>Graphics\Effect\EffectPass.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectPassCollection.cs">
+      <Link>Graphics\Effect\EffectPassCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectTechnique.cs">
+      <Link>Graphics\Effect\EffectTechnique.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EffectTechniqueCollection.cs">
+      <Link>Graphics\Effect\EffectTechniqueCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\EnvironmentMapEffect.cs">
+      <Link>Graphics\Effect\EnvironmentMapEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\IEffectLights.cs">
+      <Link>Graphics\Effect\IEffectLights.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\SkinnedEffect.cs">
+      <Link>Graphics\Effect\SkinnedEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Effect\SpriteEffect.cs">
+      <Link>Graphics\Effect\SpriteEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsAdapter.cs">
+      <Link>Graphics\GraphicsAdapter.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsCapabilities.cs">
+      <Link>Graphics\GraphicsCapabilities.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsDevice.cs">
+      <Link>Graphics\GraphicsDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsDeviceInformation.cs">
+      <Link>Graphics\GraphicsDeviceInformation.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
+      <Link>Graphics\GraphicsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsResource.cs">
+      <Link>Graphics\GraphicsResource.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\IGraphicsDeviceService.cs">
+      <Link>Graphics\IGraphicsDeviceService.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ImageEx.cs">
+      <Link>Graphics\ImageEx.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Model.cs">
+      <Link>Graphics\Model.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelBone.cs">
+      <Link>Graphics\ModelBone.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelBoneCollection.cs">
+      <Link>Graphics\ModelBoneCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelEffectCollection.cs">
+      <Link>Graphics\ModelEffectCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelMesh.cs">
+      <Link>Graphics\ModelMesh.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelMeshCollection.cs">
+      <Link>Graphics\ModelMeshCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelMeshPart.cs">
+      <Link>Graphics\ModelMeshPart.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\ModelMeshPartCollection.cs">
+      <Link>Graphics\ModelMeshPartCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\OcclusionQuery.cs">
+      <Link>Graphics\OcclusionQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\PackedVector\HalfSingle.cs">
+      <Link>Graphics\PackedVector\HalfSingle.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\PackedVector\HalfTypeHelper.cs">
+      <Link>Graphics\PackedVector\HalfTypeHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\PackedVector\HalfVector2.cs">
+      <Link>Graphics\PackedVector\HalfVector2.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\PresentationParameters.cs">
+      <Link>Graphics\PresentationParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\RenderTarget2D.cs">
+      <Link>Graphics\RenderTarget2D.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\RenderTargetBinding.cs">
+      <Link>Graphics\RenderTargetBinding.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\SamplerStateCollection.cs">
+      <Link>Graphics\SamplerStateCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Shader\ConstantBuffer.cs">
+      <Link>Graphics\Shader\ConstantBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Shader\ConstantBufferCollection.cs">
+      <Link>Graphics\Shader\ConstantBufferCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Shader\Shader.cs">
+      <Link>Graphics\Shader\Shader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Shader\ShaderProgramCache.cs">
+      <Link>Graphics\Shader\ShaderProgramCache.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\SpriteBatch.cs">
+      <Link>Graphics\SpriteBatch.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\SpriteBatcher.cs">
+      <Link>Graphics\SpriteBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\SpriteBatchItem.cs">
+      <Link>Graphics\SpriteBatchItem.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\SpriteFont.cs">
+      <Link>Graphics\SpriteFont.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\States\BlendState.cs">
+      <Link>Graphics\States\BlendState.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\States\DepthStencilState.cs">
+      <Link>Graphics\States\DepthStencilState.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\States\RasterizerState.cs">
+      <Link>Graphics\States\RasterizerState.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\States\SamplerState.cs">
+      <Link>Graphics\States\SamplerState.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Texture.cs">
+      <Link>Graphics\Texture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Texture2D.cs">
+      <Link>Graphics\Texture2D.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Texture3D.cs">
+      <Link>Graphics\Texture3D.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\TextureCollection.cs">
+      <Link>Graphics\TextureCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\TextureCube.cs">
+      <Link>Graphics\TextureCube.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\DynamicIndexBuffer.cs">
+      <Link>Graphics\Vertices\DynamicIndexBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\DynamicVertexBuffer.cs">
+      <Link>Graphics\Vertices\DynamicVertexBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\IndexBuffer.cs">
+      <Link>Graphics\Vertices\IndexBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\IVertexType.cs">
+      <Link>Graphics\Vertices\IVertexType.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexBuffer.cs">
+      <Link>Graphics\Vertices\VertexBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexDeclaration.cs">
+      <Link>Graphics\Vertices\VertexDeclaration.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexDeclarationCache.cs">
+      <Link>Graphics\Vertices\VertexDeclarationCache.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexElement.cs">
+      <Link>Graphics\Vertices\VertexElement.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexPosition2ColorTexture.cs">
+      <Link>Graphics\Vertices\VertexPosition2ColorTexture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexPositionColor.cs">
+      <Link>Graphics\Vertices\VertexPositionColor.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexPositionColorTexture.cs">
+      <Link>Graphics\Vertices\VertexPositionColorTexture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexPositionNormalTexture.cs">
+      <Link>Graphics\Vertices\VertexPositionNormalTexture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexPositionTexture.cs">
+      <Link>Graphics\Vertices\VertexPositionTexture.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\ButtonDefinition.cs">
+      <Link>Input\ButtonDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\Keyboard.cs">
+      <Link>Input\Keyboard.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\Mouse.cs">
+      <Link>Input\Mouse.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\ThumbStickDefinition.cs">
+      <Link>Input\ThumbStickDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\Touch\TouchPanel.cs">
+      <Link>Input\Touch\TouchPanel.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Input\Touch\TouchPanelCapabilities.cs">
+      <Link>Input\Touch\TouchPanelCapabilities.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Media\MediaLibrary.cs">
+      <Link>Media\MediaLibrary.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Media\MediaPlayer.cs">
+      <Link>Media\MediaPlayer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Media\MediaQueue.cs">
+      <Link>Media\MediaQueue.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Media\Song.cs">
+      <Link>Media\Song.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Media\SongCollection.cs">
+      <Link>Media\SongCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\AvailableNetworkSession.cs">
+      <Link>Net\AvailableNetworkSession.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\AvailableNetworkSessionCollection.cs">
+      <Link>Net\AvailableNetworkSessionCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandGamerStateChange.cs">
+      <Link>Net\CommandGamerStateChange.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandReceiveData.cs">
+      <Link>Net\CommandReceiveData.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandSendData.cs">
+      <Link>Net\CommandSendData.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\LocalNetworkGamer.cs">
+      <Link>Net\LocalNetworkGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\MonoGamerPeer.cs">
+      <Link>Net\MonoGamerPeer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkGamer.cs">
+      <Link>Net\NetworkGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkMachine.cs">
+      <Link>Net\NetworkMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkNotAvailableException.cs">
+      <Link>Net\NetworkNotAvailableException.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkSession.cs">
+      <Link>Net\NetworkSession.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\PacketReader.cs">
+      <Link>Net\PacketReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\PacketWriter.cs">
+      <Link>Net\PacketWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\PreparingDeviceSettingsEventArgs.cs">
+      <Link>PreparingDeviceSettingsEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Storage\StorageContainer.cs">
+      <Link>Storage\StorageContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Storage\StorageDevice.cs">
+      <Link>Storage\StorageDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Threading.cs">
+      <Link>Threading.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\TitleContainer.cs">
+      <Link>TitleContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\Audio\AudioLoader.cs">
+      <Link>Windows\Audio\AudioLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\Audio\Sound.cs">
+      <Link>Windows\Audio\Sound.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\Content\ContentReaders\SoundEffectReader.cs">
+      <Link>Windows\Content\ContentReaders\SoundEffectReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\GamerServices\Guide.cs">
+      <Link>Windows\GamerServices\Guide.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\GamerServices\MonoGameGamerServicesHelper.cs">
+      <Link>Windows\GamerServices\MonoGameGamerServicesHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\GamerServices\SignedInGamer.cs">
+      <Link>Windows\GamerServices\SignedInGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\Input\KeyboardUtil.cs">
+      <Link>Windows\Input\KeyboardUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\Media\Video.cs">
+      <Link>Windows\Media\Video.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
+      <Project>{aea9e92a-c99e-4161-8d54-7ac1ae4b3601}</Project>
+      <Name>MonoGame.Framework</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\BasicEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\BasicEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo">
+      <Link>Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utilities\" />
+  </ItemGroup>
+</Project>

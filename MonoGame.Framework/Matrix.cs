@@ -26,13 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+    #if MONOCORE || WINDOWS_PHONE
     [DataContract]
     #else
     [Serializable]
@@ -66,67 +64,67 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M11;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M12;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M13;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M14;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M21;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M22;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M23;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M24;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M31;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M32;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M33;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M34;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M41;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M42;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M43;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public float M44;

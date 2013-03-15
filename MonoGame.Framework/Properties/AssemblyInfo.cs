@@ -12,11 +12,7 @@ using System.Resources;
 #elif ANDROID
 [assembly: AssemblyDescription("MonoGame for Android")]
 #elif WINDOWS
-#if DIRECTX
-[assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
-#else
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (OpenGL)")]
-#endif
 #elif PSM
 [assembly: AssemblyDescription("MonoGame for PlayStation Mobile")]
 #elif LINUX
@@ -29,6 +25,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif PORTABLE
+[assembly: AssemblyDescription("MonoGame Portable")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -40,10 +38,10 @@ using System.Resources;
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+//[assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
+//[assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -58,3 +56,5 @@ using System.Resources;
 [assembly: AssemblyVersion("3.0.0.0")]
 [assembly: AssemblyFileVersion("3.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
+
+

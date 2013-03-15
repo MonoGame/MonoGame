@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "MonoGame.Framework.Linux\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Core", "MonoGame.Framework.Linux\MonoGame.Framework.Core-Linux\MonoGame.Framework.Core.csproj", "{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,12 +17,16 @@ Global
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Debug|x86.Build.0 = Debug|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.ActiveCfg = Release|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.Build.0 = Release|x86
+		{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}.Debug|x86.ActiveCfg = Debug|x86
+		{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}.Debug|x86.Build.0 = Debug|x86
+		{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}.Release|x86.ActiveCfg = Release|x86
+		{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}.Release|x86.Build.0 = Release|x86
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoGame.Framework\MonoGame.Framework.Linux.csproj
+		StartupItem = MonoGame.Framework.Linux\MonoGame.Framework.Linux.csproj
 	EndGlobalSection
 EndGlobal

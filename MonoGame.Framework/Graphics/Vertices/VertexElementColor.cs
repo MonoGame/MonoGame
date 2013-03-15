@@ -1,30 +1,28 @@
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    #if WINRT
+    #if MONOCORE || WINDOWS_PHONE
     [DataContract]
     #else
     [Serializable]
     #endif
 	public struct VertexElementColor
 	{
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
 		byte R;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
 		byte G;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
 		byte B;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
 		byte A;

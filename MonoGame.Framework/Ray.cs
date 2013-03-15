@@ -27,13 +27,11 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+    #if MONOCORE || WINDOWS_PHONE
     [DataContract]
     #else
     [Serializable]
@@ -41,11 +39,11 @@ namespace Microsoft.Xna.Framework
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public Vector3 Direction;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public Vector3 Position;

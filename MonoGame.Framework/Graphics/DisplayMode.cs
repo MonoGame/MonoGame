@@ -34,7 +34,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
     [DataContract]
 #else
     [Serializable]
