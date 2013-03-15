@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Clear()
         {
             for (var i = 0; i < _samplers.Length; i++)
-                _samplers[i] = null;
+                _samplers[i] = SamplerState.LinearWrap;
             
 #if DIRECTX
             _d3dDirty = int.MaxValue;
