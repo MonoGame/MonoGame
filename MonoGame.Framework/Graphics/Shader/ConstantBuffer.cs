@@ -118,6 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
             SharpDX.Utilities.Dispose(ref _cbuffer);
+            _dirty = true;
 #endif
         }
 
