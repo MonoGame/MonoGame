@@ -1535,7 +1535,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_currentRenderTargetBindings == null && renderTargets == null)
                 return;
 
-#if OPENGL
+#if GLES
             
             // if there are render target bindings and we are asked to initialize the bindings
             // we need to delete the Render Buffers if there were any attached.  If not then
