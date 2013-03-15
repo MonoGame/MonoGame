@@ -178,10 +178,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
-		public void End()
-		{
-		}
-
         protected internal virtual bool OnApply()
         {
             return false;
