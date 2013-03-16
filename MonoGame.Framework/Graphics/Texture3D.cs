@@ -43,7 +43,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return depth; }
         }
 
-		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false)
+		{		    
+		}
+
+		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
@@ -87,6 +92,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 Usage = ResourceUsage.Default,
                 OptionFlags = ResourceOptionFlags.None,
             };
+
+            if (renderTarget)
+            {
+                description.BindFlags |= BindFlags.RenderTarget;
+                if (mipMap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
 
             _texture = new SharpDX.Direct3D11.Texture3D(graphicsDevice._d3dDevice, description);
 #endif

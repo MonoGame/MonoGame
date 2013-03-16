@@ -1528,7 +1528,19 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
         }
-		
+
+#if DIRECTX
+
+        public void SetRenderTarget(RenderTarget3D renderTarget, int arraySlice)
+        {
+            if (renderTarget == null)
+                SetRenderTarget(null);
+            else
+                SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
+        }
+
+#endif
+
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{
             // If the default swap chain is already set then do nothing.
@@ -1570,7 +1582,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
                 {
                     if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
-                        _currentRenderTargetBindings[i].CubeMapFace != renderTargets[i].CubeMapFace)
+                        _currentRenderTargetBindings[i].ArraySlice != renderTargets[i].ArraySlice)
                     {
                         isEqual = false;
                         break;
@@ -1631,11 +1643,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var binding = _currentRenderTargetBindings[b];
                     var target = (IRenderTarget)binding.RenderTarget;
-                    var arraySlice = (int)binding.CubeMapFace;
-                    _currentRenderTargets[b] = target.GetRenderTargetView(arraySlice);
+                    _currentRenderTargets[b] = target.GetRenderTargetView(binding.ArraySlice);
                 }
 
-                    // Use the depth from the first target.
+                // Use the depth from the first target.
                 _currentDepthStencilView = renderTarget.GetDepthStencilView();
 
                 // Set the targets.
@@ -1705,8 +1716,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
                                 
 #endif
-    
-#if !PSM                
+
+#if !PSM
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
