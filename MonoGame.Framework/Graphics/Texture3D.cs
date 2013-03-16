@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.height = height;
             this.depth = depth;
             this.levelCount = 1;
+		    this.format = format;
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
