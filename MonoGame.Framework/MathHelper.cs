@@ -292,7 +292,7 @@ namespace Microsoft.Xna.Framework
 	    return angle;
 	}
 	
-  /// <summary>
+  	/// <summary>
         /// Wraps the specified value into a range.
         /// </summary>
         /// <param name="value">The value to wrap.</param>
