@@ -80,6 +80,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _arraySlice = (int)cubeMapFace;
         }
 
+#if DIRECTX
+
         public RenderTargetBinding(RenderTarget3D renderTarget)
         {
             if (renderTarget == null)
@@ -100,14 +102,20 @@ namespace Microsoft.Xna.Framework.Graphics
             _arraySlice = arraySlice;
         }
 
+#endif 
+
         public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
         {
             return new RenderTargetBinding(renderTarget);
         }
 
+#if DIRECTX
+
         public static implicit operator RenderTargetBinding(RenderTarget3D renderTarget)
         {
             return new RenderTargetBinding(renderTarget);
         }
+
+#endif
 	}
 }
