@@ -700,6 +700,16 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferHeight,
                                             format, 
                                             SwapChainFlags.None);
+                
+                //Update SwapChainBackgroundPanel to force scale/resolution change.                
+                if (PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
+                {
+                    if (PresentationParameters.BackBufferWidth != _viewport.Width || PresentationParameters.BackBufferHeight != _viewport.Height)
+                    {
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                            nativePanel.SwapChain = _swapChain;
+                    }
+                }
             }
 
             // Otherwise, create a new swap chain.
