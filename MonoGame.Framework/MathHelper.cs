@@ -292,7 +292,7 @@ namespace Microsoft.Xna.Framework
 	    return angle;
 	}
 	
-	/// <summary>
+        /// <summary>
         /// Wraps the specified value into a range.
         /// </summary>
         /// <param name="value">The value to wrap.</param>
@@ -303,23 +303,27 @@ namespace Microsoft.Xna.Framework
         {
             if (min == max) return min;
 
+            int r = Math.Abs(min) + Math.Abs(max);
+
             if (value >= max)
-            {
+            { 
                 int temp = value;
                 while (temp >= max)
                 {
-                    temp -= max;
+                    temp -= r;
                 }
                 return temp;
             }
             else
             {
-                if (value <= min)
+                int m = Math.Abs(min) + Math.Abs(max);
+
+                if (value < min)
                 {
                     int temp = value;
                     while (temp < min)
                     {
-                        temp += max;
+                        temp += r;
                     }
                     return temp;
                 }
