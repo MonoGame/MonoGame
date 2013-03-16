@@ -321,6 +321,16 @@ namespace Microsoft.Xna.Framework
         {
             Matrix result;
 
+            // Delegate to the other overload of the function to do the work
+            CreateBillboard(ref objectPosition, ref cameraPosition, ref cameraUpVector, cameraForwardVector, out result);
+
+            return result;
+        }
+
+        
+        public static void CreateBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
+            ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
+        {
             Vector3 vector;
             Vector3 vector2;
             Vector3 vector3;
@@ -355,16 +365,6 @@ namespace Microsoft.Xna.Framework
             result.M42 = objectPosition.Y;
             result.M43 = objectPosition.Z;
             result.M44 = 1f;
-
-            return result;
-        }
-
-        
-        public static void CreateBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
-            ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
-        {
-            // Delegate to the other overload of the function to do the work
-            result = CreateBillboard(objectPosition, cameraPosition, cameraUpVector, cameraForwardVector);
         }
 
         
