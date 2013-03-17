@@ -54,9 +54,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerState = rasterizerState;
 
             Annotations = annotations;
-
-            Initialize();
-
         }
         
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -79,10 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public void Initialize()
-        {
-        }
-        
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.

@@ -235,10 +235,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// used to detect old packaged content.
         /// </summary>
         /// <remarks>
-        /// We should avoid supporting old versions for very long as
-        /// users should be rebuilding content when packaging their game.
+        /// We should avoid supporting old versions for very long if at all 
+        /// as users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int MGFXVersion = 4;
+        private const int MGFXVersion = 5;
 
 #if !PSM
 
