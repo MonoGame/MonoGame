@@ -148,19 +148,25 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if MONOMAC || WINDOWS || LINUX
+            
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
+
+            // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
+            if (assembly != null)
+            {
+                //Use the Title attribute of the Assembly if possible.
+                var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
+                if (assemblyTitleAtt != null)
+                    windowTitle = assemblyTitleAtt.Title;
 
-            //Use the Title attribute of the Assembly if possible.
-            var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
-            if (assemblyTitleAtt != null)
-                windowTitle = assemblyTitleAtt.Title;
+                // Otherwise, fallback to the Name of the assembly.
+                if (string.IsNullOrEmpty(windowTitle))
+                    windowTitle = assembly.GetName().Name;
+            }
 
-            // Otherwise, fallback to the Name of the assembly.
-            if (string.IsNullOrEmpty(windowTitle))
-                windowTitle = assembly.GetName().Name;
             Window.Title = windowTitle;
 #endif
         }
