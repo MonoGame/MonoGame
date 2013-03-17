@@ -1183,6 +1183,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GC.SuppressFinalize(this);
         }
 
+#if DIRECTX
+
+        private void ClearLayouts()
+        {
+            foreach (var layout in _inputLayouts)
+                layout.Value.Dispose();
+            _inputLayouts.Clear();
+        }
+
+#endif
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -1194,27 +1205,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-                    if (_renderTargetView != null)
-                    {
-                        _renderTargetView.Dispose();
-                        _renderTargetView = null;
-                    }
-                    if (_depthStencilView != null)
-                    {
-                        _depthStencilView.Dispose();
-                        _depthStencilView = null;
-                    }
-
-                    if (_d3dDevice != null)
-                    {
-                        _d3dDevice.Dispose();
-                        _d3dDevice = null;
-                    }
-                    if (_d3dContext != null)
-                    {
-                        _d3dContext.Dispose();
-                        _d3dContext = null;
-                    }
+                    ClearLayouts();
+                    SharpDX.Utilities.Dispose(ref _renderTargetView);
+                    SharpDX.Utilities.Dispose(ref _depthStencilView);
+                    SharpDX.Utilities.Dispose(ref _d3dDevice);
+                    SharpDX.Utilities.Dispose(ref _d3dContext);
 
 #if WINDOWS_STOREAPP
 
@@ -1756,7 +1751,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Textures.Dirty();
             SamplerStates.Dirty();
-            _inputLayouts.Clear();
+            ClearLayouts();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
             _indexBufferDirty = true;
