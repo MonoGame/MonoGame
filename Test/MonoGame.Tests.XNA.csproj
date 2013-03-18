@@ -90,6 +90,7 @@
     <Compile Include="FrameInfo.cs" />
     <Compile Include="FramePixelData.cs" />
     <Compile Include="Framework\Bounding.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
     <Compile Include="GameTest+Methods.cs" />
     <Compile Include="Interface\AggregateTestFilter.cs" />

@@ -174,11 +174,6 @@ namespace MonoGame.Framework
                     _window = null;
                     Window = null;
                 }
-                
-                // Make sure we dispose the graphics system.
-                var graphicsDeviceManager = Game.graphicsDeviceManager;
-                if (graphicsDeviceManager != null)
-                    graphicsDeviceManager.Dispose();
             }
 
             base.Dispose(disposing);
