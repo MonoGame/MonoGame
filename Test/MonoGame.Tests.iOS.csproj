@@ -92,7 +92,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Runner\iOS\Info.plist" />
+    <None Include="Runner\iOS\Info.plist" >
+		<Link>Info.plist</Link>
+	</None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
