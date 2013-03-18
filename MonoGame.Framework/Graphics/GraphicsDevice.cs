@@ -448,6 +448,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures.Clear();
             SamplerStates.Clear();
 
+            ClearLayouts();
+
             // Clear constant buffers
             _vertexConstantBuffers.Clear();
             _pixelConstantBuffers.Clear();
@@ -1751,7 +1753,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Textures.Dirty();
             SamplerStates.Dirty();
-            ClearLayouts();
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
             _indexBufferDirty = true;
