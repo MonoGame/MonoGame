@@ -141,7 +141,12 @@ namespace MonoGame.Framework
             Game = platform.Game;
 
             _form = new Form();
-            _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+            
+            // When running unit tests this can return null.
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly != null)
+                _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
             _form.StartPosition = FormStartPosition.CenterScreen;
