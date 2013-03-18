@@ -118,6 +118,7 @@
     <Compile Include="Interface\MobileInterface.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\RayTest.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Components\Colored3DCubeComponent.cs" />
     <Compile Include="Components\TexturedQuadComponent.cs" />
     <Compile Include="GameTest.cs" />
