@@ -302,34 +302,16 @@ namespace Microsoft.Xna.Framework
         public static int Wrap(int value, int min, int max)
         {
             if (min == max) return min;
-
-            int r = Math.Abs(min) + Math.Abs(max);
-
-            if (value >= max)
-            { 
-                int temp = value;
-                while (temp >= max)
-                {
-                    temp -= r;
-                }
-                return temp;
+            int v = (((value - min)%(max - min))); 
+            if (value > max)
+            {
+                return min + v;
             }
-            else
-            { 
-                if (value < min)
-                {
-                    int temp = value;
-                    while (temp < min)
-                    {
-                        temp += r;
-                    }
-                    return temp;
-                }
-                else
-                { 
-                    return value;
-                }
-            } 
+            if (value < min)
+            {
+                return max + v;
+            }
+            return value;
         }
 
         /// <summary>
