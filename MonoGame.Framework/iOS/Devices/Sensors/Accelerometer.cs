@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 
 using MonoTouch.CoreMotion;
 using MonoTouch.Foundation;
-using MonoTouch.ObjCRuntime;
 
 namespace Microsoft.Devices.Sensors
 {
@@ -17,18 +16,7 @@ namespace Microsoft.Devices.Sensors
 
 		public static bool IsSupported
 		{
-			get 
-            { 
-                // AccelerometerAvailable will never return true when running in the simulator
-                if (Runtime.Arch != Arch.SIMULATOR)
-                {
-                    return motionManager.AccelerometerAvailable; 
-                }
-                else
-                {
-                    return true;
-                }
-            }
+			get { return motionManager.AccelerometerAvailable; }
 		}
 		public SensorState State
 		{
