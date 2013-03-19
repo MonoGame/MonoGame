@@ -42,7 +42,7 @@ namespace MonoGame.Framework.WindowsPhone
             _renderTargetView = ToDispose(new RenderTargetView(_device, _renderTarget));
 
             var viewport = new SharpDX.ViewportF(0, 0, (float)size.Width, (float)size.Height);
-            _deviceContext.Rasterizer.SetViewports(viewport);
+            _deviceContext.Rasterizer.SetViewport(viewport);
         }
 
         private void CreateDeviceResources()
