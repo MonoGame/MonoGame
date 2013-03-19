@@ -90,7 +90,7 @@ namespace MonoGame.Tests {
 
 		public TestGameBase ()
 		{
-			Content.RootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 			Services.AddService<IFrameInfoSource> (this);
 			SuppressExtraUpdatesAndDraws = true;
 		}
