@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		Vector2 _texCoordBR = new Vector2 (0,0);
 		
 		/// <summary>
-	        /// Creates new instance of <see cref="SpriteBatch"/>.
+	        /// Creates a new instance of <see cref="SpriteBatch"/>.
 	        /// </summary>
 	        /// <param name="graphicsDevice">Valid <see cref="GraphicsDevice"/>.</param>
 		public SpriteBatch (GraphicsDevice graphicsDevice)
