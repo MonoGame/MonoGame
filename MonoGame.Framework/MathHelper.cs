@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
-        /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
+        /// <returns><c>true</c> if <c>value</c> is powered by two; <c>false</c> otherwise.</returns>
 	public static bool IsPowerOfTwo(int value)
 	{
 	     return (value > 0) && ((value & (value - 1)) == 0);
