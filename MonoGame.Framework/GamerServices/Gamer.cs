@@ -49,6 +49,8 @@ namespace Microsoft.Xna.Framework.GamerServices
         Object _tag;
         bool disposed;
 
+        LeaderboardWriter _leaderboardWriter;
+
         #region Methods
         public IAsyncResult BeginGetProfile( AsyncCallback callback, Object asyncState )
         {
@@ -124,6 +126,14 @@ namespace Microsoft.Xna.Framework.GamerServices
             get
             {
                 return _signedInGamers;
+            }
+        }
+
+        public LeaderboardWriter LeaderboardWriter 
+        { 
+            get
+            {
+                return _leaderboardWriter;
             }
         }
         #endregion
