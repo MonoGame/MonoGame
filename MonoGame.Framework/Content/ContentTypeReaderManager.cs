@@ -110,6 +110,8 @@ namespace Microsoft.Xna.Framework.Content
                 var hNullableRectReader = new NullableReader<Rectangle>();
 				var hEffectMaterialReader = new EffectMaterialReader();
 				var hExternalReferenceReader = new ExternalReferenceReader();
+                var hSoundEffectReader = new SoundEffectReader();
+                var hSongReader = new SongReader();
             }
 #pragma warning restore 0219, 0649
 
