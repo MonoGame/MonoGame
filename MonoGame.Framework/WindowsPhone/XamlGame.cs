@@ -86,7 +86,7 @@ namespace MonoGame.Framework.WindowsPhone
                 _surfaceUpdateHandler.Draw(device, context, renderTargetView);
             }
 
-            public override void PrepareResources(DateTime presentTargetTime, ref DrawingSizeF desiredRenderTargetSize)
+            public override void PrepareResources(DateTime presentTargetTime, ref Size2F desiredRenderTargetSize)
             {
                 _surfaceUpdateHandler.UpdateGameWindowSize(desiredRenderTargetSize);
             }

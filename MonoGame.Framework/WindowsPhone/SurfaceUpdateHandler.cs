@@ -68,7 +68,7 @@ namespace MonoGame.Framework.WindowsPhone
             _host.RequestAdditionalFrame();
         }
 
-        public void UpdateGameWindowSize(DrawingSizeF desiredRenderTargetSize)
+        public void UpdateGameWindowSize(Size2F desiredRenderTargetSize)
         {
             WindowsPhoneGameWindow.Width = desiredRenderTargetSize.Width;
             WindowsPhoneGameWindow.Height = desiredRenderTargetSize.Height;

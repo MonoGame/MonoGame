@@ -111,7 +111,7 @@ namespace MonoGame.Framework.WindowsPhone
                 _drawingSurfaceUpdateHandler.DisposeResources();
             }
 
-            public override void GetTexture(DrawingSizeF surfaceSize, out DrawingSurfaceSynchronizedTexture synchronizedTexture, out RectangleF textureSubRectangle)
+            public override void GetTexture(Size2F surfaceSize, out DrawingSurfaceSynchronizedTexture synchronizedTexture, out RectangleF textureSubRectangle)
             {
                 if (_synchronizedTexture == null)
                 {
