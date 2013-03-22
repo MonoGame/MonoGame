@@ -68,9 +68,9 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _name = "";
 		private string _filename = "";
 		internal byte[] _data;
-		List<SoundEffectInstance> playing = null;
-		List<SoundEffectInstance> available = null;
-		List<SoundEffectInstance> toBeRecycled = null;
+		private List<SoundEffectInstance> playing = null;
+        private List<SoundEffectInstance> available = null;
+        private List<SoundEffectInstance> toBeRecycled = null;
 
 		internal float Rate { get; set; }
 
@@ -91,8 +91,13 @@ namespace Microsoft.Xna.Framework.Audio
 			double rate;
 			double duration;
 
+            try {
 			_data = OpenALSupport.LoadFromFile (_filename,
 			                                    out size, out format, out rate, out duration);
+            }
+            catch(Exception ex) {
+                throw new Content.ContentLoadException("Could not load audio data", ex);
+            }
 
 			_name = Path.GetFileNameWithoutExtension (fileName);
 
@@ -116,6 +121,9 @@ namespace Microsoft.Xna.Framework.Audio
         internal SoundEffect(Stream s)
         {
             var data = new byte[s.Length];
+            if(s.Length == 0) {
+                throw new Content.ContentLoadException("SoundEffect content stream does not contain any content.");
+            }
             s.Read(data, 0, (int)s.Length);
 
             _data = data;
@@ -157,15 +165,22 @@ namespace Microsoft.Xna.Framework.Audio
 			LoadAudioStream (_data);
 
 		}        
+        /// <summary>
+        /// Loads the audio stream from the given byte array. If the AudioFileStream does not return an Ok status
+        /// then a ContentLoadException is thrown.
+        /// </summary>
+        /// <param name="audiodata">The full byte array of the audio stream.</param>
 
 		void LoadAudioStream (byte[] audiodata)
 		{
 			AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
 			//long pac = afs.DataPacketCount;
 			afs.PacketDecoded += HandlePacketDecoded;
-
-			afs.ParseBytes (audiodata, false);
+			AudioFileStreamStatus status = afs.ParseBytes (audiodata, false);
 			afs.Close ();
+            if(status != AudioFileStreamStatus.Ok) {
+                throw new Content.ContentLoadException("Could not load audio data. The status code was " + status);
+            }
 		}
 
 		void HandlePacketDecoded (object sender, PacketReceivedEventArgs e)

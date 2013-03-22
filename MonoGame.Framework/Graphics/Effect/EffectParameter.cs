@@ -58,9 +58,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Elements = new EffectParameterCollection(cloneSource.Elements);
             StructureMembers = new EffectParameterCollection(cloneSource.StructureMembers);
 
-            // Data is mutable, but a new copy happens during
-            // boxing/unboxing so we can just assign it.
-            Data = cloneSource.Data;
+            // The data is mutable, so we have to clone it.
+            var array = cloneSource.Data as Array;
+            if (array != null)
+                Data = array.Clone();
             StateKey = unchecked(NextStateKey++);
         }
 
