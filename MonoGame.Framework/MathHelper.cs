@@ -291,12 +291,62 @@ namespace Microsoft.Xna.Framework
 	    }
 	    return angle;
 	}
+	
+  	/// <summary>
+        /// Wraps the specified value into a range.
+        /// </summary>
+        /// <param name="value">The value to wrap.</param>
+        /// <param name="min">The min.</param>
+        /// <param name="max">The max.</param>
+        /// <returns>Result of the wrapping.</returns>
+        public static int Wrap(int value, int min, int max)
+        {
+            if (min == max) return min;
+            int v = (((value - min)%(max - min))); 
+            if (value > max)
+            {
+                return min + v;
+            }
+            if (value < min)
+            {
+                return max + v;
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Wraps the specified value into a range.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="min">The min.</param>
+        /// <param name="max">The max.</param>
+        /// <returns>Result of the wrapping.</returns>
+        public static float Wrap(float value, float min, float max)
+        {
+            if (min > max)
+            {
+                var tmp = min;
+                min = max;
+                max = tmp;
+            }
+             
+            value -= min;
+
+            float rangeSize = max - min;
+
+            if (rangeSize == 0.0f)
+            { 
+                return max;
+            }
+
+            return (float)(value - (rangeSize * Math.Floor(value / rangeSize)) + min);
+        }
 
  	/// <summary>
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
-        /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
+        /// <returns><c>true</c> if <c>value</c> is powered by two; <c>false</c> otherwise.</returns>
 	public static bool IsPowerOfTwo(int value)
 	{
 	     return (value > 0) && ((value & (value - 1)) == 0);
