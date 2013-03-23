@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal Song(string fileName)
 		{			
-			_name = fileName;
+			_name = Path.Combine(TitleContainer.Location, fileName);
 			
 #if IOS
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
