@@ -14,7 +14,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <OutputPath>bin\iPhoneSimulator\Debug\</OutputPath>
+	<IntermediateOutputPath>obj\iPhoneSimulator\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;IPHONE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,7 +31,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <OutputPath>bin\iPhoneSimulator\Release\</OutputPath>
+	<IntermediateOutputPath>obj\iPhoneSimulator\Release\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -43,7 +45,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <OutputPath>bin\iPhone\Debug\</OutputPath>
+	<IntermediateOutputPath>obj\iPhone\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -58,7 +61,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\iPhone\Release</OutputPath>
+    <OutputPath>bin\iPhone\Release\</OutputPath>
+	<IntermediateOutputPath>obj\iPhone\Release\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -88,56 +92,59 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Info.plist" />
+    <None Include="Runner\iOS\Info.plist" >
+		<Link>Info.plist</Link>
+	</None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="TestResources\tests.xsl">
+    <Content Include="Resources\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\DrawFrameNumberComponent.cs" />
-    <Compile Include="Components\FrameCompareComponent.cs" />
-    <Compile Include="Components\ImplicitDrawOrderComponent.cs" />
-    <Compile Include="Components\PixelDeltaFrameComparer.cs" />
-    <Compile Include="Components\UpdateGuard.cs" />
-    <Compile Include="Components\VisualTestDrawableGameComponent.cs" />
-    <Compile Include="Components\VisualTestGameComponent.cs" />
-    <Compile Include="iOS\AppDelegate.cs" />
-    <Compile Include="iOS\Main.cs" />
-    <Compile Include="Visual\VisualTestFixtureBase.cs" />
-    <Compile Include="Visual\VisualTestGame.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="FrameInfo.cs" />
-    <Compile Include="PixelArgb.cs" />
-    <Compile Include="TestGameBase.cs" />
-    <Compile Include="Utility.cs" />
-    <Compile Include="FramePixelData.cs" />
-    <Compile Include="iOS\FramePixelData.cs" />
-    <Compile Include="Interface\MobileInterface.cs" />
+    <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
+    <Compile Include="Framework\Components\FrameCompareComponent.cs" />
+    <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
+    <Compile Include="Framework\Components\UpdateGuard.cs" />
+    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
+    <Compile Include="Runner\iOS\AppDelegate.cs" />
+    <Compile Include="Runner\iOS\Main.cs" />
+    <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
+    <Compile Include="Framework\Visual\VisualTestGame.cs" />
+    <Compile Include="Runner\Constants.cs" />
+    <Compile Include="Runner\FrameInfo.cs" />
+    <Compile Include="Runner\PixelArgb.cs" />
+    <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Runner\Utility.cs" />
+    <Compile Include="Runner\FramePixelData.cs" />
+    <Compile Include="Runner\iOS\FramePixelData.cs" />
+    <Compile Include="Runner\Interface\MobileInterface.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\RayTest.cs" />
-    <Compile Include="Components\Colored3DCubeComponent.cs" />
-    <Compile Include="Components\TexturedQuadComponent.cs" />
-    <Compile Include="GameTest.cs" />
-    <Compile Include="GameTest+Methods.cs" />
-    <Compile Include="GameTest+Properties.cs" />
-    <Compile Include="Interface\CommandLineInterface.cs" />
-    <Compile Include="Interface\AggregateTestFilter.cs" />
-    <Compile Include="Interface\RegexTestFilter.cs" />
-    <Compile Include="Interface\TestFilterAction.cs" />
-    <Compile Include="Interface\RunOptions.cs" />
-    <Compile Include="Interface\TestEventListenerBase.cs" />
-    <Compile Include="Interface\FileServer.cs" />
-    <Compile Include="Components\FlexibleGameComponent.cs" />
-    <Compile Include="Visual\MiscellaneousTests.cs" />
-    <Compile Include="Visual\ShaderTest.cs" />
-    <Compile Include="Visual\SpriteBatchTest.cs" />
-    <Compile Include="Visual\SpriteFontTest.cs" />
-    <Compile Include="Visual\ViewportTest.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
+    <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
+    <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
+    <Compile Include="Framework\GameTest.cs" />
+    <Compile Include="Framework\GameTest+Methods.cs" />
+    <Compile Include="Framework\GameTest+Properties.cs" />
+    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
+    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
+    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
+    <Compile Include="Runner\Interface\TestFilterAction.cs" />
+    <Compile Include="Runner\Interface\RunOptions.cs" />
+    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
+    <Compile Include="Runner\Interface\FileServer.cs" />
+    <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
+    <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Visual\ShaderTest.cs" />
+    <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
+    <Compile Include="Framework\Visual\SpriteFontTest.cs" />
+    <Compile Include="Framework\Visual\ViewportTest.cs" />
+    <Compile Include="Runner\Extensions.cs" />
+    <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
@@ -152,8 +159,5 @@
       <Project>{F759DE08-E160-4BB4-9A09-404D5694A4EC}</Project>
       <Name>MonoGame.Tests.Assets.iOS</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interface\" />
   </ItemGroup>
 </Project>
