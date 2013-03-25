@@ -660,6 +660,9 @@
     <Compile Include="..\MonoGame.Framework\Graphics\RenderTargetCube.cs">
       <Link>Graphics\RenderTargetCube.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

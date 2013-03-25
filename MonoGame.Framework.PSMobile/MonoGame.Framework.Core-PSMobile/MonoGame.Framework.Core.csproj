@@ -535,6 +535,9 @@
       <Link>Utilities\Hash.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\MonoGame.Framework\TextInputEventArgs.cs">
+      <Link>TextInputEventArgs.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
   <ItemGroup>
