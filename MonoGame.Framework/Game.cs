@@ -70,7 +70,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 #if !PSM
+#if !WINRT
 using System.Drawing;
+#endif
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Reflection;

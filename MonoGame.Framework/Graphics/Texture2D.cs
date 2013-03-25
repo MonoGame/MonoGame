@@ -40,7 +40,9 @@ purpose and non-infringement.
 
 using System;
 #if !PSM
+#if !WINRT
 using System.Drawing;
+#endif
 #else
 using Sce.PlayStation.Core.Graphics;
 #endif

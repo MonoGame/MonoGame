@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,17 +35,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK" />
+    <Reference Include="Ouya.Console.Api">
+      <HintPath>..\ThirdParty\Libs\OUYA\Ouya.Console.Api.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Android\IResumeManager.cs">
+      <Link>Android\IResumeManager.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Graphics\IRenderTarget.cs">
       <Link>Graphics\IRenderTarget.cs</Link>
     </Compile>
@@ -672,11 +684,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
-      <Project>{aea9e92a-c99e-4161-8d54-7ac1ae4b3601}</Project>
+      <Project>{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}</Project>
       <Name>MonoGame.Framework.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">
-      <Project>{565129e0-4ee5-4f6f-b403-c3484c9740be}</Project>
+      <Project>{565129E0-4EE5-4F6F-B403-C3484C9740BE}</Project>
       <Name>Lidgren.Network.Android</Name>
     </ProjectReference>
   </ItemGroup>

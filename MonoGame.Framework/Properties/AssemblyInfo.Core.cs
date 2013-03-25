@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: NeutralResourcesLanguage("en")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -26,8 +25,9 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: NeutralResourcesLanguageAttribute("en-US")]
 [assembly: InternalsVisibleTo("MonoGame.Framework.Windows8")]
 [assembly: InternalsVisibleTo("MonoGame.Framework.Android")]
 [assembly: InternalsVisibleTo("MonoGame.Framework.WindowsGL")]
@@ -35,4 +35,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("MonoGame.Framework.WindowsPhone")]
 [assembly: InternalsVisibleTo("MonoGame.Framework.Ouya")]
 [assembly: InternalsVisibleTo("MonoGame.Framework.iOS")]
-
+[assembly: InternalsVisibleTo("MonoGame.Framework.Linux")]

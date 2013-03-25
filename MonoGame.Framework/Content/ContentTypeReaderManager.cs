@@ -29,6 +29,7 @@ using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -38,6 +39,7 @@ namespace Microsoft.Xna.Framework.Content
         ContentTypeReader[] contentReaders;		
 		
 		static string assemblyName;
+        static string coreAssemblyName;
 		
 		static ContentTypeReaderManager()
 		{
@@ -46,6 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 #else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
 #endif
+            coreAssemblyName = "MonoGame.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null";
         }
 
         public ContentTypeReaderManager(ContentReader reader)
@@ -139,9 +142,18 @@ namespace Microsoft.Xna.Framework.Content
     				// Need to resolve namespace differences
     				string readerTypeString = originalReaderTypeString;
 
-    				readerTypeString = PrepareType(readerTypeString);
+    				readerTypeString = PrepareType(readerTypeString,assemblyName);
 
     				var l_readerType = Type.GetType(readerTypeString);
+                    if (l_readerType == null)
+                    {
+                        var recttype = Type.GetType("Microsoft.Xna.Framework.Rectangle, MonoGame.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null");
+                        string rectassem = recttype.ToString();
+
+                        //try core lookup
+                        var coreReaderTypeString = PrepareType(originalReaderTypeString, coreAssemblyName);
+                        l_readerType = Type.GetType(coreReaderTypeString);
+                    }
                     if (l_readerType != null)
                     {
                         try
@@ -183,7 +195,7 @@ namespace Microsoft.Xna.Framework.Content
 		/// <returns>
 		/// A <see cref="System.String"/>
 		/// </returns>
-		public static string PrepareType(string type)
+		public static string PrepareType(string type, string sourceAssembly)
 		{			
 			//Needed to support nested types
 			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
@@ -200,8 +212,8 @@ namespace Microsoft.Xna.Framework.Content
 				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
 			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", sourceAssembly));
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", sourceAssembly));
 			
 			return preparedType;
 		}

@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{77EBD3FC-0D63-4FAB-8DB9-29B3528184B3}</ProjectGuid>
@@ -20,32 +20,32 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>..\build\WindowsGL\Debug\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DebugSymbols>True</DebugSymbols>
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>..\build\WindowsGL\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>..\build\WindowsGL\Debug\</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DebugSymbols>True</DebugSymbols>
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
@@ -54,10 +54,10 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>..\build\WindowsGL\Release\</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
@@ -81,11 +81,6 @@
     <DefineConstants>TRACE;WINDOWS;OPENGL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -93,12 +88,17 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="OpenTK">
+      <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Graphics\IRenderTarget.cs">
       <Link>Graphics\IRenderTarget.cs</Link>
     </Compile>
@@ -748,9 +748,6 @@
       <Link>Windows\Media\Video.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -765,8 +762,8 @@
       <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
-      <Project>{aea9e92a-c99e-4161-8d54-7ac1ae4b3601}</Project>
-      <Name>MonoGame.Framework</Name>
+      <Project>{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}</Project>
+      <Name>MonoGame.Framework.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -201,6 +201,7 @@
     <Compile Include="Net\NetworkMessageType.cs" />
     <Compile Include="Net\NetworkSessionEndReason.cs" />
     <Compile Include="Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Net\NetworkSessionJoinException.cs" />
     <Compile Include="Net\NetworkSessionProperties.cs" />
     <Compile Include="Net\NetworkSessionState.cs" />
     <Compile Include="Net\NetworkSessionType.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Rectangle.cs" />
     <Compile Include="ReusableItemList.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Vector2.cs">
       <SubType>Code</SubType>

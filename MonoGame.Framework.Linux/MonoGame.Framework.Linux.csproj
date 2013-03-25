@@ -688,6 +688,9 @@
     <Compile Include="..\MonoGame.Framework\Graphics\Vertices\VertexColorTexture.cs">
       <Link>Graphics\Vertices\VertexColorTexture.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
@@ -752,8 +755,8 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.Linux</Name>
     </ProjectReference>
-    <ProjectReference Include="MonoGame.Framework.Core-Linux\MonoGame.Framework.Core.csproj">
-      <Project>{9AE1463B-8BE9-47F0-A85C-DB5148BD502A}</Project>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
+      <Project>{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}</Project>
       <Name>MonoGame.Framework.Core</Name>
     </ProjectReference>
   </ItemGroup>

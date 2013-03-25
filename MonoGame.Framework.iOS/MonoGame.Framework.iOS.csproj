@@ -87,6 +87,9 @@
     <Compile Include="..\MonoGame.Framework\Audio\InstancePlayLimitException.cs">
       <Link>Audio\InstancePlayLimitException.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Audio\NoAudioHardwareException.cs">
       <Link>Audio\NoAudioHardwareException.cs</Link>
     </Compile>

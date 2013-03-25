@@ -66,7 +66,6 @@
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
@@ -77,6 +76,9 @@
   <ItemGroup>
     <Compile Include="..\MonoGame.Framework\Audio\InstancePlayLimitException.cs">
       <Link>Audio\InstancePlayLimitException.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
+      <Link>Audio\MSADPCMToPCM.cs</Link>
     </Compile>
     <Compile Include="..\MonoGame.Framework\Audio\NoAudioHardwareException.cs">
       <Link>Audio\NoAudioHardwareException.cs</Link>
@@ -633,7 +635,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
       <Project>{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}</Project>
-      <Name>MonoGame.Framework</Name>
+      <Name>MonoGame.Framework.Core</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
