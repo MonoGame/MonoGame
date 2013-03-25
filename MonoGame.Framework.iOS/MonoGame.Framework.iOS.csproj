@@ -13,7 +13,7 @@
     <SynchReleaseVersion>False</SynchReleaseVersion>
     <ReleaseVersion>1.6</ReleaseVersion>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
-    <AssemblyName>MonoGame.Framework.iOS</AssemblyName>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>True</DebugSymbols>

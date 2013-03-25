@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 #else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
 #endif
-            coreAssemblyName = "MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+            coreAssemblyName = "MonoGame.Framework.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
         }
 
         public ContentTypeReaderManager(ContentReader reader)
@@ -147,9 +147,6 @@ namespace Microsoft.Xna.Framework.Content
     				var l_readerType = Type.GetType(readerTypeString);
                     if (l_readerType == null)
                     {
-                        var recttype = Type.GetType("Microsoft.Xna.Framework.Rectangle, MonoGame.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null");
-                        string rectassem = recttype.ToString();
-
                         //try core lookup
                         var coreReaderTypeString = PrepareType(originalReaderTypeString, coreAssemblyName);
                         l_readerType = Type.GetType(coreReaderTypeString);
