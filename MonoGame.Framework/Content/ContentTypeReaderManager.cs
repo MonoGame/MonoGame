@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Content
 #else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
 #endif
-            coreAssemblyName = "MonoGame.Framework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null";
+            coreAssemblyName = "MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
         }
 
         public ContentTypeReaderManager(ContentReader reader)
