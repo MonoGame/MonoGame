@@ -22,7 +22,7 @@ namespace MonoGame.Framework.WindowsPhone
             _drawingSurfaceContentProvider = new DrawingSurfaceContentProvider(this, game);
         }
 
-        private void CreateWindowSizeDependentResources(Size size)
+        private void CreateWindowSizeDependentResources(Size2F size)
         {
             Texture2DDescription renderTargetDesc = new Texture2DDescription
             {
@@ -88,11 +88,9 @@ namespace MonoGame.Framework.WindowsPhone
             private DrawingSurfaceSynchronizedTexture _synchronizedTexture;
             private readonly DrawingSurfaceUpdateHandler _drawingSurfaceUpdateHandler;
             private readonly SurfaceUpdateHandler _surfaceUpdateHandler;
-            private double _scaleFactor;
 
             public DrawingSurfaceContentProvider(DrawingSurfaceUpdateHandler drawingSurfaceUpdateHandler, Microsoft.Xna.Framework.Game game)
             {
-                _scaleFactor = Application.Current.Host.Content.ScaleFactor;
                 _drawingSurfaceUpdateHandler = drawingSurfaceUpdateHandler;
                 _surfaceUpdateHandler = new SurfaceUpdateHandler(game);
             }
@@ -115,12 +113,8 @@ namespace MonoGame.Framework.WindowsPhone
             {
                 if (_synchronizedTexture == null)
                 {
-                    Size renderResolution = new Size(
-                        Math.Floor(surfaceSize.Width * _scaleFactor / 100.0 + 0.5),
-                        Math.Floor(surfaceSize.Height * _scaleFactor / 100.0 + 0.5));
-
                     _drawingSurfaceUpdateHandler.CreateDeviceResources();
-                    _drawingSurfaceUpdateHandler.CreateWindowSizeDependentResources(renderResolution);
+                    _drawingSurfaceUpdateHandler.CreateWindowSizeDependentResources(surfaceSize);
                     _synchronizedTexture = _host.CreateSynchronizedTexture(_drawingSurfaceUpdateHandler._renderTarget);
                 }
 
