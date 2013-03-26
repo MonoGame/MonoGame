@@ -147,10 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_renderTargetView != null)
                 return;
 
-            GenerateTextureIfRequired();
-
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, _texture);
+            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture());
 
             // If we don't need a depth buffer then we're done.
             if (DepthStencilFormat == DepthFormat.None)

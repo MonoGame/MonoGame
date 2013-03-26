@@ -74,6 +74,15 @@ namespace Microsoft.Xna.Framework.Graphics
             if (mipMap)
                 this.levelCount = CalculateMipLevels(width, height, depth);
 
+            // Create texture
+            GetTexture();
+#endif
+        }
+
+#if DIRECTX
+
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        {
             var description = new Texture3DDescription
             {
                 Width = width,
@@ -87,11 +96,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 OptionFlags = ResourceOptionFlags.None,
             };
 
-            _texture = new SharpDX.Direct3D11.Texture3D(graphicsDevice._d3dDevice, description);
-#endif
+            return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
-		
-		public void SetData<T> (T[] data) where T : struct
+
+#endif
+        
+        public void SetData<T>(T[] data) where T : struct
 		{
 			SetData<T>(data, 0, data.Length);
 		}
@@ -131,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = GraphicsDevice._d3dContext;
             lock (d3dContext)
-                d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
+                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
 #endif
             dataHandle.Free ();
 		}

@@ -154,6 +154,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _renderTarget = renderTarget;
             _mipmap = mipmap;
 
+            // Create texture
+            GetTexture();
+
 #elif PSM
             PixelBufferOption option = PixelBufferOption.None;
             if (renderTarget)
@@ -297,8 +300,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-                GenerateTextureIfRequired();
-
                 var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
 
                 var region = new SharpDX.Direct3D11.ResourceRegion();
@@ -312,7 +313,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // TODO: We need to deal with threaded contexts here!
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, _texture, level, region);
+                    d3dContext.UpdateSubresource(box, GetTexture(), level, region);
 
 #elif PSM
                 _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
@@ -569,7 +570,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         throw new NotImplementedException();
                     }
                     else
-                        d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
+                        d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
 
                     // Copy the data to the array.
                     SharpDX.DataStream stream;
@@ -1074,11 +1075,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-        protected void GenerateTextureIfRequired()
-        {
-            if (_texture != null)
-                return;
 
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        {
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -1105,8 +1104,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            _texture = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
+
 #endif
 	}
 }
