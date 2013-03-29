@@ -58,7 +58,7 @@
 			<exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Build /p:Configuration=Release" />			
 		</if>
 		<if test="${os == 'Unix'}">
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Clean MonoGame.Framework.Linux.sln" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
 			<exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
 		</if>	
     </target>
