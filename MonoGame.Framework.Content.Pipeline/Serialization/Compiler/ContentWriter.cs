@@ -293,8 +293,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This method can be called recursively with a null value.</remarks>
         public void WriteObject<T>(T value)
         {
-            GetTypeWriter(typeof(Dictionary<int, List<string>>));
-            WriteObject<T>(value, GetTypeWriter(value.GetType()));
+            if (value == null)
+                Write7BitEncodedInt(0);
+            else
+                WriteObject<T>(value, GetTypeWriter(value.GetType()));
         }
 
         /// <summary>
@@ -472,6 +474,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.Y);
             Write(value.Z);
             Write(value.W);
+        }
+
+        internal void Write(BoundingSphere value)
+        {
+            Write(value.Center);
+            Write(value.Radius);
         }
     }
 }

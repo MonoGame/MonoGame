@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Gets a value indicating whether this object is read-only.
         /// </summary>
         /// <value>true if this object is read-only; false otherwise.</value>
-        bool System.Collections.Generic.ICollection<Microsoft.Xna.Framework.Vector3>.IsReadOnly { get { return false; } }
+        bool ICollection<Vector3>.IsReadOnly { get { return false; } }
 
         /// <summary>
         /// Initializes a new instance of IndirectPositionCollection.
@@ -87,6 +87,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         void ICollection<Vector3>.Add(Vector3 item)
         {
             items.Add(item);
+        }
+
+        public void AddRange(IEnumerable<Vector3> collection)
+        {
+            items.AddRange(collection);
         }
 
         /// <summary>

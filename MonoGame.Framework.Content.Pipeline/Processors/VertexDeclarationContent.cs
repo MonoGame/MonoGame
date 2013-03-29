@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public class VertexDeclarationContent : ContentItem
     {
         Collection<VertexElement> vertexElements;
-        Nullable<int> vertexStride;
+        int? vertexStride;
 
         /// <summary>
         /// Gets the VertexElement object of the vertex declaration.
@@ -26,7 +26,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// The number of bytes from one vertex to the next.
         /// </summary>
         /// <value>The stride (in bytes).</value>
-        public Nullable<int> VertexStride { get; set; }
+        public int? VertexStride
+        {
+            get { return vertexStride; }
+            set { vertexStride = value; }
+        }
 
         /// <summary>
         /// Initializes a new instance of VertexDeclarationContent.

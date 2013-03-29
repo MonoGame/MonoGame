@@ -17,5 +17,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public IndexCollection()
         {
         }
+
+        internal void AddRange(int[] indices)
+        {
+            foreach (var t in indices)
+                Add(t);
+        }
     }
 }
