@@ -75,6 +75,15 @@
     <Reference Include="OpenTK" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardEntry.cs">
+      <Link>GamerServices\LeaderboardEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardReader.cs">
+      <Link>GamerServices\LeaderboardReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardWriter.cs">
+      <Link>GamerServices\LeaderboardWriter.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Audio\AudioCategory.cs">
       <Link>Audio\AudioCategory.cs</Link>
     </Compile>

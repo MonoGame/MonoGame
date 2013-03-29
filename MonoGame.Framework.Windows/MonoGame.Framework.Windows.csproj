@@ -74,6 +74,33 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendCollection.cs">
+      <Link>GamerServices\FriendCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendGamer.cs">
+      <Link>GamerServices\FriendGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\Gamer.cs">
+      <Link>GamerServices\Gamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerCollection.cs">
+      <Link>GamerServices\GamerCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerProfile.cs">
+      <Link>GamerServices\GamerProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerServicesComponent.cs">
+      <Link>GamerServices\GamerServicesComponent.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardEntry.cs">
+      <Link>GamerServices\LeaderboardEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardReader.cs">
+      <Link>GamerServices\LeaderboardReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardWriter.cs">
+      <Link>GamerServices\LeaderboardWriter.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Audio\InstancePlayLimitException.cs">
       <Link>Audio\InstancePlayLimitException.cs</Link>
     </Compile>
@@ -286,6 +313,9 @@
     </Compile>
     <Compile Include="..\MonoGame.Framework\GamePlatform.cs">
       <Link>GamePlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\SignedInGamerCollection.cs">
+      <Link>GamerServices\SignedInGamerCollection.cs</Link>
     </Compile>
     <Compile Include="..\MonoGame.Framework\GameServiceContainer.cs">
       <Link>GameServiceContainer.cs</Link>
@@ -560,6 +590,45 @@
     <Compile Include="..\MonoGame.Framework\Media\SongCollection.cs">
       <Link>Media\SongCollection.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\AvailableNetworkSession.cs">
+      <Link>Net\AvailableNetworkSession.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\AvailableNetworkSessionCollection.cs">
+      <Link>Net\AvailableNetworkSessionCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandGamerStateChange.cs">
+      <Link>Net\CommandGamerStateChange.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandReceiveData.cs">
+      <Link>Net\CommandReceiveData.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\CommandSendData.cs">
+      <Link>Net\CommandSendData.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\LocalNetworkGamer.cs">
+      <Link>Net\LocalNetworkGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\MonoGamerPeer.cs">
+      <Link>Net\MonoGamerPeer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkGamer.cs">
+      <Link>Net\NetworkGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkMachine.cs">
+      <Link>Net\NetworkMachine.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkNotAvailableException.cs">
+      <Link>Net\NetworkNotAvailableException.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\NetworkSession.cs">
+      <Link>Net\NetworkSession.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\PacketReader.cs">
+      <Link>Net\PacketReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Net\PacketWriter.cs">
+      <Link>Net\PacketWriter.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\PerformanceCounter.cs">
       <Link>PerformanceCounter.cs</Link>
     </Compile>
@@ -587,6 +656,9 @@
     <Compile Include="..\MonoGame.Framework\Windows\GamerServices\Guide.cs">
       <Link>Windows\GamerServices\Guide.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows\GamerServices\SignedInGamer.cs">
+      <Link>Windows\GamerServices\SignedInGamer.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Windows\Media\Video.cs">
       <Link>Windows\Media\Video.cs</Link>
     </Compile>
@@ -596,9 +668,6 @@
     <Compile Include="..\MonoGame.Framework\Windows\WinFormsGameWindow.cs">
       <Link>Windows\WinFormsGameWindow.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -629,13 +698,16 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GamerServices\" />
     <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Core.csproj">
       <Project>{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}</Project>
       <Name>MonoGame.Framework.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.Windows</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

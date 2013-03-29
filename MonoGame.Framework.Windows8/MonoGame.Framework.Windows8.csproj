@@ -35,6 +35,33 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendCollection.cs">
+      <Link>GamerServices\FriendCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\FriendGamer.cs">
+      <Link>GamerServices\FriendGamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\Gamer.cs">
+      <Link>GamerServices\Gamer.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerCollection.cs">
+      <Link>GamerServices\GamerCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\GamerProfile.cs">
+      <Link>GamerServices\GamerProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardEntry.cs">
+      <Link>GamerServices\LeaderboardEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardReader.cs">
+      <Link>GamerServices\LeaderboardReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardWriter.cs">
+      <Link>GamerServices\LeaderboardWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\SignedInGamerCollection.cs">
+      <Link>GamerServices\SignedInGamerCollection.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Graphics\IRenderTarget.cs">
       <Link>Graphics\IRenderTarget.cs</Link>
     </Compile>
@@ -536,6 +563,9 @@
     <Compile Include="..\MonoGame.Framework\Windows8\GamePad.cs">
       <Link>Windows8\GamePad.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\Windows8\GamerServices\SignedInGamer.cs">
+      <Link>Windows8\GamerServices\SignedInGamer.cs</Link>
+    </Compile>
     <Compile Include="..\MonoGame.Framework\Windows8\InputEvents.cs">
       <Link>Windows8\InputEvents.cs</Link>
     </Compile>
@@ -566,7 +596,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Desktop\Input\" />
-    <Folder Include="GamerServices\" />
     <Folder Include="Utilities\" />
     <Folder Include="Windows\Input\" />
   </ItemGroup>

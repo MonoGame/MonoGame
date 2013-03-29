@@ -691,6 +691,15 @@
     <Compile Include="..\MonoGame.Framework\Audio\MSADPCMToPCM.cs">
       <Link>Audio\MSADPCMToPCM.cs</Link>
     </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardEntry.cs">
+      <Link>GamerServices\LeaderboardEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardReader.cs">
+      <Link>GamerServices\LeaderboardReader.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\GamerServices\LeaderboardWriter.cs">
+      <Link>GamerServices\LeaderboardWriter.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">

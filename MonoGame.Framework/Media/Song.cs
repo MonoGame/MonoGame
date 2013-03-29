@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Media
             _sound = new PSSuiteSong(_name);
 #elif WINDOWS_MEDIA_SESSION 
             GetTopology();      
-#elif !WINDOWS_MEDIA_ENGINE
+#elif !WINDOWS_MEDIA_ENGINE && !WINDOWS_PHONE
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
         }
