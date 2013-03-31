@@ -240,6 +240,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var compressionOptions = new CompressionOptions();
             compressionOptions.SetFormat(outputFormat);
+            compressionOptions.SetQuality(Quality.Fastest);
 
             _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
 
