@@ -83,7 +83,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Make sure we're not adding the same assembly twice.
             assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
             if (!Assemblies.Contains(assemblyFilePath))
+            {
                 Assemblies.Add(assemblyFilePath);
+
+                //TODO need better way to update caches
+                _processors = null;
+                _importers = null;
+                _writers = null;
+            }
         }
 
         private void ResolveAssemblies()
@@ -160,6 +167,36 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     }
                 }
             }
+        }
+
+        public Type[] GetImporterTypes()
+        {
+            if (_importers == null)
+                ResolveAssemblies();
+
+            List<Type> types = new List<Type>();
+
+            foreach (var item in _importers) 
+            {
+                types.Add(item.type);
+            }
+
+            return types.ToArray();
+        }
+
+        public Type[] GetProcessorTypes()
+        {
+            if (_processors == null)
+                ResolveAssemblies();
+            
+            List<Type> types = new List<Type>();
+            
+            foreach (var item in _processors) 
+            {
+                types.Add(item.type);
+            }
+            
+            return types.ToArray();
         }
 
         public IContentImporter CreateImporter(string name)
