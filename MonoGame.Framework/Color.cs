@@ -26,17 +26,14 @@ SOFTWARE.
 #endregion License
 
 using System;
-
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
-    #if WINRT
+    #if MONOCORE || WINDOWS_PHONE
     [DataContract]
     #else
     [Serializable]
@@ -180,7 +177,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public byte B
@@ -198,7 +195,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public byte G
@@ -216,7 +213,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public byte R
@@ -234,7 +231,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public byte A

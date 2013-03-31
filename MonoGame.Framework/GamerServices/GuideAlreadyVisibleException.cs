@@ -43,7 +43,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-#if WINRT || WINDOWS_PHONE
+#if MONOCORE || WINDOWS_PHONE
     [DataContract]
 #else
     [Serializable]

@@ -31,13 +31,11 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
     [DataContract]
 #else
     [Serializable]
@@ -47,11 +45,11 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public Vector3 Min;
-#if WINRT
+#if MONOCORE || WINDOWS_PHONE
         [DataMember]
 #endif
         public Vector3 Max;
