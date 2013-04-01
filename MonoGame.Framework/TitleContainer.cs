@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 
-        public static string Location { get; private set; }
+        static internal string Location { get; private set; }
 #if IOS
         static internal bool SupportRetina { get; private set; }
 #endif
