@@ -111,9 +111,11 @@ namespace Microsoft.Xna.Framework
             // Normalize the file path.
             var safeName = GetFilename(name);
 
+#if !PSM
             // We do not accept absolute paths here.
             if (Path.IsPathRooted(safeName))
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.");
+#endif
 
 #if WINRT
             var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;

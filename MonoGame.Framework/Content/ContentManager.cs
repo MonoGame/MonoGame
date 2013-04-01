@@ -302,9 +302,12 @@ namespace Microsoft.Xna.Framework.Content
             }
             catch (ContentLoadException ex)
             {
-				//MonoGame try to load as a non-content file
-
+				//MonoGame try to load as a non-content file 
+#if PSM          
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
+#else
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
+#endif
 
                 assetName = Normalize<T>(assetName);
 	
