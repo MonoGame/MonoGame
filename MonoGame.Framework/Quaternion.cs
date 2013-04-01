@@ -26,32 +26,31 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
+
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+    #if WINRT || MONOCORE
     [DataContract]
     #else
     [Serializable]
     #endif
     public struct Quaternion : IEquatable<Quaternion>
     {
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
         public float X;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
         public float Y;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
         public float Z;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
         public float W;
