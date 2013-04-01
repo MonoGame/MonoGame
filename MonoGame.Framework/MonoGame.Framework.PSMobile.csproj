@@ -382,6 +382,7 @@
     <Compile Include="GamerServices\LeaderboardReader.cs" />
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="GameUpdateRequiredException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
