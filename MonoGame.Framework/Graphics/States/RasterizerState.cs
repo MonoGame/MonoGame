@@ -201,6 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var g = device._graphics;
             
             g.SetCullFace(MapCullMode[CullMode], CullFaceDirection.Cw); // Front == cw
+            g.Enable(EnableMode.CullFace, this.CullMode != CullMode.None);
             
             // FIXME: Everything else
         }
