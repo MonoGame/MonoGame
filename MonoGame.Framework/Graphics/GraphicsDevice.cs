@@ -1508,17 +1508,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
-#if PSM
-                _graphics.SetFrameBuffer(null);
-#else
                 SetRenderTargets(null);
-#endif
 			else
-#if PSM
-                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
-#else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
-#endif
 		}
 		
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
@@ -1607,6 +1599,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
                 GraphicsExtensions.CheckGLError();
+#elif PSM
+                _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
 
                 clearTarget = true;
@@ -1703,16 +1697,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 					throw new InvalidOperationException(message);
 				}
-                                
+#elif PSM
+                var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;
+                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
     
-#if !PSM                
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
-#endif
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
