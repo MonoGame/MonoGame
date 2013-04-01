@@ -1,30 +1,28 @@
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    #if WINRT
+    #if WINRT || MONOCORE
     [DataContract]
     #else
     [Serializable]
     #endif
 	public struct VertexElementColor
 	{
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
 		byte R;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
 		byte G;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
 		byte B;
-#if WINRT
+#if WINRT || MONOCORE
         [DataMember]
 #endif
 		byte A;

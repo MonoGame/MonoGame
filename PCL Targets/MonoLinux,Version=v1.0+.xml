@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Framework DisplayName="Mono for Linux"
+  Identifier="MonoLinux"
+  Profile="*"
+  MinimumVersion="1.0"
+  MaximumVersion="*" />
