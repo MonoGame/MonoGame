@@ -79,7 +79,13 @@ namespace Microsoft.Xna.Framework {
 			if (viewController == null)
 				throw new ArgumentNullException("viewController");
 			_viewController = viewController;
+            _viewController.InterfaceOrientationChanged += HandleInterfaceOrientationChanged;
 		}
+
+        void HandleInterfaceOrientationChanged (object sender, EventArgs e)
+        {
+            OnOrientationChanged();
+        }
 
 		#region GameWindow Members
 
