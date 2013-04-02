@@ -98,7 +98,9 @@ namespace MonoGame.Framework.WindowsPhone
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
+        /// <param name="mediaElement">The XAML media element to use for playing music and video.</param>
         /// <returns></returns>
+        /// 
         static public T Create(string launchParameters, PhoneApplicationPage page, UIElement drawingSurface = null)
         {
             if (launchParameters == null)
@@ -112,6 +114,17 @@ namespace MonoGame.Framework.WindowsPhone
             if (!(drawingSurface is DrawingSurfaceBackgroundGrid) && !(drawingSurface is DrawingSurface))
                 throw new NullReferenceException("The drawing surface could not be found!");
             
+            MediaElement mediaElement = null;
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(page.Content); i++)
+            {
+                var child = VisualTreeHelper.GetChild(page.Content, i);
+                if (child.GetType() == typeof(MediaElement))
+                    mediaElement = (MediaElement)child;
+            }
+            if (mediaElement == null)
+                throw new NullReferenceException("The media element could not be found! Add it to the GamePage.");
+            Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
+
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
             WindowsPhoneGameWindow.Width = ((FrameworkElement)drawingSurface).ActualWidth;
             WindowsPhoneGameWindow.Height = ((FrameworkElement)drawingSurface).ActualHeight;

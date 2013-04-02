@@ -263,8 +263,15 @@ namespace Microsoft.Xna.Framework.Input
                 case Keycode.DpadRight:
                     return Buttons.DPadRight;
 
+                // Ouya system button sends Keycode.Menu after a delay if no
+                // double tap or hold is detected. It also sends Keycode.Home just
+                // before the system menu is opened (but not on dev kit controllers)
+                // http://forums.ouya.tv/discussion/comment/6076/#Comment_6076
+                case Keycode.Menu:
                 case Keycode.ButtonStart:
                     return Buttons.Start;
+                case Keycode.Home:
+                    return Buttons.BigButton;
                 case Keycode.Back:
                     return Buttons.Back;
             }
