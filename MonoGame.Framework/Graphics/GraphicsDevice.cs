@@ -209,6 +209,16 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsContext _graphics;
         internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
         internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
+        internal GraphicsContext Context {
+            get
+            {
+                return _graphics;
+            }
+            set
+            {
+                _graphics = value;
+            }
+        }
 #endif
 
 #if GLES
