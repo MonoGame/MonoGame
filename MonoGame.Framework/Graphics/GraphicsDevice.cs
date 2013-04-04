@@ -323,7 +323,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				return IsDisposed;
 			}
 		}
-
+	
+	/// <summary>
+        /// Returns a handle to internal device object. Valid only on DirectX platforms.
+        /// For usage, convert this to SharpDX.Direct3D11.Device.
+        /// </summary>
+        public object Handle
+        {
+            get
+            {
+#if DIRECTX
+                return _d3dDevice;
+#else
+                return null;
+#endif
+            }
+        }
+	
         internal bool IsRenderTargetBound
         {
             get
