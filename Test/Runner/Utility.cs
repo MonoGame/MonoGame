@@ -91,7 +91,7 @@ namespace MonoGame.Tests {
 
 	static class Paths {
 
-		private const string AssetFolder = ".";
+		private const string AssetFolder = "";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
 		private static readonly string ReferenceImageFolder = Path.Combine (AssetFolder, "ReferenceImages");
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
@@ -148,7 +148,7 @@ namespace MonoGame.Tests {
 
 		public static void SetStandardWorkingDirectory()
 		{
-			var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var directory = AppDomain.CurrentDomain.BaseDirectory;
 			Directory.SetCurrentDirectory(directory);
 		}
 	}

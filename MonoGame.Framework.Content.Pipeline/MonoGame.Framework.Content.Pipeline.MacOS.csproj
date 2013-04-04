@@ -47,6 +47,12 @@
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
       <Private>False</Private>
     </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />
@@ -191,6 +197,8 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Graphics\DXTBitmapContent.cs" />
     <Compile Include="Graphics\PVRTCBitmapContent.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
+    <Compile Include="Graphics\FontHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -205,5 +213,25 @@
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+      <Link>Dependencies\x86\Assimp32.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+      <Link>Dependencies\x64\Assimp64.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
+      <Link>Dependencies\x64\nvtt.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>Dependencies\x86\nvtt.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
+      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
+    </Content>
   </ItemGroup>
 </Project>

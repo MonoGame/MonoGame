@@ -14,7 +14,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\MacOS\Debug\</OutputPath>
+	<IntermediateOutputPath>obj\MacOS\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +25,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\MacOS\Release\</OutputPath>
+	<IntermediateOutputPath>obj\MacOS\Release\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -59,44 +61,45 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
-    <Compile Include="GameTest.cs" />
-    <Compile Include="GameTest+Properties.cs" />
-    <Compile Include="MacOS\Program.cs" />
-    <Compile Include="Interface\CommandLineInterface.cs" />
-    <Compile Include="Components\DrawFrameNumberComponent.cs" />
-    <Compile Include="Components\FrameCompareComponent.cs" />
-    <Compile Include="Components\ImplicitDrawOrderComponent.cs" />
-    <Compile Include="Components\PixelDeltaFrameComparer.cs" />
-    <Compile Include="Visual\VisualTestGame.cs" />
-    <Compile Include="FrameInfo.cs" />
-    <Compile Include="GameTest+Methods.cs" />
-    <Compile Include="TestGameBase.cs" />
-    <Compile Include="Utility.cs" />
-    <Compile Include="PixelArgb.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Visual\VisualTestFixtureBase.cs" />
+    <Compile Include="Framework\GameTest.cs" />
+    <Compile Include="Framework\GameTest+Properties.cs" />
+    <Compile Include="Runner\MacOS\Program.cs" />
+    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
+    <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
+    <Compile Include="Framework\Components\FrameCompareComponent.cs" />
+    <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
+    <Compile Include="Framework\Visual\VisualTestGame.cs" />
+    <Compile Include="Runner\FrameInfo.cs" />
+    <Compile Include="Framework\GameTest+Methods.cs" />
+    <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Runner\Utility.cs" />
+    <Compile Include="Runner\PixelArgb.cs" />
+    <Compile Include="Runner\Constants.cs" />
+    <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Components\UpdateGuard.cs" />
     <Compile Include="Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Components\VisualTestGameComponent.cs" />
     <Compile Include="Components\Colored3DCubeComponent.cs" />
     <Compile Include="Components\TexturedQuadComponent.cs" />
-    <Compile Include="FramePixelData.cs" />
+    <Compile Include="Runner\FramePixelData.cs" />
     <Compile Include="Framework\Bounding.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
-    <Compile Include="Desktop\FramePixelData.cs" />
-    <Compile Include="Interface\AggregateTestFilter.cs" />
-    <Compile Include="Interface\RegexTestFilter.cs" />
-    <Compile Include="Interface\RunOptions.cs" />
-    <Compile Include="Interface\TestEventListenerBase.cs" />
-    <Compile Include="Interface\TestFilterAction.cs" />
-    <Compile Include="Components\FlexibleGameComponent.cs" />
-    <Compile Include="Visual\MiscellaneousTests.cs" />
-    <Compile Include="Visual\ShaderTest.cs" />
-    <Compile Include="Visual\SpriteBatchTest.cs" />
-    <Compile Include="Visual\SpriteFontTest.cs" />
-    <Compile Include="Visual\ViewportTest.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Runner\Desktop\FramePixelData.cs" />
+    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
+    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
+    <Compile Include="Runner\Interface\RunOptions.cs" />
+    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
+    <Compile Include="Runner\Interface\TestFilterAction.cs" />
+    <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
+    <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Visual\ShaderTest.cs" />
+    <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
+    <Compile Include="Framework\Visual\SpriteFontTest.cs" />
+    <Compile Include="Framework\Visual\ViewportTest.cs" />
+    <Compile Include="Runner\Extensions.cs" />
+    <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
@@ -113,11 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="MacOS\" />
-    <Folder Include="Desktop\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TestResources\tests.xsl">
+    <Content Include="Resources\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
