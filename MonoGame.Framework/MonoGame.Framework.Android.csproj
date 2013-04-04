@@ -130,15 +130,7 @@
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
     <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Android\AndroidGameActivity.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
