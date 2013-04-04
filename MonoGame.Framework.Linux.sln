@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework", "MonoGame.Framework\MonoGame.Framework.csproj", "{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,8 +21,12 @@ Global
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoGame.Framework\MonoGame.Framework.Linux.csproj
+		StartupItem = MonoGame.Framework.Linux\MonoGame.Framework.Linux.csproj
 	EndGlobalSection
 EndGlobal
