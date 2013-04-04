@@ -125,7 +125,38 @@ namespace Microsoft.Xna.Framework.Input
             : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
         {
         }
-
+  
+        /// <summary>
+        /// Gets the button mask along with 'virtual buttons' like LeftThumbstickLeft.
+        /// </summary>
+        private Buttons GetVirtualButtons () {
+            var result = Buttons.buttons;
+            var sticks = ThumbSticks;
+            sticks.ApplyDeadZone(GamePadDeadZone.IndependentAxes, 7849 / 32767f);
+            
+            if (sticks.Left.X < 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft;
+            else if (sticks.Left.X > 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickRight;
+            
+            if (sticks.Left.Y < 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickDown;
+            else if (sticks.Left.Y > 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickUp;
+            
+            if (sticks.Right.X < 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickLeft;
+            else if (sticks.Right.X > 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickRight;
+            
+            if (sticks.Right.Y < 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickDown;
+            else if (sticks.Right.Y > 0)
+                result |= Microsoft.Xna.Framework.Input.Buttons.RightThumbstickUp;
+            
+            return result;
+        }
+        
         //
         // Summary:
         //     Determines whether specified input device buttons are pressed in this GamePadState.
@@ -136,7 +167,7 @@ namespace Microsoft.Xna.Framework.Input
         //     a bitwise OR operation.
         public bool IsButtonDown(Buttons button)
         {
-            return (Buttons.buttons & button) == button;
+            return (GetVirtualButtons() & button) == button;
         }
         //
         // Summary:
@@ -149,7 +180,7 @@ namespace Microsoft.Xna.Framework.Input
         //     a bitwise OR operation.
         public bool IsButtonUp(Buttons button)
         {
-            return (Buttons.buttons & button) != button;
+            return (GetVirtualButtons() & button) != button;
         }
 
         //
