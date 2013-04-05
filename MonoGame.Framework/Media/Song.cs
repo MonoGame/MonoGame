@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Media
 		private string _name;
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
-        bool disposed;
+        private bool disposed;
 
         internal Song(string fileName, int durationMS)
             : this(fileName)
@@ -76,22 +76,66 @@ namespace Microsoft.Xna.Framework.Media
             _duration = TimeSpan.FromMilliseconds(durationMS);
         }
 
+        internal Song(string name, Uri uri)
+        {
+            _name = name;
+            string src = uri.ToString();
+            if (!uri.IsAbsoluteUri)
+            {
+                // Use the TitleContainer's root path to make this
+                // an absolute URI
+                src = Path.Combine(TitleContainer.Location, src);
+            }
+            try
+            {
+#if IOS
+                _sound = AVAudioPlayer.FromUrl(NSUrl.FromString(src));
+                if (_sound != null)
+                {
+                    _sound.NumberOfLoops = 0;
+                    _sound.FinishedPlaying += OnFinishedPlaying;
+                }
+#endif
+                //
+                // TODO: Implement this for the other platforms
+                //
+            }
+            catch (Exception)
+            {
+                // Ignore and bury here. XNA does not throw any exceptions from the ctor.
+            }
+            // XNA: Song will fail silently unless an unsupported protocol
+            // is used. All methods return a default value when the Song source
+            // is invalid from Song.FromUri
+        }
+
 		internal Song(string fileName)
 		{			
 			_name = fileName;
-			
+            if (!System.IO.File.Exists(fileName))
+            {
+                throw (new Content.ContentLoadException("Error loading " + fileName + ". File not found."));
+            }
 #if IOS
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
+            if (_sound != null)
+            {
+                _sound.NumberOfLoops = 0;
+                _sound.FinishedPlaying += OnFinishedPlaying;
+            }
 #elif PSM
-            _sound = new PSSuiteSong(_name);
+			_sound = new PSSuiteSong(_name);
 #elif WINDOWS_MEDIA_SESSION 
-            GetTopology();      
+			GetTopology();      
 #elif !WINDOWS_MEDIA_ENGINE && !WINDOWS_PHONE
-            _sound = new SoundEffect(_name).CreateInstance();
+			_sound = new SoundEffect(_name).CreateInstance();
 #endif
         }
+
+		public static Song FromUri(string name, Uri uri) 
+		{
+            return (new Song(name, uri));
+		}
 
         ~Song()
         {
