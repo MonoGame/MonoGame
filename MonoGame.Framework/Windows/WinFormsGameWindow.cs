@@ -48,6 +48,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
 using XnaPoint = Microsoft.Xna.Framework.Point;
@@ -114,8 +115,8 @@ namespace MonoGame.Framework
 
         public override XnaPoint Position
         {
-            get { return _form.DesktopLocation.ToPoint(); }
-            set { _form.DesktopLocation = value.ToPoint(); }
+            get { return new XnaPoint(_form.DesktopLocation.X, _form.DesktopLocation.Y); }
+            set { _form.DesktopLocation = new Point(value.X, value.Y); }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
