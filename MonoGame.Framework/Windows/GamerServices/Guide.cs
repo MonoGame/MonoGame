@@ -95,11 +95,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 #if WINRT
 
-                var licenseInformation = CurrentApp.LicenseInformation;
-                licenseInformation.LicenseChanged += () =>
-                    isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
-
+            var licenseInformation = CurrentApp.LicenseInformation;
+            licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+
+            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
 #endif // WINRT
 
