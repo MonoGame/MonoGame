@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Utilities
         public LazyLoadWithReset(Func<T> createAction)
         {
             this.createAction = createAction;
+            value = createAction(); // Immediately create instrance, as suggested by tomspilman
         }
 
         public void Reset()
