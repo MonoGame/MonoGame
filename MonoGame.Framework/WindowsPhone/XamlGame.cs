@@ -130,6 +130,8 @@ namespace MonoGame.Framework.WindowsPhone
             WindowsPhoneGameWindow.Height = ((FrameworkElement)drawingSurface).ActualHeight;
             WindowsPhoneGameWindow.Page = page;
 
+            //bool dummy = Microsoft.Xna.Framework.GamerServices.Guide.IsTrialMode;
+           
             page.BackKeyPress += Microsoft.Xna.Framework.Input.GamePad.GamePageWP8_BackKeyPress;
 
             // Construct the game.
