@@ -82,6 +82,10 @@ namespace Microsoft.Xna.Framework.Media
 			
 #if IOS
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
+            if (_sound == null)
+            {
+                throw (new Content.ContentLoadException("Failed to load Song at " + fileName));
+            }
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
 #elif PSM
