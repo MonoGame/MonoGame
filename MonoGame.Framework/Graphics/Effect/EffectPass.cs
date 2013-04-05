@@ -54,9 +54,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerState = rasterizerState;
 
             Annotations = annotations;
-
-            Initialize();
-
         }
         
         internal EffectPass(Effect effect, EffectPass cloneSource)
@@ -79,10 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        public void Initialize()
-        {
-        }
-        
         public void Apply()
         {
             // Set/get the correct shader handle/cleanups.
@@ -127,11 +120,11 @@ namespace Microsoft.Xna.Framework.Graphics
 					// If there is no texture assigned then skip it
 					// and leave whatever set directly on the device.
 					if (texture != null)
-					{
 						device.Textures[sampler.textureSlot] = texture;
-						if (sampler.state != null)
-							device.SamplerStates[sampler.samplerSlot] = sampler.state;
-					}
+
+                    // If there is a sampler state set it.
+                    if (sampler.state != null)
+                        device.SamplerStates[sampler.samplerSlot] = sampler.state;
                 }
                 
                 // Update the constant buffers.

@@ -319,54 +319,12 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateBillboard(Vector3 objectPosition, Vector3 cameraPosition,
             Vector3 cameraUpVector, Nullable<Vector3> cameraForwardVector)
         {
-			var diff = cameraPosition - objectPosition;
-			
-			Matrix matrix = Matrix.Identity;
-			
-			diff.Normalize();
-			matrix.Forward = diff;
-			matrix.Left = Vector3.Cross(diff, cameraUpVector);
-			matrix.Up = cameraUpVector;
-			matrix.Translation = objectPosition;
-			
-			return matrix;
-			
-            /*Matrix matrix;
-		    Vector3 vector;
-		    Vector3 vector2;
-		    Vector3 vector3;
-		    vector.X = objectPosition.X - cameraPosition.X;
-		    vector.Y = objectPosition.Y - cameraPosition.Y;
-		    vector.Z = objectPosition.Z - cameraPosition.Z;
-		    float num = vector.LengthSquared();
-		    if (num < 0.0001f)
-		    {
-		        vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
-		    }
-		    else
-		    {
-		        Vector3.Multiply(ref vector, (float) (1f / ((float) Math.Sqrt((double) num))), out vector);
-		    }
-		    Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
-		    vector3.Normalize();
-		    Vector3.Cross(ref vector, ref vector3, out vector2);
-		    matrix.M11 = vector3.X;
-		    matrix.M12 = vector3.Y;
-		    matrix.M13 = vector3.Z;
-		    matrix.M14 = 0f;
-		    matrix.M21 = vector2.X;
-		    matrix.M22 = vector2.Y;
-		    matrix.M23 = vector2.Z;
-		    matrix.M24 = 0f;
-		    matrix.M31 = vector.X;
-		    matrix.M32 = vector.Y;
-		    matrix.M33 = vector.Z;
-		    matrix.M34 = 0f;
-		    matrix.M41 = objectPosition.X;
-		    matrix.M42 = objectPosition.Y;
-		    matrix.M43 = objectPosition.Z;
-		    matrix.M44 = 1f;
-		    return matrix;*/
+            Matrix result;
+
+            // Delegate to the other overload of the function to do the work
+            CreateBillboard(ref objectPosition, ref cameraPosition, ref cameraUpVector, cameraForwardVector, out result);
+
+            return result;
         }
 
         
@@ -374,39 +332,39 @@ namespace Microsoft.Xna.Framework
             ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
         {
             Vector3 vector;
-		    Vector3 vector2;
-		    Vector3 vector3;
-		    vector.X = objectPosition.X - cameraPosition.X;
-		    vector.Y = objectPosition.Y - cameraPosition.Y;
-		    vector.Z = objectPosition.Z - cameraPosition.Z;
-		    float num = vector.LengthSquared();
-		    if (num < 0.0001f)
-		    {
-		        vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
-		    }
-		    else
-		    {
-		        Vector3.Multiply(ref vector, (float) (1f / ((float) Math.Sqrt((double) num))), out vector);
-		    }
-		    Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
-		    vector3.Normalize();
-		    Vector3.Cross(ref vector, ref vector3, out vector2);
-		    result.M11 = vector3.X;
-		    result.M12 = vector3.Y;
-		    result.M13 = vector3.Z;
-		    result.M14 = 0f;
-		    result.M21 = vector2.X;
-		    result.M22 = vector2.Y;
-		    result.M23 = vector2.Z;
-		    result.M24 = 0f;
-		    result.M31 = vector.X;
-		    result.M32 = vector.Y;
-		    result.M33 = vector.Z;
-		    result.M34 = 0f;
-		    result.M41 = objectPosition.X;
-		    result.M42 = objectPosition.Y;
-		    result.M43 = objectPosition.Z;
-		    result.M44 = 1f;
+            Vector3 vector2;
+            Vector3 vector3;
+            vector.X = objectPosition.X - cameraPosition.X;
+            vector.Y = objectPosition.Y - cameraPosition.Y;
+            vector.Z = objectPosition.Z - cameraPosition.Z;
+            float num = vector.LengthSquared();
+            if (num < 0.0001f)
+            {
+                vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+            }
+            else
+            {
+                Vector3.Multiply(ref vector, (float)(1f / ((float)Math.Sqrt((double)num))), out vector);
+            }
+            Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
+            vector3.Normalize();
+            Vector3.Cross(ref vector, ref vector3, out vector2);
+            result.M11 = vector3.X;
+            result.M12 = vector3.Y;
+            result.M13 = vector3.Z;
+            result.M14 = 0f;
+            result.M21 = vector2.X;
+            result.M22 = vector2.Y;
+            result.M23 = vector2.Z;
+            result.M24 = 0f;
+            result.M31 = vector.X;
+            result.M32 = vector.Y;
+            result.M33 = vector.Z;
+            result.M34 = 0f;
+            result.M41 = objectPosition.X;
+            result.M42 = objectPosition.Y;
+            result.M43 = objectPosition.Z;
+            result.M44 = 1f;
         }
 
         
