@@ -135,8 +135,8 @@
 
   <target name="buildtests" description="Build Tests">
     <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="Tests\MonoGame.Tests.Windows.sln /t:Clean /p:Configuration=Release" failonerror="false"/>
-      <exec program="msbuild " commandline="Tests\MonoGame.Tests.Windows.sln /t:Build /p:Configuration=Release" failonerror="false"/>
+      <exec program="msbuild " commandline="Test\MonoGame.Tests.Windows.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="Test\MonoGame.Tests.Windows.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
