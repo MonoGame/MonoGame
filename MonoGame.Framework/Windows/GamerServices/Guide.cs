@@ -95,10 +95,14 @@ namespace Microsoft.Xna.Framework.GamerServices
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
 #endif
+
+#if WINRT
                 var licenseInformation = CurrentApp.LicenseInformation;
                 licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#endif
+
 #if WINDOWS_PHONE
             });
 #endif
