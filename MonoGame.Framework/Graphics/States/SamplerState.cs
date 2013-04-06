@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 #endif
 
-			_anisotropicClamp = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_anisotropicClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Clamp,
@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AddressW = TextureAddressMode.Clamp,
 			});
 			
-			_anisotropicWrap = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_anisotropicWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Wrap,
@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AddressW = TextureAddressMode.Wrap,
 			});
 			
-			_linearClamp = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_linearClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Clamp,
@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AddressW = TextureAddressMode.Clamp,
 			});
 			
-			_linearWrap = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_linearWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Wrap,
@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AddressW = TextureAddressMode.Wrap,
 			});
 			
-			_pointClamp = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_pointClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Clamp,
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AddressW = TextureAddressMode.Clamp,
 			});
 			
-			_pointWrap = new Utilities.LazyLoadWithReset<SamplerState>(() => new SamplerState
+			_pointWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Wrap,
@@ -137,12 +137,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 		
-		private static readonly Utilities.LazyLoadWithReset<SamplerState> _anisotropicClamp;
-        private static readonly Utilities.LazyLoadWithReset<SamplerState> _anisotropicWrap;
-        private static readonly Utilities.LazyLoadWithReset<SamplerState> _linearClamp;
-        private static readonly Utilities.LazyLoadWithReset<SamplerState> _linearWrap;
-        private static readonly Utilities.LazyLoadWithReset<SamplerState> _pointClamp;
-        private static readonly Utilities.LazyLoadWithReset<SamplerState> _pointWrap;
+		private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _anisotropicClamp;
+        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _anisotropicWrap;
+        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _linearClamp;
+        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _linearWrap;
+        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _pointClamp;
+        private static readonly Utilities.ObjectFactoryWithReset<SamplerState> _pointWrap;
 
         public static SamplerState AnisotropicClamp { get { return _anisotropicClamp.Value; } }
         public static SamplerState AnisotropicWrap { get { return _anisotropicWrap.Value; } }

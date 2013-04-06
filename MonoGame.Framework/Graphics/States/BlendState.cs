@@ -81,10 +81,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ColorWriteChannels ColorWriteChannels3 { get; set; }
 		public int MultiSampleMask { get; set; }
 
-		private static readonly Utilities.LazyLoadWithReset<BlendState> _additive;
-        private static readonly Utilities.LazyLoadWithReset<BlendState> _alphaBlend;
-        private static readonly Utilities.LazyLoadWithReset<BlendState> _nonPremultiplied;
-        private static readonly Utilities.LazyLoadWithReset<BlendState> _opaque;
+		private static readonly Utilities.ObjectFactoryWithReset<BlendState> _additive;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _alphaBlend;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _nonPremultiplied;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _opaque;
 
         public static BlendState Additive { get { return _additive.Value; } }
         public static BlendState AlphaBlend { get { return _alphaBlend.Value; } }
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		static BlendState() 
         {
-            _additive = new Utilities.LazyLoadWithReset<BlendState>(() => new BlendState
+            _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState
             {
                 ColorSourceBlend = Blend.SourceAlpha,
                 AlphaSourceBlend = Blend.SourceAlpha,
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 AlphaDestinationBlend = Blend.One
             });
 			
-			_alphaBlend = new Utilities.LazyLoadWithReset<BlendState>(() => new BlendState()
+			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
 			});
 			
-			_nonPremultiplied = new Utilities.LazyLoadWithReset<BlendState>(() => new BlendState() 
+			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState() 
             {
 				ColorSourceBlend = Blend.SourceAlpha,
 				AlphaSourceBlend = Blend.SourceAlpha,
@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
 			});
 			
-			_opaque = new Utilities.LazyLoadWithReset<BlendState>(() => new BlendState()
+			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,			    

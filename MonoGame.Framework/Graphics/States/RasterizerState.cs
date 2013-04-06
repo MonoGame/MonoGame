@@ -34,9 +34,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool ScissorTestEnable { get; set; }
         public float SlopeScaleDepthBias { get; set; }
 
-		private static readonly Utilities.LazyLoadWithReset<RasterizerState> _cullClockwise;
-        private static readonly Utilities.LazyLoadWithReset<RasterizerState> _cullCounterClockwise;
-        private static readonly Utilities.LazyLoadWithReset<RasterizerState> _cullNone;
+		private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullClockwise;
+        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullCounterClockwise;
+        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullNone;
 
         public static RasterizerState CullClockwise { get { return _cullClockwise.Value; } }
         public static RasterizerState CullCounterClockwise { get { return _cullCounterClockwise.Value; } }
@@ -54,17 +54,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		static RasterizerState ()
 		{
-			_cullClockwise = new Utilities.LazyLoadWithReset<RasterizerState>(() => new RasterizerState
+			_cullClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
 				CullMode = CullMode.CullClockwiseFace
 			});
 
-			_cullCounterClockwise = new Utilities.LazyLoadWithReset<RasterizerState>(() => new RasterizerState
+			_cullCounterClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
 				CullMode = CullMode.CullCounterClockwiseFace
 			});
 
-			_cullNone = new Utilities.LazyLoadWithReset<RasterizerState>(() => new RasterizerState
+			_cullNone = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
 				CullMode = CullMode.None
 			});

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Utilities
 {
-    internal class LazyLoadWithReset<T> where T : class, IDisposable
+    internal class ObjectFactoryWithReset<T> where T : class, IDisposable
     {
         private T value;
         private readonly Func<T> createAction;
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Utilities
             }
         }
 
-        public LazyLoadWithReset(Func<T> createAction)
+        public ObjectFactoryWithReset(Func<T> createAction)
         {
             this.createAction = createAction;
             value = createAction(); // Immediately create instrance, as suggested by tomspilman
