@@ -1211,16 +1211,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GC.SuppressFinalize(this);
         }
 
-#if DIRECTX
 
         private void ClearLayouts()
         {
+#if DIRECTX
             foreach (var layout in _inputLayouts)
                 layout.Value.Dispose();
             _inputLayouts.Clear();
-        }
-
 #endif
+        }
 
         protected virtual void Dispose(bool disposing)
         {

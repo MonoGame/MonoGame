@@ -190,9 +190,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected internal override void GraphicsDeviceResetting()
         {
+#if DIRECTX
             SharpDX.Utilities.Dispose(ref _renderTargetView);
             SharpDX.Utilities.Dispose(ref _depthStencilView);
-
+#endif
             base.GraphicsDeviceResetting();
         }
 
