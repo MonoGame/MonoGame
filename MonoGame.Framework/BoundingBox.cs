@@ -31,13 +31,11 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if WINRT
+#if WINRT || MONOCORE
     [DataContract]
 #else
     [Serializable]
