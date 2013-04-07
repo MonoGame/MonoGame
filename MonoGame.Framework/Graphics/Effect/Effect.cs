@@ -159,6 +159,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
                 }
             }
+            
+            // HACK
+            if (CurrentTechnique == null)
+                CurrentTechnique = Techniques[0];
 
             // Take a reference to the original shader list.
             _shaderList = cloneSource._shaderList;
@@ -487,7 +491,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+			var effectPass = new EffectPass(this, "Pass", null, null, null, null, null, new EffectAnnotationCollection());
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
 			Parameters = new EffectParameterCollection();
@@ -495,24 +499,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			{	
 			    Parameters.Add(EffectParameterForUniform(shaderProgram, i));
 			}
-			
-			#warning Hacks for BasicEffect as we don't have these parameters yet
-            Parameters.Add (new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
-            Parameters.Add (new EffectParameter(
-                EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
-            Parameters.Add (new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
-            Parameters.Add (new EffectParameter(
-                EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
             
             Techniques = new EffectTechniqueCollection();
             var effectPassCollection = new EffectPassCollection();
@@ -534,27 +520,66 @@ namespace Microsoft.Xna.Framework.Graphics
             
             //EffectParameter.Semantic => COLOR0 / POSITION0 etc
    
+            EffectParameter result = null;
+            
             //FIXME: bufferOffset in below lines is 0 but should probably be something else
             switch (type)
             {
             case ShaderUniformType.Float4x4:
-                return new EffectParameter(
+                result = new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
                     4, 4, "float4x4",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
+                result.InternalSet = (p, sp) => {
+                    var pssm = PSSHelper.ToPssMatrix4((float[])p.Data);
+                    pssm = pssm.Transpose();
+                    sp.SetUniformValue(index, ref pssm);
+                };
+                break;
+            case ShaderUniformType.Float:
+                result = new EffectParameter(
+                    EffectParameterClass.Scalar, EffectParameterType.Single, name,
+                    1, 1, "float",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[1]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float)p.Data);
+                break;
+            case ShaderUniformType.Float2:
+                result = new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    2, 1, "float2",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[2]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
+            case ShaderUniformType.Float3:
+                result = new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    3, 1, "float3",
+                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
             case ShaderUniformType.Float4:
-                return new EffectParameter(
+                result = new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
                     4, 1, "float4",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
             case ShaderUniformType.Sampler2D:
-                return new EffectParameter(
+                result = new EffectParameter(
                     EffectParameterClass.Object, EffectParameterType.Texture2D, name,
                     1, 1, "texture2d",
                     new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), null);
+                // FIXME: No InternalSet
+                break;
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }
+            
+            return result;
         }
         
 #endif
