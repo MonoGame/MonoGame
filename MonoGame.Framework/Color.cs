@@ -26,17 +26,14 @@ SOFTWARE.
 #endregion License
 
 using System;
-
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
-    #if WINRT
+    #if WINRT || MONOCORE
     [DataContract]
     #else
     [Serializable]
