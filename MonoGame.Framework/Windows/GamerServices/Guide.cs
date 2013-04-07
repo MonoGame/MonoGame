@@ -91,18 +91,21 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
 #endif
 
 #if WINRT
+                var licenseInformation = CurrentApp.LicenseInformation;
+                licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
-            var licenseInformation = CurrentApp.LicenseInformation;
-            licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#endif
 
-            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
-
-#endif // WINRT
-
+#if WINDOWS_PHONE
+            });
+#endif
         }
 
 		delegate string ShowKeyboardInputDelegate(
