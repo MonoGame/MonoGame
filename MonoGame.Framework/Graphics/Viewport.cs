@@ -44,7 +44,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-#if WINRT
+#if WINRT || MONOCORE
     [DataContract]
 #else
     [Serializable]

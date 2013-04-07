@@ -43,7 +43,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Net
 {
-#if WINRT || WINDOWS_PHONE
+#if WINRT || WINDOWS_PHONE || MONOCORE
     [DataContract]
 #else
     [Serializable]
