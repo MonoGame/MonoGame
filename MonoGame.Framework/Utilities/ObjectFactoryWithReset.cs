@@ -37,10 +37,12 @@ namespace Microsoft.Xna.Framework.Utilities
 
         public void Reset()
         {
+#if DIRECTX
             lock (valueGuard)
             {
                 SharpDX.Utilities.Dispose(ref value);
             }
+#endif
         }
     }
 }
