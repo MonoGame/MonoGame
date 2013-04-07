@@ -32,7 +32,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
 	// TODO [TypeConverter(ExpandableObjectConverter)]
-#if WINRT
+#if WINRT || MONOCORE
     [DataContract]
 #else
     [Serializable]
