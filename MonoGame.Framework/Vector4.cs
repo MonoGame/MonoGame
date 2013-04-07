@@ -27,13 +27,11 @@ SOFTWARE.
 
 using System;
 using System.Text;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
+    #if WINRT || MONOCORE
     [DataContract]
     #else
     [Serializable]

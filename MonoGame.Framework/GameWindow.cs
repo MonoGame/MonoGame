@@ -121,7 +121,6 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || LINUX
 
 		/// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
@@ -134,7 +133,6 @@ namespace Microsoft.Xna.Framework {
 		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
-#endif
 
 		#endregion Events
 
@@ -178,13 +176,11 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
-#if WINDOWS || LINUX
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
 			if (TextInput != null)
 				TextInput(sender, e);
 		}
-#endif
 
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
