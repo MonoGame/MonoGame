@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Framework DisplayName="Mono for Android"
+  Identifier="MonoAndroid"
+  Profile="*"
+  MinimumVersion="1.6"
+  MaximumVersion="*" />
