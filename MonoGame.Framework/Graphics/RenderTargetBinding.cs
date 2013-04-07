@@ -47,17 +47,17 @@ namespace Microsoft.Xna.Framework.Graphics
 	// http://msdn.microsoft.com/en-us/library/ff434403.aspx
 	public struct RenderTargetBinding
 	{
-        private Texture _renderTarget;
-        private CubeMapFace _cubeMapFace;
+        private readonly Texture _renderTarget;
+        private readonly int _arraySlice;
 
 		public Texture RenderTarget 
         {
 			get { return _renderTarget; }
 		}
 
-        public CubeMapFace CubeMapFace
+        public int ArraySlice
         {
-            get { return _cubeMapFace; }
+            get { return _arraySlice; }
         }
 
 		public RenderTargetBinding(RenderTarget2D renderTarget)
@@ -66,7 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				throw new ArgumentNullException("renderTarget");
 
 			_renderTarget = renderTarget;
-            _cubeMapFace = CubeMapFace.PositiveX;
+            _arraySlice = (int)CubeMapFace.PositiveX;
 		}
 
         public RenderTargetBinding(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
@@ -77,12 +77,45 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("cubeMapFace");
 
             _renderTarget = renderTarget;
-            _cubeMapFace = cubeMapFace;
+            _arraySlice = (int)cubeMapFace;
         }
+
+#if DIRECTX
+
+        public RenderTargetBinding(RenderTarget3D renderTarget)
+        {
+            if (renderTarget == null)
+                throw new ArgumentNullException("renderTarget");
+
+            _renderTarget = renderTarget;
+            _arraySlice = 0;
+        }
+
+        public RenderTargetBinding(RenderTarget3D renderTarget, int arraySlice)
+        {
+            if (renderTarget == null)
+                throw new ArgumentNullException("renderTarget");
+            if (arraySlice < 0 || arraySlice >= renderTarget.Depth)
+                throw new ArgumentOutOfRangeException("arraySlice");
+
+            _renderTarget = renderTarget;
+            _arraySlice = arraySlice;
+        }
+
+#endif 
 
         public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
         {
             return new RenderTargetBinding(renderTarget);
         }
+
+#if DIRECTX
+
+        public static implicit operator RenderTargetBinding(RenderTarget3D renderTarget)
+        {
+            return new RenderTargetBinding(renderTarget);
+        }
+
+#endif
 	}
 }
