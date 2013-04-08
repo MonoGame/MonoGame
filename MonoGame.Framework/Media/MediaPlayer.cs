@@ -61,10 +61,9 @@ using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
 using SharpDX.Win32;
 #elif WINDOWS_PHONE
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using Microsoft.Phone.Shell;
 #endif
 #if WINRT
 using Windows.UI.Core;
@@ -103,41 +102,57 @@ namespace Microsoft.Xna.Framework.Media
         private static readonly Guid SimpleAudioVolumeGuid = Guid.Parse("089EDF13-CF71-4338-8D13-9E569DBDC319");
 #elif WINDOWS_PHONE
         internal static MediaElement _mediaElement;
+        private static Uri source;
+        private static TimeSpan elapsedTime;
 #endif
 
         static MediaPlayer()
         {
 #if WINDOWS_MEDIA_ENGINE
-
                 MediaManager.Startup(true);
                 using (var factory = new MediaEngineClassFactory())
                 using (var attributes = new MediaEngineAttributes { AudioCategory = AudioStreamCategory.GameMedia })
                 {
                     var creationFlags = MediaEngineCreateFlags.AudioOnly;
 
-#if WINDOWS_PHONE
-                    // Frame-Server mode (The default) is the only one supported on WP8.
-                    // http://msdn.microsoft.com/en-us/library/windowsphone/develop/jj681688(v=vs.105).aspx
-                    // http://msdn.microsoft.com/en-us/library/windows/desktop/hh447921(v=vs.85).aspx
-
-                    creationFlags = MediaEngineCreateFlags.None;
-#endif
                     var mediaEngine = new MediaEngine(factory, attributes, creationFlags, MediaEngineExOnPlaybackEvent);
                     _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
                 }
 
-#if WINDOWS_PHONE
-                _dispatcher = System.Windows.Deployment.Current.Dispatcher;
-#else
                 _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-#endif
-
 #elif WINDOWS_MEDIA_SESSION
-
             MediaManager.Startup(true);
             MediaFactory.CreateMediaSession(null, out _session);
+#elif WINDOWS_PHONE
+            PhoneApplicationService.Current.Activated += (sender, e) =>
+                {
+                    if (_mediaElement.Source == null && source != null)
+                        Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+
+                    // Ensure only one subscription
+                    _mediaElement.MediaOpened -= MediaElement_MediaOpened;
+                    _mediaElement.MediaOpened += MediaElement_MediaOpened;
+                };
+
+            PhoneApplicationService.Current.Deactivated += (sender, e) => 
+                {
+                    source = _mediaElement.Source;
+                    elapsedTime = _mediaElement.Position;
+                };
 #endif
         }
+
+#if WINDOWS_PHONE
+        private static void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            if (elapsedTime != TimeSpan.Zero)
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Position = elapsedTime;
+                    elapsedTime = TimeSpan.Zero;
+                });
+        }
+#endif
 
 #if WINDOWS_MEDIA_ENGINE
 
