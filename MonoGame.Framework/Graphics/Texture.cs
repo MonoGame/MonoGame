@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        protected SharpDX.Direct3D11.Resource _texture;
+        protected internal SharpDX.Direct3D11.Resource _texture;
 
         private SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
@@ -72,19 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
         internal SamplerState glLastSamplerState = null;
 #endif
-		
-		public object Handle
-	        {
-	            get
-	            {
-#if DIRECTX
-	                return _texture;
-#elif OPENGL
-	                return glTexture;
-#endif
-	            }
-	        }
-		
+		  
 		public SurfaceFormat Format
 		{
 			get { return format; }
