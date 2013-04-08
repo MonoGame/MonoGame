@@ -48,8 +48,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{		    
 		}
 
-		internal Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget, bool computable = false)
-		{
+	protected internal Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget, bool computable = false)
+	{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
 
