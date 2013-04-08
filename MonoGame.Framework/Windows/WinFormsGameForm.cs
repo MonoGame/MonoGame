@@ -9,19 +9,21 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Windows
 {
-    public static class MessageExtensions
+    internal static class MessageExtensions
     {     
         public static int GetPointerId(this Message msg)
         {
-            return (int)msg.WParam;
+            return (short)msg.WParam;
         }
 
         public static Point GetPointerLocation(this Message msg)
         {
+            var lowword = msg.LParam.ToInt32();
+
             return new Point()
                        {
-                           X = (int)msg.LParam,
-                           Y = (int)((long)msg.LParam >> 32),
+                           X = (short)(lowword),
+                           Y = (short)(lowword >> 16),
                        };
         }                
     }
