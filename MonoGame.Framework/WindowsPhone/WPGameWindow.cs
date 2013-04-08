@@ -44,6 +44,7 @@ using Windows.UI.Core;
 using Windows.Graphics.Display;
 
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -104,24 +105,12 @@ namespace MonoGame.Framework.WindowsPhone
             _orientation = ToOrientation(Page.Orientation);
             Page.OrientationChanged += Page_OrientationChanged;
 
-            //inputElement.SizeChanged += Window_SizeChanged;
-
-            //inputElement.GotFocus += Window_FocusChanged;
-            //inputElement.LostFocus += Window_FocusChanged;
+            PhoneApplicationService.Current.Activated += (sender, e) => Platform.IsActive = true;
+            PhoneApplicationService.Current.Launching += (sender, e) => Platform.IsActive = true;
+            PhoneApplicationService.Current.Deactivated += (sender, e) => Platform.IsActive = false;
+            PhoneApplicationService.Current.Closing += (sender, e) => Platform.IsActive = false;
 
             SetClientBounds(Width, Height);
-        }
-
-        private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
-        {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
-        }
-
-        private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
-        {
         }
 
         private void SetClientBounds(double width, double height)
