@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 		
-		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget, bool computable = false)
+	protected internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget, bool computable = false)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
