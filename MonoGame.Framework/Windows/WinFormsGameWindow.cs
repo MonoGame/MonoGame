@@ -141,7 +141,7 @@ namespace MonoGame.Framework
             _platform = platform;
             Game = platform.Game;
 
-            _form = new WinForm();
+            _form = new WinFormsGameForm();
             
             // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
