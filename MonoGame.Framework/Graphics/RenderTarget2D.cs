@@ -98,6 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			RenderTargetUsage = usage;
 
 #if DIRECTX
+
+            GenerateIfRequired();
+
 #elif PSM
             _frameBuffer = new FrameBuffer();     
             _frameBuffer.SetColorTarget(_texture2D,0);

@@ -87,11 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_vertexShader == null)
-                {
-                    System.Diagnostics.Debug.Assert(Stage == ShaderStage.Vertex);
-                    _vertexShader = new VertexShader(GraphicsDevice._d3dDevice, _shaderBytecode, null);
-                }
-
+                    CreateVertexShader();
                 return _vertexShader;
             }
         }
@@ -101,11 +97,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
                 if (_pixelShader == null)
-                {
-                    System.Diagnostics.Debug.Assert(Stage == ShaderStage.Pixel);
-                    _pixelShader = new PixelShader(GraphicsDevice._d3dDevice, _shaderBytecode);
-                }
-
+                    CreatePixelShader();
                 return _pixelShader;
             }
         }
@@ -173,6 +165,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Bytecode = shaderBytecode;
                 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
+
+            if (isVertexShader)
+                CreateVertexShader();
+            else
+                CreatePixelShader();
 
 #endif // DIRECTX
 
@@ -338,6 +335,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             base.Dispose(disposing);
         }
+
+#if DIRECTX
+
+        private void CreatePixelShader()
+        {
+            System.Diagnostics.Debug.Assert(Stage == ShaderStage.Pixel);
+            _pixelShader = new PixelShader(GraphicsDevice._d3dDevice, _shaderBytecode);
+        }
+
+        private void CreateVertexShader()
+        {
+            System.Diagnostics.Debug.Assert(Stage == ShaderStage.Vertex);
+            _vertexShader = new VertexShader(GraphicsDevice._d3dDevice, _shaderBytecode, null);
+        }
+
+#endif
 	}
 }
 

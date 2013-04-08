@@ -65,6 +65,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _isDynamic = dynamic;
 
 #if DIRECTX
+
+            GenerateIfRequired();
+
 #elif PSM
             //Do nothing, we cannot create the storage array yet
 #else

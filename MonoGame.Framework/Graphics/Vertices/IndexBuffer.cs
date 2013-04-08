@@ -67,6 +67,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _isDynamic = dynamic;
             
 #if DIRECTX
+
+            GenerateIfRequired();
+
 #elif PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
