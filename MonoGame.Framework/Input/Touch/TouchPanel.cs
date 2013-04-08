@@ -329,8 +329,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     windowSize = new Vector2(   (float)Window.Current.CoreWindow.Bounds.Width * dipFactor,
                                                 (float)Window.Current.CoreWindow.Bounds.Height * dipFactor);
                 }
-#elif WINDOWS_PHONE
-            windowSize *= 96.0f / DisplayProperties.LogicalDpi;
 #endif
 
                 // Recalculate the touch scale.

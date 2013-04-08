@@ -126,16 +126,13 @@ namespace MonoGame.Framework.WindowsPhone
 
         private void SetClientBounds(double width, double height)
         {
-            var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = width * dpi / 96.0;
-            var pheight = height * dpi / 96.0;
-
-            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+            _clientBounds = new Rectangle(0, 0, (int)width, (int)height);
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
             SetClientBounds(clientWidth, clientHeight);
+            _game.graphicsDeviceManager.ApplyChanges();
         }
 
         /*
