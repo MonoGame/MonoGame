@@ -161,6 +161,7 @@
     <Compile Include="Processors\MGSongProcessor.cs" />
     <Compile Include="Processors\MGSoundEffectProcessor.cs" />
     <Compile Include="Processors\MGSpriteFontDescriptionProcessor.cs" />
+    <Compile Include="Processors\MGSpriteFontTextureProcessor.cs" />
     <Compile Include="Processors\MGTextureProcessor.cs" />
     <Compile Include="MonoGamePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
