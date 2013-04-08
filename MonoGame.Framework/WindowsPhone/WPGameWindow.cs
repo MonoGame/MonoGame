@@ -136,8 +136,6 @@ namespace MonoGame.Framework.WindowsPhone
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
             SetClientBounds(clientWidth, clientHeight);
-            TouchPanel.DisplayHeight = ClientBounds.Height;
-            TouchPanel.DisplayWidth = ClientBounds.Width;
         }
 
         /*
@@ -207,7 +205,7 @@ namespace MonoGame.Framework.WindowsPhone
 
             // If we have a valid client bounds then update the graphics device.
             //if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-            //    _game.graphicsDeviceManager.ApplyChanges();
+            _game.graphicsDeviceManager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)
