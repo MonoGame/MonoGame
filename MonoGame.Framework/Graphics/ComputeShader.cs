@@ -82,6 +82,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics = graphics;
 #if DIRECTX
             _shader = new SharpDX.Direct3D11.ComputeShader(GraphicsDevice._d3dDevice,bytecode);
+#else
+            throw new NotImplementedException();
 #endif
         }
 
