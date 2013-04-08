@@ -69,9 +69,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			ReferenceStencil = 0;
 		}
 
-        private static readonly Utilities.LazyLoadWithReset<DepthStencilState> _default;
-        private static readonly Utilities.LazyLoadWithReset<DepthStencilState> _depthRead;
-        private static readonly Utilities.LazyLoadWithReset<DepthStencilState> _none;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _default;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _depthRead;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _none;
 
         public static DepthStencilState Default { get { return _default.Value; } }
         public static DepthStencilState DepthRead { get { return _depthRead.Value; } }
@@ -79,19 +79,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		static DepthStencilState ()
 		{
-			_default = new Utilities.LazyLoadWithReset<DepthStencilState>(() => new DepthStencilState
+			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = true
 			});
 			
-			_depthRead = new Utilities.LazyLoadWithReset<DepthStencilState>(() => new DepthStencilState
+			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = false
 			});
 			
-			_none = new Utilities.LazyLoadWithReset<DepthStencilState>(() => new DepthStencilState
+			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = false,
 				DepthBufferWriteEnable = false
