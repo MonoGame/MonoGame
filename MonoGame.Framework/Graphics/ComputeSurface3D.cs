@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class ComputeSurface3D : ComputeSurface
     {
-        internal Texture3D Texture { get; private set; }
+        public Texture3D Texture { get; private set; }
 
         public ComputeSurface3D(GraphicsDevice graphics,int width,int height,int depth,bool mipmap,SurfaceFormat surfaceFormat)
         {
