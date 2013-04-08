@@ -161,11 +161,7 @@ namespace Microsoft.Xna.Framework.Media
             if (mediaEvent != MediaEngineEvent.Ended)
                 return;
 
-#if WINDOWS_PHONE
-            _dispatcher.BeginInvoke(() => OnSongFinishedPlaying(null, null));
-#else
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => OnSongFinishedPlaying(null, null)).AsTask();
-#endif
         }
 
 #endif
@@ -254,14 +250,13 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
         public static event EventHandler<EventArgs> MediaStateChanged;
-        
-		
+
+        public static bool GameHasControl
+        {
+            get
+            {
 #if IOS
-		public static bool GameHasControl 
-		{ 
-			get 
-			{ 
-				var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
+                var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
 				
 				if (musicPlayer == null)
 					return true;
@@ -275,23 +270,17 @@ namespace Microsoft.Xna.Framework.Media
 				if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
 				 	musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
 				    musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
-				return false;
+				    return false;
 				
 				return true;
-			} 
-		}
 #elif WINDOWS_PHONE
-        public static bool GameHasControl
-        {
-            get
-            {
                 return State == MediaState.Playing || MsXna_MediaPlayer.GameHasControl;
+#else
+                // TODO: Fix me!
+                return true;
+#endif
             }
         }
-#else
-        // TODO: Fix me!
-		public static bool GameHasControl { get { return true; } }
-#endif
 		
 
         public static float Volume
