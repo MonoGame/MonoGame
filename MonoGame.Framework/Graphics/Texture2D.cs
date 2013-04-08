@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 		
-		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget)
+		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget, bool computable = false)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -158,6 +158,11 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription.Quality = 0;
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+	    if (computable)
+            {
+                desc.BindFlags |= SharpDX.Direct3D11.BindFlags.UnorderedAccess;
+            }
 
             if (renderTarget)
             {
