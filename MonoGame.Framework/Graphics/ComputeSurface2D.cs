@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Texture = new Texture2D(graphics,width,height,mipmap,surfaceFormat,false,true);
 #if DIRECTX
-            _uav = new UnorderedAccessView(Texture.GraphicsDevice._d3dDevice,(Resource)Texture.Handle);
+            _uav = new UnorderedAccessView(Texture.GraphicsDevice._d3dDevice,Texture._texture);
 #else
            Texture.Dispose(); 
            throw new NotImplementedException();
