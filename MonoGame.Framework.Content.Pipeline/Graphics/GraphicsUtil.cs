@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TargetPlatform.iOS:
-                    CompressPVRTC(content, premultipliedAlpha);
+                    CompressPVRTC(content, generateMipmaps, premultipliedAlpha);
                     break;
 
                 default:
@@ -176,22 +176,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private static void CompressPVRTC(TextureContent content, bool premultipliedAlpha)
+        private static void CompressPVRTC(TextureContent content, bool generateMipmaps, bool premultipliedAlpha)
         {
-            // Note: MipGeneration will be done by NVTT, rather than PVRTC's tool.
-            // This way we have the same implementation across platforms.
+            // TODO: Once uncompressed mipmap generation is supported, first use NVTT to generate mipmaps,
+            // then compress them withthe PVRTC tool, so we have the same implementation of mipmap generation
+            // across platforms.
+
+            // Calculate number of mip levels
+            var width = content.Faces[0][0].Height;
+            var height = content.Faces[0][0].Width;
+            var numberOfMipLevels = 1;
+            if (generateMipmaps)
+            {
+                while (height != 1 || width != 1)
+                {
+                    height = Math.Max(height / 2, 1);
+                    width = Math.Max(width / 2, 1);
+                    numberOfMipLevels++;
+                }
+            }
 
             IntPtr dataSizesPtr = IntPtr.Zero;
             var texDataPtr = ManagedPVRTC.ManagedPVRTC.CompressTexture(content.Faces[0][0].GetPixelData(),
                                             content.Faces[0][0].Height,
                                             content.Faces[0][0].Width,
-                                            1,
+                                            numberOfMipLevels,
                                             premultipliedAlpha,
                                             true,
                                             ref dataSizesPtr);
 
-            // Store the size of each mipLevel
-            var dataSizesArray = new int[1];
+            // Store the size of each mip level
+            var dataSizesArray = new int[numberOfMipLevels];
             Marshal.Copy(dataSizesPtr, dataSizesArray, 0, dataSizesArray.Length);
 
             var levelSize = 0;
@@ -201,14 +216,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             content.Faces[0].Clear();
 
-            levelSize = dataSizesArray[0];
-            levelData = new byte[levelSize];
+            for (int x = 0; x < numberOfMipLevels; x++)
+            {
+                levelSize = dataSizesArray[x];
+                levelData = new byte[levelSize];
 
-            Marshal.Copy(texDataPtr, levelData, 0, levelSize);
+                Marshal.Copy(texDataPtr, levelData, 0, levelSize);
 
-            var bmpContent = new PVRTCBitmapContent(4, sourceWidth, sourceHeight);
-            bmpContent.SetPixelData(levelData);
-            content.Faces[0].Add(bmpContent);
+                var levelWidth = Math.Max(sourceWidth >> x, 1);
+                var levelHeight = Math.Max(sourceHeight >> x, 1);
+
+                var bmpContent = new PVRTCBitmapContent(4, sourceWidth, sourceHeight);
+                bmpContent.SetPixelData(levelData);
+                content.Faces[0].Add(bmpContent);
+
+                texDataPtr = IntPtr.Add(texDataPtr, levelSize);
+            }
         }
 
         private static void CompressDXT(TextureContent content, bool generateMipmaps)
