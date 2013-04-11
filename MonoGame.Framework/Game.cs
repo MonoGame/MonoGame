@@ -216,8 +216,19 @@ namespace Microsoft.Xna.Framework
                     }
 
                     Platform.Dispose();
+
+                    Effect.FlushCache();
+                    ContentTypeReaderManager.ClearTypeCreators();
+
+#if DIRECTX
+                    BlendState.ResetStates();
+                    DepthStencilState.ResetStates();
+                    RasterizerState.ResetStates();
+                    SamplerState.ResetStates();
+#endif
                 }
                 _isDisposed = true;
+                _instance = null;
             }
         }
 

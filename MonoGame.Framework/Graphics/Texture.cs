@@ -62,8 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        protected SharpDX.Direct3D11.Resource _texture;
-
+        private SharpDX.Direct3D11.Resource _texture;
         private SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
 #elif OPENGL
@@ -159,10 +158,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+        internal abstract SharpDX.Direct3D11.Resource CreateTexture();
+
+        internal SharpDX.Direct3D11.Resource GetTexture()
+        {
+            if (_texture == null)
+                _texture = CreateTexture();
+
+            return _texture;
+        }
+
         internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, _texture);
+                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
 
             return _resourceView;
         }
@@ -175,6 +184,13 @@ namespace Microsoft.Xna.Framework.Graphics
             this.glTexture = -1;
             this.glLastSamplerState = null;
 #endif
+
+#if DIRECTX
+
+            SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref _texture);
+
+#endif
         }
 
         protected override void Dispose(bool disposing)
@@ -184,17 +200,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
                 if (disposing)
                 {
-                    if (_resourceView != null)
-                    {
-                        _resourceView.Dispose();
-                        _resourceView = null;
-                    }
-
-                    if (_texture != null)
-                    {
-                        _texture.Dispose();
-                        _texture = null;
-                    }
+                    SharpDX.Utilities.Dispose(ref _resourceView);
+                    SharpDX.Utilities.Dispose(ref _texture);
                 }
 #elif OPENGL
                 GraphicsDevice.AddDisposeAction(() =>

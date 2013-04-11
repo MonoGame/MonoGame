@@ -437,6 +437,7 @@
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="iOS\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
     <Compile Include="iOS\Devices\Sensors\Compass.cs" />
