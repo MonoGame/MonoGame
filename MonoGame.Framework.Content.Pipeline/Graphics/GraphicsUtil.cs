@@ -54,7 +54,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Marshal.Copy(data, dataBuffer, 0, length);
 
             var texContent = new DXTBitmapContent(_format == Format.DXT1 ? 8 : 16, _levelWidth, _levelHeight);
-            _content.Faces[0][_currentMipLevel] = texContent;
+
+            if (_content.Faces[0].Count == _currentMipLevel)
+                _content.Faces[0].Add(texContent);
+            else
+                _content.Faces[0][_currentMipLevel] = texContent;
+
             _content.Faces[0][_currentMipLevel].SetPixelData(dataBuffer);
 
             return true;
@@ -143,7 +148,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool premultipliedAlpha)
+        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool generateMipmaps, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
@@ -159,7 +164,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
-                    CompressDXT(content);
+                    CompressDXT(content, generateMipmaps);
                     break;
 
                 case TargetPlatform.iOS:
@@ -206,7 +211,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             content.Faces[0].Add(bmpContent);
         }
 
-        private static void CompressDXT(TextureContent content)
+        private static void CompressDXT(TextureContent content, bool generateMipmaps)
         {
             var texData = content.Faces[0][0];
 
@@ -227,7 +232,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var dataPtr = dataHandle.AddrOfPinnedObject();
 
             inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
-            inputOptions.SetMipmapGeneration(false);
+            inputOptions.SetMipmapGeneration(generateMipmaps);
 
             var containsFracAlpha = ContainsFractionalAlpha(pixelData);
             var outputOptions = new OutputOptions();

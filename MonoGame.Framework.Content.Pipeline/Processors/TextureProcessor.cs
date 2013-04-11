@@ -68,10 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 }
             }
 
-            if (GenerateMipmaps)
-                throw new NotImplementedException();
-
-            // TODO: Set all mip level data
+            // Set the first layer
             input.Faces[0][0].SetPixelData(input._bitmap.GetData());
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
@@ -79,7 +76,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed || 
                 TextureFormat == TextureProcessorOutputFormat.Compressed )
-                GraphicsUtil.CompressTexture(input, context.TargetPlatform, PremultiplyAlpha);
+                GraphicsUtil.CompressTexture(input, context.TargetPlatform, GenerateMipmaps, PremultiplyAlpha);
 
             return input;
         }
