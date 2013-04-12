@@ -64,7 +64,9 @@ namespace Microsoft.Xna.Framework.Content
         protected internal override Video Read(ContentReader input, Video existingInstance)
         {
             string path = input.ReadObject<string>();
+#if !PORTABLE
             path = Path.Combine(input.ContentManager.RootDirectory, path);
+#endif
             path = TitleContainer.GetFilename(path);
 
             /*int durationMS =*/ input.ReadObject<int>();

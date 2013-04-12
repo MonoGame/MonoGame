@@ -1706,7 +1706,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                 
 #endif
     
-#if !PSM                
+#if !PSM && !PORTABLE           
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 

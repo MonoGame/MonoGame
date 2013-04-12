@@ -110,11 +110,11 @@ namespace Microsoft.Xna.Framework
         {
             // Normalize the file path.
             var safeName = GetFilename(name);
-
+#if !PORTABLE
             // We do not accept absolute paths here.
             if (Path.IsPathRooted(safeName))
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.");
-
+#endif
 #if WINRT
             var stream = Task.Run( () => OpenStreamAsync(safeName).Result ).Result;
             if (stream == null)
@@ -136,9 +136,11 @@ namespace Microsoft.Xna.Framework
                     return File.OpenRead(absolutePath2x);
             }
             return File.OpenRead(absolutePath);
-#else
+#elif !PORTABLE
             var absolutePath = Path.Combine(Location, safeName);
             return File.OpenRead(absolutePath);
+#else
+            return null;
 #endif
         }
 
@@ -150,7 +152,7 @@ namespace Microsoft.Xna.Framework
 #if WINRT
             // Replace non-windows seperators.
             name = name.Replace('/', '\\');
-#else
+#elif !PORTABLE
             // Replace Windows path separators with local path separators
             name = name.Replace('\\', Path.DirectorySeparatorChar);
 #endif

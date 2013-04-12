@@ -130,6 +130,7 @@ namespace Microsoft.Xna.Framework.Content
 #else
 		public static string Normalize(string fileName, string[] extensions)
 		{
+#if !PORTABLE
 #if WINRT
             if (MetroHelper.AppDataFileExists(fileName))
                 return fileName;
@@ -140,7 +141,8 @@ namespace Microsoft.Xna.Framework.Content
 			// Check the file extension
 			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
 				return null;
-			
+#endif	
+#if !PORTABLE
             foreach (string ext in extensions)
             {
 			    // Concat the file name with valid extensions
@@ -154,7 +156,7 @@ namespace Microsoft.Xna.Framework.Content
 				    return fileNamePlusExt;
 #endif
             }
-			
+#endif
 			return null;
 		}
 #endif

@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Audio
         private byte[] _data;
 #endif
 
-#if DIRECTX
+#if DIRECTX || PORTABLE
         internal SoundEffect()
         {
         }

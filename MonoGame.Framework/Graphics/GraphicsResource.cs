@@ -97,7 +97,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // Remove references to resources that have been garbage collected.
+#if !PORTABLE
                 resources.RemoveAll(wr => !wr.IsAlive);
+#endif
             }
         }
 

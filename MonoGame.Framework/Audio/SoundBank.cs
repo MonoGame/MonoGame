@@ -43,14 +43,18 @@ namespace Microsoft.Xna.Framework.Audio
 		
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
+#if !PORTABLE
             // Check for windows-style directory separator character
             filename = fileName.Replace('\\',Path.DirectorySeparatorChar);
+#endif
 			audioengine = audioEngine;
 		}
 		
 		//Defer loading because some programs load soundbanks before wavebanks
 		private void Load ()
 		{	
+#if !PORTABLE
+
 #if !ANDROID
 			using (FileStream soundbankstream = new FileStream (filename, FileMode.Open))
 			{
@@ -208,7 +212,7 @@ namespace Microsoft.Xna.Framework.Audio
 					}
 				}
 			}
-			
+#endif
 			loaded = true;
         }
 		

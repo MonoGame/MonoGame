@@ -336,7 +336,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     ((mask & ColorWriteChannels.Blue) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Blue : 0) |
                     ((mask & ColorWriteChannels.Alpha) != 0 ? SharpDX.Direct3D11.ColorWriteMaskFlags.Alpha : 0);
         }
-
+#elif PORTABLE
+        internal void ApplyState(GraphicsDevice device)
+        { }
 #endif // DIRECTX	
 #if PSM
         internal void ApplyState(GraphicsDevice device)

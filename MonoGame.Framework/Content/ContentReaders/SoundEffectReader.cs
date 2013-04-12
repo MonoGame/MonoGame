@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 Name = input.AssetName,
             };
-#else
+#elif !PORTABLE
             byte[] soundData = null;
             // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream
             MemoryStream mStream = new MemoryStream(20 + header.Length + 8 + data.Length);
@@ -138,6 +138,8 @@ namespace Microsoft.Xna.Framework.Content
             if (soundData == null)
                 throw new ContentLoadException("Failed to load SoundEffect");
 			return new SoundEffect(input.AssetName, soundData);
+#else
+            return null;
 #endif
 		}
 	}

@@ -186,7 +186,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // Apply the state!
             device._d3dContext.Rasterizer.State = _state;
         }
-
+#elif PORTABLE
+        internal void ApplyState(GraphicsDevice device)
+        { }
 #endif // DIRECTX
 #if PSM
         internal void ApplyState(GraphicsDevice device)

@@ -107,6 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public AudioEngine (string settingsFile, TimeSpan lookAheadTime, string rendererId)
 		{
+#if !PORTABLE
 			//Read the xact settings file
 			//Credits to alisci01 for initial format documentation
 #if !ANDROID
@@ -212,6 +213,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 				}
 			}
+#endif
 		}
 
 		//wtf C#

@@ -143,7 +143,11 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			get {
 				MemoryStream stream = (MemoryStream)this.BaseStream;
+#if !PORTABLE
 				return stream.GetBuffer();
+#else
+                return null;
+#endif
 			}
 		}
 		

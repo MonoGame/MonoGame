@@ -12,6 +12,8 @@ namespace Microsoft.Xna.Framework.Content
     {
         public static ConstructorInfo GetDefaultConstructor(this Type type)
         {
+#if !PORTABLE
+
 #if WINRT
             var typeInfo = type.GetTypeInfo();
             var ctor = typeInfo.DeclaredConstructors.FirstOrDefault(c => !c.IsStatic && c.GetParameters().Length == 0);
@@ -20,10 +22,14 @@ namespace Microsoft.Xna.Framework.Content
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             return type.GetConstructor(attrs, null, new Type[0], null);
 #endif
+#else
+            return null;
+#endif
         }
 
         public static PropertyInfo[] GetAllProperties(this Type type)
         {
+#if !PORTABLE
 
             // Sometimes, overridden properties of abstract classes can show up even with 
             // BindingFlags.DeclaredOnly is passed to GetProperties. Make sure that
@@ -43,6 +49,9 @@ namespace Microsoft.Xna.Framework.Content
 
             var props = allProps.FindAll(p => p.GetGetMethod() == p.GetGetMethod().GetBaseDefinition()).ToArray();
             return props;
+#endif
+#else
+            return null;
 #endif
         }
 

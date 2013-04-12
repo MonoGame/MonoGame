@@ -2,7 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+#if !PORTABLE
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
     public struct VertexPositionColorTexture : IVertexType
     {
         public Vector3 Position;

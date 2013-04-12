@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Content
 
             if (!String.IsNullOrEmpty(externalReference))
             {
-#if WINRT
+#if WINRT || PORTABLE
                 const char notSeparator = '/';
                 const char separator = '\\';
 #else

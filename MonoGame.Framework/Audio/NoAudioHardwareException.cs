@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
 
     [DataContract]
-#if WINRT
+#if WINRT || PORTABLE
     public sealed class NoAudioHardwareException : Exception
 #else
     public sealed class NoAudioHardwareException : ExternalException

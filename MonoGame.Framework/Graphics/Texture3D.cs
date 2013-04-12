@@ -43,7 +43,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return depth; }
         }
 
-		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false)
+		{		    
+		}
+
+		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
@@ -53,6 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.height = height;
             this.depth = depth;
             this.levelCount = 1;
+		    this.format = format;
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
@@ -87,6 +93,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 OptionFlags = ResourceOptionFlags.None,
             };
 
+            if (renderTarget)
+            {
+                description.BindFlags |= BindFlags.RenderTarget;
+                if (mipMap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
+
             _texture = new SharpDX.Direct3D11.Texture3D(graphicsDevice._d3dDevice, description);
 #endif
         }
@@ -107,6 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (data == null) 
 				throw new ArgumentNullException("data");
+#if !PORTABLE
 
 			var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -134,6 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
 #endif
             dataHandle.Free ();
+#endif
 		}
 	}
 }

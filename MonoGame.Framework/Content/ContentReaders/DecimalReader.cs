@@ -51,7 +51,11 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override decimal Read(ContentReader input, decimal existingInstance)
         {
+#if !PORTABLE
             return input.ReadDecimal();
+#else
+            return 0;
+#endif
         }
     }
 }

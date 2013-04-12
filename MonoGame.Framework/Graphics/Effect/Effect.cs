@@ -220,7 +220,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var stream = assembly.GetManifestResourceStream(name);
             using (var ms = new MemoryStream())
             {
+#if !PORTABLE
                 stream.CopyTo(ms);
+#endif
                 return ms.ToArray();
             }
         }
