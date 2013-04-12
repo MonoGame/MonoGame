@@ -39,6 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return size;
             }
         }
+#if !PORTABLE
 		
 #if DIRECTX
 
@@ -49,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		PixelFormat glFormat;
 		PixelType glType;
 #endif
-		
+#endif
 		public TextureCube (GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
             : this(graphicsDevice, size, mipMap, format, false)
 		{
@@ -90,11 +91,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, description);
 #elif PSM
 			//TODO
-#else
+#elif !PORTABLE
 			this.glTarget = TextureTarget.TextureCubeMap;
 #if IOS || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
-#else
+#elif !PORTABLE
 			GL.GenTextures(1, out this.glTexture);
 #endif
             GraphicsExtensions.CheckGLError();
@@ -184,6 +185,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (data == null) 
                 throw new ArgumentNullException("data");
+#if !PORTABLE
 
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -212,6 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     height = ((height + 3) / 4) * 4;
                 }
 #endif
+
             }
 
 #if DIRECTX
@@ -234,7 +237,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
 #elif PSM
 			//TODO
-#else
+#elif !PORTABLE
 			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
 
@@ -250,6 +253,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
             dataHandle.Free ();
+#endif
 		}
 		
 #if OPENGL

@@ -40,8 +40,9 @@
 
 #region Using clause
 using System;
+#if !PORTABLE
 using System.Net;
-
+#endif
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Net
@@ -116,6 +117,7 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			internal set { _sessionProperties = value; }			
 		}
+#if !PORTABLE
 		
 		IPEndPoint _endPoint;
 		internal IPEndPoint EndPoint 
@@ -130,7 +132,7 @@ namespace Microsoft.Xna.Framework.Net
             get { return _internalendPoint; }
             set { _internalendPoint = value; }
         }
-
+#endif
         internal NetworkSessionType SessionType { get; set; }
     }
 }

@@ -71,10 +71,12 @@ using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 
+#if !PORTABLE
 #if WINRT
 using Windows.Storage;
 #else
 using System.Runtime.Remoting.Messaging;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Storage
@@ -125,10 +127,14 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
+#if !PORTABLE
 #if WINRT
                     return long.MaxValue;
 #else
                     return new DriveInfo(GetDevicePath).AvailableFreeSpace;
+#endif
+#else
+                    return 0;
 #endif
                 }
 				catch (Exception) {
@@ -146,7 +152,7 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
-#if WINRT
+#if WINRT || PORTABLE
                     return true;
 #else
 					return new DriveInfo(GetDevicePath).IsReady;
@@ -167,7 +173,7 @@ namespace Microsoft.Xna.Framework.Storage
 				// I do not know if the DriveInfo is is implemented on Mac or not
 				// thus the try catch
 				try {
-#if WINRT
+#if WINRT || PORTABLE
                     return long.MaxValue;
 #else
 
@@ -397,7 +403,7 @@ namespace Microsoft.Xna.Framework.Storage
     				returnValue = asyncResult.EndInvoke(result);
 				}
                 containerDelegate = null;
-#else
+#elif !PORTABLE
 				// Retrieve the delegate.
 				AsyncResult asyncResult = result as AsyncResult;
 				if (asyncResult != null)
@@ -432,7 +438,7 @@ namespace Microsoft.Xna.Framework.Storage
 		//     The IAsyncResult returned from BeginShowSelector.
 		public static StorageDevice EndShowSelector (IAsyncResult result) 
 		{
-
+#if !PORTABLE
 			if (!result.IsCompleted) {
 				// Wait for the WaitHandle to become signaled.
 				try {
@@ -459,15 +465,22 @@ namespace Microsoft.Xna.Framework.Storage
 				return (del as ShowSelectorAsynchronousShowNoPlayer).EndInvoke (result);
 			else
 				throw new ArgumentException ("result");
+#else
+            return null;
+#endif
 		}
 		
 		internal static string StorageRoot
 		{
 			get {
+#if !PORTABLE
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
 #else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+#endif
+#else
+                return string.Empty;
 #endif
             }
 		}

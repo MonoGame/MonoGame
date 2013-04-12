@@ -53,7 +53,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+#if !PORTABLE
 using System.Windows;
+#endif
 using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
@@ -63,7 +65,7 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
-#else
+#elif !PORTABLE
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
 using Microsoft.Xna.Framework.Net;
@@ -91,18 +93,21 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
 #endif
 
 #if WINRT
+                var licenseInformation = CurrentApp.LicenseInformation;
+                licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
-            var licenseInformation = CurrentApp.LicenseInformation;
-            licenseInformation.LicenseChanged += () => 
                 isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#endif
 
-            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
-
-#endif // WINRT
-
+#if WINDOWS_PHONE
+            });
+#endif
         }
 
 		delegate string ShowKeyboardInputDelegate(
@@ -312,7 +317,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-#if !WINRT && !(WINDOWS && DIRECTX)
+#if !WINRT && !(WINDOWS && DIRECTX) && !PORTABLE
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)
@@ -464,7 +469,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
-#if !DIRECTX
+#if !DIRECTX && !PORTABLE
             MonoGameGamerServicesHelper.Initialise(game);
 #endif
         }

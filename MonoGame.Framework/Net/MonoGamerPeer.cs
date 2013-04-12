@@ -1,23 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
+
 
 using System.Threading;
 using System.ComponentModel;
-
+#if !PORTABLE
 using Lidgren.Network;
+using System.Net;
+using System.Net.Sockets;
+#endif
 
 namespace Microsoft.Xna.Framework.Net
 {
     public class MonoGameNetworkConfiguration
     {
+#if !PORTABLE
         public static IPAddress Broadcast = IPAddress.None;
-    }
+#endif
+        }
 
 	internal class MonoGamerPeer
 	{
+#if !PORTABLE
+
 		private BackgroundWorker MGServerWorker = new BackgroundWorker ();
 		bool done = false;
 		NetServer peer;
@@ -33,10 +39,11 @@ namespace Microsoft.Xna.Framework.Net
 		private static int masterserverport = 6000;
 		private static string masterServer = "monolive.servegame.com";
 		internal static string applicationIdentifier = "monogame";
+#endif
 		
 		static MonoGamerPeer()
 		{
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
 			// This code looks up the Guid for the host app , this is used to identify the
 			// application on the network . We use the Guid as that is unique to that application.			
 			var assembly = System.Reflection.Assembly.GetAssembly(Game.Instance.GetType());
@@ -55,6 +62,7 @@ namespace Microsoft.Xna.Framework.Net
 
 		public MonoGamerPeer (NetworkSession session,AvailableNetworkSession availableSession)
 			{            
+#if !PORTABLE
 			this.session = session;
 			this.online = this.session.SessionType == NetworkSessionType.PlayerMatch;
 			this.availableSession = availableSession;            
@@ -65,33 +73,42 @@ namespace Microsoft.Xna.Framework.Net
 			MGServerWorker.RunWorkerAsync ();
 
 			HookEvents ();
+#endif
 		}
 
 		private void HookEvents ()
 		{
+#if !PORTABLE
 			session.GameEnded += HandleSessionStateChanged;
 
 			session.SessionEnded += HandleSessionStateChanged;
 
 			session.GameStarted += HandleSessionStateChanged;		
-
+#endif
 		}
 
 		void HandleSessionStateChanged (object sender, EventArgs e)
 		{
+#if !PORTABLE
 #if !WINDOWS_PHONE
             Game.Instance.Log("session state change");
 #endif
+
 			SendSessionStateChange ();
 
 			if (session.SessionState == NetworkSessionState.Ended)
-				MGServerWorker.CancelAsync ();			
+				MGServerWorker.CancelAsync ();	
+#endif
 		}
 
 		internal void ShutDown ()
 		{
+#if !PORTABLE
 			MGServerWorker.CancelAsync ();			
+#endif
 		}
+
+#if !PORTABLE
 
 		private void MGServer_DoWork (object sender, DoWorkEventArgs e)
 		{
@@ -343,6 +360,7 @@ namespace Microsoft.Xna.Framework.Net
 					done = true;
 				}
 			} while (!done);
+
 		}
 
 		private bool AlreadyConnected (IPEndPoint endPoint)
@@ -475,9 +493,12 @@ namespace Microsoft.Xna.Framework.Net
 			return new IPEndPoint (ip, port);
 		}
 
-		internal static string GetMyLocalIpAddress ()
+#endif
+        internal static string GetMyLocalIpAddress ()
 		{
 			string localIP = "?";
+#if !PORTABLE
+
 #if !WINDOWS_PHONE
 			IPHostEntry host;
 			
@@ -497,6 +518,7 @@ namespace Microsoft.Xna.Framework.Net
 
  
 #endif			
+#endif
 			return localIP;
 		}
 
@@ -508,7 +530,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {                
-#if DEBUG
+#if DEBUG && !PORTABLE
 		if (peer != null)
                 	return new TimeSpan(0,0,(int)peer.Configuration.SimulatedAverageLatency);
 		else
@@ -519,7 +541,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             set
             {
-#if DEBUG
+#if DEBUG && !PORTABLE
 		if (peer != null) {
                 	peer.Configuration.SimulatedMinimumLatency = (float)value.TotalSeconds;
 		}
@@ -535,7 +557,7 @@ namespace Microsoft.Xna.Framework.Net
         {
             get
             {
-#if DEBUG
+#if DEBUG && !PORTABLE
 		if (peer != null)
                 	return peer.Configuration.SimulatedLoss;
 		else
@@ -546,7 +568,7 @@ namespace Microsoft.Xna.Framework.Net
             }
             set
             {
-#if DEBUG
+#if DEBUG && !PORTABLE
 		if (peer != null) {
                 	peer.Configuration.SimulatedLoss = value;
 		}
@@ -556,26 +578,33 @@ namespace Microsoft.Xna.Framework.Net
 
 		internal void DiscoverPeers ()
 		{
-			peer.DiscoverLocalPeers (port);			    
+#if !PORTABLE
+			peer.DiscoverLocalPeers (port);		
+#endif
 		}
 
 		internal void SendData (
 			byte[] data,
 			SendDataOptions options)
 		{
-			this.SendMessage (NetworkMessageType.Data, data, options, null);
-		}
+#if !PORTABLE
+            this.SendMessage (NetworkMessageType.Data, data, options, null);
+#endif
+            }
 
 		internal void SendData (
 			byte[] data,
 			SendDataOptions options,
 			NetworkGamer gamer)
 		{
+#if !PORTABLE
 			this.SendMessage (NetworkMessageType.Data, data, options, gamer);
+#endif
 		}
-
+#if !PORTABLE
 		private void SendMessage (NetworkMessageType messageType, byte[] data, SendDataOptions options, NetworkGamer gamer)
 		{
+
 
 			NetOutgoingMessage om = peer.CreateMessage ();
 
@@ -803,7 +832,8 @@ namespace Microsoft.Xna.Framework.Net
 		}
 
         internal bool IsReady { get { return this.peer != null; } }
-	}
+#endif
+    }
 
 
 }

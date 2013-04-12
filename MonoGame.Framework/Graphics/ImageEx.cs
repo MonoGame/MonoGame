@@ -15,7 +15,7 @@ namespace System.Drawing
 		     new float[] {0, 0, 0, 0, 1}
 	      };
 
-#if WINRT
+#if WINRT || PORTABLE
 
 #else
         internal static void RGBToBGR(this Image bmp)

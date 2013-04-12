@@ -70,7 +70,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 #if !PSM
+#if !WINRT
 using System.Drawing;
+#endif
+#else
+using Sce.PlayStation.Core.Graphics;
 #endif
 using System.IO;
 using System.Reflection;
@@ -148,25 +152,19 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if MONOMAC || WINDOWS || LINUX
-            
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
-
-            // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-            {
-                //Use the Title attribute of the Assembly if possible.
-                var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
-                if (assemblyTitleAtt != null)
-                    windowTitle = assemblyTitleAtt.Title;
 
-                // Otherwise, fallback to the Name of the assembly.
-                if (string.IsNullOrEmpty(windowTitle))
-                    windowTitle = assembly.GetName().Name;
-            }
+            //Use the Title attribute of the Assembly if possible.
+            var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
+            if (assemblyTitleAtt != null)
+                windowTitle = assemblyTitleAtt.Title;
 
+            // Otherwise, fallback to the Name of the assembly.
+            if (string.IsNullOrEmpty(windowTitle))
+                windowTitle = assembly.GetName().Name;
             Window.Title = windowTitle;
 #endif
         }
@@ -375,8 +373,10 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
+#if !PORTABLE
             _gameTimer.Reset();
             _gameTimer.Start();
+#endif
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
         }
@@ -442,10 +442,13 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
+#if !PORTABLE
         private Stopwatch _gameTimer = Stopwatch.StartNew();
+#endif
 
         public void Tick()
         {
+#if !PORTABLE
             // NOTE: This code is very sensitive and can break very badly
             // with even what looks like a safe change.  Be sure to test 
             // any change fully in both the fixed and variable timestep 
@@ -474,6 +477,7 @@ namespace Microsoft.Xna.Framework
                 System.Threading.Thread.Sleep(sleepTime);
 #endif
                 goto RetryTick;
+
             }
 
             // Do not allow any update to take longer than our maximum.
@@ -524,6 +528,7 @@ namespace Microsoft.Xna.Framework
             {
                 DoDraw(_gameTime);
             }
+#endif
         }
 
         #endregion

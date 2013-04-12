@@ -78,8 +78,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                 return (UInt16)(s | (e << 10) | (m >> 13));
             }
         }
-
+#if PORTABLE
+        internal static float Convert(ushort value)
+#else
         internal static unsafe float Convert(ushort value)
+#endif
         {
             uint rst;
             uint mantissa = (uint)(value & 1023);
@@ -107,7 +110,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                 rst = (uint)(((((uint)value & 0x8000) << 16) | ((((((uint)value >> 10) & 0x1f) - 15) + 127) << 23)) | (mantissa << 13));
             }
 
+#if PORTABLE
+            return 0;
+#else
             return *(((float*)&rst));
+#endif
         }
     }
 }
