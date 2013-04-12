@@ -27,17 +27,11 @@ SOFTWARE.
 
 using System;
 using System.Text;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields

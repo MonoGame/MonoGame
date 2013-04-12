@@ -32,11 +32,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
 	// TODO [TypeConverter(ExpandableObjectConverter)]
-#if WINRT
     [DataContract]
-#else
-    [Serializable]
-#endif
     public class Curve
     {
         #region Private Fields

@@ -44,11 +44,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-#if WINRT
     [DataContract]
-#else
-    [Serializable]
-#endif
     public struct Viewport
     {
 		/// <summary>
