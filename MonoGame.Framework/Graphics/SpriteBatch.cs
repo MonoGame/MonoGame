@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
         bool _beginCalled;
 
 		Effect _spriteEffect;
+	    readonly EffectParameter _matrixTransform;
+        readonly EffectPass _spritePass;
 
 		Matrix _matrix;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
@@ -32,6 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Use a custom SpriteEffect so we can control the transformation matrix
             _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
+            _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice);
 
@@ -116,8 +120,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var transform = _matrix * (halfPixelOffset * projection);
 #endif
 
-			_spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
-			_spriteEffect.CurrentTechnique.Passes[0].Apply();
+            _matrixTransform.SetValue(transform);
+            _spritePass.Apply();
 
 			// If the user supplied a custom effect then apply
             // it now to override the sprite effect.
