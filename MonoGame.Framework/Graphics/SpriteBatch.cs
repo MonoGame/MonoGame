@@ -386,6 +386,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         _spriteEffect.Dispose();
                         _spriteEffect = null;
+                        _spritePass = null;
+                        _matrixTransform = null;
                     }
                 }
             }
