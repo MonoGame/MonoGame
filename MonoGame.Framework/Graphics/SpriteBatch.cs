@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		void Setup() 
         {
-            GraphicsDevice gd = GraphicsDevice;
+            var gd = GraphicsDevice;
 			gd.BlendState = _blendState;
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
@@ -110,17 +110,18 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the default sprite effect.
 			var vp = gd.Viewport;
 
-            // GL requires a half pixel offset where as DirectX and PSS does not.
+		    Matrix projection;
 #if PSM || DIRECTX
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
-            var transform = _matrix * projection;
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
 #else
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-			var transform = _matrix * (halfPixelOffset * projection);
+            // GL requires a half pixel offset to match DX.
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
+            projection.M41 += -0.5f * projection.M11;
+            projection.M42 += -0.5f * projection.M22;
 #endif
+            Matrix.Multiply(ref _matrix, ref projection, out projection);
 
-            _matrixTransform.SetValue(transform);
+            _matrixTransform.SetValue(projection);
             _spritePass.Apply();
 
 			// If the user supplied a custom effect then apply
