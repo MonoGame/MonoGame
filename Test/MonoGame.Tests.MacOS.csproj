@@ -61,6 +61,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
+    <Compile Include="Framework\ColorTest.cs" />
     <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Runner\MacOS\Program.cs" />
