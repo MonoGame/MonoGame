@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
         bool _beginCalled;
 
 		Effect _spriteEffect;
+	    readonly EffectParameter _matrixTransform;
+        readonly EffectPass _spritePass;
 
 		Matrix _matrix;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
@@ -32,6 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Use a custom SpriteEffect so we can control the transformation matrix
             _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
+            _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice);
 
@@ -97,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		void Setup() 
         {
-            GraphicsDevice gd = GraphicsDevice;
+            var gd = GraphicsDevice;
 			gd.BlendState = _blendState;
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
@@ -106,18 +110,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the default sprite effect.
 			var vp = gd.Viewport;
 
-            // GL requires a half pixel offset where as DirectX and PSS does not.
+		    Matrix projection;
 #if PSM || DIRECTX
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
-            var transform = _matrix * projection;
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
 #else
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-			var transform = _matrix * (halfPixelOffset * projection);
+            // GL requires a half pixel offset to match DX.
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
+            projection.M41 += -0.5f * projection.M11;
+            projection.M42 += -0.5f * projection.M22;
 #endif
+            Matrix.Multiply(ref _matrix, ref projection, out projection);
 
-			_spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
-			_spriteEffect.CurrentTechnique.Passes[0].Apply();
+            _matrixTransform.SetValue(projection);
+            _spritePass.Apply();
 
 			// If the user supplied a custom effect then apply
             // it now to override the sprite effect.
