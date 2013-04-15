@@ -1745,6 +1745,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+#endif
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
@@ -1776,6 +1777,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
 #endif
+
         }
 
 #if WINRT
