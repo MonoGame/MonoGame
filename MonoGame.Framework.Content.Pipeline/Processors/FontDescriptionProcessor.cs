@@ -138,7 +138,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 output.Texture.Faces.Add(new MipmapChain(bitmapContent));
             }
 
-            GraphicsUtil.CompressTexture(output.Texture, context.TargetPlatform, false);
+            GraphicsUtil.CompressTexture(output.Texture, context.TargetPlatform, false, false);
 
             return output;
         }
