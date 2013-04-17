@@ -104,54 +104,21 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
                 case SurfaceFormat.RgbPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
                 case SurfaceFormat.RgbEtc1:
-                    Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-                    pitch = ((width + 3) / 4) * 8;
-                    break;
-
                 case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.RgbPvrtc4Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:
                     Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-                    pitch = ((width + 3) / 4) * 16;
-                    break;
-
-                case SurfaceFormat.Alpha8:
-                    pitch = width;
-                    break;
-
-                case SurfaceFormat.Bgr565:
-                case SurfaceFormat.Bgra4444:
-                case SurfaceFormat.Bgra5551:
-                case SurfaceFormat.NormalizedByte2:
-                case SurfaceFormat.HalfSingle:
-                    pitch = width * 2;
-                    break;
-
-                case SurfaceFormat.Color:
-                case SurfaceFormat.Single:
-                case SurfaceFormat.Rg32:
-                case SurfaceFormat.HalfVector2:
-                case SurfaceFormat.NormalizedByte4:
-                case SurfaceFormat.Rgba1010102:
-                    pitch = width * 4;
-                    break;
-
-                case SurfaceFormat.HalfVector4:
-                case SurfaceFormat.Rgba64:
-                case SurfaceFormat.Vector2:
-                    pitch = width * 8;
-                    break;
-
-                case SurfaceFormat.Vector4:
-                    pitch = width * 16;
+                    pitch = ((width + 3) / 4) * format.Size();
                     break;
 
                 default:
-                    throw new NotImplementedException( "Unexpected format!" );
+                    pitch = width * format.Size();
+                    break;
             };
 
             return pitch;

@@ -187,69 +187,82 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-			
-            int xOffset, yOffset, width, height;
-			if (rect.HasValue)
-			{
-				xOffset = rect.Value.X;
-				yOffset = rect.Value.Y;
-				width = rect.Value.Width;
-				height = rect.Value.Height;
-            }
-            else
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
             {
-                xOffset = 0;
-                yOffset = 0;
-                width = Math.Max(1, this.size >> level);
-                height = Math.Max(1, this.size >> level);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
+                int xOffset, yOffset, width, height;
+                if (rect.HasValue)
+                {
+                    xOffset = rect.Value.X;
+                    yOffset = rect.Value.Y;
+                    width = rect.Value.Width;
+                    height = rect.Value.Height;
+                }
+                else
+                {
+                    xOffset = 0;
+                    yOffset = 0;
+                    width = Math.Max(1, this.size >> level);
+                    height = Math.Max(1, this.size >> level);
+
+                    // For DXT textures the width and height of each level is a multiple of 4.
+                    // The last two mip levels require the width and height to be passed as 2x2 and 1x1, but
+                    // there needs to be enough data passed to occupy a 4x4 block.
+                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                    if (format == SurfaceFormat.Dxt1 ||
+                        format == SurfaceFormat.Dxt1a ||
+                        format == SurfaceFormat.Dxt3 ||
+                        format == SurfaceFormat.Dxt5)
+                    {
+                        if (width > 4)
+                            width = (width + 3) & ~3;
+                        if (height > 4)
+                            height = (height + 3) & ~3;
+                    }
+                }
 
 #if DIRECTX
-                // For DXT textures the width and height of each level is a multiply of 4.
-                if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                var box = new DataBox(dataPtr, GetPitch(width), 0);
+
+                int subresourceIndex = (int)face * levelCount + level;
+
+                var region = new ResourceRegion
                 {
-                    width = ((width + 3) / 4) * 4;
-                    height = ((height + 3) / 4) * 4;
+                    Top = yOffset,
+                    Front = 0,
+                    Back = 1,
+                    Bottom = yOffset + height,
+                    Left = xOffset,
+                    Right = xOffset + width
+                };
+
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
+#elif PSM
+			    //TODO
+#else
+                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+                GraphicsExtensions.CheckGLError();
+
+                TextureTarget target = GetGLCubeFace(face);
+                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
+                    GraphicsExtensions.CheckGLError();
                 }
 #endif
             }
-
-#if DIRECTX
-            var box = new DataBox(dataPtr, GetPitch(width), 0);
-
-            int subresourceIndex = (int)face * levelCount + level;
-
-            var region = new ResourceRegion
+            finally
             {
-                Top = yOffset,
-                Front = 0,
-                Back = 1,
-                Bottom = yOffset + height,
-                Left = xOffset,
-                Right = xOffset + width
-            };
-
-            var d3dContext = GraphicsDevice._d3dContext;
-            lock (d3dContext)
-                d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
-#elif PSM
-			//TODO
-#else
-			GL.BindTexture (TextureTarget.TextureCubeMap, this.glTexture);
-            GraphicsExtensions.CheckGLError();
-
-			TextureTarget target = GetGLCubeFace(face);
-			if (glFormat == (PixelFormat)All.CompressedTextureFormats) 
-            {
-				throw new NotImplementedException();
-			} 
-            else 
-            {
-				GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
-                GraphicsExtensions.CheckGLError();
+                dataHandle.Free();
             }
-#endif
-            dataHandle.Free ();
 		}
 		
 #if OPENGL

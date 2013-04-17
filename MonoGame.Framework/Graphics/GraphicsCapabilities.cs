@@ -70,6 +70,31 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal static bool TextureFilterAnisotric { get; private set; }
 
+        /// <summary>
+        /// Gets the support for DXT1
+        /// </summary>
+        internal static bool SupportsDxt1 { get; private set; }
+
+        /// <summary>
+        /// Gets the support for S3TC (DXT1, DXT3, DXT5)
+        /// </summary>
+        internal static bool SupportsS3tc { get; private set; }
+
+        /// <summary>
+        /// Gets the support for PVRTC
+        /// </summary>
+        internal static bool SupportsPvrtc { get; private set; }
+
+        /// <summary>
+        /// Gets the support for ETC1
+        /// </summary>
+        internal static bool SupportsEtc1 { get; private set; }
+
+        /// <summary>
+        /// Gets the support for ATITC
+        /// </summary>
+        internal static bool SupportsAtitc { get; private set; }
+
         internal static void Initialize(GraphicsDevice device)
         {
             NonPowerOfTwo = GetNonPowerOfTwo(device);
@@ -78,6 +103,22 @@ namespace Microsoft.Xna.Framework.Graphics
             TextureFilterAnisotric = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
 #else
             TextureFilterAnisotric = true;
+#endif
+
+            // Texture compression
+#if DIRECTX
+            SupportsDxt1 = true;
+            SupportsS3tc = true;
+#elif OPENGL
+            SupportsS3tc = device._extensions.Contains("GL_EXT_texture_compression_s3tc") ||
+                device._extensions.Contains("GL_OES_texture_compression_S3TC") ||
+                device._extensions.Contains("GL_EXT_texture_compression_dxt3") ||
+                device._extensions.Contains("GL_EXT_texture_compression_dxt5");
+            SupportsDxt1 = SupportsS3tc || device._extensions.Contains("GL_EXT_texture_compression_dxt1");
+            SupportsPvrtc = device._extensions.Contains("GL_IMG_texture_compression_pvrtc");
+            SupportsEtc1 = device._extensions.Contains("GL_OES_compressed_ETC1_RGB8_texture");
+            SupportsAtitc = device._extensions.Contains("GL_ATI_texture_compression_atitc") ||
+                device._extensions.Contains("GL_AMD_compressed_ATC_texture");
 #endif
         }
 
