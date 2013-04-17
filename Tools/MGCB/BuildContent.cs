@@ -98,6 +98,7 @@ namespace MGCB
                 return;
             }
 
+            _processorParams.Remove(keyAndValue[0]);
             _processorParams.Add(keyAndValue[0], keyAndValue[1]);
         }
 
