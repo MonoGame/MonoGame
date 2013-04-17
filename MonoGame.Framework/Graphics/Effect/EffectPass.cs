@@ -13,14 +13,14 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPass
     {
-        private Effect _effect;
+        private readonly Effect _effect;
 
-		private Shader _pixelShader;
-        private Shader _vertexShader;
+		private readonly Shader _pixelShader;
+        private readonly Shader _vertexShader;
 
-        private BlendState _blendState;
-        private DepthStencilState _depthStencilState;
-        private RasterizerState _rasterizerState;
+        private readonly BlendState _blendState;
+        private readonly DepthStencilState _depthStencilState;
+        private readonly RasterizerState _rasterizerState;
 
 		public string Name { get; private set; }
 
