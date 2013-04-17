@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
-        private List<Shader> _shaderList = new List<Shader>();
+        private Shader[] _shaders;
 
 	    private readonly bool _isClone;
 
@@ -142,8 +142,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
 
             // Copy the mutable members of the effect.
-            Parameters = new EffectParameterCollection(cloneSource.Parameters);
-            Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
+            Parameters = cloneSource.Parameters.Clone();
+            Techniques = cloneSource.Techniques.Clone(this);
 
             // Make a copy of the immutable constant buffers.
             ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Take a reference to the original shader list.
-            _shaderList = cloneSource._shaderList;
+            _shaders = cloneSource._shaders;
         }
 
         /// <summary>
@@ -178,10 +178,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
-		public void End()
-		{
-		}
-
         protected internal virtual bool OnApply()
         {
             return false;
@@ -191,11 +187,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                if (!_isClone)
+                if (disposing)
                 {
-                    // Only the clone source can dispose the shaders.
-                    foreach (var shader in _shaderList)
-                        shader.Dispose();
+                    if (!_isClone)
+                    {
+                        // Only the clone source can dispose the shaders.
+                        foreach (var shader in _shaders)
+                            shader.Dispose();
+                    }
+
+                    if (ConstantBuffers != null)
+                    {
+                        foreach (var buffer in ConstantBuffers)
+                            buffer.Dispose();
+                        ConstantBuffers = null;
+                    }
                 }
             }
 
@@ -266,7 +272,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Read in all the constant buffers.
 			var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
-			for (var c = 0; c < buffers; c++) {
+			for (var c = 0; c < buffers; c++) 
+            {
 				
 #if OPENGL
 				string name = reader.ReadString ();               
@@ -278,9 +285,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				var sizeInBytes = (int)reader.ReadInt16 ();
 
 				// Read the parameter index values.
-				int[] parameters = new int[reader.ReadByte ()];
-				int[] offsets = new int[parameters.Length];
-				for (var i = 0; i < parameters.Length; i++) {
+				var parameters = new int[reader.ReadByte ()];
+				var offsets = new int[parameters.Length];
+				for (var i = 0; i < parameters.Length; i++) 
+                {
 					parameters [i] = (int)reader.ReadByte ();
 					offsets [i] = (int)reader.ReadUInt16 ();
 				}
@@ -294,53 +302,49 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in all the shader objects.
-            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
+            _shaders = new Shader[shaders];
             for (var s = 0; s < shaders; s++)
-            {
-                var shader = new Shader(GraphicsDevice, reader);
-                _shaderList.Add(shader);
-            }
+                _shaders[s] = new Shader(GraphicsDevice, reader);
 
             // Read in the parameters.
             Parameters = ReadParameters(reader);
 
             // Read the techniques.
-            Techniques = new EffectTechniqueCollection();
-            var techniques = (int)reader.ReadByte();
-            for (var t = 0; t < techniques; t++)
+            var techniqueCount = (int)reader.ReadByte();
+            var techniques = new EffectTechnique[techniqueCount];
+            for (var t = 0; t < techniqueCount; t++)
             {
                 var name = reader.ReadString();
 
                 var annotations = ReadAnnotations(reader);
 
-                var passes = ReadPasses(reader, this, _shaderList);
+                var passes = ReadPasses(reader, this, _shaders);
 
-                var technique = new EffectTechnique(this, name, passes, annotations);
-                Techniques.Add(technique);
-            }            
+                techniques[t] = new EffectTechnique(this, name, passes, annotations);
+            }
 
+            Techniques = new EffectTechniqueCollection(techniques);
             CurrentTechnique = Techniques[0];
         }
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
-            var collection = new EffectAnnotationCollection();
-
             var count = (int)reader.ReadByte();
             if (count == 0)
-                return collection;
+                return EffectAnnotationCollection.Empty;
+
+            var annotations = new EffectAnnotation[count];
 
             // TODO: Annotations are not implemented!
 
-            return collection;
+            return new EffectAnnotationCollection(annotations);
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, Shader[] shaders)
         {
-            var collection = new EffectPassCollection();
-
             var count = (int)reader.ReadByte();
+            var passes = new EffectPass[count];
 
             for (var i = 0; i < count; i++)
             {
@@ -414,20 +418,20 @@ namespace Microsoft.Xna.Framework.Graphics
 						SlopeScaleDepthBias = reader.ReadSingle(),
 					};
 				}
-				var pass = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
-				collection.Add(pass);         
+
+                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
 			}
 
-			return collection;
+            return new EffectPassCollection(passes);
 		}
 
 		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
-			var collection = new EffectParameterCollection();
 			var count = (int)reader.ReadByte();			
-            if (count == 0)				
-                return collection;
+            if (count == 0)
+                return EffectParameterCollection.Empty;
 
+            var parameters = new EffectParameter[count];
 			for (var i = 0; i < count; i++)
 			{
 				var class_ = (EffectParameterClass)reader.ReadByte();				
@@ -475,14 +479,13 @@ namespace Microsoft.Xna.Framework.Graphics
 							throw new NotImplementedException();
 					}
                 }
-				var param = new EffectParameter(
+
+				parameters[i] = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
 					annotations, elements, structMembers, data);
-
-				collection.Add(param);
 			}
 
-			return collection;
+			return new EffectParameterCollection(parameters);
 		}
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
