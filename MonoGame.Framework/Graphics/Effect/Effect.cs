@@ -187,11 +187,21 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                if (!_isClone)
+                if (disposing)
                 {
-                    // Only the clone source can dispose the shaders.
-                    foreach (var shader in _shaders)
-                        shader.Dispose();
+                    if (!_isClone)
+                    {
+                        // Only the clone source can dispose the shaders.
+                        foreach (var shader in _shaders)
+                            shader.Dispose();
+                    }
+
+                    if (ConstantBuffers != null)
+                    {
+                        foreach (var buffer in ConstantBuffers)
+                            buffer.Dispose();
+                        ConstantBuffers = null;
+                    }
                 }
             }
 

@@ -103,6 +103,7 @@
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\RenderTarget3D.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -374,6 +375,7 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Windows\WinFormsGameForm.cs" />
     <Compile Include="Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Windows\WinFormsGameWindow.cs" />
   </ItemGroup>

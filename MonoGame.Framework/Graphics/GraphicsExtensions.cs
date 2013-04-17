@@ -506,6 +506,22 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 #endif
 				
+#if OUYA
+			case SurfaceFormat.Dxt1:
+                glInternalFormat = (PixelInternalFormat)0x83F1; 
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.Dxt3:
+                glInternalFormat = (PixelInternalFormat)0x83F2;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+			case SurfaceFormat.Dxt5:
+                glInternalFormat = (PixelInternalFormat)0x83F3;
+				glFormat = (PixelFormat)All.CompressedTextureFormats;
+				break;
+#endif
+                    
+
 #if IOS || ANDROID
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;

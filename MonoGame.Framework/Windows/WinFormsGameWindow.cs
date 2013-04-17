@@ -47,6 +47,7 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Windows;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaKey = Microsoft.Xna.Framework.Input.Keys;
@@ -140,8 +141,13 @@ namespace MonoGame.Framework
             _platform = platform;
             Game = platform.Game;
 
-            _form = new Form();
-            _form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+            _form = new WinFormsGameForm();
+            
+            // When running unit tests this can return null.
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly != null)
+                _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
             _form.StartPosition = FormStartPosition.CenterScreen;

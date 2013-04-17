@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace MGCB
@@ -22,7 +23,8 @@ namespace MGCB
 #if WINDOWS
             // Set the correct directory for our dependency files.
             var is32Bit = IntPtr.Size == 4;
-            var directory = string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64");
+            var directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64"));
             SetDllDirectory(directory);
 #endif
 

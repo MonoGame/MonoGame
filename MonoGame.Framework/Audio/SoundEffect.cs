@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
+        private bool isDisposed = false;
 #if DIRECTX
         internal DataStream _dataStream;
         internal AudioBuffer _buffer;
@@ -332,6 +333,14 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		#region IDisposable Members
 
+        public bool IsDisposed
+        {
+            get
+            {
+                return isDisposed;
+            }
+        }
+
         public void Dispose()
         {
 #if DIRECTX
@@ -339,6 +348,7 @@ namespace Microsoft.Xna.Framework.Audio
 #else
             _sound.Dispose();
 #endif
+            isDisposed = true;
         }
 
         #endregion
