@@ -55,8 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
             ColumnCount = cloneSource.ColumnCount;
 
             // Clone the mutable types.
-            Elements = new EffectParameterCollection(cloneSource.Elements);
-            StructureMembers = new EffectParameterCollection(cloneSource.StructureMembers);
+            Elements = cloneSource.Elements.Clone();
+            StructureMembers = cloneSource.StructureMembers.Clone();
 
             // The data is mutable, so we have to clone it.
             var array = cloneSource.Data as Array;
