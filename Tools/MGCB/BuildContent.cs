@@ -220,7 +220,8 @@ namespace MGCB
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
-            File.Delete(contentFile);
+            if (File.Exists(contentFile))
+                File.Delete(contentFile);
             if (newContent.SourceFiles.Count > 0)
                 newContent.Write(contentFile);
         }
