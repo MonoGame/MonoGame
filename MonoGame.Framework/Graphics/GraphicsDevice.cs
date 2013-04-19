@@ -1634,7 +1634,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-                // Clear the bindings.
+                // Copy the new bindings.
                 Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
                 Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
                 _currentRenderTargetCount = renderTargets.Length;
@@ -1776,7 +1776,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public RenderTargetBinding[] GetRenderTargets()
 		{
             // Return a correctly sized copy our internal array.
-		    var bindings = new RenderTargetBinding[_currentRenderTargetCount];
+            var bindings = new RenderTargetBinding[_currentRenderTargetCount];
             Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
             return bindings;
 		}
