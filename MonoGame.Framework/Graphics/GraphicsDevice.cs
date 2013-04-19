@@ -1636,6 +1636,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
                 // Clear the bindings.
                 Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+                Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
                 _currentRenderTargetCount = renderTargets.Length;
 
 #if DIRECTX
@@ -1645,8 +1646,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
-                    var binding = renderTargets[i];
-                    _currentRenderTargetBindings[i] = binding;
+                    var binding = _currentRenderTargetBindings[i];
                     var target = (IRenderTarget)binding.RenderTarget;
                     _currentRenderTargets[i] = target.GetRenderTargetView(binding.ArraySlice);
                 }
@@ -1659,10 +1659,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext)
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
 #elif OPENGL
-                if (renderTargets[0].RenderTarget is RenderTargetCube)
+                if (_currentRenderTargetBindings[0].RenderTarget is RenderTargetCube)
                     throw new NotImplementedException("RenderTargetCube not yet implemented.");
 
-                var renderTarget = renderTargets[0].RenderTarget as RenderTarget2D;
+                var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				if (this.glRenderTargetFrameBuffer == 0)
 				{
 #if GLES
@@ -1697,11 +1697,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !GLES
 				for (var i = 0; i < _currentRenderTargetCount; i++)
 				{
-                    var binding = renderTargets[i];
-                    _currentRenderTargetBindings[i] = binding;
-					GL.BindTexture(TextureTarget.Texture2D, binding.RenderTarget.glTexture);
+					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 					GraphicsExtensions.CheckGLError();
-					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, binding.RenderTarget.glTexture, 0);
+					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 					GraphicsExtensions.CheckGLError();
 				}
 
@@ -1723,7 +1721,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					throw new InvalidOperationException(message);
 				}
 #elif PSM
-                _currentRenderTargetBindings[0] = renderTargets[0];
                 var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
