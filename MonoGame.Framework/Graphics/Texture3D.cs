@@ -48,8 +48,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{		    
 		}
 
-		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
-		{
+	protected internal Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget, bool computable = false)
+	{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
 
@@ -92,6 +92,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 Usage = ResourceUsage.Default,
                 OptionFlags = ResourceOptionFlags.None,
             };
+            
+            if (computable)
+            {
+                description.BindFlags |= SharpDX.Direct3D11.BindFlags.UnorderedAccess;
+            }
 
             if (renderTarget)
             {
