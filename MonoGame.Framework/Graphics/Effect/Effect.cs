@@ -521,7 +521,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var effectPassCollection = new EffectPassCollection(effectsPassArray);            
             
             EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
-            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection(new EffectAnnotation[0]));
+            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
             Techniques = new EffectTechniqueCollection(effectTechniqueArray);
             
             ConstantBuffers = new ConstantBuffer[0];            
