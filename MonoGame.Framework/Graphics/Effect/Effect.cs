@@ -503,20 +503,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			#warning Hacks for BasicEffect as we don't have these parameters yet
             parametersArray[shaderProgram.UniformCount] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",
-                new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), new float[3]);
+                3, 1, "float3",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
             parametersArray[shaderProgram.UniformCount+1] = new EffectParameter(
                 EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",
-                new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), 0.0f);
+                1, 1, "float",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, 0.0f);
             parametersArray[shaderProgram.UniformCount+2] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",
-                new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), new float[4]);
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
             parametersArray[shaderProgram.UniformCount+3] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",
-                new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), new float[4]);
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
 
             Parameters = new EffectParameterCollection(parametersArray);
                        
@@ -548,18 +544,15 @@ namespace Microsoft.Xna.Framework.Graphics
             case ShaderUniformType.Float4x4:
                 return new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",
-                    new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), new float[4 * 4]);
+                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
             case ShaderUniformType.Float4:
                 return new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",
-                    new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), new float[4]);
+                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
             case ShaderUniformType.Sampler2D:
                 return new EffectParameter(
                     EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",
-                    new EffectAnnotationCollection(new EffectAnnotation[0]), new EffectParameterCollection(new EffectParameter[0]), new EffectParameterCollection(new EffectParameter[0]), null);
+                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }
