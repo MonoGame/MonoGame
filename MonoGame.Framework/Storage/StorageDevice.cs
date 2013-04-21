@@ -467,12 +467,11 @@ namespace Microsoft.Xna.Framework.Storage
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
 #elif LINUX
-                string osConfigDir = "";
-                osConfigDir += Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (osConfigDir.Length == 0)
+                string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                if (String.IsNullOrEmpty(osConfigDir))
                 {
-                    osConfigDir += Environment.GetEnvironmentVariable("HOME");
-                    if (osConfigDir.Length == 0)
+                    osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    if (String.IsNullOrEmpty(osConfigDir))
                     {
                         return "."; // Oh well.
                     }
@@ -480,9 +479,8 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 return osConfigDir;
 #elif MONOMAC
-                string osConfigDir = "";
-                osConfigDir += Environment.GetEnvironmentVariable("HOME");
-                if (osConfigDir.Length == 0)
+                string osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                if (String.IsNullOrEmpty(osConfigDir))
                 {
                     return "."; // Oh well.
                 }
