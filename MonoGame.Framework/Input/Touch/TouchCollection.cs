@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchCollection()
         {
-            _collection = new TouchLocation[8];
+            _collection = new TouchLocation[0];
             _isConnected = false;
         }
 
