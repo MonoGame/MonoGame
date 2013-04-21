@@ -129,11 +129,6 @@ namespace Microsoft.Xna.Framework {
 				UIApplication.SharedApplication.BeginInvokeOnMainThread(() => _callback (this));
 		}
 
-        internal void CancelAsync ()
-        {
-            ViewController_InputCanceled(null, EventArgs.Empty);
-        }
-
 		private void UnsubscribeViewEvents ()
 		{
 			_viewController.View.InputAccepted -= ViewController_InputAccepted;

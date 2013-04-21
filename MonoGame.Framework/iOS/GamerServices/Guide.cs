@@ -261,14 +261,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 			return new KeyboardInputAsyncResult (keyboardViewController, callback, state);
 		}
 
-        public static void CancelKeyboardInput (IAsyncResult result)
-        { 
-            if (!(result is KeyboardInputAsyncResult))
-                throw new ArgumentException ("result");
-
-            (result as KeyboardInputAsyncResult).CancelAsync();
-        }
-
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
 			AssertInitialised ();
