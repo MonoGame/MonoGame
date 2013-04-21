@@ -66,12 +66,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
 		#endregion
 
-        public TouchCollection()
-        {
-            _collection = new TouchLocation[8];
-            _isConnected = false;
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
         /// </summary>
