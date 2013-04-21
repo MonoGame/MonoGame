@@ -466,6 +466,28 @@ namespace Microsoft.Xna.Framework.Storage
 			get {
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
+#elif LINUX
+                string osConfigDir = "";
+                osConfigDir += Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                if (osConfigDir.Length == 0)
+                {
+                    osConfigDir += Environment.GetEnvironmentVariable("HOME");
+                    if (osConfigDir.Length == 0)
+                    {
+                        return "."; // Oh well.
+                    }
+                    osConfigDir += "/.local/share";
+                }
+                return osConfigDir;
+#elif MONOMAC
+                string osConfigDir = "";
+                osConfigDir += Environment.GetEnvironmentVariable("HOME");
+                if (osConfigDir.Length == 0)
+                {
+                    return "."; // Oh well.
+                }
+                osConfigDir += "/Library/Application Support";
+                return osConfigDir;
 #else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif
