@@ -192,8 +192,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (!_isClone)
                     {
                         // Only the clone source can dispose the shaders.
-                        foreach (var shader in _shaders)
-                            shader.Dispose();
+                        if (_shaders != null)
+                        {
+                            foreach (var shader in _shaders)
+                                shader.Dispose();
+                        }
                     }
 
                     if (ConstantBuffers != null)
@@ -490,7 +493,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection(new EffectAnnotation[0]));
+			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
             
