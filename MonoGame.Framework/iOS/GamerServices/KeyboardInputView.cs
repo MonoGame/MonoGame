@@ -262,6 +262,11 @@ namespace Microsoft.Xna.Framework {
 				handler (this, e);
 		}
 
+		internal void CancelInput(EventArgs e)
+		{
+			OnInputCanceled(e);
+		}
+
 		private void OnInputCanceled(EventArgs e)
 		{
 			var handler = InputCanceled;
