@@ -57,6 +57,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private bool _isConnected;
 
+        private static readonly TouchLocation[] emptyCollection = new TouchLocation[0];
+
 		#region Properties
 
         /// <summary>
@@ -84,6 +86,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public bool FindById(int id, out TouchLocation touchLocation)
 		{
+            if (_collection == null)
+            {
+                touchLocation = default(TouchLocation);
+                return false;
+            }
             for (var i = 0; i < _collection.Length; i++)
             {
                 var location = _collection[i];
@@ -115,6 +122,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public int IndexOf(TouchLocation item)
         {
+            if (_collection == null)
+                return -1;
             for (var i = 0; i < _collection.Length; i++)
             {
                 if (item == _collection[i])
@@ -150,7 +159,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns><see cref="TouchLocation"/></returns>
         public TouchLocation this[int index]
         {
-            get { return _collection[index]; }
+            get
+            {
+                if (_collection == null)
+                    throw new ArgumentOutOfRangeException("index");
+                return _collection[index];
+            }
             set
             {
                 throw new NotSupportedException();
@@ -181,6 +195,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Returns true if queried item is found, false otherwise.</returns>
         public bool Contains(TouchLocation item)
         {
+            if (_collection == null)
+                return false;
             for (var i = 0; i < _collection.Length; i++)
             {
                 if (item == _collection[i])
@@ -197,7 +213,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="arrayIndex">The starting index of the copy operation.</param>
         public void CopyTo(TouchLocation[] array, int arrayIndex)
         {
-            _collection.CopyTo(array, arrayIndex);
+            if (_collection != null)
+                _collection.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -205,7 +222,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public int Count
         {
-            get { return _collection.Length; }
+            get
+            {
+                if (_collection == null)
+                    return 0;
+                return _collection.Length;
+            }
         }
 
         /// <summary>
@@ -224,6 +246,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
         public IEnumerator<TouchLocation> GetEnumerator()
         {
+            if (_collection == null)
+                return emptyCollection.AsEnumerable().GetEnumerator();
             return _collection.AsEnumerable().GetEnumerator();
         }
 
@@ -234,6 +258,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Enumerable list of objects.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
+            if (_collection == null)
+                return emptyCollection.GetEnumerator();
             return _collection.GetEnumerator();
         }
 

@@ -177,7 +177,7 @@ namespace TwoMGFX
             }
 
             
-            tok = scanner.LookAhead(TokenType.Identifier, TokenType.Number);
+            tok = scanner.LookAhead(TokenType.Identifier, TokenType.Sign, TokenType.Number);
             switch (tok.Type)
             {
                 case TokenType.Identifier:
@@ -190,7 +190,24 @@ namespace TwoMGFX
                         return;
                     }
                     break;
+                case TokenType.Sign:
                 case TokenType.Number:
+
+                    
+                    tok = scanner.LookAhead(TokenType.Sign);
+                    if (tok.Type == TokenType.Sign)
+                    {
+                        tok = scanner.Scan(TokenType.Sign);
+                        n = node.CreateNode(tok, tok.ToString() );
+                        node.Token.UpdateRange(tok);
+                        node.Nodes.Add(n);
+                        if (tok.Type != TokenType.Sign) {
+                            tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Sign.ToString(), 0x1001, tok));
+                            return;
+                        }
+                    }
+
+                    
                     tok = scanner.Scan(TokenType.Number);
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
@@ -509,7 +526,7 @@ namespace TwoMGFX
             }
 
             
-            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis, TokenType.Identifier, TokenType.Number);
+            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis, TokenType.Identifier, TokenType.Sign, TokenType.Number);
             switch (tok.Type)
             {
                 case TokenType.LessThan:
@@ -593,7 +610,24 @@ namespace TwoMGFX
                         return;
                     }
                     break;
+                case TokenType.Sign:
                 case TokenType.Number:
+
+                    
+                    tok = scanner.LookAhead(TokenType.Sign);
+                    if (tok.Type == TokenType.Sign)
+                    {
+                        tok = scanner.Scan(TokenType.Sign);
+                        n = node.CreateNode(tok, tok.ToString() );
+                        node.Token.UpdateRange(tok);
+                        node.Nodes.Add(n);
+                        if (tok.Type != TokenType.Sign) {
+                            tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Sign.ToString(), 0x1001, tok));
+                            return;
+                        }
+                    }
+
+                    
                     tok = scanner.Scan(TokenType.Number);
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
