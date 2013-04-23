@@ -120,6 +120,9 @@ namespace Microsoft.Xna.Framework.Storage
 			// From the examples the root is based on MyDocuments folder
 #if WINDOWS_STOREAPP
             var saved = "";
+#elif LINUX || MONOMAC
+            // We already have a SaveData folder on Mac/Linux.
+            var saved = StorageDevice.StorageRoot;
 #else
 			var root = StorageDevice.StorageRoot;
 			var saved = Path.Combine(root,"SavedGames");
