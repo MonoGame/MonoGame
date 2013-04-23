@@ -15,6 +15,11 @@ namespace MGCB
     class BuildContent
     {
         [CommandLineParameter(
+            Name = "quiet",
+            Description = "Only output content build errors.")]
+        public bool Quiet;
+
+        [CommandLineParameter(
             Name = "@",
             ValueName = "responseFile",
             Description = "Read a text response file with additional command line options and switches.")]
@@ -220,7 +225,8 @@ namespace MGCB
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
-            File.Delete(contentFile);
+            if (File.Exists(contentFile))
+                File.Delete(contentFile);
             if (newContent.SourceFiles.Count > 0)
                 newContent.Write(contentFile);
         }

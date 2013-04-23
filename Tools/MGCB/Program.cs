@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace MGCB
@@ -60,17 +59,21 @@ namespace MGCB
                 return 0;
             }
 
-            // Print a startup message.
+            // Print a startup message.            
             var buildStarted = DateTime.Now;
-            Console.WriteLine("Build started {0}\n", buildStarted);
+            if (!content.Quiet)
+                Console.WriteLine("Build started {0}\n", buildStarted);
 
             // Let the content build.
             int successCount, errorCount;
             content.Build(out successCount, out errorCount);
 
             // Print the finishing info.
-            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
-            Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+            if (!content.Quiet)
+            {
+                Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
+                Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+            }
 
             // Return the error count.
             return errorCount;
