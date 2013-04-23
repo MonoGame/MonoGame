@@ -141,9 +141,19 @@ namespace Microsoft.Xna.Framework.Content
     				// Need to resolve namespace differences
     				string readerTypeString = originalReaderTypeString;
 
-    				readerTypeString = PrepareType(readerTypeString);
+    				readerTypeString = PrepareType(readerTypeString, assemblyName);
 
     				var l_readerType = Type.GetType(readerTypeString);
+
+                    if (l_readerType == null)
+                    {
+                        //try referencing source project for type
+                        var entryAssemblyName = Assembly.GetEntryAssembly().ToString();
+                        readerTypeString = PrepareType(readerTypeString, entryAssemblyName);
+                        l_readerType = Type.GetType(readerTypeString);
+                    }
+
+
                     if (l_readerType != null)
                     {
                         try
@@ -185,7 +195,7 @@ namespace Microsoft.Xna.Framework.Content
 		/// <returns>
 		/// A <see cref="System.String"/>
 		/// </returns>
-		public static string PrepareType(string type)
+		public static string PrepareType(string type, string assemblyName)
 		{			
 			//Needed to support nested types
 			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
@@ -204,7 +214,13 @@ namespace Microsoft.Xna.Framework.Content
 			// TODO: For WinRT this is most likely broken!
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
-			
+            if (!assemblyName.ToLower().Contains("monogame"))
+            {
+                var startPos = preparedType.IndexOf(", ");
+                var endPos = preparedType.IndexOf("]]", startPos);
+                var replaceText = preparedType.Substring(startPos, endPos - startPos);
+                preparedType = preparedType.Replace(replaceText, string.Format(", {0}", assemblyName));
+            }
 			return preparedType;
 		}
 
