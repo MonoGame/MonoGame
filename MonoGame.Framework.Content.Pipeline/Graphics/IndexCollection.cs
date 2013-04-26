@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -18,7 +19,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
         }
 
-        internal void AddRange(int[] indices)
+        /// <summary>
+        /// Add a range of indices to the collection.
+        /// </summary>
+        /// <param name="indices">A collection of indices to add.</param>
+        public void AddRange(IEnumerable<int> indices)
         {
             foreach (var t in indices)
                 Add(t);
