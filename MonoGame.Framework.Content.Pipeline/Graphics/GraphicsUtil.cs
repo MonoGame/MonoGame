@@ -232,7 +232,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var levelWidth = Math.Max(sourceWidth >> x, 1);
                 var levelHeight = Math.Max(sourceHeight >> x, 1);
 
-                var bmpContent = new PVRTCBitmapContent(4, sourceWidth, sourceHeight);
+                var bmpContent = new PvrtcBitmapContent(4, sourceWidth, sourceHeight);
                 bmpContent.SetPixelData(levelData);
                 content.Faces[0].Add(bmpContent);
 
