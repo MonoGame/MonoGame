@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class DxtBitmapContent : BitmapContent
+    public abstract class DxtBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
         internal int _blockSize;
