@@ -354,6 +354,9 @@
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />

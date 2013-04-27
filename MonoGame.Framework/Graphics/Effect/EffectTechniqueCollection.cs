@@ -7,20 +7,24 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectTechniqueCollection : IEnumerable<EffectTechnique>
     {
-		private List <EffectTechnique> _techniques = new List<EffectTechnique>();
+		private readonly EffectTechnique[] _techniques;
 
-        public int Count { get { return _techniques.Count; } }
+        public int Count { get { return _techniques.Length; } }
 
-        internal EffectTechniqueCollection()
+        internal EffectTechniqueCollection(EffectTechnique[] techniques)
         {
+            _techniques = techniques;
         }
 
-        internal EffectTechniqueCollection(Effect effect, EffectTechniqueCollection cloneSource)
+        internal EffectTechniqueCollection Clone(Effect effect)
         {
-            foreach (var technique in cloneSource)
-                Add(new EffectTechnique(effect, technique));
-        }
+            var techniques = new EffectTechnique[_techniques.Length];
+            for (var i = 0; i < _techniques.Length; i++)
+                techniques[i] = new EffectTechnique(effect, _techniques[i]);
 
+            return new EffectTechniqueCollection(techniques);
+        }
+        
         public EffectTechnique this[int index]
         {
             get { return _techniques [index]; }
@@ -43,17 +47,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public IEnumerator<EffectTechnique> GetEnumerator()
         {
-            return _techniques.GetEnumerator();
+            return ((IEnumerable<EffectTechnique>)_techniques).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _techniques.GetEnumerator();
-        }
-
-        internal void Add(EffectTechnique technique)
-        {
-            _techniques.Add(technique);
         }
     }
 }

@@ -3,20 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-
+using System.Runtime.InteropServices;
 using Nvidia.TextureTools;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class DXTDataHandler
+    class DxtDataHandler
     {
         private TextureContent _content;
         private int _currentMipLevel;
@@ -27,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public OutputOptions.WriteDataDelegate WriteData { get; private set; }
         public OutputOptions.ImageDelegate BeginImage { get; private set; }
 
-        public DXTDataHandler(TextureContent content, Format format)
+        public DxtDataHandler(TextureContent content, Format format)
         {
             _content = content;
 
@@ -53,8 +47,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             Marshal.Copy(data, dataBuffer, 0, length);
 
-            var texContent = new DXTBitmapContent(_format == Format.DXT1 ? 8 : 16, _levelWidth, _levelHeight);
-            _content.Faces[0][_currentMipLevel] = texContent;
+            DxtBitmapContent texContent = null;
+            switch (_format)
+            {
+                case Format.DXT1:
+                    texContent = new Dxt1BitmapContent(_levelWidth, _levelHeight);
+                    break;
+                case Format.DXT3:
+                    texContent = new Dxt3BitmapContent(_levelWidth, _levelHeight);
+                    break;
+                case Format.DXT5:
+                    texContent = new Dxt5BitmapContent(_levelWidth, _levelHeight);
+                    break;
+            }
+
+            if (_content.Faces[0].Count == _currentMipLevel)
+                _content.Faces[0].Add(texContent);
+            else
+                _content.Faces[0][_currentMipLevel] = texContent;
+
             _content.Faces[0][_currentMipLevel].SetPixelData(dataBuffer);
 
             return true;
@@ -82,7 +93,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
             // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
-            // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RBGA.
+            // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
             BGRAtoRGBA(output);
@@ -143,7 +154,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool premultipliedAlpha)
+        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool generateMipmaps, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
@@ -159,34 +170,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
-                    CompressDXT(content);
+                    CompressDxt(content, generateMipmaps);
                     break;
 
                 case TargetPlatform.iOS:
-                    CompressPVRTC(content, premultipliedAlpha);
+                    CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
 
                 default:
-                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", platform));
+                    throw new NotImplementedException(string.Format("Texture compression is not implemented for {0}", platform));
             }
         }
 
-        private static void CompressPVRTC(TextureContent content, bool premultipliedAlpha)
+        private static void CompressPvrtc(TextureContent content, bool generateMipmaps, bool premultipliedAlpha)
         {
-            // Note: MipGeneration will be done by NVTT, rather than PVRTC's tool.
-            // This way we have the same implementation across platforms.
+            // TODO: Once uncompressed mipmap generation is supported, first use NVTT to generate mipmaps,
+            // then compress them withthe PVRTC tool, so we have the same implementation of mipmap generation
+            // across platforms.
+
+            // Calculate number of mip levels
+            var width = content.Faces[0][0].Height;
+            var height = content.Faces[0][0].Width;
+            var numberOfMipLevels = 1;
+            if (generateMipmaps)
+            {
+                while (height != 1 || width != 1)
+                {
+                    height = Math.Max(height / 2, 1);
+                    width = Math.Max(width / 2, 1);
+                    numberOfMipLevels++;
+                }
+            }
 
             IntPtr dataSizesPtr = IntPtr.Zero;
             var texDataPtr = ManagedPVRTC.ManagedPVRTC.CompressTexture(content.Faces[0][0].GetPixelData(),
                                             content.Faces[0][0].Height,
                                             content.Faces[0][0].Width,
-                                            1,
+                                            numberOfMipLevels,
                                             premultipliedAlpha,
                                             true,
                                             ref dataSizesPtr);
 
-            // Store the size of each mipLevel
-            var dataSizesArray = new int[1];
+            // Store the size of each mip level
+            var dataSizesArray = new int[numberOfMipLevels];
             Marshal.Copy(dataSizesPtr, dataSizesArray, 0, dataSizesArray.Length);
 
             var levelSize = 0;
@@ -196,17 +222,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             content.Faces[0].Clear();
 
-            levelSize = dataSizesArray[0];
-            levelData = new byte[levelSize];
+            for (int x = 0; x < numberOfMipLevels; x++)
+            {
+                levelSize = dataSizesArray[x];
+                levelData = new byte[levelSize];
 
-            Marshal.Copy(texDataPtr, levelData, 0, levelSize);
+                Marshal.Copy(texDataPtr, levelData, 0, levelSize);
 
-            var bmpContent = new PVRTCBitmapContent(4, sourceWidth, sourceHeight);
-            bmpContent.SetPixelData(levelData);
-            content.Faces[0].Add(bmpContent);
+                var levelWidth = Math.Max(sourceWidth >> x, 1);
+                var levelHeight = Math.Max(sourceHeight >> x, 1);
+
+                var bmpContent = new PvrtcBitmapContent(4, sourceWidth, sourceHeight);
+                bmpContent.SetPixelData(levelData);
+                content.Faces[0].Add(bmpContent);
+
+                texDataPtr = IntPtr.Add(texDataPtr, levelSize);
+            }
         }
 
-        private static void CompressDXT(TextureContent content)
+        private static void CompressDxt(TextureContent content, bool generateMipmaps)
         {
             var texData = content.Faces[0][0];
 
@@ -227,7 +261,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var dataPtr = dataHandle.AddrOfPinnedObject();
 
             inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
-            inputOptions.SetMipmapGeneration(false);
+            inputOptions.SetMipmapGeneration(generateMipmaps);
 
             var containsFracAlpha = ContainsFractionalAlpha(pixelData);
             var outputOptions = new OutputOptions();
@@ -235,7 +269,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var outputFormat = containsFracAlpha ? Format.DXT5 : Format.DXT1;
 
-            var handler = new DXTDataHandler(content, outputFormat);
+            var handler = new DxtDataHandler(content, outputFormat);
             outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
 
             var compressionOptions = new CompressionOptions();

@@ -246,7 +246,7 @@ namespace TwoMGFX
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
         {
             var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0)) as string;
+        	var value = (string)(this.GetValue(tree, TokenType.Sign, 0) ?? "") + (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0));
         	
         	var pass = paramlist[0] as PassInfo;
         	pass.ParseRenderState(name, value);
@@ -291,7 +291,7 @@ namespace TwoMGFX
         protected virtual object EvalSampler_State_Expression(ParseTree tree, params object[] paramlist)
         {
             var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0))) as string;	
+        	var value = (string)(this.GetValue(tree, TokenType.Sign, 0) ?? "") + (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0)));	
         
         	var sampler = paramlist[0] as SamplerStateInfo;
         	sampler.Parse(name, value);
