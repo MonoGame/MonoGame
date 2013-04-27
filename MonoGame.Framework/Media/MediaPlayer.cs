@@ -334,6 +334,7 @@ namespace Microsoft.Xna.Framework.Media
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
+			_queue.ActiveSongIndex = 0;
             
             PlaySong(song);
         }
