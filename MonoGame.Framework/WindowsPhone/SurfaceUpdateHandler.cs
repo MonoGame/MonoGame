@@ -27,7 +27,10 @@ namespace MonoGame.Framework.WindowsPhone
         {
             // DeviceResetting events
             _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            _game.GraphicsDevice.OnDeviceResetting();
+            if (_game.GraphicsDevice != null)
+                _game.GraphicsDevice.OnDeviceResetting();
+
+            Microsoft.Xna.Framework.Input.Touch.TouchPanel.ReleaseAllTouches();
 
             _host = null;
         }

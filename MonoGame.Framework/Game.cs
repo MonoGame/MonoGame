@@ -220,6 +220,10 @@ namespace Microsoft.Xna.Framework
                     Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
+#if WINDOWS_PHONE
+                    TouchPanel.ResetState();
+#endif
+
 #if DIRECTX
                     BlendState.ResetStates();
                     DepthStencilState.ResetStates();
