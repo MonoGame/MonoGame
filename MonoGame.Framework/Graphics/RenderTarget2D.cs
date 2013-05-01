@@ -72,8 +72,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-        private RenderTargetView _renderTargetView;
-        private DepthStencilView _depthStencilView;
+        protected RenderTargetView _renderTargetView;
+        protected DepthStencilView _depthStencilView;
 #elif OPENGL
 		internal uint glDepthStencilBuffer;
 #elif PSM
@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<EventArgs> ContentLost;
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-			:base (graphicsDevice, width, height, mipMap, preferredFormat, true)
+			:base (graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget)
 		{
 			DepthStencilFormat = preferredDepthFormat;
 			MultiSampleCount = preferredMultiSampleCount;
@@ -172,6 +172,25 @@ namespace Microsoft.Xna.Framework.Graphics
 		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height)
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
+
+        /// <summary>
+        /// Allows child class to specify the surface type, eg: a swap chain.
+        /// </summary>        
+        protected RenderTarget2D(GraphicsDevice graphicsDevice,
+                        int width,
+                        int height,
+                        bool mipMap,
+                        SurfaceFormat format,
+                        DepthFormat depthFormat,
+                        int preferredMultiSampleCount,
+                        RenderTargetUsage usage,
+                        SurfaceType surfaceType)
+            : base(graphicsDevice, width, height, mipMap, format, surfaceType)
+        {
+            DepthStencilFormat = depthFormat;
+            MultiSampleCount = preferredMultiSampleCount;
+            RenderTargetUsage = usage;
+        }
 
 		protected override void Dispose(bool disposing)
 		{

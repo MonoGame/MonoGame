@@ -93,7 +93,10 @@
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />
     <Compile Include="Graphics\BoneWeightCollection.cs" />
-    <Compile Include="Graphics\DXTBitmapContent.cs" />
+    <Compile Include="Graphics\Dxt1BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt3BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt5BitmapContent.cs" />
+    <Compile Include="Graphics\DxtBitmapContent.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
@@ -111,7 +114,7 @@
     <Compile Include="Graphics\NodeContentCollection.cs" />
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
-    <Compile Include="Graphics\PVRTCBitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />

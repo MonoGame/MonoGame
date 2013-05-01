@@ -91,20 +91,12 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-#elif WINDOWS_PHONE
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
-            {
-#endif
 
-#if WINRT
-                var licenseInformation = CurrentApp.LicenseInformation;
-                licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
-                isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
-#endif
+            var licenseInformation = CurrentApp.LicenseInformation;
+            licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
-#if WINDOWS_PHONE
-            });
+            isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 #endif
         }
 
@@ -428,10 +420,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// we're in the trial mode.
 #if DEBUG
                 return simulateTrialMode;
+#elif WINDOWS_PHONE
+			    return MsXna_Guide.IsTrialMode;
 #else
                 return simulateTrialMode || isTrialMode;
 #endif
-            }
+			}
 		}
 
 		public static bool IsVisible 

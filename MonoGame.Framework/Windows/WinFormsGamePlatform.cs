@@ -67,10 +67,13 @@ non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Input;
+using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 
 
 namespace MonoGame.Framework
@@ -80,11 +83,19 @@ namespace MonoGame.Framework
         internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
+        private List<XnaKeys> _keyState;
 
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
+            _keyState = new List<XnaKeys>();
+            Keyboard.SetKeys(_keyState);
+
             _window = new WinFormsGameWindow(this);
+            _window.KeyState = _keyState;
+
+            Mouse.SetWindows(_window._form);
+
             Window = _window;
         }
 
@@ -100,7 +111,7 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            _window.Initialize();
+            _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
 
             base.BeforeInitialize();
         }
