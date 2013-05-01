@@ -107,6 +107,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
+        protected enum SurfaceType
+        {
+            Texture,
+            RenderTarget,
+            SwapChainRenderTarget,
+        }
+
 		protected int width;
 		protected int height;
 
@@ -127,12 +134,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture)
+        {
+        }
+
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, false)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture)
         {
         }
 		
-		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget)
+		protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -143,8 +155,11 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
-#if DIRECTX
+            // Texture will be assigned by the swap chain.
+		    if (type == SurfaceType.SwapChainRenderTarget)
+		        return;
 
+#if DIRECTX
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -159,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            if (renderTarget)
+            if (type == SurfaceType.RenderTarget)
             {
                 desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
                 if (mipmap)
@@ -251,12 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = SurfaceFormat.Color; //FIXME HACK
             this.levelCount = 1;
         }
-#endif
-				
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false)
-		{			
-		}
+#endif			
 
         public int Width
         {
