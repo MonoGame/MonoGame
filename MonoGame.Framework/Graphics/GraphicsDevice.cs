@@ -974,7 +974,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
-                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
+                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
                     IsWindowed = true,
                 };
 

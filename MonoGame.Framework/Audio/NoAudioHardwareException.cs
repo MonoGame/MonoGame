@@ -52,6 +52,15 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed class NoAudioHardwareException : ExternalException
 #endif
     {
+        public NoAudioHardwareException(string msg)
+            : base(msg)
+        {
+        }
+
+        public NoAudioHardwareException(string msg, Exception innerException)
+            : base(msg, innerException)
+        {
+        }
     }
 }
 
