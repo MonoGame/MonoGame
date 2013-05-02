@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Input
 #endif
         }
 
-        #endregion // Public interface
+        #endregion Public methods
     
         private static void UpdateStatePosition(int x, int y)
         {
