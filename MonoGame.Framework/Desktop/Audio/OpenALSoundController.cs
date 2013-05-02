@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Audio
         private List<OALSoundBuffer> playingSourcesCollection;
         private List<OALSoundBuffer> purgeMe;
         private bool _bSoundAvailable = false;
+        private Exception _SoundInitException; // Here to bubble back up to the developer
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -69,7 +70,15 @@ namespace Microsoft.Xna.Framework.Audio
 #if MONOMAC || IOS
 			alcMacOSXMixerOutputRate(PREFERRED_MIX_RATE);
 #endif
-            _device = Alc.OpenDevice(string.Empty);
+            try
+            {
+                _device = Alc.OpenDevice(string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _SoundInitException = ex;
+                return (false);
+            }
             if (CheckALError("Could not open AL device"))
             {
                 return(false);
@@ -148,7 +157,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Dispose ()
 		{
-			CleanUpOpenAL ();
+            if(_bSoundAvailable)
+    			CleanUpOpenAL ();
 		}
 
         /// <summary>
@@ -160,11 +170,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// <returns>True if the buffer can be played, and false if not.</returns>
 		public bool ReserveSource (OALSoundBuffer soundBuffer)
 		{
-            if (!_bSoundAvailable)
+            if (!CheckInitState())
             {
-                return (false);
+                return(false);
             }
-			int sourceNumber;
+            int sourceNumber;
 			if (availableSourcesCollection.Count == 0) {
 
 				soundBuffer.SourceId = 0;
@@ -184,18 +194,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void RecycleSource (OALSoundBuffer soundBuffer)
 		{
-            if (!_bSoundAvailable)
+            if (!CheckInitState())
             {
                 return;
             }
-			inUseSourcesCollection.Remove (soundBuffer);
+            inUseSourcesCollection.Remove(soundBuffer);
 			availableSourcesCollection.Add (soundBuffer.SourceId);
 			soundBuffer.RecycleSoundBuffer();
 		}
 
 		public void PlaySound (OALSoundBuffer soundBuffer)
         {
-            if (!_bSoundAvailable)
+            if (!CheckInitState())
             {
                 return;
             }
@@ -208,7 +218,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void StopSound (OALSoundBuffer soundBuffer)
         {
-            if (!_bSoundAvailable)
+            if (!CheckInitState())
             {
                 return;
             }
@@ -223,17 +233,29 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void PauseSound (OALSoundBuffer soundBuffer)
 		{
-			AL.SourcePause (soundBuffer.SourceId);
+            if (!CheckInitState())
+            {
+                return;
+            }
+            AL.SourcePause(soundBuffer.SourceId);
 		}
 
         public void ResumeSound(OALSoundBuffer soundBuffer)
         {
+            if (!CheckInitState())
+            {
+                return;
+            }
             AL.SourcePlay(soundBuffer.SourceId);
         }
 
 		public bool IsState (OALSoundBuffer soundBuffer, int state)
 		{
-			int sourceState;
+            if (!CheckInitState())
+            {
+                return (false);
+            }
+            int sourceState;
 
 			AL.GetSource (soundBuffer.SourceId, ALGetSourcei.SourceState, out sourceState);
 
@@ -244,9 +266,34 @@ namespace Microsoft.Xna.Framework.Audio
 			return false;
 		}
 
-		public double SourceCurrentPosition (int sourceId)
+        /// <summary>
+        /// Checks if the AL controller was initialized properly. If there was an
+        /// exception thrown during the OpenAL init, then that exception is thrown
+        /// inside of NoAudioHardwareException.
+        /// </summary>
+        /// <returns>True if the controller was initialized, false if not.</returns>
+        private bool CheckInitState()
+        {
+            if (!_bSoundAvailable)
+            {
+                if (_SoundInitException != null)
+                {
+                    Exception e = _SoundInitException;
+                    _SoundInitException = null;
+                    throw (new NoAudioHardwareException("No audio hardware available.", e));
+                }
+                return (false);
+            }
+            return (true);
+        }
+
+        public double SourceCurrentPosition (int sourceId)
 		{
-			int pos;
+            if (!CheckInitState())
+            {
+                return(0.0);
+            }
+            int pos;
 			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
 			return pos;
 		}
@@ -260,7 +307,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (!_bSoundAvailable)
             {
-                return;
+                //OK to ignore this here because the game can run without sound.
+                 return;
             }
             purgeMe.Clear();
 

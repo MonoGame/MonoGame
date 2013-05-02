@@ -43,6 +43,7 @@ using System;
 using System.Drawing;
 #else
 using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Imaging;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -106,6 +107,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
+        protected enum SurfaceType
+        {
+            Texture,
+            RenderTarget,
+            SwapChainRenderTarget,
+        }
+
 		protected int width;
 		protected int height;
 
@@ -126,12 +134,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture)
+        {
+        }
+
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, false)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture)
         {
         }
 		
-		internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget)
+		protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -142,8 +155,11 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
-#if DIRECTX
+            // Texture will be assigned by the swap chain.
+		    if (type == SurfaceType.SwapChainRenderTarget)
+		        return;
 
+#if DIRECTX
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -158,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            if (renderTarget)
+            if (type == SurfaceType.RenderTarget)
             {
                 desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
                 if (mipmap)
@@ -176,7 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PixelBufferOption option = PixelBufferOption.None;
             if (renderTarget)
 			    option = PixelBufferOption.Renderable;
-             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
+            _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;
@@ -250,12 +266,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = SurfaceFormat.Color; //FIXME HACK
             this.levelCount = 1;
         }
-#endif
-				
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false)
-		{			
-		}
+#endif			
 
         public int Width
         {
@@ -552,8 +563,61 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("GetData not implemented for type.");
             }
 #elif PSM
+            Rectangle r;
+            if (rect.HasValue)
+            {
+                r = rect.Value;
+            }
+            else
+            {
+                r = new Rectangle(0, 0, Width, Height);
+            }
+            
+            int rWidth = r.Width;
+            int rHeight = r.Height;
+            
+            var sz = 4;         
+            
+            // Loop through and extract the data but we need to load it 
+            var dataRowColOffset = 0;
+            
+            var pixelOffset = 0;
+            var result = new Color(0, 0, 0, 0);
+            
+            byte[] imageInfo = new byte[(rWidth * rHeight) * sz];
+            
+            ImageRect old_scissor = GraphicsDevice.Context.GetScissor();
+            ImageRect old_viewport = GraphicsDevice.Context.GetViewport();
+            FrameBuffer old_frame_buffer = GraphicsDevice.Context.GetFrameBuffer();
 
-            throw new NotImplementedException();
+            ColorBuffer color_buffer = new ColorBuffer(rWidth, rHeight, PixelFormat.Rgba);
+            FrameBuffer frame_buffer = new FrameBuffer();
+            frame_buffer.SetColorTarget(color_buffer);
+             
+            GraphicsDevice.Context.SetFrameBuffer(frame_buffer);
+
+            GraphicsDevice.Context.SetTexture(0, this._texture2D);
+            GraphicsDevice.Context.ReadPixels(imageInfo, PixelFormat.Rgba, 0, 0, rWidth, rHeight);
+
+            GraphicsDevice.Context.SetFrameBuffer(old_frame_buffer);
+            GraphicsDevice.Context.SetScissor(old_scissor);
+            GraphicsDevice.Context.SetViewport(old_viewport);
+            
+            for (int y = r.Top; y < rHeight; y++)
+            {
+                for (int x = r.Left; x < rWidth; x++)
+                {
+                    dataRowColOffset = ((y * r.Width) + x);
+                    
+                    pixelOffset = dataRowColOffset * sz;
+                    result.R = imageInfo[pixelOffset];
+                    result.G = imageInfo[pixelOffset + 1];
+                    result.B = imageInfo[pixelOffset + 2];
+                    result.A = imageInfo[pixelOffset + 3];
+                    
+                    data[dataRowColOffset] = (T)(object)result;
+                }
+            }
 
 #elif DIRECTX
 

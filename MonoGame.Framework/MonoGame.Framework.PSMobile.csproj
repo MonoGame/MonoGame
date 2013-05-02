@@ -223,6 +223,9 @@
     <Compile Include="Net\LocalNetworkGamer.cs" />
     <Compile Include="GamerServices\GamerCollection.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
@@ -382,6 +385,7 @@
     <Compile Include="GamerServices\LeaderboardReader.cs" />
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="GameUpdateRequiredException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />
