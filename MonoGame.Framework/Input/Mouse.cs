@@ -61,10 +61,10 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static class Mouse
     {
-		internal static MouseState State;
+	internal static MouseState State;
 
 #if (WINDOWS && OPENGL) || LINUX
-		private static OpenTK.Input.MouseDevice _mouse = null;			
+	private static OpenTK.Input.MouseDevice _mouse = null;			
 #endif
 
 #if (WINDOWS && OPENGL)
@@ -91,17 +91,17 @@ namespace Microsoft.Xna.Framework.Input
         static OpenTK.GameWindow Window;
 
         internal static void setWindows(OpenTK.GameWindow window)
-		{
+	{
             Window = window;
             
-			_mouse = window.Mouse;
-			_mouse.Move += HandleWindowMouseMove;
-		}
+	    _mouse = window.Mouse;
+	    _mouse.Move += HandleWindowMouseMove;
+	}
 
         internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-		{          
-			UpdateStatePosition(e.X, e.Y);
-		}
+	{          
+	    UpdateStatePosition(e.X, e.Y);
+	}
 
 #elif MONOMAC
         internal static GameWindow Window;
@@ -109,12 +109,34 @@ namespace Microsoft.Xna.Framework.Input
 #endif
 
         /// <summary>
-        /// Gets an empty window handle. Purely for Xna compatibility.
+        /// Gets or sets the window handle for current mouse processing.
         /// </summary>
-        /// <returns>A zero window handle</returns>
-        public static IntPtr WindowHandle { get { return IntPtr.Zero; } }
+        /// <returns>The window handle for current mouse processing.</returns>
+        public static IntPtr WindowHandle 
+        { 
+            get
+            { 
+#if (WINDOWS && OPENGL) 
+                return IntPtr.Zero; // Suggest modify OpenTK.GameWindow to retrive handle.
+#elif WINRT
+                return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
+#elif(WINDOWS && DIRECTX)
+                return Window.Handle; 
+#elif LINUX
+                return IntPtr.Zero; // Suggest modify OpenTK.GameWindow to retrive handle.
+#elif MONOMAC
+                return IntPtr.Zero;
+#else
+                return IntPtr.Zero;
+#endif
+            }
+            set
+            {
+                // only for XNA compatibility, yet
+            }
+        }
 
-        #region Public interface
+        #region Public methods
 
         /// <summary>
         /// Gets mouse state information that includes position and button presses.
@@ -127,9 +149,9 @@ namespace Microsoft.Xna.Framework.Input
             State.ScrollWheelValue = (int)ScrollWheelValue;
 #elif (WINDOWS && OPENGL) || LINUX
 
-			// maybe someone is tring to get mouse before initialize
-			if (_mouse == null)
-                return State;
+	    // maybe someone is tring to get mouse before initialize
+	    if (_mouse == null)
+            return State;
 
 #if (WINDOWS && OPENGL)
             var p = new POINT();
@@ -143,9 +165,9 @@ namespace Microsoft.Xna.Framework.Input
 			State.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
 			State.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
 
-			// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
-			// We need to counteract it to get the same value XNA provides
-			State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+		// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
+		// We need to counteract it to get the same value XNA provides
+	    State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 #endif
 
             return State;
@@ -207,13 +229,14 @@ namespace Microsoft.Xna.Framework.Input
 
         [DllImportAttribute("user32.dll", EntryPoint = "SetCursorPos")]
         [return: MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static extern bool SetCursorPos(int X, int Y);
+        internal static extern bool SetCursorPos(int X, int Y);
 
         /// <summary>
-        /// Struct representing a point.
+        /// Struct representing a point. 
+        /// (Suggestion : Make another class for mouse extensions)
         /// </summary>
         [StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-        public struct POINT
+        internal struct POINT
         {
             public int X;
             public int Y;
@@ -227,10 +250,11 @@ namespace Microsoft.Xna.Framework.Input
 
         /// <summary>
         /// Retrieves the cursor's position, in screen coordinates.
+        /// (Suggestion : Make another class for mouse extensions)
         /// </summary>
         /// <see>See MSDN documentation for further information.</see>
-        [DllImport("user32.dll")]
-        public static extern bool GetCursorPos(out POINT lpPoint);
+        [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
+        internal static extern bool GetCursorPos(out POINT lpPoint);
       
 #elif MONOMAC
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
