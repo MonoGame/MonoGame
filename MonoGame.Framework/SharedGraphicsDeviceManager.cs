@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework
         {
             var createDevice = GraphicsDevice == null;
 
-            var presentationParameters = new PresentationParameters();
+            var presentationParameters = createDevice ? new PresentationParameters() : GraphicsDevice.PresentationParameters;
             presentationParameters.BackBufferWidth = PreferredBackBufferWidth;
             presentationParameters.BackBufferHeight = PreferredBackBufferHeight;
             presentationParameters.BackBufferFormat = PreferredBackBufferFormat;
