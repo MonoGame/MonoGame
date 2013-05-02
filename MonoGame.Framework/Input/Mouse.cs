@@ -110,8 +110,7 @@ namespace Microsoft.Xna.Framework.Input
 
         /// <summary>
         /// Gets or sets the window handle for current mouse processing.
-        /// </summary>
-        /// <returns>The window handle for current mouse processing.</returns>
+        /// </summary> 
         public static IntPtr WindowHandle 
         { 
             get
