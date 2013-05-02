@@ -49,9 +49,9 @@ namespace Microsoft.Xna.Framework
                 var disporientation = DisplayOrientation.Unknown;
                 switch (ort)
                 {
-                    case 90: disporientation = DisplayOrientation.LandscapeRight;
+                    case 90: disporientation = AndroidCompatibility.FlipLandscape ? DisplayOrientation.LandscapeLeft : DisplayOrientation.LandscapeRight;
                         break;
-                    case 270: disporientation = DisplayOrientation.LandscapeLeft;
+					case 270: disporientation = AndroidCompatibility.FlipLandscape ? DisplayOrientation.LandscapeRight : DisplayOrientation.LandscapeLeft;
                         break;
                     case 0: disporientation = DisplayOrientation.Portrait;
                         break;

@@ -280,6 +280,9 @@
     <Compile Include="GamerServices\GamerCollection.cs" />
     <Compile Include="MacOS\GamerServices\Guide.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
@@ -443,6 +446,12 @@
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

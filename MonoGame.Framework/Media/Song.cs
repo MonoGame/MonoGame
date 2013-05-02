@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Media
             _sound = new PSSuiteSong(_name);
 #elif WINDOWS_MEDIA_SESSION 
             GetTopology();      
-#elif !WINDOWS_MEDIA_ENGINE
+#elif !WINDOWS_MEDIA_ENGINE && !WINDOWS_PHONE
             _sound = new SoundEffect(_name).CreateInstance();
 #endif
         }
@@ -276,7 +276,12 @@ namespace Microsoft.Xna.Framework.Media
 		{	
 			if ( _sound == null )
 				return;
-			
+
+#if IOS
+            // AVAudioPlayer sound.Stop() does not reset the playback position as XNA does.
+            // Set Play's currentTime to 0 to ensure playback at the start.
+            _sound.CurrentTime = 0.0;
+#endif
 			_sound.Play();
 
             _playCount++;

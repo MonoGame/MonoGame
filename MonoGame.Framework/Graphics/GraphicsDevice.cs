@@ -209,6 +209,16 @@ namespace Microsoft.Xna.Framework.Graphics
         internal GraphicsContext _graphics;
         internal List<PssVertexBuffer> _availableVertexBuffers = new List<PssVertexBuffer>();
         internal List<PssVertexBuffer> _usedVertexBuffers = new List<PssVertexBuffer>();
+        internal GraphicsContext Context {
+            get
+            {
+                return _graphics;
+            }
+            set
+            {
+                _graphics = value;
+            }
+        }
 #endif
 
 #if GLES
@@ -313,7 +323,23 @@ namespace Microsoft.Xna.Framework.Graphics
 				return IsDisposed;
 			}
 		}
-
+	
+	/// <summary>
+        /// Returns a handle to internal device object. Valid only on DirectX platforms.
+        /// For usage, convert this to SharpDX.Direct3D11.Device.
+        /// </summary>
+        public object Handle
+        {
+            get
+            {
+#if DIRECTX
+                return _d3dDevice;
+#else
+                return null;
+#endif
+            }
+        }
+	
         internal bool IsRenderTargetBound
         {
             get
@@ -962,7 +988,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
-                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
+                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
                     IsWindowed = true,
                 };
 
@@ -1522,17 +1548,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
-#if PSM
-                _graphics.SetFrameBuffer(null);
-#else
                 SetRenderTargets(null);
-#endif
 			else
-#if PSM
-                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
-#else
 				SetRenderTargets(new RenderTargetBinding(renderTarget));
-#endif
 		}
 		
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
@@ -1542,14 +1560,26 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 SetRenderTargets(new RenderTargetBinding(renderTarget, cubeMapFace));
         }
-		
+
+#if DIRECTX
+
+        public void SetRenderTarget(RenderTarget3D renderTarget, int arraySlice)
+        {
+            if (renderTarget == null)
+                SetRenderTarget(null);
+            else
+                SetRenderTargets(new RenderTargetBinding(renderTarget, arraySlice));
+        }
+
+#endif
+
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{
             // If the default swap chain is already set then do nothing.
             if (_currentRenderTargetBindings == null && renderTargets == null)
                 return;
 
-#if OPENGL
+#if GLES
             
             // if there are render target bindings and we are asked to initialize the bindings
             // we need to delete the Render Buffers if there were any attached.  If not then
@@ -1584,7 +1614,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
                 {
                     if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
-                        _currentRenderTargetBindings[i].CubeMapFace != renderTargets[i].CubeMapFace)
+                        _currentRenderTargetBindings[i].ArraySlice != renderTargets[i].ArraySlice)
                     {
                         isEqual = false;
                         break;
@@ -1621,6 +1651,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
                 GraphicsExtensions.CheckGLError();
+#elif PSM
+                _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
 
                 clearTarget = true;
@@ -1645,11 +1677,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var binding = _currentRenderTargetBindings[b];
                     var target = (IRenderTarget)binding.RenderTarget;
-                    var arraySlice = (int)binding.CubeMapFace;
-                    _currentRenderTargets[b] = target.GetRenderTargetView(arraySlice);
+                    _currentRenderTargets[b] = target.GetRenderTargetView(binding.ArraySlice);
                 }
 
-                    // Use the depth from the first target.
+                // Use the depth from the first target.
                 _currentDepthStencilView = renderTarget.GetDepthStencilView();
 
                 // Set the targets.
@@ -1717,16 +1748,16 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 					throw new InvalidOperationException(message);
 				}
-                                
+#elif PSM
+                var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;
+                _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
-    
-#if !PSM                
+
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
-#endif
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
@@ -2102,7 +2133,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl) 
-            where T : struct, IVertexType
+            where T : struct
         {
             DynamicVertexBuffer buffer;
 
@@ -2238,7 +2269,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserPrimitives(primitiveType, vertexData, vertexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        public void DrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {            
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
 
@@ -2322,7 +2353,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
             Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");

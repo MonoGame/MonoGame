@@ -110,6 +110,8 @@ namespace Microsoft.Xna.Framework.Content
                 var hNullableRectReader = new NullableReader<Rectangle>();
 				var hEffectMaterialReader = new EffectMaterialReader();
 				var hExternalReferenceReader = new ExternalReferenceReader();
+                var hSoundEffectReader = new SoundEffectReader();
+                var hSongReader = new SongReader();
             }
 #pragma warning restore 0219, 0649
 
@@ -158,7 +160,9 @@ namespace Microsoft.Xna.Framework.Content
                         }
                     }
                     else
-                        throw new ContentLoadException("Could not find matching content reader of type " + originalReaderTypeString + " (" + readerTypeString + ")");
+                        throw new ContentLoadException(
+                                "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " + 
+                                originalReaderTypeString + " (" + readerTypeString + ")");
                 }
 
 				// I think the next 4 bytes refer to the "Version" of the type reader,

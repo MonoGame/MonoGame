@@ -28,7 +28,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <BaseAddress>4194304</BaseAddress>
-    <DefineConstants>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -101,12 +101,17 @@
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
+    <Compile Include="Graphics\RenderTarget3D.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\SwapChainRenderTarget.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
@@ -254,6 +259,7 @@
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
@@ -373,6 +379,7 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Windows\WinFormsGameForm.cs" />
     <Compile Include="Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Windows\WinFormsGameWindow.cs" />
   </ItemGroup>

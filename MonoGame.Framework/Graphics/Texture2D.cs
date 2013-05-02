@@ -43,6 +43,7 @@ using System;
 using System.Drawing;
 #else
 using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Imaging;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
@@ -62,7 +63,6 @@ using MonoTouch.Foundation;
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #elif WINDOWS || LINUX
-using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
@@ -80,6 +80,9 @@ using ErrorCode = OpenTK.Graphics.ES20.All;
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #endif
 
+#if WINDOWS || LINUX || MONOMAC
+using System.Drawing.Imaging;
+#endif
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
@@ -104,6 +107,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
+        protected enum SurfaceType
+        {
+            Texture,
+            RenderTarget,
+            SwapChainRenderTarget,
+        }
+
 		protected int width;
 		protected int height;
 
@@ -124,12 +134,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, false, false)
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false)
         {
         }
 
-        internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, bool renderTarget, bool shared)
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false)
+        {
+        }
+
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
+            : this(graphicsDevice, width, height, mipmap, format, type, false)
+        {
+        }
+
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("Graphics Device Cannot Be Null");
@@ -140,8 +160,11 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = format;
             this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
-#if DIRECTX
+            // Texture will be assigned by the swap chain.
+		    if (type == SurfaceType.SwapChainRenderTarget)
+		        return;
 
+#if DIRECTX
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -156,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            if (renderTarget)
+            if (type == SurfaceType.RenderTarget)
             {
                 desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
                 if (mipmap)
@@ -177,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PixelBufferOption option = PixelBufferOption.None;
             if (renderTarget)
 			    option = PixelBufferOption.Renderable;
-             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
+            _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
 
             this.glTarget = TextureTarget.Texture2D;
@@ -251,12 +274,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.format = SurfaceFormat.Color; //FIXME HACK
             this.levelCount = 1;
         }
-#endif
-				
-		public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, false, false)
-		{			
-		}
+#endif			
 
         public int Width
         {
@@ -458,10 +476,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				{
 					final[i] = (uint)
 					(
-						colors[i].R << 24 |
-						colors[i].G << 16 |
-						colors[i].B << 8 |
-						colors[i].A
+						// use correct xna byte order (and remember to convert it yourself as needed)
+						colors[i].A << 24 |
+						colors[i].B << 16 |
+						colors[i].G << 8 |
+						colors[i].R
 					);
 				}
 			}
@@ -552,8 +571,61 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("GetData not implemented for type.");
             }
 #elif PSM
+            Rectangle r;
+            if (rect.HasValue)
+            {
+                r = rect.Value;
+            }
+            else
+            {
+                r = new Rectangle(0, 0, Width, Height);
+            }
+            
+            int rWidth = r.Width;
+            int rHeight = r.Height;
+            
+            var sz = 4;         
+            
+            // Loop through and extract the data but we need to load it 
+            var dataRowColOffset = 0;
+            
+            var pixelOffset = 0;
+            var result = new Color(0, 0, 0, 0);
+            
+            byte[] imageInfo = new byte[(rWidth * rHeight) * sz];
+            
+            ImageRect old_scissor = GraphicsDevice.Context.GetScissor();
+            ImageRect old_viewport = GraphicsDevice.Context.GetViewport();
+            FrameBuffer old_frame_buffer = GraphicsDevice.Context.GetFrameBuffer();
 
-            throw new NotImplementedException();
+            ColorBuffer color_buffer = new ColorBuffer(rWidth, rHeight, PixelFormat.Rgba);
+            FrameBuffer frame_buffer = new FrameBuffer();
+            frame_buffer.SetColorTarget(color_buffer);
+             
+            GraphicsDevice.Context.SetFrameBuffer(frame_buffer);
+
+            GraphicsDevice.Context.SetTexture(0, this._texture2D);
+            GraphicsDevice.Context.ReadPixels(imageInfo, PixelFormat.Rgba, 0, 0, rWidth, rHeight);
+
+            GraphicsDevice.Context.SetFrameBuffer(old_frame_buffer);
+            GraphicsDevice.Context.SetScissor(old_scissor);
+            GraphicsDevice.Context.SetViewport(old_viewport);
+            
+            for (int y = r.Top; y < rHeight; y++)
+            {
+                for (int x = r.Left; x < rWidth; x++)
+                {
+                    dataRowColOffset = ((y * r.Width) + x);
+                    
+                    pixelOffset = dataRowColOffset * sz;
+                    result.R = imageInfo[pixelOffset];
+                    result.G = imageInfo[pixelOffset + 1];
+                    result.B = imageInfo[pixelOffset + 2];
+                    result.A = imageInfo[pixelOffset + 3];
+                    
+                    data[dataRowColOffset] = (T)(object)result;
+                }
+            }
 
 #elif DIRECTX
 
@@ -803,7 +875,8 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             waitEvent.Wait();
-
+#elif MONOMAC
+			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
 #endif
@@ -813,12 +886,73 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
+#elif MONOMAC
+			SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
             throw new NotImplementedException();
 #endif
         }
+
+#if MONOMAC
+		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
+		{
+			if (stream == null)
+			{
+				throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
+			}
+			if (width <= 0)
+			{
+				throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
+			}
+			if (height <= 0)
+			{
+				throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
+			}
+			if (format == null)
+			{
+				throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
+			}
+			
+			byte[] data = null;
+			GCHandle? handle = null;
+			Bitmap bitmap = null;
+			try 
+			{
+				data = new byte[width * height * 4];
+				handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+				GetData(data);
+				
+				// internal structure is BGR while bitmap expects RGB
+				for(int i = 0; i < data.Length; i += 4)
+				{
+					byte temp = data[i + 0];
+					data[i + 0] = data[i + 2];
+					data[i + 2] = temp;
+				}
+				
+				bitmap = new Bitmap(width, height, width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, handle.Value.AddrOfPinnedObject());
+				
+				bitmap.Save(stream, format);
+			} 
+			finally 
+			{
+				if (bitmap != null)
+				{
+					bitmap.Dispose();
+				}
+				if (handle.HasValue)
+				{
+					handle.Value.Free();
+				}
+				if (data != null)
+				{
+					data = null;
+				}
+			}
+		}
+#endif
 
 #if WINDOWS_STOREAPP
 

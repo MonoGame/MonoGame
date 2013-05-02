@@ -5,11 +5,11 @@ namespace Microsoft.Xna.Framework
 
     static internal class SharpDXHelper
     {
-        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentationParameters present)
+        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentInterval presentInterval)
         {
             SharpDX.DXGI.SwapEffect effect;
 
-            switch (present.PresentationInterval)
+            switch (presentInterval)
             {
                 case PresentInterval.One:
                 case PresentInterval.Two:
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework
             }
 
             //if (present.RenderTargetUsage != RenderTargetUsage.PreserveContents && present.MultiSampleCount == 0)
-                //effect = SharpDX.DXGI.SwapEffect.Discard;
+            //effect = SharpDX.DXGI.SwapEffect.Discard;
 
             return effect;
         }

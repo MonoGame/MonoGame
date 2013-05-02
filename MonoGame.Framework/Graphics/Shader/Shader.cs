@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
 
-            var shaderLength = (int)reader.ReadUInt16();
+            var shaderLength = reader.ReadInt32();
             var shaderBytecode = reader.ReadBytes(shaderLength);
 
             var samplerCount = (int)reader.ReadByte();

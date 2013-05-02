@@ -78,6 +78,14 @@ namespace Microsoft.Xna.Framework {
 
 		public abstract Rectangle ClientBounds { get; }
 
+#if WINDOWS && DIRECTX
+        /// <summary>
+        /// The location of this window on the desktop, eg: global coordinate space
+        /// which stretches across all screens.
+        /// </summary>
+        public abstract Point Position { get; set; }
+#endif
+
 		public abstract DisplayOrientation CurrentOrientation { get; }
 
 		public abstract IntPtr Handle { get; }
@@ -121,6 +129,21 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
+#if WINDOWS || LINUX
+
+		/// <summary>
+		/// Use this event to retrieve text for objects like textbox's.
+		/// This event is not raised by noncharacter keys.
+		/// This event also supports key repeat.
+		/// For more information this event is based off:
+		/// http://msdn.microsoft.com/en-AU/library/system.windows.forms.control.keypress.aspx
+		/// </summary>
+		/// <remarks>
+		/// This event is only supported on the Windows DirectX, Windows OpenGL and Linux platforms.
+		/// </remarks>
+		public event EventHandler<TextInputEventArgs> TextInput;
+#endif
+
 		#endregion Events
 
 		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
@@ -163,7 +186,24 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
+#if WINDOWS || LINUX
+		protected void OnTextInput(object sender, TextInputEventArgs e)
+		{
+			if (TextInput != null)
+				TextInput(sender, e);
+		}
+#endif
+
 		protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 		protected abstract void SetTitle (string title);
-	}
+
+#if DIRECTX && WINDOWS
+        public static GameWindow Create(Game game, int width, int height)
+        {
+            var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);
+            window.Initialize(width, height);
+            return window;
+        }
+#endif
+    }
 }

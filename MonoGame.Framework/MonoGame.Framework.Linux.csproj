@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -132,6 +132,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Linux\Audio\Sound.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
@@ -353,6 +354,9 @@
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
+    <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+    <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+    <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
@@ -408,6 +412,12 @@
     <Compile Include="Content\ResourceContentManager.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
