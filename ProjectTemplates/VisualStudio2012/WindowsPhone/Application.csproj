@@ -122,6 +122,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>

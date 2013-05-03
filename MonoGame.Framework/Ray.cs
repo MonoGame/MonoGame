@@ -27,27 +27,19 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
-#if WINRT
+
         [DataMember]
-#endif
         public Vector3 Direction;
-#if WINRT
+      
         [DataMember]
-#endif
         public Vector3 Position;
 
         #endregion
