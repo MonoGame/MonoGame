@@ -47,21 +47,17 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-#if WINRT
+        
         [DataMember]
-#endif
         public float X;
-#if WINRT
+
         [DataMember]
-#endif
         public float Y;
-#if WINRT
+      
         [DataMember]
-#endif
         public float Z;
-#if WINRT
+      
         [DataMember]
-#endif
         public float W;
 
         #endregion Public Fields
