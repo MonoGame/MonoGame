@@ -26,21 +26,14 @@ SOFTWARE.
 #endregion License
 
 using System;
-
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif 
     public struct Color : IEquatable<Color>
     {
 	// ARGB
@@ -180,9 +173,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
         [DataMember]
-#endif
         public byte B
         {
             get
@@ -198,9 +189,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
         [DataMember]
-#endif
         public byte G
         {
             get
@@ -216,9 +205,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
         [DataMember]
-#endif
         public byte R
         {
             get
@@ -234,9 +221,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
         [DataMember]
-#endif
         public byte A
         {
             get

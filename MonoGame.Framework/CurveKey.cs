@@ -26,9 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+ [DataContract]
     public class CurveKey : IEquatable<CurveKey>, IComparable<CurveKey>
     {
         #region Private Fields
@@ -44,29 +46,34 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        [DataMember]
         public CurveContinuity Continuity
         {
             get { return this.continuity; }
             set { this.continuity = value; }
         }
 
+        [DataMember]
         public float Position
         {
             get { return this.position; }
         }
 
+        [DataMember]
         public float TangentIn
         {
             get { return this.tangentIn; }
             set { this.tangentIn = value; }
         }
 
+        [DataMember]
         public float TangentOut
         {
             get { return this.tangentOut; }
             set { this.tangentOut = value; }
         }
 
+        [DataMember]
         public float Value
         {
             get { return this.value; }
