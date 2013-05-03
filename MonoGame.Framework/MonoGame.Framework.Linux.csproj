@@ -43,6 +43,7 @@
     <Reference Include="OpenTK">
       <HintPath>..\ThirdParty\Libs\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -420,12 +421,6 @@
     <Compile Include="GamerServices\PropertyDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
-      <Name>Lidgren.Network.Linux</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
@@ -452,4 +447,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.Linux</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

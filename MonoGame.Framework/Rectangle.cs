@@ -28,10 +28,11 @@ SOFTWARE.
 using System;
 using System.Globalization;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-
+    [DataContract]
     public struct Rectangle : IEquatable<Rectangle>
     {
         #region Private Fields
@@ -43,9 +44,16 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        [DataMember]
         public int X;
+
+        [DataMember]
         public int Y;
+
+        [DataMember]
         public int Width;
+
+        [DataMember]
         public int Height;
 
         #endregion Public Fields

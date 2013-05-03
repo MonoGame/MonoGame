@@ -1,13 +1,20 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    [DataContract]
     public sealed class LeaderboardEntry
     {
 
-        public long Rating  {get; set;}
-        public PropertyDictionary Columns {get; internal set;}
-        public Gamer Gamer {get; internal set;}
+        [DataMember]
+        public long Rating { get; set; }
+
+        [DataMember]
+        public PropertyDictionary Columns { get; internal set; }
+
+        [DataMember]
+        public Gamer Gamer { get; internal set; }
 
         public LeaderboardEntry ()
         {
