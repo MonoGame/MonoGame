@@ -19,9 +19,11 @@
   </target>
 
    <target name="clean">
-     <delete>
+     <delete verbose="true">
        <fileset basedir="obj">
+         <include name="**\**\*" />
          <include name="**\*" />
+         <include name="*" />
        </fileset>
      </delete>
    </target>
