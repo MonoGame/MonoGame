@@ -1,3 +1,7 @@
+﻿#if WINDOWS_STOREAPP
+this is an error
+#endif
+
 #region License
 /*
 Microsoft Public License (Ms-PL)
