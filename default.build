@@ -19,12 +19,7 @@
   </target>
 
    <target name="clean">
-     <delete verbose="true">
-       <fileset basedir="${project::get-base-directory()}\obj">
-         <include name="**\**\*" />
-         <include name="**\*" />
-         <include name="*" />
-       </fileset>
+     <delete dir="${project::get-base-directory()}\obj" verbose="true">
      </delete>
    </target>
 
@@ -121,7 +116,7 @@
 	  <target name="buildwindows8" description="Build Windows 8" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />			
-			<exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Build /p:Configuration=Release" />			
+			<exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Rebuild /p:Configuration=Release" />			
 		</if>
 		</target>
   
