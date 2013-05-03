@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 XnaTouch - Copyright © 2009 The XnaTouch Team
@@ -58,9 +58,9 @@ namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
-        internal Form _form;
+        internal WinFormsGameForm _form;
 
-        private WinFormsGamePlatform _platform;
+        private readonly WinFormsGamePlatform _platform;
 
         private bool _isResizable;
 
@@ -144,7 +144,14 @@ namespace MonoGame.Framework
 
         #region Non-Public Properties
 
-        internal List<XnaKey> KeyState { get; set; }
+        internal List<XnaKey> KeyState
+        {
+            get { return _form.KeyState; } 
+            set
+            {
+                _form.KeyState = value;
+            }
+        }
 
         #endregion
 
@@ -164,13 +171,11 @@ namespace MonoGame.Framework
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
             _form.StartPosition = FormStartPosition.CenterScreen;           
 
-            // Capture mouse and keyboard events.
+            // Capture mouse events.
             _form.MouseDown += OnMouseState;
             _form.MouseMove += OnMouseState;
             _form.MouseUp += OnMouseState;
             _form.MouseWheel += OnMouseState;
-            _form.KeyDown += OnKeyDown;
-            _form.KeyUp += OnKeyUp;
             _form.MouseEnter += OnMouseEnter;
             _form.MouseLeave += OnMouseLeave;            
 
@@ -190,8 +195,8 @@ namespace MonoGame.Framework
         {
             _platform.IsActive = false;
 
-            if (KeyState != null)
-                KeyState.Clear();
+            if (_form.KeyState != null)
+                _form.KeyState.Clear();
         }
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
@@ -216,23 +221,7 @@ namespace MonoGame.Framework
 
             if (touchState.HasValue)
                 TouchPanel.AddEvent(0, touchState.Value, new Vector2(Mouse.State.X, Mouse.State.Y), true);
-        }
-
-        private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
-        {
-            var key = (XnaKey)keyEventArgs.KeyCode;
-
-            if (KeyState != null && !KeyState.Contains(key))
-                KeyState.Add(key);
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
-        {
-            var key = (XnaKey)keyEventArgs.KeyCode;
-
-            if (KeyState != null)
-                KeyState.Remove(key);
-        }
+        }        
 
         private void OnMouseEnter(object sender, EventArgs e)
         {
