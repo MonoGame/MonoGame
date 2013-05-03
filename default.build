@@ -44,7 +44,7 @@
 
   <target name="buildpsm" description="Build Play Station Mobile" depends="clean">
     <if test="${os == 'Win32NT'}">
-      <if test="${psmtooldir}\mdtool.exe">
+      <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')">
         <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
         <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
       </if>
