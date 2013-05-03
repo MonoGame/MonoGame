@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif PSM
             PixelBufferOption option = PixelBufferOption.None;
-            if (renderTarget)
+            if (type == SurfaceType.RenderTarget)
 			    option = PixelBufferOption.Renderable;
             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #else
