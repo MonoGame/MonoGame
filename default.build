@@ -20,7 +20,7 @@
 
    <target name="clean">
      <delete verbose="true">
-       <fileset basedir="obj">
+       <fileset basedir="${project::get-base-directory()}\obj">
          <include name="**\**\*" />
          <include name="**\*" />
          <include name="*" />
