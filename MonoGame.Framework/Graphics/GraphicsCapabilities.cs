@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			SupportsPackedDepthStencil = device._extensions.Contains("GL_OES_packed_depth_stencil");
 			SupportsDepthNonLinear = device._extensions.Contains("GL_NV_depth_nonlinear");
 #else
-			SupportsTextureFilterAnisotric = true;
+			SupportsTextureFilterAnisotropic = true;
 			SupportsDepth24 = true;
 			SupportsPackedDepthStencil = true;
 			SupportsDepthNonLinear = false;
