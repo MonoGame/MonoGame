@@ -19,7 +19,11 @@
   </target>
 
    <target name="clean">
-      <delete dir="obj"/>
+     <delete>
+       <fileset basedir="obj">
+         <include name="**\*" />
+       </fileset>
+     </delete>
    </target>
 
 	<target name="build" description="Build MonoGame Release" depends="checkos">
