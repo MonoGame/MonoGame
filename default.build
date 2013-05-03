@@ -19,7 +19,7 @@
   </target>
 
    <target name="clean">
-     <delete dir="${project::get-base-directory()}\obj" verbose="true">
+     <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" verbose="true">
      </delete>
    </target>
 
