@@ -168,6 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 				case DepthFormat.Depth24: 
 				  	glDepthFormat = GLDepthComponent24;
+				break;
 				case DepthFormat.Depth24Stencil8:
 					glDepthFormat = GLDepthComponent24;
 					glStencilFormat = GLStencilIndex8; 
