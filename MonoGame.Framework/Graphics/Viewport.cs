@@ -44,11 +44,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-#if WINRT
     [DataContract]
-#else
-    [Serializable]
-#endif
     public struct Viewport
     {
 		/// <summary>
@@ -62,7 +58,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		private float maxDepth;
 		
 		#region Properties
-		public int Height {
+        [DataMember]
+        public int Height
+        {
 			get {
 				return this.height;
 			}
@@ -71,7 +69,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public float MaxDepth {
+        [DataMember]
+        public float MaxDepth
+        {
 			get {
 				return this.maxDepth;
 			}
@@ -80,7 +80,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public float MinDepth {
+        [DataMember]
+        public float MinDepth
+        {
 			get {
 				return this.minDepth;
 			}
@@ -89,7 +91,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public int Width {
+        [DataMember]
+        public int Width
+        {
 			get {
 				return this.width;
 			}
@@ -98,7 +102,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public int Y {
+        [DataMember]
+        public int Y
+        {
 			get {
 				return this.y;
 
@@ -107,7 +113,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				y = value;
 			}
 		}
-		public int X 
+
+        [DataMember]
+        public int X 
 		{
 			get{ return x;}
 			set{ x = value;}
