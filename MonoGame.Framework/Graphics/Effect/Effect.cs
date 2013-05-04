@@ -192,8 +192,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (!_isClone)
                     {
                         // Only the clone source can dispose the shaders.
-                        foreach (var shader in _shaders)
-                            shader.Dispose();
+                        if (_shaders != null)
+                        {
+                            foreach (var shader in _shaders)
+                                shader.Dispose();
+                        }
                     }
 
                     if (ConstantBuffers != null)
@@ -490,40 +493,41 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
-			Parameters = new EffectParameterCollection();
+            
+            EffectParameter[] parametersArray = new EffectParameter[shaderProgram.UniformCount+4];
 			for (int i = 0; i < shaderProgram.UniformCount; i++)
 			{	
-			    Parameters.Add(EffectParameterForUniform(shaderProgram, i));
+                parametersArray[i]= EffectParameterForUniform(shaderProgram, i);
 			}
 			
 			#warning Hacks for BasicEffect as we don't have these parameters yet
-            Parameters.Add (new EffectParameter(
+            parametersArray[shaderProgram.UniformCount] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
-            Parameters.Add (new EffectParameter(
+                3, 1, "float3",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
+            parametersArray[shaderProgram.UniformCount+1] = new EffectParameter(
                 EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
-            Parameters.Add (new EffectParameter(
+                1, 1, "float",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, 0.0f);
+            parametersArray[shaderProgram.UniformCount+2] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
-            Parameters.Add (new EffectParameter(
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+            parametersArray[shaderProgram.UniformCount+3] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+
+            Parameters = new EffectParameterCollection(parametersArray);
+                       
+            EffectPass []effectsPassArray = new EffectPass[1];
+            effectsPassArray[0] = effectPass;
+            var effectPassCollection = new EffectPassCollection(effectsPassArray);            
             
-            Techniques = new EffectTechniqueCollection();
-            var effectPassCollection = new EffectPassCollection();
-            effectPassCollection.Add(effectPass);
-            Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
-       
-            ConstantBuffers = new ConstantBuffer[0];
+            EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
+            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
+            Techniques = new EffectTechniqueCollection(effectTechniqueArray);
             
+            ConstantBuffers = new ConstantBuffer[0];            
             CurrentTechnique = Techniques[0];
         }
         
@@ -543,18 +547,15 @@ namespace Microsoft.Xna.Framework.Graphics
             case ShaderUniformType.Float4x4:
                 return new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
+                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
             case ShaderUniformType.Float4:
                 return new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
             case ShaderUniformType.Sampler2D:
                 return new EffectParameter(
                     EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), null);
+                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }

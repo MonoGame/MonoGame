@@ -52,8 +52,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class SpriteBatcher
 	{
 #warning Magic numbers? How i set this on my game?        
-		private const int InitialBatchSize = 10000;
-		private const int InitialVertexArraySize = 10000;
+		private const int InitialBatchSize = 2000;
+		private const int InitialVertexArraySize = 2000;
         
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
