@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #region License
 /*
 Microsoft Public License (Ms-PL)
@@ -194,6 +195,202 @@ namespace Microsoft.Xna.Framework.Graphics
             PixelBufferOption option = PixelBufferOption.None;
             if (renderTarget)
 			    option = PixelBufferOption.Renderable;
+=======
+#region License
+/*
+Microsoft Public License (Ms-PL)
+MonoGame - Copyright © 2009 The MonoGame Team
+
+All rights reserved.
+
+This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
+accept the license, do not use the software.
+
+1. Definitions
+The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
+U.S. copyright law.
+
+A "contribution" is the original software, or any additions or changes to the software.
+A "contributor" is any person that distributes its contribution under this license.
+"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+
+2. Grant of Rights
+(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
+each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+3. Conditions and Limitations
+(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
+your patent license from such contributor to the software ends automatically.
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
+notices that are present in the software.
+(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
+a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
+code form, you may only do so under a license that complies with this license.
+(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
+or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
+permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement.
+*/
+#endregion License
+
+using System;
+#if !PSM
+using System.Drawing;
+#else
+using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Imaging;
+#endif
+using System.IO;
+using System.Runtime.InteropServices;
+
+#if MONOMAC
+using MonoMac.AppKit;
+using MonoMac.CoreGraphics;
+using MonoMac.Foundation;
+#elif IOS
+using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+using MonoTouch.Foundation;
+#endif
+
+#if OPENGL
+#if MONOMAC
+using MonoMac.OpenGL;
+using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
+#elif WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+#elif GLES
+using OpenTK.Graphics.ES20;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
+using TextureParameterName = OpenTK.Graphics.ES20.All;
+using TextureMinFilter = OpenTK.Graphics.ES20.All;
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
+using PixelStoreParameter = OpenTK.Graphics.ES20.All;
+using ErrorCode = OpenTK.Graphics.ES20.All;
+#endif
+#elif PSM
+using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
+#endif
+
+#if WINDOWS || LINUX || MONOMAC
+using System.Drawing.Imaging;
+#endif
+using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
+
+#if WINRT
+#if WINDOWS_PHONE
+using System.Threading;
+using System.Windows;
+using System.Windows.Media.Imaging;
+#else
+using Windows.Graphics.Imaging;
+using Windows.UI.Xaml.Media.Imaging;
+#endif
+using Windows.Storage.Streams;
+using System.Threading.Tasks;
+#endif
+
+#if ANDROID
+using Android.Graphics;
+#endif
+
+namespace Microsoft.Xna.Framework.Graphics
+{
+    public class Texture2D : Texture
+    {
+        protected enum SurfaceType
+        {
+            Texture,
+            RenderTarget,
+            SwapChainRenderTarget,
+        }
+
+		protected int width;
+		protected int height;
+
+#if PSM
+		internal PssTexture2D _texture2D;
+
+#elif OPENGL
+		PixelInternalFormat glInternalFormat;
+		GLPixelFormat glFormat;
+		PixelType glType;
+#endif
+	
+        public Rectangle Bounds
+        {
+            get
+            {
+				return new Rectangle(0, 0, this.width, this.height);
+            }
+        }
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture)
+        {
+        }
+
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture)
+        {
+        }
+		
+		protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
+		{
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+
+            this.GraphicsDevice = graphicsDevice;
+            this.width = width;
+            this.height = height;
+            this.format = format;
+            this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+
+            // Texture will be assigned by the swap chain.
+		    if (type == SurfaceType.SwapChainRenderTarget)
+		        return;
+
+#if DIRECTX
+            // TODO: Move this to SetData() if we want to make Immutable textures!
+            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = levelCount;
+            desc.ArraySize = 1;
+            desc.Format = SharpDXHelper.ToFormat(format);
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+            if (type == SurfaceType.RenderTarget)
+            {
+                desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
+                if (mipmap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
+
+            _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
+
+#elif PSM
+            PixelBufferOption option = PixelBufferOption.None;
+            if (type == SurfaceType.RenderTarget)
+			    option = PixelBufferOption.Renderable;
+>>>>>>> develop
             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
 #elif !PORTABLE
 
