@@ -126,18 +126,24 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_PHONE
             PhoneApplicationService.Current.Activated += (sender, e) =>
                 {
-                    if (_mediaElement.Source == null && source != null)
-                        Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+                    if (_mediaElement != null)
+                    {
+                        if (_mediaElement.Source == null && source != null)
+                            Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
 
-                    // Ensure only one subscription
-                    _mediaElement.MediaOpened -= MediaElement_MediaOpened;
-                    _mediaElement.MediaOpened += MediaElement_MediaOpened;
+                        // Ensure only one subscription
+                        _mediaElement.MediaOpened -= MediaElement_MediaOpened;
+                        _mediaElement.MediaOpened += MediaElement_MediaOpened;
+                    }
                 };
 
             PhoneApplicationService.Current.Deactivated += (sender, e) => 
                 {
-                    source = _mediaElement.Source;
-                    elapsedTime = _mediaElement.Position;
+                    if (_mediaElement != null)
+                    {
+                        source = _mediaElement.Source;
+                        elapsedTime = _mediaElement.Position;
+                    }
                 };
 #endif
         }
