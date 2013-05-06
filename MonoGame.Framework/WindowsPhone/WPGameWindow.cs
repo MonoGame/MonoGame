@@ -105,10 +105,10 @@ namespace MonoGame.Framework.WindowsPhone
             _orientation = ToOrientation(Page.Orientation);
             Page.OrientationChanged += Page_OrientationChanged;
 
-            PhoneApplicationService.Current.Activated += (sender, e) => Platform.IsActive = true;
-            PhoneApplicationService.Current.Launching += (sender, e) => Platform.IsActive = true;
-            PhoneApplicationService.Current.Deactivated += (sender, e) => Platform.IsActive = false;
-            PhoneApplicationService.Current.Closing += (sender, e) => Platform.IsActive = false;
+            PhoneApplicationService.Current.Activated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
+            PhoneApplicationService.Current.Launching += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
+            PhoneApplicationService.Current.Deactivated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = false; };
+            PhoneApplicationService.Current.Closing += (sender, e) => { if (Game.Instance != null) Platform.IsActive = false; };
 
             SetClientBounds(Width, Height);
         }
