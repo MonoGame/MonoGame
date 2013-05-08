@@ -19,7 +19,8 @@
   </target>
 
    <target name="clean">
-      <delete dir="obj"/>
+     <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" verbose="true">
+     </delete>
    </target>
 
 	<target name="build" description="Build MonoGame Release" depends="checkos">
@@ -115,7 +116,7 @@
 	  <target name="buildwindows8" description="Build Windows 8" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />			
-			<exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Build /p:Configuration=Release" />			
+			<exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Rebuild /p:Configuration=Release" />			
 		</if>
 		</target>
   

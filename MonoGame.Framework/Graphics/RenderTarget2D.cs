@@ -90,8 +90,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public event EventHandler<EventArgs> ContentLost;
 		
-		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-			:base (graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget)
+        public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
+			:base (graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget, shared)
 		{
 			DepthStencilFormat = preferredDepthFormat;
 			MultiSampleCount = preferredMultiSampleCount;
@@ -165,6 +165,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 		
+		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage, false)
+        {}
+
 		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
 			:this (graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
 		{}

@@ -31,11 +31,11 @@ namespace MonoGameContentProcessors.Processors
             // or even Process is tricky. This works for now, but should be replaced when the content pipeline
             // moves a bit further
 
-            var texWidth = texture.Faces[0][0].Width;
-            var texHeight = texture.Faces[0][0].Height;
+            var texWidth = ContentHelper.NextPOT(texture.Faces[0][0].Width);
+            var texHeight = ContentHelper.NextPOT(texture.Faces[0][0].Height);
 
             // Resize to square, power of two if necessary.
-            if (texWidth != texHeight)
+            if (texWidth != texHeight || texture.Faces[0][0].Width != texture.Faces[0][0].Height || texWidth != texture.Faces[0][0].Width || texHeight != texture.Faces[0][0].Height)
             {
                 texHeight = texWidth = Math.Max(texHeight, texWidth);
                 var resizedBitmap = (BitmapContent)Activator.CreateInstance(typeof(PixelBitmapContent<Color>), new object[] { texWidth, texHeight });
@@ -44,6 +44,8 @@ namespace MonoGameContentProcessors.Processors
 
                 texture.Faces[0].Clear();
                 texture.Faces[0].Add(resizedBitmap);
+                
+                context.Logger.LogImportantMessage(string.Format("Resized font texture {0} to {1}x{2}", input.Name, resizedBitmap.Width, resizedBitmap.Height));
             }
             else
                 texture.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
