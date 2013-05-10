@@ -516,7 +516,7 @@ namespace Microsoft.Xna.Framework.Audio
 #elif ANDROID
                 // Android SoundPool can't tell us when a sound is finished playing.
                 // TODO: Remove this code when OpenAL for Android is implemented
-                if (_sound != null && IsLooped)
+                if (_sound != null)
                 {
                     // Looping sounds use our stored state
                     return soundState;
