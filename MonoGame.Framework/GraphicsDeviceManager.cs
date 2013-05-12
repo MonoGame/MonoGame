@@ -115,8 +115,6 @@ namespace Microsoft.Xna.Framework
 
         public void CreateDevice()
         {
-            _graphicsDevice = new GraphicsDevice();
-
             Initialize();
 
             OnDeviceCreated(EventArgs.Empty);
@@ -305,17 +303,18 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            var presentationParameters = new PresentationParameters();
+            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
-
+            presentationParameters.IsFullScreen = false;
 #if WINDOWS_PHONE
 
 #elif WINRT
@@ -323,33 +322,33 @@ namespace Microsoft.Xna.Framework
 			// to created the default swapchain target.
             if (SwapChainPanel != null)
             {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+                presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+                presentationParameters.SwapChainPanel = SwapChainPanel;
             }
             else
             {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = null;
+                presentationParameters.DeviceWindowHandle = _game.Window.Handle;
+                presentationParameters.SwapChainPanel = null;
             }
 #else
-            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 #endif
 
-            _graphicsDevice.Initialize();
+            _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
 #else
 
 #if MONOMAC
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = false;
 #else
             // Set "full screen"  as default
-            _graphicsDevice.PresentationParameters.IsFullScreen = true;
+            presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
 
-            _graphicsDevice.Initialize();
+            _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
 
 #if !MONOMAC
             ApplyChanges();
