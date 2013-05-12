@@ -101,6 +101,11 @@ namespace Microsoft.Xna.Framework
                     // TODO: This needs to check the graphics device and 
                     // return the best hdr blendable format for the device.
                     return SharpDX.DXGI.Format.R16G16B16A16_Float;
+
+                case SurfaceFormat.Bgr32:
+                    return SharpDX.DXGI.Format.B8G8R8X8_UNorm;
+                case SurfaceFormat.Bgra32:
+                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
             }
         }
 
