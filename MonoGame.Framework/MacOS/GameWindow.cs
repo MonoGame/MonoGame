@@ -58,6 +58,10 @@ namespace Microsoft.Xna.Framework
 {
 	public class GameWindow : MonoMacGameView
 	{
+		// Amendment: Added events for integrating out key processing logic with monogame.
+		public event EventHandler<KeysEventArgs> TSKeyUp;
+		public event EventHandler<KeysEventArgs> TSKeyDown;
+	
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
 		private Game _game;
@@ -500,6 +504,12 @@ namespace Microsoft.Xna.Framework
 				_keys.Add (kk);
 
 			UpdateKeyboardState ();
+			
+			EventHandler<KeysEventArgs> handler = TSKeyDown;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
 
 		public override void KeyUp (NSEvent theEvent)
@@ -509,6 +519,12 @@ namespace Microsoft.Xna.Framework
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
+			
+			EventHandler<KeysEventArgs> handler = TSKeyUp;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
 
 		List<Keys> _flags = new List<Keys> ();
@@ -669,6 +685,16 @@ namespace Microsoft.Xna.Framework
 
 		internal void SetSupportedOrientations(DisplayOrientation orientations)
 		{
+		}
+		
+		// Amendment to the GameWindow code to allow us to use our existing key processing logic.
+		public class KeysEventArgs : EventArgs
+		{
+			public Keys Keys { get; private set; }
+			public KeysEventArgs(Keys keys)
+			{
+				this.Keys = keys;
+			}
 		}
 	}
 }
