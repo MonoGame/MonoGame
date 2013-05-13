@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content
     				readerTypeString = PrepareType(readerTypeString, assemblyName);
 
     				var l_readerType = Type.GetType(readerTypeString);
-
+#if !PORTABLE
                     if (l_readerType == null)
                     {
                         //try referencing source project for type
@@ -152,6 +152,7 @@ namespace Microsoft.Xna.Framework.Content
                         readerTypeString = PrepareType(readerTypeString, entryAssemblyName);
                         l_readerType = Type.GetType(readerTypeString);
                     }
+#endif
 
 
                     if (l_readerType != null)
