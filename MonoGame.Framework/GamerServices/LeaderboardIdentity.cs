@@ -1,11 +1,16 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    [DataContract]
     public struct LeaderboardIdentity
     {
-        public int GameMode {get; set;}
-        public LeaderboardKey Key {get; set;}
+        [DataMember]
+        public int GameMode { get; set; }
+
+        [DataMember]
+        public LeaderboardKey Key { get; set; }
 
         public static LeaderboardIdentity Create(LeaderboardKey aKey)
         {
