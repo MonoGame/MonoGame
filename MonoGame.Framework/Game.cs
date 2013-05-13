@@ -356,10 +356,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Exiting;
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
 
 #if WINRT
+        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 

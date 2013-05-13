@@ -55,6 +55,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
+    [CLSCompliant(false)]
     public partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
@@ -329,6 +330,7 @@ namespace Microsoft.Xna.Framework
         #endregion
     }
 
+    [CLSCompliant(false)]
     public class ViewStateChangedEventArgs : EventArgs
     {
         public readonly ApplicationViewState ViewState;
