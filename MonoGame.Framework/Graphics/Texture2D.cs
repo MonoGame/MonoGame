@@ -1107,8 +1107,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // create a renderbuffer object to store depth info
             GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
             GraphicsExtensions.CheckGLError();
-            GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent24Oes,
-                Width, Height);
+
+			var glDepthFormat = GraphicsCapabilities.SupportsDepth24 ? All.DepthComponent24Oes : GraphicsCapabilities.SupportsDepthNonLinear ? (OpenTK.Graphics.ES20.All)0x8E2C /*GLDepthComponent16NonLinear */: All.DepthComponent16;
+			GL.RenderbufferStorage(All.Renderbuffer, glDepthFormat, Width, Height);
             GraphicsExtensions.CheckGLError();
 
             // attach the renderbuffer to depth attachment point
