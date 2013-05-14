@@ -25,10 +25,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public byte[] VertexData { get { return stream.ToArray(); } }
 
         /// <summary>
-        /// Gets the associated VertexDeclarationContent object.
+        /// Gets and sets the associated VertexDeclarationContent object.
         /// </summary>
         /// <value>The associated VertexDeclarationContent object.</value>
-        public VertexDeclarationContent VertexDeclaration { get; private set; }
+        public VertexDeclarationContent VertexDeclaration { get; set; }
 
         /// <summary>
         /// Initializes a new instance of VertexBufferContent.

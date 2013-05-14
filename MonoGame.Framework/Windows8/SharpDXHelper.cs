@@ -5,11 +5,11 @@ namespace Microsoft.Xna.Framework
 
     static internal class SharpDXHelper
     {
-        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentationParameters present)
+        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentInterval presentInterval)
         {
             SharpDX.DXGI.SwapEffect effect;
 
-            switch (present.PresentationInterval)
+            switch (presentInterval)
             {
                 case PresentInterval.One:
                 case PresentInterval.Two:
@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework
             }
 
             //if (present.RenderTargetUsage != RenderTargetUsage.PreserveContents && present.MultiSampleCount == 0)
-                //effect = SharpDX.DXGI.SwapEffect.Discard;
+            //effect = SharpDX.DXGI.SwapEffect.Discard;
 
             return effect;
         }
@@ -101,6 +101,11 @@ namespace Microsoft.Xna.Framework
                     // TODO: This needs to check the graphics device and 
                     // return the best hdr blendable format for the device.
                     return SharpDX.DXGI.Format.R16G16B16A16_Float;
+
+                case SurfaceFormat.Bgr32:
+                    return SharpDX.DXGI.Format.B8G8R8X8_UNorm;
+                case SurfaceFormat.Bgra32:
+                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
             }
         }
 

@@ -27,6 +27,7 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -57,11 +58,15 @@ namespace Microsoft.Xna.Framework
         }
     }
 	
+    [DataContract]
     public struct Plane : IEquatable<Plane>
     {
         #region Public Fields
 
+        [DataMember]
         public float D;
+
+        [DataMember]
         public Vector3 Normal;
 
         #endregion Public Fields

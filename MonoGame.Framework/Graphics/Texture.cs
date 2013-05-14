@@ -83,6 +83,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			get { return levelCount; }
 		}
 
+#if DIRECTX
+        /// <summary>
+        /// Gets the handle to a shared resource.
+        /// </summary>
+        /// <returns>
+        /// The handle of the shared resource, or <see cref="IntPtr.Zero"/> if the texture was not
+        /// created as a shared resource.
+        /// </returns>
+        public IntPtr GetSharedHandle()
+        {
+            using (var resource = _texture.QueryInterface<SharpDX.DXGI.Resource>())
+                return resource.SharedHandle;
+        }
+#endif
+
         internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
         {
             int levels = 1;
