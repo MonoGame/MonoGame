@@ -237,6 +237,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
+		[CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; set; }
 #endif
         private static Game _instance = null;
@@ -322,6 +323,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if ANDROID
+		[CLSCompliant(false)]
         public AndroidGameWindow Window
         {
             get { return Platform.Window; }
