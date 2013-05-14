@@ -28,7 +28,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    static class GraphicsExtensions
+	[CLSCompliant(false)]
+    public static class GraphicsExtensions
     {
 #if OPENGL
         public static All OpenGL11(CullMode cull)
