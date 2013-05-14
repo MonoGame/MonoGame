@@ -1675,23 +1675,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
 
-                // NOTE: Do not call GraphicsExtensions.CheckGLError() to check for errors
-                // in GL.FramebufferRenderbuffer().  GL.CheckFramebufferStatus() is called
-                // below after all FBO calls to correctly detect errors.
-
-                if (renderTarget.DepthStencilFormat != DepthFormat.None)
-                {
-                    GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
-                        GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    else
-                        GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, 0);
-                }
-                else
-                {
-                    GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, 0);
-                    GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, 0);
-                }
+				// Reverted this change, as per @prollin's suggestion
+				GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+				GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
 				for (var i = 0; i < _currentRenderTargetCount; i++)
