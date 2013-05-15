@@ -38,6 +38,7 @@ namespace Microsoft.Xna.Framework.Content
         ContentTypeReader[] contentReaders;		
 		
 		static string assemblyName;
+        static string coreAssemblyName;
 		
 		static ContentTypeReaderManager()
 		{
@@ -46,6 +47,8 @@ namespace Microsoft.Xna.Framework.Content
 #else
 			assemblyName = Assembly.GetExecutingAssembly().FullName;
 #endif
+
+            coreAssemblyName = "MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
         }
 
         public ContentTypeReaderManager(ContentReader reader)
@@ -141,9 +144,15 @@ namespace Microsoft.Xna.Framework.Content
     				// Need to resolve namespace differences
     				string readerTypeString = originalReaderTypeString;
 
-    				readerTypeString = PrepareType(readerTypeString);
+                    readerTypeString = PrepareType(readerTypeString, assemblyName);
 
-    				var l_readerType = Type.GetType(readerTypeString);
+                    var l_readerType = Type.GetType(readerTypeString);
+                    if (l_readerType == null)
+                    {
+                        //try core lookup
+                        var coreReaderTypeString = PrepareType(originalReaderTypeString, coreAssemblyName);
+                        l_readerType = Type.GetType(coreReaderTypeString);
+                    }
                     if (l_readerType != null)
                     {
                         try
@@ -172,41 +181,44 @@ namespace Microsoft.Xna.Framework.Content
 
             return contentReaders;
         }
-		
-		/// <summary>
-		/// Removes Version, Culture and PublicKeyToken from a type string.
-		/// </summary>
-		/// <remarks>
-		/// Supports multiple generic types (e.g. Dictionary<TKey,TValue>) and nested generic types (e.g. List<List<int>>).
-		/// </remarks> 
-		/// <param name="type">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.String"/>
-		/// </returns>
-		public static string PrepareType(string type)
-		{			
-			//Needed to support nested types
-			int count = type.Split(new[] {"[["}, StringSplitOptions.None).Length - 1;
-			
-			string preparedType = type;
-			
-			for(int i=0; i<count; i++)
-			{
-				preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
-			}
-						
-			//Handle non generic types
-			if(preparedType.Contains("PublicKeyToken"))
-				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
-			
-			return preparedType;
-		}
+        /// <summary>
+        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// </summary>
+        /// <remarks>
+        /// Supports multiple generic types (e.g. Dictionary<TKey,TValue>) and nested generic types (e.g. List<List<int>>).
+        /// </remarks> 
+        /// <param name="type">
+        /// A <see cref="System.String"/>
+        /// </param>
+        /// <param name="sourceAssembly">
+        /// A <see cref="System.String"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.String"/>
+        /// </returns>
+        public static string PrepareType(string type, string sourceAssembly)
+        {
+            //Needed to support nested types
+            int count = type.Split(new[] { "[[" }, StringSplitOptions.None).Length - 1;
+
+            string preparedType = type;
+
+            for (int i = 0; i < count; i++)
+            {
+                preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
+            }
+
+            //Handle non generic types
+            if (preparedType.Contains("PublicKeyToken"))
+                preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
+
+            // TODO: For WinRT this is most likely broken!
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", sourceAssembly));
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", sourceAssembly));
+
+            return preparedType;
+        }
 
         // Static map of type names to creation functions. Required as iOS requires all types at compile time
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
