@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 
 #if OPENGL
 #if MONOMAC
@@ -22,7 +20,6 @@ using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
-using System.Diagnostics;
 #endif
 #endif
 
@@ -711,7 +708,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return prevTexture;
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        [Conditional("DEBUG")]
+		[DebuggerHidden]
         public static void CheckGLError()
         {
 #if GLES
@@ -728,7 +726,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if OPENGL
-        [System.Diagnostics.Conditional("DEBUG")]
+        [Conditional("DEBUG")]
         public static void LogGLError(string location)
         {
             try
