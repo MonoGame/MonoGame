@@ -686,15 +686,15 @@ namespace Microsoft.Xna.Framework
 		internal void SetSupportedOrientations(DisplayOrientation orientations)
 		{
 		}
+	}
 		
-		// Amendment to the GameWindow code to allow us to use our existing key processing logic.
-		public class KeysEventArgs : EventArgs
+	// Amendment to the GameWindow code to allow us to use our existing key processing logic.
+	public class KeysEventArgs : EventArgs
+	{
+		public Keys Keys { get; private set; }
+		public KeysEventArgs(Keys keys)
 		{
-			public Keys Keys { get; private set; }
-			public KeysEventArgs(Keys keys)
-			{
-				this.Keys = keys;
-			}
+			this.Keys = keys;
 		}
 	}
 }
