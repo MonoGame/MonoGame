@@ -690,6 +690,7 @@ namespace Microsoft.Xna.Framework
 	}
 		
 	// Amendment to the GameWindow code to allow us to use our existing key processing logic.
+	// I put it in this file for convenience, although it is breaking convention by doing so.
 	public class KeysEventArgs : EventArgs
 	{
 		public Keys Keys { get; private set; }
