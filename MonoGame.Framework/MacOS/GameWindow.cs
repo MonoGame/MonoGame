@@ -59,6 +59,7 @@ namespace Microsoft.Xna.Framework
 	public class GameWindow : MonoMacGameView
 	{
 		// Amendment: Added events for integrating out key processing logic with monogame.
+		// These events are triggered when keyboard keys are released and pressed down respectively.
 		public event EventHandler<KeysEventArgs> TSKeyUp;
 		public event EventHandler<KeysEventArgs> TSKeyDown;
 	
