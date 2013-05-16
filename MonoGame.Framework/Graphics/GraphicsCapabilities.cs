@@ -63,21 +63,33 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Whether the device fully supports non power-of-two textures, including
         /// mip maps and wrap modes other than CLAMP_TO_EDGE
         /// </summary>
-        internal static bool NonPowerOfTwo { get; private set; }
+        internal static bool SupportsNonPowerOfTwo { get; private set; }
 
         /// <summary>
         /// Whether the device supports anisotropic texture filtering
         /// </summary>
-        internal static bool TextureFilterAnisotric { get; private set; }
+		internal static bool SupportsTextureFilterAnisotropic { get; private set; }
+
+		internal static bool SupportsDepth24 { get; private set; }
+
+		internal static bool SupportsPackedDepthStencil { get; private set; }
+
+		internal static bool SupportsDepthNonLinear { get; private set; }
 
         internal static void Initialize(GraphicsDevice device)
         {
-            NonPowerOfTwo = GetNonPowerOfTwo(device);
+			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
 
 #if GLES
-            TextureFilterAnisotric = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
+			SupportsTextureFilterAnisotropic = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
+			SupportsDepth24 = device._extensions.Contains("GL_OES_depth24");
+			SupportsPackedDepthStencil = device._extensions.Contains("GL_OES_packed_depth_stencil");
+			SupportsDepthNonLinear = device._extensions.Contains("GL_NV_depth_nonlinear");
 #else
-            TextureFilterAnisotric = true;
+			SupportsTextureFilterAnisotropic = true;
+			SupportsDepth24 = true;
+			SupportsPackedDepthStencil = true;
+			SupportsDepthNonLinear = false;
 #endif
         }
 

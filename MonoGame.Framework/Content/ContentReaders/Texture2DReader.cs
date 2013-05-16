@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content
 
             // If the system does not fully support Power of Two textures,
             // skip any mip maps supplied with any non PoT textures.
-            if (levelCount > 1 && !GraphicsCapabilities.NonPowerOfTwo &&
+			if (levelCount > 1 && !GraphicsCapabilities.SupportsNonPowerOfTwo &&
                 (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
             {
                 levelCountOutput = 1;

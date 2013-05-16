@@ -609,6 +609,35 @@ namespace Microsoft.Xna.Framework
             result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
         }
 
+        /// <summary>
+        /// Transforms an array of vectors by a quaternion rotation.
+        /// </summary>
+        /// <param name="sourceArray">The vectors to transform</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
+        /// <param name="destinationArray">The result of the operation.</param>
+        public static void Transform(Vector3[] sourceArray, ref Quaternion rotation, Vector3[] destinationArray)
+        {
+            Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var position = sourceArray[i];
+
+                float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
+                float y = 2 * (rotation.Z * position.X - rotation.X * position.Z);
+                float z = 2 * (rotation.X * position.Y - rotation.Y * position.X);
+
+                destinationArray[i] =
+                    new Vector3(
+                        position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+                        position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+                        position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+            }
+        }
+
+
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
             TransformNormal(ref normal, ref matrix, out normal);
