@@ -562,16 +562,17 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
-        public static Vector3 Transform(Vector3 vec, Quaternion quat)
+        public static Vector3 Transform(Vector3 value, Quaternion rotation)
         {
             Vector3 result;
-            Transform(ref vec, ref quat, out result);
+            Transform(ref value, ref rotation, out result);
             return result;
         }
 
+        /*
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
@@ -591,12 +592,13 @@ namespace Microsoft.Xna.Framework
 //            Vector3.Multiply(ref temp, 2, out temp);
 //            Vector3.Add(ref vec, ref temp, out result);
 //        }
+        */
 
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
         {
