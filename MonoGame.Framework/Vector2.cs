@@ -440,13 +440,16 @@ namespace Microsoft.Xna.Framework
             int length
         )
         {
-            for (int x = 0; x < length; x++)
+            int di;
+            for (int i = 0; i < length; i++)
             {
-                var position = sourceArray[sourceIndex + x];
-                var destination = destinationArray[destinationIndex + x];
+                di = destinationIndex + i;
+
+                var position = sourceArray[sourceIndex + i];
+                var destination = destinationArray[di];
                 destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
                 destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
-                destinationArray[destinationIndex + x] = destination;
+                destinationArray[di] = destination;
             }
         }
 
@@ -460,19 +463,22 @@ namespace Microsoft.Xna.Framework
             int length
         )
         {
-            for (int x = 0; x < length; x++)
+            int di;
+            for (int i = 0; i < length; i++)
             {
-                var position = sourceArray[sourceIndex + x];
-                var destination = destinationArray[destinationIndex + x];
+                di = destinationIndex + i;
 
-                Quaternion v = new Quaternion(position.X, position.Y, 0, 0), i, t;
-                Quaternion.Inverse(ref rotation, out i);
+                var position = sourceArray[sourceIndex + i];
+                var destination = destinationArray[di];
+
+                Quaternion v = new Quaternion(position.X, position.Y, 0, 0), n, t;
+                Quaternion.Inverse(ref rotation, out n);
                 Quaternion.Multiply(ref rotation, ref v, out t);
-                Quaternion.Multiply(ref t, ref i, out v);
+                Quaternion.Multiply(ref t, ref n, out v);
 
                 destination.X = v.X;
                 destination.Y = v.Y;
-                destinationArray[destinationIndex + x] = destination;
+                destinationArray[di] = destination;
             }
         }
 
