@@ -637,6 +637,12 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Transforms an array of vectors by a matrix.
+        /// </summary>
+        /// <param name="sourceArray">The vectors to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <param name="destinationArray">The result of the operation.</param>
         public static void Transform(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
         {
             Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
@@ -657,7 +663,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Transforms an array of vectors by a quaternion rotation.
         /// </summary>
-        /// <param name="sourceArray">The vectors to transform</param>
+        /// <param name="sourceArray">The vectors to transform.</param>
         /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <param name="destinationArray">The result of the operation.</param>
         public static void Transform(Vector3[] sourceArray, ref Quaternion rotation, Vector3[] destinationArray)

@@ -71,6 +71,31 @@ namespace Microsoft.Xna.Framework
         #endregion Constructors
 
 
+        #region Operators
+
+        public static Point operator +(Point left,Point right)
+        {
+            return new Point(left.X+right.X,left.Y+right.Y);
+        }
+
+        public static Point operator -(Point left, Point right)
+        {
+            return new Point(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Point operator *(Point left, Point right)
+        {
+            return new Point(left.X * right.X, left.Y * right.Y);
+        }
+
+        public static Point operator /(Point left, Point right)
+        {
+            return new Point(left.X / right.X, left.Y / right.Y);
+        }
+
+        #endregion
+
+
         #region Public methods
 
         public static bool operator ==(Point a, Point b)
