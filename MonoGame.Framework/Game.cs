@@ -222,6 +222,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_PHONE
                     TouchPanel.ResetState();
+                    Microsoft.Xna.Framework.Audio.SoundEffect.Shutdown();
 #endif
 
 #if DIRECTX

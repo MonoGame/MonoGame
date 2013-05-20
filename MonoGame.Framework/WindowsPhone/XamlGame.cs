@@ -132,6 +132,8 @@ namespace MonoGame.Framework.WindowsPhone
             WindowsPhoneGameWindow.Height = ((FrameworkElement)drawingSurface).ActualHeight;
             WindowsPhoneGameWindow.Page = page;
 
+            Microsoft.Xna.Framework.Audio.SoundEffect.InitializeSoundEffect();
+
             page.BackKeyPress += Microsoft.Xna.Framework.Input.GamePad.GamePageWP8_BackKeyPress;
 
             // Construct the game.
@@ -150,16 +152,46 @@ namespace MonoGame.Framework.WindowsPhone
             }
             else
             {
-                DrawingSurface ds = (DrawingSurface)drawingSurface;
                 var drawingSurfaceUpdateHandler = new DrawingSurfaceUpdateHandler(game);
+                DrawingSurface ds = (DrawingSurface)drawingSurface;
 
-                // Hook-up native component to DrawingSurface
-                ds.SetContentProvider(drawingSurfaceUpdateHandler.ContentProvider);
-                ds.SetManipulationHandler(surfaceTouchHandler);
+                RoutedEventHandler onLoadedHandler = (object sender, RoutedEventArgs e) =>
+                {
+                    if (sender != ds)
+                        return;
+
+                    if (initializedSurfaces.ContainsKey(ds) == false)
+                    {
+                        // Hook-up native component to DrawingSurface
+                        ds.SetContentProvider(drawingSurfaceUpdateHandler.ContentProvider);
+                        ds.SetManipulationHandler(surfaceTouchHandler);
+
+                        // Make sure surface is not initialized twice...
+                        initializedSurfaces.Add(ds, true);
+                    }
+                };
+
+                // Don't wait for loaded event here since control might
+                // be loaded already.
+                onLoadedHandler(ds, null);
+
+                ds.Unloaded += OnDrawingSurfaceUnloaded;
+                ds.Loaded += onLoadedHandler;
             }
 
             // Return the constructed, but not initialized game.
             return game;
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<DrawingSurface, bool> initializedSurfaces = new System.Collections.Generic.Dictionary<DrawingSurface, bool>();
+
+        private static void OnDrawingSurfaceUnloaded(object sender, RoutedEventArgs e)
+        {
+            DrawingSurface drawingSurface = (DrawingSurface)sender;
+            drawingSurface.SetContentProvider(null);
+            drawingSurface.SetManipulationHandler(null);
+
+            initializedSurfaces.Remove(drawingSurface);
         }
     }
 }
