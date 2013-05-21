@@ -710,7 +710,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
 				var cgImage = uiImage.CGImage;
 #elif MONOMAC
-				var cgImage = nsImage.AsCGImage (RectangleF.Empty, null, null);
+				// TODO: soon Xamarin.Mac/MonoMac will support NSImage.CGImage to match iOS
+				var rect = RectangleF.Empty;
+				var cgImage = nsImage.AsCGImage (ref rect, null, null);
 #endif
 				
 				var width = cgImage.Width;
