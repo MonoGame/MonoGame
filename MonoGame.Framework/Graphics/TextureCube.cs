@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class TextureCube : Texture
 	{
-		protected int size;
+		internal int size;
 
         /// <summary>
         /// Gets the width and height of the cube map face in pixels.
@@ -62,15 +62,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             this.GraphicsDevice = graphicsDevice;
 			this.size = size;
-            this.format = format;
-            this.levelCount = mipMap ? CalculateMipLevels(size) : 1;
+            this._format = format;
+            this._levelCount = mipMap ? CalculateMipLevels(size) : 1;
 
 #if DIRECTX
             var description = new Texture2DDescription
             {
                 Width = size,
                 Height = size,
-                MipLevels = levelCount,
+                MipLevels = _levelCount,
                 ArraySize = 6, // A texture cube is a 2D texture array with 6 textures.
                 Format = SharpDXHelper.ToFormat(format),
                 BindFlags = BindFlags.ShaderResource,
@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
                 // For DXT textures the width and height of each level is a multiply of 4.
-                if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                if (_format == SurfaceFormat.Dxt1 || _format == SurfaceFormat.Dxt3 || _format == SurfaceFormat.Dxt5)
                 {
                     width = ((width + 3) / 4) * 4;
                     height = ((height + 3) / 4) * 4;
@@ -217,7 +217,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             var box = new DataBox(dataPtr, GetPitch(width), 0);
 
-            int subresourceIndex = (int)face * levelCount + level;
+            int subresourceIndex = (int)face * _levelCount + level;
 
             var region = new ResourceRegion
             {

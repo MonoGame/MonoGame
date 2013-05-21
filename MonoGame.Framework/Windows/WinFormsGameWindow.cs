@@ -311,6 +311,7 @@ namespace MonoGame.Framework
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        [CLSCompliant(false)]
         public struct NativeMessage
         {
             public IntPtr handle;
