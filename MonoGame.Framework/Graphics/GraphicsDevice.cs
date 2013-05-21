@@ -257,7 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glFramebuffer;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
-        internal readonly List<string> _extensions = new List<string>();
+        internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 #endif
         
@@ -347,6 +347,22 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal GraphicsDevice(GraphicsDeviceInformation gdi)
+        {
+            SetupGL();
+            if (gdi.PresentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            PresentationParameters = gdi.PresentationParameters;
+            Initialize();
+        }
+
+        internal GraphicsDevice ()
+		{
+            SetupGL();
+            PresentationParameters = new PresentationParameters();
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            Initialize();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
@@ -356,11 +372,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">
         /// <paramref name="presentationParameters"/> is <see langword="null"/>.
         /// </exception>
-        public GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
-		{
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+        {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
+            SetupGL();
+            PresentationParameters = presentationParameters;
+            GraphicsProfile = graphicsProfile;
+            Initialize();
+        }
 
+        private void SetupGL() 
+        {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
@@ -400,10 +423,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
-            GraphicsProfile = graphicsProfile;
-            PresentationParameters = presentationParameters;
-
-            Initialize();
         }
 
         ~GraphicsDevice()

@@ -115,6 +115,21 @@ namespace Microsoft.Xna.Framework
 
         public void CreateDevice()
         {
+            if (PreparingDeviceSettings != null)
+            {
+                GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
+                gdi.DeviceType = DeviceType.Hardware;
+                gdi.Adapter = GraphicsAdapter.DefaultAdapter;
+                gdi.PresentationParameters = new PresentationParameters();
+                PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
+                PreparingDeviceSettings(this, pe);
+                _graphicsDevice = new GraphicsDevice(gdi);
+            }
+            else
+            {
+                _graphicsDevice = new GraphicsDevice();
+            }
+
             Initialize();
 
             OnDeviceCreated(EventArgs.Empty);
