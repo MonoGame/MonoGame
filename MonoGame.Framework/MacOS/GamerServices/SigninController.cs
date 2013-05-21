@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			tableView = new NSTableView(new RectangleF(0,0,420, 123));
 			tableView.UsesAlternatingRowBackgroundColors = true;
 			
-			NSTableColumn colGamerTag = new NSTableColumn(new NSString("Gamer"));
+			NSTableColumn colGamerTag = new NSTableColumn("Gamer");
 			tableView.AddColumn(colGamerTag);
 			
 			colGamerTag.Width = 420;
