@@ -1623,8 +1623,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
                 _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
-
-                clearTarget = true;
+                clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
                 Viewport = new Viewport(0, 0,
 					PresentationParameters.BackBufferWidth, 
