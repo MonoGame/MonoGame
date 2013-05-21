@@ -1624,7 +1624,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
 
-                clearTarget = true;
+                //clearTarget = true;
 
                 Viewport = new Viewport(0, 0,
 					PresentationParameters.BackBufferWidth, 
