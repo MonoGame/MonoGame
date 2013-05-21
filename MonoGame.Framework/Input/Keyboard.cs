@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework.Input
 
         /// <summary>
         /// Returns the current keyboard state for a given player.
+        /// Obsolete : Use GetState() instead.
         /// </summary>
         /// <param name="playerIndex">Player index of the keyboard.</param>
         /// <returns>Current keyboard state.</returns>
