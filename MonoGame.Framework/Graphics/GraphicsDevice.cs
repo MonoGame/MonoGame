@@ -373,6 +373,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <paramref name="presentationParameters"/> is <see langword="null"/>.
         /// </exception>
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+            :this(graphicsProfile, presentationParameters)
+        {
+        }
+        internal GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
         {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
