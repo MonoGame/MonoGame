@@ -63,6 +63,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
     public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;

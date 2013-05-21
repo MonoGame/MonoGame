@@ -25,6 +25,7 @@ using GetPName = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	[CLSCompliant(false)]
     public static class GraphicsExtensions
     {
 #if OPENGL
