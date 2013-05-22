@@ -335,7 +335,6 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 #endif
 
-            _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
 #else
 
 #if MONOMAC
@@ -347,11 +346,17 @@ namespace Microsoft.Xna.Framework
             presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
+#if !MONOMAC
+            ApplyChanges();
+#endif
+
+#endif // WINDOWS || WINRT
+
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
             if (PreparingDeviceSettings != null)
             {
                 GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
-                gdi.DeviceType = DeviceType.Hardware;
+                gdi.GraphicsProfile = Graphics.GraphicsProfile.Reach; // This is unused so Reach can be defaulted.
                 gdi.Adapter = GraphicsAdapter.DefaultAdapter;
                 gdi.PresentationParameters = presentationParameters;
                 PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
@@ -360,12 +365,6 @@ namespace Microsoft.Xna.Framework
             }
 
             _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
-
-#if !MONOMAC
-            ApplyChanges();
-#endif
-
-#endif // WINDOWS || WINRT
 
             // Set the new display size on the touch panel.
             //

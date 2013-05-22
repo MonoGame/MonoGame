@@ -39,7 +39,9 @@
 // #endregion License
 // 
 using System;
-namespace Microsoft.Xna.Framework.Graphics
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Microsoft.Xna.Framework
 {
 	public class GraphicsDeviceInformation
 	{
