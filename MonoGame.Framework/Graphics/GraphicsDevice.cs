@@ -106,8 +106,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
   
-        private VertexBuffer _vertexBuffer;
-        private bool _vertexBufferDirty;
+        private VertexBuffer[] _vertexBuffers;
+        private bool[] _vertexBuffersDirty;
+        private bool _vertexBuffersAnyDirty;
 
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
@@ -497,8 +498,15 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Force set the buffers and shaders on next ApplyState() call
+            _vertexBuffers = new VertexBuffer[_featureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16];
+            _vertexBuffersDirty = new bool[_featureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16];
+
             _indexBufferDirty = true;
-            _vertexBufferDirty = true;
+            for (int vertexBuffer = 0; vertexBuffer < _vertexBuffersDirty.Length; ++vertexBuffer)
+            {
+                _vertexBuffersDirty[vertexBuffer] = true;
+            }
+            _vertexBuffersAnyDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
 
@@ -1365,7 +1373,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // to sleep until the next VSync. This ensures we don't waste any cycles rendering
                 // frames that will never be displayed to the screen.
                 lock (_d3dContext)
-                    _swapChain.Present(1, PresentFlags.None, parameters);
+                    _swapChain.Present(2, PresentFlags.None, parameters);
             }
             catch (SharpDX.SharpDXException)
             {
@@ -1751,7 +1759,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _depthStencilStateDirty = true;
             _blendStateDirty = true;
             _indexBufferDirty = true;
-            _vertexBufferDirty = true;
+            for (int vertexBuffer = 0; vertexBuffer < _vertexBuffersDirty.Length; ++vertexBuffer)
+            {
+                _vertexBuffersDirty[vertexBuffer] = true;
+            }
+            _vertexBuffersAnyDirty = true;
             _pixelShaderDirty = true;
             _vertexShaderDirty = true;
             _rasterizerStateDirty = true;
@@ -1810,11 +1822,61 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
         {
-            if (_vertexBuffer == vertexBuffer)
-                return;
+            if (_vertexBuffers[0] != vertexBuffer)
+            {
+                _vertexBuffers[0] = vertexBuffer;
+                _vertexBuffersDirty[0] = true;
+                _vertexBuffersAnyDirty = true;
+            }
 
-            _vertexBuffer = vertexBuffer;
-            _vertexBufferDirty = true;
+            for (int vertexStreamSlot = 1; vertexStreamSlot < _vertexBuffers.Length; ++vertexStreamSlot)
+            {
+                if (_vertexBuffers[vertexStreamSlot] != null)
+                {
+                    _vertexBuffers[vertexStreamSlot] = null;
+                    _vertexBuffersDirty[vertexStreamSlot] = true;
+                    _vertexBuffersAnyDirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This is temporary implementation for this function.
+        /// It should have "params VertexBufferBinding[] vertexBuffers" instead, but monogame doesn't currently implement VertexBufferBinding
+        /// </summary>
+        /// <param name="vertexBuffers"></param>
+        public void SetVertexBuffers(params VertexBuffer[] vertexBuffers)
+        {
+            if((vertexBuffers != null) && (vertexBuffers.Length > _vertexBuffers.Length))
+            {
+                throw new ArgumentOutOfRangeException("vertexBuffers", String.Format("Max Vertex Buffers supported is {0}", _vertexBuffers.Length));
+            }
+
+            // set vertex buffers if they are different
+            int vertexStreamSlot = 0;
+            if (vertexBuffers != null)
+            {
+                for (; vertexStreamSlot < vertexBuffers.Length; ++vertexStreamSlot)
+                {
+                    if (_vertexBuffers[vertexStreamSlot] != vertexBuffers[vertexStreamSlot])
+                    {
+                        _vertexBuffers[vertexStreamSlot] = vertexBuffers[vertexStreamSlot];
+                        _vertexBuffersDirty[vertexStreamSlot] = true;
+                        _vertexBuffersAnyDirty = true;
+                    }
+                }
+            }
+
+            // unset any unused vertex buffers
+            for (; vertexStreamSlot < _vertexBuffers.Length; ++vertexStreamSlot)
+            {
+                if (_vertexBuffers[vertexStreamSlot] != null)
+                {
+                    _vertexBuffers[vertexStreamSlot] = null;
+                    _vertexBuffersDirty[vertexStreamSlot] = true;
+                    _vertexBuffersAnyDirty = true;
+                }
+            }
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)
@@ -1995,13 +2057,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBuffersAnyDirty)
             {
 #if DIRECTX
-                if (_vertexBuffer != null)
-                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexBuffer._binding);
-                else
-                    _d3dContext.InputAssembler.SetVertexBuffers(0);
+                for (int slot = 0; slot < _vertexBuffers.Length; ++slot)
+                {
+                    if (_vertexBuffersDirty[slot])
+                    {
+                        if (_vertexBuffers[slot] != null)
+                        {
+                            _d3dContext.InputAssembler.SetVertexBuffers(slot, _vertexBuffers[slot]._binding);
+                        }
+                        else
+                        {
+                            _d3dContext.InputAssembler.SetVertexBuffers(slot);
+                        }
+
+                        _vertexBuffersDirty[slot] = false;
+                    }
+                }
 #elif OPENGL
                 if (_vertexBuffer != null)
                 {
@@ -2021,10 +2095,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexShaderDirty)
                 _d3dContext.VertexShader.Set(_vertexShader._vertexShader);                
 
-            if (_vertexShaderDirty || _vertexBufferDirty)
+            if (_vertexShaderDirty || _vertexBuffersAnyDirty)
             {
-                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
-                _vertexShaderDirty = _vertexBufferDirty = false;
+                _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader);
+                _vertexShaderDirty = _vertexBuffersAnyDirty = false;
             }
 
             if (_pixelShaderDirty)
@@ -2057,15 +2131,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
+        private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader)
         {
+            Debug.Assert(_vertexBuffers[0] != null, "The vertex buffer is null!");
+
             SharpDX.Direct3D11.InputLayout layout;
 
             // Lookup the layout using the shader and declaration as the key.
-            var key = (ulong)decl.HashKey << 32 | (uint)shader.HashKey;           
+            var key = (ulong)_vertexBuffers[0].VertexDeclaration.HashKey << 32 | (uint)shader.HashKey;           
             if (!_inputLayouts.TryGetValue(key, out layout))
             {
-                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
+                List<SharpDX.Direct3D11.InputElement> inputElements = new List<SharpDX.Direct3D11.InputElement>();
+                for (int vertexDeclIndex = 0; vertexDeclIndex < _vertexBuffers.Length; ++vertexDeclIndex)
+                {
+                    if (_vertexBuffers[vertexDeclIndex] != null)
+                    {
+                        int firstElementOffset = inputElements.Count;
+                        inputElements.AddRange(_vertexBuffers[vertexDeclIndex].VertexDeclaration.GetInputLayout());
+                        // set correct vertex buffer slot in the InputElements for that vertex buffer.
+                        for (int inputElement = firstElementOffset; inputElement < inputElements.Count; ++inputElement)
+                        {
+                            SharpDX.Direct3D11.InputElement element = inputElements[inputElement];
+                            element.Slot = vertexDeclIndex;
+                            inputElements[inputElement] = element;
+                        }
+                    }
+                }
+                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, inputElements.ToArray());
                 _inputLayouts.Add(key, layout);
             }
 
@@ -2157,7 +2249,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored.</remarks>
         public void DrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            Debug.Assert(_vertexBuffers[0] != null, "The vertex buffer is null!");
             Debug.Assert(_indexBuffer != null, "The index buffer is null!");
 
             // NOTE: minVertexIndex and numVertices are only hints of the
@@ -2258,7 +2350,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawPrimitives(PrimitiveType primitiveType, int vertexStart, int primitiveCount)
         {
-            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            Debug.Assert(_vertexBuffers[0] != null, "The vertex buffer is null!");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
