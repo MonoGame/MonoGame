@@ -373,6 +373,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif
 

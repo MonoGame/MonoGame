@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Resources;
@@ -29,6 +30,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif PORTABLE
+[assembly: AssemblyDescription("MonoGame Portable")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -36,6 +39,9 @@ using System.Resources;
 [assembly: AssemblyCopyright("Copyright © 2011-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+// Mark the assembly as CLS compliant so it can be safely used in other .NET languages
+[assembly:CLSCompliant(true)]
 
 #if !PORTABLE
 // Setting ComVisible to false makes the types in this assembly not visible 
