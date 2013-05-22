@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content
 {
 	using System.IO;
 	
-	public class LzxDecoder
+	class LzxDecoder
 	{
 		public static uint[] position_base = null;
 		public static byte[] extra_bits = null;
@@ -749,7 +749,7 @@ namespace Microsoft.Xna.Framework.Content
 	}
 	
 	/* CONSTANTS */
-	public struct LzxConstants {
+	struct LzxConstants {
 		public const ushort MIN_MATCH =				2;
 		public const ushort MAX_MATCH =				257;
 		public const ushort NUM_CHARS =				256;
@@ -777,7 +777,7 @@ namespace Microsoft.Xna.Framework.Content
 	}
 	
 	/* EXCEPTIONS */
-	public class UnsupportedWindowSizeRange : Exception
+	class UnsupportedWindowSizeRange : Exception
 	{
 	}
 }

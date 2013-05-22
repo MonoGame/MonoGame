@@ -208,7 +208,8 @@ namespace Microsoft.Xna.Framework
                 return;
 
 #if WINDOWS_PHONE
-
+            // Display orientation is always portrait on WP8
+            _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
 #elif WINDOWS_STOREAPP
 
             // TODO:  Does this need to occur here?
@@ -372,6 +373,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif
 

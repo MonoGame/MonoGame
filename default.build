@@ -11,7 +11,7 @@
       <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
         <property name="os" value="MacOS"/>
         <if test="${not directory::exists(mdtooldir)}">
-          <property name="mdtooldir" value="/Applications/Xamarin\ Studio.app/Contents/MacOS"/>
+          <property name="mdtooldir" value="${path::get-full-path('/Applications/Xamarin Studio.app/Contents/MacOS')}"/>
         </if>
       </if>
   </if>
