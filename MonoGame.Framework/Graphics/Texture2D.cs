@@ -710,13 +710,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
 				var cgImage = uiImage.CGImage;
 #elif MONOMAC
-<<<<<<< HEAD
-				var rect = RectangleF.Empty;
-				var cgImage = nsImage.AsCGImage (ref rect, null, null);
-=======
 				var rectangle = RectangleF.Empty;
 				var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
->>>>>>> develop
 #endif
 				
 				var width = cgImage.Width;
