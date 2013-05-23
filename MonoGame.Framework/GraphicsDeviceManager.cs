@@ -356,12 +356,13 @@ namespace Microsoft.Xna.Framework
             if (PreparingDeviceSettings != null)
             {
                 GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
-                gdi.GraphicsProfile = Graphics.GraphicsProfile.Reach; // This is unused so Reach can be defaulted.
+                gdi.GraphicsProfile = GraphicsProfile; // Microsoft defaults this to Reach.
                 gdi.Adapter = GraphicsAdapter.DefaultAdapter;
                 gdi.PresentationParameters = presentationParameters;
                 PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
                 PreparingDeviceSettings(this, pe);
                 presentationParameters = pe.GraphicsDeviceInformation.PresentationParameters;
+                GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
             }
 
             _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);

@@ -353,6 +353,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (gdi.PresentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = gdi.PresentationParameters;
+            GraphicsProfile = gdi.GraphicsProfile;
             Initialize();
         }
 
