@@ -150,39 +150,39 @@ namespace Microsoft.Xna.Framework.Graphics
         // Core Direct3D Objects
         internal SharpDX.Direct3D11.Device _d3dDevice;
         internal SharpDX.Direct3D11.DeviceContext _d3dContext;
-        protected FeatureLevel _featureLevel;
-        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+        internal FeatureLevel _featureLevel;
+        internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
 #if WINDOWS_STOREAPP
 
         // Declare Direct2D Objects
-        protected SharpDX.Direct2D1.Factory1 _d2dFactory;
-        protected SharpDX.Direct2D1.Device _d2dDevice;
-        protected SharpDX.Direct2D1.DeviceContext _d2dContext;
+        SharpDX.Direct2D1.Factory1 _d2dFactory;
+        SharpDX.Direct2D1.Device _d2dDevice;
+        SharpDX.Direct2D1.DeviceContext _d2dContext;
 
         // Declare DirectWrite & Windows Imaging Component Objects
-        protected SharpDX.DirectWrite.Factory _dwriteFactory;
-        protected SharpDX.WIC.ImagingFactory2 _wicFactory;
+        SharpDX.DirectWrite.Factory _dwriteFactory;
+        SharpDX.WIC.ImagingFactory2 _wicFactory;
 
         // The swap chain resources.
-        protected SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
-        protected SharpDX.DXGI.SwapChain1 _swapChain;
-        protected SwapChainBackgroundPanel _swapChainPanel;
+        SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
+        SharpDX.DXGI.SwapChain1 _swapChain;
+        SwapChainBackgroundPanel _swapChainPanel;
 
-        protected float _dpi; 
+        float _dpi; 
 
 #elif !WINDOWS_PHONE
 
-        protected SwapChain _swapChain;
+        SwapChain _swapChain;
 
 #endif
 
         // The active render targets.
-        protected readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
+        readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
 
         // The active depth view.
-        protected SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
+        SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -257,7 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glFramebuffer;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
-        internal readonly List<string> _extensions = new List<string>();
+        internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 #endif
         
@@ -347,6 +347,23 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal GraphicsDevice(GraphicsDeviceInformation gdi)
+        {
+            SetupGL();
+            if (gdi.PresentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            PresentationParameters = gdi.PresentationParameters;
+            GraphicsProfile = gdi.GraphicsProfile;
+            Initialize();
+        }
+
+        internal GraphicsDevice ()
+		{
+            SetupGL();
+            PresentationParameters = new PresentationParameters();
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            Initialize();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
@@ -356,11 +373,22 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">
         /// <paramref name="presentationParameters"/> is <see langword="null"/>.
         /// </exception>
-        public GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
-		{
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+            :this(graphicsProfile, presentationParameters)
+        {
+        }
+        internal GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+        {
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
+            SetupGL();
+            PresentationParameters = presentationParameters;
+            GraphicsProfile = graphicsProfile;
+            Initialize();
+        }
 
+        private void SetupGL() 
+        {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
@@ -400,10 +428,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
-            GraphicsProfile = graphicsProfile;
-            PresentationParameters = presentationParameters;
-
-            Initialize();
         }
 
         ~GraphicsDevice()
@@ -1623,8 +1647,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
                 _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
-
-                clearTarget = true;
+                clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
                 Viewport = new Viewport(0, 0,
 					PresentationParameters.BackBufferWidth, 

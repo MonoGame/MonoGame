@@ -237,6 +237,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
+		[CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; set; }
 #endif
         private static Game _instance = null;
@@ -322,6 +323,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if ANDROID
+		[CLSCompliant(false)]
         public AndroidGameWindow Window
         {
             get { return Platform.Window; }
@@ -356,10 +358,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Exiting;
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
 
 #if WINRT
+        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 

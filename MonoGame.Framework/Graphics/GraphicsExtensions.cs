@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 #if OPENGL
 #if MONOMAC
@@ -28,6 +25,7 @@ using GetPName = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+	[CLSCompliant(false)]
     public static class GraphicsExtensions
     {
 #if OPENGL
@@ -720,11 +718,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return prevTexture;
         }
 
-        // Conditional("DEBUG") means this method is a no-op in non-debug configurations.
-        // DebuggerHidden means exceptions thrown in this method are caught by the debugger
-        // in the caller, not this helper method.
         [Conditional("DEBUG")]
-        [DebuggerHidden]
+		[DebuggerHidden]
         public static void CheckGLError()
         {
 #if GLES
@@ -741,11 +736,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if OPENGL
-        // Conditional("DEBUG") means this method is a no-op in non-debug configurations.
-        // DebuggerHidden means exceptions thrown in this method are caught by the debugger
-        // in the caller, not this helper method.
         [Conditional("DEBUG")]
-        [DebuggerHidden]
         public static void LogGLError(string location)
         {
             try

@@ -107,15 +107,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
-        protected enum SurfaceType
+        internal protected enum SurfaceType
         {
             Texture,
             RenderTarget,
             SwapChainRenderTarget,
         }
 
-		protected int width;
-		protected int height;
+		internal int width;
+		internal int height;
 
 #if PSM
 		internal PssTexture2D _texture2D;
@@ -157,8 +157,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
-            this.format = format;
-            this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            this._format = format;
+            this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
             // Texture will be assigned by the swap chain.
 		    if (type == SurfaceType.SwapChainRenderTarget)
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = levelCount;
+            desc.MipLevels = _levelCount;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
@@ -270,8 +270,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture2D = new PssTexture2D(bytes, false);
             width = _texture2D.Width;
             height = _texture2D.Height;
-            this.format = SurfaceFormat.Color; //FIXME HACK
-            this.levelCount = 1;
+            this._format = SurfaceFormat.Color; //FIXME HACK
+            this._levelCount = 1;
         }
 #endif			
 
@@ -328,10 +328,10 @@ namespace Microsoft.Xna.Framework.Graphics
                         // The last two mip levels require the width and height to be passed as 2x2 and 1x1, but
                         // there needs to be enough data passed to occupy a 4x4 block.
                         // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                        if (format == SurfaceFormat.Dxt1 ||
-                            format == SurfaceFormat.Dxt1a ||
-                            format == SurfaceFormat.Dxt3 ||
-                            format == SurfaceFormat.Dxt5)
+                        if (_format == SurfaceFormat.Dxt1 ||
+                            _format == SurfaceFormat.Dxt1a ||
+                            _format == SurfaceFormat.Dxt3 ||
+                            _format == SurfaceFormat.Dxt5)
                         {
                             if (w > 4)
                                 w = (w + 3) & ~3;
@@ -371,13 +371,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (rect.HasValue)
                         {
                             GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
-                                                        level, x, y, w, h,
+                                level, x, y, w, h,
 #if GLES
-                                                    glInternalFormat,
+                                glInternalFormat,
 #else
- glFormat,
+                                glFormat,
 #endif
- data.Length - startBytes, dataPtr);
+                                data.Length - startBytes, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         else
@@ -401,11 +401,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             GL.TexImage2D(TextureTarget.Texture2D, level,
 #if GLES
-                                  (int)glInternalFormat,
+                                (int)glInternalFormat,
 #else
- glInternalFormat,
+                                glInternalFormat,
 #endif
- w, h, 0, glFormat, glType, dataPtr);
+                                w, h, 0, glFormat, glType, dataPtr);
                             GraphicsExtensions.CheckGLError();
                         }
                         // Return to default pixel alignment
@@ -648,7 +648,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Height = height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
-            desc.Format = SharpDXHelper.ToFormat(format);
+            desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
             desc.SampleDescription.Count = 1;
@@ -719,7 +719,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
 				var cgImage = uiImage.CGImage;
 #elif MONOMAC
-				var cgImage = nsImage.AsCGImage (RectangleF.Empty, null, null);
+				var rectangle = RectangleF.Empty;
+				var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
 #endif
 				
 				var width = cgImage.Width;
@@ -990,6 +991,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }).Wait();
         }
 		
+        [CLSCompliant(false)]
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
@@ -1081,7 +1083,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                                (levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                                (_levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
                 GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
                                 (int)TextureMagFilter.Linear);

@@ -55,6 +55,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
+    [CLSCompliant(false)]
     public partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
@@ -211,16 +212,16 @@ namespace Microsoft.Xna.Framework
 
             manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
 
+            // If we have a valid client bounds then 
+            // update the graphics device.
+            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
+                manager.ApplyChanges();
+
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
             Platform.ViewState = ApplicationView.Value;
             OnClientSizeChanged();
-
-            // If we have a valid client bounds then 
-            // update the graphics device.
-            if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-                manager.ApplyChanges();
         }
 
         private static DisplayOrientation ToOrientation(DisplayOrientations orientations)
@@ -329,6 +330,7 @@ namespace Microsoft.Xna.Framework
         #endregion
     }
 
+    [CLSCompliant(false)]
     public class ViewStateChangedEventArgs : EventArgs
     {
         public readonly ApplicationViewState ViewState;
