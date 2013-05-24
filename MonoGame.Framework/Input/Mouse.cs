@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Input
 
 	    // maybe someone is tring to get mouse before initialize
 	    if (_mouse == null)
-            return State;
+            return window.MouseState;
 
 #if (WINDOWS && OPENGL)
             var p = new POINT();
