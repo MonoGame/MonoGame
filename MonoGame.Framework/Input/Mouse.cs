@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static class Mouse
     {
-	internal static MouseState State;
+        internal static GameWindow PrimaryWindow;
 
 #if (WINDOWS && OPENGL) || LINUX
 	private static OpenTK.Input.MouseDevice _mouse = null;			
@@ -138,14 +138,15 @@ namespace Microsoft.Xna.Framework.Input
         #region Public methods
 
         /// <summary>
-        /// Gets mouse state information that includes position and button presses.
+        /// Gets mouse state information that includes position and button
+        /// presses for the provided window
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
-        public static MouseState GetState()
+        public static MouseState GetState(GameWindow window)
         {
 #if MONOMAC
             //We need to maintain precision...
-            State.ScrollWheelValue = (int)ScrollWheelValue;
+            window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 #elif (WINDOWS && OPENGL) || LINUX
 
 	    // maybe someone is tring to get mouse before initialize
@@ -156,20 +157,29 @@ namespace Microsoft.Xna.Framework.Input
             var p = new POINT();
             GetCursorPos(out p);
             var pc = Window.PointToClient(p.ToPoint());
-            State.X = pc.X;
-            State.Y = pc.Y;
+            window.MouseState.X = pc.X;
+            window.MouseState.Y = pc.Y;
 #endif
 
-            State.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
-			State.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
-			State.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+            window.MouseState.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
+			window.MouseState.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
+			window.MouseState.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
 
 		// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
 		// We need to counteract it to get the same value XNA provides
-	    State.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+	    window.MouseState.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 #endif
+            return window.MouseState;
+        }
 
-            return State;
+        /// <summary>
+        /// Gets mouse state information that includes position and button presses
+        /// for the primary window
+        /// </summary>
+        /// <returns>Current state of the mouse.</returns>
+        public static MouseState GetState()
+        {
+            return GetState(PrimaryWindow);
         }
 
         /// <summary>
@@ -220,8 +230,8 @@ namespace Microsoft.Xna.Framework.Input
     
         private static void UpdateStatePosition(int x, int y)
         {
-            State.X = x;
-            State.Y = y;
+            PrimaryWindow.MouseState.X = x;
+            PrimaryWindow.MouseState.Y = y;
         }
 
 #if WINDOWS
