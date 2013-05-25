@@ -359,6 +359,7 @@ namespace Microsoft.Xna.Framework
                 GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
             }
 
+            // Needs be before ApplyChanges()
             _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
 
 #if !MONOMAC
