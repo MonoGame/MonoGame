@@ -346,6 +346,8 @@ namespace Microsoft.Xna.Framework
             presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
+#endif // WINDOWS || WINRT
+
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
             if (PreparingDeviceSettings != null)
             {
@@ -365,8 +367,6 @@ namespace Microsoft.Xna.Framework
 #if !MONOMAC
             ApplyChanges();
 #endif
-
-#endif // WINDOWS || WINRT
 
             // Set the new display size on the touch panel.
             //
