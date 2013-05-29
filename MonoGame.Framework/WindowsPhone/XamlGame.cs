@@ -122,8 +122,7 @@ namespace MonoGame.Framework.WindowsPhone
         /// Creates your Game class initializing it to worth within a XAML application window.
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
-        /// <param name="drawingSurface">The XAML drawing surface to which we render the scene and recieve input events.</param>
-        /// <param name="mediaElement">The XAML media element to use for playing music and video.</param>
+        /// <param name="page">The XAML page containing the drawing surface to which we render the scene and recieve input events.</param>
         /// <returns></returns>
         /// 
         static public T Create(string launchParameters, PhoneApplicationPage page)
@@ -140,7 +139,7 @@ namespace MonoGame.Framework.WindowsPhone
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(page.Content); i++)
             {
                 var child = VisualTreeHelper.GetChild(page.Content, i);
-                if (child.GetType() == typeof(MediaElement))
+                if (child is MediaElement)
                     mediaElement = (MediaElement)child;
             }
             if (mediaElement == null)

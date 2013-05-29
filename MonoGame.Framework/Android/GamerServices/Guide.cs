@@ -380,6 +380,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
+		[CLSCompliant(false)]
 		public static AndroidGameWindow Window 
 		{ 
 			get;
