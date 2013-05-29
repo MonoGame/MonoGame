@@ -107,15 +107,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D : Texture
     {
-        protected enum SurfaceType
+        internal protected enum SurfaceType
         {
             Texture,
             RenderTarget,
             SwapChainRenderTarget,
         }
 
-		protected int width;
-		protected int height;
+		internal int width;
+		internal int height;
 
 #if PSM
 		internal PssTexture2D _texture2D;
@@ -157,8 +157,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
-            this.format = format;
-            this.levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+            this._format = format;
+            this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
 
             // Texture will be assigned by the swap chain.
 		    if (type == SurfaceType.SwapChainRenderTarget)
@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
             desc.Height = height;
-            desc.MipLevels = levelCount;
+            desc.MipLevels = _levelCount;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
@@ -228,11 +228,10 @@ namespace Microsoft.Xna.Framework.Graphics
                             imageSize = (Math.Max(this.width, 16) * Math.Max(this.height, 8) * 4 + 7) / 8;
                             break;
                         case SurfaceFormat.Dxt1:
-                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * 8 * 1;
-                            break;
+                        case SurfaceFormat.Dxt1a:
                         case SurfaceFormat.Dxt3:
                         case SurfaceFormat.Dxt5:
-                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * 16 * 1;
+                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * format.Size();
                             break;
                         default:
                             throw new NotImplementedException();
@@ -271,8 +270,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _texture2D = new PssTexture2D(bytes, false);
             width = _texture2D.Width;
             height = _texture2D.Height;
-            this.format = SurfaceFormat.Color; //FIXME HACK
-            this.levelCount = 1;
+            this._format = SurfaceFormat.Color; //FIXME HACK
+            this._levelCount = 1;
         }
 #endif			
 
@@ -304,121 +303,131 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !PSM
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * elementSizeInByte;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                // Use try..finally to make sure dataHandle is freed in case of an error
+                try
+                {
+                    var startBytes = startIndex * elementSizeInByte;
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 #endif
-                int x, y, w, h;
-                if (rect.HasValue)
-                {
-                    x = rect.Value.X;
-                    y = rect.Value.Y;
-                    w = rect.Value.Width;
-                    h = rect.Value.Height;
-                }
-                else
-                {
-                    x = 0;
-                    y = 0;
-                    w = Math.Max(width >> level, 1);
-                    h = Math.Max(height >> level, 1);
-
-#if DIRECTX
-                    // For DXT textures the width and height of each level is a multiply of 4.
-                    if (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5)
+                    int x, y, w, h;
+                    if (rect.HasValue)
                     {
-                        w = ((w + 3) / 4) * 4;
-                        h = ((h + 3) / 4) * 4;
+                        x = rect.Value.X;
+                        y = rect.Value.Y;
+                        w = rect.Value.Width;
+                        h = rect.Value.Height;
                     }
-#endif
-                }
+                    else
+                    {
+                        x = 0;
+                        y = 0;
+                        w = Math.Max(width >> level, 1);
+                        h = Math.Max(height >> level, 1);
+
+                        // For DXT textures the width and height of each level is a multiple of 4.
+                        // The last two mip levels require the width and height to be passed as 2x2 and 1x1, but
+                        // there needs to be enough data passed to occupy a 4x4 block.
+                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                        if (_format == SurfaceFormat.Dxt1 ||
+                            _format == SurfaceFormat.Dxt1a ||
+                            _format == SurfaceFormat.Dxt3 ||
+                            _format == SurfaceFormat.Dxt5)
+                        {
+                            if (w > 4)
+                                w = (w + 3) & ~3;
+                            if (h > 4)
+                                h = (h + 3) & ~3;
+                        }
+                    }
 
 #if DIRECTX
+                    var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
 
-                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
+                    var region = new SharpDX.Direct3D11.ResourceRegion();
+                    region.Top = y;
+                    region.Front = 0;
+                    region.Back = 1;
+                    region.Bottom = y + h;
+                    region.Left = x;
+                    region.Right = x + w;
 
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = y;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = y + h;
-                region.Left = x;
-                region.Right = x + w;
-
-                // TODO: We need to deal with threaded contexts here!
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, _texture, level, region);
-
+                    // TODO: We need to deal with threaded contexts here!
+                    var d3dContext = GraphicsDevice._d3dContext;
+                    lock (d3dContext)
+                        d3dContext.UpdateSubresource(box, _texture, level, region);
 #elif PSM
-                _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
-
+                    _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
 #elif OPENGL
 
-                // Store the current bound texture.
-                var prevTexture = GraphicsExtensions.GetBoundTexture2D();
+                    // Store the current bound texture.
+                    var prevTexture = GraphicsExtensions.GetBoundTexture2D();
 
-                GenerateGLTextureIfRequired();
+                    GenerateGLTextureIfRequired();
 
-                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-                GraphicsExtensions.CheckGLError();
-                if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
-                {
-                    if (rect.HasValue)
+                    GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                    GraphicsExtensions.CheckGLError();
+                    if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
                     {
-                        GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
-                                                    level, x, y, w, h,
+                        if (rect.HasValue)
+                        {
+                            GL.CompressedTexSubImage2D(TextureTarget.Texture2D,
+                                level, x, y, w, h,
 #if GLES
-                                                    glInternalFormat,
+                                glInternalFormat,
 #else
-                                                    glFormat,
+                                glFormat,
 #endif
-                                                    data.Length - startBytes, dataPtr);
-                        GraphicsExtensions.CheckGLError();
+                                data.Length - startBytes, dataPtr);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        else
+                        {
+                            GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
+                            GraphicsExtensions.CheckGLError();
+                        }
                     }
                     else
                     {
-                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, w, h, 0, data.Length - startBytes, dataPtr);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                }
-                else
-                {
-                    // Set pixel alignment to match texel size in bytes
-                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.Size(this.Format));
-                    if (rect.HasValue)
-                    {
-                        GL.TexSubImage2D(TextureTarget.Texture2D, level,
-                                        x, y, w, h,
-                                        glFormat, glType, dataPtr);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                    else
-                    {
-                        GL.TexImage2D(TextureTarget.Texture2D, level,
+                        // Set pixel alignment to match texel size in bytes
+                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.Size(this.Format));
+                        if (rect.HasValue)
+                        {
+                            GL.TexSubImage2D(TextureTarget.Texture2D, level,
+                                            x, y, w, h,
+                                            glFormat, glType, dataPtr);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        else
+                        {
+                            GL.TexImage2D(TextureTarget.Texture2D, level,
 #if GLES
-                                  (int)glInternalFormat,
+                                (int)glInternalFormat,
 #else
-                                  glInternalFormat,
+                                glInternalFormat,
 #endif
-                                  w, h, 0, glFormat, glType, dataPtr);
-                        GraphicsExtensions.CheckGLError();
+                                w, h, 0, glFormat, glType, dataPtr);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        // Return to default pixel alignment
+                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
                     }
-                    // Return to default pixel alignment
-                    GL.PixelStore(PixelStoreParameter.UnpackAlignment, 4);
-                }
 
 #if !ANDROID
-                GL.Finish();
-                GraphicsExtensions.CheckGLError();
+                    GL.Finish();
+                    GraphicsExtensions.CheckGLError();
 #endif
-                // Restore the bound texture.
-                GL.BindTexture(TextureTarget.Texture2D, prevTexture);
-                GraphicsExtensions.CheckGLError();
+                    // Restore the bound texture.
+                    GL.BindTexture(TextureTarget.Texture2D, prevTexture);
+                    GraphicsExtensions.CheckGLError();
 
 #endif // OPENGL
 
 #if !PSM
-                dataHandle.Free();
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
 #endif
 
 #if OPENGL
@@ -639,7 +648,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Height = height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
-            desc.Format = SharpDXHelper.ToFormat(format);
+            desc.Format = SharpDXHelper.ToFormat(_format);
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
             desc.SampleDescription.Count = 1;
@@ -710,7 +719,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if IOS
 				var cgImage = uiImage.CGImage;
 #elif MONOMAC
-				var cgImage = nsImage.AsCGImage (RectangleF.Empty, null, null);
+				var rectangle = RectangleF.Empty;
+				var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
 #endif
 				
 				var width = cgImage.Width;
@@ -981,6 +991,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }).Wait();
         }
 		
+        [CLSCompliant(false)]
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
@@ -1072,7 +1083,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
-                                (levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                                (_levelCount > 1) ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
                 GraphicsExtensions.CheckGLError();
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
                                 (int)TextureMagFilter.Linear);
