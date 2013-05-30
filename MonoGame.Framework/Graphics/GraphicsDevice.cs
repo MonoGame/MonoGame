@@ -1751,6 +1751,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
+
+            // Textures will need to be rebound to render correctly in the new render target.
+            Textures.Dirty();
 #endif
         }
 
