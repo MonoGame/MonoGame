@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Media
 
 #elif WINDOWS_MEDIA_SESSION
 
-            MediaManager.Startup(true);
+            MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
 #endif
         }

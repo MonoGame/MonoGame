@@ -705,6 +705,10 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
+
+#if WINDOWS_MEDIA_SESSION
+            Media.MediaManagerState.CheckShutdown();
+#endif
 		}
 
         internal void ResizeWindow(bool changed)
