@@ -57,8 +57,8 @@ using GetPName = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class SamplerState : GraphicsResource
-	{
+  public class SamplerState : GraphicsResource
+  {
 #if DIRECTX
         private SharpDX.Direct3D11.SamplerState _state;
 #endif
@@ -74,11 +74,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #endif
 
-		static SamplerState () 
+    static SamplerState () 
         {
 #if OPENGL
 #if GLES
-            if (GraphicsCapabilities.TextureFilterAnisotric)
+			if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
             {
                 GL.GetFloat(GetPNameMaxTextureMaxAnisotropy, ref SamplerState.MaxTextureMaxAnisotropy);
             }
@@ -88,70 +88,70 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 #endif
 
-			AnisotropicClamp = new SamplerState () 
+      AnisotropicClamp = new SamplerState () 
             {
-				Filter = TextureFilter.Anisotropic,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			};
-			
-			AnisotropicWrap = new SamplerState () 
+        Filter = TextureFilter.Anisotropic,
+        AddressU = TextureAddressMode.Clamp,
+        AddressV = TextureAddressMode.Clamp,
+        AddressW = TextureAddressMode.Clamp,
+      };
+      
+      AnisotropicWrap = new SamplerState () 
             {
-				Filter = TextureFilter.Anisotropic,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			};
-			
-			LinearClamp = new SamplerState () 
+        Filter = TextureFilter.Anisotropic,
+        AddressU = TextureAddressMode.Wrap,
+        AddressV = TextureAddressMode.Wrap,
+        AddressW = TextureAddressMode.Wrap,
+      };
+      
+      LinearClamp = new SamplerState () 
             {
-				Filter = TextureFilter.Linear,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			};
-			
-			LinearWrap = new SamplerState () 
+        Filter = TextureFilter.Linear,
+        AddressU = TextureAddressMode.Clamp,
+        AddressV = TextureAddressMode.Clamp,
+        AddressW = TextureAddressMode.Clamp,
+      };
+      
+      LinearWrap = new SamplerState () 
             {
-				Filter = TextureFilter.Linear,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			};
-			
-			PointClamp = new SamplerState () 
+        Filter = TextureFilter.Linear,
+        AddressU = TextureAddressMode.Wrap,
+        AddressV = TextureAddressMode.Wrap,
+        AddressW = TextureAddressMode.Wrap,
+      };
+      
+      PointClamp = new SamplerState () 
             {
-				Filter = TextureFilter.Point,
-				AddressU = TextureAddressMode.Clamp,
-				AddressV = TextureAddressMode.Clamp,
-				AddressW = TextureAddressMode.Clamp,
-			};
-			
-			PointWrap = new SamplerState () 
+        Filter = TextureFilter.Point,
+        AddressU = TextureAddressMode.Clamp,
+        AddressV = TextureAddressMode.Clamp,
+        AddressW = TextureAddressMode.Clamp,
+      };
+      
+      PointWrap = new SamplerState () 
             {
-				Filter = TextureFilter.Point,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-			};
-		}
-		
-		public static readonly SamplerState AnisotropicClamp;
-		public static readonly SamplerState AnisotropicWrap;
-		public static readonly SamplerState LinearClamp;
-		public static readonly SamplerState LinearWrap;
-		public static readonly SamplerState PointClamp;
-		public static readonly SamplerState PointWrap;
-		
-		public TextureAddressMode AddressU { get; set; }
-		public TextureAddressMode AddressV { get; set; }
-		public TextureAddressMode AddressW { get; set; }
-		public TextureFilter Filter { get; set; }
-		
-		public int MaxAnisotropy { get; set; }
-		public int MaxMipLevel { get; set; }
-		public float MipMapLevelOfDetailBias { get; set; }
+        Filter = TextureFilter.Point,
+        AddressU = TextureAddressMode.Wrap,
+        AddressV = TextureAddressMode.Wrap,
+        AddressW = TextureAddressMode.Wrap,
+      };
+    }
+    
+    public static readonly SamplerState AnisotropicClamp;
+    public static readonly SamplerState AnisotropicWrap;
+    public static readonly SamplerState LinearClamp;
+    public static readonly SamplerState LinearWrap;
+    public static readonly SamplerState PointClamp;
+    public static readonly SamplerState PointWrap;
+    
+    public TextureAddressMode AddressU { get; set; }
+    public TextureAddressMode AddressV { get; set; }
+    public TextureAddressMode AddressW { get; set; }
+    public TextureFilter Filter { get; set; }
+    
+    public int MaxAnisotropy { get; set; }
+    public int MaxMipLevel { get; set; }
+    public float MipMapLevelOfDetailBias { get; set; }
 
         public SamplerState()
         {
@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.MaxMipLevel = 0;
             this.MipMapLevelOfDetailBias = 0.0f;
         }
-		
+    
 #if DIRECTX
 
         internal SharpDX.Direct3D11.SamplerState GetState(GraphicsDevice device)
@@ -262,56 +262,56 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
 
-		internal void Activate(TextureTarget target, bool useMipmaps = false)
-		{
+    internal void Activate(TextureTarget target, bool useMipmaps = false)
+    {
             switch (Filter)
-			{
-			case TextureFilter.Point:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+      {
+      case TextureFilter.Point:
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
-				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
+        GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapNearest : TextureMinFilter.Nearest));
                 GraphicsExtensions.CheckGLError();
-				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                 GraphicsExtensions.CheckGLError();
-				break;
-			case TextureFilter.Linear:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+        break;
+      case TextureFilter.Linear:
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
-				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+        GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
                 GraphicsExtensions.CheckGLError();
-				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
-				break;
-			case TextureFilter.Anisotropic:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+        break;
+      case TextureFilter.Anisotropic:
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, MathHelper.Clamp(this.MaxAnisotropy, 1.0f, SamplerState.MaxTextureMaxAnisotropy));
                     GraphicsExtensions.CheckGLError();
                 }
-				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
+        GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Linear));
                 GraphicsExtensions.CheckGLError();
-				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
-				break;
-			case TextureFilter.PointMipLinear:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+        break;
+      case TextureFilter.PointMipLinear:
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
                 }
-				GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear : TextureMinFilter.Nearest));
+        GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)(useMipmaps ? TextureMinFilter.NearestMipmapLinear : TextureMinFilter.Nearest));
                 GraphicsExtensions.CheckGLError();
-				GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                 GraphicsExtensions.CheckGLError();
-				break;
+        break;
             case TextureFilter.LinearMipPoint:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
@@ -322,7 +322,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 break;
             case TextureFilter.MinLinearMagPointMipLinear:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 break;
             case TextureFilter.MinLinearMagPointMipPoint:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
@@ -344,7 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 break;
             case TextureFilter.MinPointMagLinearMipLinear:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
@@ -355,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 break;
             case TextureFilter.MinPointMagLinearMipPoint:
-                if (GraphicsCapabilities.TextureFilterAnisotric)
+				if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
                 {
                     GL.TexParameter(target, TextureParameterNameTextureMaxAnisotropy, 1.0f);
                     GraphicsExtensions.CheckGLError();
@@ -365,31 +365,31 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                 GraphicsExtensions.CheckGLError();
                 break;
-			default:
-				throw new NotImplementedException();
-			}
+      default:
+        throw new NotImplementedException();
+      }
 
-			// Set up texture addressing.
-			GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
+      // Set up texture addressing.
+      GL.TexParameter(target, TextureParameterName.TextureWrapS, (int)GetWrapMode(AddressU));
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
         }
 
-		private int GetWrapMode(TextureAddressMode textureAddressMode)
-		{
-			switch(textureAddressMode)
-			{
-			case TextureAddressMode.Clamp:
-				return (int)TextureWrapMode.ClampToEdge;
-			case TextureAddressMode.Wrap:
-				return (int)TextureWrapMode.Repeat;
-			case TextureAddressMode.Mirror:
-				return (int)TextureWrapMode.MirroredRepeat;
-			default:
-				throw new NotImplementedException("No support for " + textureAddressMode);
-			}
-		}
+    private int GetWrapMode(TextureAddressMode textureAddressMode)
+    {
+      switch(textureAddressMode)
+      {
+      case TextureAddressMode.Clamp:
+        return (int)TextureWrapMode.ClampToEdge;
+      case TextureAddressMode.Wrap:
+        return (int)TextureWrapMode.Repeat;
+      case TextureAddressMode.Mirror:
+        return (int)TextureWrapMode.MirroredRepeat;
+      default:
+        throw new NotImplementedException("No support for " + textureAddressMode);
+      }
+    }
 
 #endif // OPENGL
 

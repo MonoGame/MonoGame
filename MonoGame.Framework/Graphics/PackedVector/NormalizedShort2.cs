@@ -68,13 +68,17 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			return a.Equals (b);
 		}
 
-		public uint PackedValue { 
-			get { 
-				return short2Packed; 
-			} 
-			set { 
-				short2Packed = value; 
-			} 
+        [CLSCompliant(false)]
+        public uint PackedValue
+        {
+            get
+            {
+                return short2Packed;
+            }
+            set
+            {
+                short2Packed = value;
+            } 
 		}
 
 		public override bool Equals (object obj)

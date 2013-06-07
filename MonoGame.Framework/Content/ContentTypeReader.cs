@@ -114,12 +114,6 @@ namespace Microsoft.Xna.Framework.Content
             if (files.Any(s => s == file))
                 return fileName;
 
-            // Check the file extension
-            if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
-            {
-                return null;
-            }
-
 			// FirstOrDefault returns null as the default if the file is not found. This crashed Path.Combine so check
 			// for it first.
 			string file2 = files.FirstOrDefault(s => extensions.Any(ext => s.ToLower() == (file.ToLower() + ext)));
@@ -137,9 +131,6 @@ namespace Microsoft.Xna.Framework.Content
             if (File.Exists(fileName))
 				return fileName;
 #endif
-			// Check the file extension
-			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
-				return null;
 			
             foreach (string ext in extensions)
             {

@@ -57,8 +57,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.width = width;
             this.height = height;
             this.depth = depth;
-            this.levelCount = 1;
-		    this.format = format;
+            this._levelCount = 1;
+		    this._format = format;
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
@@ -78,14 +78,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
 #elif DIRECTX
             if (mipMap)
-                this.levelCount = CalculateMipLevels(width, height, depth);
+                this._levelCount = CalculateMipLevels(width, height, depth);
 
             var description = new Texture3DDescription
             {
                 Width = width,
                 Height = height,
                 Depth = depth,
-                MipLevels = levelCount,
+                MipLevels = _levelCount,
                 Format = SharpDXHelper.ToFormat(format),
                 BindFlags = BindFlags.ShaderResource,
                 CpuAccessFlags = CpuAccessFlags.None,

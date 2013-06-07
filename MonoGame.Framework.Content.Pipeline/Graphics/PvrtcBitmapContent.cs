@@ -9,14 +9,14 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    class PVRTCBitmapContent : BitmapContent
+    class PvrtcBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
         internal int _bitsPerPixel;
 
         internal SurfaceFormat _format;
 
-        public PVRTCBitmapContent(int bitsPerPixel)
+        public PvrtcBitmapContent(int bitsPerPixel)
         {
             System.Diagnostics.Debug.Assert(bitsPerPixel == 2 || bitsPerPixel == 4);
 
@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _format = _bitsPerPixel == 2 ? SurfaceFormat.RgbaPvrtc2Bpp : SurfaceFormat.RgbaPvrtc4Bpp;
         }
 
-        public PVRTCBitmapContent(int bitsPerPixel, int width, int height) : this(bitsPerPixel)
+        public PvrtcBitmapContent(int bitsPerPixel, int width, int height) : this(bitsPerPixel)
         {
             Width = width;
             Height = height;

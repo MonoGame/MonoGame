@@ -107,7 +107,14 @@ namespace Microsoft.Xna.Framework
             this.Window = _view;
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			soundControllerInstance = OpenALSoundController.GetInstance;
+            try
+            {
+                soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
             
 #if LINUX
             // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
@@ -159,10 +166,10 @@ namespace Microsoft.Xna.Framework
         public override bool BeforeUpdate(GameTime gameTime)
         {
             IsActive = _view.Window.Focused;
-            
-            // Update our OpenAL sound buffer pools
-            soundControllerInstance.Update();
 
+            // Update our OpenAL sound buffer pools
+            if (soundControllerInstance != null)
+                soundControllerInstance.Update();
             return true;
         }
 

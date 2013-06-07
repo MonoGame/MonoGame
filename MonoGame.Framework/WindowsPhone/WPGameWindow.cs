@@ -44,6 +44,7 @@ using Windows.UI.Core;
 using Windows.Graphics.Display;
 
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -104,40 +105,23 @@ namespace MonoGame.Framework.WindowsPhone
             _orientation = ToOrientation(Page.Orientation);
             Page.OrientationChanged += Page_OrientationChanged;
 
-            //inputElement.SizeChanged += Window_SizeChanged;
-
-            //inputElement.GotFocus += Window_FocusChanged;
-            //inputElement.LostFocus += Window_FocusChanged;
+            PhoneApplicationService.Current.Activated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
+            PhoneApplicationService.Current.Launching += (sender, e) => { if (Game.Instance != null) Platform.IsActive = true; };
+            PhoneApplicationService.Current.Deactivated += (sender, e) => { if (Game.Instance != null) Platform.IsActive = false; };
+            PhoneApplicationService.Current.Closing += (sender, e) => { if (Game.Instance != null) Platform.IsActive = false; };
 
             SetClientBounds(Width, Height);
         }
 
-        private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
-        {
-            if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
-                Platform.IsActive = false;
-            else
-                Platform.IsActive = true;
-        }
-
-        private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
-        {
-        }
-
         private void SetClientBounds(double width, double height)
         {
-            var dpi = DisplayProperties.LogicalDpi;
-            var pwidth = width * dpi / 96.0;
-            var pheight = height * dpi / 96.0;
-
-            _clientBounds = new Rectangle(0, 0, (int)pwidth, (int)pheight);
+            _clientBounds = new Rectangle(0, 0, (int)width, (int)height);
         }
 
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
             SetClientBounds(clientWidth, clientHeight);
-            TouchPanel.DisplayHeight = ClientBounds.Height;
-            TouchPanel.DisplayWidth = ClientBounds.Width;
+            _game.graphicsDeviceManager.ApplyChanges();
         }
 
         /*
@@ -207,7 +191,7 @@ namespace MonoGame.Framework.WindowsPhone
 
             // If we have a valid client bounds then update the graphics device.
             //if (_clientBounds.Width > 0 && _clientBounds.Height > 0)
-            //    _game.graphicsDeviceManager.ApplyChanges();
+            _game.graphicsDeviceManager.ApplyChanges();
         }
 
         protected override void SetTitle(string title)

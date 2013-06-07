@@ -112,13 +112,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
-        private RenderTargetBinding[] _currentRenderTargetBindings;
+        private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
+        private int _currentRenderTargetCount;
 
 #if OPENGL && !GLES
 		private DrawBuffersEnum[] _drawBuffers;
 #endif
-
-        private static readonly RenderTargetBinding[] EmptyRenderTargetBinding = new RenderTargetBinding[0];
 
         public TextureCollection Textures { get; private set; }
 
@@ -151,39 +150,39 @@ namespace Microsoft.Xna.Framework.Graphics
         // Core Direct3D Objects
         internal SharpDX.Direct3D11.Device _d3dDevice;
         internal SharpDX.Direct3D11.DeviceContext _d3dContext;
-        protected FeatureLevel _featureLevel;
-        protected SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        protected SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+        internal FeatureLevel _featureLevel;
+        internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
+        internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
 #if WINDOWS_STOREAPP
 
         // Declare Direct2D Objects
-        protected SharpDX.Direct2D1.Factory1 _d2dFactory;
-        protected SharpDX.Direct2D1.Device _d2dDevice;
-        protected SharpDX.Direct2D1.DeviceContext _d2dContext;
+        SharpDX.Direct2D1.Factory1 _d2dFactory;
+        SharpDX.Direct2D1.Device _d2dDevice;
+        SharpDX.Direct2D1.DeviceContext _d2dContext;
 
         // Declare DirectWrite & Windows Imaging Component Objects
-        protected SharpDX.DirectWrite.Factory _dwriteFactory;
-        protected SharpDX.WIC.ImagingFactory2 _wicFactory;
+        SharpDX.DirectWrite.Factory _dwriteFactory;
+        SharpDX.WIC.ImagingFactory2 _wicFactory;
 
         // The swap chain resources.
-        protected SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
-        protected SharpDX.DXGI.SwapChain1 _swapChain;
-        protected SwapChainBackgroundPanel _swapChainPanel;
+        SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
+        SharpDX.DXGI.SwapChain1 _swapChain;
+        SwapChainBackgroundPanel _swapChainPanel;
 
-        protected float _dpi; 
+        float _dpi; 
 
 #elif !WINDOWS_PHONE
 
-        protected SwapChain _swapChain;
+        SwapChain _swapChain;
 
 #endif
 
         // The active render targets.
-        protected SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
+        readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[4];
 
         // The active depth view.
-        protected SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
+        SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
 
         private readonly Dictionary<ulong, SharpDX.Direct3D11.InputLayout> _inputLayouts = new Dictionary<ulong, SharpDX.Direct3D11.InputLayout>();
 
@@ -258,7 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glFramebuffer;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
-        internal readonly List<string> _extensions = new List<string>();
+        internal List<string> _extensions = new List<string>();
         internal int _maxTextureSize = 0;
 #endif
         
@@ -344,12 +343,52 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _currentRenderTargetBindings != null && _currentRenderTargetBindings.Length > 0;
+                return _currentRenderTargetCount > 0;
             }
         }
 
-        public GraphicsDevice ()
+        internal GraphicsDevice(GraphicsDeviceInformation gdi)
+        {
+            SetupGL();
+            if (gdi.PresentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            PresentationParameters = gdi.PresentationParameters;
+            GraphicsProfile = gdi.GraphicsProfile;
+            Initialize();
+        }
+
+        internal GraphicsDevice ()
 		{
+            SetupGL();
+            PresentationParameters = new PresentationParameters();
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
+        /// </summary>
+        /// <param name="graphicsProfile">The graphics profile.</param>
+        /// <param name="presentationParameters">The presentation options.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="presentationParameters"/> is <see langword="null"/>.
+        /// </exception>
+        public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+            :this(graphicsProfile, presentationParameters)
+        {
+        }
+        internal GraphicsDevice(GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
+        {
+            if (presentationParameters == null)
+                throw new ArgumentNullException("presentationParameters");
+            SetupGL();
+            PresentationParameters = presentationParameters;
+            GraphicsProfile = graphicsProfile;
+            Initialize();
+        }
+
+        private void SetupGL() 
+        {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
@@ -389,8 +428,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures = new TextureCollection (MaxTextureSlots);
 			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
 
-			PresentationParameters = new PresentationParameters ();
-			PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
         }
 
         ~GraphicsDevice()
@@ -672,12 +709,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			// Clear the current render targets.
             _currentDepthStencilView = null;
-            _currentRenderTargets[0] = null;
-            _currentRenderTargets[1] = null;
-            _currentRenderTargets[2] = null;
-            _currentRenderTargets[3] = null;
-            _currentDepthStencilView = null;
-            _currentRenderTargetBindings = null;
+            Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
+            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+            _currentRenderTargetCount = 0;
 
 			// Make sure all pending rendering commands are flushed.
             _d3dContext.Flush();
@@ -742,7 +776,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
-                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
+                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
 
                     // By default we scale the backbuffer to the window 
                     // rectangle to function more like a WP7 game.
@@ -912,12 +946,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the current render targets.
             _currentDepthStencilView = null;
-            _currentRenderTargets[0] = null;
-            _currentRenderTargets[1] = null;
-            _currentRenderTargets[2] = null;
-            _currentRenderTargets[3] = null;
-            _currentDepthStencilView = null;
-            _currentRenderTargetBindings = null;
+            Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
+            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+            _currentRenderTargetCount = 0;
 
             // Make sure all pending rendering commands are flushed.
             _d3dContext.Flush();
@@ -974,7 +1005,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     SampleDescription = multisampleDesc,
                     Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                     BufferCount = 2,
-                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters),
+                    SwapEffect = SharpDXHelper.ToSwapEffect(PresentationParameters.PresentationInterval),
                     IsWindowed = true,
                 };
 
@@ -1561,43 +1592,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets) 
 		{
-            // If the default swap chain is already set then do nothing.
-            if (_currentRenderTargetBindings == null && renderTargets == null)
-                return;
-
-#if GLES
-            
-            // if there are render target bindings and we are asked to initialize the bindings
-            // we need to delete the Render Buffers if there were any attached.  If not then
-            // we may run into problems with render targets later being added with different 
-            // sizes which is not allowed.
-            if (_currentRenderTargetBindings != null && renderTargets == null) 
+            // Avoid having to check for null and zero length.
+            var renderTargetCount = 0;
+            if (renderTargets != null)
             {
-                
-                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
-                {
-                    
-                    var renderTarget = _currentRenderTargetBindings[i].RenderTarget as RenderTarget2D;
-                    if (renderTarget != null && renderTarget.DepthStencilFormat != DepthFormat.None)
-                    {
-                        // Delete the render buffers
-                        GL.DeleteRenderbuffers(1, ref renderTarget.glDepthStencilBuffer);
-                        GraphicsExtensions.CheckGLError();
-                    }
-                }
-                
-                _currentRenderTargetBindings = null;
-                
+                renderTargetCount = renderTargets.Length;
+                if (renderTargetCount == 0)
+                    renderTargets = null;
             }
-            
-#endif
-            // If the bindings are the same then early out as well.
-            if (    _currentRenderTargetBindings != null && renderTargets != null &&
-                    _currentRenderTargetBindings.Length == renderTargets.Length )
+
+            // Try to early out if the current and new bindings are equal.
+            if (_currentRenderTargetCount == renderTargetCount)
             {
                 var isEqual = true;
-
-                for (var i = 0; i < _currentRenderTargetBindings.Length; i++)
+                for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
                     if (_currentRenderTargetBindings[i].RenderTarget != renderTargets[i].RenderTarget ||
                         _currentRenderTargetBindings[i].ArraySlice != renderTargets[i].ArraySlice)
@@ -1607,7 +1615,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
 
-                if ( isEqual )
+                if (isEqual)
                     return;
             }
 
@@ -1616,20 +1624,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ApplyRenderTargets(RenderTargetBinding[] renderTargets)
         {
-            // The render target is really changing now.
-            var previousRenderTargetBindings = _currentRenderTargetBindings;
-            _currentRenderTargetBindings = renderTargets;
-		
             var clearTarget = false;
 
-            if (_currentRenderTargetBindings == null || _currentRenderTargetBindings.Length == 0)
-			{
+            // Clear the current bindings.
+            Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
+
+            if (renderTargets == null)
+            {
+                _currentRenderTargetCount = 0;
+
 #if DIRECTX
                 // Set the default swap chain.
+                Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
                 _currentRenderTargets[0] = _renderTargetView;
-                _currentRenderTargets[1] = null;
-                _currentRenderTargets[2] = null;
-                _currentRenderTargets[3] = null;
                 _currentDepthStencilView = _depthStencilView;
 
                 lock (_d3dContext) 
@@ -1640,8 +1647,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
                 _graphics.SetFrameBuffer(_graphics.Screen);
 #endif
-
-                clearTarget = true;
+                clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
                 Viewport = new Viewport(0, 0,
 					PresentationParameters.BackBufferWidth, 
@@ -1649,24 +1655,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			else
 			{
-#if DIRECTX
-                var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
+                // Copy the new bindings.
+                Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
+                _currentRenderTargetCount = renderTargets.Length;
 
-                // Set the new render targets.
-                _currentRenderTargets[0] = null;
-                _currentRenderTargets[1] = null;
-                _currentRenderTargets[2] = null;
-                _currentRenderTargets[3] = null;
+#if DIRECTX
+                // Clear the current render targets.
+                Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
                 _currentDepthStencilView = null;
 
-                for (var b = 0; b < _currentRenderTargetBindings.Length; b++)
+                for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
-                    var binding = _currentRenderTargetBindings[b];
+                    var binding = _currentRenderTargetBindings[i];
                     var target = (IRenderTarget)binding.RenderTarget;
-                    _currentRenderTargets[b] = target.GetRenderTargetView(binding.ArraySlice);
+                    _currentRenderTargets[i] = target.GetRenderTargetView(binding.ArraySlice);
                 }
 
                 // Use the depth from the first target.
+                var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
                 _currentDepthStencilView = renderTarget.GetDepthStencilView();
 
                 // Set the targets.
@@ -1691,25 +1697,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
-                if (renderTarget.DepthStencilFormat != DepthFormat.None)
-				{
-					GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                    // http://www.songho.ca/opengl/gl_fbo.html
-                    // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
-                    // below.  If we check for GLError here we could be catching errors from previous commands and not this.
-                    //GraphicsExtensions.CheckGLError();
-                    if (renderTarget.DepthStencilFormat == DepthFormat.Depth24Stencil8)
-					{
-						GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glDepthStencilBuffer);
-                        // http://www.songho.ca/opengl/gl_fbo.html
-                        // FramebufferRenderbuffer should be checked with CheckFramebufferStatus(GLFramebuffer) which is being done
-                        // below.  If we check for GLError here we could be catching errors from previous commands and not this.
-                        //GraphicsExtensions.CheckGLError();
-                    }
-				}
+
+				// Reverted this change, as per @prollin's suggestion
+				GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+				GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
-				for (int i = 0; i < _currentRenderTargetBindings.Length; i++)
+				for (var i = 0; i < _currentRenderTargetCount; i++)
 				{
 					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 					GraphicsExtensions.CheckGLError();
@@ -1717,10 +1711,11 @@ namespace Microsoft.Xna.Framework.Graphics
 					GraphicsExtensions.CheckGLError();
 				}
 
-				GL.DrawBuffers(_currentRenderTargetBindings.Length, _drawBuffers);
+				GL.DrawBuffers(_currentRenderTargetCount, _drawBuffers);
 				GraphicsExtensions.CheckGLError();
 #endif
 
+                // Test that the FBOs are attached and correct.
 				var status = GL.CheckFramebufferStatus(GLFramebuffer);
 				if (status != GLFramebufferComplete)
 				{
@@ -1751,29 +1746,14 @@ namespace Microsoft.Xna.Framework.Graphics
             // it is cleared before being rendered to.
             if (clearTarget)
                 Clear(DiscardColor);
-
-			if (previousRenderTargetBindings != null)
-			{
-				for (var i = 0; i < previousRenderTargetBindings.Length; ++i)
-				{
-					var renderTarget = previousRenderTargetBindings[i].RenderTarget;
-					if (renderTarget.LevelCount > 1)
-					{
-						throw new NotImplementedException();
-						/*
-						GL.ActiveTexture(TextureUnit.Texture0);
-						GL.BindTexture(TextureTarget.Texture2D, renderTarget.ID);
-						GL.GenerateMipmap(TextureTarget.Texture2D);
-						GL.BindTexture(TextureTarget.Texture2D, 0);
-                        */
-					}
-				}
-			}
-
+            
 #if OPENGL
 			// Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
             _rasterizerStateDirty = true;
+
+            // Textures will need to be rebound to render correctly in the new render target.
+            Textures.Dirty();
 #endif
         }
 
@@ -1807,10 +1787,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public RenderTargetBinding[] GetRenderTargets()
 		{
-            if (!IsRenderTargetBound)
-                return EmptyRenderTargetBinding;
-
-            return _currentRenderTargetBindings;
+            // Return a correctly sized copy our internal array.
+            var bindings = new RenderTargetBinding[_currentRenderTargetCount];
+            Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
+            return bindings;
 		}
 
 #if OPENGL
@@ -2548,6 +2528,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
-		
+
+#if DIRECTX		
+        /// <summary>
+        /// Sends queued-up commands in the command buffer to the graphics processing unit (GPU).
+        /// </summary>
+        public void Flush()
+        {
+            _d3dContext.Flush();
+        }
+#endif
     }
 }
