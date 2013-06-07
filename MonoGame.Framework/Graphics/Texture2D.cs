@@ -650,18 +650,31 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #else
+			var temp = new T[this.width*this.height];
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-
-			if (rect.HasValue) {
-				throw new NotImplementedException();
-			}
 
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
-				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
 			}
+
+			if (rect.HasValue) {
+				int z = 0, w = 0;
+
+				for(int y=rect.Value.Top; y < rect.Value.Bottom; y++) {
+					for(int x=rect.Value.Left; x < rect.Value.Right; x++) {		
+						data[z*rect.Value.Width+w] = temp[(y*width)+x];
+						w++;
+					}
+					z++;
+				}
+				//throw new NotImplementedException();
+			} else {
+				data = temp;
+			}
+
 
 #endif
         }
