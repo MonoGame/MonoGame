@@ -346,10 +346,6 @@ namespace Microsoft.Xna.Framework
             presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
-#if !MONOMAC
-            ApplyChanges();
-#endif
-
 #endif // WINDOWS || WINRT
 
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
@@ -365,7 +361,12 @@ namespace Microsoft.Xna.Framework
                 GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
             }
 
+            // Needs be before ApplyChanges()
             _graphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
+
+#if !MONOMAC
+            ApplyChanges();
+#endif
 
             // Set the new display size on the touch panel.
             //
@@ -375,6 +376,7 @@ namespace Microsoft.Xna.Framework
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            TouchPanel.DisplayOrientation = _graphicsDevice.PresentationParameters.DisplayOrientation;
         }
 
         public void ToggleFullScreen()

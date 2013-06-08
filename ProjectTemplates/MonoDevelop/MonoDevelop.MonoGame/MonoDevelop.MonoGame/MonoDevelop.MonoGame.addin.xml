@@ -69,6 +69,7 @@
 		<ProjectTemplate id="MonoGameForLinuxProject" file="templates/MonoGameLinuxProject.xpt.xml" />
 		<ProjectTemplate id="MonoGameForMacProject" file="templates/MonoGameMacProject.xpt.xml" />
         <ProjectTemplate id="MonoGameForMacFSharpProject" file="templates/MonoGameMacFsharpProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameForPortableProject" file="templates/MonoGamePortableProject.xpt.xml" />
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/FileTemplates">
 		<FileTemplate id="MonoGameAndroidClass" resource="MonoGameAndroidClass.xft.xml" />
@@ -84,6 +85,7 @@
         <Assembly file="assemblies/Linux/MonoGame.Framework.dll" />
         <Assembly file="assemblies/iOS/MonoGame.Framework.dll" />
         <Assembly file="assemblies/Android/MonoGame.Framework.dll" />
+        <Assembly file="assemblies/Portable/MonoGame.Framework.dll" />
 
         <Assembly file="assemblies/WindowsGL/Lidgren.Network.dll" />
         <Assembly file="assemblies/Android/Lidgren.Network.dll" />

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Portable Application</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<Icon>monogame-project</Icon>
+		<LanguageName>C#</LanguageName>
+		<_Description>Creates a new C# MonoGame Portable Application.</_Description>	   
+	</TemplateConfiguration>
+	
+	<Actions>
+		<Open filename = "Game1.cs"/>
+	</Actions>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type="MonoGame">
+			<Options />
+			<References>
+				<Reference type="Gac" refto="MonoGame.Framework.Portable" />
+			</References>
+			<Files>
+				<File name="Game1.cs" src="MonoGameApplication/Game1.cs" />
+				<RawFile name="Icon.png" src="MonoGameApplication/Icon-md.png" />
+				<Directory name="Properties">
+					<File name="AssemblyInfo.cs" src="MonoGameApplication/AssemblyInfo.cs" />
+				</Directory>
+			</Files>
+		</Project>
+	</Combine>
+</Template>
