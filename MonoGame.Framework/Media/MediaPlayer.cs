@@ -64,6 +64,7 @@ using SharpDX.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Phone.Shell;
+using System.Threading;
 #endif
 #if WINRT
 using Windows.UI.Core;
@@ -189,7 +190,10 @@ namespace Microsoft.Xna.Framework.Media
                 if (_volumeController != null)
                     _volumeController.Mute = _isMuted;
 #elif WINDOWS_PHONE
-                _mediaElement.IsMuted = value;
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.IsMuted = value;
+                });
 #else
                 if (_queue.Count == 0)
 					return;
@@ -232,7 +236,15 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_MEDIA_SESSION
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
 #elif WINDOWS_PHONE
-                return _mediaElement.Position;
+                TimeSpan pos = TimeSpan.Zero;
+                EventWaitHandle Wait = new AutoResetEvent(false);
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    pos = _mediaElement.Position;
+                    Wait.Set();
+                });
+                Wait.WaitOne();
+                return (pos);
 #else
 				if (_queue.ActiveSong == null)
 					return TimeSpan.Zero;
@@ -302,7 +314,10 @@ namespace Microsoft.Xna.Framework.Media
 			    if (_volumeController != null)
                     _volumeController.MasterVolume = _volume;
 #elif WINDOWS_PHONE
-                _mediaElement.Volume = value;
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Volume = value;
+                });
 #else
                 if (_queue.ActiveSong == null)
 					return;
