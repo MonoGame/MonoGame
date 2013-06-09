@@ -4,14 +4,23 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    #if WINRT || PORTABLE
     [DataContract]
+    #else
+    [Serializable]
+    #endif
+#if !PORTABLE
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
 	public struct VertexPositionColor : IVertexType
 	{
+#if WINRT
         [DataMember]
+#endif
 		public Vector3 Position;
-        
+#if WINRT
         [DataMember]
+#endif
 		public VertexElementColor Color;
 
 		public static readonly VertexDeclaration VertexDeclaration;

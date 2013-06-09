@@ -44,11 +44,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
-#if WINRT || WINDOWS_PHONE
     [DataContract]
-#else
-    [Serializable]
-#endif
     public class GamerPrivilegeException : Exception
 	{
 		

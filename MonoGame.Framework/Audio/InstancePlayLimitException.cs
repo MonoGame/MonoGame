@@ -45,7 +45,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework.Audio
 {
     [DataContract]
-#if WINRT
+#if WINRT || PORTABLE
     public sealed class InstancePlayLimitException : Exception
 #else
     public sealed class InstancePlayLimitException : ExternalException

@@ -42,7 +42,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
 using System.Runtime.Remoting.Messaging;
 #endif
 using System.Threading;
@@ -457,6 +457,8 @@ namespace Microsoft.Xna.Framework.Net
 		public static NetworkSession EndCreate (IAsyncResult result)
 		{
 			NetworkSession returnValue = null;
+#if !PORTABLE
+
 			try {
 #if WINDOWS_PHONE
                 return null;
@@ -477,7 +479,7 @@ namespace Microsoft.Xna.Framework.Net
 				// Close the wait handle.
 				result.AsyncWaitHandle.Close ();	 
 			}
-			
+#endif
 			return returnValue;
 		}
 
@@ -485,9 +487,11 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			AvailableNetworkSessionCollection returnValue = null;
 			List<AvailableNetworkSession> networkSessions = new List<AvailableNetworkSession>();
+#if !PORTABLE
 			
 			try {
 				// Retrieve the delegate.
+
 #if WINDOWS_PHONE
                 MonoGamerPeer.FindResults(networkSessions);
 #else
@@ -506,10 +510,12 @@ namespace Microsoft.Xna.Framework.Net
                 }
 #endif
 
+
             } finally {
 				// Close the wait handle.
 				result.AsyncWaitHandle.Close ();
 			}
+#endif
 			returnValue = new AvailableNetworkSessionCollection(networkSessions);
 			return returnValue;
 		}
@@ -527,6 +533,8 @@ namespace Microsoft.Xna.Framework.Net
 		public static NetworkSession EndJoin (IAsyncResult result)
 		{
 			NetworkSession returnValue = null;
+#if !PORTABLE
+
 			try {
 #if WINDOWS_PHONE
 #else
@@ -545,12 +553,15 @@ namespace Microsoft.Xna.Framework.Net
 				// Close the wait handle.
 				result.AsyncWaitHandle.Close ();
 			}
+#endif
 			return returnValue;
 		}
 
 		public static NetworkSession EndJoinInvited (IAsyncResult result)
 		{
 			NetworkSession returnValue = null;
+#if !PORTABLE
+
 			try {
 #if WINDOWS_PHONE
 #else
@@ -569,6 +580,7 @@ namespace Microsoft.Xna.Framework.Net
 				// Close the wait handle.
 				result.AsyncWaitHandle.Close ();
 			}
+#endif
 			return returnValue;
 		}
 
@@ -605,8 +617,10 @@ namespace Microsoft.Xna.Framework.Net
 					throw new ArgumentOutOfRangeException ( "maxLocalGamers must be between 1 and 4." );
 
 				List<AvailableNetworkSession> availableNetworkSessions = new List<AvailableNetworkSession> ();
+#if !PORTABLE
 				MonoGamerPeer.Find(sessionType);
-				return new AvailableNetworkSessionCollection ( availableNetworkSessions );
+#endif
+                return new AvailableNetworkSessionCollection ( availableNetworkSessions );
 			} finally {
 			}
 		}
@@ -696,6 +710,7 @@ namespace Microsoft.Xna.Framework.Net
 
 		public void Update ()
 		{
+#if !PORTABLE
 			// Updates the state of the multiplayer session. 
 			try {
 				while (commandQueue.Count > 0 && networkPeer.IsReady) {
@@ -741,13 +756,15 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			finally {
 			}
+#endif
 		}
 		
 		private void ProcessGamerStateChange(CommandGamerStateChange command) 
 		{
-			
+#if !PORTABLE
 			networkPeer.SendGamerStateChange(command.Gamer);	
-		}
+#endif
+            }
 		
 		private void ProcessSendData(CommandSendData command)
 		{
@@ -863,6 +880,7 @@ namespace Microsoft.Xna.Framework.Net
 				GamerJoined(this, new GamerJoinedEventArgs(gamer));
 			}
 			
+#if !PORTABLE
 			if (networkPeer !=  null && (command.State & GamerStates.Local) == 0) {
 				
 				networkPeer.SendPeerIntroductions(gamer);
@@ -872,7 +890,7 @@ namespace Microsoft.Xna.Framework.Net
 			{
 				networkPeer.UpdateLiveSession(this);
 			}
-			
+#endif
 			
 		}
 		
@@ -895,8 +913,10 @@ namespace Microsoft.Xna.Framework.Net
 			
 			if (networkPeer != null)
 			{
+#if !PORTABLE
 				networkPeer.UpdateLiveSession(this);
-			}
+#endif
+                }
 		}		
 
 		void HandleGamerPropertyChanged (object sender, System.ComponentModel.PropertyChangedEventArgs e)

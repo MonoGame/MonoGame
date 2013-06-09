@@ -32,9 +32,10 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.IO;
-
+#if !PORTABLE
 using OpenTK.Audio.OpenAL;
 using OpenTK.Audio;
+#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {    
@@ -44,7 +45,10 @@ namespace Microsoft.Xna.Framework.Audio
     /// </summary>
     internal class Sound : IDisposable
     {
+#if !PORTABLE
+
         private static AudioContext context = null;
+#endif
         private int sourceID;
         private int bufferID = -1;
 
@@ -65,15 +69,19 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                float seconds;
+                float seconds = 0;
+#if !PORTABLE
                 AL.GetSource(sourceID, ALSourcef.SecOffset, out seconds);
+#endif
                 return (double)seconds;
             }
 
             set
             {
+#if !PORTABLE
                 AL.Source(sourceID, ALSourcef.SecOffset, (float)value);
-            }
+#endif
+                }
         }
 
         public bool Looping
@@ -87,7 +95,9 @@ namespace Microsoft.Xna.Framework.Audio
                 // just do something if it's really needed
                 if (looping != value)
                 {
+#if !PORTABLE
                     AL.Source(sourceID, ALSourceb.Looping, value);
+#endif
                     loopingCtrl = looping = value;
                 }
             }
@@ -103,7 +113,11 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
+#if !PORTABLE
                 return AL.GetSourceState(sourceID) == ALSourceState.Playing;
+#else
+                return false;
+#endif
             }
 
             set
@@ -123,16 +137,19 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                float volume;
+                float volume = 0;
+#if !PORTABLE
                 AL.GetSource(sourceID, ALSourcef.Gain, out volume);
+#endif
                 return volume;
             }
             set
             {
                 if (value < 0f || value > 1f)
                     throw new ArgumentException("Volume should be between 0 and 1.0");
-
+#if !PORTABLE
                 AL.Source(sourceID, ALSourcef.Gain, value);
+#endif
             }
         }
 		
@@ -144,6 +161,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public Sound(string filename, float volume, bool looping)
         {
+#if !PORTABLE
             ALFormat format;
             int size;
             int freq;
@@ -164,10 +182,12 @@ namespace Microsoft.Xna.Framework.Audio
             s.Close();
 
             Initialize(data, format, size, freq, volume, looping);
+#endif
         }
 
         public Sound(byte[] audiodata, float volume, bool looping)
         {
+#if !PORTABLE
             ALFormat format;
             int size;
             int freq;
@@ -188,6 +208,7 @@ namespace Microsoft.Xna.Framework.Audio
             s.Close();
 
             Initialize(data, format, size, freq, volume, looping);
+#endif
         }      
 		
 		~Sound()
@@ -197,19 +218,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static void InitilizeSoundServices()
         {
+#if !PORTABLE
             if (context == null)
                 context = new AudioContext();
+#endif
         }
 
         internal static void DisposeSoundServices()
         {
+#if !PORTABLE
             if (context != null)
             {
                 context.Dispose();
                 context = null;
             }
+#endif
         }
 
+#if !PORTABLE
         private void Initialize(byte[] data, ALFormat format, int size, int frequency,
                                 float volume, bool looping)
         {
@@ -234,7 +260,7 @@ namespace Microsoft.Xna.Framework.Audio
             Volume = volume;
             this.looping = looping;
         }
-
+#endif
         public void Dispose()
         {
             Dispose(true);
@@ -250,8 +276,10 @@ namespace Microsoft.Xna.Framework.Audio
 
                 }
                 Stop();
+ #if !PORTABLE
                 AL.DeleteSource(sourceID);
                 AL.DeleteBuffer(bufferID);
+#endif
                 bufferID = -1;
 
                 disposed = true;
@@ -273,10 +301,14 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                int rv;
+                int rv = 0;
+#if !PORTABLE
                 AL.GetBuffer(bufferID, ALGetBufferi.Channels, out rv);
                 return rv;
-            }
+#else
+                return 0;
+#endif
+                }
         }
 
         /// <summary>
@@ -286,8 +318,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                int rv;
+                int rv = 0;
+#if !PORTABLE
                 AL.GetBuffer(bufferID, ALGetBufferi.Size, out rv);
+#endif
                 return rv;
             }
         }
@@ -299,8 +333,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                int rv;
+                int rv = 0;
+#if !PORTABLE
                 AL.GetBuffer(bufferID, ALGetBufferi.Bits, out rv);
+#endif
                 return rv;
             }
         }
@@ -312,8 +348,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-                int rv;
+                int rv = 0;
+#if !PORTABLE
                 AL.GetBuffer(bufferID, ALGetBufferi.Frequency, out rv);
+#endif
                 return rv;
             }
         }
@@ -344,7 +382,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Pause()
         {
+#if !PORTABLE
             AL.SourcePause(sourceID);
+#endif
         }
 		
 		public void Resume()
@@ -357,13 +397,17 @@ namespace Microsoft.Xna.Framework.Audio
             // if we must loop but looping was disabled
             if (looping && !loopingCtrl)
             {
+#if !PORTABLE
                 // then enable looping
                 AL.Source(sourceID, ALSourceb.Looping, true);
+#endif
                 loopingCtrl = true;
             }
 
             // and play
+#if !PORTABLE
             AL.SourcePlay(sourceID);
+#endif
         }
 
         public void Stop()
@@ -371,13 +415,17 @@ namespace Microsoft.Xna.Framework.Audio
             // if looping is enabled
             if (loopingCtrl)
             {
+#if !PORTABLE
                 // disable it
                 AL.Source(sourceID, ALSourceb.Looping, false);
+#endif
                 loopingCtrl = false;
             }
 
+#if !PORTABLE
             // and stop
             AL.SourceStop(sourceID);
+#endif
         }
 
         public static Sound CreateAndPlay(string url, float volume, bool looping)

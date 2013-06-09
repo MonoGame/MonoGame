@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Portable", "MonoGame.Framework\MonoGame.Framework.Portable.csproj", "{D0F9C1B4-9E45-4C50-88FC-A071E8AF6A94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0F9C1B4-9E45-4C50-88FC-A071E8AF6A94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F9C1B4-9E45-4C50-88FC-A071E8AF6A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F9C1B4-9E45-4C50-88FC-A071E8AF6A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F9C1B4-9E45-4C50-88FC-A071E8AF6A94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

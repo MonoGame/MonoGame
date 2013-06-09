@@ -82,6 +82,7 @@ namespace Microsoft.Xna.Framework.Audio
         
         public WaveBank(AudioEngine audioEngine, string nonStreamingWaveBankFilename)
         {
+#if !PORTABLE
             //XWB PARSING
             //Adapted from MonoXNA
             //Originally adaped from Luigi Auriemma's unxwb
@@ -439,6 +440,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
 			
 			audioEngine.Wavebanks[BankName] = this;
+#endif
         }
 		
 		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)

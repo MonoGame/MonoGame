@@ -53,7 +53,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+#if !PORTABLE
 using System.Windows;
+#endif
 using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
@@ -63,7 +65,7 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
-#else
+#elif !PORTABLE
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
 using Microsoft.Xna.Framework.Net;
@@ -307,7 +309,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-#if !WINRT && !(WINDOWS && DIRECTX)
+#if !WINRT && !(WINDOWS && DIRECTX) && !PORTABLE
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)
@@ -461,7 +463,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
-#if !DIRECTX
+#if !DIRECTX && !PORTABLE
             MonoGameGamerServicesHelper.Initialise(game);
 #endif
         }

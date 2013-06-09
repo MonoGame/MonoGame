@@ -6,8 +6,10 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+#if !PORTABLE
 	[StructLayout(LayoutKind.Sequential, Pack=1)]
-	internal struct VertexColorTexture
+#endif
+    internal struct VertexColorTexture
 	{
 		public Vector2 Vertex;
 		public uint Color;

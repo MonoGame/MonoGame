@@ -1733,12 +1733,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
-
+    
+#if !PSM && !PORTABLE           
                 // Set the viewport to the size of the first render target.
                 Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+#endif
             }
 
             // In XNA 4, because of hardware limitations on Xbox, when
@@ -1755,6 +1757,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Textures will need to be rebound to render correctly in the new render target.
             Textures.Dirty();
 #endif
+
         }
 
 #if WINRT

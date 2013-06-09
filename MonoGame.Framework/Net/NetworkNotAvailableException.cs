@@ -43,11 +43,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Net
 {
-#if WINRT || WINDOWS_PHONE
     [DataContract]
-#else
-    [Serializable]
-#endif
     public class NetworkNotAvailableException : NetworkException
 	{
 		public NetworkNotAvailableException()

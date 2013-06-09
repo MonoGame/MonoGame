@@ -69,9 +69,13 @@ namespace Microsoft.Xna.Framework.Net
 		internal byte[] Data
 		{
 			get {
+#if !PORTABLE
 				MemoryStream stream = (MemoryStream)this.BaseStream;
 				return stream.GetBuffer();
-			}			
+#else
+                return null;
+#endif
+                }			
 			set {
 				MemoryStream ms = (MemoryStream)this.BaseStream;
 				ms.Write(value, 0, value.Length);

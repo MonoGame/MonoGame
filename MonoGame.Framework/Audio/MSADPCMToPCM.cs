@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework.Audio
 			short numChannels,
 			short blockAlign
 		) {
+#if !PORTABLE
 			// We write to output when reading the PCM data, then we convert
 			// it back to a short array at the end.
 			MemoryStream output = new MemoryStream();
@@ -217,6 +218,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 			// Return the array.
 			return output.ToArray();
+#else
+            return null;
+#endif
 		}
 	}
 }

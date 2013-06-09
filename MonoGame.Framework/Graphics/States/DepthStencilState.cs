@@ -377,6 +377,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#elif PORTABLE
+        internal void ApplyState(GraphicsDevice device)
+        { }
 #endif // DIRECTX
 #if PSM
         internal void ApplyState(GraphicsDevice device)

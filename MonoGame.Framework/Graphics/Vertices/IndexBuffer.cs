@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
             _buffer = new ushort[indexCount];
-#else
+#elif !PORTABLE
             Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
 		}
@@ -107,6 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
         {
+#if !PORTABLE
             switch (Marshal.SizeOf(type))
             {
                 case 2:
@@ -118,6 +119,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 default:
                     throw new ArgumentOutOfRangeException("Index buffers can only be created for types that are sixteen or thirty two bits in length");
             }
+#else
+            return 0;
+#endif
         }
 
         /// <summary>
@@ -208,7 +212,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif PSM
             throw new NotImplementedException();
-#else        
+#elif !PORTABLE        
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount);
@@ -282,6 +286,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("data is null");
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
+#if !PORTABLE
 
 #if DIRECTX
 
@@ -360,6 +365,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif
+#endif
         }
 
 #if OPENGL
@@ -412,7 +418,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
                 //Do nothing
                 _buffer = null;
-#else
+#elif !PORTABLE
                 GraphicsDevice.AddDisposeAction(() =>
                     {
                         GL.DeleteBuffers(1, ref ibo);

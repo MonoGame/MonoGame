@@ -201,7 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (type == SurfaceType.RenderTarget)
 			    option = PixelBufferOption.Renderable;
             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
-#else
+#elif !PORTABLE
 
             this.glTarget = TextureTarget.Texture2D;
             
@@ -300,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 #endif
-#if !PSM
+#if !PSM && !PORTABLE
                 var elementSizeInByte = Marshal.SizeOf(typeof(T));
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 // Use try..finally to make sure dataHandle is freed in case of an error
@@ -422,7 +422,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-#if !PSM
+#if !PSM && !PORTABLE
                 }
                 finally
                 {
@@ -676,7 +676,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     stream.Dispose();
                 }
 
-#else
+#elif !PORTABLE
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
@@ -812,7 +812,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException(); 
 #elif PSM
             return new Texture2D(graphicsDevice, stream);
-#else
+#elif !PORTABLE
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {
                 // Fix up the Image to match the expected format
@@ -832,6 +832,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return texture;
             }
+#else
+            return null;
 #endif
         }
 

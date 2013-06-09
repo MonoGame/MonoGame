@@ -6,7 +6,9 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+#if !PORTABLE
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
     public struct VertexPositionNormalTexture : IVertexType
     {
         public Vector3 Position;

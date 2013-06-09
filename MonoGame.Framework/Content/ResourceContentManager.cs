@@ -21,7 +21,11 @@ namespace Microsoft.Xna.Framework.Content
 
         protected override System.IO.Stream OpenStream(string assetName)
         {
+#if !PORTABLE
             object obj = this.resource.GetObject(assetName);
+#else
+            object obj = null;
+#endif
             if (obj == null)
             {
                 throw new ContentLoadException("Resource not found");

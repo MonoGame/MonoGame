@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
-#else
+#elif !PORTABLE
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
             MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>

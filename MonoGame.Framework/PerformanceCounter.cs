@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework
 			else 
 			{
 				item = new PerformanceItem();
-#if !WINRT
+#if !WINRT && !PORTABLE
     			var stackTrace = new StackTrace();
     			var stackFrame = stackTrace.GetFrame(1);
     			MethodBase methodBase = stackFrame.GetMethod();
@@ -138,7 +138,8 @@ namespace Microsoft.Xna.Framework
 			}
 			item.TotalTime += elapsedTime;
 			item.HitCount ++;
-		}	}
+		}
+	}
 }
 
 #endif

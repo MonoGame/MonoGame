@@ -30,6 +30,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif PORTABLE
+[assembly: AssemblyDescription("MonoGame Portable")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -41,6 +43,7 @@ using System.Resources;
 // Mark the assembly as CLS compliant so it can be safely used in other .NET languages
 [assembly:CLSCompliant(true)]
 
+#if !PORTABLE
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
@@ -48,6 +51,7 @@ using System.Resources;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("81119db2-82a6-45fb-a366-63a08437b485")]
+#endif
 
 // Version information for an assembly consists of the following four values:
 //

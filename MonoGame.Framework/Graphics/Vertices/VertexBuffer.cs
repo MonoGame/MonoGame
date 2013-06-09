@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
 #elif PSM
             //Do nothing, we cannot create the storage array yet
-#else
+#elif !PORTABLE
             Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
 		}
@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif PSM
             throw new NotImplementedException();
-#else
+#elif !PORTABLE
 
             if (Threading.IsOnUIThread())
             {
@@ -260,14 +260,18 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
+#if !PORTABLE
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
+#endif
         }
 
         public void GetData<T>(T[] data) where T : struct
         {
+#if !PORTABLE
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             this.GetData<T>(0, data, 0, data.Count(), elementSizeInByte);
+#endif
         }
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
@@ -296,7 +300,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
                 throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
    
-#if !PSM
+#if !PSM && !PORTABLE
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 #endif
 
@@ -351,7 +355,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
-#else
+#elif !PORTABLE
 
             if (Threading.IsOnUIThread())
             {
@@ -412,7 +416,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
                 //Do nothing
                 _vertexArray = null;
-#else
+#elif !PORTABLE
                 GraphicsDevice.AddDisposeAction(() =>
                     {
                         GL.DeleteBuffers(1, ref vbo);

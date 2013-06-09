@@ -79,7 +79,8 @@ namespace Microsoft.Xna.Framework.Media
 		
 		internal static string Normalize(string FileName)
 		{
-			if (File.Exists(FileName))
+#if !PORTABLE
+            if (File.Exists(FileName))
 				return FileName;
 			
 			// Check the file extension
@@ -97,7 +98,7 @@ namespace Microsoft.Xna.Framework.Media
 				return FileName+".avi";
 			if (File.Exists(FileName+".m4v"))
 				return FileName+".m4v";
-			
+#endif
 			
 			return null;
 		}

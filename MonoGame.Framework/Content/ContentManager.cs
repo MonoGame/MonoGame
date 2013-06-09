@@ -46,7 +46,9 @@ using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if !PORTABLE
 using Path = System.IO.Path;
+#endif
 using System.Diagnostics;
 
 #if !WINRT
@@ -217,8 +219,10 @@ namespace Microsoft.Xna.Framework.Content
 		
 		protected virtual Stream OpenStream(string assetName)
 		{
-			Stream stream;
-			try
+
+            Stream stream;
+#if !PORTABLE
+            try
             {
                 string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
@@ -247,6 +251,9 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
+#else 
+            stream = null;
+#endif
 			return stream;
 		}
 
@@ -303,9 +310,9 @@ namespace Microsoft.Xna.Framework.Content
             catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
-
+#if !PORTABLE
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
+#endif
                 assetName = Normalize<T>(assetName);
 	
 				if (string.IsNullOrEmpty(assetName))
@@ -343,7 +350,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return SpriteFontReader.Normalize(assetName);
             }
-#if !WINRT
+#if !WINRT && !PORTABLE
             else if ((typeof(T) == typeof(Song)))
             {
                 return SongReader.Normalize(assetName);
@@ -381,7 +388,7 @@ namespace Microsoft.Xna.Framework.Content
                 //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
                 throw new NotImplementedException();
             }
-#if !DIRECTX
+#if !DIRECTX && !PORTABLE
             else if ((typeof(T) == typeof(Song)))
             {
                 return new Song(assetName);
@@ -615,9 +622,9 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
-
+#if !PORTABLE
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
+#endif
                 assetName = Normalize<T>(assetName);
 
                 ReloadRawAsset(currentAsset, assetName, originalAssetName);
@@ -664,7 +671,11 @@ namespace Microsoft.Xna.Framework.Content
         {
             get
             {
+#if !PORTABLE
                 return Path.Combine(TitleContainer.Location, RootDirectory);
+#else
+                return string.Empty;
+#endif
             }
         }
 		
