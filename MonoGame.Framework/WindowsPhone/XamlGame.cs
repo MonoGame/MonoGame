@@ -110,7 +110,7 @@ namespace MonoGame.Framework.WindowsPhone
                 _host.RequestAdditionalFrame();
             }
 
-            public override void PrepareResources(DateTime presentTargetTime, ref DrawingSizeF desiredRenderTargetSize)
+            public override void PrepareResources(DateTime presentTargetTime, ref Size2F desiredRenderTargetSize)
             {
                 WindowsPhoneGameWindow.Width = desiredRenderTargetSize.Width;
                 WindowsPhoneGameWindow.Height = desiredRenderTargetSize.Height;
