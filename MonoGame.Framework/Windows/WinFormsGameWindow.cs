@@ -48,6 +48,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
+using SharpDX.Multimedia;
+using SharpDX.RawInput;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Point = System.Drawing.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
@@ -144,14 +146,7 @@ namespace MonoGame.Framework
 
         #region Non-Public Properties
 
-        internal List<XnaKey> KeyState
-        {
-            get { return _form.KeyState; } 
-            set
-            {
-                _form.KeyState = value;
-            }
-        }
+        internal List<XnaKey> KeyState { get; set; }
 
         #endregion
 
@@ -179,6 +174,10 @@ namespace MonoGame.Framework
             _form.MouseEnter += OnMouseEnter;
             _form.MouseLeave += OnMouseLeave;            
 
+            // Use RawInput to capture key events.
+            Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.None);
+            Device.KeyboardInput += OnRawKeyEvent;
+
             _form.Activated += OnActivated;
             _form.Deactivate += OnDeactivate;
             _form.ClientSizeChanged += OnClientSizeChanged;
@@ -195,8 +194,8 @@ namespace MonoGame.Framework
         {
             _platform.IsActive = false;
 
-            if (_form.KeyState != null)
-                _form.KeyState.Clear();
+            if (KeyState != null)
+                KeyState.Clear();
         }
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
@@ -241,6 +240,39 @@ namespace MonoGame.Framework
                 _isMouseHidden = false;
                 Cursor.Show();
             }
+        }
+
+        private void OnRawKeyEvent(object sender, KeyboardInputEventArgs args)
+        {
+            XnaKey xnaKey;
+
+            switch (args.MakeCode)
+            {
+                case 0x2a: // LShift
+                    xnaKey = XnaKey.LeftShift;
+                    break;
+
+                case 0x36: // RShift
+                    xnaKey = XnaKey.RightShift;
+                    break;
+
+                case 0x1d: // Ctrl
+                    xnaKey = (args.ScanCodeFlags & ScanCodeFlags.E0) != 0 ? XnaKey.RightControl : XnaKey.LeftControl;
+                    break;
+
+                case 0x38: // Alt
+                    xnaKey = (args.ScanCodeFlags & ScanCodeFlags.E0) != 0 ? XnaKey.RightAlt : XnaKey.LeftAlt;
+                    break;
+
+                default:
+                    xnaKey = (XnaKey)args.Key;
+                    break;
+            }
+
+            if (args.State == SharpDX.RawInput.KeyState.KeyDown && !KeyState.Contains(xnaKey))
+                KeyState.Add(xnaKey);
+            else if (args.State == SharpDX.RawInput.KeyState.KeyUp)
+                KeyState.Remove(xnaKey);
         }
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
