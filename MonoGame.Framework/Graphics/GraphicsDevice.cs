@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return;
 
                 _dpi = value;
-                _d2dContext.DotsPerInch = new DrawingSizeF(_dpi, _dpi);
+                _d2dContext.DotsPerInch = new Size2F(_dpi, _dpi);
 
                 //if (OnDpiChanged != null)
                     //OnDpiChanged(this);
@@ -581,7 +581,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     PresentationParameters.BackBufferWidth = texture2D.Description.Width;
                     PresentationParameters.BackBufferHeight = texture2D.Description.Height;
 
-                    ComObject.Dispose(ref _depthStencilView);
+                    Utilities.Dispose(ref _depthStencilView);
 
                     using (var depthTexture = new SharpDX.Direct3D11.Texture2D(
                         _d3dDevice,
@@ -1521,7 +1521,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                     lock (_d3dContext)
-                        _d3dContext.Rasterizer.SetViewports(viewport);
+                        _d3dContext.Rasterizer.SetViewport(viewport);
                 }
 #elif OPENGL
                 if (IsRenderTargetBound)
@@ -1767,7 +1767,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var viewport = new SharpDX.ViewportF( _viewport.X, _viewport.Y, 
                                                           _viewport.Width, _viewport.Height, 
                                                           _viewport.MinDepth, _viewport.MaxDepth);
-                    _d3dContext.Rasterizer.SetViewports(viewport);
+                    _d3dContext.Rasterizer.SetViewport(viewport);
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
                 }
             }
