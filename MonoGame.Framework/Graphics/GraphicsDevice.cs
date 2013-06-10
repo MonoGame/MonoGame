@@ -1521,7 +1521,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
                     lock (_d3dContext)
-                        _d3dContext.Rasterizer.SetViewports(viewport);
+                        _d3dContext.Rasterizer.SetViewport(viewport);
                 }
 #elif OPENGL
                 if (IsRenderTargetBound)
