@@ -525,7 +525,7 @@ namespace Microsoft.Xna.Framework
 		{
 			if (e == null) 
 			{
-				throw new ArgumentNullException ("e", "'e' cannot be null (Nothing in Visual Basic)");
+				throw new ArgumentNullException("e");
 			}
 			
 			if (TextInput != null) 
