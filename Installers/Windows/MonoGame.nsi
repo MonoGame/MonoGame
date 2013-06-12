@@ -1,6 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Users\Dean\Desktop\Desktop\MonoGameMaster\"
+!define FrameworkPath "..\..\"
 !define VERSION "3.0"
 !define REVISION "0.0"
 !define INSTALLERFILENAME "MonoGame"
