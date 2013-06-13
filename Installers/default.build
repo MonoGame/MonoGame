@@ -10,7 +10,7 @@
       <if test="${file::exists('C:\Program Files (x86)\NSIS\makensis.exe')}">
 
         <echo append="false" file="Windows/header.nsh">
-!define FrameworkPath "${project::get-base-directory}"
+!define FrameworkPath "${project::get-base-directory()}"
 !define VERSION "3.0"
 !define REVISION "0.0"
         </echo>
