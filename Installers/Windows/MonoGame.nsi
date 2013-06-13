@@ -1,6 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
-!include "header.ns"
+!include "header.nsh"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
