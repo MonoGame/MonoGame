@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<project name="Aurora Ion Build Script" default="build" basedir=".">
-  <description>Default Ion Automated Build script</description>
+<project name="MonoGame Build Script" default="build" basedir=".">
+  <description>Default MonoGame Automated Build script</description>
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
   <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
@@ -42,11 +42,7 @@
 
     <call target="buildtests"/>
 
-    <if test="${os == 'Win32NT'}">
-      <if test="${file::exists('C:\Program Files (x86)\NSIS\makensis.exe')}">
-        <nant buildfile="Installers/default.build" target="build" />
-      </if>
-    </if>
+    <nant buildfile="Installers/default.build" target="build" />
   </target>
 
   <target name="buildpsm" description="Build Play Station Mobile" depends="clean">
