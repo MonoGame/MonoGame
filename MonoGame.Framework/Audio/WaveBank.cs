@@ -203,7 +203,8 @@ namespace Microsoft.Xna.Framework.Audio
                 //SHOWFILEOFF;
 
                 //memset(&wavebankentry, 0, sizeof(wavebankentry));
-
+				wavebankentry.LoopRegion.Length = 0;
+				wavebankentry.LoopRegion.Offset = 0;
 
                 if ((wavebankdata.Flags & Flag_Compact) != 0)
                 {
@@ -333,7 +334,10 @@ namespace Microsoft.Xna.Framework.Audio
                 if (codec == MiniFormatTag_PCM) {
                     
                     //write PCM data into a wav
-
+#if DIRECTX
+					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
+					sounds[current_entry] = new SoundEffect(waveFormat, audiodata, 0, audiodata.Length, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length).CreateInstance();
+#else
 					using (MemoryStream mStream = new MemoryStream(44 + audiodata.Length)) {
 						using (BinaryWriter writer = new BinaryWriter(mStream)) {
 
@@ -361,10 +365,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 						}
 						
-						sounds[current_entry] = new SoundEffect(mStream.ToArray(), (int)rate,  chans == 2 ? AudioChannels.Stereo: AudioChannels.Mono).CreateInstance();
-			
+						sounds[current_entry] = new SoundEffect(mStream.ToArray(), (int)rate,  chans == 2 ? AudioChannels.Stereo: AudioChannels.Mono).CreateInstance();			
 					}
-                    
+#endif                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
                     
