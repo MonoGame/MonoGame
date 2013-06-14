@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -14,6 +15,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal bool instanceLimit;
 		internal int maxInstances;
+
+		List<XactSound> sounds;
 
 		//insatnce limiting behaviour
 		internal enum MaxInstanceBehaviour {
@@ -37,6 +40,7 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		internal AudioCategory (AudioEngine audioengine, string name, BinaryReader reader)
 		{
+			this.sounds = new List<XactSound>();
 			this.name = name;
 			engine = audioengine;
 
@@ -73,25 +77,34 @@ namespace Microsoft.Xna.Framework.Audio
 			isPublic = (visibilityFlags & 0x2) != 0;
 		}
 
+		internal void AddSound(XactSound sound)
+		{
+			sounds.Add(sound);
+		}
+
 		public string Name { get { return name; } }
 
 		public void Pause ()
 		{
-			throw new NotImplementedException ();
+			foreach (var sound in sounds)
+				sound.Pause();
 		}
 
 		public void Resume ()
 		{
-			throw new NotImplementedException ();
+			foreach (var sound in sounds)
+				sound.Resume();
 		}
 
 		public void Stop ()
 		{
-			throw new NotImplementedException ();
+			foreach (var sound in sounds)
+				sound.Stop();
 		}
 
 		public void SetVolume(float volume) {
-			throw new NotImplementedException();
+			foreach (var sound in sounds)
+				sound.Volume = volume;
 		}
 
 		
