@@ -665,7 +665,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         // TODO: Need to deal with subregion copies!
                         d3dContext.CopySubresourceRegion(_texture, level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
-                        //throw new NotImplementedException();
                     }
                     else
                         d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
@@ -698,7 +697,6 @@ namespace Microsoft.Xna.Framework.Graphics
 					}
 					z++;
 				}
-				//throw new NotImplementedException();
 			} else {
 				data = temp;
 			}
