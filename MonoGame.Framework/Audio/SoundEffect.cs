@@ -465,9 +465,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        static SoundEffect()
-        {
-            var flags = XAudio2Flags.None;
+		internal static Init()
+		{
+			var flags = XAudio2Flags.None;
 
 #if !WINRT && DEBUG
             flags |= XAudio2Flags.DebugEngine;
@@ -510,8 +510,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 MasterVoice = null;
             }
-
-        }
+		}
 
         // Does someone actually need to call this if it only happens when the whole
         // game closes? And if so, who would make the call?

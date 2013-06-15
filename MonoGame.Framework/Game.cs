@@ -143,6 +143,10 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
+#if DIRECTX
+			SoundEffect.Init();
+#endif
+
 #if WINDOWS_STOREAPP
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
