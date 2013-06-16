@@ -802,9 +802,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return texture;
             }
-
-#elif DIRECTX
-
+#elif WINDOWS_PHONE
+            throw new NotImplementedException();
+#elif WINDOWS_STOREAPP || DIRECTX
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
@@ -820,7 +820,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				toReturn._texture = sharpDxTexture;
 			}
             return toReturn;
-#elif PSM
+#elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
@@ -1001,9 +1001,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }).Wait();
         }
 #endif
-		
-#if DIRECTX
-        [CLSCompliant(false)]
+#if DIRECTX && !WINDOWS_PHONE        [CLSCompliant(false)]
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
 
@@ -1187,4 +1185,3 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 	}
 }
-
