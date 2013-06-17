@@ -374,6 +374,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
+
+            GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
+            GraphicsExtensions.CheckGLError();
         }
 
     private int GetWrapMode(TextureAddressMode textureAddressMode)
