@@ -501,9 +501,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             int maxVertexBufferSlots = _featureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
 #elif OPENGL
-            int maxVertexBufferSlots;
-            GL.GetInteger(GetPName.MaxVertexAttribs, out maxVertexBufferSlots);
-            GraphicsExtensions.CheckGLError();
+            int maxVertexBufferSlots = MaxVertexAttributes;
 #endif
             _vertexBuffers = new VertexBufferBinding[maxVertexBufferSlots];
             _vertexBuffersDirty = new bool[maxVertexBufferSlots];
