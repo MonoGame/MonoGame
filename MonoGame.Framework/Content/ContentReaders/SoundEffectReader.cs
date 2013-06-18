@@ -117,16 +117,18 @@ namespace Microsoft.Xna.Framework.Content
             if (header[0] == 2 && header[1] == 0)
             {
                 // We've found MSADPCM data! Let's decode it here.
-                MemoryStream origDataStream = new MemoryStream(data);
-                BinaryReader reader = new BinaryReader(origDataStream);
-                byte[] newData = MSADPCMToPCM.MSADPCM_TO_PCM(
-                    reader,
-                    header[2],
-                    (short) ((header[12] / header[2]) - 22)
-                );
-                reader.Close();
-                origDataStream.Close();
-                data = newData;
+                using (MemoryStream origDataStream = new MemoryStream(data))
+                {
+                    using (BinaryReader reader = new BinaryReader(origDataStream))
+                    {
+                        byte[] newData = MSADPCMToPCM.MSADPCM_TO_PCM(
+                            reader,
+                            header[2],
+                            (short) ((header[12] / header[2]) - 22)
+                        );
+                        data = newData;
+                    }
+                }
                 
                 // This is PCM data now!
                 header[0] = 1;
