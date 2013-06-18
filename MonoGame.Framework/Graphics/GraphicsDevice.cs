@@ -576,7 +576,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     PresentationParameters.BackBufferWidth = texture2D.Description.Width;
                     PresentationParameters.BackBufferHeight = texture2D.Description.Height;
 
-					Utilities.Dispose(ref _depthStencilView);
+					SharpDX.Utilities.Dispose(ref _depthStencilView);
                     using (var depthTexture = new SharpDX.Direct3D11.Texture2D(
                         _d3dDevice,
                         new Texture2DDescription()
