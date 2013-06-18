@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework
 
             if (createDevice)
             {
-                GraphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
+                GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
             }
             else
             {
