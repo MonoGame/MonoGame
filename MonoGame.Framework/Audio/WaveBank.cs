@@ -435,11 +435,11 @@ namespace Microsoft.Xna.Framework.Audio
                 } else if (codec == MiniFormatTag_ADPCM) {
                     using (MemoryStream dataStream = new MemoryStream(audiodata)) {
                         using (BinaryReader source = new BinaryReader(dataStream)) {
-                            sounds[current_entry] = new SoundEffectInstance(
+                            sounds[current_entry] = new SoundEffect(
                                 MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
                                 rate,
-                                chans
-                            );
+                                (chans == 1) ? AudioChannels.Mono : AudioChannels.Stereo
+                            ).CreateInstance();
                         }
                     }
 #endif
