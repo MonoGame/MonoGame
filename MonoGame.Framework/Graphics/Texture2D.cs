@@ -126,11 +126,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		PixelType glType;
 #endif
 
+        private bool _shared;
 #if DIRECTX
 
         private bool _renderTarget;
         private bool _mipmap;
-
 #endif
 	
         public Rectangle Bounds
@@ -171,6 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    if (type == SurfaceType.SwapChainRenderTarget)
 		        return;
 
+            _shared = shared;
 #if DIRECTX
 
             _renderTarget = (type == SurfaceType.RenderTarget);
@@ -1168,11 +1169,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal override SharpDX.Direct3D11.Resource CreateTexture()
 		{
-			return(CreateTexture(false)); // Assuming this here?
-		}
-
-        internal SharpDX.Direct3D11.Resource CreateTexture(bool shared)
-        {
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
             desc.Width = width;
@@ -1198,7 +1194,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
                 }
             }
-            if (shared)
+            if (_shared)
                 desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
 
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
