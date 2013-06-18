@@ -374,9 +374,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
-
+#if !GLES
+            // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
+#endif
         }
 
     private int GetWrapMode(TextureAddressMode textureAddressMode)
