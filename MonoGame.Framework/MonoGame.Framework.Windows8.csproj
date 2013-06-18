@@ -35,6 +35,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioCategory.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="GamerServices\Achievement.cs" />
     <Compile Include="GamerServices\AchievementCollection.cs" />
@@ -331,7 +338,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />

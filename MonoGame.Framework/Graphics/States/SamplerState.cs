@@ -195,7 +195,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 desc.ComparisonFunction = SharpDX.Direct3D11.Comparison.Never;
 
                 // Create the state.
-                _state = new SharpDX.Direct3D11.SamplerState(GraphicsDevice._d3dDevice, ref desc);
+                _state = new SharpDX.Direct3D11.SamplerState(GraphicsDevice._d3dDevice, desc);
             }
 
             Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
@@ -374,6 +374,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(target, TextureParameterName.TextureWrapT, (int)GetWrapMode(AddressV));
             GraphicsExtensions.CheckGLError();
+#if !GLES
+            // LOD bias is not supported by glTexParameter in OpenGL ES 2.0
+            GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
+            GraphicsExtensions.CheckGLError();
+#endif
         }
 
     private int GetWrapMode(TextureAddressMode textureAddressMode)

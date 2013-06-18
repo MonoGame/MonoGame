@@ -75,8 +75,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-        protected RenderTargetView _renderTargetView;
-        protected DepthStencilView _depthStencilView;
+        internal RenderTargetView _renderTargetView;
+        internal DepthStencilView _depthStencilView;
 #elif OPENGL
     internal uint glDepthBuffer;
     internal uint glStencilBuffer;
