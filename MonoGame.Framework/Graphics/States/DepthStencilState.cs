@@ -68,30 +68,34 @@ namespace Microsoft.Xna.Framework.Graphics
 			StencilWriteMask = Int32.MaxValue;
 			ReferenceStencil = 0;
 		}
-		
-		public static readonly DepthStencilState Default;
-		public static readonly DepthStencilState DepthRead;
-		public static readonly DepthStencilState None;
+
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _default;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _depthRead;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _none;
+
+        public static DepthStencilState Default { get { return _default.Value; } }
+        public static DepthStencilState DepthRead { get { return _depthRead.Value; } }
+        public static DepthStencilState None { get { return _none.Value; } }
 		
 		static DepthStencilState ()
 		{
-			Default = new DepthStencilState () 
+			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = true
-			};
+			});
 			
-			DepthRead = new DepthStencilState () 
+			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = false
-			};
+			});
 			
-			None = new DepthStencilState () 
+			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
 				DepthBufferEnable = false,
 				DepthBufferWriteEnable = false
-			};
+			});
 		}
 
 #if OPENGL
@@ -254,6 +258,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
+        protected internal override void GraphicsDeviceResetting()
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.GraphicsDeviceResetting();
+        }
+
         internal void ApplyState(GraphicsDevice device)
         {
             if (_state == null)
@@ -309,6 +319,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Apply the state!
             device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
             device._d3dContext.OutputMerger.DepthStencilState = _state;
+        }
+
+        internal static void ResetStates()
+        {
+            _default.Reset();
+            _depthRead.Reset();
+            _none.Reset();
         }
 
         static private SharpDX.Direct3D11.Comparison GetComparison( CompareFunction compare)

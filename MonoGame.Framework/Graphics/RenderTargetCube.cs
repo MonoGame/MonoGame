@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 };
 
-                _renderTargetViews[i] = new RenderTargetView(graphicsDevice._d3dDevice, _texture, renderTargetViewDescription);
+                _renderTargetViews[i] = new RenderTargetView(graphicsDevice._d3dDevice, GetTexture(), renderTargetViewDescription);
             }
 
             // If we don't need a depth buffer then we're done.
