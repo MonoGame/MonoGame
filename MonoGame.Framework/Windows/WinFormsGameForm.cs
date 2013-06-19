@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 
@@ -33,19 +29,38 @@ namespace Microsoft.Xna.Framework.Windows
     {
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
-        public const int WM_POINTERUPDATE = 0x0245;  
+        public const int WM_POINTERUPDATE = 0x0245;
+
+
+        public const int WM_SYSCOMMAND = 0x0112;
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
         {
             var state = TouchLocationState.Invalid;
+           
+            switch (m.Msg)
+            {
+                case WM_SYSCOMMAND:
+                    // Disable the system menu from being toggled by
+                    // keyboard input so we can own the ALT key.
+                    if (m.WParam.ToInt32() == 0xF100) // SC_KEYMENU
+                    {
+                        m.Result = IntPtr.Zero;
+                        return;
+                    }
+                    break;
 
-            if (m.Msg == WM_POINTERUP)
-                state = TouchLocationState.Released;
-            else if (m.Msg == WM_POINTERDOWN)
-                state = TouchLocationState.Pressed;
-            else if (m.Msg == WM_POINTERUPDATE)
-                state = TouchLocationState.Moved;
+                case WM_POINTERUP:
+                    state = TouchLocationState.Released;
+                    break;
+                case WM_POINTERDOWN:
+                    state = TouchLocationState.Pressed;
+                    break;
+                case WM_POINTERUPDATE:
+                    state = TouchLocationState.Moved;
+                    break;
+            }
 
             if (state != TouchLocationState.Invalid)
             {

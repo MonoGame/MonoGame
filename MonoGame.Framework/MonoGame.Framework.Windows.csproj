@@ -59,6 +59,9 @@
     <Reference Include="SharpDX.MediaFoundation">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.RawInput">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.RawInput.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.XAudio2">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.XAudio2.dll</HintPath>
     </Reference>
