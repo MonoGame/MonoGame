@@ -808,8 +808,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				toReturn._texture = sharpDxTexture;
 			}
             return toReturn;
-#elif DIRECTX
-            throw new NotImplementedException(); 
 #elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else
