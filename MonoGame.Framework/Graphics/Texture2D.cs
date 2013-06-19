@@ -654,8 +654,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Copy the data from the GPU to the staging texture.
                     if (rect.HasValue)
                     {
-                        // TODO: Need to deal with subregion copies!
-                        throw new NotImplementedException();
+                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
                     }
                     else
                         d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
@@ -668,17 +667,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #else
+			var temp = new T[this.width*this.height];
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-
-			if (rect.HasValue) {
-				throw new NotImplementedException();
-			}
 
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
-				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
+			}
+
+			if (rect.HasValue) {
+				int z = 0, w = 0;
+
+				for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
+					for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
+						data[z*rect.Value.Width+w] = temp[(y*width)+x];
+						w++;
+					}
+					z++;
+				}
+			} else {
+				data = temp;
 			}
 
 #endif
@@ -781,8 +791,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return texture;
             }
+#elif WINDOWS_PHONE
+            throw new NotImplementedException();
 
-#elif WINDOWS_STOREAPP
+#elif WINDOWS_STOREAPP || DIRECTX
 
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
@@ -799,8 +811,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				toReturn._texture = sharpDxTexture;
 			}
             return toReturn;
-#elif DIRECTX
-            throw new NotImplementedException(); 
 #elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else
@@ -981,6 +991,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             }).Wait();
         }
+#endif
+#if DIRECTX && !WINDOWS_PHONE
 		
         [CLSCompliant(false)]
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
