@@ -396,8 +396,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
-
+   
+#if PSM
+            MaxTextureSlots = 8;
+#else
             MaxTextureSlots = 16;
+#endif
+            
 #if OPENGL
 #if GLES
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
@@ -1542,6 +1547,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // In OpenGL we have to re-apply the special "posFixup"
                 // vertex shader uniform if the viewport changes.
                 _vertexShaderDirty = true;
+#elif PSM
+                _graphics.SetViewport(
+                    value.X, value.Y, value.Width, value.Height
+                );
 #endif
             }
         }
@@ -2372,6 +2381,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+#else
+            throw new NotImplementedException("Not implemented");
 #endif
         }
 
@@ -2431,6 +2442,8 @@ namespace Microsoft.Xna.Framework.Graphics
             ibHandle.Free();
             vbHandle.Free();
 
+#else
+            throw new NotImplementedException("Not implemented");
 #endif
         }
 
