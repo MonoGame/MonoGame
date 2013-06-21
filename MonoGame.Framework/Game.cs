@@ -216,8 +216,24 @@ namespace Microsoft.Xna.Framework
                     }
 
                     Platform.Dispose();
+
+                    Effect.FlushCache();
+                    ContentTypeReaderManager.ClearTypeCreators();
+
+#if WINDOWS_PHONE
+                    TouchPanel.ResetState();
+                    Microsoft.Xna.Framework.Audio.SoundEffect.Shutdown();
+#endif
+
+#if DIRECTX
+                    BlendState.ResetStates();
+                    DepthStencilState.ResetStates();
+                    RasterizerState.ResetStates();
+                    SamplerState.ResetStates();
+#endif
                 }
                 _isDisposed = true;
+                _instance = null;
             }
         }
 
