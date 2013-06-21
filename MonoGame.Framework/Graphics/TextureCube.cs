@@ -42,6 +42,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #if DIRECTX
 
+        private bool _renderTarget;
+        private bool _mipMap;
+
 #elif PSM
 		//TODO
 #else
@@ -66,28 +69,13 @@ namespace Microsoft.Xna.Framework.Graphics
             this._levelCount = mipMap ? CalculateMipLevels(size) : 1;
 
 #if DIRECTX
-            var description = new Texture2DDescription
-            {
-                Width = size,
-                Height = size,
-                MipLevels = _levelCount,
-                ArraySize = 6, // A texture cube is a 2D texture array with 6 textures.
-                Format = SharpDXHelper.ToFormat(format),
-                BindFlags = BindFlags.ShaderResource,
-                CpuAccessFlags = CpuAccessFlags.None,
-                SampleDescription = { Count = 1, Quality = 0 },
-                Usage = ResourceUsage.Default,
-                OptionFlags = ResourceOptionFlags.TextureCube
-            };
 
-            if (renderTarget)
-            {
-                description.BindFlags |= BindFlags.RenderTarget;
-                if (mipMap)
-                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
-            }
+            _renderTarget = renderTarget;
+            _mipMap = mipMap;
 
-            _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, description);
+            // Create texture
+            GetTexture();
+
 #elif PSM
 			//TODO
 #else
@@ -146,6 +134,36 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 #endif
         }
+
+#if DIRECTX
+
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        {
+            var description = new Texture2DDescription
+            {
+                Width = size,
+                Height = size,
+                MipLevels = _levelCount,
+                ArraySize = 6, // A texture cube is a 2D texture array with 6 textures.
+                Format = SharpDXHelper.ToFormat(_format),
+                BindFlags = BindFlags.ShaderResource,
+                CpuAccessFlags = CpuAccessFlags.None,
+                SampleDescription = { Count = 1, Quality = 0 },
+                Usage = ResourceUsage.Default,
+                OptionFlags = ResourceOptionFlags.TextureCube
+            };
+
+            if (_renderTarget)
+            {
+                description.BindFlags |= BindFlags.RenderTarget;
+                if (_mipMap)
+                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+            }
+
+            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
+        }
+
+#endif
 
         /// <summary>
         /// Gets a copy of cube texture data specifying a cubemap face.
@@ -244,9 +262,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     Right = xOffset + width
                 };
 
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
+            var d3dContext = GraphicsDevice._d3dContext;
+            lock (d3dContext)
+                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
 #elif PSM
 			    //TODO
 #else

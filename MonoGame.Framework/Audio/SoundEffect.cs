@@ -465,7 +465,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        static SoundEffect()
+        internal static void InitializeSoundEffect()
         {
             var flags = XAudio2Flags.None;
 
@@ -474,10 +474,12 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
             try
             {
-                // This cannot fail.
-                Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
-
-                Device.StartEngine();
+                if (Device == null)
+                {
+                    // This cannot fail.
+                    Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
+                    Device.StartEngine();
+                }
 
                 // Just use the default device.
 #if WINRT
@@ -486,9 +488,12 @@ namespace Microsoft.Xna.Framework.Audio
                 const int deviceId = 0;
 #endif
 
-                // Let windows autodetect number of channels and sample rate.
-                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);            
-                MasterVoice.SetVolume(_masterVolume, 0);
+                if (MasterVoice == null)
+                {
+                    // Let windows autodetect number of channels and sample rate.
+                    MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
+                    MasterVoice.SetVolume(_masterVolume, 0);
+                }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
 #if WINRT
@@ -510,18 +515,33 @@ namespace Microsoft.Xna.Framework.Audio
 
                 MasterVoice = null;
             }
+        }
 
+        static SoundEffect()
+        {
+            InitializeSoundEffect();
         }
 
         // Does someone actually need to call this if it only happens when the whole
         // game closes? And if so, who would make the call?
         internal static void Shutdown()
-        {            
-            MasterVoice.DestroyVoice();
-            MasterVoice.Dispose();
+        {
+            if (MasterVoice != null)
+            {
+                MasterVoice.DestroyVoice();
+                MasterVoice.Dispose();
+                MasterVoice = null;
+            }
 
-            Device.StopEngine();
-            Device.Dispose();                     
+            if (Device != null)
+            {
+                Device.StopEngine();
+                Device.Dispose();
+                Device = null;
+            }
+
+            _device3DDirty = true;
+            _speakers = Speakers.Stereo;
         }
 #endif
         #endregion
