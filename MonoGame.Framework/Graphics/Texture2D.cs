@@ -126,13 +126,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		PixelType glType;
 #endif
 
-        private bool _shared;
 #if DIRECTX
+        private bool _shared;
 
         private bool _renderTarget;
         private bool _mipmap;
 #endif
-	
+
         public Rectangle Bounds
         {
             get
@@ -171,8 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		    if (type == SurfaceType.SwapChainRenderTarget)
 		        return;
 
-            _shared = shared;
 #if DIRECTX
+            _shared = shared;
 
             _renderTarget = (type == SurfaceType.RenderTarget);
             _mipmap = mipmap;
