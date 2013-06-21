@@ -58,7 +58,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Constructors
 
-
         #region Public Fields
 
         [DataMember]
@@ -111,6 +110,73 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Fields
 
+        #region Indexers
+
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return M11;
+                    case 1: return M12;
+                    case 2: return M13;
+                    case 3: return M14;
+                    case 4: return M21;
+                    case 5: return M22;
+                    case 6: return M23;
+                    case 7: return M24;
+                    case 8: return M31;
+                    case 9: return M32;
+                    case 10: return M33;
+                    case 11: return M34;
+                    case 12: return M41;
+                    case 13: return M42;
+                    case 14: return M43;
+                    case 15: return M44;
+                }
+                throw new ArgumentOutOfRangeException();
+            }
+
+            set
+            {
+                switch (index)
+                {
+                    case 0: M11 = value; break;
+                    case 1: M12 = value; break;
+                    case 2: M13 = value; break;
+                    case 3: M14 = value; break;
+                    case 4: M21 = value; break;
+                    case 5: M22 = value; break;
+                    case 6: M23 = value; break;
+                    case 7: M24 = value; break;
+                    case 8: M31 = value; break;
+                    case 9: M32 = value; break;
+                    case 10: M33 = value; break;
+                    case 11: M34 = value; break;
+                    case 12: M41 = value; break;
+                    case 13: M42 = value; break;
+                    case 14: M43 = value; break;
+                    case 15: M44 = value; break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        public float this[int row, int column]
+        {
+            get
+            {
+                return this[(row * 4) + column];
+            }
+
+            set
+            {
+                this[(row * 4) + column] = value;
+            }
+        }
+
+        #endregion
 
         #region Private Members
         private static Matrix identity = new Matrix(1f, 0f, 0f, 0f, 
@@ -118,7 +184,6 @@ namespace Microsoft.Xna.Framework
 		                                            0f, 0f, 1f, 0f, 
 		                                            0f, 0f, 0f, 1f);
         #endregion Private Members
-
 
         #region Public Properties
         
@@ -246,7 +311,6 @@ namespace Microsoft.Xna.Framework
             }
         }
         #endregion Public Properties
-
 
         #region Public Methods
 
@@ -1351,6 +1415,35 @@ namespace Microsoft.Xna.Framework
                         result.Translation = position;
                         result.M44 = 1f;
         }
+
+        public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        {
+            translation.X = this.M41;
+            translation.Y = this.M42;
+            translation.Z = this.M43;
+
+            float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
+            float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
+            float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;
+
+            scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
+            scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
+            scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
+
+            if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
+            {
+                rotation = Quaternion.Identity;
+                return false;
+            }
+
+            Matrix m1 = new Matrix(this.M11 / scale.X, M12 / scale.X, M13 / scale.X, 0,
+                                   this.M21 / scale.Y, M22 / scale.Y, M23 / scale.Y, 0,
+                                   this.M31 / scale.Z, M32 / scale.Z, M33 / scale.Z, 0,
+                                   0, 0, 0, 1);
+
+            rotation = Quaternion.CreateFromRotationMatrix(m1);
+            return true;
+        }	
 		
         public float Determinant()
         {
@@ -2130,35 +2223,6 @@ namespace Microsoft.Xna.Framework
                 minor12 = (float)det12;
         }
 		
-        #endregion Private Static Methods
-		
-		public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
-        {
-                translation.X = this.M41;
-                translation.Y = this.M42;
-                translation.Z = this.M43;
-                
-                float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
-                float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
-				float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;                               
-                
-                scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
-                scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
-                scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
-                
-                if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
-                {
-                        rotation = Quaternion.Identity;
-                        return false;
-                }
-
-                Matrix m1 = new Matrix(this.M11/scale.X, M12/scale.X, M13/scale.X, 0,
-                       				   this.M21/scale.Y, M22/scale.Y, M23/scale.Y, 0,
-                       				   this.M31/scale.Z, M32/scale.Z, M33/scale.Z, 0,
-                       				   0, 0, 0, 1);
-                
-                rotation = Quaternion.CreateFromRotationMatrix(m1);
-                return true;
-        }			
+        #endregion Private Static Methods 
     }
 }
