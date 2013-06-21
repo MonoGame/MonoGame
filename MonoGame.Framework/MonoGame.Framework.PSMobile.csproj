@@ -417,10 +417,10 @@
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\BasicEffect.vcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.fcg" />
     <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\SpriteEffect.vcg" />
+    <EmbeddedShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg" />
   </ItemGroup>
   <ItemGroup>
     <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.fcg" />
-    <ShaderProgram Include="PSSuite\Graphics\Resources\AlphaTestEffect.vcg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.PSMobile.csproj">
