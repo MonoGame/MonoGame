@@ -414,22 +414,74 @@ namespace Microsoft.Xna.Framework
                                  (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42);
         }
 
-        public static Vector2 Transform(Vector2 position, Quaternion quat)
+        public static Vector2 Transform(Vector2 value, Quaternion rotation)
         {
-            Transform(ref position, ref quat, out position);
-            return position;
+            Transform(ref value, ref rotation, out value);
+            return value;
         }
 
-        public static void Transform(ref Vector2 position, ref Quaternion quat, out Vector2 result)
+        public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector2 result)
         {
-            Quaternion v = new Quaternion(position.X, position.Y, 0, 0), i, t;
-            Quaternion.Inverse(ref quat, out i);
-            Quaternion.Multiply(ref quat, ref v, out t);
+            Quaternion v = new Quaternion(value.X, value.Y, 0, 0), i, t;
+            Quaternion.Inverse(ref rotation, out i);
+            Quaternion.Multiply(ref rotation, ref v, out t);
             Quaternion.Multiply(ref t, ref i, out v);
 
             result = new Vector2(v.X, v.Y);
         }
-		
+
+        public static void Transform
+        (
+            Vector2[] sourceArray,
+            int sourceIndex,
+            ref Matrix matrix,
+            Vector2[] destinationArray,
+            int destinationIndex,
+            int length
+        )
+        {
+            int di;
+            for (int i = 0; i < length; i++)
+            {
+                di = destinationIndex + i;
+
+                var position = sourceArray[sourceIndex + i];
+                var destination = destinationArray[di];
+                destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
+                destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
+                destinationArray[di] = destination;
+            }
+        }
+
+        public static void Transform
+        (
+            Vector2[] sourceArray,
+            int sourceIndex,
+            ref Quaternion rotation,
+            Vector2[] destinationArray,
+            int destinationIndex,
+            int length
+        )
+        {
+            int di;
+            for (int i = 0; i < length; i++)
+            {
+                di = destinationIndex + i;
+
+                var position = sourceArray[sourceIndex + i];
+                var destination = destinationArray[di];
+
+                Quaternion v = new Quaternion(position.X, position.Y, 0, 0), n, t;
+                Quaternion.Inverse(ref rotation, out n);
+                Quaternion.Multiply(ref rotation, ref v, out t);
+                Quaternion.Multiply(ref t, ref n, out v);
+
+                destination.X = v.X;
+                destination.Y = v.Y;
+                destinationArray[di] = destination;
+            }
+        }
+
 		public static void Transform (
 			Vector2[] sourceArray,
 			ref Matrix matrix,
@@ -438,23 +490,13 @@ namespace Microsoft.Xna.Framework
 			Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
 		}
 
-		
-		public static void Transform (
-			Vector2[] sourceArray,
-			int sourceIndex,
-			ref Matrix matrix,
-			Vector2[] destinationArray,
-			int destinationIndex,
-			int length)
-		{
-			for (int x = 0; x < length; x++) {
-				var position = sourceArray[sourceIndex + x];
-				var destination = destinationArray[destinationIndex + x];
-				destination.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
-				destination.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
-				destinationArray[destinationIndex + x] = destination;
-			}
-		}
+        public static void Transform(
+            Vector2[] sourceArray,
+            ref Quaternion rotation,
+            Vector2[] destinationArray)
+        {
+            Transform(sourceArray, 0, ref rotation, destinationArray, 0, sourceArray.Length);
+        }
 
         public static Vector2 TransformNormal(Vector2 normal, Matrix matrix)
         {

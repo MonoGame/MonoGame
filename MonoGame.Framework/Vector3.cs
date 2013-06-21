@@ -529,12 +529,24 @@ namespace Microsoft.Xna.Framework
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Transforms a vector by a matrix.
+        /// </summary>
+        /// <param name="position">The vector to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <returns>The result of the operation.</returns>
         public static Vector3 Transform(Vector3 position, Matrix matrix)
         {
             Transform(ref position, ref matrix, out position);
             return position;
         }
 
+        /// <summary>
+        /// Transforms a vector by a matrix.
+        /// </summary>
+        /// <param name="position">The vector to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector3 position, ref Matrix matrix, out Vector3 result)
         {
             result = new Vector3((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
@@ -542,6 +554,95 @@ namespace Microsoft.Xna.Framework
                                  (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
         }
 
+        /// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
+        /// <returns>The result of the operation.</returns>
+        public static Vector3 Transform(Vector3 value, Quaternion rotation)
+        {
+            Vector3 result;
+            Transform(ref value, ref rotation, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+        public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
+        {
+            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
+            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
+            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
+        }
+
+        public static void Transform(
+            Vector3[] sourceArray,
+            int sourceIndex,
+            ref Matrix matrix,
+            Vector3[] destinationArray,
+            int destinationIndex,
+            int length)
+        {
+            int di;
+            for (var i = 0; i < length; i++)
+            {
+                di = destinationIndex + i;
+
+                var position = sourceArray[sourceIndex+i];
+                var destination = destinationArray[di];
+
+                destination.X = (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41;
+                destination.Y = (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42;
+                destination.Z = (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43;
+
+                destinationArray[di] = destination;
+            }
+        }
+
+        public static void Transform(
+            Vector3[] sourceArray,
+            int sourceIndex,
+            ref Quaternion rotation,
+            Vector3[] destinationArray,
+            int destinationIndex,
+            int length
+            )
+        {
+            int di;
+            for (var i = 0; i < length; i++)
+            {
+                di = destinationIndex + i;
+
+                var position = sourceArray[sourceIndex + i];
+                var destination = destinationArray[di];
+                 
+                float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
+                float y = 2 * (rotation.Z * position.X - rotation.X * position.Z);
+                float z = 2 * (rotation.X * position.Y - rotation.Y * position.X);
+                 
+                destination.X = position.X + x*rotation.W + (rotation.Y*z - rotation.Z*y);
+                destination.Y = position.Y + y*rotation.W + (rotation.Z*x - rotation.X*z);
+                destination.Z = position.Z + z*rotation.W + (rotation.X*y - rotation.Y*x);
+                
+                destinationArray[di] = destination;
+            }
+        }
+
+        /// <summary>
+        /// Transforms an array of vectors by a matrix.
+        /// </summary>
+        /// <param name="sourceArray">The vectors to transform.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <param name="destinationArray">The result of the operation.</param>
         public static void Transform(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
         {
             Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
@@ -559,60 +660,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
-        /// <returns>The result of the operation.</returns>
-        public static Vector3 Transform(Vector3 vec, Quaternion quat)
-        {
-            Vector3 result;
-            Transform(ref vec, ref quat, out result);
-            return result;
-        }
-
-        /// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
-        /// <param name="result">The result of the operation.</param>
-//        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
-//        {
-//		// Taken from the OpentTK implementation of Vector3
-//            // Since vec.W == 0, we can optimize quat * vec * quat^-1 as follows:
-//            // vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec)
-//            Vector3 xyz = quat.Xyz, temp, temp2;
-//            Vector3.Cross(ref xyz, ref vec, out temp);
-//            Vector3.Multiply(ref vec, quat.W, out temp2);
-//            Vector3.Add(ref temp, ref temp2, out temp);
-//            Vector3.Cross(ref xyz, ref temp, out temp);
-//            Vector3.Multiply(ref temp, 2, out temp);
-//            Vector3.Add(ref vec, ref temp, out result);
-//        }
-
-        /// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
-        /// <param name="result">The result of the operation.</param>
-        public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
-        {
-            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
-            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
-            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
-
-            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
-            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
-            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
-        }
-
         /// <summary>
         /// Transforms an array of vectors by a quaternion rotation.
         /// </summary>
-        /// <param name="sourceArray">The vectors to transform</param>
+        /// <param name="sourceArray">The vectors to transform.</param>
         /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <param name="destinationArray">The result of the operation.</param>
         public static void Transform(Vector3[] sourceArray, ref Quaternion rotation, Vector3[] destinationArray)
@@ -637,7 +688,28 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-
+        /*
+        /// <summary>
+        /// Transforms a vector by a quaternion rotation.
+        /// </summary>
+        /// <param name="vec">The vector to transform.</param>
+        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+//        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
+//        {
+//		// Taken from the OpentTK implementation of Vector3
+//            // Since vec.W == 0, we can optimize quat * vec * quat^-1 as follows:
+//            // vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec)
+//            Vector3 xyz = quat.Xyz, temp, temp2;
+//            Vector3.Cross(ref xyz, ref vec, out temp);
+//            Vector3.Multiply(ref vec, quat.W, out temp2);
+//            Vector3.Add(ref temp, ref temp2, out temp);
+//            Vector3.Cross(ref xyz, ref temp, out temp);
+//            Vector3.Multiply(ref temp, 2, out temp);
+//            Vector3.Add(ref vec, ref temp, out result);
+//        }
+        */
+         
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
             TransformNormal(ref normal, ref matrix, out normal);
