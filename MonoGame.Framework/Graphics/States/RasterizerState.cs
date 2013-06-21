@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal void ApplyState(GraphicsDevice device)
         {
-            var g = device._graphics;
+            var g = device.Context;
             
             g.SetCullFace(MapCullMode[CullMode], CullFaceDirection.Cw); // Front == cw
             g.Enable(EnableMode.CullFace, this.CullMode != CullMode.None);

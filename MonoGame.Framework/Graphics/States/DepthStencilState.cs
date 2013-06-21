@@ -404,7 +404,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal void ApplyState(GraphicsDevice device)
         {
-            var g = device._graphics;
+            var g = device.Context;
             
             // FIXME: More advanced stencil attributes
             

@@ -120,9 +120,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 // FIXME: 1d/3d textures
                 var texture2d = _textures[i] as Texture2D;
                 if (texture2d == null)
-                    device._graphics.SetTexture(i, null);
+                    device.Context.SetTexture(i, null);
                 else
-                    device._graphics.SetTexture(i, texture2d._texture2D);
+                    device.Context.SetTexture(i, texture2d._texture2D);
 #endif
 
                 _dirty &= ~mask;

@@ -511,7 +511,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (ParameterType != EffectParameterType.Single)
                 throw new InvalidCastException();
-
+#if PSM
+            if(Data == null) {
+                return;
+            }
+#endif
 			((float[])Data)[0] = value;
             StateKey = unchecked(NextStateKey++);
 		}
