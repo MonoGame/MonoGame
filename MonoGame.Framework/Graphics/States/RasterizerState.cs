@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 #if OPENGL
 #if MONOMAC
@@ -189,9 +190,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // DIRECTX
 #if PSM
+        static readonly Dictionary<CullMode, CullFaceMode> MapCullMode = new Dictionary<CullMode, CullFaceMode> {
+            {CullMode.None, CullFaceMode.None},
+            {CullMode.CullClockwiseFace, CullFaceMode.Front}, // Cull cw
+            {CullMode.CullCounterClockwiseFace, CullFaceMode.Back}, // Cull ccw
+        };
+        
         internal void ApplyState(GraphicsDevice device)
         {
-            #warning Unimplemented
+            var g = device.Context;
+            
+            g.SetCullFace(MapCullMode[CullMode], CullFaceDirection.Cw); // Front == cw
+            g.Enable(EnableMode.CullFace, this.CullMode != CullMode.None);
+            
+            // FIXME: Everything else
         }
 #endif
     }
