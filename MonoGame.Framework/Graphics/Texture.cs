@@ -62,6 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+        internal SharpDX.Direct3D11.Resource _texture;
 
         internal SharpDX.Direct3D11.Resource _texture;
 

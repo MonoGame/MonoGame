@@ -344,7 +344,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // TODO: We need to deal with threaded contexts here!
                     var d3dContext = GraphicsDevice._d3dContext;
                     lock (d3dContext)
-						d3dContext.UpdateSubresource(box, GetTexture(), level, region);
+                        d3dContext.UpdateSubresource(box, GetTexture(), level, region);
 
 #elif PSM
                     _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
