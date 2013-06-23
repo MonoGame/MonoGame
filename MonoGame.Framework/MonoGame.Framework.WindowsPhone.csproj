@@ -92,6 +92,11 @@
   <ItemGroup>
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
+    <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\RenderTarget3D.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
@@ -292,8 +297,10 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\MetroHelper.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
+    <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs" />
     <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
     <Compile Include="WindowsPhone\GamePad.cs" />
+    <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs" />
     <Compile Include="WindowsPhone\WPGamePlatform.cs" />
     <Compile Include="WindowsPhone\WPGameWindow.cs" />
     <Compile Include="WindowsPhone\XamlGame.cs" />
@@ -356,7 +363,6 @@
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
@@ -386,6 +392,7 @@
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />

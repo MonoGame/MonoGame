@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
     public class AndroidGameActivity : Activity
     {
         public static Game Game { get; set; }
@@ -85,7 +86,8 @@ namespace Microsoft.Xna.Framework
 			base.OnDestroy ();
 		}
     }
-	
+
+	[CLSCompliant(false)]
 	public static class ActivityExtensions
     {
         public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)

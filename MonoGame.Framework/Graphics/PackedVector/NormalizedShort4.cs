@@ -68,14 +68,17 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			return a.Equals (b);
 		}
 
+        [CLSCompliant(false)]
         public ulong PackedValue
         {
-			get { 
-				return short4Packed; 
-			} 
-			set { 
-				short4Packed = value; 
-			} 
+            get
+            {
+                return short4Packed;
+            }
+            set
+            {
+                short4Packed = value;
+            } 
 		}
 
         public override bool Equals(object obj)

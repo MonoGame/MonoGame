@@ -91,6 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return (int)PackedValue;
         }
 
+        [CLSCompliant(false)]
         public UInt32 PackedValue
         {
             get

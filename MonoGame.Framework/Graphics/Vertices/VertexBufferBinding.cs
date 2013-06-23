@@ -6,9 +6,15 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public struct VertexBufferBinding
     {
+        static VertexBufferBinding _none = new VertexBufferBinding(null);
         VertexBuffer _vertexBuffer;
         int _vertexOffset;
         int _instanceFrequency;
+
+        /// <summary>
+        /// A null vertex buffer binding for unused vertex buffer slots.
+        /// </summary>
+        static internal VertexBufferBinding None { get { return _none; } }
 
         /// <summary>
         /// Gets the instance frequency. A value of 0 means no instancing.
