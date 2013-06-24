@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	                    }
 	            };
 
-	            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, _texture, desc);
+	            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture(), desc);
 	        }
 
 	        return _renderTargetView;

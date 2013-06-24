@@ -61,59 +61,34 @@ namespace MonoGame.Framework.WindowsPhone
             }
         }
 
-        class SurfaceUpdateHandler : DrawingSurfaceBackgroundContentProviderNativeBase                                                        
+        class DrawingSurfaceBackgroundContentProvider : DrawingSurfaceBackgroundContentProviderNativeBase                                                        
         {
-            private Device _device;
-            private DeviceContext _context;
-            private readonly T _game;
-            DrawingSurfaceRuntimeHost _host;
+            private readonly SurfaceUpdateHandler _surfaceUpdateHandler;
 
-            public SurfaceUpdateHandler(T game)
+
+            public DrawingSurfaceBackgroundContentProvider(T game)
             {
-                _game = game;
+                _surfaceUpdateHandler = new SurfaceUpdateHandler(game);
             }
 
             public override void Connect(DrawingSurfaceRuntimeHost host, Device device)
             {
-                _host = host;
+                _surfaceUpdateHandler.Connect(host);
             }
 
             public override void Disconnect()
             {
-                // TODO: Do we deal with this as a device lost case?
-                _host = null;
+                _surfaceUpdateHandler.Disconnect();
             }
 
             public override void Draw(Device device, DeviceContext context, RenderTargetView renderTargetView)
             {
-                var deviceChanged = _device != device || _context != context;
-                _device = device;
-                _context = context;
-
-                if (!_game.Initialized)
-                {
-                    DrawingSurfaceState.Device = _device;
-                    DrawingSurfaceState.Context = _context;
-                    DrawingSurfaceState.RenderTargetView = renderTargetView;
-                    deviceChanged = false;
-
-                    // Start running the game.
-                    _game.Run(GameRunBehavior.Asynchronous);
-                }
-
-                if (deviceChanged)
-                    _game.GraphicsDevice.UpdateDevice(device, context);
-                _game.GraphicsDevice.UpdateTarget(renderTargetView);
-                _game.GraphicsDevice.ResetRenderTargets();
-                _game.Tick();
-
-                _host.RequestAdditionalFrame();
+                _surfaceUpdateHandler.Draw(device, context, renderTargetView);
             }
 
             public override void PrepareResources(DateTime presentTargetTime, ref Size2F desiredRenderTargetSize)
             {
-                WindowsPhoneGameWindow.Width = desiredRenderTargetSize.Width;
-                WindowsPhoneGameWindow.Height = desiredRenderTargetSize.Height;
+                _surfaceUpdateHandler.UpdateGameWindowSize(desiredRenderTargetSize);
             }
         }
 
@@ -131,25 +106,33 @@ namespace MonoGame.Framework.WindowsPhone
                 throw new NullReferenceException("The launch parameters cannot be null!");
             if (page == null)
                 throw new NullReferenceException("The page parameter cannot be null!");
-            if (!(page.Content is DrawingSurfaceBackgroundGrid))
-                throw new NullReferenceException("The drawing surface could not be found!");
-            DrawingSurfaceBackgroundGrid drawingSurface = (DrawingSurfaceBackgroundGrid)page.Content;
 
+            UIElement drawingSurface = page.Content as DrawingSurfaceBackgroundGrid;
+            
             MediaElement mediaElement = null;
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(page.Content); i++)
             {
                 var child = VisualTreeHelper.GetChild(page.Content, i);
                 if (child is MediaElement)
                     mediaElement = (MediaElement)child;
+                else if (drawingSurface == null && child is DrawingSurface)
+                    drawingSurface = (DrawingSurface)child;
             }
+
+            if (!(drawingSurface is DrawingSurfaceBackgroundGrid) && !(drawingSurface is DrawingSurface))
+                throw new NullReferenceException("The drawing surface could not be found!");
+
             if (mediaElement == null)
                 throw new NullReferenceException("The media element could not be found! Add it to the GamePage.");
+
             Microsoft.Xna.Framework.Media.MediaPlayer._mediaElement = mediaElement;
 
             WindowsPhoneGamePlatform.LaunchParameters = launchParameters;
-            WindowsPhoneGameWindow.Width = drawingSurface.ActualWidth;
-            WindowsPhoneGameWindow.Height = drawingSurface.ActualHeight;
+            WindowsPhoneGameWindow.Width = ((FrameworkElement)drawingSurface).ActualWidth;
+            WindowsPhoneGameWindow.Height = ((FrameworkElement)drawingSurface).ActualHeight;
             WindowsPhoneGameWindow.Page = page;
+
+            Microsoft.Xna.Framework.Audio.SoundEffect.InitializeSoundEffect();
 
             page.BackKeyPress += Microsoft.Xna.Framework.Input.GamePad.GamePageWP8_BackKeyPress;
 
@@ -158,12 +141,57 @@ namespace MonoGame.Framework.WindowsPhone
             if (game.graphicsDeviceManager == null)
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
 
-            // Hookup the handlers for updates and touch.
-            drawingSurface.SetBackgroundContentProvider(new SurfaceUpdateHandler(game));
-            drawingSurface.SetBackgroundManipulationHandler(new SurfaceTouchHandler());
+            SurfaceTouchHandler surfaceTouchHandler = new SurfaceTouchHandler();
+
+            if (drawingSurface is DrawingSurfaceBackgroundGrid)
+            {
+                // Hookup the handlers for updates and touch.
+                DrawingSurfaceBackgroundGrid drawingSurfaceBackgroundGrid = (DrawingSurfaceBackgroundGrid)drawingSurface;
+                drawingSurfaceBackgroundGrid.SetBackgroundContentProvider(new DrawingSurfaceBackgroundContentProvider(game));
+                drawingSurfaceBackgroundGrid.SetBackgroundManipulationHandler(surfaceTouchHandler);
+            }
+            else
+            {
+                var drawingSurfaceUpdateHandler = new DrawingSurfaceUpdateHandler(game);
+                DrawingSurface ds = (DrawingSurface)drawingSurface;
+
+                RoutedEventHandler onLoadedHandler = (object sender, RoutedEventArgs e) =>
+                {
+                    if (sender != ds)
+                        return;
+
+                    if (initializedSurfaces.ContainsKey(ds) == false)
+                    {
+                        // Hook-up native component to DrawingSurface
+                        ds.SetContentProvider(drawingSurfaceUpdateHandler.ContentProvider);
+                        ds.SetManipulationHandler(surfaceTouchHandler);
+
+                        // Make sure surface is not initialized twice...
+                        initializedSurfaces.Add(ds, true);
+                    }
+                };
+
+                // Don't wait for loaded event here since control might
+                // be loaded already.
+                onLoadedHandler(ds, null);
+
+                ds.Unloaded += OnDrawingSurfaceUnloaded;
+                ds.Loaded += onLoadedHandler;
+            }
 
             // Return the constructed, but not initialized game.
             return game;
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<DrawingSurface, bool> initializedSurfaces = new System.Collections.Generic.Dictionary<DrawingSurface, bool>();
+
+        private static void OnDrawingSurfaceUnloaded(object sender, RoutedEventArgs e)
+        {
+            DrawingSurface drawingSurface = (DrawingSurface)sender;
+            drawingSurface.SetContentProvider(null);
+            drawingSurface.SetManipulationHandler(null);
+
+            initializedSurfaces.Remove(drawingSurface);
         }
     }
 }
