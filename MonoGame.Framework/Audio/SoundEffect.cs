@@ -464,7 +464,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-		internal static Init()
+		internal static void Init()
 		{
 			var flags = XAudio2Flags.None;
 
