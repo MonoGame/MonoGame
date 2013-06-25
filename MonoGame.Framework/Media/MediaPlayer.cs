@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 #elif WINDOWS_MEDIA_SESSION
-            MediaManager.Startup(true);
+            MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
 #elif WINDOWS_PHONE
             PhoneApplicationService.Current.Activated += (sender, e) =>
