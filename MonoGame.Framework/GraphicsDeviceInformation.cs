@@ -51,8 +51,8 @@ namespace Microsoft.Xna.Framework
 		
 		public GraphicsAdapter Adapter { get; set; }
 		
-		public DeviceType DeviceType { get; set; }
-
+		public GraphicsProfile GraphicsProfile { get; set; }
+		
 		public PresentationParameters PresentationParameters { get; set; }
 	}
 }

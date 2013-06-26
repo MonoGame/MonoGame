@@ -52,12 +52,15 @@ namespace Microsoft.Xna.Framework.Audio
 		XactSound curSound;
 		Random variationRand;
 		
-		bool paused = false;
 		float volume = 1.0f;
 		
 		public bool IsPaused
 		{
-			get { return paused; }
+			get {
+				if (curSound != null)
+					return curSound.IsPaused;
+				return true;
+			}
 		}
 		
 		public bool IsPlaying
@@ -112,7 +115,6 @@ namespace Microsoft.Xna.Framework.Audio
 			if (curSound != null) {
 				curSound.Pause();
 			}
-			paused = true;
 		}
 		
 		public void Play()
@@ -122,7 +124,6 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			curSound.Volume = volume;
 			curSound.Play ();
-			paused = false;
 		}
 		
 		public void Resume()
@@ -130,7 +131,6 @@ namespace Microsoft.Xna.Framework.Audio
 			if (curSound != null) {
 				curSound.Resume ();
 			}
-			paused = false;
 		}
 		
 		public void Stop(AudioStopOptions options)
@@ -138,7 +138,6 @@ namespace Microsoft.Xna.Framework.Audio
 			if (curSound != null) {
 				curSound.Stop();
 			}
-			paused = false;
 		}
 		
 		public void SetVariable (string name, float value)

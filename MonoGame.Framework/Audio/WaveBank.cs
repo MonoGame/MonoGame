@@ -100,11 +100,18 @@ namespace Microsoft.Xna.Framework.Audio
 
             int wavebank_offset = 0;
 
-            // Check for windows-style directory separator character
-            nonStreamingWaveBankFilename = nonStreamingWaveBankFilename.Replace('\\',Path.DirectorySeparatorChar);
+#if WINRT
+			const char notSeparator = '/';
+			const char separator = '\\';
+#else
+            const char notSeparator = '\\';
+            var separator = Path.DirectorySeparatorChar;
+#endif
+			// Check for windows-style directory separator character
+			nonStreamingWaveBankFilename = nonStreamingWaveBankFilename.Replace(notSeparator, separator);
 
 #if !ANDROID
-            BinaryReader reader = new BinaryReader(new FileStream(nonStreamingWaveBankFilename, FileMode.Open));
+            BinaryReader reader = new BinaryReader(TitleContainer.OpenStream(nonStreamingWaveBankFilename));
 #else 
 			Stream stream = Game.Activity.Assets.Open(nonStreamingWaveBankFilename);
 			MemoryStream ms = new MemoryStream();
@@ -139,11 +146,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             if ((wavebankheader.Version == 2) || (wavebankheader.Version == 3))
             {
-                wavebankdata.BankName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(16)).Replace("\0", "");
+                wavebankdata.BankName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(16),0,16).Replace("\0", "");
             }
             else
             {
-                wavebankdata.BankName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(64)).Replace("\0", "");
+                wavebankdata.BankName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(64),0,64).Replace("\0", "");
             }
 
             BankName = wavebankdata.BankName;
@@ -196,7 +203,8 @@ namespace Microsoft.Xna.Framework.Audio
                 //SHOWFILEOFF;
 
                 //memset(&wavebankentry, 0, sizeof(wavebankentry));
-
+				wavebankentry.LoopRegion.Length = 0;
+				wavebankentry.LoopRegion.Offset = 0;
 
                 if ((wavebankdata.Flags & Flag_Compact) != 0)
                 {
@@ -326,40 +334,40 @@ namespace Microsoft.Xna.Framework.Audio
                 if (codec == MiniFormatTag_PCM) {
                     
                     //write PCM data into a wav
-                    
-                    MemoryStream mStream = new MemoryStream(44+audiodata.Length);
-                    BinaryWriter writer = new BinaryWriter(mStream);
+#if DIRECTX
+					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
+					sounds[current_entry] = new SoundEffect(waveFormat, audiodata, 0, audiodata.Length, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length).CreateInstance();
+#else
+					using (MemoryStream mStream = new MemoryStream(44 + audiodata.Length)) {
+						using (BinaryWriter writer = new BinaryWriter(mStream)) {
 
-                    writer.Write("RIFF".ToCharArray());
-                    writer.Write((int)(36+audiodata.Length));
-                    writer.Write("WAVE".ToCharArray());
-                    
-                    writer.Write("fmt ".ToCharArray());
-                    writer.Write((int)16); //header size
-                    writer.Write((short)1); //format (PCM)
-                    writer.Write((short)chans);
-                    writer.Write((int)rate); //sample rate
-                    writer.Write((int)rate*align); //byte rate
-                    writer.Write((short)align);
+						writer.Write("RIFF".ToCharArray());
+						writer.Write((int)(36 + audiodata.Length));
+						writer.Write("WAVE".ToCharArray());
 
-					if (bits == 1) 
-					{
-                        writer.Write((short)16);
-                    } 
-					else 
-					{
-                        writer.Write((short)8); //not sure if this is right
-                    } 
-                    
-                    writer.Write("data".ToCharArray());
-                    writer.Write((int)audiodata.Length);
-                    writer.Write(audiodata);
-                                        
-                    writer.Close();
-                    mStream.Close();
-                    
-                    sounds[current_entry] = new SoundEffect(null, mStream.ToArray()).CreateInstance();
-                    
+						writer.Write("fmt ".ToCharArray());
+						writer.Write((int)16); //header size
+						writer.Write((short)1); //format (PCM)
+						writer.Write((short)chans);
+						writer.Write((int)rate); //sample rate
+						writer.Write((int)rate * align); //byte rate
+						writer.Write((short)align);
+
+						if (bits == 1) {
+							writer.Write((short)16);
+						} else {
+							writer.Write((short)8); //not sure if this is right
+						}
+
+						writer.Write("data".ToCharArray());
+						writer.Write((int)audiodata.Length);
+						writer.Write(audiodata);
+
+						}
+						
+						sounds[current_entry] = new SoundEffect(mStream.ToArray(), (int)rate,  chans == 2 ? AudioChannels.Stereo: AudioChannels.Mono).CreateInstance();			
+					}
+#endif                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
                     
@@ -395,7 +403,7 @@ namespace Microsoft.Xna.Framework.Audio
                     
                     if (isWma || isM4a) {
                         //WMA data can sometimes be played directly
-                        
+#if !WINRT                        
                         //hack - NSSound can't play non-wav from data, we have to give a filename
                         string filename = Path.GetTempFileName();
                         if (isWma) {
@@ -407,6 +415,9 @@ namespace Microsoft.Xna.Framework.Audio
                             audioFile.Write(audiodata, 0, audiodata.Length);
                         
                         sounds[current_entry] = new SoundEffect(filename).CreateInstance();
+#else
+						throw new NotImplementedException();
+#endif
                     } else {
                         //An xWMA or XMA2 file. Can't be played atm :(
                         throw new NotImplementedException();
@@ -422,15 +433,15 @@ namespace Microsoft.Xna.Framework.Audio
                  * -flibit
                  */
                 } else if (codec == MiniFormatTag_ADPCM) {
-                    MemoryStream dataStream = new MemoryStream(audiodata);
-                    BinaryReader source = new BinaryReader(dataStream);
-                    sounds[current_entry] = new SoundEffect(
-                        MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
-                        rate,
-                        (chans == 1) ? AudioChannels.Mono : AudioChannels.Stereo
-                    ).CreateInstance();
-                    source.Close();
-                    dataStream.Close();
+                    using (MemoryStream dataStream = new MemoryStream(audiodata)) {
+                        using (BinaryReader source = new BinaryReader(dataStream)) {
+                            sounds[current_entry] = new SoundEffect(
+                                MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
+                                rate,
+                                (chans == 1) ? AudioChannels.Mono : AudioChannels.Stereo
+                            ).CreateInstance();
+                        }
+                    }
 #endif
                 } else {
                     throw new NotImplementedException();
