@@ -67,6 +67,10 @@ namespace Microsoft.Xna.Framework.Input
 	private static OpenTK.Input.MouseDevice _mouse = null;			
 #endif
 
+#if ANDROID
+        private static MouseState _defaultState = new MouseState();
+#endif
+
 #if (WINDOWS && OPENGL)
 
         static OpenTK.GameWindow Window;
@@ -147,6 +151,7 @@ namespace Microsoft.Xna.Framework.Input
 #if MONOMAC
             //We need to maintain precision...
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
+
 #elif (WINDOWS && OPENGL) || LINUX
 
 	    // maybe someone is tring to get mouse before initialize
@@ -169,6 +174,7 @@ namespace Microsoft.Xna.Framework.Input
 		// We need to counteract it to get the same value XNA provides
 	    window.MouseState.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
 #endif
+
             return window.MouseState;
         }
 
@@ -179,6 +185,19 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState()
         {
+#if ANDROID
+
+            // Before MouseState was changed to take in a 
+            // gamewindow, Android seemed to never update 
+            // the previous static MouseState that existed.
+            // This implies that the default behavior is to return
+            // default(MouseState); A static one is used to prevent
+            // constant reallocations
+            // This will need to change when MonoGame supports desktop Android.
+            // Related discussion: https://github.com/mono/MonoGame/pull/1749
+
+            return _defaultState;
+#endif
             return GetState(PrimaryWindow);
         }
 
