@@ -485,10 +485,14 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 #if !IOS && !ANDROID
 			case SurfaceFormat.Dxt1:
-				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
+				glInternalFormat = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
-			case SurfaceFormat.Dxt3:
+            case SurfaceFormat.Dxt1a:
+                glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
+                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Dxt3:
 				glInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
@@ -566,12 +570,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 break;
 #endif
 				
-#if OUYA
+#if ANDROID
 			case SurfaceFormat.Dxt1:
-                glInternalFormat = (PixelInternalFormat)0x83F1; 
+                // 0x83F0 is the RGB version, 0x83F1 is the RGBA version (1-bit alpha)
+                // XNA uses the RGB version.
+                glInternalFormat = (PixelInternalFormat)0x83F0; 
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
-			case SurfaceFormat.Dxt3:
+            case SurfaceFormat.Dxt1a:
+                // 0x83F0 is the RGB version, 0x83F1 is the RGBA version (1-bit alpha)
+                glInternalFormat = (PixelInternalFormat)0x83F1;
+                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Dxt3:
                 glInternalFormat = (PixelInternalFormat)0x83F2;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
 				break;
@@ -611,38 +622,36 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (surfaceFormat)
             {
-                case SurfaceFormat.Color:
-                    return 4;
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
+                case SurfaceFormat.RgbPvrtc2Bpp:
+                case SurfaceFormat.RgbaPvrtc2Bpp:
+                case SurfaceFormat.RgbEtc1:
+                    // One texel in DXT1, PVRTC 2bpp and ETC1 is a minimum 4x4 block, which is 8 bytes
+                    return 8;
                 case SurfaceFormat.Dxt3:
-                    return 4;
-                case SurfaceFormat.Bgr565:
-                    return 2;
-                case SurfaceFormat.Bgra4444:
-                    return 2;
-                case SurfaceFormat.Bgra5551:
-                    return 2;
+                case SurfaceFormat.Dxt5:
+                case SurfaceFormat.RgbPvrtc4Bpp:
+                case SurfaceFormat.RgbaPvrtc4Bpp:
+                    // One texel in DXT3, DXT5 and PVRTC 4bpp is a minimum 4x4 block, which is 16 bytes
+                    return 16;
                 case SurfaceFormat.Alpha8:
                     return 1;
-				case SurfaceFormat.NormalizedByte4:
-                    return 4;
+                case SurfaceFormat.Bgr565:
+                case SurfaceFormat.Bgra4444:
+                case SurfaceFormat.Bgra5551:
                 case SurfaceFormat.HalfSingle:
-                    return 2;
-                case SurfaceFormat.HalfVector2:
-                    return 4;
-                case SurfaceFormat.HalfVector4:
-                    return 8;
-                case SurfaceFormat.HdrBlendable:
-                    return 8;
                 case SurfaceFormat.NormalizedByte2:
                     return 2;
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Single:
                 case SurfaceFormat.Rg32:
-                    return 4;
+                case SurfaceFormat.HalfVector2:
+                case SurfaceFormat.NormalizedByte4:
                 case SurfaceFormat.Rgba1010102:
                     return 4;
+                case SurfaceFormat.HalfVector4:
                 case SurfaceFormat.Rgba64:
-                    return 8;
-                case SurfaceFormat.Single:
-                    return 4;
                 case SurfaceFormat.Vector2:
                     return 8;
                 case SurfaceFormat.Vector4:
@@ -739,6 +748,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #if ANDROID
                 // Todo: Add generic MonoGame logging interface
                 Android.Util.Log.Debug("MonoGame", "MonoGameGLException at " + location + " - " + ex.Message);
+#else
+                Debug.WriteLine("MonoGameGLException at " + location + " - " + ex.Message);
 #endif
             }
         }

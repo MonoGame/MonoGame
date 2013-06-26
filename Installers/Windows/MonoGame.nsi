@@ -1,8 +1,6 @@
 SetCompressor /SOLID /FINAL lzma
 
-!define FrameworkPath "C:\Users\Dean\Desktop\Desktop\MonoGameMaster\"
-!define VERSION "3.0"
-!define REVISION "0.0"
+!include "header.nsh"
 !define INSTALLERFILENAME "MonoGame"
 !define APPNAME "MonoGame"
 
@@ -12,9 +10,9 @@ SetCompressor /SOLID /FINAL lzma
 !include "MUI2.nsh"
 !include "InstallOptions.nsh"
 
-!define MUI_ICON "${FrameworkPath}Installers\monogame.ico"
+!define MUI_ICON "${FrameworkPath}\monogame.ico"
 
-!define MUI_UNICON "${FrameworkPath}Installers\monogame.ico"
+!define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
 Name '${APPNAME} ${VERSION}'
 OutFile '${INSTALLERFILENAME}Installer-${VERSION}.exe'
@@ -33,10 +31,10 @@ RequestExecutionLevel admin
 ;Interface Configuration
 
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${FrameworkPath}Installers\monogame.bmp"
+!define MUI_HEADERIMAGE_BITMAP "${FrameworkPath}\monogame.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEFINISHPAGE_BITMAP "${FrameworkPath}Installers\panel.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${FrameworkPath}\panel.bmp"
 ;Languages
 
 !insertmacro MUI_PAGE_WELCOME
@@ -90,7 +88,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
   File '..\..\Tools\2MGFX\bin\Release\*.exe'
   
-  File '..\..\ThirdParty\Libs\PVRTexLib\Windows_x86_32\Dll\PVRTexLib.dll'
+  File '..\..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
   File '..\..\ThirdParty\Libs\lame_enc.dll'
 
