@@ -103,6 +103,10 @@ namespace Microsoft.Xna.Framework.GamerServices
                     alert.SetMessage(description);
 
                     var input = new EditText(Game.Activity) { Text = defaultText };
+                    if (defaultText != null)
+                    {
+                        input.SetSelection(defaultText.Length);
+                    }
                     alert.SetView(input);
 
                     alert.SetPositiveButton("Ok", (dialog, whichButton) =>

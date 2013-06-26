@@ -66,7 +66,6 @@
     <Compile Include="GameTime.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />

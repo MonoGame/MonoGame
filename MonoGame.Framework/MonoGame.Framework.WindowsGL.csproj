@@ -166,8 +166,11 @@
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
+	
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
+	
     <Compile Include="Graphics\PackedVector\Byte4.cs" />
+	
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
@@ -422,9 +425,7 @@
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
-    <Compile Include="Graphics\GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
@@ -471,6 +472,8 @@
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+	<Compile Include="Utilities\ObjectFactoryWithReset.cs" />
+    
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
