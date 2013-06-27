@@ -244,6 +244,9 @@ namespace MonoGame.Framework
 
         private void OnRawKeyEvent(object sender, KeyboardInputEventArgs args)
         {
+            if (KeyState == null)
+                return;
+
             XnaKey xnaKey;
 
             switch (args.MakeCode)
