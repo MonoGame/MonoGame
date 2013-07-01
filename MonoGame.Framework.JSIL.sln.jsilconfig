@@ -1,0 +1,27 @@
+{
+  "FrameworkVersion": 4.0,
+  "OutputDirectory": "%configdirectory%/MonoGame.Framework/bin/JSIL/JavaScript",
+  "Assemblies": {
+    "Stubbed": [
+      "Tao.Sdl,",
+      "OpenTK,",
+      "Lidgren.Network.Windows,"
+    ],
+    "Ignored": [
+      "System.Dynamic,",
+      "System.Core,",
+      "System.Configuration,",
+      "System.Numerics,",
+      "Microsoft.CSharp,",
+      "System.Xml,",
+      "Microsoft.Build",
+      "System.ComponentModel",
+      "System.Data",
+      "System.Deployment",
+      "System.Web.",
+      "mscorlib, Version=2.0.0.0,",
+      "System, Version=2.0.0.0,",
+      "System.Drawing, Version=2.0.0.0,"
+    ]
+  }
+}
