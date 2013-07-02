@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using System;
 
 #if WINRT
@@ -203,7 +204,10 @@ namespace Microsoft.Xna.Framework
             protected set
             {
                 if (_window == null)
+                {
                     Mouse.PrimaryWindow = value;
+                    TouchPanel.PrimaryWindow = value;
+                }
 
                 _window = value;
             }
