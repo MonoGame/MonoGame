@@ -408,6 +408,11 @@
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
     <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Vectors.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
@@ -484,6 +489,12 @@
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows Phone\ARM\SharpDX.XAudio2.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />

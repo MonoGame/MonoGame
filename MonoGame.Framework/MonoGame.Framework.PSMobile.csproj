@@ -368,6 +368,11 @@
     <Compile Include="PSSuite\Media\PSSuiteSong.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Vectors.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="Graphics\Model.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -426,5 +431,11 @@
       <Project>{167676EE-E2D5-440A-BB2B-EFBD02BC8493}</Project>
       <Name>Lidgren.Network.PSMobile</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

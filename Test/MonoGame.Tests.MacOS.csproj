@@ -71,6 +71,7 @@
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
     <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
+    <Compile Include="Framework\VectorsTest.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\TestGameBase.cs" />

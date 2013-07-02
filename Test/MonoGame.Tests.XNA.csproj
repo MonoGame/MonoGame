@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\XNA\Debug\</OutputPath>
-	<IntermediateOutputPath>obj\XNA\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\XNA\Debug\</IntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;XNA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\XNA\Release\</OutputPath>
-	<IntermediateOutputPath>obj\XNA\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\XNA\Release\</IntermediateOutputPath>
     <DefineConstants>TRACE;XNA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,7 +39,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CLI|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\XNA\Debug-CLI\</OutputPath>
-	<IntermediateOutputPath>obj\XNA\Debug-CLI\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\XNA\Debug-CLI\</IntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;XNA</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -88,6 +88,7 @@
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\VectorsTest.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Runner\Desktop\FramePixelData.cs" />
     <Compile Include="Runner\Extensions.cs" />
@@ -125,6 +126,10 @@
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsGL.Documented.csproj">
+      <Project>{7de47032-a904-4c29-bd22-2d235e8d91ba}</Project>
+      <Name>MonoGame.Framework.WindowsGL.Documented</Name>
+    </ProjectReference>
     <ProjectReference Include="Assets\MonoGame.Tests.Assets.csproj">
       <Project>{F759DE08-E160-4BB4-9A09-404D5694A4EC}</Project>
       <Name>MonoGame.Tests.Assets</Name>

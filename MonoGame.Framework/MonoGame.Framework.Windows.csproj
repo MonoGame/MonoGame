@@ -262,6 +262,11 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Vectors.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
@@ -401,5 +406,11 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

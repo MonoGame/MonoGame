@@ -115,6 +115,7 @@
     <Compile Include="Runner\iOS\Main.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
     <Compile Include="Framework\Visual\VisualTestGame.cs" />
+    <Compile Include="Framework\VectorsTest.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Runner\PixelArgb.cs" />

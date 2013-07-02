@@ -441,6 +441,11 @@
     <Compile Include="FrameworkDispatcher.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Vectors.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
@@ -477,5 +482,11 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

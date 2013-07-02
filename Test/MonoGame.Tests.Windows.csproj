@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Windows\Debug\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Windows\Release\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -37,7 +37,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CLI|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Windows\Debug-CLI\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Debug-CLI\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Debug-CLI\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,7 +60,8 @@
     <Reference Include="nunit.core.interfaces">
       <HintPath>..\ThirdParty\Libs\Tests\nunit.core.interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\Libs\Tests\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.util">
@@ -86,6 +87,7 @@
     <Compile Include="Framework\Components\UpdateGuard.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
+    <Compile Include="Framework\VectorsTest.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Runner\Desktop\FramePixelData.cs" />
     <Compile Include="Runner\Extensions.cs" />
@@ -119,9 +121,9 @@
     <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
-      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.Windows</Name>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsGL.csproj">
+      <Project>{7de47032-a904-4c29-bd22-2d235e8d91ba}</Project>
+      <Name>MonoGame.Framework.WindowsGL</Name>
     </ProjectReference>
     <ProjectReference Include="Assets\MonoGame.Tests.Assets.csproj">
       <Project>{F759DE08-E160-4BB4-9A09-404D5694A4EC}</Project>

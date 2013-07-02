@@ -341,6 +341,11 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
+    <Compile Include="Vectors.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Vectors.tt</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Audio\Sound.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
@@ -501,5 +506,11 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vectors.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Vectors.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>
