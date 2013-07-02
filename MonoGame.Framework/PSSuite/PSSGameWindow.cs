@@ -63,7 +63,6 @@ namespace Microsoft.Xna.Framework
         private DateTime _lastUpdate;
 		private DateTime _now;
         private DisplayOrientation _currentOrientation;
-        internal TouchPanelState TouchPanelState = new TouchPanelState();
 		// TODO private GestureDetector gesture = null;
 		private bool _needsToResetElapsedTime = false;
 		private bool _isFirstTime = true;

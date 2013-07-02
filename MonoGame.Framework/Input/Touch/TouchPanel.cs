@@ -63,8 +63,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
     {
 #if ANDROID
         internal static AndroidGameWindow PrimaryWindow;
-#elif PSM
-        internal static PSSGameWindow PrimaryWindow;
 #else
         internal static GameWindow PrimaryWindow;
 #endif
