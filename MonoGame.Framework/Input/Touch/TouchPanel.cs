@@ -61,7 +61,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     public static class TouchPanel
     {
+#if ANDROID
+        internal static AndroidGameWindow PrimaryWindow;
+#elif PSM
+        internal static PSSGameWindow PrimaryWindow;
+#else
         internal static GameWindow PrimaryWindow;
+#endif
 
         /// <summary>
         /// Gets the current state of the touch panel.

@@ -74,6 +74,7 @@ namespace Microsoft.Xna.Framework
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
+        internal TouchPanelState TouchPanelState = new TouchPanelState();
 
         public bool TouchEnabled
         {
