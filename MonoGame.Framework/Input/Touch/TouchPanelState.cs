@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if WINRT
+using Windows.Graphics.Display;
+#if !WINDOWS_PHONE
+using Windows.UI.Xaml;
+#endif
+#endif
+
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public class TouchPanelState
