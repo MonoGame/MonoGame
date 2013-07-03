@@ -171,14 +171,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 Rectangle? sourceRectangle = null)
         {
 
-            // Assign default values to null parameters
+            // Assign default values to null parameters here, as they are not compile-time constants
             if(color == null)
                 color = Color.White;
             if(origin == null)
                 origin = Vector2.Zero;
             if(scale == null)
                 scale = Vector2.One;
-
 
             // If it's unclear where the the texture should be drawn, raise an error
             if((drawRectangle == null) == (position == null))
