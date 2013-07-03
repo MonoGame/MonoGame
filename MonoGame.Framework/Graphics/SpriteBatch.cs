@@ -158,6 +158,46 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
+        // Overload for calling Draw() with named parameters
+        public void Draw (Texture2D texture,
+                float depth = 0f,
+                SpriteEffects effect = SpriteEffects.None,
+                Vector2? scale = null,
+                Vector2? origin = null,
+                float rotation = 0f,
+                Color? color = null,
+                Vector2? position = null,
+                Rectangle? drawRectangle = null,
+                Rectangle? sourceRectangle = null)
+        {
+
+            // Assign default values to null parameters
+            if(color == null)
+                color = Color.White;
+            if(origin == null)
+                origin = Vector2.Zero;
+            if(scale == null)
+                scale = Vector2.One;
+
+
+            // If it's unclear where the the texture should be drawn, raise an error
+            if((drawRectangle == null) == (position == null))
+            {
+                throw new InvalidOperationException("Expected drawRectangle or position, but received neither or both.");
+            }
+            else if(position != null)
+            {
+                // Call Draw() using position
+                Draw(texture, (Vector2)position, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effect, depth);
+            }
+            else
+            {
+                // Call Draw() using drawRectangle
+                Draw(texture, (Rectangle)drawRectangle, sourceRectangle, (Color)color, rotation, (Vector2)origin, effect, depth);
+            }
+        }
+
+
 		public void Draw (Texture2D texture,
 				Vector2 position,
 				Rectangle? sourceRectangle,
