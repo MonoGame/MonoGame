@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
-    class TouchPanelState
+    public class TouchPanelState
     {
         /// <summary>
         /// The maximum number of events to allow in the touch or gesture event lists.
