@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return stateChanged;
         }
 
-        internal TouchCollection GetTouchLocations()
+        public TouchCollection GetState()
         {
             // Process the touch state.
             var consumeState = true;

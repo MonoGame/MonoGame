@@ -73,7 +73,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns><see cref="TouchCollection"/></returns>
         public static TouchCollection GetState()
         {
-            return PrimaryWindow.TouchPanelState.GetTouchLocations();
+            return PrimaryWindow.TouchPanelState.GetState();
+        }
+
+        public static TouchPanelState GetState(GameWindow window)
+        {
+            return window.TouchPanelState;
         }
 
         public static TouchPanelCapabilities GetCapabilities()
