@@ -346,6 +346,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns the next available gesture on touch panel device.
+        /// </summary>
+        /// <returns><see cref="GestureSample"/></returns>
+        public GestureSample ReadGesture()
+        {
+            // Return the next gesture.
+            return GestureList.Dequeue();
+        }
+
         #region Gesture Recognition
 
         /// <summary>
