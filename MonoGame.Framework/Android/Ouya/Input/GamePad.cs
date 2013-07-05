@@ -56,6 +56,11 @@ namespace Microsoft.Xna.Framework.Input
         private float _leftTrigger, _rightTrigger;
         private Vector2 _leftStick, _rightStick;
 
+        // Workaround for the OnKeyUp and OnKeyDown events for KeyCode.Menu 
+        // both being sent in a single frame. This can be removed if the
+        // OUYA firmware is updated to send these events in different frames. 
+        private bool _startButtonPressed;
+
         private readonly GamePadCapabilities _capabilities;
 
         private static readonly GamePad[] GamePads = new GamePad[OuyaController.MaxControllers];
@@ -113,6 +118,16 @@ namespace Microsoft.Xna.Framework.Input
 
                 GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
                 thumbSticks.ApplyDeadZone(deadZone, 0.3f);
+
+                if (gamePad._startButtonPressed)
+                {
+                    gamePad._buttons |= Buttons.Start;
+                    gamePad._startButtonPressed = false;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.Start;
+                }
 
                 state = new GamePadState(
                     thumbSticks, 
@@ -197,6 +212,11 @@ namespace Microsoft.Xna.Framework.Input
                 return false;
 
             gamePad._buttons |= ButtonForKeyCode(keyCode);
+
+            if (keyCode == Keycode.Menu)
+            {
+                gamePad._startButtonPressed = true;
+            }
             return true;
         }
 

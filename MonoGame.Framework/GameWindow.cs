@@ -66,6 +66,7 @@ non-infringement.
 */
 #endregion License
 
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.ComponentModel;
 
@@ -120,6 +121,8 @@ namespace Microsoft.Xna.Framework {
                 throw new NotImplementedException();
             }
         }
+
+        internal MouseState MouseState;
 
 		#endregion Properties
 
