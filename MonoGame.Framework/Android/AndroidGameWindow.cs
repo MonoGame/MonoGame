@@ -160,13 +160,33 @@ namespace Microsoft.Xna.Framework
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
 			try
             {
-                GLContextVersion = GLContextVersion.Gles2_0;
+				GLContextVersion = GLContextVersion.Gles2_0;
 				try
 				{
+					int depth = 0;
+					int stencil = 0;
+					switch (this._game.graphicsDeviceManager.PreferredDepthStencilFormat)
+					{
+						case DepthFormat.Depth16: 
+						depth = 16;
+						break;
+						case DepthFormat.Depth24: 
+						depth = 24;
+						break;
+						case DepthFormat.Depth24Stencil8: 
+						depth = 24;
+						stencil = 8;
+						break;
+						case DepthFormat.None: break;
+					}
+					Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:RGBA8 Depth:{0} Stencil:{1}", depth, stencil));
+					GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8,8,8,8), depth,stencil, 0, 0, false);
 					base.CreateFrameBuffer();
+					Android.Util.Log.Debug("MonoGame", "Created desired format");
 				}
 				catch(Exception)
 				{
+					Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
 					// try again using a more basic mode which hopefully the device will support
 					GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
 					base.CreateFrameBuffer();
