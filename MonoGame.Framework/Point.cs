@@ -25,9 +25,11 @@ SOFTWARE.
 */
 #endregion License
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+    [DataContract]
     public struct Point : IEquatable<Point>
     {
         #region Private Fields
@@ -39,7 +41,10 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        [DataMember]
         public int X;
+
+        [DataMember]
         public int Y;
 
         #endregion Public Fields

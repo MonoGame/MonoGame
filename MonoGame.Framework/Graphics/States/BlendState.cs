@@ -81,12 +81,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public ColorWriteChannels ColorWriteChannels3 { get; set; }
 		public int MultiSampleMask { get; set; }
 
-		public static readonly BlendState Additive;
-		public static readonly BlendState AlphaBlend;
-		public static readonly BlendState NonPremultiplied;
-		public static readonly BlendState Opaque;
-		
-		public BlendState() 
+		private static readonly Utilities.ObjectFactoryWithReset<BlendState> _additive;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _alphaBlend;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _nonPremultiplied;
+        private static readonly Utilities.ObjectFactoryWithReset<BlendState> _opaque;
+
+        public static BlendState Additive { get { return _additive.Value; } }
+        public static BlendState AlphaBlend { get { return _alphaBlend.Value; } }
+        public static BlendState NonPremultiplied { get { return _nonPremultiplied.Value; } }
+        public static BlendState Opaque { get { return _opaque.Value; } }
+        
+        public BlendState() 
         {
 			AlphaBlendFunction = BlendFunction.Add;
 			AlphaDestinationBlend = Blend.Zero;
@@ -104,37 +109,37 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		static BlendState() 
         {
-			Additive = new BlendState() 
+            _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState
             {
-				ColorSourceBlend = Blend.SourceAlpha,
-				AlphaSourceBlend = Blend.SourceAlpha,
-    			ColorDestinationBlend = Blend.One,	
-				AlphaDestinationBlend = Blend.One
-			};
+                ColorSourceBlend = Blend.SourceAlpha,
+                AlphaSourceBlend = Blend.SourceAlpha,
+                ColorDestinationBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One
+            });
 			
-			AlphaBlend = new BlendState()
+			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
+			});
 			
-			NonPremultiplied = new BlendState() 
+			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState() 
             {
 				ColorSourceBlend = Blend.SourceAlpha,
 				AlphaSourceBlend = Blend.SourceAlpha,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
 				AlphaDestinationBlend = Blend.InverseSourceAlpha
-			};
+			});
 			
-			Opaque = new BlendState()
+			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,			    
 				ColorDestinationBlend = Blend.Zero,
 				AlphaDestinationBlend = Blend.Zero
-			};
+			});
 		}
 
         public override string ToString ()
@@ -197,6 +202,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
+        protected internal override void GraphicsDeviceResetting()
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.GraphicsDeviceResetting();
+        }
+
         internal void ApplyState(GraphicsDevice device)
         {
             if (_state == null)
@@ -255,6 +266,14 @@ namespace Microsoft.Xna.Framework.Graphics
             d3dContext.OutputMerger.BlendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
             d3dContext.OutputMerger.BlendSampleMask = -1;
             d3dContext.OutputMerger.BlendState = _state;
+        }
+
+        internal static void ResetStates()
+        {
+            _additive.Reset();
+            _alphaBlend.Reset();
+            _nonPremultiplied.Reset();
+            _opaque.Reset();
         }
 
         static private SharpDX.Direct3D11.BlendOperation GetBlendOperation(BlendFunction blend)

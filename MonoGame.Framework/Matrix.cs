@@ -26,17 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif
     public struct Matrix : IEquatable<Matrix>
     {
         #region Public Constructors
@@ -66,69 +60,53 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-#if WINRT
+
         [DataMember]
-#endif
         public float M11;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M12;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M13;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M14;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M21;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M22;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M23;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M24;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M31;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M32;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M33;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M34;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M41;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M42;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M43;
-#if WINRT
+      
         [DataMember]
-#endif
         public float M44;
 
         #endregion Public Fields

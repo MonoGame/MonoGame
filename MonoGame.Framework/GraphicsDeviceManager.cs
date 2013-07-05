@@ -115,8 +115,6 @@ namespace Microsoft.Xna.Framework
 
         public void CreateDevice()
         {
-            _graphicsDevice = new GraphicsDevice();
-
             Initialize();
 
             OnDeviceCreated(EventArgs.Empty);
@@ -210,7 +208,8 @@ namespace Microsoft.Xna.Framework
                 return;
 
 #if WINDOWS_PHONE
-
+            // Display orientation is always portrait on WP8
+            _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
 #elif WINDOWS_STOREAPP
 
             // TODO:  Does this need to occur here?
@@ -305,17 +304,18 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize()
         {
+            var presentationParameters = new PresentationParameters();
+            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
+            presentationParameters.BackBufferWidth = _preferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
+            presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
-
+            presentationParameters.IsFullScreen = false;
 #if WINDOWS_PHONE
 
 #elif WINRT
@@ -323,39 +323,50 @@ namespace Microsoft.Xna.Framework
 			// to created the default swapchain target.
             if (SwapChainPanel != null)
             {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+                presentationParameters.DeviceWindowHandle = IntPtr.Zero;
+                presentationParameters.SwapChainPanel = SwapChainPanel;
             }
             else
             {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = null;
+                presentationParameters.DeviceWindowHandle = _game.Window.Handle;
+                presentationParameters.SwapChainPanel = null;
             }
 #else
-            _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
+            presentationParameters.DeviceWindowHandle = _game.Window.Handle;
 #endif
 
-            _graphicsDevice.Initialize();
 #else
 
 #if MONOMAC
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = false;
 #else
             // Set "full screen"  as default
-            _graphicsDevice.PresentationParameters.IsFullScreen = true;
+            presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
-            // TODO: Implement multisampling (aka anti-alising) for all platforms!
+#endif // WINDOWS || WINRT
 
-            _graphicsDevice.Initialize();
+            // TODO: Implement multisampling (aka anti-alising) for all platforms!
+            if (PreparingDeviceSettings != null)
+            {
+                GraphicsDeviceInformation gdi = new GraphicsDeviceInformation();
+                gdi.GraphicsProfile = GraphicsProfile; // Microsoft defaults this to Reach.
+                gdi.Adapter = GraphicsAdapter.DefaultAdapter;
+                gdi.PresentationParameters = presentationParameters;
+                PreparingDeviceSettingsEventArgs pe = new PreparingDeviceSettingsEventArgs(gdi);
+                PreparingDeviceSettings(this, pe);
+                presentationParameters = pe.GraphicsDeviceInformation.PresentationParameters;
+                GraphicsProfile = pe.GraphicsDeviceInformation.GraphicsProfile;
+            }
+
+            // Needs to be before ApplyChanges()
+            _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
 
 #if !MONOMAC
             ApplyChanges();
 #endif
-
-#endif // WINDOWS || WINRT
 
             // Set the new display size on the touch panel.
             //
@@ -365,6 +376,7 @@ namespace Microsoft.Xna.Framework
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            TouchPanel.DisplayOrientation = _graphicsDevice.PresentationParameters.DisplayOrientation;
         }
 
         public void ToggleFullScreen()
@@ -373,6 +385,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif
 

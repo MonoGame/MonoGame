@@ -543,23 +543,13 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
-                if (asset.Value is Texture2D)
-                {
-                    ReloadAsset<Texture2D>(asset.Key, asset.Value as Texture2D);
-                }
-                else if (asset.Value is SpriteFont)
-                {
-                    ReloadAsset<SpriteFont>(asset.Key, asset.Value as SpriteFont);
-                }
-                else if (asset.Value is Model)
-                {
-                    ReloadAsset<Model>(asset.Key, asset.Value as Model);
-                }
-                // Not requried as we are recompiling them from cached source in response to DeviceReset event
-                //else if (asset.Value is Effect)
-                //{
-                //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
-                //}
+#if WINDOWS_STOREAPP
+                var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
+#else
+                var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
             }
         }
 

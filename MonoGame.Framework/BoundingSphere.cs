@@ -32,14 +32,20 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+ 
+    [DataContract]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         #region Public Fields
 
+        [DataMember]
         public Vector3 Center;
+
+        [DataMember]
         public float Radius;
 
         #endregion Public Fields
