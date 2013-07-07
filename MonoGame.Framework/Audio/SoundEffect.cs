@@ -77,11 +77,7 @@ namespace Microsoft.Xna.Framework.Audio
         private List<SoundEffectInstance> _availableInstances;
         private List<SoundEffectInstance> _toBeRecycledInstances;
 #else
-        private Sound _sound;
-        private SoundEffectInstance _instance;
-
         private string _filename = "";
-
         internal byte[] _data;
 
 #if WINDOWS || LINUX
@@ -105,7 +101,9 @@ namespace Microsoft.Xna.Framework.Audio
             get;
             set;
         }
-
+#else
+        private Sound _sound;
+        private SoundEffectInstance _instance;
 #endif
 
 #endif
