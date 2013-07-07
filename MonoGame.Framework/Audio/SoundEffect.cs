@@ -51,7 +51,7 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.X3DAudio;
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
 using OpenTK.Audio.OpenAL;
 #endif
 
@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Audio
         private string _filename = "";
         internal byte[] _data;
 
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
 
         // OpenAL-specific information
 
@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _name = Path.GetFileNameWithoutExtension(fileName);
 
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
             Stream s;
             try
             {
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Audio
             _data = data;
             _name = name;
 
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
             Stream s;
             try
             {
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal SoundEffect(Stream s)
         {
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
             _data = LoadAudioStream(s, 1.0f, false);
 #elif !DIRECTX
             var data = new byte[s.Length];
@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if DIRECTX            
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
             _data = buffer;
             Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -265,7 +265,7 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             var instance = new SoundEffectInstance(this, voice);
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
             var instance = new SoundEffectInstance(this);
 #else
             var instance = new SoundEffectInstance();
@@ -289,7 +289,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
             return Play(MasterVolume, 0.0f, 0.0f);
 #else
             return Play(1.0f, 0.0f, 0.0f);
@@ -353,7 +353,7 @@ namespace Microsoft.Xna.Framework.Audio
             // XNA documentation says this method returns false if the sound limit
             // has been reached. However, there is no limit on PC.
             return true;
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
             if (MasterVolume > 0.0f)
             {
                 SoundEffectInstance instance = CreateInstance();
@@ -382,7 +382,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Properties
 
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
         private TimeSpan _duration = TimeSpan.Zero;
 #endif
 
@@ -395,7 +395,7 @@ namespace Microsoft.Xna.Framework.Audio
                 var avgBPS = _format.AverageBytesPerSecond;
                 
                 return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
-#elif WINDOWS || LINUX
+#elif (WINDOWS && OPENGL) || LINUX
                 return _duration;
 #else
                 if ( _sound != null )
@@ -509,7 +509,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-#if WINDOWS || LINUX
+#if (WINDOWS && OPENGL) || LINUX
             // No-op. Note that isDisposed remains false!
 #else
 
