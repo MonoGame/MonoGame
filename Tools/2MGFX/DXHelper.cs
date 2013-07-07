@@ -12,6 +12,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return result;
         }
 
+        public static string UnmarshalToStr(IntPtr ptr)
+        {            
+            return Marshal.PtrToStringAnsi(ptr);
+        }
+
 		public static T[] UnmarshalArray<T>(IntPtr ptr, int count) 
         {
 			var type = typeof(T);

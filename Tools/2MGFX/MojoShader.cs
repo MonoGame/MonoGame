@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+		    public IntPtr name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// int
 		    public int texbem;
@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
@@ -180,7 +180,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// unsigned char[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst=4)]
-		    public string swizzles;
+		    public IntPtr swizzles;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -213,7 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// MOJOSHADER_symbolTypeInfo
 		    public MOJOSHADER_symbolTypeInfo info;
@@ -224,7 +224,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// MOJOSHADER_symbolRegisterSet->Anonymous_9ff7ac54_131c_43b0_a295_9830d24ac76b
 		    public MOJOSHADER_symbolRegisterSet register_set;
@@ -244,11 +244,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string error;
+            public IntPtr error;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string filename;
+            public IntPtr filename;
 		    
 		    /// int
 		    public int error_position;
@@ -417,11 +417,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string profile;
+            public IntPtr profile;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string output;
+            public IntPtr output;
 		    
 		    /// int
 		    public int output_len;
@@ -498,11 +498,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -517,7 +517,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// unsigned int
 		    public uint state_count;
@@ -531,7 +531,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// unsigned int
 		    public uint pass_count;
@@ -548,7 +548,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -575,7 +575,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string profile;
+            public IntPtr profile;
 		    
 		    /// int
 		    public int param_count;
@@ -616,11 +616,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string definition;
+            public IntPtr definition;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -634,7 +634,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string output;
+            public IntPtr output;
 		    
 		    /// int
 		    public int output_len;
@@ -724,7 +724,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -809,7 +809,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Explicit)]
@@ -1055,7 +1055,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string filename;
+            public IntPtr filename;
 		    
 		    /// unsigned int
 		    public uint line;
@@ -1210,7 +1210,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// int
 		    public int index;
@@ -1253,7 +1253,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string @string;
+            public IntPtr @string;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1296,7 +1296,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string member;
+            public IntPtr member;
 		    
 		    /// int
 		    public int isswizzle;
@@ -1393,11 +1393,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astInterpolationModifier
 		    public MOJOSHADER_astInterpolationModifier interpolation_modifier;
@@ -1420,7 +1420,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// MOJOSHADER_astFunctionParameters*
 		    public IntPtr @params;
@@ -1430,7 +1430,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1441,7 +1441,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// int
 		    public int isarray;
@@ -1474,11 +1474,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string ident1;
+            public IntPtr ident1;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string ident2;
+            public IntPtr ident2;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1492,7 +1492,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string register_name;
+            public IntPtr register_name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1506,7 +1506,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astScalarOrArray*
 		    public IntPtr details;
@@ -1529,7 +1529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// MOJOSHADER_astStructMembers*
 		    public IntPtr members;
@@ -1555,7 +1555,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astAnnotations*
 		    public IntPtr annotations;
@@ -2043,7 +2043,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string source_profile;
+            public IntPtr source_profile;
 		    
 		    /// MOJOSHADER_astNode*
 		    public IntPtr ast;
@@ -2122,7 +2122,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string filename;
+		    public IntPtr filename;
 		    
 		    /// unsigned int
 		    public uint line;
@@ -2296,7 +2296,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst=4)]
-		    public string channels;
+		    public IntPtr channels;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -2552,11 +2552,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string source_profile;
+            public IntPtr source_profile;
 		    
 		    /// char*
 		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string output;
+            public IntPtr output;
 		    
 		    /// int
 		    public int output_len;
@@ -2588,12 +2588,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// float[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.R4)]
 		    [FieldOffsetAttribute(0)]
-		    public float[] f;
+		    public IntPtr f;
 		    
 		    /// int[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.I4)]
 		    [FieldOffsetAttribute(0)]
-		    public int[] i;
+		    public IntPtr i;
 		    
 		    /// int
 		    [FieldOffsetAttribute(0)]
@@ -2606,12 +2606,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// int[16]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=16, ArraySubType=UnmanagedType.I4)]
 		    [FieldOffsetAttribute(0)]
-		    public int[] ival;
+		    public IntPtr ival;
 		    
 		    /// float[16]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=16, ArraySubType=UnmanagedType.R4)]
 		    [FieldOffsetAttribute(0)]
-		    public float[] fval;
+            public IntPtr fval;
 		}
 		
 		public enum MOJOSHADER_uniformType {

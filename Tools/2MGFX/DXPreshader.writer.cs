@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (parseData.error_count > 0)
             {
                 var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
-                throw new Exception(errors[0].error);
+                throw new Exception(DXHelper.UnmarshalToStr(errors[0].error));
             }
 
             var preshader = DXHelper.Unmarshal<MojoShader.MOJOSHADER_preshader>(parseData.preshader);
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
             writer.Write((byte)_symbols.Length);
             foreach (var symbol in _symbols)
             {
-		        writer.Write(symbol.name);
+		        writer.Write(DXHelper.UnmarshalToStr(symbol.name));
 		        writer.Write((byte)symbol.register_set);
 		        writer.Write((ushort)symbol.register_index);
 		        writer.Write((byte)symbol.register_count);
