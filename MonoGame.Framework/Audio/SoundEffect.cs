@@ -527,6 +527,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Additional OpenTK SoundEffect Code
 
+#if (WINDOWS && OPENGL) || LINUX
         byte[] LoadAudioStream(Stream s, float volume, bool looping)
         {
             ALFormat format;
@@ -541,6 +542,7 @@ namespace Microsoft.Xna.Framework.Audio
             Rate = freq;
             return data;
         }
+#endif
 
         #endregion
 
