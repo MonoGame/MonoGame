@@ -265,13 +265,11 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             var instance = new SoundEffectInstance(this, voice);
+#elif WINDOWS || LINUX
+            var instance = new SoundEffectInstance(this);
 #else
             var instance = new SoundEffectInstance();
-
-#if !WINDOWS && !LINUX
             instance.Sound = _sound;
-#endif
-
 #endif
             return instance;
         }
