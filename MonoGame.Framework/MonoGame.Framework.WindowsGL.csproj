@@ -127,7 +127,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
-    <Compile Include="Desktop\Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Desktop\Input\Axis.cs" />
     <Compile Include="Desktop\Input\Capabilities.cs" />
