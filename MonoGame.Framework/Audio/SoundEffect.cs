@@ -192,13 +192,47 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-        internal SoundEffect(string name, byte[] data, int channels, uint frequency)
+        internal SoundEffect(string name, byte[] buffer, int channels, uint sampleRate)
         {
+#if WINDOWS || LINUX
             _name = name;
-            _data = data;
-            Size = data.Length;
+            _data = buffer;
+            Size = buffer.Length;
             Format = (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            Rate = frequency;
+            Rate = sampleRate;
+#else
+            //buffer should contain 16-bit PCM wave data
+            short bitsPerSample = 16;
+
+            _name = name;
+
+            using (var mStream = new MemoryStream(44+buffer.Length))
+            using (var writer = new BinaryWriter(mStream))
+            {
+                writer.Write("RIFF".ToCharArray()); //chunk id
+                writer.Write((int)(36 + buffer.Length)); //chunk size
+                writer.Write("WAVE".ToCharArray()); //RIFF type
+
+                writer.Write("fmt ".ToCharArray()); //chunk id
+                writer.Write((int)16); //format header size
+                writer.Write((short)1); //format (PCM)
+                writer.Write((short)channels);
+                writer.Write((int)sampleRate);
+                short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
+                writer.Write((int)(sampleRate * blockAlign)); //byte rate
+                writer.Write((short)blockAlign);
+                writer.Write((short)bitsPerSample);
+
+                writer.Write("data".ToCharArray()); //chunk id
+                writer.Write((int)buffer.Length); //data size   MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199    C#
+
+                writer.Write(buffer);
+
+                _data = mStream.ToArray();
+            }
+
+            _sound = new Sound(_data, 1.0f, false);
+#endif
         }
 
         #endregion
