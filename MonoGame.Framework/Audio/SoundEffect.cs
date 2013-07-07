@@ -194,8 +194,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal SoundEffect(string name, byte[] buffer, int channels, uint sampleRate)
         {
-#if WINDOWS || LINUX
             _name = name;
+            
+#if WINDOWS || LINUX
             _data = buffer;
             Size = buffer.Length;
             Format = (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -203,8 +204,6 @@ namespace Microsoft.Xna.Framework.Audio
 #else
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
-
-            _name = name;
 
             using (var mStream = new MemoryStream(44+buffer.Length))
             using (var writer = new BinaryWriter(mStream))
