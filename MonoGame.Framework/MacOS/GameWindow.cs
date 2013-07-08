@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private MacGamePlatform _platform;
         internal MouseState MouseState;
+        internal TouchPanelState TouchPanelState = new TouchPanelState();
 
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
