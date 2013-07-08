@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Private Fields
 
-
         #region Public Fields
         
         [DataMember]
@@ -65,7 +64,6 @@ namespace Microsoft.Xna.Framework
         public float Z;
 
         #endregion Public Fields
-
 
         #region Properties
 
@@ -126,7 +124,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Properties
 
-
         #region Constructors
 
         public Vector3(float x, float y, float z)
@@ -155,8 +152,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion Constructors
 
-
-        #region Public Methods
+        #region Public methods
 
         public static Vector3 Add(Vector3 value1, Vector3 value2)
         {
@@ -559,7 +555,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
+	    /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
         /// <param name="vec">The vector to transform.</param>
@@ -571,6 +567,8 @@ namespace Microsoft.Xna.Framework
             Transform(ref vec, ref quat, out result);
             return result;
         }
+        
+        /*
 
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
@@ -591,6 +589,8 @@ namespace Microsoft.Xna.Framework
 //            Vector3.Multiply(ref temp, 2, out temp);
 //            Vector3.Add(ref vec, ref temp, out result);
 //        }
+
+        */
 
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
@@ -653,8 +653,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public methods
 
-
-        #region Operators
+        #region Public operators
 
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
@@ -731,6 +730,6 @@ namespace Microsoft.Xna.Framework
             return value;
         }
 
-        #endregion
+        #endregion Public operators
     }
 }

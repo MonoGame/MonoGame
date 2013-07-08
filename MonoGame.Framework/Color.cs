@@ -36,9 +36,15 @@ namespace Microsoft.Xna.Framework
     [DataContract]
     public struct Color : IEquatable<Color>
     {
-	// ARGB
+        #region Private fields
+
+        // ARGB
         private uint _packedValue;
-	  
+
+        #endregion Private fields
+
+        #region Private constructors
+
         private Color(uint packedValue)
         {
             _packedValue = packedValue;
@@ -48,7 +54,11 @@ namespace Microsoft.Xna.Framework
 			//_packedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
-	/// <summary>
+        #endregion Private constructors
+
+        #region Public constructors
+
+        /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="color">A <see cref="Vector4"/> representing color.</param>
@@ -62,7 +72,7 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(color.W * 255, Byte.MinValue, Byte.MaxValue);
         }
 
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="color">A <see cref="Vector3"/> representing color.</param>
@@ -76,7 +86,7 @@ namespace Microsoft.Xna.Framework
             A = 255;
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
@@ -91,7 +101,7 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> for RGB values of new <see cref="Color"/> instance.</param>
@@ -106,7 +116,7 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -122,7 +132,7 @@ namespace Microsoft.Xna.Framework
             A = 255;
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -137,7 +147,7 @@ namespace Microsoft.Xna.Framework
             A = (byte)255;
         }
 
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -153,7 +163,7 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -169,8 +179,22 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
-        
-	/// <summary>
+
+        #endregion Public constructors
+
+        #region Public properties
+
+        /// <summary>
+        /// Gets or sets packed value of this <see cref="Color"/>.
+        /// </summary>
+        [CLSCompliant(false)]
+        public UInt32 PackedValue
+        {
+            get { return _packedValue; }
+            set { _packedValue = value; }
+        }
+
+        /// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -186,7 +210,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -202,7 +226,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -218,7 +242,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
+	    /// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -233,42 +257,12 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
             }
         }
-		
-	/// <summary>
-        /// Compares whether two <see cref="Color"/> instances are equal.
-        /// </summary>
-        /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
-        /// <param name="b"><see cref="Color"/> instance on the right of the equal sign.</param>
-        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public static bool operator ==(Color a, Color b)
-        {
-            return (a.A == b.A &&
-                a.R == b.R &&
-                a.G == b.G &&
-                a.B == b.B);
-        }
-	
-	/// <summary>
-        /// Compares whether two <see cref="Color"/> instances are not equal.
-        /// </summary>
-        /// <param name="a"><see cref="Color"/> instance on the left of the not equal sign.</param>
-        /// <param name="b"><see cref="Color"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
-        public static bool operator !=(Color a, Color b)
-        {
-            return !(a == b);
-        }
-	
-	/// <summary>
-        /// Gets the hash code for <see cref="Color"/> instance.
-        /// </summary>
-        /// <returns>Hash code of the object.</returns>
-        public override int GetHashCode()
-        {
-            return this._packedValue.GetHashCode();
-        }
-	
-	/// <summary>
+
+        #endregion Public properties
+
+        #region Object overrided methods
+
+        /// <summary>
         /// Compares whether current instance is equal to specified object.
         /// </summary>
         /// <param name="obj">The <see cref="Color"/> to compare.</param>
@@ -277,8 +271,30 @@ namespace Microsoft.Xna.Framework
         {
             return ((obj is Color) && this.Equals((Color)obj));
         }
-	
-	/// <summary>
+
+        /// <summary>
+        /// Gets the hash code for <see cref="Color"/> instance.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
+        public override int GetHashCode()
+        {
+            return this._packedValue.GetHashCode();
+        }
+
+        /// <summary>
+        /// Converts the color values of this instance to its equivalent string representation.
+        /// </summary>
+        /// <returns>The string representation of the color value of this instance.</returns>
+        public override string ToString()
+        {
+            return string.Format("[Color: R={0}, G={1}, B={2}, A={3}, PackedValue={4}]", R, G, B, A, PackedValue);
+        }
+
+        #endregion Object overrided methods
+
+        #region Public static properties - Predefined colors
+
+        /// <summary>
         /// TransparentBlack color (R:0,G:0,B:0,A:0).
         /// </summary>
         public static Color TransparentBlack
@@ -293,14 +309,14 @@ namespace Microsoft.Xna.Framework
         /// Transparent color (R:0,G:0,B:0,A:0).
         /// </summary>
         public static Color Transparent
-	{
-	    get
 	    {
-	       return new Color(0);
+	        get
+	        {
+	           return new Color(0);
+	        }
 	    }
-	}
 	
-	/// <summary>
+	    /// <summary>
         /// AliceBlue color (R:240,G:248,B:255,A:255).
         /// </summary>
         public static Color AliceBlue
@@ -325,15 +341,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Aqua color (R:0,G:255,B:255,A:255).
         /// </summary>
-	public static Color Aqua
-	{
-	    get
+	    public static Color Aqua
 	    {
-	       return new Color(0xffffff00);
+	        get
+	        {
+	           return new Color(0xffffff00);
+	        }
 	    }
-	}
 	
-	/// <summary>
+	    /// <summary>
         /// Aquamarine color (R:127,G:255,B:212,A:255).
         /// </summary>
         public static Color Aquamarine
@@ -347,15 +363,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Azure color (R:240,G:255,B:255,A:255).
         /// </summary>
-	public static Color Azure
-	{
-	    get
-	    {
-	       return new Color(0xfffffff0);
-	    }
-	}
+        public static Color Azure
+        {
+            get
+            {
+                return new Color(0xfffffff0);
+            }
+        }
 	
-	/// <summary>
+	    /// <summary>
         /// Beige color (R:245,G:245,B:220,A:255).
         /// </summary>
         public static Color Beige
@@ -501,15 +517,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Cornsilk color (R:255,G:248,B:220,A:255).
         /// </summary>
-	public static Color Cornsilk
-	{
-	    get
+	    public static Color Cornsilk
 	    {
-	       return new Color(0xffdcf8ff);
+	        get
+	        {
+	           return new Color(0xffdcf8ff);
+	        }
 	    }
-	}
 	
-	/// <summary>
+	    /// <summary>
         /// Crimson color (R:220,G:20,B:60,A:255).
         /// </summary>
         public static Color Crimson
@@ -534,15 +550,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// DarkBlue color (R:0,G:0,B:139,A:255).
         /// </summary>
-	public static Color DarkBlue
-	{
-	    get
-            {
-	       return new Color(0xff8b0000);
+	    public static Color DarkBlue
+	    {
+	        get
+                {
+	           return new Color(0xff8b0000);
+	        }
 	    }
-	}
 	
-	/// <summary>
+	    /// <summary>
         /// DarkCyan color (R:0,G:139,B:139,A:255).
         /// </summary>
         public static Color DarkCyan
@@ -567,15 +583,15 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// DarkGray color (R:169,G:169,B:169,A:255).
         /// </summary>
-	public static Color DarkGray
-	{
-	    get
+	    public static Color DarkGray
 	    {
-	       return new Color(0xffa9a9a9);
+	        get
+	        {
+	           return new Color(0xffa9a9a9);
+	        }
 	    }
-	}
 	
-	/// <summary>
+	    /// <summary>
         /// DarkGreen color (R:0,G:100,B:0,A:255).
         /// </summary>
         public static Color DarkGreen
@@ -795,7 +811,7 @@ namespace Microsoft.Xna.Framework
             }
         }
         
-	/// <summary>
+	    /// <summary>
         /// Fuchsia color (R:255,G:0,B:255,A:255).
         /// </summary>
         public static Color Fuchsia
@@ -1786,13 +1802,13 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Wheat color (R:245,G:222,B:179,A:255).
         /// </summary>
-	public static Color Wheat
-	{
-	    get
-	    {
-	       return new Color(0xffb3def5);
-	    }
-	}
+        public static Color Wheat
+        {
+            get
+            {
+                return new Color(0xffb3def5);
+            }
+        }
 	
         /// <summary>
         /// White color (R:255,G:255,B:255,A:255).
@@ -1837,8 +1853,12 @@ namespace Microsoft.Xna.Framework
                return new Color(0xff32cd9a);
             }
         }
-	
-	/// <summary>
+
+        #endregion Public static properties - Predefined colors
+
+        #region Public methods
+
+        /// <summary>
         /// Performs linear interpolation of <see cref="Color"/>.
         /// </summary>
         /// <param name="value1">Source <see cref="Color"/>.</param>
@@ -1853,29 +1873,18 @@ namespace Microsoft.Xna.Framework
                                 (int)MathHelper.Lerp(value1.A, value2.A, amount) );
         }
 		
-	/// <summary>
+	    /// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
         /// <param name="value">Source <see cref="Color"/>.</param>
         /// <param name="scale">Multiplicator.</param>
         /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
-	
-	/// <summary>
-        /// Multiply <see cref="Color"/> by value.
-        /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+        public static Color Multiply(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-        }		
-
-	/// <summary>
+        }
+	 
+	    /// <summary>
         /// Converts <see cref="Color"/> to <see cref="Vector3"/>.
         /// </summary>
         /// <returns>Converted color.</returns>
@@ -1884,7 +1893,7 @@ namespace Microsoft.Xna.Framework
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Converts <see cref="Color"/> to <see cref="Vector4"/>.
         /// </summary>
         /// <returns>Converted color.</returns>
@@ -1892,27 +1901,8 @@ namespace Microsoft.Xna.Framework
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
-	
-	/// <summary>
-        /// Gets or sets packed value of this <see cref="Color"/>.
-        /// </summary>
-        [CLSCompliant(false)]
-        public UInt32 PackedValue
-        {
-            get { return _packedValue; }
-            set { _packedValue = value; }
-        }
-	
-	/// <summary>
-        /// Converts the color values of this instance to its equivalent string representation.
-        /// </summary>
-        /// <returns>The string representation of the color value of this instance.</returns>
-	public override string ToString ()
-	{
-	    return string.Format("[Color: R={0}, G={1}, B={2}, A={3}, PackedValue={4}]", R, G, B, A, PackedValue);
-	}
-	
-	/// <summary>
+	    
+	    /// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
@@ -1921,8 +1911,8 @@ namespace Microsoft.Xna.Framework
         {
             return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
         }
-	
-	/// <summary>
+	    
+	    /// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="r">Red component value.</param>
@@ -1935,18 +1925,60 @@ namespace Microsoft.Xna.Framework
             return new Color((byte)(r * a / 255),(byte)(g * a / 255), (byte)(b * a / 255), a);
         }
 
+        #endregion Public methods
+
+        #region Public operators
+
+        /// <summary>
+        /// Compares whether two <see cref="Color"/> instances are equal.
+        /// </summary>
+        /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
+        /// <param name="b"><see cref="Color"/> instance on the right of the equal sign.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        public static bool operator ==(Color a, Color b)
+        {
+            return (a.A == b.A &&
+                a.R == b.R &&
+                a.G == b.G &&
+                a.B == b.B);
+        }
+
+        /// <summary>
+        /// Compares whether two <see cref="Color"/> instances are not equal.
+        /// </summary>
+        /// <param name="a"><see cref="Color"/> instance on the left of the not equal sign.</param>
+        /// <param name="b"><see cref="Color"/> instance on the right of the not equal sign.</param>
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        public static bool operator !=(Color a, Color b)
+        {
+            return !(a == b);
+        }
+         
+        /// <summary>
+        /// Multiply <see cref="Color"/> by value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Color"/>.</param>
+        /// <param name="scale">Multiplicator.</param>
+        /// <returns>Multiplication result.</returns>
+        public static Color operator *(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }		
+
+        #endregion Public operators
+
         #region IEquatable<Color> Members
 	
-	/// <summary>
+	    /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Color"/>.
         /// </summary>
         /// <param name="other">The <see cref="Color"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(Color other)
         {
-	    return this.PackedValue == other.PackedValue;
+	        return this.PackedValue == other.PackedValue;
         }
 
-        #endregion
+        #endregion IEquatable<Color> Members
     }
 }
