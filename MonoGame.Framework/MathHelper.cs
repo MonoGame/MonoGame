@@ -26,8 +26,6 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -42,12 +40,12 @@ namespace Microsoft.Xna.Framework
         public const float E = (float)Math.E;
         
         /// <summary>
-        /// Represents the log base ten of e(0.4342945f).
+        /// Represents the log base ten of e(0.4342945).
         /// </summary>
         public const float Log10E = 0.4342945f;
         
         /// <summary>
-        /// Represents the log base two of e(1.442695f).
+        /// Represents the log base two of e(1.442695).
         /// </summary>
         public const float Log2E = 1.442695f;
         
@@ -85,7 +83,7 @@ namespace Microsoft.Xna.Framework
             return value1 + (value2 - value1) * amount1 + (value3 - value1) * amount2;
         }
 
-	/// <summary>
+	    /// <summary>
         /// Performs a Catmull-Rom interpolation using the specified positions.
         /// </summary>
         /// <param name="value1">The first position in the interpolation.</param>
@@ -106,7 +104,7 @@ namespace Microsoft.Xna.Framework
                 (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
         }
 
- 	/// <summary>
+ 	    /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>
         /// <param name="value">The value to clamp.</param>
@@ -196,7 +194,7 @@ namespace Microsoft.Xna.Framework
             return value1 + (value2 - value1) * amount;
         }
 
-	/// <summary>
+	    /// <summary>
         /// Returns the greater of two values.
         /// </summary>
         /// <param name="value1">Source value.</param>
@@ -230,13 +228,10 @@ namespace Microsoft.Xna.Framework
             // It is expected that 0 < amount < 1
             // If amount < 0, return value1
             // If amount > 1, return value2
-#if(USE_FARSEER)
-            float result = SilverSpriteMathHelper.Clamp(amount, 0f, 1f);
-            result = SilverSpriteMathHelper.Hermite(value1, 0f, value2, 0f, result);
-#else
+
             float result = MathHelper.Clamp(amount, 0f, 1f);
             result = MathHelper.Hermite(value1, 0f, value2, 0f, result);
-#endif
+
             return result;
         }
         
@@ -258,7 +253,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>
-        /// <param name="radians">The angle in degrees.</param>
+        /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in radians.</returns>
         /// <remarks>
         /// This method uses double precission internally,
@@ -275,31 +270,31 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="angle">The angle to reduce, in radians.</param>
         /// <returns>The new angle, in radians.</returns>
-	public static float WrapAngle(float angle)
-	{
+        public static float WrapAngle(float angle)
+        {
             angle = (float)Math.IEEERemainder((double)angle, 6.2831854820251465);
-	    if (angle <= -3.14159274f)
-	    {
-		angle += 6.28318548f;
-	    }
-	    else
-	    {
-		if (angle > 3.14159274f)
-		{
-		   angle -= 6.28318548f;
-		}
-	    }
-	    return angle;
-	}
+            if (angle <= -3.14159274f)
+            {
+                angle += 6.28318548f;
+            }
+            else
+            {
+                if (angle > 3.14159274f)
+                {
+                    angle -= 6.28318548f;
+                }
+            }
+            return angle;
+        }
 
- 	/// <summary>
+        /// <summary>
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
         /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
-	public static bool IsPowerOfTwo(int value)
-	{
-	     return (value > 0) && ((value & (value - 1)) == 0);
-	}
+        public static bool IsPowerOfTwo(int value)
+        {
+	        return (value > 0) && ((value & (value - 1)) == 0);
+        }
     }
 }
