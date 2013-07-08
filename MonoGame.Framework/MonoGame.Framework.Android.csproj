@@ -227,7 +227,6 @@
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
-    <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePadButtons.cs" />
@@ -241,7 +240,6 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
     <Compile Include="Input\MouseState.cs" />
-    <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="IUpdateable.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />

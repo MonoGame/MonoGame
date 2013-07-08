@@ -14,25 +14,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		private GraphicsDevice graphicsDevice;
 		private List<ModelBone> bones;
 		private List<ModelMesh> meshes;		
-
-		// Summary:
-		//     Gets a collection of ModelBone objects which describe how each mesh in the
-		//     Meshes collection for this model relates to its parent mesh.
-		public ModelBoneCollection Bones { get; private set; }
-		//
-		// Summary:
-		//     Gets a collection of ModelMesh objects which compose the model. Each ModelMesh
-		//     in a model may be moved independently and may be composed of multiple materials
-		//     identified as ModelMeshPart objects.
-		public ModelMeshCollection Meshes { get; private set; }
-		//
-		// Summary:
-		//     Gets the root bone for this model.
-		public ModelBone Root { get; set; }
-		//
-		// Summary:
-		//     Gets or sets an object identifying this model.
-		public object Tag { get; set; }
+         
+        /// <summary>
+        /// Gets a collection of ModelBone objects which describe how each mesh in the
+        /// Meshes collection for this model relates to its parent mesh. 
+        /// </summary>
+        public ModelBoneCollection Bones { get; private set; }
+		 
+        /// <summary>
+        /// Gets a collection of ModelMesh objects which compose the model. Each ModelMesh
+        /// in a model may be moved independently and may be composed of multiple materials
+        /// identified as ModelMeshPart objects.
+        /// </summary>
+        public ModelMeshCollection Meshes { get; private set; }
+		 
+        /// <summary>
+        /// Gets the root bone for this model.
+        /// </summary>
+        public ModelBone Root { get; set; }
+		 
+		/// <summary>
+        /// Gets or sets an object identifying this model.
+		/// </summary>
+        public object Tag { get; set; }
 
 		public Model()
 		{

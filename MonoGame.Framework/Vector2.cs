@@ -32,31 +32,38 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Describe a 2d-vector of floating-point values.
+    /// </summary>
     [DataContract]
     public struct Vector2 : IEquatable<Vector2>
     {
-        #region Private Fields
+        #region Private fields
 
         private static Vector2 zeroVector = new Vector2(0f, 0f);
         private static Vector2 unitVector = new Vector2(1f, 1f);
         private static Vector2 unitXVector = new Vector2(1f, 0f);
         private static Vector2 unitYVector = new Vector2(0f, 1f);
 
-        #endregion Private Fields
+        #endregion Private fields
 
-
-        #region Public Fields
-      
+        #region Public fields
+        
+        /// <summary>
+        /// X component.
+        /// </summary>
         [DataMember]
         public float X;
         
+        /// <summary>
+        /// Y component.
+        /// </summary>
         [DataMember]
         public float Y;
 
-        #endregion Public Fields
+        #endregion Public fields
 
-
-        #region Properties
+        #region Public static properties
 
         public static Vector2 Zero
         {
@@ -78,10 +85,9 @@ namespace Microsoft.Xna.Framework
             get { return unitYVector; }
         }
 
-        #endregion Properties
+        #endregion Public static properties
 
-
-        #region Constructors
+        #region Public constructors
 
         public Vector2(float x, float y)
         {
@@ -95,10 +101,43 @@ namespace Microsoft.Xna.Framework
             this.Y = value;
         }
 
-        #endregion Constructors
+        #endregion Public constructors
 
+        #region Object overrided methods
 
-        #region Public Methods
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector2)
+            {
+                return Equals((Vector2)obj);
+            }
+
+            return false;
+        } 
+
+        /// <summary>
+        /// Gets the hash code for <see cref="Vector2"/> instance.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() + Y.GetHashCode();
+        }
+        
+        /// <summary>
+        ///  Converts the vector values of this instance to its equivalent string representation.
+        /// </summary>
+        /// <returns>The string representation of the vector values of this instance.</returns>
+        public override string ToString()
+        {
+            CultureInfo currentCulture = CultureInfo.CurrentCulture;
+            return string.Format(currentCulture, "{{X:{0} Y:{1}}}", new object[] { 
+				this.X.ToString(currentCulture), this.Y.ToString(currentCulture) });
+        }
+
+        #endregion
+
+        #region Public methods
 
         public static Vector2 Add(Vector2 value1, Vector2 value2)
         {
@@ -216,21 +255,6 @@ namespace Microsoft.Xna.Framework
         {
             result = (value1.X * value2.X) + (value1.Y * value2.Y);
         }
-
-        public override bool Equals(object obj)
-        {
-			if(obj is Vector2)
-			{
-				return Equals((Vector2)obj);
-			}
-			
-            return false;
-        }
-
-        public bool Equals(Vector2 other)
-        {
-            return (X == other.X) && (Y == other.Y);
-        }
 		
 		public static Vector2 Reflect(Vector2 vector, Vector2 normal)
 		{
@@ -247,11 +271,6 @@ namespace Microsoft.Xna.Framework
 			result.X = vector.X - (normal.X * val);
 			result.Y = vector.Y - (normal.Y * val);
 		}
-		
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() + Y.GetHashCode();
-        }
 
         public static Vector2 Hermite(Vector2 value1, Vector2 tangent1, Vector2 value2, Vector2 tangent2, float amount)
         {
@@ -437,8 +456,7 @@ namespace Microsoft.Xna.Framework
 		{
 			Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
 		}
-
-		
+        
 		public static void Transform (
 			Vector2[] sourceArray,
 			int sourceIndex,
@@ -467,18 +485,10 @@ namespace Microsoft.Xna.Framework
             result = new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),
                                  (normal.X * matrix.M12) + (normal.Y * matrix.M22));
         }
+         
+        #endregion Public methods
 
-        public override string ToString()
-        {
-			CultureInfo currentCulture = CultureInfo.CurrentCulture;
-        	return string.Format(currentCulture, "{{X:{0} Y:{1}}}", new object[] { 
-				this.X.ToString(currentCulture), this.Y.ToString(currentCulture) });
-        }
-
-        #endregion Public Methods
-
-
-        #region Operators
+        #region Public operators
 
         public static Vector2 operator -(Vector2 value)
         {
@@ -487,18 +497,15 @@ namespace Microsoft.Xna.Framework
             return value;
         }
 
-
         public static bool operator ==(Vector2 value1, Vector2 value2)
         {
             return value1.X == value2.X && value1.Y == value2.Y;
         }
 
-
         public static bool operator !=(Vector2 value1, Vector2 value2)
         {
             return value1.X != value2.X || value1.Y != value2.Y;
         }
-
 
         public static Vector2 operator +(Vector2 value1, Vector2 value2)
         {
@@ -507,14 +514,12 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
-
         public static Vector2 operator -(Vector2 value1, Vector2 value2)
         {
             value1.X -= value2.X;
             value1.Y -= value2.Y;
             return value1;
         }
-
 
         public static Vector2 operator *(Vector2 value1, Vector2 value2)
         {
@@ -523,14 +528,12 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
-
         public static Vector2 operator *(Vector2 value, float scaleFactor)
         {
             value.X *= scaleFactor;
             value.Y *= scaleFactor;
             return value;
         }
-
 
         public static Vector2 operator *(float scaleFactor, Vector2 value)
         {
@@ -539,14 +542,12 @@ namespace Microsoft.Xna.Framework
             return value;
         }
 
-
         public static Vector2 operator /(Vector2 value1, Vector2 value2)
         {
             value1.X /= value2.X;
             value1.Y /= value2.Y;
             return value1;
         }
-
 
         public static Vector2 operator /(Vector2 value1, float divider)
         {
@@ -557,5 +558,19 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion Operators
+
+        #region IEquatable<Vector2> Members
+        
+        /// <summary>
+        /// Compares whether current instance is equal to specified <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="Vector2"/> to compare.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        public bool Equals(Vector2 other)
+        {
+            return (X == other.X) && (Y == other.Y);
+        }
+
+        #endregion IEquatable<Vector2> Members
     }
 }

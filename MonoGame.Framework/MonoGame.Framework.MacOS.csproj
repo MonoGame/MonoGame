@@ -256,8 +256,6 @@
     <Compile Include="Desktop\Input\PadConfig.cs" />
     <Compile Include="Desktop\Input\Settings.cs" />
     <Compile Include="Desktop\Input\Stick.cs" />
-    <Compile Include="Input\ButtonDefinition.cs" />
-    <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="MacOS\GamerServices\SignedInGamer.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />

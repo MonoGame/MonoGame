@@ -156,70 +156,38 @@ namespace Microsoft.Xna.Framework
 
         public static Vector4 Barycentric(Vector4 value1, Vector4 value2, Vector4 value3, float amount1, float amount2)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#else
             return new Vector4(
                 MathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
                 MathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
                 MathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
                 MathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#endif
         }
 
         public static void Barycentric(ref Vector4 value1, ref Vector4 value2, ref Vector4 value3, float amount1, float amount2, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#else
             result = new Vector4(
                 MathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
                 MathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
                 MathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
                 MathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#endif
         }
 
         public static Vector4 CatmullRom(Vector4 value1, Vector4 value2, Vector4 value3, Vector4 value4, float amount)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#else
             return new Vector4(
                 MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
                 MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
                 MathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
                 MathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#endif
         }
 
         public static void CatmullRom(ref Vector4 value1, ref Vector4 value2, ref Vector4 value3, ref Vector4 value4, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#else
             result = new Vector4(
                 MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
                 MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
                 MathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
                 MathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#endif
         }
 
         public static Vector4 Clamp(Vector4 value1, Vector4 min, Vector4 max)
@@ -338,17 +306,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Hermite(ref Vector4 value1, ref Vector4 tangent1, ref Vector4 value2, ref Vector4 tangent2, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result.W = SilverSpriteMathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount);
-            result.X = SilverSpriteMathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount);
-            result.Y = SilverSpriteMathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount);
-            result.Z = SilverSpriteMathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount);
-#else
             result.W = MathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount);
             result.X = MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount);
             result.Y = MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount);
             result.Z = MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount);
-#endif
         }
 
         public float Length()
@@ -489,36 +450,20 @@ namespace Microsoft.Xna.Framework
 
         public static Vector4 SmoothStep(Vector4 value1, Vector4 value2, float amount)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.SmoothStep(value1.X, value2.X, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Y, value2.Y, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Z, value2.Z, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.W, value2.W, amount));
-#else
             return new Vector4(
                 MathHelper.SmoothStep(value1.X, value2.X, amount),
                 MathHelper.SmoothStep(value1.Y, value2.Y, amount),
                 MathHelper.SmoothStep(value1.Z, value2.Z, amount),
                 MathHelper.SmoothStep(value1.W, value2.W, amount));
-#endif
         }
 
         public static void SmoothStep(ref Vector4 value1, ref Vector4 value2, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.SmoothStep(value1.X, value2.X, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Y, value2.Y, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Z, value2.Z, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.W, value2.W, amount));
-#else
             result = new Vector4(
                 MathHelper.SmoothStep(value1.X, value2.X, amount),
                 MathHelper.SmoothStep(value1.Y, value2.Y, amount),
                 MathHelper.SmoothStep(value1.Z, value2.Z, amount),
                 MathHelper.SmoothStep(value1.W, value2.W, amount));
-#endif
         }
 
         public static Vector4 Subtract(Vector4 value1, Vector4 value2)
