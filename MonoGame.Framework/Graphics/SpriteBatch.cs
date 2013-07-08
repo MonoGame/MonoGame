@@ -205,15 +205,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 
             // Assign default values to null parameters here, as they are not compile-time constants
-            if(color == null)
+            if(!color.HasValue)
                 color = Color.White;
-            if(origin == null)
+            if(!origin.HasValue)
                 origin = Vector2.Zero;
-            if(scale == null)
+            if(!scale.HasValue)
                 scale = Vector2.One;
 
-            // If it's unclear where the the texture should be drawn, raise an error
-            if((drawRectangle == null) == (position == null))
+            // If both drawRectangle and position are null, or if both have been assigned a value, raise an error
+            if((drawRectangle.HasValue) == (position.HasValue))
             {
                 throw new InvalidOperationException("Expected drawRectangle or position, but received neither or both.");
             }
