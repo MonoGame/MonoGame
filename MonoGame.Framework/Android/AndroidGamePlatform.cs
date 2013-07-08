@@ -203,22 +203,26 @@ namespace Microsoft.Xna.Framework
                 IsActive = true;
                 Window.Resume();
                 Sound.ResumeAll();
-                MediaPlayer.Resume();
+				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
+                	MediaPlayer.Resume();
 				if(!Window.IsFocused)
 		           Window.RequestFocus();
             }
         }
 
+		MediaState _MediaPlayer_PrevState = MediaState.Stopped;
         // EnterBackground
         void Activity_Paused(object sender, EventArgs e)
         {
             if (IsActive)
             {
                 IsActive = false;
+				_MediaPlayer_PrevState = MediaPlayer.State;
                 Window.Pause();
 				Window.ClearFocus();
                 Sound.PauseAll();
-                MediaPlayer.Pause();
+				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
+                	MediaPlayer.Pause();
             }
         }
 
