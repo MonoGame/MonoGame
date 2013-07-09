@@ -46,281 +46,139 @@ namespace Microsoft.Xna.Framework
             Aquamarine = new Color(0xffd4ff7f);
             Azure = new Color(0xfffffff0);
             Beige = new Color(0xffdcf5f5);
-
             Bisque = new Color(0xffc4e4ff);
-
             Black = new Color(0xff000000);
-
             BlanchedAlmond = new Color(0xffcdebff);
-
             Blue = new Color(0xffff0000);
-
             BlueViolet = new Color(0xffe22b8a);
-
             Brown = new Color(0xff2a2aa5);
-
             BurlyWood = new Color(0xff87b8de);
-
             CadetBlue = new Color(0xffa09e5f);
-
             Chartreuse = new Color(0xff00ff7f);
-
             Chocolate = new Color(0xff1e69d2);
-
             Coral = new Color(0xff507fff);
-
             CornflowerBlue = new Color(0xffed9564);
-
             Cornsilk = new Color(0xffdcf8ff);
-
             Crimson = new Color(0xff3c14dc);
-
             Cyan = new Color(0xffffff00);
-
             DarkBlue = new Color(0xff8b0000);
-
             DarkCyan = new Color(0xff8b8b00);
-
             DarkGoldenrod = new Color(0xff0b86b8);
-
             DarkGray = new Color(0xffa9a9a9);
-
             DarkGreen = new Color(0xff006400);
-            DarkKhaki
-                   = new Color(0xff6bb7bd);
-
-            DarkMagenta
-                   = new Color(0xff8b008b);
-
-            DarkOliveGreen
-                   = new Color(0xff2f6b55);
-
-            DarkOrange
-                   = new Color(0xff008cff);
-
-            DarkOrchid
-                   = new Color(0xffcc3299);
-
-            DarkRed
-                   = new Color(0xff00008b);
-            DarkSalmon
-                   = new Color(0xff7a96e9);
-            DarkSeaGreen
-                   = new Color(0xff8bbc8f);
-            DarkSlateBlue
-                   = new Color(0xff8b3d48);
-            DarkSlateGray
-                   = new Color(0xff4f4f2f);
-            DarkTurquoise
-                   = new Color(0xffd1ce00);
-            DarkViolet
-                   = new Color(0xffd30094);
-            DeepPink
-                   = new Color(0xff9314ff);
-            DeepSkyBlue
-                   = new Color(0xffffbf00);
-            DimGray
-                   = new Color(0xff696969);
-            DodgerBlue
-                   = new Color(0xffff901e);
-            Firebrick
-                   = new Color(0xff2222b2);
-            FloralWhite
-                   = new Color(0xfff0faff);
-            ForestGreen
-                   = new Color(0xff228b22);
-            Fuchsia
-                   = new Color(0xffff00ff);
-            Gainsboro
-                   = new Color(0xffdcdcdc);
-            GhostWhite
-                   = new Color(0xfffff8f8);
-            Gold
-                   = new Color(0xff00d7ff);
-            Goldenrod
-                   = new Color(0xff20a5da);
-            Gray
-                   = new Color(0xff808080);
-            Green
-                   = new Color(0xff008000);
-            GreenYellow
-                   = new Color(0xff2fffad);
-            Honeydew
-                   = new Color(0xfff0fff0);
-            HotPink
-                   = new Color(0xffb469ff);
-            IndianRed
-                   = new Color(0xff5c5ccd);
-            Indigo
-                   = new Color(0xff82004b);
-            Ivory
-                   = new Color(0xfff0ffff);
-            Khaki
-                   = new Color(0xff8ce6f0);
-            Lavender
-                   = new Color(0xfffae6e6);
-            LavenderBlush
-                   = new Color(0xfff5f0ff);
-            LawnGreen
-                   = new Color(0xff00fc7c);
-            LemonChiffon
-                   = new Color(0xffcdfaff);
-            LightBlue
-                   = new Color(0xffe6d8ad);
-            LightCoral
-                   = new Color(0xff8080f0);
-            LightCyan
-                   = new Color(0xffffffe0);
-            LightGoldenrodYellow
-                   = new Color(0xffd2fafa);
-            LightGray
-                   = new Color(0xffd3d3d3);
-            LightGreen
-                   = new Color(0xff90ee90);
-            LightPink
-                   = new Color(0xffc1b6ff);
-            LightSalmon
-                   = new Color(0xff7aa0ff);
-            LightSeaGreen
-                   = new Color(0xffaab220);
-            LightSkyBlue
-                   = new Color(0xffface87);
-            LightSlateGray
-                   = new Color(0xff998877);
-            LightSteelBlue
-                   = new Color(0xffdec4b0);
-            LightYellow
-                   = new Color(0xffe0ffff);
-            Lime
-                   = new Color(0xff00ff00);
-            LimeGreen
-                   = new Color(0xff32cd32);
-            Linen
-                   = new Color(0xffe6f0fa);
-            Magenta
-                   = new Color(0xffff00ff);
-            Maroon
-                   = new Color(0xff000080);
-            MediumAquamarine
-                   = new Color(0xffaacd66);
-            MediumBlue
-                   = new Color(0xffcd0000);
-            MediumOrchid
-                   = new Color(0xffd355ba);
-            MediumPurple
-                   = new Color(0xffdb7093);
-            MediumSeaGreen
-                   = new Color(0xff71b33c);
-            MediumSlateBlue
-                   = new Color(0xffee687b);
-            MediumSpringGreen
-                   = new Color(0xff9afa00);
-            MediumTurquoise
-                   = new Color(0xffccd148);
-            MediumVioletRed
-                   = new Color(0xff8515c7);
-            MidnightBlue
-                   = new Color(0xff701919);
-            MintCream
-                   = new Color(0xfffafff5);
-            MistyRose
-                   = new Color(0xffe1e4ff);
-            Moccasin
-                   = new Color(0xffb5e4ff);
-            NavajoWhite
-                   = new Color(0xffaddeff);
-            Navy
-                   = new Color(0xff800000);
-            OldLace
-                   = new Color(0xffe6f5fd);
-            Olive
-                   = new Color(0xff008080);
-
-            OliveDrab
-                   = new Color(0xff238e6b);
-            Orange
-                   = new Color(0xff00a5ff);
-            OrangeRed
-                   = new Color(0xff0045ff);
-            Orchid
-                   = new Color(0xffd670da);
-            PaleGoldenrod
-                   = new Color(0xffaae8ee);
-            PaleGreen
-                   = new Color(0xff98fb98);
-            PaleTurquoise
-                   = new Color(0xffeeeeaf);
-            PaleVioletRed
-                   = new Color(0xff9370db);
-            PapayaWhip
-                   = new Color(0xffd5efff);
-            PeachPuff
-                   = new Color(0xffb9daff);
-            Peru
-                   = new Color(0xff3f85cd);
-            Pink
-                   = new Color(0xffcbc0ff);
-            Plum
-                   = new Color(0xffdda0dd);
-            PowderBlue
-                   = new Color(0xffe6e0b0);
-            Purple
-                   = new Color(0xff800080);
-            Red
-                   = new Color(0xff0000ff);
-            RosyBrown
-                   = new Color(0xff8f8fbc);
-            RoyalBlue
-                   = new Color(0xffe16941);
-            SaddleBrown
-                   = new Color(0xff13458b);
-            Salmon
-                  = new Color(0xff7280fa);
-            SandyBrown
-                   = new Color(0xff60a4f4);
-            SeaGreen
-                   = new Color(0xff578b2e);
-
-            SeaShell
-                   = new Color(0xffeef5ff);
-            Sienna
-                   = new Color(0xff2d52a0);
-            Silver
-                    = new Color(0xffc0c0c0);
-            SkyBlue
-                    = new Color(0xffebce87);
-            SlateBlue
-                  = new Color(0xffcd5a6a);
-            SlateGray
-                  = new Color(0xff908070);
-
-            Snow
-                  = new Color(0xfffafaff);
-            SpringGreen
-                  = new Color(0xff7fff00);
-            SteelBlue
-                  = new Color(0xffb48246);
-            Tan
-                  = new Color(0xff8cb4d2);
-            Teal
-                  = new Color(0xff808000);
-            Thistle
-                  = new Color(0xffd8bfd8);
-            Tomato
-                  = new Color(0xff4763ff);
-            Turquoise
-                  = new Color(0xffd0e040);
-            Violet
-                  = new Color(0xffee82ee);
-            Wheat
-                  = new Color(0xffb3def5);
-            White
-                  = new Color(uint.MaxValue);
-            WhiteSmoke
-                  = new Color(0xfff5f5f5);
-
+            DarkKhaki = new Color(0xff6bb7bd);
+            DarkMagenta = new Color(0xff8b008b);
+            DarkOliveGreen = new Color(0xff2f6b55);
+            DarkOrange = new Color(0xff008cff);
+            DarkOrchid = new Color(0xffcc3299);
+            DarkRed = new Color(0xff00008b);
+            DarkSalmon = new Color(0xff7a96e9);
+            DarkSeaGreen = new Color(0xff8bbc8f);
+            DarkSlateBlue = new Color(0xff8b3d48);
+            DarkSlateGray = new Color(0xff4f4f2f);
+            DarkTurquoise = new Color(0xffd1ce00);
+            DarkViolet = new Color(0xffd30094);
+            DeepPink = new Color(0xff9314ff);
+            DeepSkyBlue = new Color(0xffffbf00);
+            DimGray = new Color(0xff696969);
+            DodgerBlue = new Color(0xffff901e);
+            Firebrick = new Color(0xff2222b2);
+            FloralWhite = new Color(0xfff0faff);
+            ForestGreen = new Color(0xff228b22);
+            Fuchsia = new Color(0xffff00ff);
+            Gainsboro = new Color(0xffdcdcdc);
+            GhostWhite = new Color(0xfffff8f8);
+            Gold = new Color(0xff00d7ff);
+            Goldenrod = new Color(0xff20a5da);
+            Gray = new Color(0xff808080);
+            Green = new Color(0xff008000);
+            GreenYellow = new Color(0xff2fffad);
+            Honeydew = new Color(0xfff0fff0);
+            HotPink = new Color(0xffb469ff);
+            IndianRed = new Color(0xff5c5ccd);
+            Indigo = new Color(0xff82004b);
+            Ivory = new Color(0xfff0ffff);
+            Khaki = new Color(0xff8ce6f0);
+            Lavender = new Color(0xfffae6e6);
+            LavenderBlush = new Color(0xfff5f0ff);
+            LawnGreen = new Color(0xff00fc7c);
+            LemonChiffon = new Color(0xffcdfaff);
+            LightBlue = new Color(0xffe6d8ad);
+            LightCoral = new Color(0xff8080f0);
+            LightCyan = new Color(0xffffffe0);
+            LightGoldenrodYellow = new Color(0xffd2fafa);
+            LightGray = new Color(0xffd3d3d3);
+            LightGreen = new Color(0xff90ee90);
+            LightPink = new Color(0xffc1b6ff);
+            LightSalmon = new Color(0xff7aa0ff);
+            LightSeaGreen = new Color(0xffaab220);
+            LightSkyBlue = new Color(0xffface87);
+            LightSlateGray = new Color(0xff998877);
+            LightSteelBlue = new Color(0xffdec4b0);
+            LightYellow = new Color(0xffe0ffff);
+            Lime = new Color(0xff00ff00);
+            LimeGreen = new Color(0xff32cd32);
+            Linen = new Color(0xffe6f0fa);
+            Magenta = new Color(0xffff00ff);
+            Maroon = new Color(0xff000080);
+            MediumAquamarine = new Color(0xffaacd66);
+            MediumBlue = new Color(0xffcd0000);
+            MediumOrchid = new Color(0xffd355ba);
+            MediumPurple = new Color(0xffdb7093);
+            MediumSeaGreen = new Color(0xff71b33c);
+            MediumSlateBlue = new Color(0xffee687b);
+            MediumSpringGreen = new Color(0xff9afa00);
+            MediumTurquoise = new Color(0xffccd148);
+            MediumVioletRed = new Color(0xff8515c7);
+            MidnightBlue = new Color(0xff701919);
+            MintCream = new Color(0xfffafff5);
+            MistyRose = new Color(0xffe1e4ff);
+            Moccasin = new Color(0xffb5e4ff);
+            NavajoWhite = new Color(0xffaddeff);
+            Navy = new Color(0xff800000);
+            OldLace = new Color(0xffe6f5fd);
+            Olive = new Color(0xff008080);
+            OliveDrab = new Color(0xff238e6b);
+            Orange = new Color(0xff00a5ff);
+            OrangeRed = new Color(0xff0045ff);
+            Orchid = new Color(0xffd670da);
+            PaleGoldenrod = new Color(0xffaae8ee);
+            PaleGreen = new Color(0xff98fb98);
+            PaleTurquoise = new Color(0xffeeeeaf);
+            PaleVioletRed = new Color(0xff9370db);
+            PapayaWhip = new Color(0xffd5efff);
+            PeachPuff = new Color(0xffb9daff);
+            Peru = new Color(0xff3f85cd);
+            Pink = new Color(0xffcbc0ff);
+            Plum = new Color(0xffdda0dd);
+            PowderBlue = new Color(0xffe6e0b0);
+            Purple = new Color(0xff800080);
+            Red = new Color(0xff0000ff);
+            RosyBrown = new Color(0xff8f8fbc);
+            RoyalBlue = new Color(0xffe16941);
+            SaddleBrown = new Color(0xff13458b);
+            Salmon= new Color(0xff7280fa);
+            SandyBrown = new Color(0xff60a4f4);
+            SeaGreen = new Color(0xff578b2e);
+            SeaShell = new Color(0xffeef5ff);
+            Sienna = new Color(0xff2d52a0);
+            Silver  = new Color(0xffc0c0c0);
+            SkyBlue  = new Color(0xffebce87);
+            SlateBlue= new Color(0xffcd5a6a);
+            SlateGray= new Color(0xff908070);
+            Snow= new Color(0xfffafaff);
+            SpringGreen= new Color(0xff7fff00);
+            SteelBlue= new Color(0xffb48246);
+            Tan= new Color(0xff8cb4d2);
+            Teal= new Color(0xff808000);
+            Thistle= new Color(0xffd8bfd8);
+            Tomato= new Color(0xff4763ff);
+            Turquoise= new Color(0xffd0e040);
+            Violet= new Color(0xffee82ee);
+            Wheat= new Color(0xffb3def5);
+            White= new Color(uint.MaxValue);
+            WhiteSmoke= new Color(0xfff5f5f5);
             Yellow = new Color(0xff00ffff);
-
             YellowGreen = new Color(0xff32cd9a);
         }
 	// ARGB
@@ -1852,10 +1710,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Interpolated <see cref="Color"/>.</returns>
         public static Color Lerp(Color value1, Color value2, Single amount)
         {		
-            return new Color(   (int)MathHelper.Lerp(value1.R, value2.R, amount), 
-                                (int)MathHelper.Lerp(value1.G, value2.G, amount), 
-                                (int)MathHelper.Lerp(value1.B, value2.B, amount), 
-                                (int)MathHelper.Lerp(value1.A, value2.A, amount) );
+            return new Color(   (int)MathHelper.Lerp(value1.R, value2.R, amount),               (int)MathHelper.Lerp(value1.G, value2.G, amount),               (int)MathHelper.Lerp(value1.B, value2.B, amount),               (int)MathHelper.Lerp(value1.A, value2.A, amount) );
         }
 		
 	/// <summary>
