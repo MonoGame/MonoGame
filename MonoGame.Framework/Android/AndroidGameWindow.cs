@@ -473,7 +473,7 @@ namespace Microsoft.Xna.Framework
                         // so we need to clear them out.
                         if (wasPortrait != requestPortrait)
                         {
-                            TouchPanel.ReleaseAllTouches();
+                            TouchPanelState.ReleaseAllTouches();
                         }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;
