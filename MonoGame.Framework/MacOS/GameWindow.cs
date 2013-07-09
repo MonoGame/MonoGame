@@ -42,6 +42,8 @@ purpose and non-infringement.
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 using MonoMac.CoreAnimation;
 using MonoMac.Foundation;
@@ -62,6 +64,7 @@ namespace Microsoft.Xna.Framework
 		private Rectangle clientBounds;
 		private Game _game;
 		private MacGamePlatform _platform;
+        internal MouseState MouseState;
 
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
@@ -494,6 +497,14 @@ namespace Microsoft.Xna.Framework
 
 		public override void KeyDown (NSEvent theEvent)
 		{
+			if (!string.IsNullOrEmpty (theEvent.Characters) && theEvent.Characters.All (c => char.GetUnicodeCategory (c) != UnicodeCategory.PrivateUse)) 
+			{
+				foreach(char c in theEvent.Characters)
+				{
+					OnTextInput(new TextInputEventArgs(c));
+				}
+			}
+
 			Keys kk = KeyUtil.GetKeys (theEvent); 
 
 			if (!_keys.Contains (kk))
@@ -510,6 +521,26 @@ namespace Microsoft.Xna.Framework
 
 			UpdateKeyboardState ();
 		}
+
+		protected void OnTextInput(TextInputEventArgs e)
+		{
+			if (e == null) 
+			{
+				throw new ArgumentNullException("e");
+			}
+			
+			if (TextInput != null) 
+			{
+				TextInput.Invoke(this, e);
+			}
+		}
+		
+		/// <summary>
+		/// Use this event to retrieve text for objects like textbox's.
+		/// This event is not raised by noncharacter keys.
+		/// This event also supports key repeat.
+		/// </summary>
+		public event EventHandler<TextInputEventArgs> TextInput;
 
 		List<Keys> _flags = new List<Keys> ();
 
@@ -554,7 +585,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.LeftMouseDown:
-				Mouse.State.LeftButton = ButtonState.Pressed;
+				MouseState.LeftButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -566,7 +597,7 @@ namespace Microsoft.Xna.Framework
 			switch (theEvent.Type) {
 
 			case NSEventType.LeftMouseUp:
-				Mouse.State.LeftButton = ButtonState.Released;
+				MouseState.LeftButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -583,7 +614,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseDown:
-				Mouse.State.RightButton = ButtonState.Pressed;
+				MouseState.RightButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -594,7 +625,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.RightMouseUp:
-				Mouse.State.RightButton = ButtonState.Released;
+				MouseState.RightButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -611,7 +642,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseDown:
-				Mouse.State.MiddleButton = ButtonState.Pressed;
+				MouseState.MiddleButton = ButtonState.Pressed;
 				break;
 			}
 		}
@@ -622,7 +653,7 @@ namespace Microsoft.Xna.Framework
 			UpdateMousePosition (loc);
 			switch (theEvent.Type) {
 			case NSEventType.OtherMouseUp:
-				Mouse.State.MiddleButton = ButtonState.Released;
+				MouseState.MiddleButton = ButtonState.Released;
 				break;
 			}
 		}
@@ -663,8 +694,8 @@ namespace Microsoft.Xna.Framework
 
 		private void UpdateMousePosition (PointF location)
 		{
-			Mouse.State.X = (int)location.X;
-			Mouse.State.Y = (int)(ClientBounds.Height - location.Y);			
+			MouseState.X = (int)location.X;
+			MouseState.Y = (int)(ClientBounds.Height - location.Y);			
 		}
 
 		internal void SetSupportedOrientations(DisplayOrientation orientations)

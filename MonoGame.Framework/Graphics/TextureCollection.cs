@@ -116,6 +116,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     pixelShaderStage.SetShaderResource(i, null);
                 else
                     pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+#elif PSM
+                // FIXME: 1d/3d textures
+                var texture2d = _textures[i] as Texture2D;
+                if (texture2d == null)
+                    device.Context.SetTexture(i, null);
+                else
+                    device.Context.SetTexture(i, texture2d._texture2D);
 #endif
 
                 _dirty &= ~mask;

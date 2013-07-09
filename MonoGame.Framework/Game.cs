@@ -216,8 +216,24 @@ namespace Microsoft.Xna.Framework
                     }
 
                     Platform.Dispose();
+
+                    Effect.FlushCache();
+                    ContentTypeReaderManager.ClearTypeCreators();
+
+#if WINDOWS_PHONE
+                    TouchPanel.ResetState();
+                    Microsoft.Xna.Framework.Audio.SoundEffect.Shutdown();
+#endif
+
+#if DIRECTX
+                    BlendState.ResetStates();
+                    DepthStencilState.ResetStates();
+                    RasterizerState.ResetStates();
+                    SamplerState.ResetStates();
+#endif
                 }
                 _isDisposed = true;
+                _instance = null;
             }
         }
 
@@ -237,6 +253,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
+		[CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; set; }
 #endif
         private static Game _instance = null;
@@ -322,6 +339,7 @@ namespace Microsoft.Xna.Framework
         }
 
 #if ANDROID
+		[CLSCompliant(false)]
         public AndroidGameWindow Window
         {
             get { return Platform.Window; }
@@ -356,10 +374,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Exiting;
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
 
 #if WINRT
+        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -701,6 +721,10 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
+
+#if WINDOWS_MEDIA_SESSION
+            Media.MediaManagerState.CheckShutdown();
+#endif
 		}
 
         internal void ResizeWindow(bool changed)

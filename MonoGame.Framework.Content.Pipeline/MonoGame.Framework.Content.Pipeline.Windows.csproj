@@ -217,6 +217,10 @@
     <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.csproj">
+      <Project>{aea9e92a-c99e-4161-8d54-7ac1ae4b3601}</Project>
+      <Name>MonoGame.Framework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
       <Name>MonoGame.Framework.Windows</Name>

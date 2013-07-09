@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
 #if WINRT && !WINDOWS_PHONE
+        [CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif 
 
@@ -93,7 +94,7 @@ namespace Microsoft.Xna.Framework
 
             if (createDevice)
             {
-                GraphicsDevice = new GraphicsDevice(GraphicsProfile, presentationParameters);
+                GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
             }
             else
             {

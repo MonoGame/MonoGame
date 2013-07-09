@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Audio
 		AudioCategory[] categories;
 		Dictionary<string, int> categoryLookup = new Dictionary<string, int>();
 
+		internal AudioCategory[] Categories { get { return categories; } }
+
 		struct Variable {
 			public string name;
 			public float value;
@@ -110,7 +112,7 @@ namespace Microsoft.Xna.Framework.Audio
 			//Read the xact settings file
 			//Credits to alisci01 for initial format documentation
 #if !ANDROID
-			using (var stream = File.OpenRead (settingsFile))
+			using (var stream = TitleContainer.OpenStream(settingsFile))
 			{
 #else
 			using (var fileStream = Game.Activity.Assets.Open(settingsFile))
@@ -129,7 +131,7 @@ namespace Microsoft.Xna.Framework.Audio
 					uint formatVersion = reader.ReadUInt16 ();
 #if DEBUG
 					if (formatVersion != 42) {
-						Console.WriteLine ("Warning: XGS format not supported");
+						System.Diagnostics.Debug.WriteLine ("Warning: XGS format not supported");
 					}
 #endif
 					uint crc = reader.ReadUInt16 (); //??

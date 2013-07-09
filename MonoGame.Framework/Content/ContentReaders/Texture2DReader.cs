@@ -110,11 +110,16 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt5:
 					convertedFormat = SurfaceFormat.RgbaPvrtc4Bpp;
 					break;
-#elif (ANDROID && !OUYA) || PSM
+#else
 				case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
+                    if (!GraphicsCapabilities.SupportsDxt1)
+                        convertedFormat = SurfaceFormat.Color;
+                    break;
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
-					convertedFormat = SurfaceFormat.Color;
+                    if (!GraphicsCapabilities.SupportsS3tc)
+					    convertedFormat = SurfaceFormat.Color;
 					break;
 #endif
 				case SurfaceFormat.NormalizedByte4:
@@ -142,16 +147,19 @@ namespace Microsoft.Xna.Framework.Content
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-#if (ANDROID && !OUYA) || PSM
-					//no Dxt in OpenGL ES
+#if !IOS
 					case SurfaceFormat.Dxt1:
-						levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
+                    case SurfaceFormat.Dxt1a:
+                        if (!GraphicsCapabilities.SupportsDxt1)
+						    levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt3:
-						levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
+                        if (!GraphicsCapabilities.SupportsS3tc)
+						    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt5:
-						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
+                        if (!GraphicsCapabilities.SupportsS3tc)
+    						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
 						break;
 #endif
 					case SurfaceFormat.Bgr565:

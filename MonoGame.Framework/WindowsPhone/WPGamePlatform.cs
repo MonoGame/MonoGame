@@ -64,6 +64,9 @@ the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
 
+extern alias MicrosoftXnaFramework;
+using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher; 
+
 using System.Diagnostics;
 using System.Windows.Controls;
 using Microsoft.Xna.Framework;
@@ -166,6 +169,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            MsXna_FrameworkDispatcher.Update(); 
             return true;
         }
 

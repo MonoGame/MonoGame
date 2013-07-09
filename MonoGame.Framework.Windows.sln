@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework", "MonoGame.Framework\MonoGame.Framework.csproj", "{923AFF68-8530-4C91-86C5-17B20D8D0EE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework", "MonoGame.Framework\MonoGame.Framework.csproj", "{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,10 @@ Global
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{923AFF68-8530-4C91-86C5-17B20D8D0EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{923AFF68-8530-4C91-86C5-17B20D8D0EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{923AFF68-8530-4C91-86C5-17B20D8D0EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{923AFF68-8530-4C91-86C5-17B20D8D0EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA9E92A-C99E-4161-8D54-7AC1AE4B3601}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
