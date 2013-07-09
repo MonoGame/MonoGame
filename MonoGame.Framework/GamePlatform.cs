@@ -66,6 +66,7 @@ non-infringement.
 */
 #endregion License
 
+using Microsoft.Xna.Framework.Input;
 using System;
 
 #if WINRT
@@ -193,9 +194,19 @@ namespace Microsoft.Xna.Framework
 			get; protected set;
 		}
 #else
+        private GameWindow _window;
         public GameWindow Window
         {
-            get; protected set;
+            get { return _window; }
+
+
+            protected set
+            {
+                if (_window == null)
+                    Mouse.PrimaryWindow = value;
+
+                _window = value;
+            }
         }
 #endif
   
