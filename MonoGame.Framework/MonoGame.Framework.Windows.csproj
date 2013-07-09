@@ -244,8 +244,6 @@
     <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-    <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\SpriteBatchItem.cs" />
@@ -294,6 +292,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GamerServices\" />
-    <Folder Include="Utilities\" />
   </ItemGroup>
 </Project>
