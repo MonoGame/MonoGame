@@ -249,7 +249,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -315,7 +315,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
-            presentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #if WINDOWS_PHONE
 
 #elif WINRT
@@ -382,6 +382,7 @@ namespace Microsoft.Xna.Framework
         public void ToggleFullScreen()
         {
             IsFullScreen = !IsFullScreen;
+            ApplyChanges();
         }
 
 #if WINDOWS_STOREAPP
@@ -399,17 +400,24 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+
         public bool IsFullScreen
         {
+            // This property should not directly change window state,
+            // instead it change window state at the beginning(in the Game constructor),
+            // or when using ApplyChange
+
             get
             {
 #if WINRT
                 return true;
-#else
+#elif ANDROID
                 if (_graphicsDevice != null)
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
                 else
                     return _wantFullScreen;
+#else
+		return _wantFullScreen;
 #endif
             }
             set
@@ -418,13 +426,15 @@ namespace Microsoft.Xna.Framework
                 // Just ignore this as it is not relevant on Windows 8
 #else
                 _wantFullScreen = value;
-                if (_graphicsDevice != null)
-                {
-                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
+                
 #if ANDROID
+                if (_graphicsDevice != null)
+                { 
+                    _graphicsDevice.PresentationParameters.IsFullScreen = value;
                     ForceSetFullScreen();
-#endif
                 }
+#endif
+
 #endif
             }
         }
