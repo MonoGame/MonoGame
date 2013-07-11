@@ -411,11 +411,13 @@ namespace Microsoft.Xna.Framework
             {
 #if WINRT
                 return true;
-#else
-                //if (_graphicsDevice != null)
-                //    return _graphicsDevice.PresentationParameters.IsFullScreen;
-                //else
+#elif ANDROID
+                if (_graphicsDevice != null)
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                else
                     return _wantFullScreen;
+#else
+		return _wantFullScreen;
 #endif
             }
             set
