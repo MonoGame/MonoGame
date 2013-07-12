@@ -1,0 +1,14 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# Explicit paths specified without -i nor -o; assuming --only paths...
+# On branch develop
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   MonoGame.Framework/Color.cs
+#	modified:   MonoGame.Framework/MonoGame.Framework.iOS.csproj
+#	modified:   MonoGame.Framework/Vector3.cs
+#	modified:   ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj
+#
+
