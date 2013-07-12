@@ -321,6 +321,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.IsFullScreen = true;
 #endif
  
+#if WINDOWS || WINRT
 
 #if WINDOWS_PHONE
 
