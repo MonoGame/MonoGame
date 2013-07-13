@@ -141,7 +141,6 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            //ResetWindowBounds(false);
             _view.Window.Run(0);
         }
 
