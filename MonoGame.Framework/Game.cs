@@ -677,10 +677,6 @@ namespace Microsoft.Xna.Framework
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
-            //if (GraphicsDevice.PresentationParameters.IsFullScreen)
-            //    Platform.EnterFullScreen();
-            //else
-            //    Platform.ExitFullScreen();
 
             var viewport = new Viewport(0, 0,
 			                            GraphicsDevice.PresentationParameters.BackBufferWidth,
