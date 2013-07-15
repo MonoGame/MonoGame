@@ -808,7 +808,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr details;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
             public IntPtr name;
 		}
 		
@@ -1054,7 +1053,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astNodeType type;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
             public IntPtr filename;
 		    
 		    /// unsigned int
@@ -1208,8 +1206,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// MOJOSHADER_astDataType*
 		    public IntPtr datatype;
 		    
-		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
+		    /// char* Requires manual marshaling with
             public IntPtr identifier;
 		    
 		    /// int
