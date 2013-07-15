@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using TwoMGFX;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -37,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					parseData.errors,
 					parseData.error_count
 				);
-				throw new Exception (errors [0].error);
+                throw new Exception(DXHelper.UnmarshalToStr(errors[0].error));
 			}
 
 			switch (parseData.shader_type) {
@@ -62,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				dxshader._attributes = new Attribute[attributes.Length];
 				for (var i = 0; i < attributes.Length; i++) {
-					dxshader._attributes [i].name = attributes [i].name;
+                    dxshader._attributes[i].name = DXHelper.UnmarshalToStr(attributes[i].name);
 					dxshader._attributes [i].index = attributes [i].index;
 					dxshader._attributes [i].usage = DXEffectObject.ToXNAVertexElementUsage (attributes [i].usage);
 				}
@@ -133,10 +134,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     parameter = -1,
                                       
                     // GLSL needs the MojoShader mangled sampler name.
-                    samplerName = samplers[i].name,
+                    samplerName = DXHelper.UnmarshalToStr(samplers[i].name),
 
                     // By default use the original sampler name for the parameter name.
-                    parameterName = originalSamplerName,
+                    parameterName = DXHelper.UnmarshalToStr(originalSamplerName),
 
                     textureSlot = samplers[i].index,
                     samplerSlot = samplers[i].index,
@@ -144,10 +145,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 };
 
                 SamplerStateInfo state;
-                if (samplerStates.TryGetValue(originalSamplerName, out state))
+                if (samplerStates.TryGetValue(DXHelper.UnmarshalToStr(originalSamplerName), out state))
                 {
                     sampler.state = state.State;
-                    sampler.parameterName = state.TextureName ?? originalSamplerName;
+                    sampler.parameterName = state.TextureName ?? DXHelper.UnmarshalToStr(originalSamplerName);
                 }
 
                 // Store the sampler.
@@ -178,7 +179,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			dxshader._cbuffers = cbuffer_index.ToArray ();
 
-			var glslCode = parseData.output;
+		    var glslCode = DXHelper.UnmarshalToStr(parseData.output);
 
 #if GLSLOPTIMIZER
 			//glslCode = GLSLOptimizer.Optimize(glslCode, ShaderType);

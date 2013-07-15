@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var param = new DXEffectObject.d3dx_parameter();
             param.rows = symbol.info.rows;
             param.columns = symbol.info.columns;
-            param.name = symbol.name ?? string.Empty;
+            param.name = DXHelper.UnmarshalToStr(symbol.name) ?? string.Empty;
             param.semantic = string.Empty; // TODO: How do i do this with only MojoShader?
 
             var registerSize = (symbol.register_set == MojoShader.MOJOSHADER_symbolRegisterSet.MOJOSHADER_SYMREGSET_BOOL ? 1 : 4) * 4;
