@@ -1024,7 +1024,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Ensure that DXGI does not queue more than one frame at a time. This 
                     // both reduces latency and ensures that the application will only render 
                     // after each VSync, minimizing power consumption.
-                    dxgiDevice.MaximumFrameLatency = 1;
+                    if (PresentationParameters.PresentationInterval == PresentInterval.Default ||
+                        PresentationParameters.PresentationInterval == PresentInterval.One)
+                        dxgiDevice.MaximumFrameLatency = 1;
                 }
             }
 
@@ -1405,11 +1407,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             try
             {
+                var syncInterval = PresentationParameters.PresentationInterval == PresentInterval.Immediate ? 0 : 1;
+
                 // The first argument instructs DXGI to block until VSync, putting the application
                 // to sleep until the next VSync. This ensures we don't waste any cycles rendering
                 // frames that will never be displayed to the screen.
                 lock (_d3dContext)
-                    _swapChain.Present(1, PresentFlags.None);
+                    _swapChain.Present(syncInterval, PresentFlags.None);
             }
             catch (SharpDX.SharpDXException)
             {
