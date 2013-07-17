@@ -57,3 +57,4 @@ monodroid*.msi
 *.metaproj
 *.buildlog
 *.jsillog
+JSILSkeletons/*.js

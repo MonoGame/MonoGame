@@ -1,0 +1,1 @@
+..\JSIL\bin\JSILc MonoGame.Framework.JSIL.sln "JSILSkeletons\skeletons.jsilconfig"
