@@ -350,7 +350,7 @@ namespace Microsoft.Xna.Framework
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;            
 
-#if WINDOWS
+#if WINDOWS && !JSIL
             {
                 var windowInfoType = window.WindowInfo.GetType();
                 var propertyInfo = windowInfoType.GetProperty("WindowHandle");
