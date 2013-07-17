@@ -10,17 +10,17 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Portrait" Orientation="Portrait"
+    SupportedOrientations="Landscape"  Orientation="Landscape"
     shell:SystemTray.IsVisible="False">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <DrawingSurfaceBackgroundGrid x:Name="XnaSurface" Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+		<!--Drawing surface for DirectX content - supports Landscape and Portrait-->
+        <DrawingSurface x:Name="XnaSurface"/>
 
+		<!-- Media element for audio -->
         <MediaElement></MediaElement>
+		
         <!-- LOCALIZATION NOTE:
             To localize the displayed strings copy their values to appropriately named
             keys in the app's neutral language resource file (AppResources.resx) then
@@ -47,6 +47,14 @@
 
             Before shipping remove this XAML and the image itself.-->
         <!--<Image Source="/Assets/AlignmentGrid.png" VerticalAlignment="Top" Height="800" Width="480" Margin="0,-32,0,0" Grid.Row="0" Grid.RowSpan="2" IsHitTestVisible="False" />-->
-    </DrawingSurfaceBackgroundGrid>
+    </Grid>
+	
+	<!-- 	Optionally replace the grid above with the following drawing surface grid, 
+			it may yield better performance for portrait only games, however it
+			Does NOT support landscape mode
+	    <DrawingSurfaceBackgroundGrid x:Name="XnaSurface" Background="Transparent">
+			<MediaElement></MediaElement>
+		</DrawingSurfaceBackgroundGrid>
+	-->
 
 </phone:PhoneApplicationPage>

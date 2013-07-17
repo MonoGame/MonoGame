@@ -115,6 +115,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Force the uniform location to be looked up again
             _program = -1;
 #endif
+
+#if DIRECTX
+            SharpDX.Utilities.Dispose(ref _cbuffer);
+            _dirty = true;
+#endif
         }
 
         private void SetData(int offset, int rows, int columns, object data)
@@ -233,6 +238,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
         {
+            if (_cbuffer == null)
+                Initialize();
+
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             var d3dContext = GraphicsDevice._d3dContext;

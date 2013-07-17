@@ -21,6 +21,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int width;
         private int height;
         private int depth;
+
+#if DIRECTX
+        private bool renderTarget;
+        private bool mipMap;
+#endif
 		
 #if OPENGL
 		PixelInternalFormat glInternalFormat;
@@ -77,16 +82,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (mipMap) 
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
 #elif DIRECTX
+            this.renderTarget = renderTarget;
+            this.mipMap = mipMap;
+
             if (mipMap)
                 this._levelCount = CalculateMipLevels(width, height, depth);
 
+            // Create texture
+            GetTexture();
+#endif
+        }
+
+#if DIRECTX
+
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        {
             var description = new Texture3DDescription
             {
                 Width = width,
                 Height = height,
                 Depth = depth,
                 MipLevels = _levelCount,
-                Format = SharpDXHelper.ToFormat(format),
+                Format = SharpDXHelper.ToFormat(_format),
                 BindFlags = BindFlags.ShaderResource,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Usage = ResourceUsage.Default,
@@ -105,11 +122,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-            _texture = new SharpDX.Direct3D11.Texture3D(graphicsDevice._d3dDevice, description);
-#endif
+            return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
-		
-		public void SetData<T> (T[] data) where T : struct
+
+#endif
+        
+        public void SetData<T>(T[] data) where T : struct
 		{
 			SetData<T>(data, 0, data.Length);
 		}
@@ -149,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = GraphicsDevice._d3dContext;
             lock (d3dContext)
-                d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
+                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
 #endif
             dataHandle.Free ();
 		}
