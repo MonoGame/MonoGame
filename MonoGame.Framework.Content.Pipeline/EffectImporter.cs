@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public override EffectContent Import(string filename, ContentImporterContext context)
         {
             var effect = new EffectContent();
+            effect.Identity = new ContentIdentity(filename);
             using (var reader = new StreamReader(filename))
                 effect.EffectCode = reader.ReadToEnd();
             return effect;
