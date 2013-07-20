@@ -402,7 +402,24 @@ namespace Microsoft.Xna.Framework.Media
 
             // Get the volume interface.
             IntPtr volumeObj;
-            MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+
+            int trycount = 0;
+            tryagain:
+            try
+            {
+                MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+            }
+            catch (Exception e)
+            {
+                if (trycount >= 5)
+                {
+                    throw;
+                }
+
+                trycount++;
+                goto tryagain;
+            } 
+
             _volumeController = CppObject.FromPointer<SimpleAudioVolume>(volumeObj);
             _volumeController.Mute = _isMuted;
             _volumeController.MasterVolume = _volume;
