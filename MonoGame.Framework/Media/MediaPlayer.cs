@@ -403,6 +403,7 @@ namespace Microsoft.Xna.Framework.Media
             // Get the volume interface.
             IntPtr volumeObj;
 
+            // This try/catch block is a fix for this bug - https://github.com/mono/MonoGame/pull/1874 
             int trycount = 0;
             tryagain:
             try
