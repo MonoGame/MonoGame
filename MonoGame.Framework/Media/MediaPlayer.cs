@@ -403,23 +403,16 @@ namespace Microsoft.Xna.Framework.Media
             // Get the volume interface.
             IntPtr volumeObj;
 
-            // This try/catch block is a fix for this bug - https://github.com/mono/MonoGame/pull/1874 
-            int trycount = 0;
-            tryagain:
+            // This try/catch block is a fix for this bug - https://github.com/mono/MonoGame/pull/1874
             try
             {
                 MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
             }
             catch (Exception e)
             {
-                if (trycount >= 5)
-                {
-                    throw;
-                }
-
-                trycount++;
-                goto tryagain;
-            } 
+                MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+            }  
+          
 
             _volumeController = CppObject.FromPointer<SimpleAudioVolume>(volumeObj);
             _volumeController.Mute = _isMuted;
