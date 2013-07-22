@@ -280,6 +280,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (data == null)
 				throw new ArgumentNullException("data");
+#if JSIL
+            Console.WriteLine("JSIL HORRIBLE HACK WARNING: Texture.SetData ignored :-(");
+            return;
+#endif
 
 #if OPENGL
             Threading.BlockOnUIThread(() =>
