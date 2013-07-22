@@ -130,7 +130,12 @@ namespace Microsoft.Xna.Framework
         public override GameRunBehavior DefaultRunBehavior
         {
 #if JSIL
-            get { return GameRunBehavior.Asynchronous; }
+            get { 
+                if (JSIL.Builtins.IsJavascript)
+                    return GameRunBehavior.Asynchronous; 
+                else
+                    return GameRunBehavior.Synchronous;
+            }
 #else
             get { return GameRunBehavior.Synchronous; }
 #endif
