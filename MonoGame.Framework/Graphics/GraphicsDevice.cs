@@ -423,12 +423,15 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
+#if !JSIL
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
 			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
 			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
 			for (int i = 0; i < maxDrawBuffers; i++)
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+#endif
+
 #endif
             _extensions = GetGLExtensions();
 #endif // OPENGL

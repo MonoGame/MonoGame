@@ -157,10 +157,12 @@ namespace Microsoft.Xna.Framework
             var assembly = Assembly.GetEntryAssembly();
             if (assembly != null)
             {
+#if !JSIL
                 //Use the Title attribute of the Assembly if possible.
                 var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
                 if (assemblyTitleAtt != null)
                     windowTitle = assemblyTitleAtt.Title;
+#endif
 
                 // Otherwise, fallback to the Name of the assembly.
                 if (string.IsNullOrEmpty(windowTitle))
