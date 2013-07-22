@@ -423,6 +423,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
+// WebGL does not support draw buffers yet...
 #if !JSIL
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
