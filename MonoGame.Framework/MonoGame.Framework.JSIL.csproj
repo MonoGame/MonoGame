@@ -147,6 +147,7 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="JSIL\OpenTKService.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
