@@ -6,7 +6,9 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+#if WINDOWS
 using TwoMGFX;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
