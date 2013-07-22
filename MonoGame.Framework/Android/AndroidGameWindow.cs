@@ -161,16 +161,29 @@ namespace Microsoft.Xna.Framework
 			try
             {
                 GLContextVersion = GLContextVersion.Gles2_0;
-				try
-				{
-					base.CreateFrameBuffer();
-				}
-				catch(Exception)
-				{
-					// try again using a more basic mode which hopefully the device will support
-					GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-					base.CreateFrameBuffer();
-				}
+                GraphicsMode defaultGraphicsMode = GraphicsMode;
+                GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 0, 0, false);
+                try
+                {
+                    // Try to create a framebuffer with a stencil buffer attached.
+                    base.CreateFrameBuffer();
+                }
+                catch (Exception)
+                {
+
+                    GraphicsMode = defaultGraphicsMode;
+                    try
+                    {
+                        // Try to create a framebuffer with the default GLES2.0 graphics mode parameters.
+                        base.CreateFrameBuffer();
+                    }
+                    catch (Exception)
+                    {
+                        // try again using a more basic mode which hopefully the device will support
+                        GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+                        base.CreateFrameBuffer();
+                    }
+                }
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
             } 

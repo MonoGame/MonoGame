@@ -361,7 +361,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             SetupGL();
             PresentationParameters = new PresentationParameters();
-            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
             Initialize();
         }
 
