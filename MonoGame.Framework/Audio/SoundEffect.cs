@@ -467,18 +467,23 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void InitializeSoundEffect()
         {
-            var flags = XAudio2Flags.None;
-
-#if !WINRT && DEBUG
-            flags |= XAudio2Flags.DebugEngine;
-#endif
             try
             {
                 if (Device == null)
                 {
-                    // This cannot fail.
-                    Device = new XAudio2(flags, ProcessorSpecifier.DefaultProcessor);
-                    Device.StartEngine();
+#if !WINRT && DEBUG
+                    try
+                    {
+                        //Fails if the XAudio2 SDK is not installed
+                        Device = new XAudio2(XAudio2Flags.DebugEngine, ProcessorSpecifier.DefaultProcessor);
+                        Device.StartEngine();
+                    }
+                    catch
+#endif
+                    {
+                        Device = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.DefaultProcessor);
+                        Device.StartEngine();
+                    }
                 }
 
                 // Just use the default device.
