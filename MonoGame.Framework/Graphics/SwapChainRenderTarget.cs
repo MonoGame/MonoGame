@@ -152,13 +152,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public void Present()
         {
-            var syncInterval = PresentInterval == Graphics.PresentInterval.Default ? 1 : (int)PresentInterval;
-
             lock (GraphicsDevice._d3dContext)
             {
                 try
                 {
-                    _swapChain.Present(syncInterval, PresentFlags.None);
+                    _swapChain.Present(PresentInterval.GetFrameLatency(), PresentFlags.None);
                 }
                 catch (SharpDX.SharpDXException)
                 {
