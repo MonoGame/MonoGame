@@ -470,6 +470,31 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GraphicsCapabilities.Initialize(this);
 
+            // Set our DepthBufferFormat correctly.
+            int stencilSize = 0;
+            int depthSize = 0;
+            GL.GetInteger(All.DepthBits, ref depthSize);
+            GL.GetInteger(All.StencilBits, ref stencilSize);
+            if (depthSize >= 24)
+            {
+                if (stencilSize >= 8)
+                {
+                    PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+                }
+                else
+                {
+                    PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+                }
+            }
+            else if (depthSize == 16)
+            {
+                PresentationParameters.DepthStencilFormat = DepthFormat.Depth16;
+            }
+            else
+            {
+                PresentationParameters.DepthStencilFormat = DepthFormat.None;
+            }
+
 #if DIRECTX
 
 #if WINDOWS_PHONE

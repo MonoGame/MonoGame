@@ -305,7 +305,8 @@ namespace Microsoft.Xna.Framework
         private void Initialize()
         {
             var presentationParameters = new PresentationParameters();
-            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            presentationParameters.DepthStencilFormat = DepthFormat.None;
+
 
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
