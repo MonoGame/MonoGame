@@ -987,6 +987,21 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferHeight,
                                             format,
                                             SwapChainFlags.None);
+
+                using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
+                {
+                    // Ensure that DXGI does not queue more than one frame at a time. This 
+                    // both reduces latency and ensures that the application will only render 
+                    // after each VSync, minimizing power consumption.
+                    if (PresentationParameters.PresentationInterval == PresentInterval.Default ||
+                        PresentationParameters.PresentationInterval == PresentInterval.One)
+                        dxgiDevice.MaximumFrameLatency = 1;
+                    else
+                    {
+                        // Setting zero sets it to the hardware default (usually 3).
+                        dxgiDevice.MaximumFrameLatency = 0;
+                    }
+                }
             }
 
             // Otherwise, create a new swap chain.
@@ -1027,6 +1042,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (PresentationParameters.PresentationInterval == PresentInterval.Default ||
                         PresentationParameters.PresentationInterval == PresentInterval.One)
                         dxgiDevice.MaximumFrameLatency = 1;
+                    else
+                    {
+                        // Setting zero sets it to the hardware default (usually 3).
+                        dxgiDevice.MaximumFrameLatency = 0;
+                    }
                 }
             }
 
