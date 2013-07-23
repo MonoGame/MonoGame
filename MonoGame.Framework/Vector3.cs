@@ -33,7 +33,7 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-    [Serializeable, DataContract]
+    [Serializable, DataContract]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
