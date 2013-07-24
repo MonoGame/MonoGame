@@ -41,6 +41,15 @@
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="Nvidia.TextureTools">
+      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />

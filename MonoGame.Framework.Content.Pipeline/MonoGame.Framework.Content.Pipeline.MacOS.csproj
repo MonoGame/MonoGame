@@ -221,23 +221,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
-      <Link>Dependencies\x86\Assimp32.dll</Link>
+    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\nvtt.dylib">
+      <Link>Dependencies\nvtt.dylib</Link>
     </Content>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
-      <Link>Dependencies\x64\Assimp64.dll</Link>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\pvrtc.dylib">
+      <Link>Dependencies\pvrtc.dylib</Link>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
-      <Link>Dependencies\x64\nvtt.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x64\pvrtc.dll">
-      <Link>Dependencies\x64\pvrtc.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
-      <Link>Dependencies\x86\nvtt.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
-      <Link>Dependencies\x86\pvrtc.dll</Link>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
+      <Link>Dependencies\ManagedPVRTC.dll.config</Link>
     </Content>
   </ItemGroup>
 </Project>
