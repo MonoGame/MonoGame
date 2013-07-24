@@ -7,6 +7,8 @@ using System.Drawing;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    #if WINDOWS
+    
     static class FontHelper
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -39,6 +41,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             return _temp[0];
         }
-
     }
+    
+    #endif
+    
+    #if LINUX
+    
+    static class FontHelper
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ABC
+        {
+            public int abcA;
+            public uint abcB;
+            public int abcC;
+        }
+        
+        public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
+        {
+            var sf = StringFormat.GenericTypographic;
+            sf.Trimming = StringTrimming.None;
+            sf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+            return new ABC
+            {
+                abcA = 0,
+                abcB = (uint)gr.MeasureString(ch.ToString(), font, new PointF(0, 0), sf).Width,
+                abcC = 0
+            };
+        }
+    }
+    
+    #endif
 }
