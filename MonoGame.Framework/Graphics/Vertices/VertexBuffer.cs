@@ -345,19 +345,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
                     mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
 
-                SharpDX.DataStream stream;
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
                 {
-                    d3dContext.MapSubresource(
-                        _buffer,
-                        mode,
-                        SharpDX.Direct3D11.MapFlags.None,
-                        out stream);
-
-                    stream.Position = offsetInBytes;
-                    stream.WriteRange(data, startIndex, elementCount);
-
+                    var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
+                    SharpDX.Utilities.Write(IntPtr.Add(dataBox.DataPointer, offsetInBytes), data, startIndex,
+                                            elementCount);
                     d3dContext.UnmapSubresource(_buffer, 0);
                 }
             }
