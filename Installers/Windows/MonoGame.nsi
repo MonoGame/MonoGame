@@ -88,7 +88,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
   File '..\..\Tools\2MGFX\bin\Release\*.exe'
   
-  File '..\..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll'
+  File '..\..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
   File '..\..\ThirdParty\Libs\lame_enc.dll'
 
