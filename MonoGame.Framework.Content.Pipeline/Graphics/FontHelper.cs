@@ -15,8 +15,7 @@ using MonoMac.ImageIO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    #if WINDOWS
-    
+ 
     static class FontHelper
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -27,6 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             public int abcC;
         }
 
+#if WINDOWS
 		[DllImport("gdi32.dll", ExactSpelling = true)]
 		public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObj);
 
@@ -35,7 +35,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		[DllImport("gdi32.dll", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern bool GetCharABCWidthsW(IntPtr hdc, uint uFirstChar, uint uLastChar, [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStruct, SizeConst = 1)] ABC[] lpabc);
-		#if MACOS
+
+		public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
+		{
+			ABC[] _temp = new ABC[1];
+			IntPtr hDC = gr.GetHdc();
+			Font ft = (Font)font.Clone();
+			IntPtr hFt = ft.ToHfont();
+			SelectObject(hDC, hFt);
+			GetCharABCWidthsW(hDC, ch, ch, _temp);
+			DeleteObject(hFt);
+			gr.ReleaseHdc();
+
+			return _temp[0];
+		}
+
+#elif MACOS
 
 		static CTFont nativeFont;
 
@@ -195,38 +210,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		}
 
-		#else
+#elif LINUX
 		public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
-		{
-			ABC[] _temp = new ABC[1];
-			IntPtr hDC = gr.GetHdc();
-			Font ft = (Font)font.Clone();
-			IntPtr hFt = ft.ToHfont();
-			SelectObject(hDC, hFt);
-			GetCharABCWidthsW(hDC, ch, ch, _temp);
-			DeleteObject(hFt);
-			gr.ReleaseHdc();
-
-			return _temp[0];
-		}
-		#endif
-	}
-    
-    #endif
-    
-    #if LINUX
-    
-    static class FontHelper
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct ABC
-        {
-            public int abcA;
-            public uint abcB;
-            public int abcC;
-        }
-        
-        public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
         {
             var sf = StringFormat.GenericTypographic;
             sf.Trimming = StringTrimming.None;
@@ -238,7 +223,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 abcC = 0
             };
         }
-    }
-    
-    #endif
+#endif
+	}
 }

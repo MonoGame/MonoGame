@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				output.Texture =  (Texture2DContent)p.Process (output.Texture, context);
             }
 
-            GraphicsUtil.CompressTexture(output.Texture, context.TargetPlatform, false, false);
+            GraphicsUtil.CompressTexture(output.Texture, context, false, false);
 
             return output;
         }
