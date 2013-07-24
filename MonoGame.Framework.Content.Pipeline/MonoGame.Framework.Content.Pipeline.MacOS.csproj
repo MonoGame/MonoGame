@@ -202,8 +202,6 @@
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\FontHelper.cs" />
-    <Compile Include="Graphics\FontHelper.cs" />
-    <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
