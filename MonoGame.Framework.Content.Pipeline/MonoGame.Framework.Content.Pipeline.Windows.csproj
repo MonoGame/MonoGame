@@ -317,14 +317,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\pvrtc.dll">
+      <Link>Dependencies\x64\pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
+    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>Dependencies\x86\pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
