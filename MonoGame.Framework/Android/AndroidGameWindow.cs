@@ -163,6 +163,7 @@ namespace Microsoft.Xna.Framework
                 GLContextVersion = GLContextVersion.Gles2_0;
 				try
 				{
+					GraphicsMode = new OpenTK.Graphics.GraphicsMode(new ColorFormat(24), 24, 8, 0);
 					base.CreateFrameBuffer();
 				}
 				catch(Exception)

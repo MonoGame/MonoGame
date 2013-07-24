@@ -220,11 +220,12 @@ namespace Microsoft.Xna.Framework {
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
 			
-			// Create our Depth buffer. Color buffer must be the last one bound
-			GL.GenRenderbuffers(1, ref _depthbuffer);
-			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-            GL.RenderbufferStorage (All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
-			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
+            // Create our Depth buffer. Color buffer must be the last one bound
+            GL.GenRenderbuffers(1, ref _depthbuffer);
+            GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
+            GL.RenderbufferStorage (All.Renderbuffer, All.Depth24Stencil8Oes, viewportWidth, viewportHeight);
+            GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
+            GL.FramebufferRenderbuffer(All.Framebuffer, All.StencilAttachment, All.Renderbuffer, _depthbuffer);
 
 			_glapi.GenRenderbuffers(1, ref _colorbuffer);
 			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
