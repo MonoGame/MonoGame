@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>MonoGame</id>
+    <version>1.0.0</version>
+    <title>MonoGame</title>
+    <authors>Simon-Darkside</authors>
+    <owners>MonoGameTeam</owners>
+    <description>
+      MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>
+      MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework
+    </summary>
+    <language>en-US</language>
+    <projectUrl>http://monogame.net/</projectUrl>
+    <iconUrl>http://monogame.net/themes/_bartik/css/logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+    <copyright>Copyright  2013</copyright>
+    <dependencies>
+        <group targetFramework="net40">
+          <dependency id="log4net" version="1.2.10" />
+        </group>
+    </dependencies>
+    <references></references>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="lib\" target="lib" />
+    <file src="tools\" target="tools" />
+    <file src="content\" target="content" />
+  </files>
+</package>
