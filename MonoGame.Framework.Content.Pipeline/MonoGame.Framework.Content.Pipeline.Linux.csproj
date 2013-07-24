@@ -69,7 +69,6 @@
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
-    <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
     <Compile Include="Graphics\AnimationChannelDictionary.cs" />
@@ -85,7 +84,6 @@
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
-    <Compile Include="Graphics\GraphicsUtil.cs" />
     <Compile Include="Graphics\IndexCollection.cs" />
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
@@ -146,6 +144,64 @@
     <Compile Include="WmvImporter.cs" />
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
+    <Compile Include="Serialization\Compiler\ArrayWriter.cs" />
+    <Compile Include="Serialization\Compiler\BooleanWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingBoxWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingFrustumWriter.cs" />
+    <Compile Include="Serialization\Compiler\BoundingSphereWriter.cs" />
+    <Compile Include="Serialization\Compiler\BuiltInContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\ByteWriter.cs" />
+    <Compile Include="Serialization\Compiler\CharWriter.cs" />
+    <Compile Include="Serialization\Compiler\ColorWriter.cs" />
+    <Compile Include="Serialization\Compiler\CurveWriter.cs" />
+    <Compile Include="Serialization\Compiler\DateTimeWriter.cs" />
+    <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
+    <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
+    <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
+    <Compile Include="Serialization\Compiler\EnumWriter.cs" />
+    <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
+    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\Int16Writer.cs" />
+    <Compile Include="Serialization\Compiler\Int32Writer.cs" />
+    <Compile Include="Serialization\Compiler\Int64Writer.cs" />
+    <Compile Include="Serialization\Compiler\ListWriter.cs" />
+    <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
+    <Compile Include="Serialization\Compiler\ModelWriter.cs" />
+    <Compile Include="Serialization\Compiler\NullableWriter.cs" />
+    <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
+    <Compile Include="Serialization\Compiler\PointWriter.cs" />
+    <Compile Include="Serialization\Compiler\QuaternionWriter.cs" />
+    <Compile Include="Serialization\Compiler\RayWriter.cs" />
+    <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
+    <Compile Include="Serialization\Compiler\SByteWriter.cs" />
+    <Compile Include="Serialization\Compiler\SingleWriter.cs" />
+    <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\StringWriter.cs" />
+    <Compile Include="Serialization\Compiler\TimeSpanWriter.cs" />
+    <Compile Include="Serialization\Compiler\UInt16Writer.cs" />
+    <Compile Include="Serialization\Compiler\UInt32Writer.cs" />
+    <Compile Include="Serialization\Compiler\UInt64Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
+    <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
+    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
+    <Compile Include="Graphics\Dxt1BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt3BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt5BitmapContent.cs" />
+    <Compile Include="Graphics\DxtBitmapContent.cs" />
+    <Compile Include="Graphics\FontHelper.cs" />
+    <Compile Include="Graphics\PvrtcBitmapContent.cs" />
+    <Compile Include="Processors\ModelBoneContent.cs" />
+    <Compile Include="Processors\ModelBoneContentCollection.cs" />
+    <Compile Include="Processors\ModelContent.cs" />
+    <Compile Include="Processors\ModelMeshContent.cs" />
+    <Compile Include="Processors\ModelMeshContentCollection.cs" />
+    <Compile Include="Processors\ModelMeshPartContent.cs" />
+    <Compile Include="Processors\ModelMeshPartContentCollection.cs" />
+    <Compile Include="Processors\ModelProcessor.cs" />
+    <Compile Include="Graphics\GraphicsUtil.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -160,5 +216,8 @@
       <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
       <Name>MonoGame.Framework.Linux</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FbxImporter.cs" />
   </ItemGroup>
 </Project>
