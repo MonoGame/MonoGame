@@ -89,7 +89,7 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
-            Initialize();
+			Initialize();
         }		
 						
         private void Initialize()
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework
 						case DepthFormat.Depth16: 
 						depth = 16;
 						break;
-						case DepthFormat.Depth24: 
+						case DepthFormat.Depth24:
 						depth = 24;
 						break;
 						case DepthFormat.Depth24Stencil8: 
@@ -179,18 +179,24 @@ namespace Microsoft.Xna.Framework
 						break;
 						case DepthFormat.None: break;
 					}
-					Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:RGBA8 Depth:{0} Stencil:{1}", depth, stencil));
+					Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
 					GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8,8,8,8), depth,stencil, 0, 0, false);
 					base.CreateFrameBuffer();
-					Android.Util.Log.Debug("MonoGame", "Created desired format");
 				}
 				catch(Exception)
 				{
 					Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
-					// try again using a more basic mode which hopefully the device will support
-					GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-					base.CreateFrameBuffer();
+					// try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
+					GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
+					try {
+						base.CreateFrameBuffer();
+					} catch (Exception) {
+						// ok we are right back to getting the default
+						GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+						base.CreateFrameBuffer();
+					}
 				}
+				Android.Util.Log.Debug("MonoGame", "Created format {0}", this.GraphicsContext.GraphicsMode);
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
             } 
