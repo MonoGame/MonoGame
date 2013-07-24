@@ -20,8 +20,7 @@ void ApplyFog(inout float4 color, float fogFactor)
 
 void AddSpecular(inout float4 color, float3 specular)
 {
-    color.rgb += specular;
-    color.rgb *= color.a;
+    color.rgb += specular * color.a;
 }
 
 
