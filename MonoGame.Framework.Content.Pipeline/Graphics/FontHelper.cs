@@ -59,11 +59,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         
         public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
         {
+            var sf = StringFormat.GenericTypographic;
+            sf.Trimming = StringTrimming.None;
+            sf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
             return new ABC
             {
-                abcA = 8,
-                abcB = 8,
-                abcC = 8
+                abcA = 0,
+                abcB = (uint)gr.MeasureString(ch.ToString(), font, new PointF(0, 0), sf).Width,
+                abcC = 0
             };
         }
     }
