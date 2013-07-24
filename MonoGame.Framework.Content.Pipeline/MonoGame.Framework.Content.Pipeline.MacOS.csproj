@@ -221,14 +221,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\nvtt.dylib">
-      <Link>Dependencies\nvtt.dylib</Link>
+    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+      <Link>Dependencies\libnvtt.dylib</Link>
     </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\pvrtc.dylib">
-      <Link>Dependencies\pvrtc.dylib</Link>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Link>Dependencies\libpvrtc.dylib</Link>
     </Content>
     <Content Include="..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
       <Link>Dependencies\ManagedPVRTC.dll.config</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
+      <Link>Dependencies\Nvidia.TextureTools.dll.config</Link>
     </Content>
   </ItemGroup>
 </Project>
