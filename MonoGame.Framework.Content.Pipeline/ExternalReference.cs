@@ -52,7 +52,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 throw new ArgumentNullException("relativeToContent");
             if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
                 throw new ArgumentNullException("relativeToContent.SourceFilename");
-            Filename = Path.Combine(relativeToContent.SourceFilename, filename);
+
+#if WINRT
+            const char notSeparator = '/';
+            const char separator = '\\';
+#else
+            const char notSeparator = '\\';
+            var separator = Path.DirectorySeparatorChar;
+#endif
+            // Get a uri for the asset path using the file:// schema and no host
+            var src = new Uri("file:///" + relativeToContent.SourceFilename.Replace(notSeparator, separator));
+
+            // Add the relative path to the external reference
+            var dst = new Uri(src, filename.Replace(notSeparator, separator));
+
+            // The uri now contains the path to the external reference
+            // Get the local path and skip the first character (the path separator)
+            Filename = dst.LocalPath.Substring(1);
         }
     }
 }

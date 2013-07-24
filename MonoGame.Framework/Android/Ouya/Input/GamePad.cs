@@ -56,6 +56,11 @@ namespace Microsoft.Xna.Framework.Input
         private float _leftTrigger, _rightTrigger;
         private Vector2 _leftStick, _rightStick;
 
+        // Workaround for the OnKeyUp and OnKeyDown events for KeyCode.Menu 
+        // both being sent in a single frame. This can be removed if the
+        // OUYA firmware is updated to send these events in different frames. 
+        private bool _startButtonPressed;
+
         private readonly GamePadCapabilities _capabilities;
 
         private static readonly GamePad[] GamePads = new GamePad[OuyaController.MaxControllers];
@@ -113,6 +118,16 @@ namespace Microsoft.Xna.Framework.Input
 
                 GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
                 thumbSticks.ApplyDeadZone(deadZone, 0.3f);
+
+                if (gamePad._startButtonPressed)
+                {
+                    gamePad._buttons |= Buttons.Start;
+                    gamePad._startButtonPressed = false;
+                }
+                else
+                {
+                    gamePad._buttons &= ~Buttons.Start;
+                }
 
                 state = new GamePadState(
                     thumbSticks, 
@@ -197,6 +212,11 @@ namespace Microsoft.Xna.Framework.Input
                 return false;
 
             gamePad._buttons |= ButtonForKeyCode(keyCode);
+
+            if (keyCode == Keycode.Menu)
+            {
+                gamePad._startButtonPressed = true;
+            }
             return true;
         }
 
@@ -263,8 +283,15 @@ namespace Microsoft.Xna.Framework.Input
                 case Keycode.DpadRight:
                     return Buttons.DPadRight;
 
+                // Ouya system button sends Keycode.Menu after a delay if no
+                // double tap or hold is detected. It also sends Keycode.Home just
+                // before the system menu is opened (but not on dev kit controllers)
+                // http://forums.ouya.tv/discussion/comment/6076/#Comment_6076
+                case Keycode.Menu:
                 case Keycode.ButtonStart:
                     return Buttons.Start;
+                case Keycode.Home:
+                    return Buttons.BigButton;
                 case Keycode.Back:
                     return Buttons.Back;
             }

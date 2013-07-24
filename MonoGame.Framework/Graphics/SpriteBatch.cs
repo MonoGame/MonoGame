@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Graphics
         bool _beginCalled;
 
 		Effect _spriteEffect;
+	    readonly EffectParameter _matrixTransform;
+        readonly EffectPass _spritePass;
 
 		Matrix _matrix;
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
@@ -32,6 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Use a custom SpriteEffect so we can control the transformation matrix
             _spriteEffect = new Effect(graphicsDevice, SpriteEffect.Bytecode);
+            _matrixTransform = _spriteEffect.Parameters["MatrixTransform"];
+            _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice);
 
@@ -97,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		void Setup() 
         {
-            GraphicsDevice gd = GraphicsDevice;
+            var gd = GraphicsDevice;
 			gd.BlendState = _blendState;
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
@@ -106,18 +110,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // Setup the default sprite effect.
 			var vp = gd.Viewport;
 
-            // GL requires a half pixel offset where as DirectX and PSS does not.
+		    Matrix projection;
 #if PSM || DIRECTX
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0);
-            var transform = _matrix * projection;
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, -1, 0, out projection);
 #else
-            var projection = Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1);
-			var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-			var transform = _matrix * (halfPixelOffset * projection);
+            // GL requires a half pixel offset to match DX.
+            Matrix.CreateOrthographicOffCenter(0, vp.Width, vp.Height, 0, 0, 1, out projection);
+            projection.M41 += -0.5f * projection.M11;
+            projection.M42 += -0.5f * projection.M22;
 #endif
+            Matrix.Multiply(ref _matrix, ref projection, out projection);
 
-			_spriteEffect.Parameters["MatrixTransform"].SetValue(transform);				                
-			_spriteEffect.CurrentTechnique.Passes[0].Apply();
+            _matrixTransform.SetValue(projection);
+            _spritePass.Apply();
 
 			// If the user supplied a custom effect then apply
             // it now to override the sprite effect.
@@ -152,6 +157,78 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
+
+        // Overload for calling Draw() with named parameters
+        /// <summary>
+        /// This is a MonoGame Extension method for calling Draw() using named parameters.  It is not available in the standard XNA Framework.
+        /// </summary>
+        /// <param name='texture'>
+        /// The Texture2D to draw.  Required.
+        /// </param>
+        /// <param name='position'>
+        /// The position to draw at.  If left empty, the method will draw at drawRectangle instead.
+        /// </param>
+        /// <param name='drawRectangle'>
+        /// The rectangle to draw at.  If left empty, the method will draw at position instead.
+        /// </param>
+        /// <param name='sourceRectangle'>
+        /// The source rectangle of the texture.  Default is null
+        /// </param>
+        /// <param name='origin'>
+        /// Origin of the texture.  Default is Vector2.Zero
+        /// </param>
+        /// <param name='rotation'>
+        /// Rotation of the texture.  Default is 0f
+        /// </param>
+        /// <param name='scale'>
+        /// The scale of the texture as a Vector2.  Default is Vector2.One
+        /// </param>
+        /// <param name='color'>
+        /// Color of the texture.  Default is Color.White
+        /// </param>
+        /// <param name='effect'>
+        /// SpriteEffect to draw with.  Default is SpriteEffects.None
+        /// </param>
+        /// <param name='depth'>
+        /// Draw depth.  Default is 0f.
+        /// </param>
+        public void Draw (Texture2D texture,
+                Vector2? position = null,
+                Rectangle? drawRectangle = null,
+                Rectangle? sourceRectangle = null,
+                Vector2? origin = null,
+                float rotation = 0f,
+                Vector2? scale = null,
+                Color? color = null,
+                SpriteEffects effect = SpriteEffects.None,
+                float depth = 0f)
+        {
+
+            // Assign default values to null parameters here, as they are not compile-time constants
+            if(!color.HasValue)
+                color = Color.White;
+            if(!origin.HasValue)
+                origin = Vector2.Zero;
+            if(!scale.HasValue)
+                scale = Vector2.One;
+
+            // If both drawRectangle and position are null, or if both have been assigned a value, raise an error
+            if((drawRectangle.HasValue) == (position.HasValue))
+            {
+                throw new InvalidOperationException("Expected drawRectangle or position, but received neither or both.");
+            }
+            else if(position != null)
+            {
+                // Call Draw() using position
+                Draw(texture, (Vector2)position, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effect, depth);
+            }
+            else
+            {
+                // Call Draw() using drawRectangle
+                Draw(texture, (Rectangle)drawRectangle, sourceRectangle, (Color)color, rotation, (Vector2)origin, effect, depth);
+            }
+        }
+
 
 		public void Draw (Texture2D texture,
 				Vector2 position,

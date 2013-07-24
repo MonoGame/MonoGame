@@ -21,6 +21,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int width;
         private int height;
         private int depth;
+
+#if DIRECTX
+        private bool renderTarget;
+        private bool mipMap;
+#endif
 		
 #if OPENGL
 		PixelInternalFormat glInternalFormat;
@@ -43,7 +48,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return depth; }
         }
 
-		public Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
+            : this(graphicsDevice, width, height, depth, mipMap, format, false)
+		{		    
+		}
+
+		protected Texture3D (GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice");
@@ -52,7 +62,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.width = width;
             this.height = height;
             this.depth = depth;
-            this.levelCount = 1;
+            this._levelCount = 1;
+		    this._format = format;
 
 #if OPENGL
 			this.glTarget = TextureTarget.Texture3D;
@@ -71,27 +82,52 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (mipMap) 
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
 #elif DIRECTX
-            if (mipMap)
-                this.levelCount = CalculateMipLevels(width, height, depth);
+            this.renderTarget = renderTarget;
+            this.mipMap = mipMap;
 
+            if (mipMap)
+                this._levelCount = CalculateMipLevels(width, height, depth);
+
+            // Create texture
+            GetTexture();
+#endif
+        }
+
+#if DIRECTX
+
+        internal override SharpDX.Direct3D11.Resource CreateTexture()
+        {
             var description = new Texture3DDescription
             {
                 Width = width,
                 Height = height,
                 Depth = depth,
-                MipLevels = levelCount,
-                Format = SharpDXHelper.ToFormat(format),
+                MipLevels = _levelCount,
+                Format = SharpDXHelper.ToFormat(_format),
                 BindFlags = BindFlags.ShaderResource,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Usage = ResourceUsage.Default,
                 OptionFlags = ResourceOptionFlags.None,
             };
 
-            _texture = new SharpDX.Direct3D11.Texture3D(graphicsDevice._d3dDevice, description);
-#endif
+            if (renderTarget)
+            {
+                description.BindFlags |= BindFlags.RenderTarget;
+                if (mipMap)
+                {
+                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
+                    // because generation of mipmaps is not supported on the Xbox 360.
+                    // TODO: New method Texture.GenerateMipMaps() required.
+                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
+                }
+            }
+
+            return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
-		
-		public void SetData<T> (T[] data) where T : struct
+
+#endif
+        
+        public void SetData<T>(T[] data) where T : struct
 		{
 			SetData<T>(data, 0, data.Length);
 		}
@@ -131,7 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var d3dContext = GraphicsDevice._d3dContext;
             lock (d3dContext)
-                d3dContext.UpdateSubresource(box, _texture, subresourceIndex, region);
+                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
 #endif
             dataHandle.Free ();
 		}

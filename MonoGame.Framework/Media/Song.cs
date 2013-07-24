@@ -185,6 +185,8 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_topology == null)
             {
+                MediaManagerState.CheckStartup();
+
                 MediaFactory.CreateTopology(out _topology);
 
                 SharpDX.MediaFoundation.MediaSource mediaSource;
@@ -276,7 +278,12 @@ namespace Microsoft.Xna.Framework.Media
 		{	
 			if ( _sound == null )
 				return;
-			
+
+#if IOS
+            // AVAudioPlayer sound.Stop() does not reset the playback position as XNA does.
+            // Set Play's currentTime to 0 to ensure playback at the start.
+            _sound.CurrentTime = 0.0;
+#endif
 			_sound.Play();
 
             _playCount++;

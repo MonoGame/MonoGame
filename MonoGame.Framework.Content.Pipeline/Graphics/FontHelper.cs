@@ -15,15 +15,17 @@ using MonoMac.ImageIO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-	static class FontHelper
-	{
-		[StructLayout(LayoutKind.Sequential)]
-		public struct ABC
-		{
-			public int abcA;
-			public uint abcB;
-			public int abcC;
-		}
+    #if WINDOWS
+    
+    static class FontHelper
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ABC
+        {
+            public int abcA;
+            public uint abcB;
+            public int abcC;
+        }
 
 		[DllImport("gdi32.dll", ExactSpelling = true)]
 		public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObj);
@@ -42,7 +44,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			ABC[] _temp = new ABC[1];
 			var nativFont = CreateFont (font.Name, font.Size, font.Style, font.GdiCharSet, font.GdiVerticalFont);
 			var atts = buildAttributedString(ch.ToString(), nativFont);
-
 			// for now just a line not sure if this is going to work
 			CTLine line = new CTLine(atts);
 
@@ -210,4 +211,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		}
 		#endif
 	}
+    
+    #endif
+    
+    #if LINUX
+    
+    static class FontHelper
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ABC
+        {
+            public int abcA;
+            public uint abcB;
+            public int abcC;
+        }
+        
+        public static ABC GetCharWidthABC(char ch, Font font, System.Drawing.Graphics gr)
+        {
+            var sf = StringFormat.GenericTypographic;
+            sf.Trimming = StringTrimming.None;
+            sf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+            return new ABC
+            {
+                abcA = 0,
+                abcB = (uint)gr.MeasureString(ch.ToString(), font, new PointF(0, 0), sf).Width,
+                abcC = 0
+            };
+        }
+    }
+    
+    #endif
 }

@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework
         public bool SynchronizeWithVerticalRetrace { get; set; }
 
 #if WINRT && !WINDOWS_PHONE
+        [CLSCompliant(false)]
         public SwapChainBackgroundPanel SwapChainPanel { get; set; }
 #endif 
 
@@ -80,22 +81,20 @@ namespace Microsoft.Xna.Framework
         public void ApplyChanges()
         {
             var createDevice = GraphicsDevice == null;
-            if (createDevice)
-                GraphicsDevice = new GraphicsDevice();
 
-            GraphicsDevice.PresentationParameters.BackBufferWidth = PreferredBackBufferWidth;
-            GraphicsDevice.PresentationParameters.BackBufferHeight = PreferredBackBufferHeight;
-            GraphicsDevice.PresentationParameters.BackBufferFormat = PreferredBackBufferFormat;
-            GraphicsDevice.PresentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
-            GraphicsDevice.PresentationParameters.MultiSampleCount = MultiSampleCount;
-            GraphicsDevice.PresentationParameters.PresentationInterval = PresentationInterval;
-            GraphicsDevice.PresentationParameters.IsFullScreen = false;
-            GraphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+            var presentationParameters = createDevice ? new PresentationParameters() : GraphicsDevice.PresentationParameters;
+            presentationParameters.BackBufferWidth = PreferredBackBufferWidth;
+            presentationParameters.BackBufferHeight = PreferredBackBufferHeight;
+            presentationParameters.BackBufferFormat = PreferredBackBufferFormat;
+            presentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
+            presentationParameters.MultiSampleCount = MultiSampleCount;
+            presentationParameters.PresentationInterval = PresentationInterval;
+            presentationParameters.IsFullScreen = false;
+            presentationParameters.SwapChainPanel = SwapChainPanel;
 
             if (createDevice)
             {
-                GraphicsDevice.GraphicsProfile = GraphicsProfile;
-                GraphicsDevice.Initialize();
+                GraphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile, presentationParameters);
             }
             else
             {

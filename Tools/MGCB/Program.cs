@@ -22,7 +22,8 @@ namespace MGCB
 #if WINDOWS
             // Set the correct directory for our dependency files.
             var is32Bit = IntPtr.Size == 4;
-            var directory = string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64");
+            var directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                string.Format("Dependencies{0}{1}", Path.DirectorySeparatorChar, is32Bit ? "x32" : "x64"));
             SetDllDirectory(directory);
 #endif
 
@@ -58,17 +59,21 @@ namespace MGCB
                 return 0;
             }
 
-            // Print a startup message.
+            // Print a startup message.            
             var buildStarted = DateTime.Now;
-            Console.WriteLine("Build started {0}\n", buildStarted);
+            if (!content.Quiet)
+                Console.WriteLine("Build started {0}\n", buildStarted);
 
             // Let the content build.
             int successCount, errorCount;
             content.Build(out successCount, out errorCount);
 
             // Print the finishing info.
-            Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
-            Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+            if (!content.Quiet)
+            {
+                Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
+                Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
+            }
 
             // Return the error count.
             return errorCount;

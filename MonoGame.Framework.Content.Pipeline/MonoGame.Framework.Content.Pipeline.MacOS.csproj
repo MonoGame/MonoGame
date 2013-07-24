@@ -195,8 +195,13 @@
     <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
-    <Compile Include="Graphics\DXTBitmapContent.cs" />
-    <Compile Include="Graphics\PVRTCBitmapContent.cs" />
+    <Compile Include="Graphics\Dxt1BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt3BitmapContent.cs" />
+    <Compile Include="Graphics\Dxt5BitmapContent.cs" />
+    <Compile Include="Graphics\DxtBitmapContent.cs" />
+    <Compile Include="Graphics\PvrtcBitmapContent.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
+    <Compile Include="Graphics\FontHelper.cs" />
     <Compile Include="Graphics\FontHelper.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
@@ -214,5 +219,25 @@
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+      <Link>Dependencies\x86\Assimp32.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+      <Link>Dependencies\x64\Assimp64.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
+      <Link>Dependencies\x64\nvtt.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x64\pvrtc.dll">
+      <Link>Dependencies\x64\pvrtc.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>Dependencies\x86\nvtt.dll</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>Dependencies\x86\pvrtc.dll</Link>
+    </Content>
   </ItemGroup>
 </Project>
