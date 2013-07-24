@@ -42,7 +42,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private ContentCompiler _compiler;
         private MethodInfo _compileMethod;
 
-        public ContentBuildLogger Logger { get; private set; }
+        public ContentBuildLogger Logger { get; set; }
 
         public List<string> Assemblies { get; private set; }
 
@@ -161,6 +161,30 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
             }
         }
+
+		public Type[] GetProcessorTypes()
+		{
+			if (_processors == null)
+				ResolveAssemblies ();
+
+			List <Type> types = new List<Type> ();
+			foreach (var item in _processors) {
+				types.Add (item.type);
+			}
+			return types.ToArray ();
+		}
+
+		public Type[] GetImporterTypes()
+		{
+			if (_importers == null)
+				ResolveAssemblies ();
+
+			List <Type> types = new List<Type> ();
+			foreach (var item in _importers) {
+				types.Add (item.type);
+			}
+			return types.ToArray ();
+		}
 
         public IContentImporter CreateImporter(string name)
         {

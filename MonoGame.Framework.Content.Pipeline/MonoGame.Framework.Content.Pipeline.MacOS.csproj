@@ -47,6 +47,12 @@
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
       <Private>False</Private>
     </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedPVRTC">
+      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />
@@ -191,6 +197,9 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Graphics\DXTBitmapContent.cs" />
     <Compile Include="Graphics\PVRTCBitmapContent.cs" />
+    <Compile Include="Graphics\FontHelper.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
+    <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

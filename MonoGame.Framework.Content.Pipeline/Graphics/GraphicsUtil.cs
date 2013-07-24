@@ -143,31 +143,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool premultipliedAlpha)
+		public static void CompressTexture(TextureContent content, ContentProcessorContext context, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
-            switch (platform)
+            switch (context.TargetPlatform)
             {
-                case TargetPlatform.Windows:
-                case TargetPlatform.WindowsPhone:
-                case TargetPlatform.WindowsPhone8:
-                case TargetPlatform.WindowsStoreApp:
-                case TargetPlatform.Ouya:
-                case TargetPlatform.Android:
-                case TargetPlatform.Linux: 
-                case TargetPlatform.MacOSX:
-                case TargetPlatform.NativeClient:
-                case TargetPlatform.Xbox360:
-                    CompressDXT(content);
-                    break;
+				case TargetPlatform.Windows:
+				case TargetPlatform.WindowsPhone:
+				case TargetPlatform.WindowsPhone8:
+				case TargetPlatform.WindowsStoreApp:
+				case TargetPlatform.Ouya:
+				case TargetPlatform.Android:
+				case TargetPlatform.Linux: 
+				case TargetPlatform.MacOSX:
+				case TargetPlatform.NativeClient:
+				case TargetPlatform.Xbox360:
+					context.Logger.LogMessage ("Detected {0} using DXT Compression", context.TargetPlatform);
+				    CompressDXT(content);
+				    break;
 
                 case TargetPlatform.iOS:
+					context.Logger.LogMessage ("Detected {0} using PVRTC Compression", context.TargetPlatform);
                     CompressPVRTC(content, premultipliedAlpha);
                     break;
 
                 default:
-                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", platform));
+                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", context.TargetPlatform));
             }
         }
 

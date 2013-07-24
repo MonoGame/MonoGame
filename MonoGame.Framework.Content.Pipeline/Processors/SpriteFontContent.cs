@@ -4,10 +4,11 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class SpriteFontContent
+	public class SpriteFontContent
     {
         public SpriteFontContent() { }
 

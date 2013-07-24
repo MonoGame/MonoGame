@@ -133,9 +133,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     }
                 }
 
-                var bitmapContent = new PixelBitmapContent<Color>(texBounds.X, texBounds.Y);
+				output.Texture._bitmap = outputBitmap;
+
+				var bitmapContent = new PixelBitmapContent<Color>(texBounds.X, texBounds.Y);
                 bitmapContent.SetPixelData(outputBitmap.GetData());
                 output.Texture.Faces.Add(new MipmapChain(bitmapContent));
+
+				TextureProcessor p = new TextureProcessor ();
+				p.TextureFormat = TextureProcessorOutputFormat.Compressed;
+				output.Texture =  (Texture2DContent)p.Process (output.Texture, context);
             }
 
             return output;
