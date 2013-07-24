@@ -6,10 +6,14 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+#if WINDOWS
 using Nvidia.TextureTools;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    #if WINDOWS
+    
     class DxtDataHandler
     {
         private TextureContent _content;
@@ -71,6 +75,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return true;
         }
     }
+    
+    #endif
 
     public static class GraphicsUtil
     {
@@ -158,6 +164,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
+            #if WINDOWS
             switch (platform)
             {
                 case TargetPlatform.Windows:
@@ -172,7 +179,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.Xbox360:
                     CompressDxt(content, generateMipmaps);
                     break;
-
                 case TargetPlatform.iOS:
                     CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
@@ -180,7 +186,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 default:
                     throw new NotImplementedException(string.Format("Texture compression is not implemented for {0}", platform));
             }
+            #endif
         }
+        
+        #if WINDOWS
 
         private static void CompressPvrtc(TextureContent content, bool generateMipmaps, bool premultipliedAlpha)
         {
@@ -280,6 +289,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             dataHandle.Free();
         }
+        
+        #endif
 
         internal static bool ContainsFractionalAlpha(byte[] data)
         {
