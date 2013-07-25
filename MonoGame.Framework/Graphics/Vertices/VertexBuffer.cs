@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the index buffer
-            ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
+            ptr = ptr + offsetInBytes;
             if (data is byte[]) {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     for (int i = 0; i < elementCount; i++)
                     {
                         Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
-                        dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
+                        dataPtr = dataPtr + dataSize;
                     }
                 }
                 

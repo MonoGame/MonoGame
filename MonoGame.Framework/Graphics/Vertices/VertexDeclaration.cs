@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     element.VertexAttribPointerType,
                     element.Normalized,
                     this.VertexStride,
-                    (IntPtr)(offset.ToInt64() + element.Offset));
+                    offset + element.Offset);
                 GraphicsExtensions.CheckGLError();
             }
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);

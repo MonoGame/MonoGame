@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
-            ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
+            ptr = ptr + offsetInBytes;
             if (data is byte[])
             {
                 byte[] buffer = data as byte[];
