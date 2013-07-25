@@ -403,6 +403,7 @@
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Windows8\GamerServices\SignedInGamer.cs" />
+    <Compile Include="Utilities\Unsafe.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX">

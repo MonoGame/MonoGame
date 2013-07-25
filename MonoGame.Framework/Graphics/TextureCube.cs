@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
+using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -208,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
 
                 int xOffset, yOffset, width, height;
                 if (rect.HasValue)

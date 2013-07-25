@@ -63,6 +63,7 @@ using MonoTouch.Foundation;
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #elif WINDOWS || LINUX
+using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
@@ -298,7 +299,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 try
                 {
                     var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+                    var dataPtr = dataHandle.AddressWithOffset(startBytes);
 #endif
                     int x, y, w, h;
                     if (rect.HasValue)

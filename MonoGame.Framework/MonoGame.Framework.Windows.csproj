@@ -384,6 +384,7 @@
     <Compile Include="Windows\WinFormsGameForm.cs" />
     <Compile Include="Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Windows\WinFormsGameWindow.cs" />
+    <Compile Include="Utilities\Unsafe.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
+using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -266,7 +267,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Marshal.Copy(ptr, buffer, 0, buffer.Length);
                 
                 var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
+                var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
                 
                 // Copy from the temporary buffer to the destination array
                 
@@ -415,7 +416,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
+            var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInBytes);
 
             GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
             GraphicsExtensions.CheckGLError();

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
+using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -396,7 +397,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var sizeInBytes = elementSizeInByte * elementCount;
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+            var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
             var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
             
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);

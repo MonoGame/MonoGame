@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
+using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DIRECTX
@@ -146,7 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+			var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
             int width = right - left;
             int height = bottom - top;
             int depth = back - front;

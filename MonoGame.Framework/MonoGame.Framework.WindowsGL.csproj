@@ -469,6 +469,7 @@
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="Utilities\Unsafe.cs" />
 	<Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     
     <Compile Include="GamerServices\LeaderboardEntry.cs" />

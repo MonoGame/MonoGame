@@ -423,6 +423,7 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
     <Compile Include="GameUpdateRequiredException.cs" />
+    <Compile Include="Utilities\Unsafe.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
