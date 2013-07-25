@@ -514,6 +514,9 @@ namespace Microsoft.Xna.Framework
                 // fluctuation is an acceptable result.
 #if WINRT
                 Task.Delay(sleepTime).Wait();
+#elif JSIL
+                // No way to actually do a sleep in the browser, so all we can do is spin. Blah.
+                // FIXME: Maybe bail out and trigger a setTimeout callback instead? Timer granularity in browsers is trash, though...
 #else
                 System.Threading.Thread.Sleep(sleepTime);
 #endif
