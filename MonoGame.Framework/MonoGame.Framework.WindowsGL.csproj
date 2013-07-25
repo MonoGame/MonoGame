@@ -212,6 +212,8 @@
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
+    <Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs" />
+    <Compile Include="Audio\DynamicSoundEffectInstance.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />

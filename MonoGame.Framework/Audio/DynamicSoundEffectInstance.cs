@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-#if MONOMAC
-using MonoMac.OpenAL;
-#else
-using OpenTK.Audio.OpenAL;
-#endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed class DynamicSoundEffectInstance : SoundEffectInstance
+    public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     {
         private AudioChannels channels;
         private int sampleRate;
-        private ALFormat format;
         private bool looped;
         private int pendingBufferCount;
         // Events
@@ -32,17 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             this.sampleRate = sampleRate;
             this.channels = channels;
-            switch (channels)
-            {
-                case AudioChannels.Mono:
-                    this.format = ALFormat.Mono16;
-                    break;
-                case AudioChannels.Stereo:
-                    this.format = ALFormat.Stereo16;
-                    break;
-                default:
-                    break;
-            }                       
+            setFormatFor(channels);
         }
 
         public TimeSpan GetSampleDuration(int sizeInBytes)
@@ -51,11 +32,6 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         public int GetSampleSizeInBytes(TimeSpan duration)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Play()
         {
             throw new NotImplementedException();
         }
