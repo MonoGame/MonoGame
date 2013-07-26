@@ -306,10 +306,10 @@ namespace Microsoft.Xna.Framework
                 //        Hopefully this does not cause excessive havoc.
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
-                _mainWindow.HidesOnDeactivate = true;   
-                Mouse.State.LeftButton = ButtonState.Released;
-                Mouse.State.RightButton = ButtonState.Released;
-                Mouse.State.MiddleButton = ButtonState.Released;
+                _mainWindow.HidesOnDeactivate = true;
+                _gameWindow.MouseState.LeftButton = ButtonState.Released;
+                _gameWindow.MouseState.RightButton = ButtonState.Released;
+                _gameWindow.MouseState.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }
@@ -350,9 +350,9 @@ namespace Microsoft.Xna.Framework
                 //_mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = false;
-                Mouse.State.LeftButton = ButtonState.Released;
-                Mouse.State.RightButton = ButtonState.Released;
-                Mouse.State.MiddleButton = ButtonState.Released;
+                _gameWindow.MouseState.LeftButton = ButtonState.Released;
+                _gameWindow.MouseState.RightButton = ButtonState.Released;
+                _gameWindow.MouseState.MiddleButton = ButtonState.Released;
             }
             finally { ResumeUpdatingAndDrawing(); }
         }

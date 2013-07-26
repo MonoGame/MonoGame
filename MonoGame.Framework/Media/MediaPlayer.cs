@@ -85,6 +85,8 @@ namespace Microsoft.Xna.Framework.Media
 		private static bool _isMuted = false;
 		private static readonly MediaQueue _queue = new MediaQueue();
 
+		public static event EventHandler<EventArgs> ActiveSongChanged;
+
 #if WINDOWS_MEDIA_ENGINE
         private static readonly MediaEngine _mediaEngineEx;
 #if WINDOWS_PHONE
@@ -122,7 +124,7 @@ namespace Microsoft.Xna.Framework.Media
 
                 _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
 #elif WINDOWS_MEDIA_SESSION
-            MediaManager.Startup(true);
+            MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
 #elif WINDOWS_PHONE
             PhoneApplicationService.Current.Activated += (sender, e) =>
@@ -440,6 +442,12 @@ namespace Microsoft.Xna.Framework.Media
 				if (!IsRepeating)
 				{
 					State = MediaState.Stopped;
+
+					if (ActiveSongChanged != null)
+					{
+						ActiveSongChanged.Invoke(null, null);
+					}
+
 					return;
 				}
 			}
@@ -523,6 +531,11 @@ namespace Microsoft.Xna.Framework.Media
                 Stop();
             else            
                 Play(nextSong);                            
+
+            if (ActiveSongChanged != null)
+            {
+                ActiveSongChanged.Invoke(null, null);
+            }
 		}
     }
 }

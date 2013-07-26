@@ -132,7 +132,9 @@ namespace Microsoft.Xna.Framework {
         public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
         {
             DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
-            if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
+            if ((supportedOrientations & OrientationConverter.ToDisplayOrientation(this.InterfaceOrientation)) != 0)
+                return this.InterfaceOrientation;
+            else if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
                 return UIInterfaceOrientation.LandscapeRight;
             else if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
                 return UIInterfaceOrientation.LandscapeLeft;

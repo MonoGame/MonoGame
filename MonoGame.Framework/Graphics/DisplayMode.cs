@@ -95,6 +95,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(DisplayMode left, DisplayMode right)
         {
+            if (left == null && right == null)
+            {
+                return true;
+            }
+            if (left == null || right == null)
+            {
+                return false;
+            }
             return (left.format == right.format) &&
                 (left.height == right.height) &&
                 (left.refreshRate == right.refreshRate) &&
