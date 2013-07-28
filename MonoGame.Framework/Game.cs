@@ -515,12 +515,16 @@ namespace Microsoft.Xna.Framework
 #if WINRT
                 Task.Delay(sleepTime).Wait();
 #elif JSIL
-                // No way to actually do a sleep in the browser, so all we can do is spin. Blah.
+                // No way to actually do a sleep in the browser, so all we can do is bail out. BLAH.
+                // The next callback should cause us to catch up, worst-case. This SHOULD never happen since rAF is supposed to give us
+                //  60hz timing resolution, but in practice that doesn't work in any browser I've ever tested.
                 // FIXME: Maybe bail out and trigger a setTimeout callback instead? Timer granularity in browsers is trash, though...
+                //  maybe use postMessage since the delay on that is much shorter? It'd still destroy the browser event loop.
+                return;
 #else
                 System.Threading.Thread.Sleep(sleepTime);
-#endif
                 goto RetryTick;
+#endif
             }
 
             // Do not allow any update to take longer than our maximum.
