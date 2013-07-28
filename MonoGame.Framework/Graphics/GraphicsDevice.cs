@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
 
-#if OPENGL && !GLES
+#if OPENGL && !GLES && !JSIL
 		private DrawBuffersEnum[] _drawBuffers;
 #endif
 
@@ -1760,7 +1760,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
 				GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
-#if !GLES
+#if !GLES && !JSIL
 				for (var i = 0; i < _currentRenderTargetCount; i++)
 				{
 					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);

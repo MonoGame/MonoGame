@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			return (Texture2D)Data;
 		}
 
-#if !GLES
+#if !GLES && !JSIL
 	    public Texture3D GetValueTexture3D ()
 	    {
             if (ParameterClass != EffectParameterClass.Object || ParameterType != EffectParameterType.Texture3D)

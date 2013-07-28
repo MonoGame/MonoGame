@@ -164,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-#if GLES
+#if GLES || JSIL
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
@@ -244,7 +244,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if OPENGL && !GLES
+#if OPENGL && !GLES && !JSIL
 
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
