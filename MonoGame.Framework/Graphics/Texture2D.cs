@@ -281,14 +281,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (data == null)
 				throw new ArgumentNullException("data");
-#if JSIL
-            if (JSIL.Builtins.IsJavascript) {
-                Console.WriteLine("JSIL HORRIBLE HACK WARNING: Texture.SetData ignored :-(");
-                return;
-            }
-#endif
 
-#if OPENGL
+#if OPENGL && !JSIL
             Threading.BlockOnUIThread(() =>
             {
 #endif
@@ -429,7 +423,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 #endif
 
-#if OPENGL
+#if OPENGL && !JSIL
 #if !ANDROID
                 // Required to make sure that any texture uploads on a thread are completed
                 // before the main thread tries to use the texture.

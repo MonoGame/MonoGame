@@ -1,3 +1,4 @@
+using System.Collections;
 using JSIL.Meta;
 using Microsoft.Xna.Framework;
 
@@ -14,6 +15,9 @@ namespace JSIL {
         }
 
         public void StartRunLoop (GamePlatform platform) {
+        }
+
+        public void VertexAttribPointers (System.IntPtr vertexBuffer, int vertexStride, IList elements) {
         }
     }
 }

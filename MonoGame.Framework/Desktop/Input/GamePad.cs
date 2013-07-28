@@ -207,7 +207,12 @@ namespace Microsoft.Xna.Framework.Input
         //Inits SDL and grabs the sticks
         static void Init ()
         {
-        	running = true;
+#if JSIL
+            // FIXME: Maybe map this to webkit and firefox gamepad APIs?
+            return;
+#endif
+
+            running = true;
 		    try 
             {
          	    Joystick.Init ();
@@ -408,6 +413,11 @@ namespace Microsoft.Xna.Framework.Input
         //     Enumerated value that specifies what dead zone type to use.
         public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
+#if JSIL
+            // FIXME: Maybe map this to webkit and firefox gamepad APIs?
+            return new GamePadState();
+#endif
+
             PrepSettings();
             if (sdl)
 				Sdl.SDL_JoystickUpdate();

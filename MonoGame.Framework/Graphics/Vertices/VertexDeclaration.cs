@@ -160,6 +160,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderAttributeInfo.Add(shaderHash, attrInfo);
             }
 
+#if JSIL
+            JSIL.OpenTKService.Instance.VertexAttribPointers(
+                offset, this.VertexStride, attrInfo.Elements
+            );
+            GraphicsExtensions.CheckGLError();
+#else
             // Apply the vertex attribute info
             foreach (var element in attrInfo.Elements)
             {
@@ -171,6 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset + element.Offset);
                 GraphicsExtensions.CheckGLError();
             }
+#endif
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
 		}
 
