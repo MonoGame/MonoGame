@@ -67,6 +67,10 @@ namespace Microsoft.Xna.Framework.Input
 
 		static void AutoConfig()
 		{
+#if JSIL
+            // FIXME: Maybe map this to webkit and firefox gamepad APIs?
+            return;
+#endif
 			Init();
 			if (!sdl) return;
 #if DEBUG
