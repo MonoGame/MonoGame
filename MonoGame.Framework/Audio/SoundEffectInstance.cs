@@ -87,6 +87,14 @@ namespace Microsoft.Xna.Framework.Audio
             _effect = effect;
             _voice = voice;
         }
+#else
+        /* Creates a standalone SoundEffectInstance from given wavedata. */
+        internal SoundEffectInstance(byte[] audioData, int sampleRate, int channels)
+        {
+            _sound = new Sound(buffer, 1.0f, false);
+            _sound.Rate = sampleRate;
+            // TODO: Sound.cs does not contain channel data!
+        }
 #endif
 
         public void Dispose()
