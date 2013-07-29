@@ -26,6 +26,8 @@ There are four quick start options available:
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop.zip).
 * Fork and clone the repo: `https://github.com/mono/MonoGame.git`.
 
+Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame-Samples](https://github.com/CartBlanche/MonoGame-Samples) to help get you started on your first project.
+
 ## Bug Tracker
 
 Have a bug or a feature request? [Please open a new issue](https://github.com/mono/MonoGame/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines).
