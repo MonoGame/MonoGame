@@ -50,6 +50,9 @@
     <Reference Include="ManagedPVRTC">
       <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />

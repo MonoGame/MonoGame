@@ -53,6 +53,9 @@
     <Reference Include="ManagedPVRTC">
       <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />
@@ -213,12 +216,6 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
-      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
-      <Name>MonoGame.Framework.MacOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
       <Link>Dependencies\libnvtt.dylib</Link>
     </Content>
@@ -231,5 +228,20 @@
     <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Link>Dependencies\Nvidia.TextureTools.dll.config</Link>
     </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+      <Link>Dependencies\libfreetype.6.dylib</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+      <Link>Dependencies\libpng15.15.dylib</Link>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
+      <Link>Dependencies\SharpFont.dll.config</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
+      <Name>MonoGame.Framework.MacOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
