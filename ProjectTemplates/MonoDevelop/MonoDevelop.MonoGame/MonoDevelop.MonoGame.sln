@@ -30,7 +30,7 @@ Global
 		{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}.ReleaseLinux|Any CPU.Build.0 = ReleaseLinux|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MonoDevelop.MonoGame\MonoDevelop.MonoGame.Linux.csproj
+		StartupItem = MonoDevelop.MonoGame\MonoDevelop.MonoGame.MacOS.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

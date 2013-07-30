@@ -8,6 +8,7 @@
     <ProjectGuid>{EEB381D4-9C4D-4FEC-93C7-A3C72A5DE4B4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>MonoDevelop.MonoGame.Linux</RootNamespace>
+    <AssemblyName>MonoDevelop.MonoGame</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -18,7 +19,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <AssemblyName>MonoDevelop.MonoGame</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -27,7 +27,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <AssemblyName>MonoDevelop.MonoGame</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseLinux|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -36,7 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <AssemblyName>MonoDevelop.MonoGame</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
