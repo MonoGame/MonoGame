@@ -56,7 +56,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-	public class GameWindow : MonoMacGameView
+	public class GameWindow : MacGameView
 	{
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
@@ -73,8 +73,9 @@ namespace Microsoft.Xna.Framework
 		}
 
 		#region GameWindow Methods
-		public GameWindow(Game game, RectangleF frame) : base (frame)
+		public GameWindow(Game game, RectangleF frame) : base(frame)
 		{
+
             if (game == null)
                 throw new ArgumentNullException("game");
             _game = game;
