@@ -64,7 +64,9 @@ namespace Microsoft.Xna.Framework
 				NSOpenGLPixelFormatAttribute.NoRecovery,
 				NSOpenGLPixelFormatAttribute.DoubleBuffer,
 				NSOpenGLPixelFormatAttribute.ColorSize, 24,
-				NSOpenGLPixelFormatAttribute.DepthSize, 24 };
+				NSOpenGLPixelFormatAttribute.DepthSize, 32,
+				NSOpenGLPixelFormatAttribute.StencilSize, 8,
+				NSOpenGLPixelFormatAttribute.};
 
 			pixelFormat = new NSOpenGLPixelFormat (attribs);
 
@@ -494,9 +496,8 @@ namespace Microsoft.Xna.Framework
 			// This fixes a potential error
 			if (t <= 0) t = Double.Epsilon;
 
-			updateEventArgs.GetType().InvokeMember("Time",
-			                                       BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.SetProperty,
-			                                       Type.DefaultBinder, updateEventArgs, new object[]{ t });
+			var field = typeof(FrameEventArgs).GetField("elapsed", BindingFlags.Instance | BindingFlags.NonPublic);
+			field.SetValue(updateEventArgs, t);
 
 			OnUpdateFrame (updateEventArgs);
 			prevUpdateTime = curUpdateTime;
@@ -510,9 +511,7 @@ namespace Microsoft.Xna.Framework
 			// This fixes a potential error
 			if (t <= 0) t = Double.Epsilon;
 			
-			updateEventArgs.GetType().InvokeMember("Time",
-			                                       BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.SetProperty,
-			                                       Type.DefaultBinder, updateEventArgs, new object[]{ t });
+			field.SetValue(updateEventArgs, t);
 
 			OnRenderFrame (renderEventArgs);
 			prevRenderTime = curRenderTime;

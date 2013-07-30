@@ -473,8 +473,13 @@ namespace Microsoft.Xna.Framework.Graphics
             // Set our DepthBufferFormat correctly.
             int stencilSize = 0;
             int depthSize = 0;
-            GL.GetInteger(All.DepthBits, ref depthSize);
-            GL.GetInteger(All.StencilBits, ref stencilSize);
+#if MONOMAC
+            GL.GetInteger(GetPName.DepthBits, out depthSize);
+			GL.GetInteger(GetPName.StencilBits, out stencilSize);
+#elif
+			GL.GetInteger(All.DepthBits, ref depthSize);
+			GL.GetInteger(All.StencilBits, ref stencilSize);
+#endif
             if (depthSize >= 24)
             {
                 if (stencilSize >= 8)
