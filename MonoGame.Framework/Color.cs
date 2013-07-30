@@ -28,12 +28,20 @@ SOFTWARE.
 using System;
 using System.Runtime.Serialization;
 
+#if iOS
+using ProtoBuf;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
-    [DataContract]
+#if IOS
+[Serializable, ProtoContract]
+#else
+[DataContract] 
+#endif
     public struct Color : IEquatable<Color>
     {
 	// ARGB
@@ -173,7 +181,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
-        [DataMember]
+#if IOS
+[ProtoMember(1)]
+#else
+[DataMember]
+#endif
         public byte B
         {
             get
@@ -189,7 +201,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
-        [DataMember]
+#if IOS
+[ProtoMember(2)]
+#else
+[DataMember]
+#endif
         public byte G
         {
             get
@@ -205,7 +221,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
-        [DataMember]
+#if IOS
+[ProtoMember(3)]
+#else
+[DataMember]
+#endif
         public byte R
         {
             get
@@ -221,7 +241,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
-        [DataMember]
+#if IOS
+[ProtoMember(4)]
+#else
+[DataMember]
+#endif
         public byte A
         {
             get
