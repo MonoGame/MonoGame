@@ -58,7 +58,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-	public class GameWindow : MonoMacGameView
+	public class GameWindow : MacGameView
 	{
 		// Amendment: Added events for integrating out key processing logic with monogame.
 		// These events are triggered when keyboard keys are released and pressed down respectively.
@@ -80,8 +80,9 @@ namespace Microsoft.Xna.Framework
 		}
 
 		#region GameWindow Methods
-		public GameWindow(Game game, RectangleF frame) : base (frame)
+		public GameWindow(Game game, RectangleF frame) : base(frame)
 		{
+
             if (game == null)
                 throw new ArgumentNullException("game");
             _game = game;
