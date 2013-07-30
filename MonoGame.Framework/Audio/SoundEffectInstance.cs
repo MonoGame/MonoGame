@@ -90,6 +90,9 @@ namespace Microsoft.Xna.Framework.Audio
             _voice = voice;
         }
 #else
+        /* Default constructor. Exists purely for the compiler. */
+        internal SoundEffectInstance(){}
+
         /* Creates a standalone SoundEffectInstance from given wavedata. */
         internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
         {
