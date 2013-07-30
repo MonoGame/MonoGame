@@ -44,6 +44,8 @@ using System;
 using SharpDX.XAudio2;
 using SharpDX.X3DAudio;
 using SharpDX.Multimedia;
+#else
+using System.IO;
 #endif
 #endregion Statements
 
