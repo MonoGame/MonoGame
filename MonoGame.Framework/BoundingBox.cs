@@ -403,20 +403,15 @@ namespace Microsoft.Xna.Framework
 
             double dmin = 0;
 
-            if (sphere.Center.X - Min.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Min.X) * (sphere.Center.X - Min.X);
-            else if (Max.X - sphere.Center.X <= sphere.Radius)
-                dmin += (sphere.Center.X - Max.X) * (sphere.Center.X - Max.X);
+            //real time collision detection page 131 function SqDistPointAABB
+            if (sphere.Center.X < Min.X) dmin += (Min.X - sphere.Center.X) * (Min.X - sphere.Center.X);
+            if (sphere.Center.X > Max.X) dmin += (sphere.Center.X - Max.X) * (sphere.Center.X - Max.X);
 
-            if (sphere.Center.Y - Min.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Min.Y) * (sphere.Center.Y - Min.Y);
-            else if (Max.Y - sphere.Center.Y <= sphere.Radius)
-                dmin += (sphere.Center.Y - Max.Y) * (sphere.Center.Y - Max.Y);
+            if (sphere.Center.Y < Min.Y) dmin += (Min.Y - sphere.Center.Y) * (Min.Y - sphere.Center.Y);
+            if (sphere.Center.Y > Max.Y) dmin += (sphere.Center.Y - Max.Y) * (sphere.Center.Y - Max.Y);
 
-            if (sphere.Center.Z - Min.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Min.Z) * (sphere.Center.Z - Min.Z);
-            else if (Max.Z - sphere.Center.Z <= sphere.Radius)
-                dmin += (sphere.Center.Z - Max.Z) * (sphere.Center.Z - Max.Z);
+            if (sphere.Center.Z < Min.Z) dmin += (Min.Z - sphere.Center.Z) * (Min.Z - sphere.Center.Z);
+            if (sphere.Center.Z > Max.Z) dmin += (sphere.Center.Z - Max.Z) * (sphere.Center.Z - Max.Z);
 
             if (dmin <= sphere.Radius * sphere.Radius)
                 return true;
