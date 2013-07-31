@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
-        internal TouchPanelState TouchPanelState = new TouchPanelState();
+        internal TouchPanelState TouchPanelState;
 
         public bool TouchEnabled
         {
@@ -90,6 +90,7 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
+            TouchPanelState = new TouchPanelState(this);
             Initialize();
         }		
 						

@@ -70,6 +70,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
+#if ANDROID
+
+        // TODO: Fix AndroidGameWindow and this
+        // gross hack can be removed.
+
+        internal readonly AndroidGameWindow Window;
+
+        internal TouchPanelState(AndroidGameWindow window)
+        {
+            Window = window;
+        }
+#else
+        internal readonly GameWindow Window;
+
+        internal TouchPanelState(GameWindow window)
+        {
+            Window = window;
+        }
+#endif
+
         /// <summary>
         /// The window handle of the touch panel. Purely for Xna compatibility.
         /// </summary>
@@ -243,24 +263,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private void UpdateTouchScale()
         {
             // Get the window size.
-            //
-            // TODO: This will be alot smoother once we get XAML working with Game.
-            var windowSize = Vector2.One;
-            if (Game.Instance != null)
-                windowSize = new Vector2(Game.Instance.Window.ClientBounds.Width,
-                                            Game.Instance.Window.ClientBounds.Height);
-#if WINDOWS_STOREAPP
-                else
-                {
-                    var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-                    windowSize = new Vector2(   (float)Window.Current.CoreWindow.Bounds.Width * dipFactor,
-                                                (float)Window.Current.CoreWindow.Bounds.Height * dipFactor);
-                }
-#endif
+            var windowSize = new Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             // Recalculate the touch scale.
-            _touchScale = new Vector2((float)DisplayWidth / windowSize.X,
-                                        (float)DisplayHeight / windowSize.Y);
+            _touchScale = new Vector2(  _displaySize.X / windowSize.X,
+                                        _displaySize.Y / windowSize.Y);
         }
 
         /// <summary>

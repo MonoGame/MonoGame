@@ -124,7 +124,12 @@ namespace Microsoft.Xna.Framework {
         }
 
         internal MouseState MouseState;
-        internal TouchPanelState TouchPanelState = new TouchPanelState();
+	    internal TouchPanelState TouchPanelState;
+
+        protected GameWindow()
+        {
+            TouchPanelState = new TouchPanelState(this);
+        }
 
 		#endregion Properties
 
