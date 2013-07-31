@@ -128,7 +128,10 @@ namespace Microsoft.Xna.Framework {
 
         protected GameWindow()
         {
+#if !ANDROID
+            // TODO: Fix the AndroidGameWindow!
             TouchPanelState = new TouchPanelState(this);
+#endif
         }
 
 		#endregion Properties
