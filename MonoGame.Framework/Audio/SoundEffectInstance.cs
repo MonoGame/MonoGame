@@ -49,7 +49,7 @@ using SharpDX.Multimedia;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
+	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 #if !DIRECTX
@@ -87,6 +87,9 @@ namespace Microsoft.Xna.Framework.Audio
             _effect = effect;
             _voice = voice;
         }
+
+        // Parameterless ctor used by DynamicSoundEffectInstance
+        internal SoundEffectInstance(){}
 #endif
 
         public void Dispose()
