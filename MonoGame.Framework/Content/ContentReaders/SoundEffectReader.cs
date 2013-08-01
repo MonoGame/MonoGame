@@ -134,30 +134,19 @@ namespace Microsoft.Xna.Framework.Content
                 header[0] = 1;
             }
             
-            byte[] soundData = null;
-            // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream
-            MemoryStream mStream = new MemoryStream(20 + header.Length + 8 + data.Length);
-            using (BinaryWriter writer = new BinaryWriter(mStream))
-            {
-                writer.Write("RIFF".ToCharArray());
-                writer.Write((int)(20 + header.Length + data.Length));
-                writer.Write("WAVE".ToCharArray());
-
-                //header can be written as-is
-                writer.Write("fmt ".ToCharArray());
-                writer.Write(header.Length);
-                writer.Write(header);
-
-                writer.Write("data".ToCharArray());
-                writer.Write((int)data.Length);
-                writer.Write(data);
-
-                // Copy the data to an array before disposing the stream
-                soundData = mStream.ToArray();
-            }
-            if (soundData == null)
-                throw new ContentLoadException("Failed to load SoundEffect");
-			return new SoundEffect(input.AssetName, soundData);
+            int sampleRate = (
+                (header[4]) +
+                (header[5] << 8) +
+                (header[6] << 16) +
+                (header[7] << 24)
+            );
+            
+            return new SoundEffect(
+                input.AssetName,
+                data,
+                sampleRate,
+                (header[2] == 2) ? AudioChannels.Stereo : AudioChannels.Mono
+            );
 #endif
 		}
 	}

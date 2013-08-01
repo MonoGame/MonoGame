@@ -86,6 +86,18 @@ namespace Microsoft.Xna.Framework.Audio
             Dispose();
         }
 
+        /* Creates a standalone SoundEffectInstance from given wavedata. */
+        internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
+        {
+            InitializeSound();
+            BindDataBuffer(
+                buffer,
+                (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16,
+                buffer.Length,
+                sampleRate
+            );
+        }
+
         /// <summary>
         /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
         /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
@@ -119,7 +131,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
         protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
-			EffectData = data;
             soundBuffer.BindDataBuffer(data, format, size, rate);
         }
 
@@ -401,24 +412,6 @@ namespace Microsoft.Xna.Framework.Audio
 					AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 				}
 
-			}
-		}
-
-        /// <summary>
-        /// The source audio buffer from the SoundEffect. This is a reference to the audio buffer in SoundEffect.
-        /// </summary>
-		private byte[] audioData;
-
-        /// <summary>
-        /// Get/set the sound effect data.
-        /// </summary>
-		internal byte[] EffectData {
-			get {
-				return audioData;
-			}
-
-			set {
-				audioData = value;
 			}
 		}
 
