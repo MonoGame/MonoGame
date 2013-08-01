@@ -56,6 +56,10 @@ namespace Microsoft.Xna.Framework
 {
     public class OpenTKGameWindow : GameWindow, IDisposable
     {
+        // Amendment: Added events for integrating our key processing logic with monogame.
+        public event EventHandler<KeysEventArgs> TSKeyUp;
+        public event EventHandler<KeysEventArgs> TSKeyDown;
+
         private bool _isResizable;
         private bool _isBorderless;
 #if WINDOWS
@@ -78,14 +82,14 @@ namespace Microsoft.Xna.Framework
 
         #region Internal Properties
 
-        internal Game Game 
+        internal Game Game
         {
             get { return game; }
             set
             {
                 if (game != value)
                 {
-                    game = value;                   
+                    game = value;
                 }
             }
         }
@@ -173,6 +177,13 @@ namespace Microsoft.Xna.Framework
         {
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (keys.Contains(xnaKey)) keys.Remove(xnaKey);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyUp;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(xnaKey));
+            }
         }
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -184,8 +195,15 @@ namespace Microsoft.Xna.Framework
             }
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (!keys.Contains(xnaKey)) keys.Add(xnaKey);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyDown;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(xnaKey));
+            }
         }
-        
+
         #endregion
 
         private void OnResize(object sender, EventArgs e)
@@ -202,7 +220,7 @@ namespace Microsoft.Xna.Framework
             //If we've already got a pending change, do nothing
             if (updateClientBounds)
                 return;
-            
+
             Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
             Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
 
@@ -233,7 +251,7 @@ namespace Microsoft.Xna.Framework
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
-                
+
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
                 // this code might not cover all corner cases
@@ -243,7 +261,7 @@ namespace Microsoft.Xna.Framework
                     windowState = window.WindowState; // maximize->normal and normal->maximize are usually set from the outside
                 else
                     window.WindowState = windowState; // usually fullscreen-stuff is set from the code
-                
+
                 // fixes issue on linux (and windows?) that AllowUserResizing is not set any more when exiting fullscreen mode
                 WindowBorder desired;
                 if (_isBorderless)
@@ -316,7 +334,7 @@ namespace Microsoft.Xna.Framework
         {
             OnTextInput(sender, new TextInputEventArgs(e.KeyChar));
         }
-        
+
         #endregion
 
         private void Initialize()
@@ -339,14 +357,14 @@ namespace Microsoft.Xna.Framework
 #endif
 
             window.KeyPress += OnKeyPress;
-            
+
             // Set the window icon.
             window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
-            windowState = window.WindowState;            
+            windowState = window.WindowState;
 
 #if WINDOWS
             {
@@ -364,7 +382,7 @@ namespace Microsoft.Xna.Framework
             // Make the foreground context the current context
             if (GraphicsContext.CurrentContext == null || !GraphicsContext.CurrentContext.IsCurrent)
                 window.MakeCurrent();
-            
+
             // mouse
             // TODO review this when opentk 1.1 is released
 #if WINDOWS || LINUX
@@ -379,7 +397,7 @@ namespace Microsoft.Xna.Framework
 
         protected override void SetTitle(string title)
         {
-            window.Title = title;            
+            window.Title = title;
         }
 
         internal void Run(double updateRate)
@@ -465,6 +483,17 @@ namespace Microsoft.Xna.Framework
 #endif
 
         #endregion
+    }
+
+    // Amendment to OpenTK code to allow us to use our existing key processing logic (with a few slight alterations).
+    public class KeysEventArgs : EventArgs
+    {
+        public Keys Keys { get; private set; }
+
+        public KeysEventArgs(Keys keys)
+        {
+            this.Keys = keys;
+        }
     }
 }
 

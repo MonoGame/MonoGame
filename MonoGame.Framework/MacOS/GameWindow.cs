@@ -42,6 +42,8 @@ purpose and non-infringement.
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 using MonoMac.CoreAnimation;
 using MonoMac.Foundation;
@@ -58,6 +60,11 @@ namespace Microsoft.Xna.Framework
 {
 	public class GameWindow : MonoMacGameView
 	{
+		// Amendment: Added events for integrating out key processing logic with monogame.
+		// These events are triggered when keyboard keys are released and pressed down respectively.
+		public event EventHandler<KeysEventArgs> TSKeyUp;
+		public event EventHandler<KeysEventArgs> TSKeyDown;
+	
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
 		private Game _game;
@@ -494,13 +501,47 @@ namespace Microsoft.Xna.Framework
 
 		public override void KeyDown (NSEvent theEvent)
 		{
+			if (!string.IsNullOrEmpty (theEvent.Characters) && theEvent.Characters.All (c => char.GetUnicodeCategory (c) != UnicodeCategory.PrivateUse))
+			{
+				foreach(char c in theEvent.Characters)
+				{
+					OnTextInput(new TextInputEventArgs(c));
+				}
+			}
+		
 			Keys kk = KeyUtil.GetKeys (theEvent); 
 
 			if (!_keys.Contains (kk))
 				_keys.Add (kk);
 
 			UpdateKeyboardState ();
+			
+			EventHandler<KeysEventArgs> handler = TSKeyDown;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
+		
+		protected void OnTextInput(TextInputEventArgs e)
+		{
+			if (e == null)
+			{
+				throw new ArgumentNullException();
+			}
+			
+			if (TextInput != null)
+			{
+				TextInput.Invoke(this, e);
+			}
+		}
+		
+		/// <summary>
+		/// Use this event to retrieve text for objects like textbox's.
+		/// This event is not raised by noncharacter keys.
+		/// This event also supports key repeat.
+		/// </summary>
+		public event EventHandler<TextInputEventArgs> TextInput;
 
 		public override void KeyUp (NSEvent theEvent)
 		{
@@ -509,6 +550,12 @@ namespace Microsoft.Xna.Framework
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
+			
+			EventHandler<KeysEventArgs> handler = TSKeyUp;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
 
 		List<Keys> _flags = new List<Keys> ();
@@ -669,6 +716,17 @@ namespace Microsoft.Xna.Framework
 
 		internal void SetSupportedOrientations(DisplayOrientation orientations)
 		{
+		}
+	}
+		
+	// Amendment to the GameWindow code to allow us to use our existing key processing logic.
+	// I put it in this file for convenience, although it is breaking convention by doing so.
+	public class KeysEventArgs : EventArgs
+	{
+		public Keys Keys { get; private set; }
+		public KeysEventArgs(Keys keys)
+		{
+			this.Keys = keys;
 		}
 	}
 }
