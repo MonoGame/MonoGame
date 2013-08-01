@@ -39,7 +39,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+      <HintPath>..\ThirdParty\Libs\NAudio.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
