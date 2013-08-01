@@ -338,35 +338,7 @@ namespace Microsoft.Xna.Framework.Audio
 					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
 					sounds[current_entry] = new SoundEffect(waveFormat, audiodata, 0, audiodata.Length, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length).CreateInstance();
 #else
-					using (MemoryStream mStream = new MemoryStream(44 + audiodata.Length)) {
-						using (BinaryWriter writer = new BinaryWriter(mStream)) {
-
-						writer.Write("RIFF".ToCharArray());
-						writer.Write((int)(36 + audiodata.Length));
-						writer.Write("WAVE".ToCharArray());
-
-						writer.Write("fmt ".ToCharArray());
-						writer.Write((int)16); //header size
-						writer.Write((short)1); //format (PCM)
-						writer.Write((short)chans);
-						writer.Write((int)rate); //sample rate
-						writer.Write((int)rate * align); //byte rate
-						writer.Write((short)align);
-
-						if (bits == 1) {
-							writer.Write((short)16);
-						} else {
-							writer.Write((short)8); //not sure if this is right
-						}
-
-						writer.Write("data".ToCharArray());
-						writer.Write((int)audiodata.Length);
-						writer.Write(audiodata);
-
-						}
-						
-						sounds[current_entry] = new SoundEffect(mStream.ToArray(), (int)rate,  chans == 2 ? AudioChannels.Stereo: AudioChannels.Mono).CreateInstance();			
-					}
+					sounds[current_entry] = new SoundEffectInstance(audiodata, rate, chans);
 #endif                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
@@ -435,11 +407,11 @@ namespace Microsoft.Xna.Framework.Audio
                 } else if (codec == MiniFormatTag_ADPCM) {
                     using (MemoryStream dataStream = new MemoryStream(audiodata)) {
                         using (BinaryReader source = new BinaryReader(dataStream)) {
-                            sounds[current_entry] = new SoundEffect(
+                            sounds[current_entry] = new SoundEffectInstance(
                                 MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
                                 rate,
-                                (chans == 1) ? AudioChannels.Mono : AudioChannels.Stereo
-                            ).CreateInstance();
+                                chans
+                            );
                         }
                     }
 #endif
