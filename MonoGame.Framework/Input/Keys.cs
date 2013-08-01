@@ -661,7 +661,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// PAUSE key
         /// </summary>
-		Pause = 0x13,
+		Pause = 0xA2,
         /// <summary>
         /// IME Convert key
         /// </summary>
