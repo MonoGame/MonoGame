@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (header != MGFXHeader)
 				throw new Exception ("The MGFX file is corrupt!");
             if (version != MGFXVersion)
-                throw new Exception("Wrong MGFX file version!");
+                throw new Exception("Wrong MGFX file version! " + version.ToString() + " vs. " + MGFXVersion.ToString());
 
 			var profile = reader.ReadByte ();
 #if DIRECTX
