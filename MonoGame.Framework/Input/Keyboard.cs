@@ -65,7 +65,8 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <param name="playerIndex">Player index of the keyboard.</param>
         /// <returns>Current keyboard state.</returns>
-		public static KeyboardState GetState(PlayerIndex playerIndex)
+        [Obsolete("Use GetState() instead. In future versions this method can be removed.")]
+        public static KeyboardState GetState(PlayerIndex playerIndex)
 		{
             return new KeyboardState(_keys);
 		}
