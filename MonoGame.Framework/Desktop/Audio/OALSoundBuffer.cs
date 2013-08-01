@@ -12,7 +12,6 @@ namespace Microsoft.Xna.Framework.Audio
 	internal class OALSoundBuffer : IDisposable
 	{
 		int openALDataBuffer;
-		internal byte[] pcmDataBuffer;
 		ALFormat openALFormat;
 		int dataSize;
 		int sampleRate;
@@ -43,11 +42,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
         {
-            pcmDataBuffer = dataBuffer;
             openALFormat = format;
             dataSize = size;
             this.sampleRate = sampleRate;
-            AL.BufferData(openALDataBuffer, openALFormat, pcmDataBuffer, dataSize, this.sampleRate);
+            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
 
             int bits, channels;
 
@@ -87,9 +85,6 @@ namespace Microsoft.Xna.Framework.Audio
 			if (AL.IsBuffer (openALDataBuffer)) {
 				AL.DeleteBuffers (1, ref openALDataBuffer);
 			}
-
-			pcmDataBuffer = null;
-
 		}
 
 		public int SourceId
