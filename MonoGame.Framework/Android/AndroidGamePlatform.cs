@@ -96,12 +96,23 @@ namespace Microsoft.Xna.Framework
             AndroidGameActivity.Paused += Activity_Paused;
             AndroidGameActivity.Resumed += Activity_Resumed;
 
+            // Setup our OpenALSoundController to handle our SoundBuffer pools
+            try
+            {
+                soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
+
             Window = new AndroidGameWindow(Game.Activity, game);
         }
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
 		private bool _exiting = false;
+        private OpenALSoundController soundControllerInstance;
 
         public override void Exit()
         {
@@ -139,6 +150,10 @@ namespace Microsoft.Xna.Framework
                 Game.DoInitialize();
                 _initialized = true;				
             }
+
+            // Update our OpenAL sound buffer pools
+            if (soundControllerInstance != null)
+                soundControllerInstance.Update();
 
             return true;
         }
@@ -202,7 +217,6 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
                 Window.Resume();
-                Sound.ResumeAll();
                 MediaPlayer.Resume();
 				if(!Window.IsFocused)
 		           Window.RequestFocus();
@@ -217,7 +231,6 @@ namespace Microsoft.Xna.Framework
                 IsActive = false;
                 Window.Pause();
 				Window.ClearFocus();
-                Sound.PauseAll();
                 MediaPlayer.Pause();
             }
         }

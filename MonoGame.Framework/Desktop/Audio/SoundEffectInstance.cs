@@ -64,6 +64,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private SoundState soundState = SoundState.Stopped;
 		private OALSoundBuffer soundBuffer;
 		private OpenALSoundController controller;
+        private SoundEffect soundEffect;
 
         private float _volume = 1.0f;
         private bool _looped = false;
@@ -83,7 +84,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         ~SoundEffectInstance()
         {
-            Dispose();
+            Dispose(false);
         }
 
         /// <summary>
@@ -91,8 +92,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
         /// </summary>
         /// <param name="parent"></param>
-		public SoundEffectInstance (SoundEffect parent)
+		public SoundEffectInstance(SoundEffect parent)
 		{
+            soundEffect = parent;
 			InitializeSound ();
             BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
 		}
@@ -101,7 +103,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Gets the OpenAL sound controller, constructs the sound buffer, and sets up the event delegates for
         /// the reserved and recycled events.
         /// </summary>
-		private void InitializeSound ()
+		private void InitializeSound()
 		{
 			controller = OpenALSoundController.GetInstance;
 			soundBuffer = new OALSoundBuffer ();			
@@ -117,6 +119,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="format">The sound buffer data format, e.g. Mono, Mono16 bit, Stereo, etc.</param>
         /// <param name="size">The size of the data buffer</param>
         /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
+        [CLSCompliant(false)]
         protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
 			EffectData = data;
@@ -129,12 +132,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-		private void HandleSoundBufferRecycled (object sender, EventArgs e)
+		private void HandleSoundBufferRecycled(object sender, EventArgs e)
 		{
 			sourceId = 0;
 			hasSourceId = false;
 			soundState = SoundState.Stopped;
-			//Console.WriteLine ("recycled: " + soundEffect.Name);
+			Console.WriteLine ("recycled: " + soundEffect.Name);
 		}
 
         /// <summary>
@@ -153,19 +156,36 @@ namespace Microsoft.Xna.Framework.Audio
         /// Stops the current running sound effect, if relevant, removes its event handlers, and disposes
         /// of the sound buffer.
         /// </summary>
-		public void Dispose ()
+		public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+		}
+
+        /// <summary>
+        /// Disposes of resources owned by this object.
+        /// </summary>
+        /// <param name="disposing">true if came from a call to Dispose()</param>
+        protected virtual void Dispose(bool disposing)
         {
             if (!isDisposed)
             {
-                this.Stop(true);
-                soundBuffer.Reserved -= HandleSoundBufferReserved;
-                soundBuffer.Recycled -= HandleSoundBufferRecycled;
-                soundBuffer.Dispose();
-                soundBuffer = null;
+                if (disposing)
+                {
+                    this.Stop(true);
+                    if (soundBuffer != null)
+                    {
+                        soundBuffer.Reserved -= HandleSoundBufferReserved;
+                        soundBuffer.Recycled -= HandleSoundBufferRecycled;
+                        soundBuffer.Dispose();
+                        soundBuffer = null;
+                    }
+                    controller = null;
+                }
                 isDisposed = true;
             }
-		}
-		
+        }
+
         /// <summary>
         /// Wrapper for Apply3D(AudioListener[], AudioEmitter)
         /// </summary>
@@ -288,7 +308,7 @@ namespace Microsoft.Xna.Framework.Audio
 			ApplyState ();
 
 			controller.PlaySound (soundBuffer);            
-			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
+			Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
 		}
 
@@ -322,7 +342,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Stop ()
 		{
 			if (hasSourceId) {
-				//Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
+				Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
 				controller.StopSound (soundBuffer);
 			}
 			soundState = SoundState.Stopped;

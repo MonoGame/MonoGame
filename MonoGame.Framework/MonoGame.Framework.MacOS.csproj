@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\MacOS\Debug</OutputPath>
-    <DefineConstants>DEBUG;MONOMAC;OPENGL</DefineConstants>
+    <DefineConstants>DEBUG;MONOMAC;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>MONOMAC;OPENGL</DefineConstants>
+    <DefineConstants>MONOMAC;OPENGL;OPENAL</DefineConstants>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>
@@ -49,7 +49,7 @@
     <OutputPath>bin\MacOS\Distribution</OutputPath>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DefineConstants>MONOMAC;OPENGL</DefineConstants>
+    <DefineConstants>MONOMAC;OPENGL;OPENAL</DefineConstants>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>
