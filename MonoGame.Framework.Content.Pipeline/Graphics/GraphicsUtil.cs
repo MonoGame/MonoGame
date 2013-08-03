@@ -6,13 +6,10 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-#if WINDOWS
 using Nvidia.TextureTools;
-#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    #if WINDOWS
     
     class DxtDataHandler
     {
@@ -76,8 +73,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
     }
     
-    #endif
-
     public static class GraphicsUtil
     {
         public static byte[] GetData(this Bitmap bmp)
@@ -160,12 +155,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, TargetPlatform platform, bool generateMipmaps, bool premultipliedAlpha)
+        public static void CompressTexture(TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             // Add more here as they become available.
-            #if WINDOWS
-            switch (platform)
+            switch (context.TargetPlatform)
             {
                 case TargetPlatform.Windows:
                 case TargetPlatform.WindowsPhone:
@@ -177,20 +171,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
-                    CompressDxt(content, generateMipmaps);
-                    break;
+					context.Logger.LogMessage ("Detected {0} using DXT Compression", context.TargetPlatform);
+				    CompressDxt(content, generateMipmaps);
+				    break;
                 case TargetPlatform.iOS:
+					context.Logger.LogMessage ("Detected {0} using PVRTC Compression", context.TargetPlatform);
                     CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
 
                 default:
-                    throw new NotImplementedException(string.Format("Texture compression is not implemented for {0}", platform));
+                    throw new NotImplementedException(string.Format("Texture Compression it not implemented for {0}", context.TargetPlatform));
             }
-            #endif
+
         }
         
-        #if WINDOWS
-
         private static void CompressPvrtc(TextureContent content, bool generateMipmaps, bool premultipliedAlpha)
         {
             // TODO: Once uncompressed mipmap generation is supported, first use NVTT to generate mipmaps,
@@ -290,8 +284,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             dataHandle.Free();
         }
         
-        #endif
-
         internal static bool ContainsFractionalAlpha(byte[] data)
         {
             for (var x = 3; x < data.Length; x += 4)
