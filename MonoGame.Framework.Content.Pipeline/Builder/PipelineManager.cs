@@ -42,7 +42,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private ContentCompiler _compiler;
         private MethodInfo _compileMethod;
 
-        public ContentBuildLogger Logger { get; private set; }
+        public ContentBuildLogger Logger { get; set; }
 
         public List<string> Assemblies { get; private set; }
 
