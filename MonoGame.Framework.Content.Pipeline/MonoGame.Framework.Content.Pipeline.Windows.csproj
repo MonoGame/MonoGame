@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Windows\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,22 +25,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Windows\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet, Version=3.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
-    </Reference>
     <Reference Include="ManagedPVRTC">
       <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
-    </Reference>
-    <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
@@ -58,6 +50,15 @@
     <Reference Include="System.Xml" />
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Nvidia.TextureTools">
+      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -181,7 +182,6 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
-    <Compile Include="Graphics\FontHelper.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
     <Compile Include="Graphics\GraphicsUtil.cs" />
@@ -305,28 +305,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
-      <Link>Dependencies\x64\nvtt.dll</Link>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
-      <Link>Dependencies\x86\nvtt.dll</Link>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\pvrtc.dll">
-      <Link>Dependencies\x64\pvrtc.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
-      <Link>Dependencies\x86\pvrtc.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
@@ -345,6 +333,10 @@
       <Link>Dependencies\x86\libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="..\ThirdParty\Libs\SharpFont\freetype6.dll">
+      <Link>freetype6.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

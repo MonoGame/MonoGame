@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 var contentTypeWriterType = typeof(ContentTypeWriter<>);
                 foreach (var type in exportedTypes)
                 {
-                    if (type.IsAbstract)
+					if (type.IsAbstract)
                         continue;
                     if (Attribute.IsDefined(type, typeof(ContentTypeWriterAttribute)))
                     {
@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Type typeWriterType;
             if (!typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
             {
-                var inputTypeDef = type.GetGenericTypeDefinition();
+				var inputTypeDef = type.GetGenericTypeDefinition ();
 
                 Type chosen = null;
                 foreach (var kvp in typeWriterMap)
@@ -108,6 +108,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 {
                     throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
                 }
+				
             }
             else
             {
