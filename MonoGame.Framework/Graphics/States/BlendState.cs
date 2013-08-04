@@ -262,10 +262,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
-            var d3dContext = device._d3dContext;
-            d3dContext.OutputMerger.BlendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
-            d3dContext.OutputMerger.BlendSampleMask = -1;
-            d3dContext.OutputMerger.BlendState = _state;
+            var blendFactor = new SharpDX.Color4(BlendFactor.R / 255.0f, BlendFactor.G / 255.0f, BlendFactor.B / 255.0f, BlendFactor.A / 255.0f);
+            device._d3dContext.OutputMerger.SetBlendState(_state, blendFactor);
         }
 
         internal static void ResetStates()

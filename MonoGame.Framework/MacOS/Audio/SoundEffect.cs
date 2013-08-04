@@ -129,6 +129,12 @@ namespace Microsoft.Xna.Framework.Audio
             _data = data;
             LoadAudioStream(_data);
         }
+        
+        internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
+            : this(buffer, sampleRate, channels)
+        {
+            _name = name;
+        }
 
 		public SoundEffect (byte[] buffer, int sampleRate, AudioChannels channels)
 		{

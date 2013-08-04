@@ -185,8 +185,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
-      <Link>PVRTexLibWrapper.dll</Link>
+    <None Include="..\..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

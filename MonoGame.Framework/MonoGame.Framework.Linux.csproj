@@ -135,7 +135,6 @@
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Linux\Audio\Sound.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
@@ -293,7 +292,7 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Linux\Input\KeyboardUtil.cs" />
-    <Compile Include="Linux\Audio\AudioLoader.cs" />
+    <Compile Include="Desktop\Audio\AudioLoader.cs" />
     <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -336,7 +335,7 @@
     <Compile Include="Content\ContentReaders\VideoReader.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
-    <Compile Include="Desktop\Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
