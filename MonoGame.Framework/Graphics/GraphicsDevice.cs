@@ -474,12 +474,14 @@ namespace Microsoft.Xna.Framework.Graphics
             int stencilSize = 0;
             int depthSize = 0;
 #if MONOMAC
-            GL.GetInteger(GetPName.DepthBits, out depthSize);
-			GL.GetInteger(GetPName.StencilBits, out stencilSize);
-#elif
-			GL.GetInteger(All.DepthBits, ref depthSize);
-			GL.GetInteger(All.StencilBits, ref stencilSize);
+           GL.GetInteger(GetPName.DepthBits, out depthSize);
+  	       GL.GetInteger(GetPName.StencilBits, out stencilSize);
+#elif OPENGL
+           GL.GetInteger(All.DepthBits, ref depthSize);
+           GL.GetInteger(All.StencilBits, ref stencilSize);
 #endif
+
+#if MONOMAC || OPENGL
             if (depthSize >= 24)
             {
                 if (stencilSize >= 8)
@@ -499,6 +501,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 PresentationParameters.DepthStencilFormat = DepthFormat.None;
             }
+#endif
+
 
 #if DIRECTX
 

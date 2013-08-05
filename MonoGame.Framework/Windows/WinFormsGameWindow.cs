@@ -58,6 +58,10 @@ namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
+        // Amendment: Added events for integrating our key processing logic with monogame.
+        public event EventHandler<KeysEventArgs> TSKeyUp;
+        public event EventHandler<KeysEventArgs> TSKeyDown;
+
         internal Form _form;
 
         private WinFormsGamePlatform _platform;
@@ -224,6 +228,13 @@ namespace MonoGame.Framework
 
             if (KeyState != null && !KeyState.Contains(key))
                 KeyState.Add(key);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyDown;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
         }
 
         private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
@@ -232,6 +243,13 @@ namespace MonoGame.Framework
 
             if (KeyState != null)
                 KeyState.Remove(key);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyUp;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
         }
 
         private void OnMouseEnter(object sender, EventArgs e)
@@ -368,6 +386,17 @@ namespace MonoGame.Framework
         }
 
         #endregion
+    }
+
+    // Amendment to OpenTK code to allow us to use our existing key processing logic (with a few slight alterations).
+    public class KeysEventArgs : EventArgs
+    {
+        public Microsoft.Xna.Framework.Input.Keys Keys { get; private set; }
+
+        public KeysEventArgs(Microsoft.Xna.Framework.Input.Keys keys)
+        {
+            this.Keys = keys;
+        }
     }
 }
 
