@@ -124,10 +124,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         static SoundEffect()
         {
-#if ANDROID
-            AndroidGameActivity.Paused += Activity_Paused;
-            AndroidGameActivity.Resumed += Activity_Resumed;
-#endif
 #if DIRECTX
             InitializeSoundEffect();
 #endif
@@ -790,40 +786,6 @@ namespace Microsoft.Xna.Framework.Audio
             _speakers = Speakers.Stereo;
         }
 #endif
-        #endregion
-
-        #region App event handlers
-
-#if ANDROID
-        // EnterForeground
-        static void Activity_Resumed(object sender, EventArgs e)
-        {
-            foreach (var soundEffect in _soundEffects)
-                soundEffect.ResumeInstances();
-        }
-
-        // EnterBackground
-        static void Activity_Paused(object sender, EventArgs e)
-        {
-            foreach (var soundEffect in _soundEffects)
-                soundEffect.PauseInstances();
-        }
-
-        /// <summary>
-        /// Resume all instances that were paused by PauseInstances.
-        /// </summary>
-        void ResumeInstances()
-        {
-        }
-
-        /// <summary>
-        /// Pause all currently playing instances.
-        /// </summary>
-        void PauseInstances()
-        {
-        }
-#endif
-
         #endregion
     }
 }

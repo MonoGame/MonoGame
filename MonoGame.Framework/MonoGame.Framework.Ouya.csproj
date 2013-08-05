@@ -25,7 +25,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\OUYA\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ANDROID;GLES;OPENGL;OPENAL;OUYA</DefineConstants>
+    <DefineConstants>DEBUG;ANDROID;GLES;OPENGL;OPENAL;PAUSE_SOUND_ON_APP_SUSPEND;OUYA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -36,7 +36,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\OUYA\Release\</OutputPath>
-    <DefineConstants>TRACE;ANDROID;GLES;OPENGL;OPENAL;OUYA</DefineConstants>
+    <DefineConstants>ANDROID;GLES;OPENGL;OPENAL;PAUSE_SOUND_ON_APP_SUSPEND;OUYA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>

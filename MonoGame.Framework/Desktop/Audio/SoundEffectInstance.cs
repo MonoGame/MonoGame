@@ -48,6 +48,7 @@ using OpenTK.Audio.OpenAL;
 #endif
 
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 #endregion Statements
 
@@ -73,6 +74,22 @@ namespace Microsoft.Xna.Framework.Audio
 
 		bool hasSourceId = false;
 		int sourceId;
+#if PAUSE_SOUND_ON_APP_SUSPEND
+        bool _wasPlayingWhenSuspended;
+        WeakReference<SoundEffectInstance> _weakRef;
+        static List<WeakReference<SoundEffectInstance>> _instances;
+
+        static SoundEffectInstance()
+        {
+            Android.Util.Log.Debug("OpenAL", AL.Get(ALGetString.Extensions));
+            _instances = new List<WeakReference<SoundEffectInstance>>();
+
+#if ANDROID
+            AndroidGameActivity.Paused += Activity_Paused;
+            AndroidGameActivity.Resumed += Activity_Resumed;
+#endif
+        }
+#endif
 
         /// <summary>
         /// Creates an instance and initializes it.
@@ -121,6 +138,9 @@ namespace Microsoft.Xna.Framework.Audio
 			soundBuffer = new OALSoundBuffer ();			
 			soundBuffer.Reserved += HandleSoundBufferReserved;
 			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
+#if PAUSE_SOUND_ON_APP_SUSPEND
+            _weakRef = new WeakReference<SoundEffectInstance>(this);
+#endif
 		}
 
         /// <summary>
@@ -198,14 +218,30 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Wrapper for Apply3D(AudioListener[], AudioEmitter)
+        /// 
         /// </summary>
         /// <param name="listener"></param>
         /// <param name="emitter"></param>
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
-			Apply3D ( new AudioListener[] { listener }, emitter);
-		}
+            // get AL's listener position
+            float x, y, z;
+            AL.GetListener(ALListener3f.Position, out x, out y, out z);
+
+            // get the emitter offset from origin
+            Vector3 posOffset = emitter.Position - listener.Position;
+            // set up orientation matrix
+            Matrix orientation = Matrix.CreateWorld(Vector3.Zero, listener.Forward, listener.Up);
+            // set up our final position and velocity according to orientation of listener
+            Vector3 finalPos = new Vector3(x + posOffset.X, y + posOffset.Y, z + posOffset.Z);
+            finalPos = Vector3.Transform(finalPos, orientation);
+            Vector3 finalVel = emitter.Velocity;
+            finalVel = Vector3.Transform(finalVel, orientation);
+
+            // set the position based on relative positon
+            AL.Source(sourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
+            AL.Source(sourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
+        }
 		
         /// <summary>
         /// Applies a 3D transform on the emitter and the listeners to account for head-up
@@ -263,14 +299,14 @@ namespace Microsoft.Xna.Framework.Audio
         {
             /* 
             XNA sets pitch bounds to [-1.0f, 1.0f], each end being one octave.
-             •OpenAL's AL_PITCH boundaries are (0.0f, INF). *
-             •Consider the function f(x) = 2 ^ x
-             •The domain is (-INF, INF) and the range is (0, INF). *
-             •0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
-             •Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
-             •XNA's pitch values are on the domain, OpenAL's are on the range.
-             •Remember: the XNA limit is arbitrarily between two octaves on the domain. *
-             •To convert, we just plug XNA pitch into f(x). 
+             -OpenAL's AL_PITCH boundaries are (0.0f, INF). *
+             -Consider the function f(x) = 2 ^ x
+             -The domain is (-INF, INF) and the range is (0, INF). *
+             -0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
+             -Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
+             -XNA's pitch values are on the domain, OpenAL's are on the range.
+             -Remember: the XNA limit is arbitrarily between two octaves on the domain. *
+             -To convert, we just plug XNA pitch into f(x). 
                     */
             if (xnaPitch < -1.0f || xnaPitch > 1.0f)
             {
@@ -321,6 +357,10 @@ namespace Microsoft.Xna.Framework.Audio
 			controller.PlaySound (soundBuffer);            
 			Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 			soundState = SoundState.Playing;
+
+#if PAUSE_SOUND_ON_APP_SUSPEND
+            _instances.Add(_weakRef);
+#endif
 		}
 
         /// <summary>
@@ -357,6 +397,12 @@ namespace Microsoft.Xna.Framework.Audio
 				controller.StopSound (soundBuffer);
 			}
 			soundState = SoundState.Stopped;
+
+#if PAUSE_SOUND_ON_APP_SUSPEND
+            var index = _instances.IndexOf(_weakRef);
+            if (index >= 0)
+                _instances.RemoveAt(index);
+#endif
 		}
 
         /// <summary>
@@ -462,8 +508,58 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 
 			}
-		}	
-		
-		
+		}
+
+#if PAUSE_SOUND_ON_APP_SUSPEND
+
+#if ANDROID
+        // EnterForeground
+        static void Activity_Resumed(object sender, EventArgs e)
+        {
+            foreach (var instanceRef in _instances)
+            {
+                SoundEffectInstance instance;
+                if (instanceRef.TryGetTarget(out instance))
+                    instance.ResumeInstance();
+            }
+        }
+
+        // EnterBackground
+        static void Activity_Paused(object sender, EventArgs e)
+        {
+            foreach (var instanceRef in _instances)
+            {
+                SoundEffectInstance instance;
+                if (instanceRef.TryGetTarget(out instance))
+                    instance.PauseInstance();
+            }
+        }
+#endif
+        
+        /// <summary>
+        /// When the app is suspended, all currently playing sounds must be suspended.
+        /// </summary>
+        internal void PauseInstance()
+        {
+            if (State == SoundState.Playing)
+            {
+                Pause();
+                _wasPlayingWhenSuspended = true;
+            }
+        }
+
+        /// <summary>
+        /// If this instance was playing when the app was suspended, resume playing
+        /// the sound when app is brought to the foreground again.
+        /// </summary>
+        internal void ResumeInstance()
+        {
+            if (_wasPlayingWhenSuspended)
+            {
+                _wasPlayingWhenSuspended = false;
+                Resume();
+            }
+        }
+#endif
 	}
 }
