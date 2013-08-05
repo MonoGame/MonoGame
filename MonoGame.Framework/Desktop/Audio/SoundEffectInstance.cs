@@ -76,13 +76,13 @@ namespace Microsoft.Xna.Framework.Audio
 		int sourceId;
 #if PAUSE_SOUND_ON_APP_SUSPEND
         bool _wasPlayingWhenSuspended;
-        WeakReference<SoundEffectInstance> _weakRef;
-        static List<WeakReference<SoundEffectInstance>> _instances;
+        WeakReference _weakRef;
+        static List<WeakReference> _instances;
 
         static SoundEffectInstance()
         {
             Android.Util.Log.Debug("OpenAL", AL.Get(ALGetString.Extensions));
-            _instances = new List<WeakReference<SoundEffectInstance>>();
+            _instances = new List<WeakReference>();
 
 #if ANDROID
             AndroidGameActivity.Paused += Activity_Paused;
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Audio
 			soundBuffer.Reserved += HandleSoundBufferReserved;
 			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
 #if PAUSE_SOUND_ON_APP_SUSPEND
-            _weakRef = new WeakReference<SoundEffectInstance>(this);
+            _weakRef = new WeakReference(this);
 #endif
 		}
 
@@ -359,7 +359,10 @@ namespace Microsoft.Xna.Framework.Audio
 			soundState = SoundState.Playing;
 
 #if PAUSE_SOUND_ON_APP_SUSPEND
-            _instances.Add(_weakRef);
+            lock (_instances)
+            {
+                _instances.Add(_weakRef);
+            }
 #endif
 		}
 
@@ -399,9 +402,12 @@ namespace Microsoft.Xna.Framework.Audio
 			soundState = SoundState.Stopped;
 
 #if PAUSE_SOUND_ON_APP_SUSPEND
-            var index = _instances.IndexOf(_weakRef);
-            if (index >= 0)
-                _instances.RemoveAt(index);
+            lock (_instances)
+            {
+                var index = _instances.IndexOf(_weakRef);
+                if (index >= 0)
+                    _instances.RemoveAt(index);
+            }
 #endif
 		}
 
@@ -516,22 +522,26 @@ namespace Microsoft.Xna.Framework.Audio
         // EnterForeground
         static void Activity_Resumed(object sender, EventArgs e)
         {
-            foreach (var instanceRef in _instances)
+            lock (_instances)
             {
-                SoundEffectInstance instance;
-                if (instanceRef.TryGetTarget(out instance))
-                    instance.ResumeInstance();
+                foreach (var instanceRef in _instances)
+                {
+                    if (instanceRef.IsAlive)
+                        ((SoundEffectInstance)instanceRef.Target).ResumeInstance();
+                }
             }
         }
 
         // EnterBackground
         static void Activity_Paused(object sender, EventArgs e)
         {
-            foreach (var instanceRef in _instances)
+            lock (_instances)
             {
-                SoundEffectInstance instance;
-                if (instanceRef.TryGetTarget(out instance))
-                    instance.PauseInstance();
+                foreach (var instanceRef in _instances)
+                {
+                    if (instanceRef.IsAlive)
+                        ((SoundEffectInstance)instanceRef.Target).PauseInstance();
+                }
             }
         }
 #endif
