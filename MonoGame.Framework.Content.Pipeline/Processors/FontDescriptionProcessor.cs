@@ -153,7 +153,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         outputBitmap.SetPixel(i, j, px);
                     }
                 }
-				outputBitmap.Save("test.png");
 				output.Texture._bitmap = outputBitmap;
 
 				var bitmapContent = new PixelBitmapContent<Color>(texBounds.X, texBounds.Y);
