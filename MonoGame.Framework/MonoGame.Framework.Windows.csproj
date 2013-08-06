@@ -30,6 +30,7 @@
     <BaseAddress>4194304</BaseAddress>
     <DefineConstants>DEBUG;TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Windows\Debug\MonoGame.Framework.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -42,6 +43,7 @@
     <BaseAddress>4194304</BaseAddress>
     <DefineConstants>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Windows\Release\MonoGame.Framework.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
