@@ -30,7 +30,7 @@ namespace MonoDevelop.MonoGameContent
 #endif				
 			}
 		}
-		
+
 		protected override BuildResult Compile (MonoDevelop.Core.IProgressMonitor monitor, SolutionEntityItem item, BuildData buildData)
 		{
 #if DEBUG			
@@ -54,14 +54,25 @@ namespace MonoDevelop.MonoGameContent
 				manager.Logger = new MonitorBuilder(monitor);
 				manager.Platform =  (TargetPlatform)Enum.Parse(typeof(TargetPlatform), cfg.MonoGamePlatform);
 
-				foreach(var r in proj.References)
-				{
-					if (r.Package.Name == "monogame-contentpipeline" ) {
-						var output = proj.GetOutputFileName(buildData.ConfigurationSelector).FullPath;
-						monitor.Log.WriteLine("Adding {0} to Content Pipeline Assembly List", output);
-						manager.AddAssembly(output);
-						break;
+				try {
+				foreach(var pr in proj.ParentSolution.GetAllProjects()) {
+					if (pr is DotNetAssemblyProject) {
+						var dot = pr as DotNetAssemblyProject;
+						foreach(var r in dot.References)
+						{
+							if (r.Package.Name == "monogame-contentpipeline" ) {
+
+								var output = proj.GetOutputFileName(buildData.ConfigurationSelector).FullPath;
+								monitor.Log.WriteLine("Adding {0} to Content Pipeline Assembly List", output);
+								manager.AddAssembly(output);
+								break;
+							}
+						}
 					}
+				}
+				}
+				catch(Exception ex) {
+					result.AddWarning(string.Format("Problem processing Content Extensions {0}", ex.Message));
 				}
 
 				var dict = new Microsoft.Xna.Framework.Content.Pipeline.OpaqueDataDictionary();

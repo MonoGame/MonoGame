@@ -262,4 +262,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+      <Link>libnvcore.dylib</Link>
+    </None>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+      <Link>libnvimage.dylib</Link>
+    </None>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+      <Link>libnvmath.dylib</Link>
+    </None>
+  </ItemGroup>
 </Project>

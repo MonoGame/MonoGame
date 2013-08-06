@@ -82,16 +82,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\MonoGameContentProject.xpt.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="icons\monogame-icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\SpriteFont.xft.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\MonoGameContentExtensionProject.xpt.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
       <Link>ManagedPVRTC.dll.config</Link>
@@ -119,6 +119,18 @@
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
       <Link>SharpFont.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+      <Link>libnvmath.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

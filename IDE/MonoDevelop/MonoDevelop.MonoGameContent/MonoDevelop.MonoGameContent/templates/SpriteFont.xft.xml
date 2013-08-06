@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
 <Template>
-    <TemplateConfiguration>
-            <_Name>Sprite Font</_Name>
-            <Icon>monogame-icon</Icon>
-            <_Category>MonoGame</_Category>
-            <_Description>MonoGame SpriteFont Template</_Description>
-    </TemplateConfiguration>
-    <TemplateFiles>
-        <File DefaultExtension=".spritefont" DefaultName="Font">
+	<TemplateConfiguration>
+		<_Name>Sprite Font</_Name>
+		<Icon>monogame-icon</Icon>
+		<_Category>MonoGame</_Category>
+		<LanguageName>C#</LanguageName>
+		<ProjectType>MonoGameContent</ProjectType>
+		<_Description>MonoGame SpriteFont Template</_Description>
+	</TemplateConfiguration>
+	
+	<Conditions>
+	</Conditions>
+	
+	<TemplateFiles>
+		<File name="${Name}.spritefont">
 <![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
   <Asset Type="Graphics:FontDescription">
@@ -24,8 +30,6 @@
       </CharacterRegion>
     </CharacterRegions>
   </Asset>
-</XnaContent>]]>
-        </File>
-    </TemplateFiles>
-    <FileOptions/>
+</XnaContent>]]></File>
+	</TemplateFiles>
 </Template>

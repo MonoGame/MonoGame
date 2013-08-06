@@ -12,6 +12,7 @@ namespace MonoDevelop.MonoGameContent
 {
 	public class MonoGameContentProject : DotNetProject
 	{
+
 		private PipelineManager manager; 
 
 		public PipelineManager Manager {
@@ -56,8 +57,20 @@ namespace MonoDevelop.MonoGameContent
 
 		public override string GetDefaultBuildAction (string fileName)
 		{
-			return "Compile";
-			//return base.GetDefaultBuildAction (fileName);
+			var ext = System.IO.Path.GetExtension (fileName);
+			foreach (var type in manager.GetImporterTypes ()) {
+				foreach (var attr in type.GetCustomAttributes(typeof(ContentImporterAttribute), false)) {
+					if (attr is ContentImporterAttribute) {
+						var c = attr as ContentImporterAttribute;
+						foreach (var f in c.FileExtensions) {
+							if (f.Equals (ext, StringComparison.OrdinalIgnoreCase)) {
+								return "Compile";
+							}
+						}
+					}
+				}
+			}
+			return base.GetDefaultBuildAction (fileName);
 		}
 
 		public override bool SupportsFormat (FileFormat format)
@@ -72,7 +85,8 @@ namespace MonoDevelop.MonoGameContent
 
 		public override bool SupportsFramework (MonoDevelop.Core.Assemblies.TargetFramework framework)
 		{
-			if (!framework.IsCompatibleWithFramework (MonoDevelop.Core.Assemblies.TargetFrameworkMoniker.NET_4_0))
+
+			if (!framework.CanReferenceAssembliesTargetingFramework (MonoDevelop.Core.Assemblies.TargetFrameworkMoniker.NET_4_0))
 				return false;
 			else
 				return base.SupportsFramework (framework);

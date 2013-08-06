@@ -13,6 +13,9 @@
 		<Import file="templates/SpriteFont.xft.xml" />
 		<Import file="icons/monogame-icon.png"/>
 		<Import file="libnvtt.dylib"/>
+		<Import file="libnvimage.dylib"/>
+		<Import file="libnvmath.dylib"/>
+		<Import file="libnvcore.dylib"/>
 		<Import file="libpvrtc.dylib"/>
 		<Import file="libfreetype.6.dylib"/>
 		<Import file="libpng15.15.dylib"/>
@@ -59,7 +62,7 @@
 		<ProjectTemplate id="MonoGameContentExtension" file="templates/MonoGameContentExtensionProject.xpt.xml" />
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/FileTemplates">
-        <FileTemplate id="SpriteFont" resource="templates/SpriteFont.xft.xml" />
+        <FileTemplate id="MonoGameSpriteFont" file="templates/SpriteFont.xft.xml" />
     </Extension>
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">  
         <Class class="MonoDevelop.MonoGameContent.MonoGameContentBuildExtension" insertafter="MidStep"/>  
@@ -91,8 +94,8 @@
 	<Extension path="/MonoDevelop/Core/SupportPackages">
 	<Condition id="PackageNotInstalled" name="monogame-contentpipeline" version="3.0">
       <Package name="monogame-contentpipeline" version="3.0" clrVersion="Default">
-        <Assembly file="MonoGame.Framework.Content.Pipeline.dll" />
-        <Assembly file="MonoGame.Framework.dll" />      
+        <Assembly file="MonoGame.Framework.Content.Pipeline.dll" /> 
+        <Assembly file="MonoGame.Framework.dll" />  
       </Package>
     </Condition>
 	</Extension>
