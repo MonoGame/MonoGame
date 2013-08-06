@@ -333,7 +333,7 @@ namespace Microsoft.Xna.Framework.Audio
             var instance = new SoundEffectInstance(this);
 #else
             var instance = new SoundEffectInstance();
-            var instance.Sound = _sound;
+            instance.Sound = _sound;
 #endif
             return instance;
         }
