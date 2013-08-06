@@ -1,127 +1,130 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
-
-using Microsoft.Xna.Framework;
-using System;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a view field used by <see cref="GraphicsDevice"/>. 
+    /// </summary>
     [DataContract]
     public struct Viewport
     {
-		/// <summary>
-		/// Attributes 
-		/// </summary>
-		private int x;
+        #region Private Fields
+
+        private int x;
 		private int y;
 		private int width;
 		private int height;
 		private float minDepth;
 		private float maxDepth;
-		
-		#region Properties
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// Gets or sets the X coordinate of top-left corner of the viewport.
+        /// </summary>
+        [DataMember]
+        public int X
+        {
+            get
+            {
+                return x;
+            }
+            set
+            {
+                x = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Y coordinate of top-left corner of the viewport.
+        /// </summary>
+        [DataMember]
+        public int Y
+        {
+            get
+            {
+                return this.y;
+
+            }
+            set
+            {
+                y = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the width of the viewport.
+        /// </summary>
+        [DataMember]
+        public int Width
+        {
+            get
+            {
+                return this.width;
+            }
+            set
+            {
+                width = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the height of the viewport.
+        /// </summary>
         [DataMember]
         public int Height
         {
-			get {
+			get 
+            {
 				return this.height;
 			}
-			set {
+			set 
+            {
 				height = value;
 			}
 		}
 
-        [DataMember]
-        public float MaxDepth
-        {
-			get {
-				return this.maxDepth;
-			}
-			set {
-				maxDepth = value;
-			}
-		}
-
+        /// <summary>
+        /// Gets or sets the minimal depth of the viewport. 
+        /// </summary>
         [DataMember]
         public float MinDepth
         {
-			get {
-				return this.minDepth;
-			}
-			set {
-				minDepth = value;
-			}
-		}
+            get
+            {
+                return this.minDepth;
+            }
+            set
+            {
+                minDepth = value;
+            }
+        }
 
+        /// <summary>
+        /// Gets or sets the maximal depth of the viewport. 
+        /// </summary>
         [DataMember]
-        public int Width
+        public float MaxDepth
         {
-			get {
-				return this.width;
+			get 
+            {
+				return this.maxDepth;
 			}
-			set {
-				width = value;
+			set 
+            {
+				maxDepth = value;
 			}
-		}
+		}		
 
-        [DataMember]
-        public int Y
-        {
-			get {
-				return this.y;
-
-			}
-			set {
-				y = value;
-			}
-		}
-
-        [DataMember]
-        public int X 
-		{
-			get{ return x;}
-			set{ x = value;}
-		}
-		#endregion
-		
+        /// <summary>
+        /// Gets aspect ratio of the viewport.
+        /// </summary>
 		public float AspectRatio 
 		{
 			get
@@ -134,6 +137,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
+        /// <summary>
+        /// Gets or sets the size of the viewport.
+        /// </summary>
 		public Rectangle Bounds 
 		{ 
 			get 
@@ -155,6 +161,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
+        /// <summary>
+        /// Gets the tile safe area of the viewport.
+        /// </summary>
 		public Rectangle TitleSafeArea 
 		{
 			get
@@ -162,8 +171,19 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Rectangle(x,y,width,height);
 			}
 		}
-		
-		public Viewport(int x, int y, int width, int height)
+
+        #endregion
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct. Assumes MinDepth as 0.0f and MaxDepth as 1.0f.
+        /// </summary>
+        /// <param name="x">X coordinate of top-left corner of the viewport in pixels.</param>
+        /// <param name="y">Y coordinate of top-left corner of the viewport in pixels.</param>
+        /// <param name="width">Width of the viewport in pixels.</param>
+        /// <param name="height">Height of the viewport in pixels.</param>
+        public Viewport(int x, int y, int width, int height)
 		{
 			this.x = x;
 		    this.y = y;
@@ -172,11 +192,56 @@ namespace Microsoft.Xna.Framework.Graphics
 		    this.minDepth = 0.0f;
 		    this.maxDepth = 1.0f;
 		}
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="x">X coordinate of top-left corner of the viewport in pixels.</param>
+        /// <param name="y">Y coordinate of top-left corner of the viewport in pixels.</param>
+        /// <param name="width">Width of the viewport in pixels.</param>
+        /// <param name="height">Height of the viewport in pixels.</param>
+        /// <param name="minDepth">Minimal depth of the viewport.</param>
+        /// <param name="maxDepth">Maximal depth of the viewport.</param>
+        public Viewport(int x, int y, int width, int height, float minDepth, float maxDepth)
+        {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.minDepth = minDepth;
+            this.maxDepth = maxDepth;
+        }
 		
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="bounds">Bounds that describes top-left corner and size for the viewport.</param>
 		public Viewport(Rectangle bounds) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height)
 		{
 		}
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="bounds">Bounds that describes top-left corner and size for the viewport.</param>
+        /// <param name="minDepth">Minimal depth of the viewport.</param>
+        /// <param name="maxDepth">Maximal depth of the viewport.</param>
+        public Viewport(Rectangle bounds,float minDepth,float maxDepth) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height, minDepth, maxDepth)
+        {
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Projects <see cref="Vector3"/> from object space to screen space.
+        /// </summary>
+        /// <param name="source">The <see cref="Vector3"/> needs to be projected.</param>
+        /// <param name="projection">Projection matrix.</param>
+        /// <param name="view">View matrix.</param>
+        /// <param name="world">World matrix.</param>
+        /// <returns>The <see cref="Vector3"/> in screen space.</returns>
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix = Matrix.Multiply(Matrix.Multiply(world, view), projection);
@@ -184,41 +249,61 @@ namespace Microsoft.Xna.Framework.Graphics
 		    float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
 		    if (!WithinEpsilon(a, 1f))
 		    {
-		        vector = (Vector3) (vector / a);
+		        vector = vector / a;
 		    }
-		    vector.X = (((vector.X + 1f) * 0.5f) * this.Width) + this.X;
-		    vector.Y = (((-vector.Y + 1f) * 0.5f) * this.Height) + this.Y;
-		    vector.Z = (vector.Z * (this.MaxDepth - this.MinDepth)) + this.MinDepth;
+		    vector.X = (((vector.X + 1f) * 0.5f) * this.width) + this.x;
+		    vector.Y = (((-vector.Y + 1f) * 0.5f) * this.height) + this.y;
+		    vector.Z = (vector.Z * (this.maxDepth - this.minDepth)) + this.minDepth;
 		    return vector;
         }
 
+        /// <summary>
+        /// Unprojects <see cref="Vector3"/> from screen space to object space.
+        /// </summary>
+        /// <param name="source">The <see cref="Vector3"/> needs to be unprojected.</param>
+        /// <param name="projection">Projection matrix.</param>
+        /// <param name="view">View matrix.</param>
+        /// <param name="world">World matrix.</param>
+        /// <returns>The <see cref="Vector3"/> in object space.</returns>
         public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix = Matrix.Invert(Matrix.Multiply(Matrix.Multiply(world, view), projection));
-		    source.X = (((source.X - this.X) / ((float) this.Width)) * 2f) - 1f;
-		    source.Y = -((((source.Y - this.Y) / ((float) this.Height)) * 2f) - 1f);
-		    source.Z = (source.Z - this.MinDepth) / (this.MaxDepth - this.MinDepth);
+		    source.X = (((source.X - this.x) / ((float) this.width)) * 2f) - 1f;
+		    source.Y = -((((source.Y - this.y) / ((float) this.height)) * 2f) - 1f);
+		    source.Z = (source.Z - this.minDepth) / (this.maxDepth - this.minDepth);
 		    Vector3 vector = Vector3.Transform(source, matrix);
 		    float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
 		    if (!WithinEpsilon(a, 1f))
 		    {
-		        vector = (Vector3) (vector / a);
+		        vector = vector / a;
 		    }
 		    return vector;
-
         }
-		
-		private static bool WithinEpsilon(float a, float b)
+
+        #endregion
+
+        #region Private Methods
+
+        private static bool WithinEpsilon(float a, float b)
 		{
 		    float num = a - b;
 		    return ((-1.401298E-45f <= num) && (num <= float.Epsilon));
 		}
 
+        #endregion
 
+        #region Object Overrided Methods
+
+        /// <summary>
+        /// Converts the viewport values of this instance to its equivalent string representation.
+        /// </summary>
+        /// <returns>The string representation of the viewport values of this instance.</returns>
         public override string ToString ()
 		{
-			return string.Format ("[Viewport: X={0} Y={1} Width={2} Height={3}]", X,Y, Width,Height);
-		}
+            return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3} MinDepth:{4} MaxDepth:{5}}}", x, y, width, height, minDepth, maxDepth);
+        }
+
+        #endregion
     }
 }
 
