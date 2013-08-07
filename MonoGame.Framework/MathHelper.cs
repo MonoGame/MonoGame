@@ -26,7 +26,6 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
@@ -147,7 +146,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Distance between the two values.</returns>
         public static float Distance(float value1, float value2)
         {
-            return Math.Abs(value1 - value2);
+            return 
+#if AGENT
+                (float)
+#endif
+                Math.Abs(value1 - value2);
         }
         
         /// <summary>
@@ -204,7 +207,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The greater value.</returns>
         public static float Max(float value1, float value2)
         {
-            return Math.Max(value1, value2);
+            return
+#if AGENT
+                (float)
+#endif
+                Math.Max(value1, value2);
         }
         
         /// <summary>
@@ -215,7 +222,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The lesser value.</returns>
         public static float Min(float value1, float value2)
         {
-            return Math.Min(value1, value2);
+            return
+#if AGENT
+                (float)
+#endif
+                Math.Min(value1, value2);
         }
         
         /// <summary>

@@ -38,13 +38,17 @@ purpose and non-infringement.
 */
 #endregion License
 
+#if !AGENT
 using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+#if !AGENT
     [DataContract]
+#endif
     public struct Viewport
     {
 		/// <summary>
@@ -58,7 +62,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		private float maxDepth;
 		
 		#region Properties
+#if !AGENT
         [DataMember]
+#endif
         public int Height
         {
 			get {
@@ -69,7 +75,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#if !AGENT
         [DataMember]
+#endif
         public float MaxDepth
         {
 			get {
@@ -80,7 +88,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#if !AGENT
         [DataMember]
+#endif
         public float MinDepth
         {
 			get {
@@ -91,7 +101,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#if !AGENT
         [DataMember]
+#endif
         public int Width
         {
 			get {
@@ -102,7 +114,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#if !AGENT
         [DataMember]
+#endif
         public int Y
         {
 			get {
@@ -114,7 +128,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+#if !AGENT
         [DataMember]
+#endif
         public int X 
 		{
 			get{ return x;}
@@ -177,6 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 		}
 
+#if !AGENT
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix = Matrix.Multiply(Matrix.Multiply(world, view), projection);
@@ -207,8 +224,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		    return vector;
 
         }
-		
-		private static bool WithinEpsilon(float a, float b)
+#endif
+
+        private static bool WithinEpsilon(float a, float b)
 		{
 		    float num = a - b;
 		    return ((-1.401298E-45f <= num) && (num <= float.Epsilon));
@@ -217,8 +235,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString ()
 		{
+#if AGENT
+            return "[Viewport: X=" + X + " Y=" + Y + " Width=" + Width + " Height=" + Height + "]";
+#else
 			return string.Format ("[Viewport: X={0} Y={1} Width={2} Height={3}]", X,Y, Width,Height);
-		}
+#endif
+        }
     }
 }
 

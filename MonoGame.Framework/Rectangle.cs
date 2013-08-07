@@ -26,14 +26,21 @@ SOFTWARE.
 #endregion License
 
 using System;
+#if !AGENT
 using System.Globalization;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
+#if !AGENT
     [DataContract]
-    public struct Rectangle : IEquatable<Rectangle>
+#endif
+    public struct Rectangle 
+#if !AGENT
+        : IEquatable<Rectangle>
+#endif
     {
         #region Private Fields
 
@@ -42,17 +49,24 @@ namespace Microsoft.Xna.Framework
         #endregion Private Fields
 
         #region Public Fields
-
+#if !AGENT
         [DataMember]
+#endif
         public int X;
 
+#if !AGENT
         [DataMember]
+#endif
         public int Y;
 
+#if !AGENT
         [DataMember]
+#endif
         public int Width;
 
+#if !AGENT
         [DataMember]
+#endif
         public int Height;
 
         #endregion Public Fields
@@ -196,7 +210,11 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
+#if AGENT
+            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
+#else
             return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3}}}", X, Y, Width, Height);
+#endif
         }
 
         public override int GetHashCode()
