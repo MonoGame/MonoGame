@@ -24,17 +24,17 @@ namespace MonoDevelop.MonoGameContent
 		public bool SupportsObject (object o)
 		{
 			ProjectFile file = o as ProjectFile;
-			if(file != null)
+			if (file != null)
 				return file.Project is MonoGameContentProject;// || file.Project is ContentProject;
-			
+
 			return false;
 		}
 		
 		public object CreateProvider (object o)
 		{
 			return new ContentFileWrapper ((ProjectFile)o);
-		}		
-		
+		}	
+
 		#endregion IPropertyProvider Implementation
 		
 		#region Nested ContentFileWrapper Class
@@ -48,7 +48,7 @@ namespace MonoDevelop.MonoGameContent
 			const string processorKey = "Processor";
 			
 			ProjectFile file;
-			
+
 			#endregion Private Fields
 			
 			#region Constructor
@@ -96,56 +96,9 @@ namespace MonoDevelop.MonoGameContent
 				}
 				set { file.ExtendedProperties[processorKey] = value; }
 			}
-			
+
 			#endregion Properties
-			
-			#region Nested ContentStringsConverter Class
-			
-			class ContentStringsConverter : TypeConverter 
-			{
-				#region TypeConverter Overrides
-				
-				public override bool CanConvertTo (ITypeDescriptorContext context, Type destinationType)
-				{
-					return destinationType == typeof(string);
-				}
-				
-				public override bool CanConvertFrom (ITypeDescriptorContext context, Type sourceType)
-				{
-					return sourceType == typeof(string);	
-				}
-				
-				public override object ConvertFrom (ITypeDescriptorContext context, CultureInfo culture, object value)
-				{
-					return value as string;
-				}
-				
-				public override object ConvertTo (ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-				{
-					return value as string;
-				}
-				
-				public override bool GetStandardValuesSupported (ITypeDescriptorContext context)
-				{
-					return true;
-				}
-				
-				public override bool GetStandardValuesExclusive (ITypeDescriptorContext context)
-				{
-					ContentFileWrapper wrapper = context != null ? context.Instance as ContentFileWrapper : null;
-					if (wrapper != null && wrapper.file != null)
-					{
-						MonoGameContentProject project = wrapper.file.Project as MonoGameContentProject;
-						return project != null;
-					}
-					return false;
-				}
-				
-				#endregion TypeConverter Overrides
-			}
-			
-			#endregion Nested ContentStringConverter Class
-			
+
 			#region Nested ImporterStringConverter Class
 			
 			[MonoDevelop.Components.PropertyGrid.PropertyEditors.StandardValuesSeparator("--")]
@@ -232,6 +185,5 @@ namespace MonoDevelop.MonoGameContent
 		
 		#endregion Nested ContentFileWrapper Class		
 	}
-
 }
 

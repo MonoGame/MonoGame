@@ -3,6 +3,7 @@ using MonoDevelop.Projects;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using System.Collections.Generic;
 
 namespace MonoDevelop.MonoGameContent
 {
@@ -76,7 +77,6 @@ namespace MonoDevelop.MonoGameContent
 				}
 
 				var dict = new Microsoft.Xna.Framework.Content.Pipeline.OpaqueDataDictionary();
-				dict.Add("TextureFormat", "Compressed");
 				if (cfg != null) {
 					if (cfg.XnaCompressContent.ToLower() == "true") {
 						// tell the manager to compress the output
@@ -94,6 +94,13 @@ namespace MonoDevelop.MonoGameContent
 							{
 								monitor.Log.WriteLine(ex.Message);
 								result.AddWarning(ex.Message);
+							}
+
+							foreach(object key in file.ExtendedProperties.Keys) {
+								string k = key as string;
+								if (k != null && k.StartsWith("ProcessorParameters_")) {
+									dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
+								}
 							}
 							// check if the file has changed and rebuild if required.
 							manager.BuildContent(file.FilePath.FullPath, 
@@ -119,6 +126,7 @@ namespace MonoDevelop.MonoGameContent
 #endif				
 			}
 		}
+
 	}
 
 	public class MonitorBuilder : Microsoft.Xna.Framework.Content.Pipeline.ContentBuildLogger
