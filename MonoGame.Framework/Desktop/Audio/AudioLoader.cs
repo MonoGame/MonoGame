@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using OpenTK.Audio.OpenAL;
 
@@ -63,12 +63,9 @@ namespace Microsoft.Xna.Framework.Audio
             // WAVE header
             string format_signature = new string(reader.ReadChars(4));
             while (format_signature != "fmt ") {
-
                 reader.ReadBytes(reader.ReadInt32());
-
                 format_signature = new string(reader.ReadChars(4));
-
-              }
+            }
 
             int format_chunk_size = reader.ReadInt32();
 
@@ -80,16 +77,23 @@ namespace Microsoft.Xna.Framework.Audio
             int block_align = reader.ReadInt16();  // 14
             int bits_per_sample = reader.ReadInt16(); // 16
 
+            if (audio_format != 1)
+            {
+                throw new NotSupportedException("Wave compression is not supported.");
+            }
+
             // reads residual bytes
             if (format_chunk_size > 16)
                 reader.ReadBytes(format_chunk_size - 16);
+            
+            string data_signature = new string(reader.ReadChars(4));
 
-            var data_signature = new string(reader.ReadChars(4));
             while (data_signature.ToLower() != "data")
             {
-                reader.ReadBytes(reader.ReadInt32());                
+                reader.ReadBytes(reader.ReadInt32());
                 data_signature = new string(reader.ReadChars(4));
             }
+
             if (data_signature != "data")
             {
                 throw new NotSupportedException("Specified wave file is not supported.");
@@ -102,17 +106,7 @@ namespace Microsoft.Xna.Framework.Audio
             audioData = reader.ReadBytes((int)reader.BaseStream.Length);
             size = data_chunk_size;
 
-
-            // WAV compression is not supported. Warn our user and 
-            // Set size to 0 So that nothing is played.
-            if (audio_format != 1)
-            {
-                Console.WriteLine("Wave compression is not supported.");
-                size = 0;
-            }
-
             return audioData;
         }
     }
 }
-
