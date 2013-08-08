@@ -146,6 +146,7 @@
     <Compile Include="Framework\Visual\ViewportTest.cs" />
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Framework\Audio\DynamicEffectInstanceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">

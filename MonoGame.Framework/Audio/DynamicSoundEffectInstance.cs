@@ -4,8 +4,11 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     {
+        private const int SAMPLE_WIDTH = 2;
+
         private AudioChannels channels;
         private int sampleRate;
+        private int bytesPerSecond;
         private bool looped;
         private int pendingBufferCount;
         // Events
@@ -24,16 +27,17 @@ namespace Microsoft.Xna.Framework.Audio
             this.sampleRate = sampleRate;
             this.channels = channels;
             setFormatFor(channels);
+            bytesPerSecond = ((int)channels) * sampleRate * SAMPLE_WIDTH;
         }
 
         public TimeSpan GetSampleDuration(int sizeInBytes)
         {
-            throw new NotImplementedException();
+            return new TimeSpan(0, 0, 0, 0, (int) ((long) sizeInBytes * 1000L) / bytesPerSecond);
         }
 
         public int GetSampleSizeInBytes(TimeSpan duration)
         {
-            throw new NotImplementedException();
+            return (int) (duration.TotalSeconds * bytesPerSecond);
         }
 
         public void SubmitBuffer(byte[] buffer)

@@ -451,6 +451,8 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="TextInputEventArgs.cs" />
+    <Compile Include="Audio\DynamicSoundEffectInstance.cs" />
+    <Compile Include="Audio\DynamicSoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

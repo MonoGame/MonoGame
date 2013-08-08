@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Audio
                     this.format = ALFormat.Stereo16;
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException("channels", channels, "Expected Mono or Stereo");
             }                       
         }
 
