@@ -55,12 +55,57 @@
     <None Include="NuGet.config" />
     <None Include="Package.nuspec" />
     <None Include="tools\init.ps1" />
-    <None Include="tools\install.ps1" />
+    <None Include="tools\netcore45\install.ps1" />
     <None Include="tools\uninstall.ps1" />
+    <None Include="tools\wp8\install.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="content\" />
-    <Folder Include="lib\" />
+    <Folder Include="build\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MonoGame.Framework\bin\Windows8\ARM\Release\MonoGame.Framework.dll">
+      <Link>lib\netcore45\ARM\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\Windows8\x86\Release\MonoGame.Framework.dll">
+      <Link>lib\netcore45\x86\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\WindowsGL\Release\Lidgren.Network.dll">
+      <Link>lib\net40\Lidgren.Network.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\WindowsGL\Release\MonoGame.Framework.dll">
+      <Link>lib\net40\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\WindowsGL\Release\Tao.Sdl.dll">
+      <Link>lib\net40\Tao.Sdl.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll">
+      <Link>lib\wp8\ARM\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll">
+      <Link>lib\wp8\x86\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\net40\ToDo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\net45\ToDo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\netcore45\ToDo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\wp8\ToDo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\portable-net4+wp8+win8\ToDo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
