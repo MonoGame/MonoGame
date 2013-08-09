@@ -108,7 +108,9 @@ namespace MonoDevelop.MonoGameContent
 				object result = file.ExtendedProperties["ProcessorParameters_ColorKeyEnabled"];
 				return result == null ? false : (bool)result;
 			}
-			set { file.ExtendedProperties["ProcessorParameters_ColorKeyEnabled"] = value; }
+			set { 
+				file.ExtendedProperties["ProcessorParameters_ColorKeyEnabled"] = value; 
+			}
 		}
 
 		[LocalizedCategory("TextureProcessor")]
