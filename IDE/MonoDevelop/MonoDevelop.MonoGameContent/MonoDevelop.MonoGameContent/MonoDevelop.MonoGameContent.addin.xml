@@ -19,7 +19,9 @@
 		<Import file="libpvrtc.dylib"/>
 		<Import file="libfreetype.6.dylib"/>
 		<Import file="libpng15.15.dylib"/>
-		<!--Import file="nvtt.dll"/-->
+		<Import file="nvtt.dll"/>
+		<Import file="pvrtc.dll"/>
+		<Import file="freetype6.dll"/>
 		<Import file="AssimpNet.dll"/>
 		<Import file="Lidgren.Network.dll"/>
 		<Import file="ManagedPVRTC.dll"/>
@@ -32,6 +34,7 @@
 		<Import file="Nvidia.TextureTools.dll.config"/>
 		<Import file="SharpFont.dll"/>
 		<Import file="SharpFont.dll.config"/>
+		<Import file="OpenTK.dll"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="4.0" />
