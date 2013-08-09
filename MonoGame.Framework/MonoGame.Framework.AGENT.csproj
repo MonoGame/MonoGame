@@ -31,6 +31,8 @@
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
     <Compile Include="AGENT\ContentManager.cs" />
+    <Compile Include="AGENT\DataContractAttribute.cs" />
+    <Compile Include="AGENT\DataMemberAttribute.cs" />
     <Compile Include="AGENT\Game.cs" />
     <Compile Include="AGENT\GraphicsDevice.cs" />
     <Compile Include="AGENT\GraphicsDeviceManager.cs" />
