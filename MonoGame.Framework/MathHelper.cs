@@ -146,11 +146,8 @@ namespace Microsoft.Xna.Framework
         /// <returns>Distance between the two values.</returns>
         public static float Distance(float value1, float value2)
         {
-            return 
-#if AGENT
-                (float)
-#endif
-                Math.Abs(value1 - value2);
+            // The float cast is required for .NET Micro Framework (AGENT port)
+            return (float)Math.Abs(value1 - value2);
         }
         
         /// <summary>
