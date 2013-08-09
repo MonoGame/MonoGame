@@ -38,17 +38,13 @@ purpose and non-infringement.
 */
 #endregion License
 
-#if !AGENT
 using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-#if !AGENT
     [DataContract]
-#endif
     public struct Viewport
     {
 		/// <summary>
@@ -62,9 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		private float maxDepth;
 		
 		#region Properties
-#if !AGENT
         [DataMember]
-#endif
         public int Height
         {
 			get {
@@ -75,9 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#if !AGENT
         [DataMember]
-#endif
         public float MaxDepth
         {
 			get {
@@ -88,9 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#if !AGENT
         [DataMember]
-#endif
         public float MinDepth
         {
 			get {
@@ -101,9 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#if !AGENT
         [DataMember]
-#endif
         public int Width
         {
 			get {
@@ -114,9 +102,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#if !AGENT
         [DataMember]
-#endif
         public int Y
         {
 			get {
@@ -128,9 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-#if !AGENT
         [DataMember]
-#endif
         public int X 
 		{
 			get{ return x;}
