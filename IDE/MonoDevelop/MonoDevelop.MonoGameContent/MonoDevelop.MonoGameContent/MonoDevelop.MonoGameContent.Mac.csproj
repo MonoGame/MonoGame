@@ -73,6 +73,8 @@
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="Gui\MonoGameOptions.cs" />
     <Compile Include="gtk-gui\MonoDevelop.MonoGameContent.MonoGameOptions.cs" />
+    <Compile Include="ContentStringsConverter.cs" />
+    <Compile Include="TextureProcessorPropertyProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -131,6 +133,18 @@
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
       <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>pvrtc.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>nvtt.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\freetype6.dll">
+      <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

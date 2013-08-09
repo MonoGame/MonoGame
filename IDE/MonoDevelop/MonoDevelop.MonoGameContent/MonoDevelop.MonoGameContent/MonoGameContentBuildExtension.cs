@@ -32,6 +32,36 @@ namespace MonoDevelop.MonoGameContent
 			}
 		}
 
+		protected override void Clean (MonoDevelop.Core.IProgressMonitor monitor, SolutionEntityItem item, ConfigurationSelector configuration)
+		{
+			var proj = item as MonoGameContentProject;
+			MonoGameContentProjectConfiguration cfg = null;
+			if (proj != null)
+				cfg = proj.GetConfiguration (configuration) as MonoGameContentProjectConfiguration;
+			if (proj == null) {
+				monitor.Log.WriteLine("Cleaning for Unknown MonoGame Project");
+				base.Clean (monitor, item, configuration);
+			}
+			var manager = new PipelineManager(proj.BaseDirectory.FullPath,
+			                                  Path.Combine(cfg.OutputDirectory, cfg.MonoGamePlatform),
+			                                  cfg.IntermediateOutputDirectory);
+			monitor.Log.WriteLine("Detected {0} MonoGame Platform", cfg.MonoGamePlatform);                              
+			foreach(var file in proj.Files)
+			{
+				if (file.BuildAction == "Compile") {
+					try {
+						monitor.Log.WriteLine("Cleaning {0}", file.FilePath.FileName);
+						manager.CleanContent(file.FilePath.FullPath, null);
+					}
+					catch(Exception ex)
+					{
+						monitor.Log.WriteLine(ex.Message);
+					}
+				}
+			}
+			base.Clean (monitor, item, configuration);
+		}
+
 		protected override BuildResult Compile (MonoDevelop.Core.IProgressMonitor monitor, SolutionEntityItem item, BuildData buildData)
 		{
 #if DEBUG			
@@ -52,7 +82,7 @@ namespace MonoDevelop.MonoGameContent
 				                                  Path.Combine(buildData.Configuration.OutputDirectory, cfg.MonoGamePlatform),
 				                                  buildData.Configuration.IntermediateOutputDirectory);
 			
-				manager.Logger = new MonitorBuilder(monitor);
+				manager.Logger = new MonitorBuilder(monitor, result);
 				manager.Platform =  (TargetPlatform)Enum.Parse(typeof(TargetPlatform), cfg.MonoGamePlatform);
 
 				try {
@@ -102,6 +132,7 @@ namespace MonoDevelop.MonoGameContent
 									dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
 								}
 							}
+
 							// check if the file has changed and rebuild if required.
 							manager.BuildContent(file.FilePath.FullPath, 
 					                     null, 
@@ -132,15 +163,19 @@ namespace MonoDevelop.MonoGameContent
 	public class MonitorBuilder : Microsoft.Xna.Framework.Content.Pipeline.ContentBuildLogger
 	{
 		MonoDevelop.Core.IProgressMonitor monitor;
+		BuildResult result;
 
-		public MonitorBuilder (MonoDevelop.Core.IProgressMonitor monitor)
+		public MonitorBuilder (MonoDevelop.Core.IProgressMonitor monitor, BuildResult result)
 		{
 			this.monitor = monitor;
+			this.result = result;
 		}
 
 		public override void LogImportantMessage (string message, params object[] messageArgs)
 		{
 			monitor.Log.WriteLine (string.Format (message, messageArgs));
+			if (result != null)
+				result.AddError(string.Format (message, messageArgs));
 		}
 
 		public override void LogMessage (string message, params object[] messageArgs)
@@ -153,6 +188,8 @@ namespace MonoDevelop.MonoGameContent
 			var msg = string.Format(message, messageArgs);
 			var fileName = GetCurrentFilename(contentIdentity);
 			monitor.Log.WriteLine(string.Format("{0}: {1}", fileName, msg));
+			if (result != null)
+				result.AddWarning(string.Format("{0}: {1}", fileName, msg));
 		}
 	}
 }

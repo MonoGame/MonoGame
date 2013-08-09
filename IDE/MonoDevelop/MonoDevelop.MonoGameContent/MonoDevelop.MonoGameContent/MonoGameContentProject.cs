@@ -94,7 +94,7 @@ namespace MonoDevelop.MonoGameContent
 
 		public bool IsProcessorNameValid (string str)
 		{
-			return true;
+			return manager.GetProcessorType(str) != null;
 		}
 
 		public System.Collections.ICollection GetProcessorNames ()
@@ -106,9 +106,19 @@ namespace MonoDevelop.MonoGameContent
 			return types.ToArray ();
 		}
 
+		public Type GetProcessorType (string processorName)
+		{
+			return manager.GetProcessorType (processorName);
+		}
+
 		public bool IsImporterNameValid (string str)
 		{
-			return true;
+			Type[] types = manager.GetImporterTypes ();
+			foreach (var t in manager.GetImporterTypes ()) {
+				if (str == t.Name)
+					return true;
+			}
+			return false;
 		}
 
 		public System.Collections.ICollection GetImporterNames ()

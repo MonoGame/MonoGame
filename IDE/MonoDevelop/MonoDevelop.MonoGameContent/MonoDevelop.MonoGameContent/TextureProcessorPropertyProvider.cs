@@ -56,13 +56,71 @@ namespace MonoDevelop.MonoGameContent
 		[LocalizedCategory("TextureProcessor")]
 		[LocalizedDisplayName("TextureFormat")]
 		[LocalizedDescription("The Format of the texture")]
+		[DefaultValue("Compressed")]
 		[TypeConverter(typeof(TextureFormatStringsConverter))]
 		public string Name {
 			get {
 				object result = file.ExtendedProperties["ProcessorParameters_TextureFormat"];
-				return result == null ? "" : (string)result;
+				return result == null ? "Compressed" : (string)result;
 			}
 			set { file.ExtendedProperties["ProcessorParameters_TextureFormat"] = value; }
+		}
+
+		[LocalizedCategory("TextureProcessor")]
+		[LocalizedDisplayName("PremultiplyAlpha")]
+		[LocalizedDescription("Premultiply the Alpha channel for the texture")]
+		[DefaultValue(true)]
+		public bool PremultiplyAlpha {
+			get {
+				object result = file.ExtendedProperties["ProcessorParameters_PremultiplyAlpha"];
+				return result == null ? true : (bool)result;
+			}
+			set { file.ExtendedProperties["ProcessorParameters_PremultiplyAlpha"] = value; }
+		}
+
+		[LocalizedCategory("TextureProcessor")]
+		[LocalizedDisplayName("GenerateMipmaps")]
+		[LocalizedDescription("Generate Mipmaps for this texture")]
+		public bool GenerateMipmaps {
+			get {
+				object result = file.ExtendedProperties["ProcessorParameters_GenerateMipmaps"];
+				return result == null ? false : (bool)result;
+			}
+			set { file.ExtendedProperties["ProcessorParameters_GenerateMipmaps"] = value; }
+		}
+
+		[LocalizedCategory("TextureProcessor")]
+		[LocalizedDisplayName("ResizeToPowerOfTwo")]
+		[LocalizedDescription("Resize the texture to a power of 2")]
+		public bool ResizeToPowerOfTwo {
+			get {
+				object result = file.ExtendedProperties["ProcessorParameters_ResizeToPowerOfTwo"];
+				return result == null ? false : (bool)result;
+			}
+			set { file.ExtendedProperties["ProcessorParameters_ResizeToPowerOfTwo"] = value; }
+		}
+
+		[LocalizedCategory("TextureProcessor")]
+		[LocalizedDisplayName("ColorKeyEnabled")]
+		[LocalizedDescription("Enable color keying for this texture")]
+		public bool ColorKeyEnabled {
+			get {
+				object result = file.ExtendedProperties["ProcessorParameters_ColorKeyEnabled"];
+				return result == null ? false : (bool)result;
+			}
+			set { file.ExtendedProperties["ProcessorParameters_ColorKeyEnabled"] = value; }
+		}
+
+		[LocalizedCategory("TextureProcessor")]
+		[LocalizedDisplayName("ColorKeyColor")]
+		[LocalizedDescription("The key color for this texture")]
+		[DefaultValue("255, 0, 255, 255")]
+		public string ColorKeyColor {
+			get {
+				object result = file.ExtendedProperties["ProcessorParameters_ColorKeyColor"];
+				return result == null ? "255, 0, 255, 255" : (string)result;
+			}
+			set { file.ExtendedProperties["ProcessorParameters_ColorKeyColor"] = value; }
 		}
 
 		[MonoDevelop.Components.PropertyGrid.PropertyEditors.StandardValuesSeparator("--")]

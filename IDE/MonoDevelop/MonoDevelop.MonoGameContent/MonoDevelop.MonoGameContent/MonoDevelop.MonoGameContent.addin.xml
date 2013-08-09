@@ -76,10 +76,29 @@
                      type = "System.String" />  
 	  <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
                      name = "Name"  
-                     type = "System.String" />                       
+                     type = "System.String" /> 
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_TextureFormat"  
+                     type = "System.String" />  
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ResizeToPowerOfTwo"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_PremultiplyAlpha"  
+                     type = "System.Boolean" />  
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ColorKeyEnabled"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_GenerateMipmaps"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ColorKeyColor"  
+                     type = "System.String" />                                                                                                                                                       
      </Extension>    
      <Extension path="/MonoDevelop/DesignerSupport/PropertyProviders">
 		<Class class="MonoDevelop.MonoGameContent.ContentPropertyProvider"/>
+		<Class class="MonoDevelop.MonoGameContent.TextureProcessorPropertyProvider"/>
 	</Extension>
 	<Extension path = "/MonoDevelop/ProjectModel/Gui/ItemOptionPanels/Build">
 		<ComplexCondition>
