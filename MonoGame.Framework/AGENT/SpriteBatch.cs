@@ -20,14 +20,14 @@ namespace Microsoft.Xna.Framework.Graphics
             drawing = true;
         }
 
-        public void Draw(Texture2D texture, Rectangle destinationRectangle)
+        /*public void Draw(Texture2D texture, Rectangle destinationRectangle)
         {
             if (!drawing)
             {
                 throw new InvalidOperationException("Cannot be called till after Begin is called");
             }
             graphicsDevice.CurrentDraw.StretchImage(destinationRectangle.X, destinationRectangle.Y, texture.Bitmap, destinationRectangle.Width, destinationRectangle.Height, 1);
-        }
+        }*/
 
         public void Draw(Texture2D texture, Vector2 position)
         {
@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new InvalidOperationException("Cannot be called till after Begin is called");
             }
-            graphicsDevice.CurrentDraw.StretchImage((int)position.X, (int)position.Y, texture.Bitmap, texture.Width, texture.Height, 1);
+            Draw(texture, position, new Rectangle(0, 0, texture.Width, texture.Height));
         }
 
         public void Draw(Texture2D texture, Vector2 position, Rectangle sourceRectangle)
@@ -47,14 +47,14 @@ namespace Microsoft.Xna.Framework.Graphics
             graphicsDevice.CurrentDraw.DrawImage((int)position.X, (int)position.Y, texture.Bitmap, sourceRectangle.X, sourceRectangle.Y, sourceRectangle.Width, sourceRectangle.Height);
         }
 
-        public void Draw(Texture2D texture, Vector2 position, Rectangle sourceRectangle, float rotation)
+        /*public void Draw(Texture2D texture, Vector2 position, Rectangle sourceRectangle, float rotation)
         {
             if (!drawing)
             {
                 throw new InvalidOperationException("Cannot be called till after Begin is called");
             }
             graphicsDevice.CurrentDraw.RotateImage((int)Math.Round(rotation), (int)position.X, (int)position.Y, texture.Bitmap, sourceRectangle.X, sourceRectangle.Y, sourceRectangle.Width, sourceRectangle.Height, 1);
-        }
+        }*/
 
         public void DrawString(SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
