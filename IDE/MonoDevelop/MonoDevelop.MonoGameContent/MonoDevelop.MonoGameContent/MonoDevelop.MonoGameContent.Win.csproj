@@ -119,6 +119,34 @@
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+      <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+      <Link>libfreetype.6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+      <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MonoDevelop.MonoGameContent.addin.xml" />

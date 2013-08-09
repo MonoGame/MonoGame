@@ -299,12 +299,6 @@
     <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
-      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -346,4 +340,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsGL.csproj">
+      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
+      <Name>MonoGame.Framework.WindowsGL</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
