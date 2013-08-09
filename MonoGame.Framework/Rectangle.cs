@@ -26,17 +26,13 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if !AGENT
 using System.Globalization;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if !AGENT
     [DataContract]
-#endif
     public struct Rectangle 
 #if !AGENT
         : IEquatable<Rectangle>
@@ -49,24 +45,16 @@ namespace Microsoft.Xna.Framework
         #endregion Private Fields
 
         #region Public Fields
-#if !AGENT
         [DataMember]
-#endif
         public int X;
 
-#if !AGENT
         [DataMember]
-#endif
         public int Y;
 
-#if !AGENT
         [DataMember]
-#endif
         public int Width;
 
-#if !AGENT
         [DataMember]
-#endif
         public int Height;
 
         #endregion Public Fields

@@ -25,16 +25,12 @@ SOFTWARE.
 */
 #endregion License
 
-#if !AGENT
 using System;
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if !AGENT
     [DataContract]
-#endif
     public struct Point
 #if !AGENT
         : IEquatable<Point>
@@ -48,14 +44,10 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
-#if !AGENT
         [DataMember]
-#endif
         public int X;
 
-#if !AGENT
         [DataMember]
-#endif
         public int Y;
 
         #endregion Public Fields

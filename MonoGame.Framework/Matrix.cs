@@ -26,15 +26,11 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if !AGENT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if !AGENT
     [DataContract]
-#endif
     public struct Matrix 
 #if !AGENT
         : IEquatable<Matrix>
@@ -67,84 +63,52 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
-#if !AGENT
         [DataMember]
-#endif
         public float M11;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M12;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M13;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M14;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M21;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M22;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M23;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M24;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M31;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M32;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M33;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M34;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M41;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M42;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M43;
 
-#if !AGENT
         [DataMember]
-#endif
         public float M44;
 
         #endregion Public Fields
