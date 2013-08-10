@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Media
                     _androidPlayer.Reset();
                     _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
                     _androidPlayer.Prepare();
-                    _androidPlayer.Looping = true;
+                    _androidPlayer.Looping = MediaPlayer.IsRepeating;
                 }
             }
         }
