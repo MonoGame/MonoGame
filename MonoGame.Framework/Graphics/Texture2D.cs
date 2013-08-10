@@ -630,13 +630,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif DIRECTX
 
             // Create a temp staging resource for copying the data.
-            // 
+            //
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
             var desc = new SharpDX.Direct3D11.Texture2DDescription();
-            desc.Width = width;
-            desc.Height = height;
+            desc.Width = rect != null ? rect.Value.Width : width;
+            desc.Height = rect != null ? rect.Value.Height : height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
             desc.Format = SharpDXHelper.ToFormat(_format);
@@ -654,7 +654,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Copy the data from the GPU to the staging texture.
                     if (rect.HasValue)
                     {
-                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
+                        var sourceRegion = new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1);
+                        d3dContext.CopySubresourceRegion(GetTexture(), level, sourceRegion, stagingTex, 0, 0, 0, 0);
                     }
                     else
                         d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
@@ -676,15 +677,11 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (rect.HasValue) {
 					var temp = new T[this.width*this.height];
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
-					int z = 0, w = 0;
+					int w = startIndex;
 
-					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
-						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
-							data[z*rect.Value.Width+w] = temp[(y*width)+x];
-							w++;
-						}
-						z++;
-					}
+					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height && w < elementCount; y++)
+						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width && w < elementCount; x++)
+							data[w++] = temp[(y*width)+x];
 				} else {
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
 				}
