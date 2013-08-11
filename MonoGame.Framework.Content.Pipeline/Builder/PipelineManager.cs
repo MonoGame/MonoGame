@@ -543,7 +543,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
+                _compiler.Compile(stream, content, Platform, Profile, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.
