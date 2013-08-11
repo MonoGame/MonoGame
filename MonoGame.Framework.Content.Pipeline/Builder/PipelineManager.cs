@@ -68,9 +68,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = PathHelper.Normalize(projectDir + Path.DirectorySeparatorChar);
-            OutputDirectory = PathHelper.Normalize(outputDir + Path.DirectorySeparatorChar);
-            IntermediateDirectory = PathHelper.Normalize(intermediateDir + Path.DirectorySeparatorChar);
+            ProjectDirectory = PathHelper.NormalizeDirectory(projectDir);
+            OutputDirectory = PathHelper.NormalizeDirectory(outputDir);
+            IntermediateDirectory = PathHelper.NormalizeDirectory(intermediateDir);
         }
 
         public void AddAssembly(string assemblyFilePath)
