@@ -674,16 +674,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
-				if (rect.HasValue) {
-					var temp = new T[this.width*this.height];
-					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
-					int w = startIndex;
+				var region = rect ?? new Rectangle(0, 0, this.width, this.height);
 
-					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height && w < elementCount; y++)
-						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width && w < elementCount; x++)
-							data[w++] = temp[(y*width)+x];
-				} else {
+				if (startIndex == 0 && elementCount >= this.width * this.height &&
+					(region.Width == this.width && region.Height == this.height))
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+				else
+				{
+					var temp = new T[this.width * this.height];
+					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
+
+					int w = 0;
+					for (int y = region.Y; y < region.Y + region.Height && w < elementCount; y++)
+						for (int x = region.X; x < region.X + region.Width && w < elementCount; x++)
+							data[startIndex + w++] = temp[(y * width) + x];
 				}
 			}
 
