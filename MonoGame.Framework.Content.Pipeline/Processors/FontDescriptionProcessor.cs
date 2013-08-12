@@ -35,8 +35,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			if (File.Exists(Path.Combine(directory,fontName+".otf"))) fontName += ".otf";
 
 			fontName = Path.Combine (directory, fontName);
+
 			context.Logger.LogMessage ("Building Font {0}", fontName);
 			try {
+				if (!File.Exists(fontName)) {
+					throw new Exception(string.Format("Could not load {0}", fontName));
+				}
 				Library lib = new Library ();
 				Face face = lib.NewFace (fontName, 0);
 				face.SetCharSize(0, (int)input.Size * 64, 0, 96);

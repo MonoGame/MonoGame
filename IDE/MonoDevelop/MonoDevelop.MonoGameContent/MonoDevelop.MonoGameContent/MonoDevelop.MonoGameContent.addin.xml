@@ -1,4 +1,4 @@
-<Addin id="MonoGameContent_Mac" 
+<Addin id="MonoGameContent" 
 		namespace="MonoDevelop" 
 		name="MonoGame Content Support" 
 		author="Dean Ellis" 
@@ -46,6 +46,7 @@
 	</Dependencies>
 	<Extension path="/MonoDevelop/Core/StockIcons">
 		<StockIcon stockid="monogame-icon" file="icons/monogame-icon.png" />
+		<StockIcon stockid="monogame-font" file="icons/monogame-font.png" />
 	</Extension>
 	<Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
 		<DotNetProjectSubtype

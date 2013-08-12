@@ -84,7 +84,6 @@ namespace MonoDevelop.MonoGameContent
 			
 				manager.Logger = new MonitorBuilder(monitor, result);
 				manager.Platform =  (TargetPlatform)Enum.Parse(typeof(TargetPlatform), cfg.MonoGamePlatform);
-
 				try {
 				foreach(var pr in proj.ParentSolution.GetAllProjects()) {
 					if (pr is DotNetAssemblyProject) {
@@ -93,9 +92,10 @@ namespace MonoDevelop.MonoGameContent
 						{
 							if (r.Package.Name == "monogame-contentpipeline" ) {
 
-								var output = proj.GetOutputFileName(buildData.ConfigurationSelector).FullPath;
+								var output = dot.GetOutputFileName(buildData.ConfigurationSelector).FullPath;
 								monitor.Log.WriteLine("Adding {0} to Content Pipeline Assembly List", output);
 								manager.AddAssembly(output);
+								proj.Manager.AddAssembly(output);
 								break;
 							}
 						}

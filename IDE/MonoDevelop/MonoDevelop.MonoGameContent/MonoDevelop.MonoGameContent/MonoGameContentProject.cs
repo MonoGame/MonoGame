@@ -83,6 +83,12 @@ namespace MonoDevelop.MonoGameContent
 			return new TargetFrameworkMoniker("4.0");
 		}
 
+		public override string ProjectType {
+			get {
+				return "MonoGameContent";
+			}
+		}
+
 		public override bool SupportsFramework (MonoDevelop.Core.Assemblies.TargetFramework framework)
 		{
 
@@ -146,18 +152,6 @@ namespace MonoDevelop.MonoGameContent
 			}
 		}
 
-		protected override void OnReferenceAddedToProject (ProjectReferenceEventArgs e)
-		{
-			try {
-				if (manager != null) {
-					manager.AddAssembly (e.ProjectReference.OwnerProject.GetOutputFileName(this.DefaultConfiguration.Selector).FullPath);
-				}
-			}
-			catch {
-			}
-			base.OnReferenceAddedToProject (e);
-		}
-		
 	}
 
 	public class MonoGameContentProjectBinding : IProjectBinding
