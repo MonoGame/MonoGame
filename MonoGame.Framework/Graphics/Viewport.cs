@@ -303,8 +303,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <returns>The string representation of the viewport values of this instance.</returns>
         public override string ToString ()
-		{
-            return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3} MinDepth:{4} MaxDepth:{5}}}", x, y, width, height, minDepth, maxDepth);
+	{
+            return "{X:" + x + " Y:" + y + " Width:" + width + " Height:" + height + " MinDepth:" + minDepth + " MaxDepth:" + maxDepth + "}";
         }
 
         #endregion
