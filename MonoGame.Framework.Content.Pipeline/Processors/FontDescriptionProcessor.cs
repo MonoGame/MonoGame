@@ -29,10 +29,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var fontName = input.FontName;
 
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
+			var directories = new string[] { directory, 
+				"/Library/Fonts",
+				"C:\\Windows\\Fonts"
+			};
 
-			if (File.Exists(Path.Combine(directory,fontName+".ttf"))) fontName += ".ttf";
-			if (File.Exists(Path.Combine(directory,fontName+".ttc"))) fontName += ".ttc";
-			if (File.Exists(Path.Combine(directory,fontName+".otf"))) fontName += ".otf";
+			foreach( var dir in directories) {
+				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
+					fontName += ".ttf";
+					directory = dir;
+					break;
+				}
+				if (File.Exists (Path.Combine(dir,fontName+".ttc"))) {
+					fontName += ".ttc";
+					directory = dir;
+					break;
+				}
+				if (File.Exists(Path.Combine(dir,fontName+".otf"))) {
+					fontName += ".otf";
+					directory = dir;
+					break;
+				}
+			}
 
 			fontName = Path.Combine (directory, fontName);
 
