@@ -18,11 +18,11 @@ namespace MonoGameContentProcessors.Processors
         {
             // Fallback if we aren't buiding for iOS.
             var platform = ContentHelper.GetMonoGamePlatform();
-            if (platform != MonoGamePlatform.iOS && platform != MonoGamePlatform.Linux)
+            if (platform != MonoGamePlatform.iOS && platform != MonoGamePlatform.Linux && platform != MonoGamePlatform.OSX)
                 return base.Process(input, context);
 
             //TODO: If quality isn't best and it's a .wma, don't compress to MP3. Leave it as a .wav instead
-            string outputType = (platform == MonoGamePlatform.iOS) ? "mp3" : "wav";
+            string outputType = (platform == MonoGamePlatform.iOS || platform == MonoGamePlatform.OSX) ? "mp3" : "wav";
             string outputFilename = Path.ChangeExtension(context.OutputFilename, outputType);
             string directoryName = Path.GetDirectoryName(outputFilename);
             if (!Directory.Exists(directoryName))
@@ -49,7 +49,7 @@ namespace MonoGameContentProcessors.Processors
                     break;
             }
 
-            AudioFileType target = (platform == MonoGamePlatform.iOS) ? AudioFileType.Mp3 : AudioFileType.Wav;
+            AudioFileType target = (platform == MonoGamePlatform.iOS || platform == MonoGamePlatform.OSX) ? AudioFileType.Mp3 : AudioFileType.Wav;
             // Create a new file if we need to.
             FileStream outputStream = input.FileType != target ? new FileStream(outputFilename, FileMode.Create) : null;
             
