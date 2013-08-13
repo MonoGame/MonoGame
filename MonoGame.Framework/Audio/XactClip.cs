@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			public override bool Playing {
 				get {
-					return wave.State == SoundState.Playing;
+					return wave.State != SoundState.Stopped;
 				}
 			}
 			public override bool IsPaused
