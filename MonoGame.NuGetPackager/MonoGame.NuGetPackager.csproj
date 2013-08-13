@@ -49,27 +49,174 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\wp8\Game1.cs.pp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="content\wp8\GamePage.xaml.cs .pp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="content\wp8\GamePage.xaml.pp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="NuGetPackage.ps1" />
     <None Include="NuGetSetup.ps1" />
     <None Include="NuGet.exe" />
     <None Include="NuGet.config" />
-    <None Include="Package.nuspec" />
+    <None Include="Package.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="tools\init.ps1" />
-    <None Include="tools\netcore45\install.ps1" />
+    <None Include="tools\install.ps1" />
     <None Include="tools\uninstall.ps1" />
-    <None Include="tools\wp8\install.ps1" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="build\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\MonoGame.Framework\bin\Windows8\ARM\Release\MonoGame.Framework.dll">
-      <Link>lib\netcore45\ARM\MonoGame.Framework.dll</Link>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\MonoGame.Framework.dll">
+      <Link>build\wp8\ARM\MonoGame.Framework.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\MonoGame.Framework\bin\Windows8\x86\Release\MonoGame.Framework.dll">
-      <Link>lib\netcore45\x86\MonoGame.Framework.dll</Link>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Direct3D11.dll">
+      <Link>build\wp8\ARM\SharpDX.Direct3D11.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Direct3D11.xml">
+      <Link>build\wp8\ARM\SharpDX.Direct3D11.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.dll">
+      <Link>build\wp8\ARM\SharpDX.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.DXGI.dll">
+      <Link>build\wp8\ARM\SharpDX.DXGI.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.DXGI.xml">
+      <Link>build\wp8\ARM\SharpDX.DXGI.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.MediaFoundation.dll">
+      <Link>build\wp8\ARM\SharpDX.MediaFoundation.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.MediaFoundation.xml">
+      <Link>build\wp8\ARM\SharpDX.MediaFoundation.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.dll">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.Game.dll">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.Game.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.Game.xml">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.Game.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.Graphics.dll">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.Graphics.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.Graphics.xml">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.Graphics.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Toolkit.xml">
+      <Link>build\wp8\ARM\SharpDX.Toolkit.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.WP8.dll">
+      <Link>build\wp8\ARM\SharpDX.WP8.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.XAudio2.dll">
+      <Link>build\wp8\ARM\SharpDX.XAudio2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.XAudio2.xml">
+      <Link>build\wp8\ARM\SharpDX.XAudio2.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.xml">
+      <Link>build\wp8\ARM\SharpDX.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\MonoGame.Framework.dll">
+      <Link>build\wp8\x86\MonoGame.Framework.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Direct3D11.dll">
+      <Link>build\wp8\x86\SharpDX.Direct3D11.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Direct3D11.xml">
+      <Link>build\wp8\x86\SharpDX.Direct3D11.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.dll">
+      <Link>build\wp8\x86\SharpDX.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.DXGI.dll">
+      <Link>build\wp8\x86\SharpDX.DXGI.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.DXGI.xml">
+      <Link>build\wp8\x86\SharpDX.DXGI.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.MediaFoundation.dll">
+      <Link>build\wp8\x86\SharpDX.MediaFoundation.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.MediaFoundation.xml">
+      <Link>build\wp8\x86\SharpDX.MediaFoundation.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.dll">
+      <Link>build\wp8\x86\SharpDX.Toolkit.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.Game.dll">
+      <Link>build\wp8\x86\SharpDX.Toolkit.Game.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.Game.xml">
+      <Link>build\wp8\x86\SharpDX.Toolkit.Game.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.Graphics.dll">
+      <Link>build\wp8\x86\SharpDX.Toolkit.Graphics.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.Graphics.xml">
+      <Link>build\wp8\x86\SharpDX.Toolkit.Graphics.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Toolkit.xml">
+      <Link>build\wp8\x86\SharpDX.Toolkit.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.WP8.dll">
+      <Link>build\wp8\x86\SharpDX.WP8.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.XAudio2.dll">
+      <Link>build\wp8\x86\SharpDX.XAudio2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.XAudio2.xml">
+      <Link>build\wp8\x86\SharpDX.XAudio2.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.xml">
+      <Link>build\wp8\x86\SharpDX.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll">
+      <Link>lib\netcore45\MonoGame.Framework.dll</Link>
     </Content>
     <Content Include="..\MonoGame.Framework\bin\WindowsGL\Release\Lidgren.Network.dll">
       <Link>lib\net40\Lidgren.Network.dll</Link>
@@ -83,14 +230,10 @@
       <Link>lib\net40\Tao.Sdl.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll">
-      <Link>lib\wp8\ARM\MonoGame.Framework.dll</Link>
+    <None Include="build\wp8\MonoGame.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll">
-      <Link>lib\wp8\x86\MonoGame.Framework.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="content\net40\ToDo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -98,9 +241,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="content\netcore45\ToDo.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="content\wp8\ToDo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\portable-net4+wp8+win8\ToDo.txt">

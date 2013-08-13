@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>MonoGame</id>
-        <version>1.0.0</version>
+        <version>3.0.1</version>
         <title>MonoGame</title>
         <authors>Simon-Darkside</authors>
         <owners>MonoGameTeam</owners>
@@ -18,18 +18,11 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="bin\release\content\net40\_._" target="content\net40\_._" />
-        <file src="bin\release\content\net45\_._" target="content\net45\_._" />
-        <file src="bin\release\content\netcore45\_._" target="content\netcore45\_._" />
-        <file src="bin\release\content\wp8\_._" target="content\wp8\_._" />
-        <file src="bin\release\lib\net40\*.dll" target="lib\net40\_._" />
-      <file src="bin\release\lib\netcore45\ARM\*.dll" target="lib\netcore45\ARM" />
-      <file src="bin\release\lib\netcore45\x86\*.dll" target="lib\netcore45\x86" />
-        <file src="bin\release\lib\portable-net4+wp8+win8\_._" target="lib\portable-net4+wp8+win8\" />
-      <file src="bin\release\lib\wp8\ARM\*.dll" target="lib\wp8\ARM" />
-      <file src="bin\release\lib\wp8\x86\*.dll" target="lib\wp8\x86" />
-        <file src="tools\netcore45\install.ps1" target="tools\netcore45\install.ps1" />
-        <file src="tools\wp8\install.ps1" target="tools\wp8\install.ps1" />
+        <file src="bin\release\content\wp8\*.*" target="content\wp8" />
+        <file src="bin\release\build\wp8\ARM\*.dll" target="build\wp8\ARM" />
+        <file src="bin\release\build\wp8\x86\*.dll" target="build\wp8\x86" />
+        <file src="bin\release\build\wp8\MonoGame.targets" target="build\wp8\MonoGame.targets" />
+        <file src="tools\install.ps1" target="tools\wp8\install.ps1" />
         <file src="tools\init.ps1" target="tools\init.ps1" />
         <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
     </files>
