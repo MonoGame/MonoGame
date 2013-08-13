@@ -385,8 +385,9 @@ namespace Microsoft.Xna.Framework.Audio
                         }
                         using (var audioFile = File.Create(filename))
                             audioFile.Write(audiodata, 0, audiodata.Length);
-                        
-                        sounds[current_entry] = new SoundEffect(filename).CreateInstance();
+
+                        Stream s = File.OpenRead(filename);
+                        sounds[current_entry] = new SoundEffect(s).CreateInstance();
 #else
 						throw new NotImplementedException();
 #endif
