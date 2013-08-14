@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
             Rate = (float)asbd.SampleRate;
             Size = (int)afs.DataByteCount;
             
-            if (asbd.ChannelsPerFrame == 1)
+            if (asbd.ChannelsPerFrame <= 1)
                 Format = asbd.BitsPerChannel == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
             else
                 Format = asbd.BitsPerChannel == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
