@@ -26,7 +26,6 @@ SOFTWARE.
 #endregion License
 
 using System;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework

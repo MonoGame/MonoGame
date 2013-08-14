@@ -42,34 +42,54 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Snapshot of the game timing state expressed in values that can be used by variable-step (real time) or fixed-step (game time) games.
+    /// </summary>
     public class GameTime
     {
+        /// <summary>
+        /// The amount of game time since the start of the game.
+        /// </summary>
         public TimeSpan TotalGameTime { get; set; }
 
+        /// <summary>
+        /// The amount of elapsed game time since the last update.
+        /// </summary>
         public TimeSpan ElapsedGameTime { get; set; }
 
+        /// <summary>
+        /// Gets a value indicating that the game loop is taking longer than its TargetElapsedTime. In this case, the game loop can be considered to be running too slowly and should do something to "catch up."
+        /// </summary>
         public bool IsRunningSlowly { get; set; }
 
+        /// <summary>
+        /// Creates a new instance of GameTime.
+        /// </summary>
         public GameTime()
         {
-            TotalGameTime = TimeSpan.Zero;
-            ElapsedGameTime = TimeSpan.Zero;
-            IsRunningSlowly = false;
         }
 
+        /// <summary>
+        /// Creates a new instance of GameTime.
+        /// </summary>
+        /// <param name="totalGameTime">The amount of game time since the start of the game.</param>
+        /// <param name="elapsedGameTime">The amount of elapsed game time since the last update.</param>
         public GameTime(TimeSpan totalGameTime, TimeSpan elapsedGameTime)
+            : this(totalGameTime, elapsedGameTime, false)
         {
-            TotalGameTime = totalGameTime;
-            ElapsedGameTime = elapsedGameTime;
-            IsRunningSlowly = false;
         }
 
-		public GameTime (TimeSpan totalRealTime, TimeSpan elapsedRealTime, bool isRunningSlowly)
-		{
+        /// <summary>
+        /// Creates a new instance of GameTime.
+        /// </summary>
+        /// <param name="totalRealTime">The amount of game time since the start of the game.</param>
+        /// <param name="elapsedRealTime">The amount of elapsed game time since the last update.</param>
+        /// <param name="isRunningSlowly">Whether the game is running multiple updates this frame.</param>
+        public GameTime(TimeSpan totalRealTime, TimeSpan elapsedRealTime, bool isRunningSlowly)
+        {
             TotalGameTime = totalRealTime;
             ElapsedGameTime = elapsedRealTime;
-		    IsRunningSlowly = isRunningSlowly;
-		}
+            IsRunningSlowly = isRunningSlowly;
+        }
     }
 }
-
