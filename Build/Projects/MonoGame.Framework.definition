@@ -442,6 +442,24 @@
     <Compile Include="Net\PacketWriter.cs" />
     <Compile Include="Net\QualityOfService.cs" />
     <Compile Include="Net\SendDataOptions.cs" />
+    <Compile Include="Media\MediaSourceType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\MediaState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\Playlist.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\PlaylistCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\Song.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Media\SongCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
@@ -518,6 +536,19 @@
     <Compile Include="Windows8\MetroHelper.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows8\XamlGame.cs" />
+    <Compile Include="Windows8\MetroHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Windows8\SharpDXHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
+    <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs" />
+    <Compile Include="WindowsPhone\GamePad.cs" />
+    <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs" />
+    <Compile Include="WindowsPhone\WPGamePlatform.cs" />
+    <Compile Include="WindowsPhone\WPGameWindow.cs" />
+    <Compile Include="WindowsPhone\XamlGame.cs" />
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo" />
