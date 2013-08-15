@@ -13,19 +13,19 @@ for ocs in $CSFILES; do
   while [[ "$is" == *"/"* ]]; do
     is=${is/\//\\}
   done
-  notin=""
+  notin=" "
   for platform in $PLATFORMS; do
     result=$(grep "\"$cs" MonoGame.Framework.$platform.csproj)
     if [ "$result" == "" ]; then
       notin="$notin$platform "
     fi
   done
-  if [ "$notin" == "" ]; then
+  if [ "$notin" == " " ]; then
     echo "<Compile Include=\"${is}\" />"
   else
     platresult=""
     for platform in $PLATFORMS; do
-      if [[ "$notin" == *"$platform"* ]]; then
+      if [[ "$notin" == *" $platform "* ]]; then
         # do nothing
         true
       else
