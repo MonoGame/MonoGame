@@ -26,6 +26,7 @@
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\Ouya\Input\GamePad.cs" />
     <Compile Include="Android\PowerStatus.cs" />
     <Compile Include="Android\ResumeManager.cs" />
     <Compile Include="Android\ScreenReciever.cs" />
