@@ -90,6 +90,7 @@
         <AssemblyName>
           <xsl:value-of select="$project/@Name" />
         </AssemblyName>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       </PropertyGroup>
       <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugSymbols>true</DebugSymbols>
@@ -109,7 +110,7 @@
           <xsl:text>DEBUG;</xsl:text>
           <xsl:choose>
             <xsl:when test="/Input/Generation/Platform = 'Linux'">
-              <xsl:text>LINUX</xsl:text>
+              <xsl:text>TRACE;LINUX;OPENGL</xsl:text>
             </xsl:when>
             <xsl:when test="/Input/Generation/Platform = 'Windows'">
               <xsl:text>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</xsl:text>
