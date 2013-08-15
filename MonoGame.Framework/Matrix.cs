@@ -31,7 +31,10 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    public struct Matrix : IEquatable<Matrix>
+    public struct Matrix 
+#if !AGENT
+        : IEquatable<Matrix>
+#endif
     {
         #region Public Constructors
         
@@ -62,49 +65,49 @@ namespace Microsoft.Xna.Framework
 
         [DataMember]
         public float M11;
-      
+
         [DataMember]
         public float M12;
-      
+
         [DataMember]
         public float M13;
-      
+
         [DataMember]
         public float M14;
-      
+
         [DataMember]
         public float M21;
-      
+
         [DataMember]
         public float M22;
-      
+
         [DataMember]
         public float M23;
-      
+
         [DataMember]
         public float M24;
-      
+
         [DataMember]
         public float M31;
-      
+
         [DataMember]
         public float M32;
-      
+
         [DataMember]
         public float M33;
-      
+
         [DataMember]
         public float M34;
-      
+
         [DataMember]
         public float M41;
-      
+
         [DataMember]
         public float M42;
-      
+
         [DataMember]
         public float M43;
-      
+
         [DataMember]
         public float M44;
 
@@ -187,6 +190,7 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
         
+#if !AGENT
         public Vector3 Backward
         {
             get
@@ -230,8 +234,8 @@ namespace Microsoft.Xna.Framework
                 this.M33 = -value.Z;
             }
         }
+#endif
 
-        
         public static Matrix Identity
         {
             get { return identity; }
@@ -251,7 +255,8 @@ namespace Microsoft.Xna.Framework
 								};
 			return matarray;
 		}
-        
+
+#if !AGENT
         public Vector3 Left
         {
             get
@@ -310,6 +315,7 @@ namespace Microsoft.Xna.Framework
                 this.M23 = value.Z;
             }
         }
+#endif
         #endregion Public Properties
 
         #region Public Methods
@@ -357,7 +363,7 @@ namespace Microsoft.Xna.Framework
 
         }
 
-        
+#if !AGENT        
         public static Matrix CreateBillboard(Vector3 objectPosition, Vector3 cameraPosition,
             Vector3 cameraUpVector, Nullable<Vector3> cameraForwardVector)
         {
@@ -775,7 +781,7 @@ namespace Microsoft.Xna.Framework
 		    result.M43 = -Vector3.Dot(vector, cameraPosition);
 		    result.M44 = 1f;
         }
-
+#endif
 
         public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
         {
@@ -1203,7 +1209,7 @@ namespace Microsoft.Xna.Framework
 			result.M44 = 1;
         }
 
-
+#if !AGENT
         public static Matrix CreateScale(Vector3 scales)
         {
             Matrix result;
@@ -1246,7 +1252,7 @@ namespace Microsoft.Xna.Framework
 			result.M43 = 0;
 			result.M44 = 1;
         }
-
+#endif
         public static Matrix CreateTranslation(float xPosition, float yPosition, float zPosition)
         {
             Matrix result;
@@ -1269,7 +1275,7 @@ namespace Microsoft.Xna.Framework
 			return result;
         }
 
-
+#if !AGENT
         public static void CreateTranslation(ref Vector3 position, out Matrix result)
         {
             result.M11 = 1;
@@ -1312,7 +1318,7 @@ namespace Microsoft.Xna.Framework
 			result.M44 = 1;
 			return result;
         }
-
+#endif
 
         public static void CreateTranslation(float xPosition, float yPosition, float zPosition, out Matrix result)
         {
@@ -1333,7 +1339,7 @@ namespace Microsoft.Xna.Framework
 			result.M43 = zPosition;
 			result.M44 = 1;
         }
-
+#if !AGENT
         public static Matrix CreateReflection(Plane value)
         {
             Matrix matrix;
@@ -1444,7 +1450,7 @@ namespace Microsoft.Xna.Framework
             rotation = Quaternion.CreateFromRotationMatrix(m1);
             return true;
         }	
-		
+#endif	
         public float Determinant()
         {
             float num22 = this.M11;
@@ -2142,10 +2148,17 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
+#if AGENT
+            return "{M11:" + M11 + " M12:" + M12 + " M13:" + M13 + " M14:" + M14 + "}"
+                 + "{M21:" + M21 + " M22:" + M22 + " M23:" + M23 + " M24:" + M24 + "}"
+                 + "{M31:" + M31 + " M32:" + M32 + " M33:" + M33 + " M34:" + M34 + "}"
+                 + "{M41:" + M41 + " M42:" + M42 + " M43:" + M43 + " M44:" + M44 + "}";
+#else
             return "{" + String.Format("M11:{0} M12:{1} M13:{2} M14:{3}", M11, M12, M13, M14) + "}"
 				+ " {" + String.Format("M21:{0} M22:{1} M23:{2} M24:{3}", M21, M22, M23, M24) + "}"
 				+ " {" + String.Format("M31:{0} M32:{1} M33:{2} M34:{3}", M31, M32, M33, M34) + "}"
 				+ " {" + String.Format("M41:{0} M42:{1} M43:{2} M44:{3}", M41, M42, M43, M44) + "}";
+#endif
         }
 
 

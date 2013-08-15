@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <AssemblyName>MonoGame.Framework</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MonoGame.Framework</RootNamespace>
+    <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5EF8E0ED-57A1-438D-BDA2-0A527AD5B68E}</ProjectGuid>
+    <TargetFrameworkVersion>v4.3</TargetFrameworkVersion>
+    <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\AGENT\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;AGENT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\AGENT\Release\</OutputPath>
+    <DefineConstants>TRACE;AGENT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
+  <ItemGroup>
+    <Compile Include="AGENT\ContentManager.cs" />
+    <Compile Include="AGENT\DataContractAttribute.cs" />
+    <Compile Include="AGENT\DataMemberAttribute.cs" />
+    <Compile Include="AGENT\Game.cs" />
+    <Compile Include="AGENT\GraphicsDevice.cs" />
+    <Compile Include="AGENT\GraphicsDeviceManager.cs" />
+    <Compile Include="AGENT\RenderTarget2D.cs" />
+    <Compile Include="AGENT\SpriteBatch.cs" />
+    <Compile Include="AGENT\SpriteFont.cs" />
+    <Compile Include="AGENT\Texture2D.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="Graphics\Viewport.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="Matrix.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="Vector2.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SPOT.Graphics" />
+    <Reference Include="Microsoft.SPOT.Native">
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup />
+</Project>

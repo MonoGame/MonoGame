@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#if !AGENT
+using System.Runtime.CompilerServices;
 using System.Resources;
+#endif
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -30,6 +32,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
 #elif WINDOWS_PHONE
 [assembly: AssemblyDescription("MonoGame for Windows Phone 8")]
+#elif AGENT
+[assembly: AssemblyDescription("MonoGame for Agent")]
 #endif
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -61,4 +65,6 @@ using System.Resources;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("3.0.0.0")]
 [assembly: AssemblyFileVersion("3.0.0.0")]
+#if !AGENT
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
+#endif

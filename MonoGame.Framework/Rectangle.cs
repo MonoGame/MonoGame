@@ -33,7 +33,10 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    public struct Rectangle : IEquatable<Rectangle>
+    public struct Rectangle 
+#if !AGENT
+        : IEquatable<Rectangle>
+#endif
     {
         #region Private Fields
 
@@ -42,7 +45,6 @@ namespace Microsoft.Xna.Framework
         #endregion Private Fields
 
         #region Public Fields
-
         [DataMember]
         public int X;
 
@@ -196,7 +198,11 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
+#if AGENT
+            return "{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}";
+#else
             return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3}}}", X, Y, Width, Height);
+#endif
         }
 
         public override int GetHashCode()

@@ -33,7 +33,10 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    public struct Vector2 : IEquatable<Vector2>
+    public struct Vector2 
+#if !AGENT
+        : IEquatable<Vector2>
+#endif
     {
         #region Private Fields
 
@@ -49,7 +52,7 @@ namespace Microsoft.Xna.Framework
       
         [DataMember]
         public float X;
-        
+
         [DataMember]
         public float Y;
 
@@ -414,6 +417,7 @@ namespace Microsoft.Xna.Framework
                                  (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42);
         }
 
+#if !AGENT
         public static Vector2 Transform(Vector2 position, Quaternion quat)
         {
             Transform(ref position, ref quat, out position);
@@ -429,8 +433,9 @@ namespace Microsoft.Xna.Framework
 
             result = new Vector2(v.X, v.Y);
         }
-		
-		public static void Transform (
+#endif
+
+        public static void Transform (
 			Vector2[] sourceArray,
 			ref Matrix matrix,
 			Vector2[] destinationArray)
@@ -470,9 +475,13 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
+#if AGENT
+            return "{X:" + this.X.ToString() + " Y:" + this.Y.ToString() + "}";
+#else
 			CultureInfo currentCulture = CultureInfo.CurrentCulture;
         	return string.Format(currentCulture, "{{X:{0} Y:{1}}}", new object[] { 
 				this.X.ToString(currentCulture), this.Y.ToString(currentCulture) });
+#endif
         }
 
         #endregion Public Methods

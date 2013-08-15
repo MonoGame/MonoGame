@@ -24,13 +24,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #endregion License
+
 using System;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    public struct Point : IEquatable<Point>
+    public struct Point
+#if !AGENT
+        : IEquatable<Point>
+#endif
     {
         #region Private Fields
 
@@ -120,7 +124,11 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
+#if AGENT
+            return "{X:" + this.X.ToString() + " Y:" + this.Y.ToString() + "}";
+#else
             return string.Format("{{X:{0} Y:{1}}}", X, Y);
+#endif
         }
 
         #endregion
