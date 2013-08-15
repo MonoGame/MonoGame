@@ -47,6 +47,116 @@
     }
     ]]>
   </msxsl:script> 
+  
+  <xsl:template name="configuration">
+    <xsl:param name="project" />
+    <xsl:param name="debug" />
+    <xsl:choose>
+      <xsl:when test="$debug = 'true'">
+        <DebugSymbols>true</DebugSymbols>
+        <Optimize>false</Optimize>
+      </xsl:when>
+      <xsl:otherwise>
+        <Optimize>true</Optimize>
+      </xsl:otherwise>
+    </xsl:choose>
+    <DebugType>full</DebugType>
+    <OutputPath>
+      <xsl:choose>
+        <xsl:when test="$project/@Type = 'Website'">
+          <xsl:text>bin</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="$debug = 'true'">
+              <xsl:text>bin\Debug</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>bin\Release</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </OutputPath>
+    <DefineConstants>
+      <xsl:text>DEBUG;</xsl:text>
+      <xsl:choose>
+        <xsl:when test="/Input/Generation/Platform = 'Android'">
+          <xsl:text>TRACE;ANDROID;GLES;OPENGL</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'iOS'">
+          <xsl:text>IOS;GLES;OPENGL</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'Linux'">
+          <xsl:text>TRACE;LINUX;OPENGL</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'MacOS'">
+          <xsl:text>MONOMAC;OPENGL</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'Ouya'">
+          <xsl:text>TRACE;ANDROID;GLES;OPENGL;OUYA</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'PSMobile'">
+          <xsl:text>PSM</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'Windows'">
+          <xsl:text>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+          <xsl:text>TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'WindowsGL'">
+          <xsl:text>TRACE;WINDOWS;OPENGL</xsl:text>
+        </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'WindowsPhone'">
+          <xsl:text>TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:text>;</xsl:text>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <xsl:choose>
+      <xsl:when test="/Input/Properties/ForceArchitecture">
+        <PlatformTarget><xsl:value-of select="/Input/Properties/ForceArchitecture" /></PlatformTarget>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="/Input/Generation/Platform = 'Android'">
+        <xsl:choose>
+          <xsl:when test="$debug = 'true'">
+            <MonoDroidLinkMode>None</MonoDroidLinkMode>
+            <AndroidLinkMode>None</AndroidLinkMode>
+          </xsl:when>
+          <xsl:otherwise>
+            <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+            <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+            <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="/Input/Generation/Platform = 'iOS'">
+        <xsl:choose>
+          <xsl:when test="$debug = 'true'">
+            <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+            <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+            <MtouchDebug>True</MtouchDebug>
+            <MtouchUseArmv7>false</MtouchUseArmv7>
+          </xsl:when>
+          <xsl:otherwise>
+            <MtouchUseArmv7>false</MtouchUseArmv7>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="/Input/Generation/Platform = 'MacOS'">
+        <EnableCodeSigning>False</EnableCodeSigning>
+        <CreatePackage>False</CreatePackage>
+        <EnablePackageSigning>False</EnablePackageSigning>
+        <IncludeMonoRuntime>False</IncludeMonoRuntime>
+        <UseSGen>False</UseSGen>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
  
   <xsl:template match="/">
   
@@ -79,6 +189,24 @@
               <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
             </ProjectTypeGuids>
           </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'Android'">            
+            <ProjectTypeGuids>
+              <xsl:text>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};</xsl:text>
+              <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
+            </ProjectTypeGuids>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'iOS'">            
+            <ProjectTypeGuids>
+              <xsl:text>{6BC8ED88-2882-458C-8E55-DFD12B67127B};</xsl:text>
+              <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
+            </ProjectTypeGuids>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'PSMobile'">            
+            <ProjectTypeGuids>
+              <xsl:text>{69878862-DA7D-4DC6-B0A1-50D8FAB4242F};</xsl:text>
+              <xsl:text>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</xsl:text>
+            </ProjectTypeGuids>
+          </xsl:when>
           <xsl:otherwise>
           </xsl:otherwise>
         </xsl:choose>
@@ -108,85 +236,46 @@
           <xsl:value-of select="$project/@Name" />
         </AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <xsl:choose>
+          <xsl:when test="/Input/Generation/Platform = 'Android'">
+            <FileAlignment>512</FileAlignment>
+            <AndroidSupportedAbis>armeabi%3barmeabi-v7a%3bx86</AndroidSupportedAbis>
+            <AndroidStoreUncompressedFileExtensions />
+            <MandroidI18n />
+            <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+            <DeployExternal>False</DeployExternal>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'iOS'">
+            <SynchReleaseVersion>False</SynchReleaseVersion>
+            <ReleaseVersion>1.6</ReleaseVersion>
+            <MtouchSdkVersion>3.0</MtouchSdkVersion>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'MacOS'">
+            <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+          </xsl:when>
+          <xsl:when test="/Input/Generation/Platform = 'Ouya'">
+            <FileAlignment>512</FileAlignment>
+            <AndroidSupportedAbis>armeabi%3barmeabi-v7a%3bx86</AndroidSupportedAbis>
+            <AndroidStoreUncompressedFileExtensions />
+            <MandroidI18n />
+            <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+            <DeployExternal>False</DeployExternal>
+            <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
+            <TargetFrameworkProfile />
+          </xsl:when>
+        </xsl:choose>
       </PropertyGroup>
       <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>
-          <xsl:choose>
-            <xsl:when test="$project/@Type = 'Website'">
-              <xsl:text>bin</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>bin\Debug</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </OutputPath>
-        <DefineConstants>
-          <xsl:text>DEBUG;</xsl:text>
-          <xsl:choose>
-            <xsl:when test="/Input/Generation/Platform = 'Linux'">
-              <xsl:text>TRACE;LINUX;OPENGL</xsl:text>
-            </xsl:when>
-            <xsl:when test="/Input/Generation/Platform = 'Windows'">
-              <xsl:text>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</xsl:text>
-            </xsl:when>
-            <xsl:when test="/Input/Generation/Platform = 'Android'">
-              <xsl:text>TRACE;ANDROID;GLES;OPENGL</xsl:text>
-            </xsl:when>
-            <xsl:when test="/Input/Generation/Platform = 'iOS'">
-              <xsl:text>IOS;GLES;OPENGL</xsl:text>
-            </xsl:when>
-            <xsl:when test="/Input/Generation/Platform = 'MacOS'">
-              <xsl:text>MONOMAC;OPENGL</xsl:text>
-            </xsl:when>
-          </xsl:choose>
-          <xsl:text>;</xsl:text>
-        </DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <xsl:choose>
-          <xsl:when test="/Input/Properties/ForceArchitecture">
-            <PlatformTarget><xsl:value-of select="/Input/Properties/ForceArchitecture" /></PlatformTarget>
-          </xsl:when>
-        </xsl:choose>
+        <xsl:call-template name="configuration">
+          <xsl:with-param name="project"><value-of select="$project" /></xsl:with-param>
+          <xsl:with-param name="debug">true</xsl:with-param>
+        </xsl:call-template>
       </PropertyGroup>
       <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>full</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>
-          <xsl:choose>
-            <xsl:when test="$project/@Type = 'Website'">
-              <xsl:text>bin</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>bin\Release</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </OutputPath>
-        <DefineConstants>
-          <xsl:text>RELEASE;</xsl:text>
-          <xsl:choose>
-            <xsl:when test="/Input/Generation/Platform = 'Linux'">
-              <xsl:text>PLATFORM_LINUX</xsl:text>
-            </xsl:when>
-            <xsl:when test="/Input/Generation/Platform = 'Windows'">
-              <xsl:text>PLATFORM_WINDOWS</xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>PLATFORM_UNKNOWN</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>;</xsl:text>
-        </DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <xsl:choose>
-          <xsl:when test="/Input/Properties/ForceArchitecture">
-            <PlatformTarget><xsl:value-of select="/Input/Properties/ForceArchitecture" /></PlatformTarget>
-          </xsl:when>
-        </xsl:choose>
+        <xsl:call-template name="configuration">
+          <xsl:with-param name="project"><value-of select="$project" /></xsl:with-param>
+          <xsl:with-param name="debug">false</xsl:with-param>
+        </xsl:call-template>
       </PropertyGroup>
       <xsl:if test="/Input/Properties/ForceArchitecture">
         <PropertyGroup>
@@ -195,37 +284,10 @@
             <xsl:value-of select="/Input/Properties/ForceArchitecture" />
             <xsl:text>' </xsl:text>
           </xsl:attribute>
-          <DebugSymbols>true</DebugSymbols>
-          <DebugType>full</DebugType>
-          <Optimize>false</Optimize>
-          <OutputPath>
-            <xsl:choose>
-              <xsl:when test="$project/@Type = 'Website'">
-                <xsl:text>bin</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>bin\Debug</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </OutputPath>
-          <DefineConstants>
-            <xsl:text>DEBUG;</xsl:text>
-            <xsl:choose>
-              <xsl:when test="/Input/Generation/Platform = 'Linux'">
-                <xsl:text>PLATFORM_LINUX</xsl:text>
-              </xsl:when>
-              <xsl:when test="/Input/Generation/Platform = 'Windows'">
-                <xsl:text>PLATFORM_WINDOWS</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>PLATFORM_UNKNOWN</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:text>;</xsl:text>
-          </DefineConstants>
-          <ErrorReport>prompt</ErrorReport>
-          <WarningLevel>4</WarningLevel>
-          <PlatformTarget><xsl:value-of select="/Input/Properties/ForceArchitecture" /></PlatformTarget>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="project"><value-of select="$project" /></xsl:with-param>
+            <xsl:with-param name="debug">true</xsl:with-param>
+          </xsl:call-template>
         </PropertyGroup>
         <PropertyGroup>
           <xsl:attribute name="Condition">
@@ -233,36 +295,10 @@
             <xsl:value-of select="/Input/Properties/ForceArchitecture" />
             <xsl:text>' </xsl:text>
           </xsl:attribute>
-          <DebugType>full</DebugType>
-          <Optimize>true</Optimize>
-          <OutputPath>
-            <xsl:choose>
-              <xsl:when test="$project/@Type = 'Website'">
-                <xsl:text>bin</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>bin\Release</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-          </OutputPath>
-          <DefineConstants>
-            <xsl:text>RELEASE;</xsl:text>
-            <xsl:choose>
-              <xsl:when test="/Input/Generation/Platform = 'Linux'">
-                <xsl:text>PLATFORM_LINUX</xsl:text>
-              </xsl:when>
-              <xsl:when test="/Input/Generation/Platform = 'Windows'">
-                <xsl:text>PLATFORM_WINDOWS</xsl:text>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:text>PLATFORM_UNKNOWN</xsl:text>
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:text>;</xsl:text>
-          </DefineConstants>
-          <ErrorReport>prompt</ErrorReport>
-          <WarningLevel>4</WarningLevel>
-          <PlatformTarget>AnyCPU</PlatformTarget>
+          <xsl:call-template name="configuration">
+            <xsl:with-param name="project"><value-of select="$project" /></xsl:with-param>
+            <xsl:with-param name="debug">false</xsl:with-param>
+          </xsl:call-template>
         </PropertyGroup>
       </xsl:if>
       
