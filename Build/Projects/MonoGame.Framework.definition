@@ -171,6 +171,8 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\NotificationPosition.cs" />
+    <Compile Include="GamerServices\MonoLive.cs" />
+    <Compile Include="GamerServices\MonoLiveClient.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="GameServiceContainer.cs" />
@@ -475,6 +477,7 @@
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Threading.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="TitleContainer.cs" />
@@ -483,6 +486,12 @@
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
+    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
+    <Compile Include="Windows\GamerServices\Guide.cs" />
+    <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
+    <Compile Include="Windows\Input\KeyboardUtil.cs" />
+    <Compile Include="Windows\Media\Video.cs" />
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
