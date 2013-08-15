@@ -26,10 +26,17 @@
           (
             ('$(TargetPlatform)' != 'Windows') And
             ('$(TargetPlatform)' != 'Linux') And
-            ('$(TargetPlatform)' != 'Java')
+            ('$(TargetPlatform)' != 'iOS') And
+            ('$(TargetPlatform)' != 'Ouya') And
+            ('$(TargetPlatform)' != 'MacOS') And
+            ('$(TargetPlatform)' != 'PSMobile') And
+            ('$(TargetPlatform)' != 'Windows8') And
+            ('$(TargetPlatform)' != 'WindowsPhone') And
+            ('$(TargetPlatform)' != 'WindowsGL') And
+            ('$(TargetPlatform)' != 'Xamarin')
           )
         )"
-      Text="You must set the TargetPlatform property to Windows, Linux or Java!" />
+      Text="You must set the TargetPlatform property to Windows, Linux, iOS, Ouya, MacOS, PSMobile, Windows8, WindowsPhone, WindowsGL or Xamarin!" />
     <Error
       Condition="'$(RootPath)' == ''"
       Text="RootPath property is not set.  Build 'Main.proj' instead." />
