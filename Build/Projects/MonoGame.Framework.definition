@@ -8,6 +8,27 @@
     <Reference Include="MonoGame.ThirdParty" />
   </References>
   <Files>
+    <Compile Include="Android\AndroidCompatibility.cs" />
+    <Compile Include="Android\AndroidGameActivity.cs" />
+    <Compile Include="Android\AndroidGamePlatform.cs" />
+    <Compile Include="Android\AndroidGameWindow.cs" />
+    <Compile Include="Android\Audio\Sound.cs" />
+    <Compile Include="Android\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Android\Devices\Sensors\Compass.cs" />
+    <Compile Include="Android\GamerServices\Guide.cs" />
+    <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Android\GamerServices\SignedInGamer.cs" />
+    <Compile Include="Android\Input\GamePad.cs" />
+    <Compile Include="Android\Input\Keyboard.cs" />
+    <Compile Include="Android\Input\Touch\AndroidTouchEventManager.cs" />
+    <Compile Include="Android\IResumeManager.cs" />
+    <Compile Include="Android\Media\Song.cs" />
+    <Compile Include="Android\Media\Video.cs" />
+    <Compile Include="Android\Media\VideoPlayer.cs" />
+    <Compile Include="Android\OrientationListener.cs" />
+    <Compile Include="Android\PowerStatus.cs" />
+    <Compile Include="Android\ResumeManager.cs" />
+    <Compile Include="Android\ScreenReciever.cs" />
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -20,6 +41,7 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Audio\XactClip.cs" />
@@ -148,6 +170,7 @@
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
+    <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
@@ -326,6 +349,15 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
     <Compile Include="Net\AvailableNetworkSession.cs" />
     <Compile Include="Net\AvailableNetworkSessionCollection.cs" />
     <Compile Include="Net\CommandEvent.cs" />
@@ -363,6 +395,7 @@
     <Compile Include="Point.cs" />
     <Compile Include="PowerLineStatus.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
+    <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />
@@ -371,6 +404,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="TextInputEventArgs.cs" />
+    <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Threading.cs" />
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Utilities\Hash.cs" />
