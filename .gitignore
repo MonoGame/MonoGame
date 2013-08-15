@@ -75,7 +75,7 @@ monodroid*.msi
 *.WindowsGL.csproj
 *.WindowsGL.nuspec
 *.WindowsGL.sln
-*.Xamarin.csproj
-*.Xamarin.nuspec
-*.Xamarin.sln
+*.Android.csproj
+*.Android.nuspec
+*.Android.sln
 
