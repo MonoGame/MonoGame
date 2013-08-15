@@ -28,6 +28,23 @@
         return ex.Message;
       }
     }
+    
+    public bool ProjectIsActive(string platformString, string activePlatform)
+    {
+      if (string.IsNullOrEmpty(platformString))
+      {
+        return true;
+      }
+      var platforms = platformString.Split(',');
+      foreach (var i in platforms)
+      {
+        if (i == activePlatform)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
     ]]>
   </msxsl:script> 
  
@@ -400,53 +417,69 @@
       
       <ItemGroup>
         <xsl:for-each select="$project/Files/Compile">
-          <xsl:element 
-            name="{name()}" 
-            namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-            <xsl:attribute name="Include">
-              <xsl:value-of select="@Include" />
-            </xsl:attribute>
-            <xsl:apply-templates select="node()"/>
-          </xsl:element>
+          <xsl:if test="user:ProjectIsActive(
+              ./Platforms,
+              /Input/Generation/Platform)">
+            <xsl:element 
+              name="{name()}" 
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
         </xsl:for-each>
       </ItemGroup>
       
       <ItemGroup>
         <xsl:for-each select="$project/Files/None">
-          <xsl:element 
-            name="{name()}" 
-            namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-            <xsl:attribute name="Include">
-              <xsl:value-of select="@Include" />
-            </xsl:attribute>
-            <xsl:apply-templates select="node()"/>
-          </xsl:element>
+          <xsl:if test="user:ProjectIsActive(
+              ./Platforms,
+              /Input/Generation/Platform)">
+            <xsl:element 
+              name="{name()}" 
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
         </xsl:for-each>
       </ItemGroup>
       
       <ItemGroup>
         <xsl:for-each select="$project/Files/Content">
-          <xsl:element 
-            name="{name()}" 
-            namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-            <xsl:attribute name="Include">
-              <xsl:value-of select="@Include" />
-            </xsl:attribute>
-            <xsl:apply-templates select="node()"/>
-          </xsl:element>
+          <xsl:if test="user:ProjectIsActive(
+              ./Platforms,
+              /Input/Generation/Platform)">
+            <xsl:element 
+              name="{name()}" 
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
         </xsl:for-each>
       </ItemGroup>
       
       <ItemGroup>
         <xsl:for-each select="$project/Files/EmbeddedResource">
-          <xsl:element 
-            name="{name()}" 
-            namespace="http://schemas.microsoft.com/developer/msbuild/2003">
-            <xsl:attribute name="Include">
-              <xsl:value-of select="@Include" />
-            </xsl:attribute>
-            <xsl:apply-templates select="node()"/>
-          </xsl:element>
+          <xsl:if test="user:ProjectIsActive(
+              ./Platforms,
+              /Input/Generation/Platform)">
+            <xsl:element 
+              name="{name()}" 
+              namespace="http://schemas.microsoft.com/developer/msbuild/2003">
+              <xsl:attribute name="Include">
+                <xsl:value-of select="@Include" />
+              </xsl:attribute>
+              <xsl:apply-templates select="node()"/>
+            </xsl:element>
+          </xsl:if>
         </xsl:for-each>
       </ItemGroup>
       

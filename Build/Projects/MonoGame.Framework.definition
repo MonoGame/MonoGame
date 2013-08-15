@@ -87,9 +87,6 @@
     <Compile Include="Audio\Cue.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Audio\DynamicSoundEffectInstance.cs">
-      <Platforms></Platforms>
-    </Compile>
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL</Platforms>
@@ -646,9 +643,6 @@
     <Compile Include="Linux\Media\Video.cs">
       <Platforms>Linux</Platforms>
     </Compile>
-    <Compile Include="Linux\PowerStatus.cs">
-      <Platforms></Platforms>
-    </Compile>
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs">
       <Platforms>Linux</Platforms>
     </Compile>
@@ -693,9 +687,6 @@
     </Compile>
     <Compile Include="MacOS\Media\VideoPlayer.cs">
       <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\PowerStatus.cs">
-      <Platforms></Platforms>
     </Compile>
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
       <Platforms>MacOS</Platforms>
@@ -845,9 +836,6 @@
     <Compile Include="Net\SendDataOptions.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="obj\Debug\.NETFramework,Version=v4.0.AssemblyAttribute.cs">
-      <Platforms></Platforms>
-    </Compile>
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
@@ -897,9 +885,6 @@
     </Compile>
     <Compile Include="PSSuite\Media\Video.cs">
       <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\PowerStatus.cs">
-      <Platforms></Platforms>
     </Compile>
     <Compile Include="PSSuite\PSSExtensions.cs">
       <Platforms>PSMobile</Platforms>
