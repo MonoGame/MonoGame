@@ -61,23 +61,36 @@ namespace Microsoft.Xna.Framework.Audio
 	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
-		private SoundState soundState = SoundState.Stopped;
+        private SoundState _soundState;
+        protected SoundState soundState {
+            get {
+                lock (this) {
+                    return _soundState;
+                }
+            }
+            set {
+                lock (this) {
+                    _soundState = value;
+                }
+            }
+        }
 		private OALSoundBuffer soundBuffer;
-		private OpenALSoundController controller;
+		internal OpenALSoundController controller;
 
         private float _volume = 1.0f;
         private bool _looped = false;
         private float _pan = 0f;
         private float _pitch = 0f;
 
-		bool hasSourceId = false;
-		int sourceId;
+		protected bool hasSourceId = false;
+		protected int sourceId;
 
         /// <summary>
         /// Creates an instance and initializes it.
         /// </summary>
         public SoundEffectInstance()
         {
+            soundState = SoundState.Stopped;
             InitializeSound();
         }
 
@@ -226,7 +239,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// the sound playback and set the state to SoundState.Paused. Otherwise, no change is
         /// made to the state of this instance.
         /// </summary>
-		public void Pause ()
+		public virtual void Pause ()
 		{
 			if (hasSourceId && soundState == SoundState.Playing)
             {
@@ -266,6 +279,11 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if (!hasSourceId)
 				return;
+			ApplyState (sourceId);
+		}
+
+		protected void ApplyState (int sourceId)
+		{
 			// Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
 			// Listener
@@ -276,7 +294,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Looping
 			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
 			// Pitch
-			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch (_pitch));
 		}
 
         /// <summary>
@@ -330,7 +348,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// the state of the instance will always be SoundState.Stopped after this method is
         /// called.
         /// </summary>
-		public void Stop ()
+		public virtual void Stop ()
 		{
 			if (hasSourceId) {
 				//Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);

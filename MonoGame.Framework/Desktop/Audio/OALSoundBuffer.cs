@@ -12,10 +12,10 @@ namespace Microsoft.Xna.Framework.Audio
 	internal class OALSoundBuffer : IDisposable
 	{
 		int openALDataBuffer;
-		ALFormat openALFormat;
+		protected ALFormat openALFormat { get; set; }
 		int dataSize;
-		int sampleRate;
-		private int _sourceId;
+		protected int sampleRate { get; set; }
+		protected int _sourceId { get; set; }
 
 		public OALSoundBuffer ()
 		{
@@ -29,6 +29,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        public OALSoundBuffer (int bufferId, int sourceId)
+        {
+            openALDataBuffer = bufferId;
+            SourceId = sourceId;
+        }
+
 		public int OpenALDataBuffer {
 			get {
 				return openALDataBuffer;
@@ -40,17 +46,21 @@ namespace Microsoft.Xna.Framework.Audio
 			set;
 		}
 
-        public void BindDataBuffer(byte[] dataBuffer, ALFormat format, int size, int sampleRate)
+        public void BindDataBuffer (byte [] dataBuffer, ALFormat format, int size, int sampleRate)
         {
             openALFormat = format;
             dataSize = size;
             this.sampleRate = sampleRate;
-            AL.BufferData(openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            AL.BufferData (openALDataBuffer, openALFormat, dataBuffer, dataSize, this.sampleRate);
+            ALError alError = AL.GetError ();
+            if (alError != ALError.NoError) {
+                Console.WriteLine("failed to fill OpenAL buffer: " + AL.GetErrorString(alError));
+            }
 
             int bits, channels;
 
             AL.GetBuffer(openALDataBuffer, ALGetBufferi.Bits, out bits);
-            ALError alError = AL.GetError();
+            alError = AL.GetError();
             if (alError != ALError.NoError)
             {
                 Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
@@ -63,7 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
                 alError = AL.GetError();
                 if (alError != ALError.NoError)
                 {
-                    Console.WriteLine("Failed to get buffer bits: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
+                    Console.WriteLine("Failed to get buffer channels: {0}, format={1}, size={2}, sampleRate={3}", AL.GetErrorString(alError), format, size, sampleRate);
                     Duration = -1;
                 }
                 else
