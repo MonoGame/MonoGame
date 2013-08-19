@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 #if OPENGL
 #if MONOMAC
@@ -34,11 +35,15 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool ScissorTestEnable { get; set; }
         public float SlopeScaleDepthBias { get; set; }
 
-		public static readonly RasterizerState CullClockwise;		
-		public static readonly RasterizerState CullCounterClockwise;
-		public static readonly RasterizerState CullNone;
+		private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullClockwise;
+        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullCounterClockwise;
+        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullNone;
 
-		public RasterizerState ()
+        public static RasterizerState CullClockwise { get { return _cullClockwise.Value; } }
+        public static RasterizerState CullCounterClockwise { get { return _cullCounterClockwise.Value; } }
+        public static RasterizerState CullNone { get { return _cullNone.Value; } }
+        
+        public RasterizerState()
 		{
 			CullMode = CullMode.CullCounterClockwiseFace;
 			FillMode = FillMode.Solid;
@@ -50,15 +55,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		static RasterizerState ()
 		{
-			CullClockwise = new RasterizerState () {
+			_cullClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
+            {
 				CullMode = CullMode.CullClockwiseFace
-			};
-			CullCounterClockwise = new RasterizerState () {
+			});
+
+			_cullCounterClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
+            {
 				CullMode = CullMode.CullCounterClockwiseFace
-			};
-			CullNone = new RasterizerState () {
+			});
+
+			_cullNone = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
+            {
 				CullMode = CullMode.None
-			};
+			});
 		}
 
 #if OPENGL
@@ -128,6 +138,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif DIRECTX
 
+        protected internal override void GraphicsDeviceResetting()
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.GraphicsDeviceResetting();
+        }
+
         internal void ApplyState(GraphicsDevice device)
         {
             if (_state == null)
@@ -187,11 +203,29 @@ namespace Microsoft.Xna.Framework.Graphics
             device._d3dContext.Rasterizer.State = _state;
         }
 
+        internal static void ResetStates()
+        {
+            _cullClockwise.Reset();
+            _cullCounterClockwise.Reset();
+            _cullNone.Reset();
+        }
+
 #endif // DIRECTX
 #if PSM
+        static readonly Dictionary<CullMode, CullFaceMode> MapCullMode = new Dictionary<CullMode, CullFaceMode> {
+            {CullMode.None, CullFaceMode.None},
+            {CullMode.CullClockwiseFace, CullFaceMode.Front}, // Cull cw
+            {CullMode.CullCounterClockwiseFace, CullFaceMode.Back}, // Cull ccw
+        };
+        
         internal void ApplyState(GraphicsDevice device)
         {
-            #warning Unimplemented
+            var g = device.Context;
+            
+            g.SetCullFace(MapCullMode[CullMode], CullFaceDirection.Cw); // Front == cw
+            g.Enable(EnableMode.CullFace, this.CullMode != CullMode.None);
+            
+            // FIXME: Everything else
         }
 #endif
     }

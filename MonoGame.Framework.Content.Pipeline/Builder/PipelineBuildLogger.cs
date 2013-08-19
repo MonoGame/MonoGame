@@ -11,20 +11,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
     {
         public override void LogMessage(string message, params object[] messageArgs)
         {
-            Console.WriteLine(message, messageArgs);
+			System.Diagnostics.Trace.WriteLine(string.Format(message, messageArgs));
         }
 
         public override void LogImportantMessage(string message, params object[] messageArgs)
         {
             // TODO: How do i make it high importance?
-            Console.WriteLine(message, messageArgs);
+			System.Diagnostics.Trace.WriteLine(string.Format(message, messageArgs));
         }
 
         public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
         {
             var msg = string.Format(message, messageArgs);
             var fileName = GetCurrentFilename(contentIdentity);
-            Console.WriteLine("{0}: {1}", fileName, msg);
+			System.Diagnostics.Trace.WriteLine(string.Format("{0}: {1}", fileName, msg));
         }
+
     }
+
 }
