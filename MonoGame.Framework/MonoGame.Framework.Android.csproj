@@ -59,6 +59,9 @@
     <Compile Include="GamerServices\LeaderboardReader.cs" />
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="Graphics\GLWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\ArbFboWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\IFboWrapper.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />

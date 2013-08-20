@@ -60,6 +60,9 @@
   <ItemGroup>
     <Compile Include="Android\IResumeManager.cs" />
     <Compile Include="Android\ResumeManager.cs" />
+    <Compile Include="Graphics\GLWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\ArbFboWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\IFboWrapper.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />

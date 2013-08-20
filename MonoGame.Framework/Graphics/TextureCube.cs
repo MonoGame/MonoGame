@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (mipMap)
 			{
 #if IOS || ANDROID
-				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
+				GLWrapper.Fbo.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
 				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
