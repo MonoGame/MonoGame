@@ -1,142 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
-    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Windows\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Windows\Release\</OutputPath>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ManagedPVRTC">
-      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
-    </Reference>
+<Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library">
+  <References>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Nvidia.TextureTools">
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpFont">
-      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">
-      <Link>Processors\MGFX\CommandLineParser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
-      <Link>Processors\MGFX\CompilerInclude.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
-      <Link>Processors\MGFX\DXConstantBufferData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
-      <Link>Processors\MGFX\DXConstantBufferData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.sharpdx.cs">
-      <Link>Processors\MGFX\DXConstantBufferData.sharpdx.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.writer.cs">
-      <Link>Processors\MGFX\DXConstantBufferData.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
-      <Link>Processors\MGFX\DXEffectObject.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXEffectObject.hlsl.cs">
-      <Link>Processors\MGFX\DXEffectObject.hlsl.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXEffectObject.writer.cs">
-      <Link>Processors\MGFX\DXEffectObject.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXExpression.cs">
-      <Link>Processors\MGFX\DXExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
-      <Link>Processors\MGFX\DXHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXPreshader.cs">
-      <Link>Processors\MGFX\DXPreshader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXPreshader.writer.cs">
-      <Link>Processors\MGFX\DXPreshader.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
-      <Link>Processors\MGFX\DXShaderData.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
-      <Link>Processors\MGFX\DXShaderData.mojo.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.sharpdx.cs">
-      <Link>Processors\MGFX\DXShaderData.sharpdx.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\DXShaderData.writer.cs">
-      <Link>Processors\MGFX\DXShaderData.writer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\GLSLOptimizer.cs">
-      <Link>Processors\MGFX\GLSLOptimizer.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
-      <Link>Processors\MGFX\MojoShader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Options.cs">
-      <Link>Processors\MGFX\Options.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Parser.cs">
-      <Link>Processors\MGFX\Parser.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTree.cs">
-      <Link>Processors\MGFX\ParseTree.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ParseTreeTools.cs">
-      <Link>Processors\MGFX\ParseTreeTools.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Scanner.cs">
-      <Link>Processors\MGFX\Scanner.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\ShaderInfo.cs">
-      <Link>Processors\MGFX\ShaderInfo.cs</Link>
-    </Compile>
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.ThirdParty.Content.Pipeline" />
+  </References>
+  <Properties>
+    <CustomDefinitions>
+      <Platform Name="Linux">TRACE;LINUX;</Platform>
+      <Platform Name="MacOS">TRACE;MACOS;</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;</Platform>
+    </CustomDefinitions>
+  </Properties>
+  <Files>
     <Compile Include="Audio\AudioContent.cs" />
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
@@ -154,13 +37,13 @@
     <Compile Include="ChildCollection.cs" />
     <Compile Include="ContentBuildLogger.cs" />
     <Compile Include="ContentIdentity.cs" />
-    <Compile Include="ContentImporter.cs" />
     <Compile Include="ContentImporterAttribute.cs" />
     <Compile Include="ContentImporterContext.cs" />
+    <Compile Include="ContentImporter.cs" />
     <Compile Include="ContentItem.cs" />
-    <Compile Include="ContentProcessor.cs" />
     <Compile Include="ContentProcessorAttribute.cs" />
     <Compile Include="ContentProcessorContext.cs" />
+    <Compile Include="ContentProcessor.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="FbxImporter.cs" />
@@ -173,8 +56,8 @@
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\BoneContent.cs" />
-    <Compile Include="Graphics\BoneWeight.cs" />
     <Compile Include="Graphics\BoneWeightCollection.cs" />
+    <Compile Include="Graphics\BoneWeight.cs" />
     <Compile Include="Graphics\Dxt1BitmapContent.cs" />
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
     <Compile Include="Graphics\Dxt5BitmapContent.cs" />
@@ -182,25 +65,25 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
-    <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
+    <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GraphicsUtil.cs" />
     <Compile Include="Graphics\IndexCollection.cs" />
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
     <Compile Include="Graphics\MeshContent.cs" />
-    <Compile Include="Graphics\MipmapChain.cs" />
     <Compile Include="Graphics\MipmapChainCollection.cs" />
-    <Compile Include="Graphics\NodeContent.cs" />
+    <Compile Include="Graphics\MipmapChain.cs" />
     <Compile Include="Graphics\NodeContentCollection.cs" />
+    <Compile Include="Graphics\NodeContent.cs" />
     <Compile Include="Graphics\PixelBitmapContent.cs" />
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
-    <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelCollection.cs" />
+    <Compile Include="Graphics\VertexChannel.cs" />
     <Compile Include="Graphics\VertexChannelGeneric.cs" />
     <Compile Include="Graphics\VertexChannelNames.cs" />
     <Compile Include="Graphics\VertexContent.cs" />
@@ -212,22 +95,38 @@
     <Compile Include="OpaqueDataDictionary.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
     <Compile Include="PipelineException.cs" />
-    <Compile Include="ProcessorParameter.cs" />
     <Compile Include="ProcessorParameterCollection.cs" />
+    <Compile Include="ProcessorParameter.cs" />
     <Compile Include="Processors\CompiledEffectContent.cs" />
     <Compile Include="Processors\EffectProcessor.cs" />
     <Compile Include="Processors\EffectProcessorDebugMode.cs" />
     <Compile Include="Processors\FontDescriptionProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
-    <Compile Include="Processors\ModelBoneContent.cs" />
-    <Compile Include="Processors\ModelBoneContentCollection.cs" />
-    <Compile Include="Processors\ModelContent.cs" />
-    <Compile Include="Processors\ModelMeshContent.cs" />
-    <Compile Include="Processors\ModelMeshContentCollection.cs" />
-    <Compile Include="Processors\ModelMeshPartContent.cs" />
-    <Compile Include="Processors\ModelMeshPartContentCollection.cs" />
-    <Compile Include="Processors\ModelProcessor.cs" />
+    <Compile Include="Processors\ModelBoneContentCollection.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelBoneContent.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelContent.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelMeshContentCollection.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelMeshContent.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelMeshPartContentCollection.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelMeshPartContent.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Processors\ModelProcessor.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
     <Compile Include="Processors\SoundEffectContent.cs" />
@@ -247,9 +146,12 @@
     <Compile Include="Serialization\Compiler\ByteWriter.cs" />
     <Compile Include="Serialization\Compiler\CharWriter.cs" />
     <Compile Include="Serialization\Compiler\ColorWriter.cs" />
+    <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Serialization\Compiler\ContentCompiler.cs" />
-    <Compile Include="Serialization\Compiler\ContentTypeWriter.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriterAttribute.cs" />
+    <Compile Include="Serialization\Compiler\ContentTypeWriter.cs" />
     <Compile Include="Serialization\Compiler\ContentTypeWriterGeneric.cs" />
     <Compile Include="Serialization\Compiler\ContentWriter.cs" />
     <Compile Include="Serialization\Compiler\CurveWriter.cs" />
@@ -257,16 +159,19 @@
     <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
     <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
-    <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
-    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
     <Compile Include="Serialization\Compiler\Int32Writer.cs" />
     <Compile Include="Serialization\Compiler\Int64Writer.cs" />
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
-    <Compile Include="Serialization\Compiler\ModelWriter.cs" />
+    <Compile Include="Serialization\Compiler\ModelWriter.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
@@ -287,8 +192,12 @@
     <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
-    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
-    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
+    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs">
+      <Platforms>Linux,Windows</Platforms>
+    </Compile>
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
     <Compile Include="VideoContent.cs" />
@@ -297,53 +206,105 @@
     <Compile Include="WmvImporter.cs" />
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
-      <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
-      <Name>MonoGame.Framework.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>SharpFont.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\AssimpNet.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>AssimpNet.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Platforms>Windows</Platforms>
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Platforms>Windows</Platforms>
       <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+      <Platforms>Windows</Platforms>
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+      <Platforms>Windows</Platforms>
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
+      <Platforms>Windows</Platforms>
       <Link>Dependencies\x64\libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Platforms>Windows</Platforms>
       <Link>Dependencies\x86\libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="..\ThirdParty\Libs\SharpFont\freetype6.dll">
+      <Platforms>Windows</Platforms>
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvcore.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvimage.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvimage.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvmath.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvmath.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Linux</Platforms>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvtt.so">
+      <Link>libnvtt.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>ManagedPVRTC.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreetype.6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\libassimp.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </Files>
 </Project>
