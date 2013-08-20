@@ -24,6 +24,13 @@
     <Binary
       Name="SharpDX.D3DCompiler"
       Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+    <Project
+      Name="2MGFX"
+      Guid="6362E6BD-4656-4216-B404-9C959C5B3825"
+      Path="Tools/2MGFX/2MGFX.csproj">
+      <ConfigurationMapping Old="Debug" New="Debug|x86" />
+      <ConfigurationMapping Old="Release" New="Release|x86" />
+    </Project>
   </Platform>
   
   <Platform Type="MacOS">

@@ -57,6 +57,9 @@ monodroid*.msi
 *.Windows.csproj
 *.Windows.nuspec
 *.Windows.sln
+*.MacOS.csproj
+*.MacOS.nuspec
+*.MacOS.sln
 *.iOS.csproj
 *.iOS.nuspec
 *.iOS.sln
