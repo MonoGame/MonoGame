@@ -20,12 +20,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="device"></param>
         internal static void Initialize(GraphicsDevice device)
         {
-#if !GLES
+#if MONOMAC
+            // MonoMac.OpenGL does not currently provide any EXT methods in its API.
+            // However, for the FBO methods it actually calls the EXT versions behind the scenes anyway.
+            if (device._extensions.Contains("GL_ARB_framebuffer_object") || device._extensions.Contains("GL_EXT_framebuffer_object"))
+                Fbo = new ArbFboWrapper();
+#elif WINDOWS || LINUX
             if (device._extensions.Contains("GL_ARB_framebuffer_object"))
                 Fbo = new ArbFboWrapper();
             else if (device._extensions.Contains("GL_EXT_framebuffer_object"))
                 Fbo = new ExtFboWrapper();
-#else
+#elif GLES
             if (device._extensions.Contains("GL_OES_framebuffer_object"))
                 Fbo = new ArbFboWrapper();
 #endif

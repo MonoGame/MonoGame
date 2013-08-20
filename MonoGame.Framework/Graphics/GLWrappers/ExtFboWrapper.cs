@@ -2,13 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if (OPENGL && !GLES)
+#if (OPENGL && (WINDOWS || LINUX))
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 {
