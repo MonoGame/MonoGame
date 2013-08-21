@@ -20,6 +20,106 @@
     </CustomDefinitions>
   </Properties>
   <Files>
+    <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\CompilerInclude.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXConstantBufferData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXConstantBufferData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.sharpdx.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXConstantBufferData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.writer.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXConstantBufferData.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.hlsl.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXEffectObject.hlsl.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.writer.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXEffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXExpression.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXPreshader.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXPreshader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXPreshader.writer.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXPreshader.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXShaderData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXShaderData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.sharpdx.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXShaderData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.writer.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\DXShaderData.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\GLSLOptimizer.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\GLSLOptimizer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Options.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Options.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Parser.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ParseTree.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ParseTreeTools.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ParseTreeTools.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Scanner.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderInfo.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderInfo.cs</Link>
+    </Compile>
     <Compile Include="Audio\AudioContent.cs" />
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
