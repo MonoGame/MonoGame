@@ -173,8 +173,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 			// Query its ABC spacing.
 			//float? abc = GetCharacterWidth(character, font, graphics);
-			if (glyphBitmap == null)
-				Console.WriteLine("null");
+//			if (glyphBitmap == null)
+//				Console.WriteLine("null");
 
 
 			// Construct the output Glyph object.
