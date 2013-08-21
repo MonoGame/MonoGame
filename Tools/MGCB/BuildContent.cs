@@ -159,8 +159,8 @@ namespace MGCB
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = Directory.GetCurrentDirectory();
-            var outputPath = Path.Combine(projectDirectory, OutputDir);
-            var intermediatePath = Path.Combine(projectDirectory, IntermediateDir);
+            var outputPath = Path.GetFullPath(Path.Combine(projectDirectory, OutputDir));
+            var intermediatePath = Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir));
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
 
             // Feed all the assembly references to the pipeline manager
