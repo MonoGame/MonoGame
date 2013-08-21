@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="MonoGame.Tests" Path="Test" Type="Console">
+  <References>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="MonoGame.ThirdParty" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Tests.Assets" />
+  </References>
+  <Files>
+    <Compile Include="Framework\Bounding.cs" />
+    <Compile Include="Framework\ColorTest.cs" />
+    <Compile Include="Framework\Components\Colored3DCubeComponent.cs">
+      <Platforms>iOS,Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
+    <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
+    <Compile Include="Framework\Components\FrameCompareComponent.cs" />
+    <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
+    <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Framework\Components\TexturedQuadComponent.cs">
+      <Platforms>iOS,Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Framework\Components\UpdateGuard.cs">
+      <Platforms>iOS,Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs">
+      <Platforms>iOS,Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Framework\Components\VisualTestGameComponent.cs">
+      <Platforms>iOS,Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Framework\GameTest.cs" />
+    <Compile Include="Framework\GameTest+Methods.cs" />
+    <Compile Include="Framework\GameTest+Properties.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
+    <Compile Include="Framework\RayTest.cs" />
+    <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Visual\ShaderTest.cs" />
+    <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
+    <Compile Include="Framework\Visual\SpriteFontTest.cs" />
+    <Compile Include="Framework\Visual\ViewportTest.cs" />
+    <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
+    <Compile Include="Framework\Visual\VisualTestGame.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <Platforms>Linux,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Runner\Constants.cs" />
+    <Compile Include="Runner\Desktop\FramePixelData.cs">
+      <Platforms>Linux,MacOS,Windows,XNA</Platforms>
+    </Compile>
+    <Compile Include="Runner\Extensions.cs" />
+    <Compile Include="Runner\FrameInfo.cs" />
+    <Compile Include="Runner\FramePixelData.cs" />
+    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
+    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
+    <Compile Include="Runner\Interface\FileServer.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\Interface\MobileInterface.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
+    <Compile Include="Runner\Interface\RunOptions.cs" />
+    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
+    <Compile Include="Runner\Interface\TestFilterAction.cs" />
+    <Compile Include="Runner\iOS\AppDelegate.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\iOS\FramePixelData.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\iOS\Main.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\Linux\Program.cs">
+      <Platforms>Linux</Platforms>
+    </Compile>
+    <Compile Include="Runner\MacOS\Program.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\PixelArgb.cs" />
+    <Compile Include="Runner\Utility.cs" />
+    <Compile Include="Runner\Windows\Program.cs">
+      <Platforms>Windows,XNA</Platforms>
+    </Compile>
+  </Files>
+</Project>
