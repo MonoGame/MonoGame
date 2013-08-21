@@ -791,6 +791,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #elif WINDOWS_PHONE
+            // Note that contrary to the method name this works for both JPEG and PNGs.
             var writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
             // Convert from ARGB to ABGR
             int[] pixels = writableBitmap.Pixels;
