@@ -12,7 +12,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	/// </summary>
 	public class FontDescription : ContentItem
 	{
-		List<char> characters;
 		char? defaultCharacter;
 		string fontName;
 		float size;
@@ -20,18 +19,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		FontDescriptionStyle style;
 		bool useKerning;
 		List<CharacterRegion> characterRegions;
-
-		/// <summary>
-		/// Gets the collection of characters provided by this FontDescription.
-		/// </summary>
-		[ContentSerializerIgnoreAttribute]
-		public List<char> Characters
-		{
-			get
-			{
-				return characters;
-			}
-		}
 
 		/// <summary>
 		/// Gets or sets the default character for the font.
@@ -194,7 +181,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
-		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning, List<char> chars, List<CharacterRegion> charRegions)
+		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning, List<CharacterRegion> charRegions)
 		{
 			// Write to the properties so the validation is run
 			FontName = fontName;
@@ -202,7 +189,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			Spacing = spacing;
 			Style = fontStyle;
 			UseKerning = useKerning;
-			characters = chars;
 			characterRegions = charRegions;
 		}
 	}

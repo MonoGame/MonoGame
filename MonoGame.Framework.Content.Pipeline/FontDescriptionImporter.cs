@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 			if (defChar != null)
 				defaultCharacter = defChar.Value[0];
 
-			var characters = new List<char>();
 			var characterRegions = new List<CharacterRegion> ();
 
 			foreach (var region in xmldoc.Descendants("CharacterRegion"))
@@ -60,20 +59,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 				var Start = (int)region.Element("Start").Value[0];
 				var End = (int)region.Element("End").Value[0];
 
-
-				for (var x = Start; x <= End; x++)
-				{
-					var character = (char)x;
-					if (characters.Contains(character))
-						continue;
-
-					characters.Add(character);
-				}
-
 				characterRegions.Add(new CharacterRegion((char)Start, (char)End));
 			}
 
-			var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning, characters, characterRegions);
+			var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning, characterRegions);
 			fontDescription.DefaultCharacter = defaultCharacter;
 			fontDescription.Identity = new ContentIdentity (filename);
 			return fontDescription;
