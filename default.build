@@ -49,8 +49,8 @@
   <target name="buildpsm" description="Build Play Station Mobile" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
+        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.PSMobile.sln" />
+        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.PSMobile.sln" />
       </if>
     </if>
   </target>
@@ -78,12 +78,12 @@
     <exec program="Protobuild.exe" commandline="--clean Linux" />
     <exec program="Protobuild.exe" commandline="--generate Linux" />
     <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Linux.csproj /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Linux.csproj /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Linux.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Linux.sln /t:Build /p:Configuration=Release" />
     </if>
     <if test="${os == 'Unix'}">
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework/MonoGame.Framework.Linux.csproj" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework/MonoGame.Framework.Linux.csproj" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Linux.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Linux.sln" />
     </if>
   </target>
 
@@ -91,8 +91,8 @@
     <exec program="Protobuild.exe" commandline="--clean MacOS" />
     <exec program="Protobuild.exe" commandline="--generate MacOS" />
     <if test="${os == 'MacOS'}">
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework/MonoGame.Framework.MacOS.csproj" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework/MonoGame.Framework.MacOS.csproj" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.MacOS.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.MacOS.sln" />
     </if>
   </target>
 
@@ -101,8 +101,8 @@
     <exec program="Protobuild.exe" commandline="--generate iOS" /> 
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets')}">
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework/MonoGame.Framework.iOS.csproj" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework/MonoGame.Framework.iOS.csproj" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.iOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.iOS.sln" />
       </if>
     </if>
   </target>
@@ -114,36 +114,36 @@
     <exec program="Protobuild.exe" commandline="--generate Ouya" />  
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
-        <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Android.csproj /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Android.csproj /t:Build /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Ouya.csproj /t:Clean /p:Configuration=Release" />
-        <exec program="msbuild " commandline="MonoGame.Framework/MonoGame.Framework.Ouya.csproj /t:Build /p:Configuration=Release" />
+        <exec program="msbuild " commandline="MonoGame.Android.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild " commandline="MonoGame.Android.sln /t:Build /p:Configuration=Release" />
+        <exec program="msbuild " commandline="MonoGame.Ouya.sln /t:Clean /p:Configuration=Release" />
+        <exec program="msbuild " commandline="MonoGame.Ouya.sln /t:Build /p:Configuration=Release" />
       </if>
     </if>
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoAndroid/usr/bin/mandroid')}">
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework/MonoGame.Framework.Android.csproj" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework/MonoGame.Framework.Android.csproj" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework/MonoGame.Framework.Ouya.csproj" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework/MonoGame.Framework.Ouya.csproj" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Android.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Android.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Ouya.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Ouya.sln" />
       </if>
     </if>
   </target>
 
   <target name="buildwindows8" description="Build Windows 8" depends="clean">
     <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Rebuild /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Windows8.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Windows8.sln /t:Rebuild /p:Configuration=Release" />
     </if>
   </target>
 
   <target name="buildwindowsphone" description="Build Windows Phone" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.0\Microsoft.Cpp.WindowsPhone.8.0.targets')}">
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="ARM"' />
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="ARM"' />
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="x86"' />
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />
+        <exec program="msbuild " commandline='MonoGame.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="ARM"' />
+        <exec program="msbuild " commandline='MonoGame.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="ARM"' />
+        <exec program="msbuild " commandline='MonoGame.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="x86"' />
+        <exec program="msbuild " commandline='MonoGame.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />
       </if>
     </if>
   </target>
