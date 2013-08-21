@@ -60,9 +60,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].AlphaBlendFunction = value;
-                _targetBlendState[1].AlphaBlendFunction = value;
-                _targetBlendState[2].AlphaBlendFunction = value;
-                _targetBlendState[3].AlphaBlendFunction = value;
             }
 	    }
 
@@ -73,9 +70,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].AlphaDestinationBlend = value;
-                _targetBlendState[1].AlphaDestinationBlend = value;
-                _targetBlendState[2].AlphaDestinationBlend = value;
-                _targetBlendState[3].AlphaDestinationBlend = value;
             }
         }
 
@@ -86,9 +80,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].AlphaSourceBlend = value;
-                _targetBlendState[1].AlphaSourceBlend = value;
-                _targetBlendState[2].AlphaSourceBlend = value;
-                _targetBlendState[3].AlphaSourceBlend = value;
             }
         }
 
@@ -99,9 +90,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].ColorBlendFunction = value;
-                _targetBlendState[1].ColorBlendFunction = value;
-                _targetBlendState[2].ColorBlendFunction = value;
-                _targetBlendState[3].ColorBlendFunction = value;
             }
         }
 
@@ -112,9 +100,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].ColorDestinationBlend = value;
-                _targetBlendState[1].ColorDestinationBlend = value;
-                _targetBlendState[2].ColorDestinationBlend = value;
-                _targetBlendState[3].ColorDestinationBlend = value;
             }
         }
 
@@ -125,9 +110,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 AssertIfBound();
                 _targetBlendState[0].ColorSourceBlend = value;
-                _targetBlendState[1].ColorSourceBlend = value;
-                _targetBlendState[2].ColorSourceBlend = value;
-                _targetBlendState[3].ColorSourceBlend = value;
             }
         }
 
