@@ -327,7 +327,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// the sound is played using the Play() method. Upon success, the sound state should
         /// be SoundState.Playing.
         /// </summary>
-		public void Resume ()
+		public virtual void Resume ()
 		{
             if (hasSourceId)
             {

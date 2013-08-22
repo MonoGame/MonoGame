@@ -85,6 +85,11 @@ namespace Microsoft.Xna.Framework.Audio {
             ThreadPool.QueueUserWorkItem (new WaitCallback (startPlaying));
         }
 
+        public override void Resume ()
+        {
+            Play ();
+        }
+        
         public override void Stop ()
         {
             soundState = SoundState.Stopped;
@@ -146,7 +151,7 @@ namespace Microsoft.Xna.Framework.Audio {
                         break;
                     }
                 }
-        }
+            }
         }
     }
 }
