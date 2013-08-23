@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="iOS,Linux,MacOS,Windows,XNA">
   <References>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="MonoGame.ThirdParty" />
+    <Reference Include="MonoGame.ThirdParty.Tests" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Tests.Assets" />
   </References>
