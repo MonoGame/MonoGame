@@ -178,6 +178,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.WindowsMedia:
 #if WINDOWS
+                    //Ensure the directory is there so the wma file can be saved in it
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetFileName) + Path.DirectorySeparatorChar);
                     reader.Position = 0;
                     MediaFoundationEncoder.EncodeToWma(reader, targetFileName, QualityToBitRate(quality));
                     break;
