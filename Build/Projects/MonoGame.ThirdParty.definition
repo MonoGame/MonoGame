@@ -9,10 +9,7 @@
     <Project
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
   
   <Platform Type="iOS">
@@ -22,10 +19,7 @@
     <Project 
       Name="Lidgren.Network.iOS"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj" />
   </Platform>
   
   <Platform Type="Linux">
@@ -38,10 +32,7 @@
     <Project 
       Name="Lidgren.Network.Linux"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Linux.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Linux.csproj" />
   </Platform>
   
   <Platform Type="MacOS">
@@ -54,10 +45,7 @@
     <Project 
       Name="Lidgren.Network.MacOS"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.MacOS.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.MacOS.csproj" />
   </Platform>
   
   <Platform Type="Ouya">
@@ -71,10 +59,7 @@
     <Project
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
   
   <Platform Type="PSMobile">
@@ -83,10 +68,7 @@
     <Project 
       Name="Lidgren.Network.PSMobile"
       Guid="167676EE-E2D5-440A-BB2B-EFBD02BC8493"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj" />
   </Platform>
   
   <Platform Type="Windows">
@@ -160,10 +142,7 @@
     <Project 
       Name="Lidgren.Network.Windows"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj">
-      <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
-      <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
-    </Project>
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
   </Platform>
 
   <Platform Type="WindowsPhone">
