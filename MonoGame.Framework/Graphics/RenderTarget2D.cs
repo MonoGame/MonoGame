@@ -146,6 +146,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			}
 
+            Threading.BlockOnUIThread(() =>
+            {
+
 #if GLES
 			GL.GenRenderbuffers(1, ref glDepthBuffer);
 #else
@@ -188,6 +191,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				GraphicsExtensions.CheckGLError();
 			}
 #endif
+        });
+
         }
 		
 		public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
