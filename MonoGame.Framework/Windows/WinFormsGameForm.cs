@@ -31,6 +31,7 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
 
+        public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
         public const int WM_SYSCOMMAND = 0x0112;
 
@@ -41,6 +42,23 @@ namespace Microsoft.Xna.Framework.Windows
            
             switch (m.Msg)
             {
+                case WM_TABLET_QUERYSYSTEMGESTURESTA:
+                    {
+                        // This disables the windows touch helpers, popups, and 
+                        // guides that get in the way of touch gameplay.
+                        const int flags = 0x00000001 | // TABLET_DISABLE_PRESSANDHOLD
+                                          0x00000008 | // TABLET_DISABLE_PENTAPFEEDBACK
+                                          0x00000010 | // TABLET_DISABLE_PENBARRELFEEDBACK
+                                          0x00000100 | // TABLET_DISABLE_TOUCHUIFORCEON
+                                          0x00000200 | // TABLET_DISABLE_TOUCHUIFORCEOFF
+                                          0x00008000 | // TABLET_DISABLE_TOUCHSWITCH
+                                          0x00010000 | // TABLET_DISABLE_FLICKS
+                                          0x00080000 | // TABLET_DISABLE_SMOOTHSCROLLING 
+                                          0x00100000; // TABLET_DISABLE_FLICKFALLBACKKEYS
+                        m.Result = new IntPtr(flags);
+                        return;
+                    }
+
                 case WM_SYSCOMMAND:
                     // Disable the system menu from being toggled by
                     // keyboard input so we can own the ALT key.

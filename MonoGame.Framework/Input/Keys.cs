@@ -46,8 +46,7 @@ namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
     /// Identifies keys on a keyboard.
-    /// </summary>
-	[Flags]
+    /// </summary>	
 	public enum Keys
 	{
         /// <summary>

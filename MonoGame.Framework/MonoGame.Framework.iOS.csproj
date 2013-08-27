@@ -460,7 +460,7 @@
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
-  <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
