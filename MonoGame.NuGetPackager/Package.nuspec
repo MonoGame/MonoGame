@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>MonoGame</id>
+        <version>3.0.1</version>
+        <title>MonoGame</title>
+        <authors>Simon-Darkside</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>http://monogame.net/themes/_bartik/css/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes />
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="bin\release\content\wp8\*.*" target="content\wp8" />
+        <file src="bin\release\build\wp8\ARM\*.dll" target="build\wp8\ARM" />
+        <file src="bin\release\build\wp8\x86\*.dll" target="build\wp8\x86" />
+        <file src="bin\release\build\wp8\MonoGame.targets" target="build\wp8\MonoGame.targets" />
+        <file src="tools\install.ps1" target="tools\wp8\install.ps1" />
+        <file src="tools\init.ps1" target="tools\init.ps1" />
+        <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
+    </files>
+</package>

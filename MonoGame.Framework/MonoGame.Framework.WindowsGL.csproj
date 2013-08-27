@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -166,11 +166,8 @@
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
-	
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
-	
     <Compile Include="Graphics\PackedVector\Byte4.cs" />
-	
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
@@ -471,8 +468,7 @@
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
-	<Compile Include="Utilities\ObjectFactoryWithReset.cs" />
-    
+    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
