@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         protected internal override void Write(ContentWriter output, SongContent value)
         {
             output.Write(value.fileName);
-            output.Write((int)value.duration.TotalMilliseconds);
+            output.WriteObject((int)value.duration.TotalMilliseconds);
         }
     }
 }

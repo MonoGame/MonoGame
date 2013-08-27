@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Audio
 					}
 					return false;
 				} else {
-					return wave.State == SoundState.Playing;
+					return wave.State != SoundState.Stopped;
 				}
 			}
 		}
