@@ -305,15 +305,17 @@ namespace Microsoft.Xna.Framework.Content
 				//MonoGame try to load as a non-content file
 
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
+                
                 assetName = Normalize<T>(assetName);
 	
 				if (string.IsNullOrEmpty(assetName))
 				{
 					throw new ContentLoadException("Could not load " + originalAssetName + " asset as a non-content file!", ex);
 				}
+                // Make sure we take into account the Location when we load the content
+                var absolutePath = Path.Combine(TitleContainer.Location, assetName);
 
-                result = ReadRawAsset<T>(assetName, originalAssetName);
+                result = ReadRawAsset<T>(absolutePath, originalAssetName);
 
                 // Because Raw Assets skip the ContentReader step, they need to have their
                 // disopsables recorded here. Doing it outside of this catch will 
