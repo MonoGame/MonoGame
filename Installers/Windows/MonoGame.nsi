@@ -95,12 +95,14 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.Android.targets'  
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
   File /nonfatal '..\..\MonoGame.Framework\bin\OUYA\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\OUYA\Release\*.xml'  
   File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
-  
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.OUYA.targets'  
+ 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\Release\*.xml'
@@ -109,12 +111,14 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.WindowsGL.targets'  
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows'
   File /nonfatal '..\..\MonoGame.Framework\bin\Windows\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows\Release\*.xml'
   File '..\..\ThirdParty\Libs\SharpDX\Windows\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows\*.xml'
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.Windows.targets'  
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\Release\*.dll'
@@ -125,6 +129,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.Linux.targets'  
 
     
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
@@ -133,12 +138,14 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.xml'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
   File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.xml'
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.Windows8.targets'  
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
 
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.WP8.targets'  
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
@@ -150,6 +157,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
   File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
+  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.WP8.targets'  
 
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows' '' '$INSTDIR\Assemblies\Windows'
