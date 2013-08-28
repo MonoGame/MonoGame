@@ -13,12 +13,12 @@ using OpenTK.Audio.OpenAL;
 namespace Microsoft.Xna.Framework.Audio {
     public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance {
         const int NUM_BUFFERS = 3;
-        private ALFormat format;
-        private ConcurrentQueue<OALSoundBuffer> allocatedBuffers = new ConcurrentQueue<OALSoundBuffer> ();
-        private ConcurrentQueue<OALSoundBuffer> processedBuffers = new ConcurrentQueue<OALSoundBuffer> ();
-        int SourceId = 0;
+        ALFormat format;
+        ConcurrentQueue<OALSoundBuffer> allocatedBuffers = new ConcurrentQueue<OALSoundBuffer> ();
+        ConcurrentQueue<OALSoundBuffer> processedBuffers = new ConcurrentQueue<OALSoundBuffer> ();
+        int SourceId;
 
-        private void setFormatFor (AudioChannels channels)
+        void setFormatFor (AudioChannels channels)
         {
             switch (channels) {
             case AudioChannels.Mono:
@@ -68,6 +68,8 @@ namespace Microsoft.Xna.Framework.Audio {
             if (controller.CheckALError("failed to queue buffer")) {
                 throw new InvalidOperationException ("failed to queue buffer");
             }
+            
+            PendingBufferCount--;
         }
 
         public override bool IsLooped {
@@ -104,12 +106,14 @@ namespace Microsoft.Xna.Framework.Audio {
         
         private void startPlaying (Object stateInfo)
         {
-            // immediately fill up one buffer
-            this.OnBufferNeeded (new EventArgs ());
-            this.OnBufferNeeded (new EventArgs ());
+            PendingBufferCount = NUM_BUFFERS;
+
+            if (allocatedBuffers.Count < NUM_BUFFERS) {
+                this.OnBufferNeeded (new EventArgs ());
+            }
 
             OALSoundBuffer nextBuffer;
-            var hasNext = allocatedBuffers.TryPeek(out nextBuffer);
+            var hasNext = allocatedBuffers.TryPeek (out nextBuffer);
 
             if (!hasNext) {
                 Stop ();
@@ -122,10 +126,10 @@ namespace Microsoft.Xna.Framework.Audio {
             soundState = SoundState.Playing;
 
             while (soundState == SoundState.Playing) {
-                int processed = 0;
+                int processed;
                 AL.GetSource (nextBuffer.SourceId, ALGetSourcei.BuffersProcessed, out processed);
-                pendingBufferCount += processed;
-                
+                PendingBufferCount += processed;
+
                 while (processed > 0) {
                     OALSoundBuffer soundBuffer;
                     if (!allocatedBuffers.TryDequeue (out soundBuffer)) {
@@ -138,20 +142,39 @@ namespace Microsoft.Xna.Framework.Audio {
                     controller.CheckALError ("failed to unqueue buffer");
 
                     processedBuffers.Enqueue (soundBuffer);
-                
-                    try {
-                        OnBufferNeeded (new EventArgs ());
-                    } catch (InvalidOperationException ignored) {
-                        pendingBufferCount--;
-                    }
+
                     processed--;
-                
-                    if (pendingBufferCount == 0) {
+                }
+
+                while (allocatedBuffers.Count < NUM_BUFFERS) {
+                    if (PendingBufferCount == 0) {
                         soundState = SoundState.Stopped;
                         break;
+                    }
+
+                    try {
+                        OnBufferNeeded (new EventArgs ());
+                    } catch (InvalidOperationException) {
+                        PendingBufferCount--;
                     }
                 }
             }
         }
+//        /// <summary>
+//        /// Stops the current running sound effect, if relevant, removes its event handlers, and disposes
+//        /// of the sound buffer.
+//        /// </summary>
+//        public void Dispose ()
+//        {
+//            if (!isDisposed)
+//            {
+//                this.Stop(true);
+//                soundBuffer.Reserved -= HandleSoundBufferReserved;
+//                soundBuffer.Recycled -= HandleSoundBufferRecycled;
+//                soundBuffer.Dispose();
+//                soundBuffer = null;
+//                isDisposed = true;
+//            }
+//        }
     }
 }

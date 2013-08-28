@@ -3,10 +3,10 @@
 namespace Microsoft.Xna.Framework.Audio {
     public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance {
         private const int SAMPLE_WIDTH = 2;
-        private AudioChannels channels;
         private int sampleRate;
         private int bytesPerSecond;
-        private int pendingBufferCount;
+        public int PendingBufferCount { get; private set; }
+
         // Events
         public event EventHandler<EventArgs> BufferNeeded;
 
@@ -21,7 +21,6 @@ namespace Microsoft.Xna.Framework.Audio {
         {
             soundState = SoundState.Stopped;
             this.sampleRate = sampleRate;
-            this.channels = channels;
             setFormatFor (channels);
             bytesPerSecond = ((int) channels) * sampleRate * SAMPLE_WIDTH;
         }
@@ -44,15 +43,6 @@ namespace Microsoft.Xna.Framework.Audio {
         public void SubmitBuffer (byte [] buffer, int offset, int count)
         {
             QueueDataBuffer (buffer, format, offset, count, sampleRate);
-        }
-
-        public int PendingBufferCount {
-            get {
-                return pendingBufferCount;
-            }
-            private set {
-                pendingBufferCount = value;
-            }
         }
     }
 }

@@ -54,11 +54,8 @@ namespace MonoGame.Tests {
                     return;
                 }
 
-                dynamicSound.SubmitBuffer (byteArray, position, count);
-
-                // from original Microsoft implementation
-                //dynamicSound.SubmitBuffer (byteArray, position, count / 2);
-                //dynamicSound.SubmitBuffer (byteArray, position + count / 2, count / 2);
+                dynamicSound.SubmitBuffer (byteArray, position, count / 2);
+                dynamicSound.SubmitBuffer (byteArray, position + count / 2, count / 2);
             
                 position += count;
             });
