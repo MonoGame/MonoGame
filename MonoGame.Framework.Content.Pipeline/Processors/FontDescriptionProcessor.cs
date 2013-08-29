@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 
 			// Import the source font data.
-			importer.Import(options);
+			importer.Import(options, fontName);
 
 			lineSpacing = importer.LineSpacing;
 

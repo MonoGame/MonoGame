@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		const int MaxGlyphSize = 1024;
 
 
-		public void Import(FontDescription options)
+		public void Import(FontDescription options, string fontName)
 		{
 			// Create a bunch of GDI+ objects.
 			using (Font font = CreateFont(options))

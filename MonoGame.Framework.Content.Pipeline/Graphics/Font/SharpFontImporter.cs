@@ -23,59 +23,59 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		// Size of the temp surface used for GDI+ rasterization.
 		const int MaxGlyphSize = 1024;
 
+		Library lib = null;
 
-		public void Import(FontDescription options)
+		public void Import(FontDescription options, string fontName)
 		{
+			lib = new Library ();
 			// Create a bunch of GDI+ objects.
-			using (Face face = CreateFontFace(options))
+			Face face = CreateFontFace (options, fontName);
+			try {
 				using (Brush brush = new SolidBrush(System.Drawing.Color.White))
 					using (StringFormat stringFormat = new StringFormat(StringFormatFlags.NoFontFallback))
 					using (Bitmap bitmap = new Bitmap(MaxGlyphSize, MaxGlyphSize, PixelFormat.Format32bppArgb))
 					using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(bitmap))
-			{
-				graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-				graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-				graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-
-				// Which characters do we want to include?
-				var characters = CharacterRegion.Flatten(options.CharacterRegions);
-
-				var glyphList = new List<Glyph>();
-				// Rasterize each character in turn.
-				foreach (char character in characters)
 				{
-					Glyph glyph = ImportGlyph(character, face, brush, stringFormat, bitmap, graphics);
-					glyphList.Add(glyph);
+					graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+					graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+					graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
+					// Which characters do we want to include?
+					var characters = CharacterRegion.Flatten(options.CharacterRegions);
+
+					var glyphList = new List<Glyph>();
+					// Rasterize each character in turn.
+					foreach (char character in characters)
+					{
+						Glyph glyph = ImportGlyph(character, face, brush, stringFormat, bitmap, graphics);
+						glyphList.Add(glyph);
+
+					}
+					Glyphs = glyphList;
+
+					// Store the font height.
+					LineSpacing = 0;
+					foreach (var glyph in Glyphs) 
+					{
+						LineSpacing = (glyph.Subrect.Height > LineSpacing) ? glyph.Subrect.Height : LineSpacing;
+					}
 				}
-				Glyphs = glyphList;
-
-				// Store the font height.
-				LineSpacing = 0;
-				foreach (var glyph in Glyphs) 
-				{
-					LineSpacing = (glyph.Subrect.Height > LineSpacing) ? glyph.Subrect.Height : LineSpacing;
+			} finally {
+				if (face != null)
+					face.Dispose ();
+				if (lib != null) {
+					lib.Dispose ();
+					lib = null;
 				}
 			}
 		}
 
 
 		// Attempts to instantiate the requested GDI+ font object.
-		static Face CreateFontFace(FontDescription options)
+		Face CreateFontFace(FontDescription options, string fontName)
 		{
 
-			var fontName = options.FontName;
-
-			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-
-			var directory = Path.GetDirectoryName (options.Identity.SourceFilename);
-
-			if (File.Exists(Path.Combine(directory,fontName+".ttf"))) fontName += ".ttf";
-			if (File.Exists(Path.Combine(directory,fontName+".ttc"))) fontName += ".ttc";
-			if (File.Exists(Path.Combine(directory,fontName+".otf"))) fontName += ".otf";
-			fontName = Path.Combine (directory, fontName);
 			try {
-				Library lib = new Library ();
 				Face face = lib.NewFace (fontName, 0);
 				face.SetCharSize(0, (int)options.Size * 64, 0, 96);
 
