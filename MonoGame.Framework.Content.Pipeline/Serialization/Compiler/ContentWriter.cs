@@ -307,8 +307,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="typeWriter">The content type writer.</param>
         /// <remarks>The type hint should be retrieved from the Initialize method of the ContentTypeWriter
         /// that is calling WriteObject, by calling GetTypeWriter and passing it the type of the field used
-        /// to hold the value being serialized. If the hint type is a sealed value type (which cannot be
-        /// null or hold a polymorphic object instance) this method skips writing the usual type identifier.</remarks>
+        /// to hold the value being serialized.
+        /// </remarks>
         public void WriteObject<T>(T value, ContentTypeWriter typeWriter)
         {
             if (typeWriter == null)
@@ -321,18 +321,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                if (value.GetType().IsValueType)
-                {
-                    // Value types do not have the type identifier written to the file
-                    typeWriter.Write(this, value);
-                }
-                else
-                {
-                    int index = typeWriterMap[typeWriter];
-                    // Because zero means null object, we add one to the index before writing it to the file
-                    Write7BitEncodedInt(index + 1);
-                    typeWriter.Write(this, value);
-                }
+                var index = typeWriterMap[typeWriter];
+                // Because zero means null object, we add one to the index before writing it to the file
+                Write7BitEncodedInt(index + 1);
+                typeWriter.Write(this, value);
             }
         }
 

@@ -11,7 +11,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName="Texture - MonoGame")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
-        public TextureProcessor() { }
+        public TextureProcessor()
+        {
+            PremultiplyAlpha = true;
+        }
 
         public virtual Color ColorKeyColor { get; set; }
 
