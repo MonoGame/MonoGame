@@ -44,8 +44,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			// Create the merged output bitmap.
 			outputHeight = MakeValidTextureSize(outputHeight, requirePOT);
 
-			if (requireSquare)
-				outputHeight = outputWidth;
+			if (requireSquare) {
+				outputHeight = Math.Max (outputWidth, outputHeight);
+				outputWidth = outputHeight;
+			}
 
 			return CopyGlyphsToOutput(glyphs, outputWidth, outputHeight);
 		}
@@ -169,8 +171,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 			foreach (Glyph glyph in sourceGlyphs)
 			{
-				maxWidth = Math.Max(maxWidth, glyph.Subrect.Width);
-				totalSize += glyph.Subrect.Width * glyph.Subrect.Height;
+				maxWidth = Math.Max(maxWidth, glyph.Bitmap.Width);
+				totalSize += glyph.Bitmap.Width * glyph.Bitmap.Height;
 			}
 
 			int width = Math.Max((int)Math.Sqrt(totalSize), maxWidth);
