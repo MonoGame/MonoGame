@@ -146,17 +146,18 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             string blendStateName;
 
-            if(this == BlendState.Additive)
+            if (this == BlendState.Additive)
                 blendStateName = "Additive";
             else if (this == BlendState.AlphaBlend)
                 blendStateName = "AlphaBlend";
             else if (this == BlendState.NonPremultiplied)
                 blendStateName = "NonPremultiplied";
-            else
+            else if (this == BlendState.Opaque)
                 blendStateName = "Opaque";
+            else
+                blendStateName = "Custom";
 
-
-            return string.Format("{0}.{1}", base.ToString(), blendStateName);
+            return string.Format("BlendState.{0}", blendStateName);
         }
 
 

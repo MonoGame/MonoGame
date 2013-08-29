@@ -439,6 +439,22 @@ namespace Microsoft.Xna.Framework.Graphics
             g.Enable(EnableMode.StencilTest, StencilEnable);
         }
 #endif
+
+        public override string ToString()
+        {
+            string name;
+
+            if (this == DepthStencilState.Default)
+                name = "Default";
+            else if (this == DepthStencilState.DepthRead)
+                name = "DepthRead";
+            else if (this == DepthStencilState.None)
+                name = "None";            
+            else
+                name = "Custom";
+
+            return string.Format("DepthStencilState.{0}", name);
+        }
 	}
 }
 

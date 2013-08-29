@@ -228,5 +228,21 @@ namespace Microsoft.Xna.Framework.Graphics
             // FIXME: Everything else
         }
 #endif
+
+        public override string ToString()
+        {
+            string name;
+
+            if (this == RasterizerState.CullClockwise)
+                name = "CullClockwise";
+            else if (this == RasterizerState.CullCounterClockwise)
+                name = "CullCounterClockwise";
+            else if (this == RasterizerState.CullNone)
+                name = "CullNone";
+            else
+                name = "Custom";
+
+            return string.Format("RasterizerState.{0}", name);
+        }
     }
 }
