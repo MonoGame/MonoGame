@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
 				    Window.Close();
+					Process.KillProcess(Process.MyPid());
 				}
             }
             catch
