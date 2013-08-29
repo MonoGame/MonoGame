@@ -246,7 +246,9 @@ namespace Microsoft.Xna.Framework
                     SamplerState.ResetStates();
 #endif
                 }
+#if ANDROID
                 Activity = null;
+#endif
                 _isDisposed = true;
                 _instance = null;
             }
