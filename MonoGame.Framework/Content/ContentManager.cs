@@ -180,7 +180,10 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			if (!disposed)
 			{
-				Unload();
+                if (disposing)
+                {
+                    Unload();
+                }
 				disposed = true;
 			}
 		}
