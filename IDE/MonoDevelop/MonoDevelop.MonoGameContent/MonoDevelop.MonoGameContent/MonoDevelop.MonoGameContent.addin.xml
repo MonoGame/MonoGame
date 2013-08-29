@@ -12,16 +12,6 @@
 		<Import file="templates/MonoGameContentExtensionProject.xpt.xml" />
 		<Import file="templates/SpriteFont.xft.xml" />
 		<Import file="icons/monogame-icon.png"/>
-		<Import file="libnvtt.dylib"/>
-		<Import file="libnvimage.dylib"/>
-		<Import file="libnvmath.dylib"/>
-		<Import file="libnvcore.dylib"/>
-		<Import file="libpvrtc.dylib"/>
-		<Import file="libfreetype.6.dylib"/>
-		<Import file="libpng15.15.dylib"/>
-		<Import file="nvtt.dll"/>
-		<Import file="pvrtc.dll"/>
-		<Import file="freetype6.dll"/>
 		<Import file="AssimpNet.dll"/>
 		<Import file="Lidgren.Network.dll"/>
 		<Import file="ManagedPVRTC.dll"/>
@@ -35,6 +25,28 @@
 		<Import file="SharpFont.dll"/>
 		<Import file="SharpFont.dll.config"/>
 		<Import file="OpenTK.dll"/>
+		<!-- Include Native code -->
+		<Import file="libnvtt.dylib"/>
+		<Import file="libnvimage.dylib"/>
+		<Import file="libnvmath.dylib"/>
+		<Import file="libnvcore.dylib"/>
+		<Import file="libpvrtc.dylib"/>
+		<Import file="libfreetype.6.dylib"/>
+		<Import file="libpng15.15.dylib"/>
+		<Import file="nvtt.dll"/>
+		<Import file="pvrtc.dll"/>
+		<Import file="freetype6.dll"/>
+		<!-- Make sure we dont scan native dll's otherwise we get errors -->
+		<ScanExclude path="nvtt.dll"/>
+		<ScanExclude path="freetype6.dll"/>
+		<ScanExclude path="pvrtc.dll"/>
+		<ScanExclude path="libnvtt.dylib"/>
+		<ScanExclude path="libnvimage.dylib"/>
+		<ScanExclude path="libnvmath.dylib"/>
+		<ScanExclude path="libnvcore.dylib"/>
+		<ScanExclude path="libpvrtc.dylib"/>
+		<ScanExclude path="libfreetype.6.dylib"/>
+		<ScanExclude path="libpng15.15.dylib"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="4.0" />
