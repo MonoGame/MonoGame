@@ -70,7 +70,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>..\..\SVNProjects\ThortsphereV1\DLLs\protobuf-net\protobuf-net.dll</HintPath>
+      <HintPath>..\..\SVNProjects\ThirdParty\protobuf-net\Debug\protobuf-net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
