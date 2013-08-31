@@ -151,6 +151,10 @@
     <Content Include="icons\monogame-font.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\assimp\AssimpNet.dll.config">
+      <Link>AssimpNet.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MonoDevelop.MonoGameContent.addin.xml" />
