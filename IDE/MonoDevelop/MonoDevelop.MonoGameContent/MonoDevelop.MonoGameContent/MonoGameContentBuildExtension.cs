@@ -126,10 +126,15 @@ namespace MonoDevelop.MonoGameContent
 								result.AddWarning(ex.Message);
 							}
 
+							dict.Clear();
 							foreach(object key in file.ExtendedProperties.Keys) {
 								string k = key as string;
 								if (k != null && k.StartsWith("ProcessorParameters_")) {
-									dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
+									if (!dict.ContainsKey(k.Replace("ProcessorParameters_", String.Empty))) {
+										dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
+									} else {
+										dict[k.Replace("ProcessorParameters_", String.Empty)] = file.ExtendedProperties[k];
+									}
 								}
 							}
 
@@ -142,7 +147,7 @@ namespace MonoDevelop.MonoGameContent
 						}
 						catch(Exception ex)
 						{
-							monitor.Log.WriteLine(ex.Message);
+							monitor.Log.WriteLine(ex.ToString());
 							result.AddError(ex.Message);
 						}
 
