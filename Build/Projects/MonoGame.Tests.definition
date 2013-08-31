@@ -23,15 +23,9 @@
     <Compile Include="Framework\Components\TexturedQuadComponent.cs">
       <Platforms>iOS,Linux,Windows,XNA</Platforms>
     </Compile>
-    <Compile Include="Framework\Components\UpdateGuard.cs">
-      <Platforms>iOS,Linux,Windows,XNA</Platforms>
-    </Compile>
-    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs">
-      <Platforms>iOS,Linux,Windows,XNA</Platforms>
-    </Compile>
-    <Compile Include="Framework\Components\VisualTestGameComponent.cs">
-      <Platforms>iOS,Linux,Windows,XNA</Platforms>
-    </Compile>
+    <Compile Include="Framework\Components\UpdateGuard.cs" />
+    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
