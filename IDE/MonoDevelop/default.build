@@ -32,7 +32,7 @@
     <if test="${os == 'MacOS'}">
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent/bin/MonoDevelop.MonoGameContent.dll"/>
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent/bin/Release/MonoDevelop.MonoGameContent.dll"/>
     </if>
   </target>
 
