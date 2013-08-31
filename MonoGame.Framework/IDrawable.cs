@@ -42,15 +42,35 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Defines the interface for a drawable game component.
+    /// </summary>
     public interface IDrawable
     {
+        /// <summary>
+        /// The order in which to draw this object relative to other objects. Objects with a lower value are drawn first.
+        /// </summary>
         int DrawOrder { get; }
+
+        /// <summary>
+        /// Indicates whether IDrawable.Draw should be called in Game.Draw for this game component.
+        /// </summary>
         bool Visible { get; }
-		
-		event EventHandler<EventArgs> DrawOrderChanged;
+
+        /// <summary>
+        /// Raised when the DrawOrder property changes.
+        /// </summary>
+        event EventHandler<EventArgs> DrawOrderChanged;
+
+        /// <summary>
+        /// Raised when the Visible property changes.
+        /// </summary>
         event EventHandler<EventArgs> VisibleChanged;
 
-        void Draw(GameTime gameTime);      
+        /// <summary>
+        /// Draws the IDrawable. Reference page contains links to related conceptual articles.
+        /// </summary>
+        /// <param name="gameTime">Snapshot of the game's timing state.</param>
+        void Draw(GameTime gameTime);
     }
 }
-

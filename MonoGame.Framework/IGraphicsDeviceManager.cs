@@ -27,11 +27,25 @@ SOFTWARE.
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Defines the interface for an object that manages a GraphicsDevice.
+    /// </summary>
     public interface IGraphicsDeviceManager
     {
+        /// <summary>
+        /// Starts the drawing of a frame.
+        /// </summary>
+        /// <returns>true if the frame should be drawn; false otherwise.</returns>
         bool BeginDraw();
+
+        /// <summary>
+        /// Called to ensure that the device manager has created a valid device.
+        /// </summary>
         void CreateDevice();
+
+        /// <summary>
+        /// Called by the game at the end of drawing; presents the final rendering.
+        /// </summary>
         void EndDraw();
     }
 }
-

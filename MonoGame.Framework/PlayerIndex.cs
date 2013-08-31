@@ -38,16 +38,31 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;
-
 namespace Microsoft.Xna.Framework
-{   
+{
+    /// <summary>
+    /// Specifies the game controller associated with a player.
+    /// </summary>
     public enum PlayerIndex
     {
-        One = 0,
-        Two = 1,
-        Three = 2,
-        Four = 3
+        /// <summary>
+        /// The first controller.
+        /// </summary>
+        One,
+
+        /// <summary>
+        /// The second controller.
+        /// </summary>
+        Two,
+
+        /// <summary>
+        /// The third controller.
+        /// </summary>
+        Three,
+
+        /// <summary>
+        /// The fourth controller.
+        /// </summary>
+        Four
     }
 }
-
