@@ -205,9 +205,13 @@ namespace Microsoft.Xna.Framework
                         if (disposable != null)
                             disposable.Dispose();
                     }
+                    _components = null;
 
                     if (Content != null)
+                    {
                         Content.Dispose();
+                        Content = null;
+                    }
 
                     if (_graphicsDeviceManager != null)
                     {
@@ -215,7 +219,17 @@ namespace Microsoft.Xna.Framework
                         _graphicsDeviceManager = null;
                     }
 
-                    Platform.Dispose();
+                    if (Platform != null)
+                    {
+                        Platform.Activated -= OnActivated;
+                        Platform.Deactivated -= OnDeactivated;
+                        _services.RemoveService(typeof(GamePlatform));
+#if WINDOWS_STOREAPP
+                        Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
+#endif
+                        Platform.Dispose();
+                        Platform = null;
+                    }
 
                     Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
@@ -232,6 +246,9 @@ namespace Microsoft.Xna.Framework
                     SamplerState.ResetStates();
 #endif
                 }
+#if ANDROID
+                Activity = null;
+#endif
                 _isDisposed = true;
                 _instance = null;
             }
