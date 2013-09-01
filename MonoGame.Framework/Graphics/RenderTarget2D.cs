@@ -190,8 +190,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
 				GraphicsExtensions.CheckGLError();
 			}
+
+            });
 #endif
-        });
 
         }
 		
