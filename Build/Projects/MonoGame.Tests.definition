@@ -11,18 +11,14 @@
   <Files>
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\ColorTest.cs" />
-    <Compile Include="Framework\Components\Colored3DCubeComponent.cs">
-      <Platforms>iOS,Linux,Windows,XNA</Platforms>
-    </Compile>
+    <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
     <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
     <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
-    <Compile Include="Framework\Components\TexturedQuadComponent.cs">
-      <Platforms>iOS,Linux,Windows,XNA</Platforms>
-    </Compile>
+    <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
     <Compile Include="Framework\Components\UpdateGuard.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
