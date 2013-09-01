@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MonoGame.ThirdParty.Tests">
+  
+  <Binary 
+    Name="NDesk.Options"
+    Path="ThirdParty/Libs/Tests/NDesk.Options.dll" />
+  <Binary 
+    Name="nunit.core"
+    Path="ThirdParty/Libs/Tests/nunit.core.dll" />
+  <Binary 
+    Name="nunit.core.interfaces"
+    Path="ThirdParty/Libs/Tests/nunit.core.interfaces.dll" />
+  <Binary 
+    Name="nunit.framework"
+    Path="ThirdParty/Libs/Tests/nunit.framework.dll" />
+  <Binary 
+    Name="nunit.util"
+    Path="ThirdParty/Libs/Tests/nunit.util.dll" />
+
+  <Platform Type="iOS">
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </Platform>
+  
+  <Platform Type="Linux">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Binary 
+      Name="Moq"
+      Path="Tests/Libs/Moq.dll" />
+  </Platform>
+  
+  <Platform Type="MacOS">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac" />
+    <Binary 
+      Name="Moq"
+      Path="Tests/Libs/Moq.dll" />
+  </Platform>
+  
+  <Platform Type="Windows">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </Platform>
+      
+  <Platform Type="XNA">
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </Platform>
+ 
+</ExternalProject>

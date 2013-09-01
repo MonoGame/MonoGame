@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MonoGame.ThirdParty.Content.Pipeline">
+
+  <Binary
+    Name="ManagedPVRTC"
+    Path="ThirdParty/Libs/ManagedPVRTC/ManagedPVRTC.dll" />
+  <Binary
+    Name="NAudio"
+    Path="ThirdParty/Libs/NAudio/NAudio.dll" />
+  <Binary
+    Name="AssimpNet"
+    Path="ThirdParty/Libs/assimp/AssimpNet.dll" />
+  <Binary
+    Name="SharpFont"
+    Path="ThirdParty/Libs/SharpFont/SharpFont.dll" />
+  <Binary
+    Name="Nvidia.TextureTools"
+    Path="ThirdParty/Libs/NVTT/Windows/Nvidia.TextureTools.dll" />
+
+  <Platform Type="Windows">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.dll" />
+    <Binary
+      Name="SharpDX.D3DCompiler"
+      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.D3DCompiler.dll" />
+  </Platform>
+  
+  <Platform Type="MacOS">
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
+  </Platform>
+ 
+</ExternalProject>

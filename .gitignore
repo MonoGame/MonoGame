@@ -38,9 +38,6 @@ _ReSharper*/
 *.resharper
 [Tt]est[Rr]esult*
 
-#Project files
-[Bb]uild/
-
 #Subversion files
 .svn
 
@@ -52,3 +49,36 @@ monodroid*.msi
 
 #Unix temporary files
 *~
+
+#Project files
+*.Linux.csproj
+*.Linux.nuspec
+*.Linux.sln
+*.Windows.csproj
+*.Windows.nuspec
+*.Windows.sln
+*.MacOS.csproj
+*.MacOS.nuspec
+*.MacOS.sln
+*.iOS.csproj
+*.iOS.nuspec
+*.iOS.sln
+*.Ouya.csproj
+*.Ouya.nuspec
+*.Ouya.sln
+*.PSMobile.csproj
+*.PSMobile.nuspec
+*.PSMobile.sln
+*.Windows8.csproj
+*.Windows8.nuspec
+*.Windows8.sln
+*.WindowsPhone.csproj
+*.WindowsPhone.nuspec
+*.WindowsPhone.sln
+*.WindowsGL.csproj
+*.WindowsGL.nuspec
+*.WindowsGL.sln
+*.Android.csproj
+*.Android.nuspec
+*.Android.sln
+
