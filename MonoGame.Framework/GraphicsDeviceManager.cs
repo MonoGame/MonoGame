@@ -249,6 +249,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
             // TODO: We probably should be resetting the whole 

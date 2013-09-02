@@ -618,6 +618,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
+        public static int GetFrameLatency(this PresentInterval interval)
+        {
+            switch (interval)
+            {
+                case PresentInterval.Immediate:
+                    return 0;
+
+                case PresentInterval.Two:
+                    return 2;
+
+                default:
+                    return 1;
+            }
+        }
+
         public static int Size(this SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)
