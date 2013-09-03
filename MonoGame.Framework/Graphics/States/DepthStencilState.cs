@@ -82,19 +82,22 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
+                Name = "DepthStencilState.Default",
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = true
 			});
 			
 			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = true,
+                Name = "DepthStencilState.DepthRead",
+                DepthBufferEnable = true,
 				DepthBufferWriteEnable = false
 			});
 			
 			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = false,
+                Name = "DepthStencilState.None",
+                DepthBufferEnable = false,
 				DepthBufferWriteEnable = false
 			});
 		}
@@ -439,22 +442,6 @@ namespace Microsoft.Xna.Framework.Graphics
             g.Enable(EnableMode.StencilTest, StencilEnable);
         }
 #endif
-
-        public override string ToString()
-        {
-            string name;
-
-            if (this == DepthStencilState.Default)
-                name = "Default";
-            else if (this == DepthStencilState.DepthRead)
-                name = "DepthRead";
-            else if (this == DepthStencilState.None)
-                name = "None";            
-            else
-                name = "Custom";
-
-            return string.Format("DepthStencilState.{0}", name);
-        }
 	}
 }
 

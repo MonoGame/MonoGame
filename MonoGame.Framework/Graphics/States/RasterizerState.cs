@@ -57,16 +57,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			_cullClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
+                Name = "RasterizerState.CullClockwise",
 				CullMode = CullMode.CullClockwiseFace
 			});
 
 			_cullCounterClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
+                Name = "RasterizerState.CullCounterClockwise",
 				CullMode = CullMode.CullCounterClockwiseFace
 			});
 
 			_cullNone = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
             {
+                Name = "RasterizerState.CullNone",
 				CullMode = CullMode.None
 			});
 		}
@@ -228,21 +231,5 @@ namespace Microsoft.Xna.Framework.Graphics
             // FIXME: Everything else
         }
 #endif
-
-        public override string ToString()
-        {
-            string name;
-
-            if (this == RasterizerState.CullClockwise)
-                name = "CullClockwise";
-            else if (this == RasterizerState.CullCounterClockwise)
-                name = "CullCounterClockwise";
-            else if (this == RasterizerState.CullNone)
-                name = "CullNone";
-            else
-                name = "Custom";
-
-            return string.Format("RasterizerState.{0}", name);
-        }
     }
 }
