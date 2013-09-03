@@ -10,9 +10,15 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using RenderbufferStorage = OpenTK.Graphics.ES20.RenderbufferInternalFormat;
-using FramebufferAttachment = OpenTK.Graphics.ES20.FramebufferSlot;
-using GenerateMipmapTarget = OpenTK.Graphics.ES20.TextureTarget;
+using FramebufferAttachment = OpenTK.Graphics.ES20.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
+using FramebufferParameterName = OpenTK.Graphics.ES20.All;
+using FramebufferTarget = OpenTK.Graphics.ES20.All;
+using GenerateMipmapTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferParameterName = OpenTK.Graphics.ES20.All;
+using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics.GLWrappers
