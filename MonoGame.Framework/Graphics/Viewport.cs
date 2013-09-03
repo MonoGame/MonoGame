@@ -15,11 +15,11 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Private Fields
 
         private int x;
-		private int y;
-		private int width;
-		private int height;
-		private float minDepth;
-		private float maxDepth;
+	private int y;
+	private int width;
+	private int height;
+	private float minDepth;
+	private float maxDepth;
 
         #endregion
 
@@ -80,15 +80,15 @@ namespace Microsoft.Xna.Framework.Graphics
         [DataMember]
         public int Height
         {
-			get 
+	    get 
             {
-				return this.height;
-			}
-			set 
+		return this.height;
+	    }
+	    set 
             {
-				height = value;
-			}
-		}
+		height = value;
+	    }
+	}
 
         /// <summary>
         /// Gets or sets the minimal depth of the viewport. 
@@ -112,65 +112,65 @@ namespace Microsoft.Xna.Framework.Graphics
         [DataMember]
         public float MaxDepth
         {
-			get 
+	    get 
             {
-				return this.maxDepth;
-			}
-			set 
+		return this.maxDepth;
+	    }
+	    set 
             {
-				maxDepth = value;
-			}
-		}		
+		maxDepth = value;
+	    }
+	}		
 
         /// <summary>
         /// Gets aspect ratio of the viewport.
         /// </summary>
-		public float AspectRatio 
+	public float AspectRatio 
+	{
+		get
 		{
-			get
+			if ((height != 0) && (width != 0))
 			{
-				if ((height != 0) && (width != 0))
-				{
-					return (((float) width)/((float)height));
-				}
-				return 0f;
+				return (((float) width)/((float)height));
 			}
+			return 0f;
 		}
+	}
 		
         /// <summary>
         /// Gets or sets the size of the viewport.
         /// </summary>
-		public Rectangle Bounds 
-		{ 
-			get 
-			{
-				Rectangle rectangle;
-				rectangle.X = x;
-				rectangle.Y = y;
-				rectangle.Width = width;
-				rectangle.Height = height;
-				return rectangle;
-			}
-				
-			set
-			{				
-				x = value.X;
-				y = value.Y;
-				width = value.Width;
-				height = value.Height;
-			}
+	public Rectangle Bounds 
+	{ 
+		get 
+		{
+			Rectangle rectangle;
+			rectangle.X = x;
+			rectangle.Y = y;
+			rectangle.Width = width;
+			rectangle.Height = height;
+			return rectangle;
 		}
+				
+		set
+		{				
+			x = value.X;
+			y = value.Y;
+			width = value.Width;
+			height = value.Height;
+		}
+	}
 		
         /// <summary>
         /// Gets the tile safe area of the viewport.
         /// </summary>
-		public Rectangle TitleSafeArea 
+	public Rectangle TitleSafeArea 
+	{
+		get
 		{
-			get
-			{
-				return new Rectangle(x,y,width,height);
-			}
+			return new Rectangle(x,y,width,height);
 		}
+	}
 
         #endregion
 
@@ -184,14 +184,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="width">Width of the viewport in pixels.</param>
         /// <param name="height">Height of the viewport in pixels.</param>
         public Viewport(int x, int y, int width, int height)
-		{
-			this.x = x;
-		    this.y = y;
-		    this.width = width;
-		    this.height = height;
-		    this.minDepth = 0.0f;
-		    this.maxDepth = 1.0f;
-		}
+	{
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.minDepth = 0.0f;
+		this.maxDepth = 1.0f;
+	}
 
         /// <summary>
         /// Creates a new instance of <see cref="Viewport"/> struct.
@@ -216,9 +216,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new instance of <see cref="Viewport"/> struct.
         /// </summary>
         /// <param name="bounds">Bounds that describes top-left corner and size for the viewport.</param>
-		public Viewport(Rectangle bounds) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height)
-		{
-		}
+	public Viewport(Rectangle bounds) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height)
+	{
+	}
 
         /// <summary>
         /// Creates a new instance of <see cref="Viewport"/> struct.
@@ -289,10 +289,10 @@ namespace Microsoft.Xna.Framework.Graphics
         #region Private Methods
 
         private static bool WithinEpsilon(float a, float b)
-		{
+	{
 		    float num = a - b;
 		    return ((-1.401298E-45f <= num) && (num <= float.Epsilon));
-		}
+	}
 
         #endregion
 
