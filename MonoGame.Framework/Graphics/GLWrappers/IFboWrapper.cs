@@ -44,9 +44,11 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 
         void RenderbufferStorage(RenderbufferTarget target, RenderbufferStorage internalformat, int width, int height);
 
+#if !MONOMAC
         unsafe void GetRenderbufferParameter(RenderbufferTarget target, RenderbufferParameterName pname, int* @params);
         void GetRenderbufferParameter(RenderbufferTarget target, RenderbufferParameterName pname, int[] @params);
         void GetRenderbufferParameter(RenderbufferTarget target, RenderbufferParameterName pname, out int @params);
+#endif
 
         bool IsFramebuffer(int framebuffer);
         bool IsFramebuffer(uint framebuffer);
@@ -86,11 +88,13 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
         void FramebufferRenderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbuffertarget, int renderbuffer);
         void FramebufferRenderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbuffertarget, uint renderbuffer);
 
+#if !MONOMAC
         unsafe void GetFramebufferAttachmentParameter(FramebufferTarget target, FramebufferAttachment attachment, FramebufferParameterName pname, int* @params);
         void GetFramebufferAttachmentParameter(FramebufferTarget target, FramebufferAttachment attachment, FramebufferParameterName pname, int[] @params);
         void GetFramebufferAttachmentParameter(FramebufferTarget target, FramebufferAttachment attachment, FramebufferParameterName pname, out int @params);
 
         void GenerateMipmap(GenerateMipmapTarget target);
+#endif
     }
 }
 

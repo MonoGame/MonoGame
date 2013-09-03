@@ -107,6 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
             GL.RenderbufferStorage(target, internalformat, width, height);
         }
 
+#if !MONOMAC
         public unsafe void GetRenderbufferParameter(RenderbufferTarget target, RenderbufferParameterName pname, int* @params)
         {
             GL.GetRenderbufferParameter(target, pname, @params);
@@ -121,6 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
         {
             GL.GetRenderbufferParameter(target, pname, out @params);
         }
+#endif
 
         public bool IsFramebuffer(int framebuffer)
         {
@@ -251,6 +253,7 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
             GL.FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
         }
 
+#if !MONOMAC
         public unsafe void GetFramebufferAttachmentParameter(FramebufferTarget target, FramebufferAttachment attachment, FramebufferParameterName pname, int* @params)
         {
             GL.GetFramebufferAttachmentParameter(target, attachment, pname, @params);
@@ -270,6 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
         {
             GL.GenerateMipmap(target);
         }
+#endif
     }
 }
 
