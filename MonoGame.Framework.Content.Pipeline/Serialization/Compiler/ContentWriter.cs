@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         bool compressContent;
         bool disposed;
         List<ContentTypeWriter> typeWriters = new List<ContentTypeWriter>();
-        Dictionary<ContentTypeWriter, int> typeWriterMap = new Dictionary<ContentTypeWriter, int>();
+        Dictionary<Type, int> typeWriterMap = new Dictionary<Type, int>();
         Dictionary<Type, ContentTypeWriter> typeMap = new Dictionary<Type, ContentTypeWriter>();
         List<object> sharedResources = new List<object>();
         Dictionary<object, int> sharedResourceMap = new Dictionary<object, int>();
@@ -240,7 +240,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
                 typeWriters.Add(typeWriter);
-                typeWriterMap.Add(typeWriter, index);
+		if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+			typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
                 var args = type.GetGenericArguments();
@@ -321,7 +322,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                var index = typeWriterMap[typeWriter];
+                var index = typeWriterMap[typeWriter.GetType()];
                 // Because zero means null object, we add one to the index before writing it to the file
                 Write7BitEncodedInt(index + 1);
                 typeWriter.Write(this, value);
