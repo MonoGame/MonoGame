@@ -149,11 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 
-#if GLES
-			GLWrapper.Fbo.GenRenderbuffers(1, ref glDepthBuffer);
-#else
 			GLWrapper.Fbo.GenRenderbuffers(1, out glDepthBuffer);
-#endif
 			GraphicsExtensions.CheckGLError();
 			if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
 			{
@@ -171,11 +167,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					GraphicsExtensions.CheckGLError();
 					GLWrapper.Fbo.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
 					GraphicsExtensions.CheckGLError();
-#if GLES
-					GLWrapper.Fbo.GenRenderbuffers(1, ref glStencilBuffer);
-#else
 					GLWrapper.Fbo.GenRenderbuffers(1, out glStencilBuffer);
-#endif
 					GraphicsExtensions.CheckGLError();
 					GLWrapper.Fbo.BindRenderbuffer(GLRenderbuffer, this.glStencilBuffer);
 					GraphicsExtensions.CheckGLError();

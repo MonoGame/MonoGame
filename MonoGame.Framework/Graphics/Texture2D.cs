@@ -1105,12 +1105,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			int framebufferId = -1;
             int renderBufferID = -1;
             
-			GLWrapper.Fbo.GenFramebuffers(1, ref framebufferId);
+			GLWrapper.Fbo.GenFramebuffers(1, out framebufferId);
             GraphicsExtensions.CheckGLError();
             GLWrapper.Fbo.BindFramebuffer(All.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
             //renderBufferIDs = new int[currentRenderTargets];
-            GLWrapper.Fbo.GenRenderbuffers(1, ref renderBufferID);
+            GLWrapper.Fbo.GenRenderbuffers(1, out renderBufferID);
             GraphicsExtensions.CheckGLError();
 
             // attach the texture to FBO color attachment point

@@ -90,12 +90,22 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 
         public void GenRenderbuffers(int n, out int renderbuffers)
         {
+#if GLES
+            renderbuffers = 0;
+            GL.GenRenderbuffers(n, ref renderbuffers);
+#else
             GL.GenRenderbuffers(n, out renderbuffers);
+#endif
         }
 
         public void GenRenderbuffers(int n, out uint renderbuffers)
         {
+#if GLES
+            renderbuffers = 0;
+            GL.GenRenderbuffers(n, ref renderbuffers);
+#else
             GL.GenRenderbuffers(n, out renderbuffers);
+#endif
         }
 
         public unsafe void GenRenderbuffers(int n, uint* renderbuffers)
@@ -126,7 +136,12 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 
         public void GetRenderbufferParameter(RenderbufferTarget target, RenderbufferParameterName pname, out int @params)
         {
+#if GLES
+            @params = 0;
+            GL.GetRenderbufferParameter(target, pname, ref @params);
+#else
             GL.GetRenderbufferParameter(target, pname, out @params);
+#endif
         }
 #endif
 
@@ -192,12 +207,22 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 
         public void GenFramebuffers(int n, out int framebuffers)
         {
+#if GLES
+            framebuffers = 0;
+            GL.GenFramebuffers(n, ref framebuffers);
+#else
             GL.GenFramebuffers(n, out framebuffers);
+#endif
         }
 
         public void GenFramebuffers(int n, out uint framebuffers)
         {
+#if GLES
+            framebuffers = 0;
+            GL.GenFramebuffers(n, ref framebuffers);
+#else
             GL.GenFramebuffers(n, out framebuffers);
+#endif
         }
 
         public unsafe void GenFramebuffers(int n, uint* framebuffers)
@@ -272,7 +297,12 @@ namespace Microsoft.Xna.Framework.Graphics.GLWrappers
 
         public void GetFramebufferAttachmentParameter(FramebufferTarget target, FramebufferAttachment attachment, FramebufferParameterName pname, out int @params)
         {
+#if GLES
+            @params = 0;
+            GL.GetFramebufferAttachmentParameter(target, attachment, pname, ref @params);
+#else
             GL.GetFramebufferAttachmentParameter(target, attachment, pname, out @params);
+#endif
         }
 
         public void GenerateMipmap(GenerateMipmapTarget target)

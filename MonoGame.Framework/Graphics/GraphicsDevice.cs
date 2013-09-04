@@ -1686,11 +1686,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				if (this.glRenderTargetFrameBuffer == 0)
 				{
-#if GLES
-                    GLWrapper.Fbo.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-#else
                     GLWrapper.Fbo.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
-#endif
                     GraphicsExtensions.CheckGLError();
                 }
 
