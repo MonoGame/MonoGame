@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             // Base the reader type string from a known public class in the same namespace in the same assembly
             Type type = typeof(ContentReader);
-            string readerType = type.Namespace + ".SpriteFontReader, " + type.Assembly.FullName;
+			string readerType = type.Namespace + ".SpriteFontReader, " + type.Assembly.FullName;
             return readerType;
         }
 
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             // Base the reader type string from a known public class in the same namespace in the same assembly
             Type type = typeof(ContentReader);
-            string readerType = type.Namespace + ".SpriteFontReader, " + type.AssemblyQualifiedName;
+			string readerType = type.Namespace + ".SpriteFontReader, " + type.AssemblyQualifiedName;
             return readerType;
         }
 

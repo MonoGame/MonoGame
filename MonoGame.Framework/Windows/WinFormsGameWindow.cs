@@ -200,17 +200,17 @@ namespace MonoGame.Framework
 
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
         {
-            var previousState = Mouse.State.LeftButton;
-            
-            Mouse.State.X = mouseEventArgs.X;
-            Mouse.State.Y = mouseEventArgs.Y;
-            Mouse.State.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.State.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.State.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
-            Mouse.State.ScrollWheelValue += mouseEventArgs.Delta;
+            var previousState = MouseState.LeftButton;
+
+            MouseState.X = mouseEventArgs.X;
+            MouseState.Y = mouseEventArgs.Y;
+            MouseState.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.ScrollWheelValue += mouseEventArgs.Delta;
             
             TouchLocationState? touchState = null;
-            if (Mouse.State.LeftButton == ButtonState.Pressed)
+            if (MouseState.LeftButton == ButtonState.Pressed)
                 if (previousState == ButtonState.Released)
                     touchState = TouchLocationState.Pressed;
                 else
@@ -219,8 +219,8 @@ namespace MonoGame.Framework
                 touchState = TouchLocationState.Released;
 
             if (touchState.HasValue)
-                TouchPanel.AddEvent(0, touchState.Value, new Vector2(Mouse.State.X, Mouse.State.Y), true);
-        }        
+                 TouchPanel.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+        } 
 
         private void OnMouseEnter(object sender, EventArgs e)
         {
@@ -244,6 +244,9 @@ namespace MonoGame.Framework
 
         private void OnRawKeyEvent(object sender, KeyboardInputEventArgs args)
         {
+            if (KeyState == null)
+                return;
+
             XnaKey xnaKey;
 
             switch (args.MakeCode)

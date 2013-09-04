@@ -11,11 +11,25 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
     static class PathHelper
     {
         /// <summary>
+        /// The/universal/standard/directory/seperator.
+        /// </summary>
+        public const char DirectorySeparator = '/';
+
+        /// <summary>
         /// Returns a path string normalized to the/universal/standard.
         /// </summary>
         public static string Normalize(string path)
         {
             return path.Replace('\\', '/');
+        }
+
+        /// <summary>
+        /// Returns a directory path string normalized to the/universal/standard
+        /// with a trailing seperator.
+        /// </summary>
+        public static string NormalizeDirectory(string path)
+        {
+            return path.Replace('\\', '/').TrimEnd('/') + '/';
         }
 
         /// <summary>

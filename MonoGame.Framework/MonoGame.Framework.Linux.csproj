@@ -135,7 +135,6 @@
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
-    <Compile Include="Linux\Audio\Sound.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
@@ -161,7 +160,6 @@
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Linux\Media\Video.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\CharReader.cs" />
     <Compile Include="Content\ContentReaders\StringReader.cs" />
@@ -187,6 +185,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
@@ -294,7 +293,7 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Net\CommandGamerLeft.cs" />
     <Compile Include="Linux\Input\KeyboardUtil.cs" />
-    <Compile Include="Linux\Audio\AudioLoader.cs" />
+    <Compile Include="Desktop\Audio\AudioLoader.cs" />
     <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs" />
     <Compile Include="Content\ContentManager.cs" />
@@ -337,7 +336,7 @@
     <Compile Include="Content\ContentReaders\VideoReader.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
-    <Compile Include="Desktop\Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />

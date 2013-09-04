@@ -183,7 +183,6 @@
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="MacOS\Media\Video.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\CharReader.cs" />
     <Compile Include="Content\ContentReaders\StringReader.cs" />
@@ -209,6 +208,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />

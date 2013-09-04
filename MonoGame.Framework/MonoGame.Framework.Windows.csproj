@@ -30,6 +30,7 @@
     <BaseAddress>4194304</BaseAddress>
     <DefineConstants>DEBUG;TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Windows\Debug\MonoGame.Framework.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -42,6 +43,7 @@
     <BaseAddress>4194304</BaseAddress>
     <DefineConstants>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Windows\Release\MonoGame.Framework.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
@@ -256,6 +258,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionColor.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
+    <Compile Include="Media\MediaManagerState.cs" />
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
@@ -340,8 +343,8 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />

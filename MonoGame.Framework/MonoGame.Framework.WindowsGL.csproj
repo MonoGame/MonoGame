@@ -127,7 +127,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs" />
     <Compile Include="Content\ResourceContentManager.cs" />
-    <Compile Include="Desktop\Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="Desktop\Input\Axis.cs" />
     <Compile Include="Desktop\Input\Capabilities.cs" />
@@ -345,8 +345,7 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
-    <Compile Include="Windows\Audio\AudioLoader.cs" />
-    <Compile Include="Windows\Audio\Sound.cs" />
+    <Compile Include="Desktop\Audio\AudioLoader.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs" />
@@ -425,8 +424,8 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\CompilerOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
