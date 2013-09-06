@@ -251,24 +251,39 @@ namespace Microsoft.Xna.Framework
                 result = ContainmentType.Contains;
         }
 
+        private static readonly Vector3 MaxVector3 = new Vector3(float.MaxValue);
+        private static readonly Vector3 MinVector3 = new Vector3(float.MinValue);
+
+        /// <summary>
+        /// Create a bounding box from the given list of points.
+        /// </summary>
+        /// <param name="points">The list of Vector3 instances defining the point cloud to bound</param>
+        /// <returns>A bounding box that encapsulates the given point cloud.</returns>
+        /// <exception cref="System.ArgumentException">Thrown if the given list has no points.</exception>
         public static BoundingBox CreateFromPoints(IEnumerable<Vector3> points)
         {
             if (points == null)
                 throw new ArgumentNullException();
 
             var empty = true;
-            var vector2 = new Vector3(float.MaxValue);
-            var vector1 = new Vector3(float.MinValue);
-            foreach (var vector3 in points)
+            var minVec = MaxVector3;
+            var maxVec = MinVector3;
+            foreach (var ptVector in points)
             {
-                vector2 = Vector3.Min(vector2, vector3);
-                vector1 = Vector3.Max(vector1, vector3);
+                minVec.X = (minVec.X < ptVector.X) ? minVec.X : ptVector.X;
+                minVec.Y = (minVec.Y < ptVector.Y) ? minVec.Y : ptVector.Y;
+                minVec.Z = (minVec.Z < ptVector.Z) ? minVec.Z : ptVector.Z;
+
+                maxVec.X = (maxVec.X > ptVector.X) ? maxVec.X : ptVector.X;
+                maxVec.Y = (maxVec.Y > ptVector.Y) ? maxVec.Y : ptVector.Y;
+                maxVec.Z = (maxVec.Z > ptVector.Z) ? maxVec.Z : ptVector.Z;
+
                 empty = false;
             }
             if (empty)
                 throw new ArgumentException();
 
-            return new BoundingBox(vector2, vector1);
+            return new BoundingBox(minVec, maxVec);
         }
 
         public static BoundingBox CreateFromSphere(BoundingSphere sphere)
