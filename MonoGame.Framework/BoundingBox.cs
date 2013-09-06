@@ -249,8 +249,6 @@ namespace Microsoft.Xna.Framework
                 result = ContainmentType.Intersects;
             else
                 result = ContainmentType.Contains;
-
-
         }
 
         public static BoundingBox CreateFromPoints(IEnumerable<Vector3> points)
@@ -258,11 +256,10 @@ namespace Microsoft.Xna.Framework
             if (points == null)
                 throw new ArgumentNullException();
 
-            // TODO: Just check that Count > 0
-            bool empty = true;
-            Vector3 vector2 = new Vector3(float.MaxValue);
-            Vector3 vector1 = new Vector3(float.MinValue);
-            foreach (Vector3 vector3 in points)
+            var empty = true;
+            var vector2 = new Vector3(float.MaxValue);
+            var vector1 = new Vector3(float.MinValue);
+            foreach (var vector3 in points)
             {
                 vector2 = Vector3.Min(vector2, vector3);
                 vector1 = Vector3.Max(vector1, vector3);
@@ -276,24 +273,33 @@ namespace Microsoft.Xna.Framework
 
         public static BoundingBox CreateFromSphere(BoundingSphere sphere)
         {
-            Vector3 vector1 = new Vector3(sphere.Radius);
-            return new BoundingBox(sphere.Center - vector1, sphere.Center + vector1);
+            BoundingBox result;
+            CreateFromSphere(ref sphere, out result);
+            return result;
         }
 
         public static void CreateFromSphere(ref BoundingSphere sphere, out BoundingBox result)
         {
-            result = BoundingBox.CreateFromSphere(sphere);
+            var corner = new Vector3(sphere.Radius);
+            result.Min = sphere.Center - corner;
+            result.Max = sphere.Center + corner;
         }
 
         public static BoundingBox CreateMerged(BoundingBox original, BoundingBox additional)
         {
-            return new BoundingBox(
-                Vector3.Min(original.Min, additional.Min), Vector3.Max(original.Max, additional.Max));
+            BoundingBox result;
+            CreateMerged(ref original, ref additional, out result);
+            return result;
         }
 
         public static void CreateMerged(ref BoundingBox original, ref BoundingBox additional, out BoundingBox result)
         {
-            result = BoundingBox.CreateMerged(original, additional);
+            result.Min.X = Math.Min(original.Min.X, additional.Min.X);
+            result.Min.Y = Math.Min(original.Min.Y, additional.Min.Y);
+            result.Min.Z = Math.Min(original.Min.Z, additional.Min.Z);
+            result.Max.X = Math.Max(original.Max.X, additional.Max.X);
+            result.Max.Y = Math.Max(original.Max.Y, additional.Max.Y);
+            result.Max.Z = Math.Max(original.Max.Z, additional.Max.Z);
         }
 
         public bool Equals(BoundingBox other)
