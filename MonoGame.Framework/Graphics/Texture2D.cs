@@ -791,8 +791,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #elif WINDOWS_PHONE
-            // Note that contrary to the method name this works for both JPEG and PNGs.
-            var writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
+            WriteableBitmap writableBitmap = null;
+            var waitEvent = new ManualResetEventSlim(false);
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                // Note that contrary to the method name this works for both JPEG and PNGs.
+                writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
+                waitEvent.Set();
+            });
+            waitEvent.Wait();
             // Convert from ARGB to ABGR
             int[] pixels = writableBitmap.Pixels;
             for (int i = 0; i < writableBitmap.PixelWidth * writableBitmap.PixelHeight; ++i)
