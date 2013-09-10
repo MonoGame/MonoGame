@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+        private bool _drawBegun;
         bool disposed;
 
 #if !WINRT
@@ -122,12 +123,20 @@ namespace Microsoft.Xna.Framework
 
         public bool BeginDraw()
         {
-            throw new NotImplementedException();
+            if (_graphicsDevice == null)
+                return false;
+
+            _drawBegun = true;
+            return true;
         }
 
         public void EndDraw()
         {
-            throw new NotImplementedException();
+            if (_graphicsDevice != null && _drawBegun)
+            {
+                _drawBegun = false;
+                _graphicsDevice.Present();
+            }
         }
 
         #region IGraphicsDeviceService Members
