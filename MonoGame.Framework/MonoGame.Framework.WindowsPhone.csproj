@@ -328,7 +328,6 @@
     <Compile Include="WindowsPhone\WPGameWindow.cs" />
     <Compile Include="WindowsPhone\XamlGame.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
-    <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
     <Compile Include="BoundingSphere.cs" />
@@ -359,7 +358,6 @@
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
-    <Compile Include="PowerLineStatus.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />
