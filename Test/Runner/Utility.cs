@@ -97,6 +97,7 @@ namespace MonoGame.Tests {
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
 		private static readonly string ModelFolder = Path.Combine (AssetFolder, "Models");
+        private static readonly string AudioFolder = Path.Combine (AssetFolder, "Audio");
 		private const string CapturedFrameFolder = "CapturedFrames";
 		private const string CapturedFrameDiffFolder = "Diffs";
 
@@ -125,6 +126,11 @@ namespace MonoGame.Tests {
 			return Combine (ModelFolder, pathParths);
 		}
 
+        public static string Audio (params string [] pathParts)
+        {
+            return Combine (AudioFolder, pathParts);
+        }
+        
 		public static string ReferenceImage (params string [] pathParts)
 		{
 			return Combine (ReferenceImageFolder, pathParts);

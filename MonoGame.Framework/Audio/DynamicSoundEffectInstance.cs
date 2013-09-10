@@ -1,100 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-#if MONOMAC
-using MonoMac.OpenAL;
-#else
-using OpenTK.Audio.OpenAL;
-#endif
 
-namespace Microsoft.Xna.Framework.Audio
-{
-    public sealed class DynamicSoundEffectInstance : SoundEffectInstance
-    {
-        private AudioChannels channels;
+namespace Microsoft.Xna.Framework.Audio {
+    public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance {
+        private const int SAMPLE_WIDTH = 2;
         private int sampleRate;
-        private ALFormat format;
-        private bool looped;
-        private int pendingBufferCount;
+        private int bytesPerSecond;
+        public int PendingBufferCount { get; private set; }
+
         // Events
         public event EventHandler<EventArgs> BufferNeeded;
 
-        internal void OnBufferNeeded(EventArgs args)
+        internal void OnBufferNeeded (EventArgs args)
         {
-            if (BufferNeeded != null)
-            {
-                BufferNeeded(this, args);
+            if (BufferNeeded != null) {
+                BufferNeeded (this, args);
             }
         }
 
-        public DynamicSoundEffectInstance(int sampleRate, AudioChannels channels)
+        public DynamicSoundEffectInstance (int sampleRate, AudioChannels channels)
         {
+            soundState = SoundState.Stopped;
             this.sampleRate = sampleRate;
-            this.channels = channels;
-            switch (channels)
-            {
-                case AudioChannels.Mono:
-                    this.format = ALFormat.Mono16;
-                    break;
-                case AudioChannels.Stereo:
-                    this.format = ALFormat.Stereo16;
-                    break;
-                default:
-                    break;
-            }                       
+            setFormatFor (channels);
+            bytesPerSecond = ((int) channels) * sampleRate * SAMPLE_WIDTH;
         }
 
-        public TimeSpan GetSampleDuration(int sizeInBytes)
+        public TimeSpan GetSampleDuration (int sizeInBytes)
         {
-            throw new NotImplementedException();
+            return new TimeSpan (0, 0, 0, 0, (int) ((long) sizeInBytes * 1000L) / bytesPerSecond);
         }
 
-        public int GetSampleSizeInBytes(TimeSpan duration)
+        public int GetSampleSizeInBytes (TimeSpan duration)
         {
-            throw new NotImplementedException();
+            return (int) (duration.TotalSeconds * bytesPerSecond);
         }
 
-        public override void Play()
+        public void SubmitBuffer (byte [] buffer)
         {
-            throw new NotImplementedException();
+            this.SubmitBuffer (buffer, 0, buffer.Length);
         }
 
-        public void SubmitBuffer(byte[] buffer)
+        public void SubmitBuffer (byte [] buffer, int offset, int count)
         {
-            this.SubmitBuffer(buffer, 0, buffer.Length);
-        }
-
-        public void SubmitBuffer(byte[] buffer, int offset, int count)
-        {
-            BindDataBuffer(buffer, format, count, sampleRate);
-        }
-
-        public override bool IsLooped
-        {
-            get
-            {
-                return looped;
-            }
-
-            set
-            {
-                looped = value;                
-            }
-        }
-
-        public int PendingBufferCount 
-        {
-            get
-            {
-                return pendingBufferCount;
-            }
-            private set
-            {
-                pendingBufferCount = value;
-            }
+            QueueDataBuffer (buffer, format, offset, count, sampleRate);
         }
     }
-
-
 }

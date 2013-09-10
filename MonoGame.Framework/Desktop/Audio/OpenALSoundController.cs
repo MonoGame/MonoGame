@@ -214,6 +214,7 @@ namespace Microsoft.Xna.Framework.Audio
                 playingSourcesCollection.Add (soundBuffer);
             }
 			AL.SourcePlay (soundBuffer.SourceId);
+            CheckALError(String.Format("could not play source '{0}'", soundBuffer.SourceId));
 		}
 
 		public void StopSound (OALSoundBuffer soundBuffer)

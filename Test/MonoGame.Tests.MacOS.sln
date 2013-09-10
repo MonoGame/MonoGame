@@ -54,8 +54,8 @@ Global
 		StartupItem = MonoGame.Tests.MacOS.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
-		$1.RemoveTrailingWhitespace = True
-		$1.inheritsSet = Mono
+		$1.EolMarker = Windows
+		$1.inheritsSet = VisualStudio
 		$1.inheritsScope = text/plain
 		$1.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $2
@@ -72,7 +72,6 @@ Global
 		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
 		$0.TextStylePolicy = $3
-		$3.RemoveTrailingWhitespace = True
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/plain
 		$3.scope = text/plain
