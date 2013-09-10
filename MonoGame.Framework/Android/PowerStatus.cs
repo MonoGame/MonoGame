@@ -92,6 +92,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /*
         public static TimeSpan? BatteryFullLifetime
         {
             get
@@ -99,9 +100,11 @@ namespace Microsoft.Xna.Framework
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static float? BatteryLifePercent { get { return _batteryLevel * 100 / _batteryLevelScale; } }
 
+        /*
         public static TimeSpan? BatteryLifeRemaining
         {
             get
@@ -109,6 +112,7 @@ namespace Microsoft.Xna.Framework
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static Microsoft.Xna.Framework.PowerLineStatus PowerLineStatus
         {

@@ -77,6 +77,7 @@ using System;
 				UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
 		}
 
+        /*
         public static TimeSpan? BatteryFullLifetime
         {
             get
@@ -84,6 +85,7 @@ using System;
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static float? BatteryLifePercent
         {
@@ -94,6 +96,7 @@ using System;
             }
         }
 
+        /*
         public static TimeSpan? BatteryLifeRemaining
         {
             get
@@ -101,6 +104,7 @@ using System;
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static Microsoft.Xna.Framework.PowerLineStatus PowerLineStatus
         {

@@ -155,7 +155,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override void RunLoop()
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The Windows Phone platform does not support synchronous run loops");
         }
 
         public override void StartRunLoop()

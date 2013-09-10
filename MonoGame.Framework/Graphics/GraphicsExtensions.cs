@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case CullMode.CullCounterClockwiseFace:
                     return All.Ccw;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentException();
             }
         }
 
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return 4;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
         public static VertexPointerType OpenGLVertexPointerType(this VertexElementFormat elementFormat)
@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return VertexPointerType.Float;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
 		public static VertexAttribPointerType OpenGLVertexAttribPointerType(this VertexElementFormat elementFormat)
@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
         public static bool OpenGLVertexAttribNormalized(this VertexElement element)
@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			}
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
        public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
@@ -289,7 +289,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			}
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
        public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
@@ -335,7 +335,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 			}
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 
 		
@@ -361,7 +361,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				return BlendEquationMode.FuncSubtract;
 
 			default:
-                throw new NotImplementedException();
+                throw new ArgumentException();
 			}
 		}
 
@@ -672,7 +672,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Vector4:
                     return 16;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentException();
             }
         }
 		

@@ -79,6 +79,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          string defaultText,
 		 bool usePasswordMode);
 
+        /*
 		public static string ShowKeyboardInput(
 		 PlayerIndex player,           
          string title,
@@ -87,45 +88,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode)
 		{
 			throw new NotImplementedException();
-			/* TODO Use UISystem etc (See Sample: UI/Overlay and others)
-			string result = defaultText; 
-			if (!isKeyboardInputShowing)
-			{
-				isKeyboardInputShowing = true;				
-	
-			}
-			
-			isVisible = isKeyboardInputShowing;
-
-		    var alert = new AlertDialog.Builder(Game.Activity);
-
-		    alert.SetTitle(title);
-		    alert.SetMessage(description);
-
-		    var input = new EditText(Game.Activity) {Text = defaultText};
-		    alert.SetView(input);
-
-		    alert.SetPositiveButton("Ok", (dialog, whichButton) =>
-		                                      {
-		                                          result = input.Text;
-		                                          isVisible = false;
-		                                      });
-
-		    alert.SetNegativeButton("Cancel", (dialog, whichButton) =>
-		                                          {
-		                                              result = null;
-                                                      isVisible = false;
-                                                  });
-
-            Game.Activity.RunOnUiThread(() => alert.Show());
-
-		    while (isVisible)
-		    {
-		        Thread.Sleep(1);
-		    }
-
-            return result;*/
 		}
+        */
 
 		public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,

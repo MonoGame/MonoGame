@@ -109,11 +109,13 @@ namespace Microsoft.Xna.Framework.Graphics
             return ((float[])Data)[0] != 0.0f;
 #endif
         }
-
+        
+        /*
 		public bool[] GetValueBooleanArray ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public int GetValueInt32 ()
 		{
@@ -127,11 +129,13 @@ namespace Microsoft.Xna.Framework.Graphics
             return (int)((float[])Data)[0];
 #endif
         }
-
+        
+        /*
 		public int[] GetValueInt32Array ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public Matrix GetValueMatrix ()
 		{
@@ -242,10 +246,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			return new Vector2(vecInfo[0],vecInfo[1]);
 		}
 
+        /*
 		public Vector2[] GetValueVector2Array ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public Vector3 GetValueVector3 ()
 		{
@@ -256,10 +262,12 @@ namespace Microsoft.Xna.Framework.Graphics
 			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
 		}
 
+        /*
 		public Vector3[] GetValueVector3Array ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public Vector4 GetValueVector4 ()
 		{
@@ -269,11 +277,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var vecInfo = (float[])Data;
 			return new Vector4(vecInfo[0],vecInfo[1],vecInfo[2],vecInfo[3]);
 		}
-
+        
+        /*
 		public Vector4[] GetValueVector4Array ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public void SetValue (bool value)
 		{
@@ -291,10 +301,12 @@ namespace Microsoft.Xna.Framework.Graphics
             StateKey = unchecked(NextStateKey++);
 		}
 
+        /*
 		public void SetValue (bool[] value)
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public void SetValue (int value)
 		{
@@ -310,10 +322,12 @@ namespace Microsoft.Xna.Framework.Graphics
             StateKey = unchecked(NextStateKey++);
 		}
 
+        /*
 		public void SetValue (int[] value)
 		{
 			throw new NotImplementedException();
 		}
+        */
 
         public void SetValue(Matrix value)
         {
@@ -528,10 +542,12 @@ namespace Microsoft.Xna.Framework.Graphics
             StateKey = unchecked(NextStateKey++);
 		}
 		
+        /*
 		public void SetValue (string value)
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		public void SetValue (Texture value)
 		{

@@ -107,12 +107,12 @@ namespace Microsoft.Xna.Framework.Audio
 				sound.Volume = volume;
 		}
 
-		
+		/*
 		public bool Equals(AudioCategory other)
 		{
 			throw new NotImplementedException();
 		}
-		
+		*/
 	}
 }
 

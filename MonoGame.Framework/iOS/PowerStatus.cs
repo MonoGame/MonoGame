@@ -75,6 +75,7 @@ using MonoTouch.UIKit;
 				UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
 		}
 
+        /*
         public static TimeSpan? BatteryFullLifetime
         {
             get
@@ -82,6 +83,7 @@ using MonoTouch.UIKit;
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static float? BatteryLifePercent
         {
@@ -92,6 +94,7 @@ using MonoTouch.UIKit;
             }
         }
 
+        /*
         public static TimeSpan? BatteryLifeRemaining
         {
             get
@@ -99,6 +102,7 @@ using MonoTouch.UIKit;
                 throw new NotImplementedException();
             }
         }
+        */
 
         public static Microsoft.Xna.Framework.PowerLineStatus PowerLineStatus
         {
