@@ -439,7 +439,6 @@ namespace Microsoft.Xna.Framework.Net
 			} finally {
 			}
 		}
-        */
 
 		public static IAsyncResult BeginJoinInvited (
 			int maxLocalGamers,
@@ -455,8 +454,9 @@ namespace Microsoft.Xna.Framework.Net
 			} finally {
 			}
 		}
+        */
 
-		public static NetworkSession EndCreate (IAsyncResult result)
+        public static NetworkSession EndCreate (IAsyncResult result)
 		{
 			NetworkSession returnValue = null;
 			try {
@@ -550,6 +550,7 @@ namespace Microsoft.Xna.Framework.Net
 			return returnValue;
 		}
 
+        /*
 		public static NetworkSession EndJoinInvited (IAsyncResult result)
 		{
 			NetworkSession returnValue = null;
@@ -573,6 +574,7 @@ namespace Microsoft.Xna.Framework.Net
 			}
 			return returnValue;
 		}
+        */
 
 		public static AvailableNetworkSessionCollection Find (
 			NetworkSessionType sessionType,
