@@ -67,6 +67,7 @@ non-infringement.
 extern alias MicrosoftXnaFramework;
 using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher; 
 
+using System;
 using System.Diagnostics;
 using System.Windows.Controls;
 using Microsoft.Xna.Framework;
