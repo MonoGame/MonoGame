@@ -87,11 +87,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             GraphicsExtensions.CheckGLError();
 #endif
-
-
 	
 			_anisotropicClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.AnisotropicClamp",
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -100,6 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_anisotropicWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.AnisotropicWrap",
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
@@ -108,6 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_linearClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.LinearClamp",
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -116,6 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_linearWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.LinearWrap",
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
@@ -124,6 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_pointClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.PointClamp",
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -132,6 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_pointWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.PointWrap",
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
