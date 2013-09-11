@@ -89,7 +89,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			throw new NotImplementedException();
 		}
-        */
 
 		public static IAsyncResult BeginShowKeyboardInput (
          PlayerIndex player,
@@ -129,6 +128,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				isVisible = false;
 			}			
 		}
+        */
 
 		delegate Nullable<int> ShowMessageBoxDelegate( string title,
          string text,
