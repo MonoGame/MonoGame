@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content
             else if (format == 2)
                 waveFormat = new SharpDX.Multimedia.WaveFormatAdpcm(sampleRate, channels, blockAlignment);
             else
-                throw new NotImplementedException("Unsupported wave format!");
+                throw new NotSupportedException("Unsupported wave format!");
 
             return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength)
             {

@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Audio
 					events[i] = evnt;
 					break;
 				default:
-					throw new NotImplementedException();
+					throw new NotSupportedException();
 				}
 				
 				events[i].clip = this;

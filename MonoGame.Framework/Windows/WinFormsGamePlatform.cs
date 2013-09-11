@@ -123,8 +123,7 @@ namespace MonoGame.Framework
 
         public override void StartRunLoop()
         {
-            // We don't support syncronous run loops right now!
-            throw new NotSupportedException();
+            throw new NotSupportedException("The Windows platform does not support asynchronous run loops");
         }
         
         public override void Exit()
