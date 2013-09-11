@@ -302,6 +302,7 @@ namespace Microsoft.Xna.Framework
 			result = Intersects(box);
         }
 
+        /*
         public bool Intersects(BoundingFrustum frustum)
         {
             if (frustum == null)
@@ -309,6 +310,7 @@ namespace Microsoft.Xna.Framework
 
             throw new NotImplementedException();
         }
+        */
 
         public bool Intersects(BoundingSphere sphere)
         {

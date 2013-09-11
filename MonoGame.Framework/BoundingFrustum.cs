@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        // TODO: Implement this
+        /*
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
@@ -164,6 +164,7 @@ namespace Microsoft.Xna.Framework
 
             throw new NotImplementedException();
         }
+        */
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -258,10 +259,12 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
+        /*
         public bool Intersects(BoundingFrustum frustum)
         {
             throw new NotImplementedException();
         }
+        */
 
         public bool Intersects(BoundingSphere sphere)
         {
@@ -277,6 +280,7 @@ namespace Microsoft.Xna.Framework
             result = containment != ContainmentType.Disjoint;
         }
 
+        /*
         public PlaneIntersectionType Intersects(Plane plane)
         {
             throw new NotImplementedException();
@@ -296,6 +300,7 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
+        */
 
         public override string ToString()
         {

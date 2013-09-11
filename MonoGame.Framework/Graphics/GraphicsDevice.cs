@@ -1452,6 +1452,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /*
         public void Present(Rectangle? sourceRectangle, Rectangle? destinationRectangle, IntPtr overrideWindowHandle)
         {
             throw new NotImplementedException();
@@ -1472,6 +1473,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             throw new NotImplementedException();
         }
+        */
 
         /// <summary>
         /// Trigger the DeviceResetting event
@@ -1824,7 +1826,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return BeginMode.TriangleStrip;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 		
 #elif DIRECTX
@@ -1843,7 +1845,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PrimitiveTopology.TriangleStrip;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
 		
 #endif

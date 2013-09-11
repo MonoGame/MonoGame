@@ -478,8 +478,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                 data = buffer;
                                 break;							
                             }
-						case EffectParameterType.String:
-							throw new NotImplementedException();
+
+						default:
+							throw new NotSupportedException();
 					}
                 }
 

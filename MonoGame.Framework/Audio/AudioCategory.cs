@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 
@@ -40,6 +41,9 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		internal AudioCategory (AudioEngine audioengine, string name, BinaryReader reader)
 		{
+		    Debug.Assert(audioengine != null);
+            Debug.Assert(!string.IsNullOrEmpty(name));
+
 			this.sounds = new List<XactSound>();
 			this.name = name;
 			engine = audioengine;
@@ -107,12 +111,41 @@ namespace Microsoft.Xna.Framework.Audio
 				sound.Volume = volume;
 		}
 
-		
-		public bool Equals(AudioCategory other)
+        public static bool operator ==(AudioCategory first, AudioCategory second)
+        {
+            return first.engine == second.engine && first.name.Equals(second.name, StringComparison.Ordinal);
+        }
+
+        public static bool operator !=(AudioCategory first, AudioCategory second)
+	    {
+            return first.engine != second.engine || !first.name.Equals(second.name, StringComparison.Ordinal);
+	    }
+
+	    public bool Equals(AudioCategory other)
 		{
-			throw new NotImplementedException();
+            return engine == other.engine && name.Equals(other.name, StringComparison.Ordinal);
 		}
-		
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AudioCategory)
+            {
+                var other = (AudioCategory)obj;
+                return engine == other.engine && name.Equals(other.name, StringComparison.Ordinal);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return name.GetHashCode() ^ engine.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
 	}
 }
 

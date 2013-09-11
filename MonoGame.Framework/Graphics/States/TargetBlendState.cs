@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOperation.Subtract;
 
                 default:
-                    throw new NotImplementedException("Invalid blend function!");
+                    throw new ArgumentException("Invalid blend function!");
             }
         }
 
@@ -122,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.BlendOption.Zero;
 
                 default:
-                    throw new NotImplementedException("Invalid blend!");
+                    throw new ArgumentException("Invalid blend!");
             }
         }
 
