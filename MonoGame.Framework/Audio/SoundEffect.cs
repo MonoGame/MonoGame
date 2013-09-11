@@ -276,11 +276,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public static SoundEffect FromStream(Stream stream)
         {            
-#if ANDROID
-            throw new NotImplementedException();
-#else
             return new SoundEffect(stream);
-#endif
         }
 
         #endregion

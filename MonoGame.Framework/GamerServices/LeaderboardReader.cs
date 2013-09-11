@@ -9,6 +9,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
         }
 
+        /*
         public IAsyncResult BeginPageDown(AsyncCallback aAsyncCallback, object aAsyncState)
         {
             throw new NotImplementedException ();
@@ -48,6 +49,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
             throw new NotImplementedException ();
         }
+        */
 
         public bool CanPageDown {
             get;

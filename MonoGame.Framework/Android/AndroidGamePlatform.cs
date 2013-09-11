@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("The Android platform does not support synchronous run loops");
         }
 
         public override void StartRunLoop()
