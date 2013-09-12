@@ -72,39 +72,12 @@ namespace Microsoft.Xna.Framework.Audio {
             PendingBufferCount--;
         }
 
-        public override bool IsLooped {
-            get {
-                return false;
-            }
-
-            set {
-                throw new InvalidOperationException ("cannot loop DynamicSoundEffect");
-            }
+        void startPlaying ()
+        {
+            ThreadPool.QueueUserWorkItem (new WaitCallback (queueBuffersForPlay));
         }
 
-        public override void Play ()
-        {
-            ThreadPool.QueueUserWorkItem (new WaitCallback (startPlaying));
-        }
-
-        public override void Resume ()
-        {
-            Play ();
-        }
-        
-        public override void Stop ()
-        {
-            soundState = SoundState.Stopped;
-        }
-        
-        public override void Pause ()
-        {
-            if (soundState == SoundState.Playing) {
-                soundState = SoundState.Paused;
-            }
-        }
-        
-        private void startPlaying (Object stateInfo)
+        private void queueBuffersForPlay (Object stateInfo)
         {
             PendingBufferCount = NUM_BUFFERS;
 
