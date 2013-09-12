@@ -64,10 +64,11 @@ Global
 		$2.InterfaceBraceStyle = EndOfLine
 		$2.StructBraceStyle = EndOfLine
 		$2.EnumBraceStyle = EndOfLine
-		$2.BeforeSizeOfParentheses = True
-		$2.BeforeTypeOfParentheses = True
+		$2.BeforeMethodDeclarationParentheses = False
+		$2.BeforeMethodCallParentheses = False
+		$2.NewParentheses = False
+		$2.SpacesBeforeBrackets = False
 		$2.SpacesAfterTypecast = True
-		$2.SpacesBeforeArrayDeclarationBrackets = True
 		$2.inheritsSet = Mono
 		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
