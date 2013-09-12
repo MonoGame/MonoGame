@@ -1109,14 +1109,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Set the current viewport.
             Viewport = new Viewport
-            {
-                X = 0,
-                Y = 0,
-                Width = targetSize.X,
-                Height = targetSize.Y,
-                MinDepth = 0.0f,
-                MaxDepth = 1.0f
-            };
+            (
+                0,
+                0,
+                targetSize.X,
+                targetSize.Y,
+                0.0f,
+                1.0f
+            );
         }
 		
 #endif // WINDOWS
