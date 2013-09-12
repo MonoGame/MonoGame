@@ -1681,6 +1681,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
                 _currentDepthStencilView = null;
 
+                // Make sure none of the new targets are bound
+                // to the device as a texture resource.
+                lock (_d3dContext)
+                    Textures.ClearTargets(this, _currentRenderTargetBindings);
+
                 for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
                     var binding = _currentRenderTargetBindings[i];
