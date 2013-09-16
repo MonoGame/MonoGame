@@ -472,7 +472,7 @@ namespace Microsoft.Xna.Framework
 				DoExiting();
                 break;
             default:
-                throw new NotImplementedException(string.Format(
+                throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }

@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework
 			result = Intersects(box);
         }
 
-
+        /*
         public float? Intersects(BoundingFrustum frustum)
         {
             if (frustum == null)
@@ -173,10 +173,9 @@ namespace Microsoft.Xna.Framework
 				throw new ArgumentNullException("frustum");
 			}
 			
-			return frustum.Intersects(this);
-			
+			return frustum.Intersects(this);			
         }
-
+        */
 
         public float? Intersects(BoundingSphere sphere)
         {
