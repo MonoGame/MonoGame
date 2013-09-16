@@ -247,8 +247,8 @@ namespace Microsoft.Xna.Framework {
 			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
             _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
 
-			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService(
-				typeof (IGraphicsDeviceService));
+			var gds = _platform.Game.Services.GetService(
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
 			if (gds != null && gds.GraphicsDevice != null)
 			{
@@ -344,8 +344,8 @@ namespace Microsoft.Xna.Framework {
 		{
 			base.LayoutSubviews ();
 
-            var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
-                typeof (IGraphicsDeviceService));
+            var gds = _platform.Game.Services.GetService (
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
             if (gds == null || gds.GraphicsDevice == null)
                 return;
