@@ -4,6 +4,7 @@
     <Exclude>nvtt.dll</Exclude>
 	<Exclude>freetype6.dll</Exclude>
 	<Exlcude>pvrtc.dll</Exlcude>
+	<!--
 	<Exclude>libnvtt.dylib</Exlcude>
 	<Exclude>libnvimage.dylib</Exlcude>
 	<Exclude>libnvmath.dylib</Exlcude>
@@ -11,5 +12,6 @@
 	<Exclude>libpvrtc.dylib</Exlcude>
 	<Exclude>libfreetype.6.dylib</Exlcude>
 	<Exclude>libpng15.15.dylib</Exlcude>
+	-->
 </Addins>
 

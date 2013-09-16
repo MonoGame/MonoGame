@@ -57,7 +57,7 @@
 		<ScanExclude path="libpvrtc.dylib"/>
 		<ScanExclude path="libfreetype.6.dylib"/>
 		<ScanExclude path="libpng15.15.dylib"/>
-		<Import file="exclude.addin"/>
+		<Import file="exclude.addins"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="4.0" />
