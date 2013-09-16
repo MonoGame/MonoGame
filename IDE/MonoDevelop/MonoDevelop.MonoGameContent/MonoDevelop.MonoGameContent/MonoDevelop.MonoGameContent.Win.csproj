@@ -176,4 +176,7 @@
       <Name>MonoGame.Framework.Content.Pipeline.Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="exclude.addins" />
+  </ItemGroup>
 </Project>

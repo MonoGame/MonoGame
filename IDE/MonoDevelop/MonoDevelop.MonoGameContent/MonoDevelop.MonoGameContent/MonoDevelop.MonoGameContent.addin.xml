@@ -49,7 +49,7 @@
 		<ScanExclude path="freetype6.dll"/>
 		<ScanExclude path="pvrtc.dll"/>
 		<ScanExclude path="Assimp32.dll"/>
-		<ScanExclude path="Assimp32.dll"/>
+		<ScanExclude path="Assimp64.dll"/>
 		<ScanExclude path="libnvtt.dylib"/>
 		<ScanExclude path="libnvimage.dylib"/>
 		<ScanExclude path="libnvmath.dylib"/>
@@ -57,6 +57,7 @@
 		<ScanExclude path="libpvrtc.dylib"/>
 		<ScanExclude path="libfreetype.6.dylib"/>
 		<ScanExclude path="libpng15.15.dylib"/>
+		<Import file="exclude.addin"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="4.0" />
