@@ -668,9 +668,24 @@ namespace Microsoft.Xna.Framework.Graphics
             featureLevels.Add(FeatureLevel.Level_9_2);
             featureLevels.Add(FeatureLevel.Level_9_1);
 
-            // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
-                _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+#if DEBUG
+            try 
+            {
+#endif
+                // Create the Direct3D device.
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                    _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+#if DEBUG
+            }
+            catch(SharpDXException)
+            {
+                // Try again without the debug flag.  This allows debug builds to run
+                // on machines that don't have the debug runtime installed.
+                creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                    _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+            }
+#endif
 
             // Set the correct profile based on the feature level.
             _featureLevel = _d3dDevice.FeatureLevel;
@@ -918,9 +933,24 @@ namespace Microsoft.Xna.Framework.Graphics
             featureLevels.Add(FeatureLevel.Level_9_2);
             featureLevels.Add(FeatureLevel.Level_9_1);
 
-            // Create the Direct3D device.
-            using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
-                _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
+#if DEBUG
+            try 
+            {
+#endif
+                // Create the Direct3D device.
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                    _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
+#if DEBUG
+            }
+            catch(SharpDXException)
+            {
+                // Try again without the debug flag.  This allows debug builds to run
+                // on machines that don't have the debug runtime installed.
+                creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                    _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
+            }
+#endif
 
             // Set the correct profile based on the feature level.
             _featureLevel = _d3dDevice.FeatureLevel;
@@ -1680,6 +1710,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Clear the current render targets.
                 Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
                 _currentDepthStencilView = null;
+
+                // Make sure none of the new targets are bound
+                // to the device as a texture resource.
+                lock (_d3dContext)
+                    Textures.ClearTargets(this, _currentRenderTargetBindings);
 
                 for (var i = 0; i < _currentRenderTargetCount; i++)
                 {
