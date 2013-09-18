@@ -74,7 +74,7 @@ using Windows.UI.ViewManagement;
 
 namespace Microsoft.Xna.Framework
 {
-    abstract class GamePlatform : IDisposable
+    public abstract class GamePlatform : IDisposable
     {
         #region Fields
 

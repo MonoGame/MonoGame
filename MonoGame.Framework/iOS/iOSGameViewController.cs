@@ -72,7 +72,7 @@ using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 
 namespace Microsoft.Xna.Framework {
-	class iOSGameViewController : UIViewController {
+	public class iOSGameViewController : UIViewController {
 		iOSGamePlatform _platform;
 
 		public iOSGameViewController (iOSGamePlatform platform)
