@@ -240,12 +240,17 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_PHONE
                 TimeSpan pos = TimeSpan.Zero;
                 EventWaitHandle Wait = new AutoResetEvent(false);
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
+                if(_mediaElement.Dispatcher.CheckAccess()) {
                     pos = _mediaElement.Position;
-                    Wait.Set();
-                });
-                Wait.WaitOne();
+                }
+                else {
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        pos = _mediaElement.Position;
+                        Wait.Set();
+                    });
+                    Wait.WaitOne();
+                }
                 return (pos);
 #else
 				if (_queue.ActiveSong == null)

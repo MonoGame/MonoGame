@@ -58,9 +58,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Drawing" />
     <Reference Include="Tao.Sdl">
@@ -80,7 +78,6 @@
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
-    <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
     <Compile Include="BoundingSphere.cs" />
@@ -106,7 +103,6 @@
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
-    <Compile Include="PowerLineStatus.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="Rectangle.cs" />
@@ -208,6 +204,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />

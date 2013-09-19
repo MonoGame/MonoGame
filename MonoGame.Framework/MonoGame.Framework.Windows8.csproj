@@ -317,7 +317,6 @@
     <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="Windows8\XamlGame.cs" />
     <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
-    <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
     <Compile Include="BoundingSphere.cs" />
@@ -348,7 +347,6 @@
     <Compile Include="PlaneIntersectionType.cs" />
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
-    <Compile Include="PowerLineStatus.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Ray.cs" />
@@ -372,6 +370,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
