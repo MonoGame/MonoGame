@@ -16,7 +16,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\MacOS\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;MACOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\MacOS\Release\</OutputPath>
     <DefineConstants>TRACE;MACOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -52,6 +52,9 @@
     </Reference>
     <Reference Include="ManagedPVRTC">
       <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -201,7 +204,7 @@
     <Compile Include="Graphics\DxtBitmapContent.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
-    <Compile Include="Graphics\FontHelper.cs" />
+    <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -212,29 +215,51 @@
   </Target>
   -->
   <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
+      <Link>ManagedPVRTC.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+      <Link>libfreetype.6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+      <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
+      <Link>SharpFont.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
-      <Link>Dependencies\x86\Assimp32.dll</Link>
+    <Content Include="..\ThirdParty\Libs\assimp\AssimpNet.dll.config">
+      <Link>AssimpNet.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
-      <Link>Dependencies\x64\Assimp64.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
-      <Link>Dependencies\x64\nvtt.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
-      <Link>Dependencies\x86\nvtt.dll</Link>
-    </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\assimp\libassimp.dylib">
+      <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>

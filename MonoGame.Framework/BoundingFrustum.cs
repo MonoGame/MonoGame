@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework
         #region Private Fields
 
         private Matrix matrix;
-        private Vector3[] corners;
-        private Plane[] planes;
+        private readonly Vector3[] corners = new Vector3[CornerCount];
+        private readonly Plane[] planes = new Plane[PlaneCount];
 
         private const int PlaneCount = 6;
 
@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework
             result = intersects ? ContainmentType.Intersects : ContainmentType.Contains;
         }
 
-        // TODO: Implement this
+        /*
         public ContainmentType Contains(BoundingFrustum frustum)
         {
             if (this == frustum)                // We check to see if the two frustums are equal
@@ -164,6 +164,7 @@ namespace Microsoft.Xna.Framework
 
             throw new NotImplementedException();
         }
+        */
 
         public ContainmentType Contains(BoundingSphere sphere)
         {
@@ -258,10 +259,12 @@ namespace Microsoft.Xna.Framework
 			result = containment != ContainmentType.Disjoint;
 		}
 
+        /*
         public bool Intersects(BoundingFrustum frustum)
         {
             throw new NotImplementedException();
         }
+        */
 
         public bool Intersects(BoundingSphere sphere)
         {
@@ -277,6 +280,7 @@ namespace Microsoft.Xna.Framework
             result = containment != ContainmentType.Disjoint;
         }
 
+        /*
         public PlaneIntersectionType Intersects(Plane plane)
         {
             throw new NotImplementedException();
@@ -296,6 +300,7 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
+        */
 
         public override string ToString()
         {
@@ -323,7 +328,6 @@ namespace Microsoft.Xna.Framework
 
         private void CreateCorners()
         {
-            this.corners = new Vector3[CornerCount];
             IntersectionPoint(ref this.planes[0], ref this.planes[2], ref this.planes[4], out this.corners[0]);
             IntersectionPoint(ref this.planes[0], ref this.planes[3], ref this.planes[4], out this.corners[1]);
             IntersectionPoint(ref this.planes[0], ref this.planes[3], ref this.planes[5], out this.corners[2]);
@@ -335,8 +339,7 @@ namespace Microsoft.Xna.Framework
         }
 
         private void CreatePlanes()
-        {
-            this.planes = new Plane[PlaneCount];
+        {            
             this.planes[0] = new Plane(-this.matrix.M13, -this.matrix.M23, -this.matrix.M33, -this.matrix.M43);
             this.planes[1] = new Plane(this.matrix.M13 - this.matrix.M14, this.matrix.M23 - this.matrix.M24, this.matrix.M33 - this.matrix.M34, this.matrix.M43 - this.matrix.M44);
             this.planes[2] = new Plane(-this.matrix.M14 - this.matrix.M11, -this.matrix.M24 - this.matrix.M21, -this.matrix.M34 - this.matrix.M31, -this.matrix.M44 - this.matrix.M41);

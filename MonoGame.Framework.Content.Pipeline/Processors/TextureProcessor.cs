@@ -11,7 +11,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName="Texture - MonoGame")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
-        public TextureProcessor() { }
+        public TextureProcessor()
+        {
+            PremultiplyAlpha = true;
+        }
 
         public virtual Color ColorKeyColor { get; set; }
 
@@ -73,10 +76,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
-
-            if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed || 
+			try 
+			{
+			if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed || 
                 TextureFormat == TextureProcessorOutputFormat.Compressed )
-                GraphicsUtil.CompressTexture(input, context.TargetPlatform, GenerateMipmaps, PremultiplyAlpha);
+                context.Logger.LogMessage("Compressing using {0}",TextureFormat);
+                GraphicsUtil.CompressTexture(input, context, GenerateMipmaps, PremultiplyAlpha);
+				context.Logger.LogMessage("Compression {0} Suceeded", TextureFormat);
+			}
+			catch(EntryPointNotFoundException ex) {
+				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
+			catch(DllNotFoundException ex) {
+				context.Logger.LogImportantMessage ("Could not compress texture. Required shared lib is missing. {0}", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
+			catch(Exception ex)
+			{
+				context.Logger.LogImportantMessage ("Could not compress texture {0}", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
 
             return input;
         }

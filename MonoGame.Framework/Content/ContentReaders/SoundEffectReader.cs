@@ -107,37 +107,46 @@ namespace Microsoft.Xna.Framework.Content
             else if (format == 2)
                 waveFormat = new SharpDX.Multimedia.WaveFormatAdpcm(sampleRate, channels, blockAlignment);
             else
-                throw new NotImplementedException("Unsupported wave format!");
+                throw new NotSupportedException("Unsupported wave format!");
 
             return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength)
             {
                 Name = input.AssetName,
             };
 #else
-            byte[] soundData = null;
-            // Proper use of "using" corectly disposes of BinaryWriter which in turn disposes the underlying stream
-            MemoryStream mStream = new MemoryStream(20 + header.Length + 8 + data.Length);
-            using (BinaryWriter writer = new BinaryWriter(mStream))
+            if (header[0] == 2 && header[1] == 0)
             {
-                writer.Write("RIFF".ToCharArray());
-                writer.Write((int)(20 + header.Length + data.Length));
-                writer.Write("WAVE".ToCharArray());
-
-                //header can be written as-is
-                writer.Write("fmt ".ToCharArray());
-                writer.Write(header.Length);
-                writer.Write(header);
-
-                writer.Write("data".ToCharArray());
-                writer.Write((int)data.Length);
-                writer.Write(data);
-
-                // Copy the data to an array before disposing the stream
-                soundData = mStream.ToArray();
+                // We've found MSADPCM data! Let's decode it here.
+                using (MemoryStream origDataStream = new MemoryStream(data))
+                {
+                    using (BinaryReader reader = new BinaryReader(origDataStream))
+                    {
+                        byte[] newData = MSADPCMToPCM.MSADPCM_TO_PCM(
+                            reader,
+                            header[2],
+                            (short) ((header[12] / header[2]) - 22)
+                        );
+                        data = newData;
+                    }
+                }
+                
+                // This is PCM data now!
+                header[0] = 1;
             }
-            if (soundData == null)
-                throw new ContentLoadException("Failed to load SoundEffect");
-			return new SoundEffect(input.AssetName, soundData);
+            
+            int sampleRate = (
+                (header[4]) +
+                (header[5] << 8) +
+                (header[6] << 16) +
+                (header[7] << 24)
+            );
+            
+            return new SoundEffect(
+                input.AssetName,
+                data,
+                sampleRate,
+                (header[2] == 2) ? AudioChannels.Stereo : AudioChannels.Mono
+            );
 #endif
 		}
 	}

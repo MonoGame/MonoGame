@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         bool compressContent;
         bool disposed;
         List<ContentTypeWriter> typeWriters = new List<ContentTypeWriter>();
-        Dictionary<ContentTypeWriter, int> typeWriterMap = new Dictionary<ContentTypeWriter, int>();
+        Dictionary<Type, int> typeWriterMap = new Dictionary<Type, int>();
         Dictionary<Type, ContentTypeWriter> typeMap = new Dictionary<Type, ContentTypeWriter>();
         List<object> sharedResources = new List<object>();
         Dictionary<object, int> sharedResourceMap = new Dictionary<object, int>();
@@ -240,7 +240,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
                 typeWriters.Add(typeWriter);
-                typeWriterMap.Add(typeWriter, index);
+		if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+			typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
                 var args = type.GetGenericArguments();
@@ -307,8 +308,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="typeWriter">The content type writer.</param>
         /// <remarks>The type hint should be retrieved from the Initialize method of the ContentTypeWriter
         /// that is calling WriteObject, by calling GetTypeWriter and passing it the type of the field used
-        /// to hold the value being serialized. If the hint type is a sealed value type (which cannot be
-        /// null or hold a polymorphic object instance) this method skips writing the usual type identifier.</remarks>
+        /// to hold the value being serialized.
+        /// </remarks>
         public void WriteObject<T>(T value, ContentTypeWriter typeWriter)
         {
             if (typeWriter == null)
@@ -321,18 +322,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                if (value.GetType().IsValueType)
-                {
-                    // Value types do not have the type identifier written to the file
-                    typeWriter.Write(this, value);
-                }
-                else
-                {
-                    int index = typeWriterMap[typeWriter];
-                    // Because zero means null object, we add one to the index before writing it to the file
-                    Write7BitEncodedInt(index + 1);
-                    typeWriter.Write(this, value);
-                }
+                var index = typeWriterMap[typeWriter.GetType()];
+                // Because zero means null object, we add one to the index before writing it to the file
+                Write7BitEncodedInt(index + 1);
+                typeWriter.Write(this, value);
             }
         }
 

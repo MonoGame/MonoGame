@@ -78,14 +78,12 @@ namespace Microsoft.Xna.Framework.GamerServices
         [DataMember]
         public string Name { get; internal set; }
 
+        /*
 		public Stream GetPicture ()
 		{
 			throw new NotImplementedException();
 		}
-
-
-
-
+        */
 	}
 }
 
