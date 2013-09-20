@@ -60,11 +60,14 @@ namespace Microsoft.Xna.Framework.Graphics
         // disposed yet.
 		GraphicsDevice graphicsDevice;
 
+	    private WeakReference wr;
+
 		internal GraphicsResource()
         {
             lock (resourcesLock)
             {
-                resources.Add(new WeakReference(this));
+                wr = new WeakReference(this);
+                resources.Add(wr);
             }
         }
 
@@ -151,7 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Remove from the global list of graphics resources
                 lock (resourcesLock)
                 {
-                    resources.Remove(new WeakReference(this));
+                    resources.Remove(wr);
                 }
 
                 graphicsDevice = null;
