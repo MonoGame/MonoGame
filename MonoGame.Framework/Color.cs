@@ -27,13 +27,18 @@ SOFTWARE.
 
 using System;
 using System.Runtime.Serialization;
+using ProtoBuf;
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
+#if WINRT
     [DataContract]
+#else
+    [ProtoContract]
+#endif
     public struct Color : IEquatable<Color>
     {
         static Color()
@@ -318,7 +323,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
+#if WINRT
         [DataMember]
+#else
+        [ProtoMember(3)]
+#endif
         public byte B
         {
             get
@@ -334,7 +343,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
+#if WINRT
         [DataMember]
+#else
+        [ProtoMember(2)]
+#endif
         public byte G
         {
             get
@@ -347,10 +360,14 @@ namespace Microsoft.Xna.Framework
             }
         }
 	
-	/// <summary>
+	    /// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
+#if WINRT
         [DataMember]
+#else
+        [ProtoMember(1)]
+#endif
         public byte R
         {
             get
@@ -366,7 +383,11 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
+#if WINRT
         [DataMember]
+#else
+        [ProtoMember(4)]
+#endif
         public byte A
         {
             get
