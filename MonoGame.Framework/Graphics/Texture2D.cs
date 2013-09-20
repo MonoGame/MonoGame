@@ -172,40 +172,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		        return;
 
 #if DIRECTX
-            // TODO: Move this to SetData() if we want to make Immutable textures!
-            var desc = new SharpDX.Direct3D11.Texture2DDescription();
-            desc.Width = width;
-            desc.Height = height;
-            desc.MipLevels = _levelCount;
-            desc.ArraySize = 1;
-            desc.Format = SharpDXHelper.ToFormat(format);
-            desc.BindFlags = SharpDX.Direct3D11.BindFlags.ShaderResource;
-            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
-            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
-            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            _shared = shared;
 
-            if (type == SurfaceType.RenderTarget)
-            {
-                desc.BindFlags |= SharpDX.Direct3D11.BindFlags.RenderTarget;
-                if (mipmap)
-                {
-                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
-                    // because generation of mipmaps is not supported on the Xbox 360.
-                    // TODO: New method Texture.GenerateMipMaps() required.
-                    desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+            _renderTarget = (type == SurfaceType.RenderTarget);
+            _mipmap = mipmap;
 
-                    
-                }
-            }
-
-            if (shared)
-                desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
-
-            _texture = new SharpDX.Direct3D11.Texture2D(graphicsDevice._d3dDevice, desc);
-
-
+            // Create texture
+            GetTexture();
 
 #elif PSM
             PixelBufferOption option = PixelBufferOption.None;
