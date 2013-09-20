@@ -92,7 +92,12 @@
         <FileTemplate id="MonoGameSpriteFont" file="templates/SpriteFont.xft.xml" />
     </Extension>
 	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">  
-        <Class class="MonoDevelop.MonoGameContent.MonoGameContentBuildExtension" insertafter="MidStep"/>  
+		<ComplexCondition>
+			<Or>
+				<Condition id="ItemType" value="MonoDevelop.MonoGameContent.MonoGameContentProject" />
+			</Or>
+        	<Class class="MonoDevelop.MonoGameContent.MonoGameContentBuildExtension" insertafter="MidStep"/>  
+        </ComplexCondition>
     </Extension>
     <Extension path = "/MonoDevelop/ProjectModel/ExtendedProperties">  
        <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
