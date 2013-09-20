@@ -392,7 +392,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void SetupGL() 
         {
+#if WINDOWS && OPENGL
             ((OpenTKGameWindow)Game.Instance.Window).Initialize(PresentationParameters);
+#endif
 
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
