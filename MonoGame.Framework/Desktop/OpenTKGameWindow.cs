@@ -76,6 +76,8 @@ namespace Microsoft.Xna.Framework
         private bool updateClientBounds;
         bool disposed;
 
+        private string _title;
+
         #region Internal Properties
 
         internal Game Game 
@@ -108,13 +110,15 @@ namespace Microsoft.Xna.Framework
             get { return _isResizable; }
             set
             {
-                if (_isResizable != value)
-                    _isResizable = value;
-                else
-                    return;
+                _isResizable = value;
+                
                 if (_isBorderless)
                     return;
-                window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+                
+                if (window != null)
+                {
+                    window.WindowBorder = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+                }
             }
         }
 
@@ -133,10 +137,13 @@ namespace Microsoft.Xna.Framework
             get { return _isBorderless; }
             set
             {
-                if (_isBorderless != value)
-                    _isBorderless = value;
-                else
+                _isBorderless = value;
+
+                if (window == null)
+                {
                     return;
+                }
+                
                 if (_isBorderless)
                 {
                     window.WindowBorder = WindowBorder.Hidden;
@@ -150,7 +157,7 @@ namespace Microsoft.Xna.Framework
 
         public OpenTKGameWindow()
         {
-            Initialize();
+            //Initialize();
         }
 
         ~OpenTKGameWindow()
@@ -319,11 +326,42 @@ namespace Microsoft.Xna.Framework
         
         #endregion
 
-        private void Initialize()
+        internal void Initialize(PresentationParameters presentationParameters)
         {
             GraphicsContext.ShareContexts = true;
 
-            window = new OpenTK.GameWindow();
+            if (window != null)
+            {
+                window.Dispose();
+            }
+
+            var pp = presentationParameters;
+
+            var colorSize = GraphicsExtensions.Size(pp.BackBufferFormat) * 8;
+            var depthSize = 0;
+            var stencilSize = 0;
+
+            switch (pp.DepthStencilFormat)
+            {
+                case DepthFormat.None:
+                    break;
+                case DepthFormat.Depth16:
+                    depthSize = 16;
+                    break;
+                case DepthFormat.Depth24:
+                    depthSize = 24;
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    depthSize = 24;
+                    stencilSize = 8;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var graphichMode = new GraphicsMode(colorSize, depthSize, stencilSize, 0, ColorFormat.Empty, 2, false);
+
+            window = new OpenTK.GameWindow(pp.BackBufferWidth, pp.BackBufferHeight, graphichMode);
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
@@ -355,10 +393,12 @@ namespace Microsoft.Xna.Framework
                 var windowInfoType = window.WindowInfo.GetType();
                 var propertyInfo = windowInfoType.GetProperty("WindowHandle");
                 _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
+
+                presentationParameters.DeviceWindowHandle = _windowHandle;
             }
 #endif
             // Provide the graphics context for background loading
-            Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
+            Threading.BackgroundContext = new GraphicsContext(graphichMode, window.WindowInfo);
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
@@ -376,12 +416,19 @@ namespace Microsoft.Xna.Framework
 #endif
 
             //Default no resizing
-            AllowUserResizing = false;
+            IsBorderless = IsBorderless;
+            AllowUserResizing = AllowUserResizing;
+
+            window.Title = _title;
         }
 
         protected override void SetTitle(string title)
         {
-            window.Title = title;            
+            _title = title;
+            if (window != null)
+            {
+                window.Title = _title;
+            }
         }
 
         internal void Run(double updateRate)
