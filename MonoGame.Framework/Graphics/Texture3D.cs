@@ -246,6 +246,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Copy the data to the array.
                     DataStream stream;
                     var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
+
+                    // Some drivers may add pitch to rows or slices.
+                    // We need to copy each row separatly and skip trailing zeros.
                     var currentIndex = startIndex;
                     var elementsInRow = right - left;
                     var rowsInSlice = bottom - top;
