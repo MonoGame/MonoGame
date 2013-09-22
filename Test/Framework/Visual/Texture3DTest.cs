@@ -96,17 +96,17 @@ namespace MonoGame.Tests.Visual
             Game.DrawWith += (sender, e) =>
             {
                 var dataSize = width * height * depth;
-                var texture3D = new Texture3D(Game.GraphicsDevice, width, height, depth, false, SurfaceFormat.Alpha8);
-                var savedData = new byte[dataSize];
-                for (var index = 0; index < dataSize; index++) savedData[index] = (byte)(index + 1);
+                var texture3D = new Texture3D(Game.GraphicsDevice, width, height, depth, false, SurfaceFormat.Color);
+                var savedData = new Color[dataSize];
+                for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index, index, index);
                 texture3D.SetData(savedData);
 
-                var readData = new byte[dataSize];
+                var readData = new Color[dataSize];
                 texture3D.GetData(readData);
 
                 Assert.AreEqual(savedData, readData);
             };
-            Game.Run();
+            Game.RunOneFrame();
         }
     }
 }

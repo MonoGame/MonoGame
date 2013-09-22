@@ -675,10 +675,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Some drivers may add pitch to rows.
                     // We need to copy each row separatly and skip trailing zeros.
                     var currentIndex = startIndex;
+                    var elementSize = SharpDX.Utilities.SizeOf<T>();
                     for (var row = 0; row < rows; row++)
                     {
                         stream.ReadRange(data, currentIndex, elementsInRow);
-                        stream.Seek(databox.RowPitch - elementsInRow, SeekOrigin.Current);
+                        stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
                         currentIndex += elementsInRow;
                     }
                     stream.Dispose();
