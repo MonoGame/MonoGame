@@ -282,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of elements to get.</param>
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            GetData(0, 0, 0, Width, Height, 0, Depth, data, startIndex, elementCount);
+            GetData(0, 0, 0, width, height, 0, depth, data, startIndex, elementCount);
         }
 
         /// <summary>
