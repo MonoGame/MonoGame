@@ -37,15 +37,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 			var fontName = xmldoc.Element("FontName").Value;
 			var fontSize = float.Parse(xmldoc.Element("Size").Value);
 			var spacing = float.Parse(xmldoc.Element("Spacing").Value);
-			var useKerning = bool.Parse(xmldoc.Element("UseKerning").Value);
-
-			var styleVal = xmldoc.Element("Style").Value;
+			var useKerning = false;
+			var useKerningElement = xmldoc.Element ("UseKerning");
+			if (useKerningElement != null)
+				useKerning = bool.Parse(useKerningElement.Value);
 
 			FontDescriptionStyle style = FontDescriptionStyle.Regular;
-			if (styleVal.Contains("Bold") && styleVal.Contains("Italic"))
-				style = FontDescriptionStyle.Bold | FontDescriptionStyle.Italic;
-			else
-				style = (FontDescriptionStyle)Enum.Parse(typeof(FontDescriptionStyle), styleVal, false);
+			var styleElement = xmldoc.Element ("Style");
+			if (styleElement != null) {
+				var styleVal = styleElement.Value;
+
+				if (styleVal.Contains ("Bold") && styleVal.Contains ("Italic"))
+					style = FontDescriptionStyle.Bold | FontDescriptionStyle.Italic;
+				else
+					style = (FontDescriptionStyle)Enum.Parse (typeof (FontDescriptionStyle), styleVal, false);
+			}
 
 			char? defaultCharacter = null;
 			var defChar = xmldoc.Element("DefaultCharacter");
