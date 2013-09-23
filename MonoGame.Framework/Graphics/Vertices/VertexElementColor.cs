@@ -7,16 +7,16 @@ namespace Microsoft.Xna.Framework.Graphics
 	public struct VertexElementColor
 	{
         [DataMember]
-		byte R;
+        public byte R;
 
         [DataMember]
-		byte G;
+        public byte G;
         
         [DataMember]
-		byte B;
+        public byte B;
         
         [DataMember]
-		byte A;
+        public byte A;
 
 		public VertexElementColor (Color color)
 		{
