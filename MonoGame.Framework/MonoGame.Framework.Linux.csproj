@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -101,7 +101,6 @@
     <Compile Include="GamerServices\GamerPresenceMode.cs" />
     <Compile Include="GamerServices\GamerPrivileges.cs" />
     <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
-    <Compile Include="Input\AccelerometerState.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePadState.cs" />
     <Compile Include="Input\KeyboardState.cs" />
@@ -182,7 +181,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
@@ -219,8 +218,6 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
     <Compile Include="Graphics\States\TextureFilter.cs" />
-    <Compile Include="Input\ButtonDefinition.cs" />
-    <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Linux\GamerServices\SignedInGamer.cs" />
     <Compile Include="GamerServices\Gamer.cs" />
     <Compile Include="GamerServices\SignedInGamerCollection.cs" />
