@@ -109,15 +109,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal static void DisposeAll()
         {
+            WeakReference[] foo = null;
             lock (resourcesLock)
             {
-                foreach (var resource in resources)
-                {
-                    var target = resource.Target;
-                    if (target != null)
-                        (target as IDisposable).Dispose();
-                }
+                foo = resources.ToArray();
                 resources.Clear();
+            }
+            foreach (var resource in foo)
+            {
+                var target = resource.Target;
+                if (target != null)
+                    (target as IDisposable).Dispose();
             }
         }
 
