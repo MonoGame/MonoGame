@@ -99,7 +99,6 @@
     </None>
     <None Include="NuGetPackage.ps1" />
     <None Include="NuGetSetup.ps1" />
-    <None Include="NuGet.exe" />
     <None Include="NuGet.config" />
     <None Include="Package.nuspec">
       <SubType>Designer</SubType>
@@ -272,6 +271,9 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NuGet.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
