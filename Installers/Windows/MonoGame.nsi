@@ -145,8 +145,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
-  File /nonfatal ' ..\..\ProjectTemplates\TargetFiles\MonoGame.WP8.targets'  
-
+  
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
 

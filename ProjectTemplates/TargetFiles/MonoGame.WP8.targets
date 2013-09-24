@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Reference Include="MonoGame.Framework" Condition=" '$(Platform)' == 'ARM' ">
-      <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Framework" Condition=" '$(Platform)' == 'x86' ">
-      <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsPhone\x86\MonoGame.Framework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+
+  <Target Name="PlatformCheck" BeforeTargets="InjectReference"
+  Condition=" ( ('$(Platform)' != 'x86') AND ('$(Platform)' != 'ARM') )">
+    <Error  Text="$(MSBuildThisFileName) does not work correctly on '$(Platform)' 
+                     platform. You need to specify platform (x86 or ARM)." />
+  </Target>
+
+  <Target Name="InjectReference" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup Condition=" '$(Platform)' == 'x86' or '$(Platform)' == 'ARM'">
+      <Reference Include="MonoGame.Framework">
+        <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsPhone$(Platform)\MonoGame.Framework.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+  </Target>
+  
   <Target Name="MonoGame_RemoveXnaAssemblies" AfterTargets="ImplicitlyExpandTargetFramework">
     <Message Text="MonoGame - Removing XNA Assembly references!" Importance="normal" />
     <ItemGroup>
