@@ -48,6 +48,18 @@ namespace Microsoft.Xna.Framework
         private int _drawOrder;
         private bool _visible = true;
 
+        public Graphics.GraphicsDevice GraphicsDevice
+        {
+            get 
+            {
+                if (!_initialized)
+                {
+                    throw new InvalidOperationException("The GraphicsDevice property cannot be used before Initialize has been called.");
+                }
+                return this.Game.GraphicsDevice; 
+            }
+        }
+
         public int DrawOrder
         {
             get { return _drawOrder; }
