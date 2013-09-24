@@ -399,7 +399,6 @@
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\KeyboardState.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Android\Media\Song.cs" />

@@ -457,7 +457,6 @@
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
