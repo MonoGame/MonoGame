@@ -5,7 +5,7 @@ using System.Collections.Generic;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;

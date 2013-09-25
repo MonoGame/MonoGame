@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSM
 using Sce.PlayStation.Core.Graphics;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-#if MONOMAC || WINDOWS || LINUX
+#if SDL2 || MONOMAC || WINDOWS || LINUX
 			if (FillMode == FillMode.Solid) 
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             else

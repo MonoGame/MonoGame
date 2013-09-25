@@ -58,7 +58,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private static ReadOnlyCollection<GraphicsAdapter> adapters;
         
         
-#if MONOMAC
+#if SDL2
+        private SDL2_GameWindow _screen;
+        internal GraphicsAdapter(SDL2_GameWindow sdlWindow)
+        {
+            _screen = sdlWindow;
+        }
+#elif MONOMAC
 		private NSScreen _screen;
         internal GraphicsAdapter(NSScreen screen)
         {
@@ -90,7 +96,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-#if MONOMAC
+#if SDL2
+                return new DisplayMode(
+                    _screen.INTERNAL_glFramebufferWidth,
+                    _screen.INTERNAL_glFramebufferHeight,
+                    60, // FIXME: Assumption!
+                    SurfaceFormat.Color
+                );
+#elif MONOMAC
                 //Dummy values until MonoMac implements Quartz Display Services
                 int refreshRate = 60;
                 SurfaceFormat format = SurfaceFormat.Color;
@@ -123,7 +136,14 @@ namespace Microsoft.Xna.Framework.Graphics
         public static ReadOnlyCollection<GraphicsAdapter> Adapters {
             get {
                 if (adapters == null) {
-#if MONOMAC
+#if SDL2
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(
+                        new GraphicsAdapter[]
+                        {
+                            new GraphicsAdapter((SDL2_GameWindow) Game.Instance.Window)
+                        }
+                    );
+#elif MONOMAC
                     GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
                     for (int i=0; i<NSScreen.Screens.Length; i++) {
                         tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
@@ -256,7 +276,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (supportedDisplayModes == null)
                 {
                     List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
-#if (WINDOWS && OPENGL) || LINUX
+#if SDL2
+                    SDL2.SDL.SDL_DisplayMode filler = new SDL2.SDL.SDL_DisplayMode();
+                    int numModes = SDL2.SDL.SDL_GetNumDisplayModes(0);
+                    for (int i = 0; i < numModes; i++)
+                    {
+                        SDL2.SDL.SDL_GetDisplayMode(0, i, out filler);
+                        modes.Add(
+                            new DisplayMode(
+                                filler.w,
+                                filler.h,
+                                filler.refresh_rate,
+                                SurfaceFormat.Color // FIXME: Assumption!
+                            )
+                        );
+                    }
+#elif (WINDOWS && OPENGL) || LINUX
                     IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
                     if (displays.Count > 0)
                     {

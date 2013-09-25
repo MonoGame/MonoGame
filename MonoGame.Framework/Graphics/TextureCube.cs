@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif GLES
 using OpenTK.Graphics.ES20;
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             //FIXME Does not compile on Android or iOS
-#if MONOMAC
+#if SDL2 || MONOMAC
             TextureTarget target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(target, this.glTexture);
             // 4 bytes per pixel

@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework
     {
         static TitleContainer() 
         {
-#if WINDOWS || LINUX
+#if SDL2 || WINDOWS || LINUX
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;

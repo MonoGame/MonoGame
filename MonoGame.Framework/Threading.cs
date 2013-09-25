@@ -38,6 +38,22 @@ purpose and non-infringement.
 */
 #endregion License
 
+// #define THREADED_GL
+/* Ah, so I see you've run into some issues with threaded GL...
+ *
+ * This class is designed to handle rendering coming from multiple threads, but
+ * if you're too wreckless with how many threads are calling the GL, this will
+ * hang.
+ *
+ * With THREADED_GL we instead allow you to run threaded rendering using
+ * multiple GL contexts. This is more flexible, but much more dangerous.
+ *
+ * Also note that this affects SDL2/SDL2_GameWindow.cs! Check THREADED_GL there too.
+ *
+ * Basically, if you have to enable this, you should feel very bad.
+ * -flibit
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -58,13 +74,27 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 #endif
 
+#if SDL2 && THREADED_GL
+using SDL2;
+using OpenTK.Graphics.OpenGL;
+#endif
+
 namespace Microsoft.Xna.Framework
 {
+#if SDL2 && THREADED_GL
+    internal class GL_ContextHandle
+    {
+        public IntPtr context;
+    }
+#endif
     internal class Threading
     {
         static int mainThreadId;
         static int currentThreadId;
-#if ANDROID
+#if SDL2 && THREADED_GL
+        public static GL_ContextHandle BackgroundContext;
+        public static IntPtr WindowInfo;
+#elif ANDROID || SDL2
         static List<Action> actions = new List<Action>();
         static Mutex actionsMutex = new Mutex();
 #elif IOS
@@ -129,6 +159,19 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
+#elif SDL2 && THREADED_GL
+            lock (BackgroundContext)
+            {
+                // Make the context current on this thread
+                SDL.SDL_GL_MakeCurrent(WindowInfo, BackgroundContext.context);
+                // Execute the action
+                action();
+                // Must flush the GL calls so the texture is ready for the main context to use
+                GL.Flush();
+                GraphicsExtensions.CheckGLError();
+                // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
+                SDL.SDL_GL_MakeCurrent(WindowInfo, IntPtr.Zero);
+            }
 #elif WINDOWS || LINUX
             lock (BackgroundContext)
             {
@@ -162,7 +205,7 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
-#if ANDROID
+#if ANDROID || (SDL2 && !THREADED_GL)
         static void Add(Action action)
         {
             lock (actions)

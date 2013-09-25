@@ -12,6 +12,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for OUYA")]
 #elif ANDROID
 [assembly: AssemblyDescription("MonoGame for Android")]
+#elif SDL2
+[assembly: AssemblyDescription("MonoGame for SDL2 Desktop")]
 #elif WINDOWS
 #if DIRECTX
 [assembly: AssemblyDescription("MonoGame for Windows Desktop (DirectX)")]
