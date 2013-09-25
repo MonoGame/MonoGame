@@ -1,6 +1,9 @@
 using System.Collections;
-using JSIL.Meta;
 using Microsoft.Xna.Framework;
+
+#if JSIL
+using JSIL.Meta;
+#endif
 
 namespace JSIL {
     [JSExternal]
@@ -8,7 +11,9 @@ namespace JSIL {
         private static readonly OpenTKService _Instance = new OpenTKService();
 
         public static OpenTKService Instance {
+#if JSIL
             [JSReplacement("JSIL.Host.getService('opentk')")]
+#endif
             get {
                 return _Instance;
             }

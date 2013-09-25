@@ -40,7 +40,9 @@
 // 
 
 using System.Collections.Generic;
+#if JSIL
 using JSIL.Meta;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

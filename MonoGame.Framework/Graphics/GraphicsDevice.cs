@@ -41,7 +41,6 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using JSIL.Meta;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -88,6 +87,9 @@ using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #endif
 
+#if JSIL
+using JSIL.Meta;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
