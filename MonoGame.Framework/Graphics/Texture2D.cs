@@ -47,6 +47,7 @@ using Sce.PlayStation.Core.Imaging;
 #endif
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Internal;
 
 #if MONOMAC
 using MonoMac.AppKit;
@@ -63,7 +64,6 @@ using MonoTouch.Foundation;
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
 #elif WINDOWS || LINUX
-using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES

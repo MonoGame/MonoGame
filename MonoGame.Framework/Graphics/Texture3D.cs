@@ -1,11 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Internal;
 
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
-using Microsoft.Xna.Framework.Internal;
 using OpenTK.Graphics.OpenGL;
 #endif
 #elif DIRECTX
