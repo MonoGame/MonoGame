@@ -877,12 +877,12 @@ namespace Microsoft.Xna.Framework.Graphics
             var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
             GetData(pixelData);
 
+            //We Must convert from BGRA to RGBA
+            ConvertToRGBA(height, width, pixelData);
+
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                //We Must convert from BGRA to RGBA
-                ConvertToRGBA(height, width, pixelData);
-                
                 var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
