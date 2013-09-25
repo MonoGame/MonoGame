@@ -97,23 +97,15 @@ namespace Microsoft.Xna.Framework.Graphics
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
         {
 #if PSM
-            try {
-                var stream = new System.IO.MemoryStream();
-                var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                var objectType = Activator.CreateInstance(type);
-                formatter.Serialize(stream, objectType);
-                switch(stream.Length) {
-                case 16L:
-                    return(IndexElementSize.SixteenBits);
-                case 32L:
-                    return(IndexElementSize.ThirtyTwoBits);
-                default:
-                    throw(new NotSupportedException("Stream length " + stream.Length + " is not supported for IndexElementSize."));
-                }
+            if(type == typeof(int) || type == typeof(uint)) {
+                return(IndexElementSize.ThirtyTwoBits);
             }
-            catch(Exception ex) {
+            else if(type == typeof(short) || type == typeof(ushort)) {
+                return(IndexElementSize.SixteenBits);
             }
-            return IndexElementSize.SixteenBits;
+            else {
+                throw(new NotSupportedException("Type " + type + " is not supported for IndexElementSize."));
+            }
 #else            
             switch (Marshal.SizeOf(type))
             {
