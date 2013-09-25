@@ -880,6 +880,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
+                //We Must convert from BGRA to RGBA
+                ConvertToRGBA(height, width, pixelData);
+                
                 var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
@@ -892,6 +895,30 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             throw new NotImplementedException();
 #endif
+        }
+
+        //Converts Pixel Data from BGRA to RGBA
+        private static void ConvertToRGBA(int pixelHeight, int pixelWidth, byte[] pixels)
+        {
+            int offset = 0;
+
+            for (int row = 0; row < (uint)pixelHeight; row++)
+            {
+                for (int col = 0; col < (uint)pixelWidth; col++)
+                {
+                    offset = (row * (int)pixelWidth * 4) + (col * 4);
+
+                    byte B = pixels[offset];
+                    byte G = pixels[offset + 1];
+                    byte R = pixels[offset + 2];
+                    byte A = pixels[offset + 3];
+
+                    pixels[offset] = R;
+                    pixels[offset + 1] = G;
+                    pixels[offset + 2] = B;
+                    pixels[offset + 3] = A;
+                }
+            }
         }
 
         public void SaveAsPng(Stream stream, int width, int height)
