@@ -117,15 +117,6 @@ namespace MonoDevelop.MonoGameContent
 					if (file.BuildAction == "Compile") {
 						try 
 						{
-							try {
-								manager.CleanContent(file.FilePath.FullPath, null);
-							}
-							catch(Exception ex)
-							{
-								monitor.Log.WriteLine(ex.Message);
-								result.AddWarning(ex.Message);
-							}
-
 							dict.Clear();
 							foreach(object key in file.ExtendedProperties.Keys) {
 								string k = key as string;
