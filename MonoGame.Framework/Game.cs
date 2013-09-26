@@ -79,7 +79,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 #endif
-
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -205,9 +205,13 @@ namespace Microsoft.Xna.Framework
                         if (disposable != null)
                             disposable.Dispose();
                     }
+                    _components = null;
 
                     if (Content != null)
+                    {
                         Content.Dispose();
+                        Content = null;
+                    }
 
                     if (_graphicsDeviceManager != null)
                     {
@@ -215,23 +219,41 @@ namespace Microsoft.Xna.Framework
                         _graphicsDeviceManager = null;
                     }
 
-                    Platform.Dispose();
+                    if (Platform != null)
+                    {
+                        Platform.Activated -= OnActivated;
+                        Platform.Deactivated -= OnDeactivated;
+                        _services.RemoveService(typeof(GamePlatform));
+#if WINDOWS_STOREAPP
+                        Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
+#endif
+                        Platform.Dispose();
+                        Platform = null;
+                    }
 
                     Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
 #if WINDOWS_PHONE
-                    TouchPanel.ResetState();
-                    Microsoft.Xna.Framework.Audio.SoundEffect.Shutdown();
+                    TouchPanel.ResetState();                    
+#endif
+
+#if WINDOWS_MEDIA_SESSION
+                    Media.MediaManagerState.CheckShutdown();
 #endif
 
 #if DIRECTX
+                    SoundEffect.Shutdown();
+
                     BlendState.ResetStates();
                     DepthStencilState.ResetStates();
                     RasterizerState.ResetStates();
                     SamplerState.ResetStates();
 #endif
                 }
+#if ANDROID
+                Activity = null;
+#endif
                 _isDisposed = true;
                 _instance = null;
             }
@@ -455,7 +477,7 @@ namespace Microsoft.Xna.Framework
 				DoExiting();
                 break;
             default:
-                throw new NotImplementedException(string.Format(
+                throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
@@ -721,6 +743,10 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
+
+#if DIRECTX
+		    SoundEffect.Shutdown();
+#endif
 
 #if WINDOWS_MEDIA_SESSION
             Media.MediaManagerState.CheckShutdown();

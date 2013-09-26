@@ -136,7 +136,8 @@ namespace Microsoft.Xna.Framework
         {
             result = ((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z);
         }
-
+        
+        /*
         public static void Transform(ref Plane plane, ref Quaternion rotation, out Plane result)
         {
             throw new NotImplementedException();
@@ -156,6 +157,7 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
+        */
 
         public void Normalize()
         {
@@ -218,10 +220,12 @@ namespace Microsoft.Xna.Framework
             box.Intersects (ref this, out result);
         }
 
+        /*
         public PlaneIntersectionType Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
+        */
 
         public PlaneIntersectionType Intersects(BoundingSphere sphere)
         {

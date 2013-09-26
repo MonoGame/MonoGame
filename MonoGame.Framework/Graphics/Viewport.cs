@@ -184,25 +184,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		    float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
 		    if (!WithinEpsilon(a, 1f))
 		    {
-		        vector = (Vector3) (vector / a);
+		        vector.X = vector.X / a;
+		        vector.Y = vector.Y / a;
+		        vector.Z = vector.Z / a;
 		    }
-		    vector.X = (((vector.X + 1f) * 0.5f) * this.Width) + this.X;
-		    vector.Y = (((-vector.Y + 1f) * 0.5f) * this.Height) + this.Y;
-		    vector.Z = (vector.Z * (this.MaxDepth - this.MinDepth)) + this.MinDepth;
+		    vector.X = (((vector.X + 1f) * 0.5f) * this.width) + this.x;
+		    vector.Y = (((-vector.Y + 1f) * 0.5f) * this.height) + this.y;
+		    vector.Z = (vector.Z * (this.maxDepth - this.minDepth)) + this.minDepth;
 		    return vector;
         }
 
         public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
-            Matrix matrix = Matrix.Invert(Matrix.Multiply(Matrix.Multiply(world, view), projection));
-		    source.X = (((source.X - this.X) / ((float) this.Width)) * 2f) - 1f;
-		    source.Y = -((((source.Y - this.Y) / ((float) this.Height)) * 2f) - 1f);
-		    source.Z = (source.Z - this.MinDepth) / (this.MaxDepth - this.MinDepth);
+             Matrix matrix = Matrix.Invert(Matrix.Multiply(Matrix.Multiply(world, view), projection));
+		    source.X = (((source.X - this.x) / ((float) this.width)) * 2f) - 1f;
+		    source.Y = -((((source.Y - this.y) / ((float) this.height)) * 2f) - 1f);
+		    source.Z = (source.Z - this.minDepth) / (this.maxDepth - this.minDepth);
 		    Vector3 vector = Vector3.Transform(source, matrix);
 		    float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
 		    if (!WithinEpsilon(a, 1f))
 		    {
-		        vector = (Vector3) (vector / a);
+		        vector.X = vector.X / a;
+		        vector.Y = vector.Y / a;
+		        vector.Z = vector.Z / a;
 		    }
 		    return vector;
 
@@ -216,9 +220,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         public override string ToString ()
-		{
-			return string.Format ("[Viewport: X={0} Y={1} Width={2} Height={3}]", X,Y, Width,Height);
-		}
+	{
+	        return "{X:" + x + " Y:" + y + " Width:" + width + " Height:" + height + " MinDepth:" + minDepth + " MaxDepth:" + maxDepth + "}";
+	}
     }
 }
 
