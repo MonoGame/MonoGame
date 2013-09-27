@@ -10,9 +10,12 @@ namespace TwoMGFX
 
         readonly Dictionary<Stream, string> _resolvedPaths = new Dictionary<Stream, string>();
 
-        public CompilerInclude(string rootPath)
+        private readonly List<string> _dependancies;
+
+        public CompilerInclude(string rootPath, List<string> dependancies)
         {
             _rootPath = rootPath;
+            _dependancies = dependancies;
         }
 
         public void Close(Stream stream)
@@ -57,6 +60,8 @@ namespace TwoMGFX
                 var fullFileName = (new FileInfo(resolvedFile)).FullName;
 
                 _resolvedPaths[stream] = fullFileName;
+                if (!_dependancies.Contains(fullFileName))
+                    _dependancies.Add(fullFileName);
 
                 return stream;
             }
