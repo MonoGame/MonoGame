@@ -25,11 +25,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var output = new SpriteFontContent(input);
 
 			var fontName = input.FontName;
-
+			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 			var directories = new string[] { directory, 
 				"/Library/Fonts",
-				"C:\\Windows\\Fonts"
+				Path.Combine(windowsfolder,"Fonts")
 			};
 
 			foreach( var dir in directories) {
@@ -76,7 +76,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				foreach (Glyph glyph in glyphs)
 				{
 					glyph.XAdvance += input.Spacing;
-					output.CharacterMap.Add(glyph.Character);
+					if (!output.CharacterMap.Contains(glyph.Character))
+						output.CharacterMap.Add(glyph.Character);
 					output.Glyphs.Add(new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
 					output.Cropping.Add(new Rectangle(0,0,glyph.Subrect.Width, glyph.Subrect.Height));
 					ABCFloat abc = glyph.CharacterWidths;
