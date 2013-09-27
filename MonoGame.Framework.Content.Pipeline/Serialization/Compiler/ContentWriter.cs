@@ -301,7 +301,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 			var index = typeWriterMap[elementWriter.GetType ()];
 			// Because zero means null object, we add one to the index before writing it to the file
 			Write7BitEncodedInt (index + 1);
-			WriteObject<T> (value, elementWriter);
+			elementWriter.Write (this, value);
 		}
         }
 
@@ -327,7 +327,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                typeWriter.Write (this, value);
+		    Type objectType = typeof (T);
+		    if (!objectType.IsValueType) {
+			    var index = typeWriterMap[typeWriter.GetType ()];
+			    // Because zero means null object, we add one to the index before writing it to the file
+			    Write7BitEncodedInt (index + 1);
+		    }
+		    typeWriter.Write (this, value);
             }
         }
 
