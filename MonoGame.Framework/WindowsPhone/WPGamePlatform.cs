@@ -67,6 +67,7 @@ non-infringement.
 extern alias MicrosoftXnaFramework;
 using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher; 
 
+using System;
 using System.Diagnostics;
 using System.Windows.Controls;
 using Microsoft.Xna.Framework;
@@ -155,7 +156,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override void RunLoop()
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The Windows Phone platform does not support synchronous run loops");
         }
 
         public override void StartRunLoop()

@@ -205,12 +205,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     {
                         case SurfaceFormat.RgbPvrtc2Bpp:
                         case SurfaceFormat.RgbaPvrtc2Bpp:
-                            imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 2 + 7) / 8;
+                            imageSize = (Math.Max(this.width, 16) * Math.Max(this.height, 8) * 2 + 7) / 8;
                             break;
                         case SurfaceFormat.RgbPvrtc4Bpp:
                         case SurfaceFormat.RgbaPvrtc4Bpp:
-                            imageSize = (Math.Max(this.width, 16) * Math.Max(this.height, 8) * 4 + 7) / 8;
+                            imageSize = (Math.Max(this.width, 8) * Math.Max(this.height, 8) * 4 + 7) / 8;
                             break;
+                        case SurfaceFormat.RgbEtc1:
                         case SurfaceFormat.Dxt1:
                         case SurfaceFormat.Dxt1a:
                         case SurfaceFormat.Dxt3:
@@ -218,7 +219,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * format.Size();
                             break;
                         default:
-                            throw new NotImplementedException();
+                            throw new NotSupportedException();
                     }
 
                     GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
@@ -667,28 +668,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #else
-			var temp = new T[this.width*this.height];
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
 			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
 				throw new NotImplementedException();
 			} else {
-				GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
-			}
+				if (rect.HasValue) {
+					var temp = new T[this.width*this.height];
+					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
+					int z = 0, w = 0;
 
-			if (rect.HasValue) {
-				int z = 0, w = 0;
-
-				for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
-					for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
-						data[z*rect.Value.Width+w] = temp[(y*width)+x];
-						w++;
+					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
+						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
+							data[z*rect.Value.Width+w] = temp[(y*width)+x];
+							w++;
+						}
+						z++;
 					}
-					z++;
+				} else {
+					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
 				}
-			} else {
-				data = temp;
 			}
 
 #endif
@@ -823,7 +823,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                     ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4) throw new NotImplementedException();
+                if (bitmapData.Stride != image.Width * 4) 
+                    throw new NotImplementedException();
                 Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
                 image.UnlockBits(bitmapData);
 

@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Windows\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,22 +25,20 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Windows\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet, Version=3.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
-    </Reference>
     <Reference Include="ManagedPVRTC">
       <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
-    <Reference Include="Nvidia.TextureTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+    <Reference Include="SharpDX">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler">
+      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,8 +51,92 @@
     <Reference Include="NAudio">
       <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="AssimpNet">
+      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Nvidia.TextureTools">
+      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont">
+      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">
+      <Link>Processors\MGFX\CommandLineParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\CompilerInclude.cs">
+      <Link>Processors\MGFX\CompilerInclude.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.cs">
+      <Link>Processors\MGFX\DXConstantBufferData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
+      <Link>Processors\MGFX\DXConstantBufferData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.sharpdx.cs">
+      <Link>Processors\MGFX\DXConstantBufferData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXConstantBufferData.writer.cs">
+      <Link>Processors\MGFX\DXConstantBufferData.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.cs">
+      <Link>Processors\MGFX\DXEffectObject.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.hlsl.cs">
+      <Link>Processors\MGFX\DXEffectObject.hlsl.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXEffectObject.writer.cs">
+      <Link>Processors\MGFX\DXEffectObject.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXExpression.cs">
+      <Link>Processors\MGFX\DXExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXHelper.cs">
+      <Link>Processors\MGFX\DXHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXPreshader.cs">
+      <Link>Processors\MGFX\DXPreshader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXPreshader.writer.cs">
+      <Link>Processors\MGFX\DXPreshader.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.cs">
+      <Link>Processors\MGFX\DXShaderData.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.mojo.cs">
+      <Link>Processors\MGFX\DXShaderData.mojo.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.sharpdx.cs">
+      <Link>Processors\MGFX\DXShaderData.sharpdx.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\DXShaderData.writer.cs">
+      <Link>Processors\MGFX\DXShaderData.writer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\GLSLOptimizer.cs">
+      <Link>Processors\MGFX\GLSLOptimizer.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\MojoShader.cs">
+      <Link>Processors\MGFX\MojoShader.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Options.cs">
+      <Link>Processors\MGFX\Options.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Parser.cs">
+      <Link>Processors\MGFX\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ParseTree.cs">
+      <Link>Processors\MGFX\ParseTree.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ParseTreeTools.cs">
+      <Link>Processors\MGFX\ParseTreeTools.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\Scanner.cs">
+      <Link>Processors\MGFX\Scanner.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderInfo.cs">
+      <Link>Processors\MGFX\ShaderInfo.cs</Link>
+    </Compile>
     <Compile Include="Audio\AudioContent.cs" />
     <Compile Include="Audio\AudioFileType.cs" />
     <Compile Include="Audio\AudioFormat.cs" />
@@ -100,7 +182,6 @@
     <Compile Include="Graphics\EffectContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
-    <Compile Include="Graphics\FontHelper.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
     <Compile Include="Graphics\GeometryContentCollection.cs" />
     <Compile Include="Graphics\GraphicsUtil.cs" />
@@ -176,6 +257,7 @@
     <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
     <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
+    <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
     <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
@@ -223,28 +305,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\Windows\x64\nvtt.dll">
-      <Link>Dependencies\x64\nvtt.dll</Link>
+    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+      <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
-      <Link>Dependencies\x86\nvtt.dll</Link>
+    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+      <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x64\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x64\PVRTexLibWrapper.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ThirdParty\Libs\ManagedPVRTC\x86\PVRTexLibWrapper.dll">
-      <Link>Dependencies\x86\PVRTexLibWrapper.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
@@ -254,6 +324,18 @@
     <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
+      <Link>Dependencies\x64\libmojoshader_64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
+      <Link>Dependencies\x86\libmojoshader_32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="..\ThirdParty\Libs\SharpFont\freetype6.dll">
+      <Link>freetype6.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

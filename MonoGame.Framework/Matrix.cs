@@ -58,7 +58,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Constructors
 
-
         #region Public Fields
 
         [DataMember]
@@ -111,6 +110,73 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Fields
 
+        #region Indexers
+
+        public float this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return M11;
+                    case 1: return M12;
+                    case 2: return M13;
+                    case 3: return M14;
+                    case 4: return M21;
+                    case 5: return M22;
+                    case 6: return M23;
+                    case 7: return M24;
+                    case 8: return M31;
+                    case 9: return M32;
+                    case 10: return M33;
+                    case 11: return M34;
+                    case 12: return M41;
+                    case 13: return M42;
+                    case 14: return M43;
+                    case 15: return M44;
+                }
+                throw new ArgumentOutOfRangeException();
+            }
+
+            set
+            {
+                switch (index)
+                {
+                    case 0: M11 = value; break;
+                    case 1: M12 = value; break;
+                    case 2: M13 = value; break;
+                    case 3: M14 = value; break;
+                    case 4: M21 = value; break;
+                    case 5: M22 = value; break;
+                    case 6: M23 = value; break;
+                    case 7: M24 = value; break;
+                    case 8: M31 = value; break;
+                    case 9: M32 = value; break;
+                    case 10: M33 = value; break;
+                    case 11: M34 = value; break;
+                    case 12: M41 = value; break;
+                    case 13: M42 = value; break;
+                    case 14: M43 = value; break;
+                    case 15: M44 = value; break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        public float this[int row, int column]
+        {
+            get
+            {
+                return this[(row * 4) + column];
+            }
+
+            set
+            {
+                this[(row * 4) + column] = value;
+            }
+        }
+
+        #endregion
 
         #region Private Members
         private static Matrix identity = new Matrix(1f, 0f, 0f, 0f, 
@@ -118,7 +184,6 @@ namespace Microsoft.Xna.Framework
 		                                            0f, 0f, 1f, 0f, 
 		                                            0f, 0f, 0f, 1f);
         #endregion Private Members
-
 
         #region Public Properties
         
@@ -246,7 +311,6 @@ namespace Microsoft.Xna.Framework
             }
         }
         #endregion Public Properties
-
 
         #region Public Methods
 
@@ -619,17 +683,11 @@ namespace Microsoft.Xna.Framework
 		public static Matrix CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 		{
 			Matrix matrix;
-		    Quaternion quaternion;
-		    Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
-		    CreateFromQuaternion(ref quaternion, out matrix);
+            CreateFromYawPitchRoll(yaw, pitch, roll, out matrix);
 		    return matrix;
 		}
 		
-		public static void CreateFromYawPitchRoll(
-         float yaw,
-         float pitch,
-         float roll,
-         out Matrix result)
+		public static void CreateFromYawPitchRoll(float yaw, float pitch, float roll, out Matrix result)
 		{
 			Quaternion quaternion;
 		    Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll, out quaternion);
@@ -638,62 +696,16 @@ namespace Microsoft.Xna.Framework
 
         public static Matrix CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
         {
-			Vector3 vector3_1 = Vector3.Normalize(cameraPosition - cameraTarget);
-			Vector3 vector3_2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector3_1));
-			Vector3 vector1 = Vector3.Cross(vector3_1, vector3_2);
-			Matrix matrix;
-			matrix.M11 = vector3_2.X;
-			matrix.M12 = vector1.X;
-			matrix.M13 = vector3_1.X;
-			matrix.M14 = 0.0f;
-			matrix.M21 = vector3_2.Y;
-			matrix.M22 = vector1.Y;
-			matrix.M23 = vector3_1.Y;
-			matrix.M24 = 0.0f;
-			matrix.M31 = vector3_2.Z;
-			matrix.M32 = vector1.Z;
-			matrix.M33 = vector3_1.Z;
-			matrix.M34 = 0.0f;
-			matrix.M41 = -Vector3.Dot(vector3_2, cameraPosition);
-			matrix.M42 = -Vector3.Dot(vector1, cameraPosition);
-			matrix.M43 = -Vector3.Dot(vector3_1, cameraPosition);
-			matrix.M44 = 1f;
-			return matrix;
-  
-			
-			/*
-            Matrix m = identity;
-			
-			m.Translation = cameraPosition;
-			
-			var diff = cameraPosition - cameraTarget;
-			diff.Normalize();
-			m.Forward = -diff;
-			
-			Console.WriteLine("Forward: {0}", m.Forward);
-
-			Vector3 right;
-			Vector3.Cross(ref cameraUpVector, ref diff, out right);
-			m.Right = right;
-			
-			Console.WriteLine("Right: {0}", right);
-			
-			Vector3 up;
-			Vector3.Cross(ref diff, ref right, out up);
-			m.Up = up;
-			
-			return Matrix.Invert(m);
-			*/
-			
-			//return m;
+            Matrix matrix;
+            CreateLookAt(ref cameraPosition, ref cameraTarget, ref cameraUpVector, out matrix);
+            return matrix;
         }
-
 
         public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix result)
         {
-            Vector3 vector = Vector3.Normalize(cameraPosition - cameraTarget);
-		    Vector3 vector2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector));
-		    Vector3 vector3 = Vector3.Cross(vector, vector2);
+            var vector = Vector3.Normalize(cameraPosition - cameraTarget);
+            var vector2 = Vector3.Normalize(Vector3.Cross(cameraUpVector, vector));
+            var vector3 = Vector3.Cross(vector, vector2);
 		    result.M11 = vector2.X;
 		    result.M12 = vector3.X;
 		    result.M13 = vector.X;
@@ -716,15 +728,7 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
         {
             Matrix matrix;
-		    matrix.M11 = 2f / width;
-		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-		    matrix.M22 = 2f / height;
-		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-		    matrix.M33 = 1f / (zNearPlane - zFarPlane);
-		    matrix.M31 = matrix.M32 = matrix.M34 = 0f;
-		    matrix.M41 = matrix.M42 = 0f;
-		    matrix.M43 = zNearPlane / (zNearPlane - zFarPlane);
-		    matrix.M44 = 1f;
+            CreateOrthographic(width, height, zNearPlane, zFarPlane, out matrix);
 		    return matrix;
         }
 
@@ -746,22 +750,7 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
         {
 			Matrix matrix;
-			matrix.M11 = (float)(2.0 / ((double)right - (double)left));
-			matrix.M12 = 0.0f;
-			matrix.M13 = 0.0f;
-			matrix.M14 = 0.0f;
-			matrix.M21 = 0.0f;
-			matrix.M22 = (float)(2.0 / ((double)top - (double)bottom));
-			matrix.M23 = 0.0f;
-			matrix.M24 = 0.0f;
-			matrix.M31 = 0.0f;
-			matrix.M32 = 0.0f;
-			matrix.M33 = (float)(1.0 / ((double)zNearPlane - (double)zFarPlane));
-			matrix.M34 = 0.0f;
-			matrix.M41 = (float)(((double)left + (double)right) / ((double)left - (double)right));
-			matrix.M42 = (float)(((double)top + (double)bottom) / ((double)bottom - (double)top));
-			matrix.M43 = (float)((double)zNearPlane / ((double)zNearPlane - (double)zFarPlane));
-			matrix.M44 = 1.0f;
+            CreateOrthographicOffCenter(left, right, bottom, top, zNearPlane, zFarPlane, out matrix);
 			return matrix;
         }
 
@@ -786,30 +775,11 @@ namespace Microsoft.Xna.Framework
 			result.M44 = 1.0f;
 		}
 
+
         public static Matrix CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
         {
             Matrix matrix;
-		    if (nearPlaneDistance <= 0f)
-		    {
-		        throw new ArgumentException("nearPlaneDistance <= 0");
-		    }
-		    if (farPlaneDistance <= 0f)
-		    {
-		        throw new ArgumentException("farPlaneDistance <= 0");
-		    }
-		    if (nearPlaneDistance >= farPlaneDistance)
-		    {
-		        throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-		    }
-		    matrix.M11 = (2f * nearPlaneDistance) / width;
-		    matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-		    matrix.M22 = (2f * nearPlaneDistance) / height;
-		    matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-		    matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-		    matrix.M31 = matrix.M32 = 0f;
-		    matrix.M34 = -1f;
-		    matrix.M41 = matrix.M42 = matrix.M44 = 0f;
-		    matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
+            CreatePerspective(width, height, nearPlaneDistance, farPlaneDistance, out matrix);
 		    return matrix;
         }
 
@@ -1351,6 +1321,35 @@ namespace Microsoft.Xna.Framework
                         result.Translation = position;
                         result.M44 = 1f;
         }
+
+        public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        {
+            translation.X = this.M41;
+            translation.Y = this.M42;
+            translation.Z = this.M43;
+
+            float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
+            float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
+            float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;
+
+            scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
+            scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
+            scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
+
+            if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
+            {
+                rotation = Quaternion.Identity;
+                return false;
+            }
+
+            Matrix m1 = new Matrix(this.M11 / scale.X, M12 / scale.X, M13 / scale.X, 0,
+                                   this.M21 / scale.Y, M22 / scale.Y, M23 / scale.Y, 0,
+                                   this.M31 / scale.Z, M32 / scale.Z, M33 / scale.Z, 0,
+                                   0, 0, 0, 1);
+
+            rotation = Quaternion.CreateFromRotationMatrix(m1);
+            return true;
+        }	
 		
         public float Determinant()
         {
@@ -2130,35 +2129,6 @@ namespace Microsoft.Xna.Framework
                 minor12 = (float)det12;
         }
 		
-        #endregion Private Static Methods
-		
-		public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
-        {
-                translation.X = this.M41;
-                translation.Y = this.M42;
-                translation.Z = this.M43;
-                
-                float xs = (Math.Sign(M11 * M12 * M13 * M14) < 0) ? -1f : 1f;
-                float ys = (Math.Sign(M21 * M22 * M23 * M24) < 0) ? -1f : 1f;
-				float zs = (Math.Sign(M31 * M32 * M33 * M34) < 0) ? -1f : 1f;                               
-                
-                scale.X = xs * (float)Math.Sqrt(this.M11 * this.M11 + this.M12 * this.M12 + this.M13 * this.M13);
-                scale.Y = ys * (float)Math.Sqrt(this.M21 * this.M21 + this.M22 * this.M22 + this.M23 * this.M23);
-                scale.Z = zs * (float)Math.Sqrt(this.M31 * this.M31 + this.M32 * this.M32 + this.M33 * this.M33);
-                
-                if (scale.X == 0.0 || scale.Y == 0.0 || scale.Z == 0.0)
-                {
-                        rotation = Quaternion.Identity;
-                        return false;
-                }
-
-                Matrix m1 = new Matrix(this.M11/scale.X, M12/scale.X, M13/scale.X, 0,
-                       				   this.M21/scale.Y, M22/scale.Y, M23/scale.Y, 0,
-                       				   this.M31/scale.Z, M32/scale.Z, M33/scale.Z, 0,
-                       				   0, 0, 0, 1);
-                
-                rotation = Quaternion.CreateFromRotationMatrix(m1);
-                return true;
-        }			
+        #endregion Private Static Methods 
     }
 }

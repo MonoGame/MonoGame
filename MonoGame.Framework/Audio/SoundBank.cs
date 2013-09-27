@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Audio
 									break;
 								}
 								default:
-									throw new NotImplementedException();
+									throw new NotSupportedException();
 								}
 							}
 							
@@ -238,10 +238,12 @@ namespace Microsoft.Xna.Framework.Audio
             musicCue.Play();
 		}
 		
+        /*
 		public void PlayCue (string name, AudioListener listener, AudioEmitter emitter)
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		#region IDisposable implementation
 		public void Dispose ()

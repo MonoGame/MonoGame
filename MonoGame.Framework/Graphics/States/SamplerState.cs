@@ -87,11 +87,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             GraphicsExtensions.CheckGLError();
 #endif
-
-
 	
 			_anisotropicClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.AnisotropicClamp",
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -100,6 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_anisotropicWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.AnisotropicWrap",
 				Filter = TextureFilter.Anisotropic,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
@@ -108,6 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_linearClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.LinearClamp",
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -116,6 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_linearWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.LinearWrap",
 				Filter = TextureFilter.Linear,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
@@ -124,6 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_pointClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.PointClamp",
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Clamp,
 				AddressV = TextureAddressMode.Clamp,
@@ -132,6 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_pointWrap = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
+                Name = "SamplerState.PointWrap",
 				Filter = TextureFilter.Point,
 				AddressU = TextureAddressMode.Wrap,
 				AddressV = TextureAddressMode.Wrap,
@@ -260,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.Filter.MinMagPointMipLinear;
 
                 default:
-                    throw new NotImplementedException("Invalid texture filter!");
+                    throw new ArgumentException("Invalid texture filter!");
             }
         }
 
@@ -278,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.TextureAddressMode.Wrap;
 
                 default:
-                    throw new NotImplementedException("Invalid texture address mode!");
+                    throw new ArgumentException("Invalid texture address mode!");
             }
         }
 
@@ -391,7 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 break;
       default:
-        throw new NotImplementedException();
+        throw new NotSupportedException();
       }
 
       // Set up texture addressing.
@@ -417,12 +421,12 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Mirror:
         return (int)TextureWrapMode.MirroredRepeat;
       default:
-        throw new NotImplementedException("No support for " + textureAddressMode);
+        throw new ArgumentException("No support for " + textureAddressMode);
       }
     }
 
 #endif // OPENGL
 
-    }
+  }
 }
 

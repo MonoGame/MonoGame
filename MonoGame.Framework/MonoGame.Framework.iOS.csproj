@@ -68,7 +68,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
@@ -123,7 +122,6 @@
     <Compile Include="Net\CommandGamerStateChange.cs" />
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
-    <Compile Include="BatteryChargeStatus.cs" />
     <Compile Include="Curve.cs" />
     <Compile Include="CurveKey.cs" />
     <Compile Include="CurveKeyCollection.cs" />
@@ -140,7 +138,6 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="PlayerIndex.cs" />
     <Compile Include="Point.cs" />
-    <Compile Include="PowerLineStatus.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="Threading.cs" />
@@ -265,6 +262,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
@@ -301,7 +299,6 @@
     <Compile Include="iOS\iOSGameView.cs" />
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs" />
     <Compile Include="iOS\iOSGameView_Touch.cs" />
-    <Compile Include="iOS\PowerStatus.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="iOS\Media\Video.cs" />
@@ -314,7 +311,6 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Game.cs" />
@@ -461,7 +457,7 @@
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
-  <Import Project="$(ProgramFiles)\MSBuild\MonoTouch\Novell.MonoTouch.Common.targets" Condition="'$(windir)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>

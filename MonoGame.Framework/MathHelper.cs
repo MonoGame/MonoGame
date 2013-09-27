@@ -42,12 +42,12 @@ namespace Microsoft.Xna.Framework
         public const float E = (float)Math.E;
         
         /// <summary>
-        /// Represents the log base ten of e(0.4342945f).
+        /// Represents the log base ten of e(0.4342945).
         /// </summary>
         public const float Log10E = 0.4342945f;
         
         /// <summary>
-        /// Represents the log base two of e(1.442695f).
+        /// Represents the log base two of e(1.442695).
         /// </summary>
         public const float Log2E = 1.442695f;
         
@@ -230,13 +230,9 @@ namespace Microsoft.Xna.Framework
             // It is expected that 0 < amount < 1
             // If amount < 0, return value1
             // If amount > 1, return value2
-#if(USE_FARSEER)
-            float result = SilverSpriteMathHelper.Clamp(amount, 0f, 1f);
-            result = SilverSpriteMathHelper.Hermite(value1, 0f, value2, 0f, result);
-#else
             float result = MathHelper.Clamp(amount, 0f, 1f);
             result = MathHelper.Hermite(value1, 0f, value2, 0f, result);
-#endif
+
             return result;
         }
         
@@ -258,7 +254,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>
-        /// <param name="radians">The angle in degrees.</param>
+        /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in radians.</returns>
         /// <remarks>
         /// This method uses double precission internally,

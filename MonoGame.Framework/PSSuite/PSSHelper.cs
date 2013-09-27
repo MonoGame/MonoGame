@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return PssDrawMode.TriangleStrip;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
         
         public static BlendFuncFactor ToBlendFuncFactor(Blend format)
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case Blend.Zero :
                     return BlendFuncFactor.Zero;
             }
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
         
         public static BlendFuncMode ToBlendFuncMode(BlendFunction format)
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case BlendFunction.Subtract  :
                     return BlendFuncMode.Subtract;    
             }
-            throw new NotImplementedException();
+            throw new ArgumentException();
         }
         
         public static PssVertexFormat ToVertexFormat(VertexElementFormat format)

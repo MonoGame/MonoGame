@@ -69,7 +69,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 }
             }
 
-            return new FontDescription(fontName, fontSize, spacing, style, useKerning, characters);
+            var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning, characters);
+			fontDescription.Identity = new ContentIdentity (filename);
+			return fontDescription;
         }
     }
 }

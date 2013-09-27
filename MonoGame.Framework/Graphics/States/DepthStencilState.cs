@@ -82,19 +82,22 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
+                Name = "DepthStencilState.Default",
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = true
 			});
 			
 			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = true,
+                Name = "DepthStencilState.DepthRead",
+                DepthBufferEnable = true,
 				DepthBufferWriteEnable = false
 			});
 			
 			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = false,
+                Name = "DepthStencilState.None",
+                DepthBufferEnable = false,
 				DepthBufferWriteEnable = false
 			});
 		}
@@ -318,8 +321,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
-            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
-            device._d3dContext.OutputMerger.DepthStencilState = _state;
+            device._d3dContext.OutputMerger.SetDepthStencilState(_state, ReferenceStencil);
         }
 
         internal static void ResetStates()
@@ -358,7 +360,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.Comparison.NotEqual;
 
                 default:
-                    throw new NotImplementedException("Invalid comparison!");
+                    throw new ArgumentException("Invalid comparison!");
             }
         }
 
@@ -391,7 +393,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.StencilOperation.Zero;
 
                 default:
-                    throw new NotImplementedException("Invalid stencil operation!");
+                    throw new ArgumentException("Invalid stencil operation!");
             }
         }
 

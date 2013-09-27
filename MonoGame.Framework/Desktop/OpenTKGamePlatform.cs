@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
         
         public override void Exit()
