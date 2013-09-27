@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using NAudio.Wave;
+using NAudio.MediaFoundation;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -123,6 +125,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             return 192000;
         }
 
+	public static MediaType SelectMediaType (Guid audioSubtype, WaveFormat inputFormat, int desiredBitRate)
+	{
+		return MediaFoundationEncoder.GetOutputMediaTypes (audioSubtype)
+		    .Where (mt => mt.SampleRate >= inputFormat.SampleRate && mt.ChannelCount == inputFormat.Channels)
+		    .Select (mt => new { MediaType = mt, Delta = Math.Abs (desiredBitRate - mt.AverageBytesPerSecond * 8) })
+		    .OrderBy (mt => mt.Delta)
+		    .Select (mt => mt.MediaType)
+		    .FirstOrDefault ();
+	}
+
         /// <summary>
         /// Converts the audio using the specified wave format.
         /// </summary>
@@ -166,7 +178,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (disposed)
                 throw new ObjectDisposedException("AudioContent");
 
-            switch (formatType)
+	    switch (formatType)
             {
                 case ConversionFormat.Adpcm:
                     ConvertWav(new AdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount));
@@ -194,8 +206,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.Aac:
 #if WINDOWS
-                    reader.Position = 0;
-                    MediaFoundationEncoder.EncodeToAac(reader, targetFileName, QualityToBitRate(quality));
+		    reader.Position = 0;
+		    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
+		    if (mediaType == null) {
+			    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
+		    }
+		    using (var encoder = new MediaFoundationEncoder (mediaType)) {
+			    encoder.Encode (targetFileName, reader);
+		    } 
                     break;
 #else
                     throw new NotImplementedException();
