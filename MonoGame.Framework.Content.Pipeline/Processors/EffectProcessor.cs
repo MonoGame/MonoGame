@@ -64,6 +64,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+                foreach (var dep in shaderInfo.Dependancies)
+                    context.AddDependency(dep);
             }
             catch (Exception ex)
             {
