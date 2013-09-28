@@ -55,6 +55,9 @@
     <Reference Include="SharpFont">
       <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />
