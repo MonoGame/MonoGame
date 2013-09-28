@@ -13,23 +13,37 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
+
         public override SpriteFontContent Process(FontDescription input,
             ContentProcessorContext context)
         {
             var output = new SpriteFontContent(input);
 
 			var fontName = input.FontName;
+
+#if WINDOWS
 			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
+		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+			if (string.IsNullOrWhiteSpace(fontName)) {
+				fontName = input.FontName;
+#endif
+				
 			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
 			var directories = new string[] { directory, 
 				"/Library/Fonts",
-				Path.Combine(windowsfolder,"Fonts")
+#if WINDOWS
+				fontDirectory,
+#endif
 			};
 
 			foreach( var dir in directories) {
@@ -51,6 +65,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 
 			fontName = Path.Combine (directory, fontName);
+#if WINDOWS
+			}
+#endif
 
 			context.Logger.LogMessage ("Building Font {0}", fontName);
 			try {
@@ -165,5 +182,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			return glyphs.ToArray();
 		}
+
+#if WINDOWS
+		string FindFontFileFromFontName (string fontName, string fontDirectory)
+		{
+			var key = Registry.LocalMachine.OpenSubKey (@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+			foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
+				if (font.StartsWith (fontName, StringComparison.OrdinalIgnoreCase)) {
+					var fontPath = key.GetValue (font).ToString ();
+					return Path.IsPathRooted (fontPath) ? fontPath : Path.Combine (fontDirectory, fontPath);
+				}
+			}
+			return String.Empty;
+		}
+#endif
     }
 }
