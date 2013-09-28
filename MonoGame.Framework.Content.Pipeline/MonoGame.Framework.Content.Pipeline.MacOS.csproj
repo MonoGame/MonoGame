@@ -40,9 +40,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
-    </Reference>
     <Reference Include="Nvidia.TextureTools">
       <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
@@ -217,6 +214,7 @@
     <Compile Include="Graphics\Font\IFontImporter.cs" />
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
     <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
+    <Compile Include="Audio\ConvertAudio.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

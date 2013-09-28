@@ -7,8 +7,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+#if MACOS
+using MonoMac.AudioToolbox;
+#endif
+#if WINDOWS
 using NAudio.Wave;
 using NAudio.MediaFoundation;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -18,7 +23,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public class AudioContent : ContentItem, IDisposable
     {
         internal List<byte> data;
+#if WINDOWS
         WaveStream reader;
+#endif
         TimeSpan duration;
         string fileName;
         AudioFileType fileType;
@@ -80,7 +87,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             fileName = audioFileName;
             fileType = audioFileType;
+#if WINDOWS
             Read();
+#endif
         }
 
         /// <summary>
@@ -125,6 +134,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             return 192000;
         }
 
+#if WINDOWS
 	public static MediaType SelectMediaType (Guid audioSubtype, WaveFormat inputFormat, int desiredBitRate)
 	{
 		return MediaFoundationEncoder.GetOutputMediaTypes (audioSubtype)
@@ -134,7 +144,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 		    .Select (mt => mt.MediaType)
 		    .FirstOrDefault ();
 	}
-
         /// <summary>
         /// Converts the audio using the specified wave format.
         /// </summary>
@@ -142,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         void ConvertWav(WaveFormat waveFormat)
         {
             reader.Position = 0;
-#if WINDOWS
+
             //var mediaTypes = MediaFoundationEncoder.GetOutputMediaTypes(NAudio.MediaFoundation.AudioSubtypes.MFAudioFormat_PCM);
             using (var resampler = new MediaFoundationResampler(reader, waveFormat))
             {
@@ -162,10 +171,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     format = new AudioFormat(waveFormat);
                 }
             }
-#else
-            throw new NotImplementedException();
-#endif
         }
+#endif
 
         /// <summary>
         /// Transcodes the source audio to the target format and quality.
@@ -178,14 +185,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if (disposed)
                 throw new ObjectDisposedException("AudioContent");
 
+
 	    switch (formatType)
             {
                 case ConversionFormat.Adpcm:
+#if WINDOWS
                     ConvertWav(new AdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount));
+#else
+				throw new NotSupportedException("Adpcm encoding supported on Windows only");
+#endif
                     break;
 
                 case ConversionFormat.Pcm:
+#if WINDOWS
                     ConvertWav(new WaveFormat(QualityToSampleRate(quality), format.ChannelCount));
+#else
+				targetFileName = Guid.NewGuid().ToString() + ".wav";
+				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.LinearPCM, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
+					throw new InvalidDataException("Failed to convert to PCM");
+				}
+				Read(targetFileName);
+				if (File.Exists(targetFileName))
+					File.Delete(targetFileName);
+#endif
                     break;
 
                 case ConversionFormat.WindowsMedia:
@@ -201,7 +223,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     throw new NotSupportedException("XMA is not a supported encoding format. It is specific to the Xbox 360.");
 
                 case ConversionFormat.ImaAdpcm:
+#if WINDOWS
                     ConvertWav(new ImaAdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount, 4));
+#else
+				throw new NotImplementedException();
+#endif
                     break;
 
                 case ConversionFormat.Aac:
@@ -214,10 +240,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 		    using (var encoder = new MediaFoundationEncoder (mediaType)) {
 			    encoder.Encode (targetFileName, reader);
 		    } 
-                    break;
 #else
-                    throw new NotImplementedException();
+				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
+					throw new InvalidDataException("Failed to convert to AAC");
+				}
+
 #endif
+				break;
 
                 case ConversionFormat.Vorbis:
                     throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");
@@ -243,21 +272,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             {
                 if (disposing)
                 {
+#if WINDOWS
                     // Release managed resources
                     if (reader != null)
                         reader.Dispose();
                     reader = null;
+#endif
                 }
                 disposed = true;
             }
         }
 
+#if WINDOWS
         /// <summary>
         /// Read an audio file.
         /// </summary>
         void Read()
         {
-#if WINDOWS
+
             reader = new MediaFoundationReader(fileName);
             duration = reader.TotalTime;
             format = new AudioFormat(reader.WaveFormat);
@@ -265,9 +297,59 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             var bytes = new byte[reader.Length];
             var read = reader.Read(bytes, 0, bytes.Length);
             data = new List<byte>(bytes);
-#else
-            throw new NotImplementedException();
-#endif
         }
-    }
+#elif MACOS
+		void Read(string filename) {
+			UInt32 dataSize;
+			using (var fs = new FileStream(filename, FileMode.Open)) {
+				using (var reader = new BinaryReader(fs)) {
+					var riffID = reader.ReadBytes (4);
+					var fileSize = reader.ReadInt32 ();
+					var wavID = reader.ReadBytes (4);
+			 		var fmtID = reader.ReadBytes (4);
+			 		var fmtSize = reader.ReadUInt32 ();
+					var fmtCode = reader.ReadUInt16 ();
+					var channels = reader.ReadUInt16 ();
+					var sampleRate = reader.ReadUInt32 ();
+					var fmtAvgBPS = reader.ReadUInt32 ();
+					var fmtBlockAlign = reader.ReadUInt16 ();
+					var bitDepth = reader.ReadUInt16 ();
+
+					string dataId = "data";
+					int index =0;
+					char c;
+					while (true) {
+						c = reader.ReadChar ();
+						if (c == dataId [index]) {
+							index++;
+						} else
+							index = 0;
+						if (index == dataId.Length)
+							break;
+					}
+
+					dataSize = reader.ReadUInt32 ();
+				    this.data = reader.ReadBytes ((int)dataSize).ToList();
+
+					using(var ms = new MemoryStream()) {
+						using (var writer = new BinaryWriter(ms)) {
+							writer.Write ((int)18);
+							writer.Write ((short)fmtCode);
+							writer.Write ((short)channels);
+							writer.Write ((int)sampleRate);
+							writer.Write ((int)fmtAvgBPS);
+							writer.Write ((short)fmtBlockAlign);
+							writer.Write ((short)bitDepth);
+							writer.Write ((short)0);
+						}					
+
+						this.format = new AudioFormat (ms.ToArray().ToList());
+					}
+					this.duration = new TimeSpan (0,0,(int)(fileSize / (sampleRate * channels * bitDepth / 8)));
+
+				}
+			}
+		}
+#endif
+	}
 }
