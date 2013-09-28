@@ -423,7 +423,6 @@
     <Compile Include="Graphics\States\BlendState.cs" />
 	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
