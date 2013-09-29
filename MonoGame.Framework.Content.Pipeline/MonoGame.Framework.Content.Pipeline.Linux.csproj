@@ -20,6 +20,7 @@
     <DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE;LINUX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -61,6 +63,7 @@
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Builder\Convertors\StringToColorConverter.cs" />
     <Compile Include="Builder\PathHelper.cs" />
     <Compile Include="Builder\PipelineBuildEvent.cs" />
     <Compile Include="Builder\PipelineBuildLogger.cs" />
@@ -213,6 +216,15 @@
     <Compile Include="Processors\ModelMeshPartContentCollection.cs" />
     <Compile Include="Processors\ModelProcessor.cs" />
     <Compile Include="Graphics\GraphicsUtil.cs" />
+    <Compile Include="Graphics\Font\BitmapUtils.cs" />
+    <Compile Include="Graphics\Font\CharacterRegion.cs" />
+    <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
+    <Compile Include="Graphics\Font\Glyph.cs" />
+    <Compile Include="Graphics\Font\GlyphCropper.cs" />
+    <Compile Include="Graphics\Font\GlyphPacker.cs" />
+    <Compile Include="Graphics\Font\IFontImporter.cs" />
+    <Compile Include="Graphics\Font\SharpFontImporter.cs" />
+    <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -258,5 +270,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="FbxImporter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Graphics\Font\" />
   </ItemGroup>
 </Project>

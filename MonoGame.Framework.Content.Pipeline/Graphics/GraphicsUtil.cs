@@ -194,6 +194,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Calculate number of mip levels
             var width = content.Faces[0][0].Height;
             var height = content.Faces[0][0].Width;
+
+			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
+				throw new PipelineException("PVRTC Compressed textures width and height must be powers of two.");
+
+			if (width != height)
+				throw new PipelineException("PVRTC Compressed textures must be square. i.e width == height.");
+
             var numberOfMipLevels = 1;
             if (generateMipmaps)
             {

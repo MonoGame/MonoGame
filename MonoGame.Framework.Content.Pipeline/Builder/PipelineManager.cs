@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
@@ -71,7 +72,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             ProjectDirectory = PathHelper.NormalizeDirectory(projectDir);
             OutputDirectory = PathHelper.NormalizeDirectory(outputDir);
             IntermediateDirectory = PathHelper.NormalizeDirectory(intermediateDir);
+
+	    RegisterCustomConverters ();
         }
+
+	public void AssignTypeConverter<IType, IConverterType> ()
+	{
+		TypeDescriptor.AddAttributes (typeof (IType), new TypeConverterAttribute (typeof (IConverterType)));
+	}
+
+	private void RegisterCustomConverters ()
+	{
+		AssignTypeConverter<Microsoft.Xna.Framework.Color, StringToColorConverter> ();
+	}
 
         public void AddAssembly(string assemblyFilePath)
         {
