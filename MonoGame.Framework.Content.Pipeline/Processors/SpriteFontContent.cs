@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -17,7 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             FontName = desc.FontName;
             Style = desc.Style;
             FontSize = desc.Size;
-            CharacterMap = desc.Characters;
+			CharacterMap = CharacterRegion.Flatten(desc.CharacterRegions).ToList();
             VerticalLineSpacing = (int)desc.Spacing; // Will be replaced in the pipeline.
             HorizontalSpacing = desc.Spacing;
 

@@ -20,6 +20,7 @@
     <DefineConstants>TRACE;DEBUG;MACOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE;MACOS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -38,9 +40,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
-    </Reference>
     <Reference Include="Nvidia.TextureTools">
       <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
@@ -56,6 +55,9 @@
     <Reference Include="SharpFont">
       <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioContent.cs" />
@@ -64,6 +66,7 @@
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Builder\Convertors\StringToColorConverter.cs" />
     <Compile Include="Builder\PathHelper.cs" />
     <Compile Include="Builder\PipelineBuildEvent.cs" />
     <Compile Include="Builder\PipelineBuildLogger.cs" />
@@ -205,6 +208,16 @@
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
+    <Compile Include="Graphics\Font\BitmapUtils.cs" />
+    <Compile Include="Graphics\Font\CharacterRegion.cs" />
+    <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
+    <Compile Include="Graphics\Font\Glyph.cs" />
+    <Compile Include="Graphics\Font\GlyphCropper.cs" />
+    <Compile Include="Graphics\Font\GlyphPacker.cs" />
+    <Compile Include="Graphics\Font\IFontImporter.cs" />
+    <Compile Include="Graphics\Font\SharpFontImporter.cs" />
+    <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
+    <Compile Include="Audio\ConvertAudio.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -261,5 +274,19 @@
       <Link>libassimp.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+      <Link>libnvcore.dylib</Link>
+    </None>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+      <Link>libnvimage.dylib</Link>
+    </None>
+    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+      <Link>libnvmath.dylib</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Graphics\Font\" />
   </ItemGroup>
 </Project>
