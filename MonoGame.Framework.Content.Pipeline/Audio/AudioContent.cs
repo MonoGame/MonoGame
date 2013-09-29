@@ -226,7 +226,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 #if WINDOWS
                     ConvertWav(new ImaAdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount, 4));
 #else
-				throw new NotImplementedException();
+				targetFileName = Guid.NewGuid().ToString() + ".wav";
+				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.AppleIMA4, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
+					throw new InvalidDataException("Failed to convert to ImaAdpcm");
+				}
+				Read(targetFileName);
+				if (File.Exists(targetFileName))
+					File.Delete(targetFileName);
 #endif
                     break;
 
