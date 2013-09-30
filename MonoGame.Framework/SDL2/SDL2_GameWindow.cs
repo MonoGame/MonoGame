@@ -417,6 +417,16 @@ namespace Microsoft.Xna.Framework
                     {
                         Mouse.INTERNAL_MouseWheel += evt.wheel.y;
                     }
+                    
+                    // Controller device management
+                    else if (evt.type == SDL.SDL_EventType.SDL_JOYDEVICEADDED)
+                    {
+                        Input.GamePad.INTERNAL_AddInstance(evt.jdevice.which);
+                    }
+                    else if (evt.type == SDL.SDL_EventType.SDL_JOYDEVICEREMOVED)
+                    {
+                        Input.GamePad.INTERNAL_RemoveInstance(evt.jdevice.which);
+                    }
 
                     // Text Input
                     else if (evt.type == SDL.SDL_EventType.SDL_TEXTINPUT && !INTERNAL_TextInputSuppress)

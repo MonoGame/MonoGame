@@ -42,6 +42,7 @@ purpose and non-infringement.
 using System;
 using System.IO;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
 using SDL2;
 #endregion
@@ -111,6 +112,8 @@ namespace Microsoft.Xna.Framework.Input
         // The SDL device lists
         private static IntPtr[] INTERNAL_devices = new IntPtr[4];
         private static IntPtr[] INTERNAL_haptics = new IntPtr[4];
+        private static bool[] INTERNAL_isGameController = new bool[4];
+        private static Dictionary<int, int> INTERNAL_instanceList = new Dictionary<int, int>();
         
         // We use this to apply XInput-like rumble effects.
         private static SDL.SDL_HapticEffect INTERNAL_effect = new SDL.SDL_HapticEffect
@@ -157,6 +160,129 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
+        #endregion
+        
+        #region Device List, Open/Close Devices
+        
+        internal static void INTERNAL_AddInstance(int which)
+        {
+            if (which > 3)
+            {
+                return; // Ignoring more than 4 controllers.
+            }
+            
+            // Clear the error buffer. We're about to do a LOT of dangerous stuff.
+            SDL.SDL_ClearError();
+            
+            // We use this when dealing with Haptic initialization.
+            IntPtr thisJoystick;
+
+            // Initialize either a GameController or a Joystick.
+            if (SDL.SDL_IsGameController(which) == SDL.SDL_bool.SDL_TRUE)
+            {
+                INTERNAL_isGameController[which] = true;
+                INTERNAL_devices[which] = SDL.SDL_GameControllerOpen(which);
+                thisJoystick = SDL.SDL_GameControllerGetJoystick(INTERNAL_devices[which]);
+            }
+            else
+            {
+                INTERNAL_isGameController[which] = false;
+                INTERNAL_devices[which] = SDL.SDL_JoystickOpen(which);
+                thisJoystick = INTERNAL_devices[which];
+            }
+
+            if (INTERNAL_devices[which] == IntPtr.Zero && thisJoystick == IntPtr.Zero)
+            {
+                // Crap, something went wrong.
+                System.Console.WriteLine("JOYSTICK OPEN ERROR: " + SDL.SDL_GetError());
+                return;
+            }
+
+            // Add the index, better known as the instance ID, to the dictionary.
+            int instance = SDL.SDL_JoystickInstanceID(thisJoystick);
+            if (INTERNAL_instanceList.ContainsKey(instance))
+            {
+                /* Some platforms (read: Windows) will try to open a joystick
+                 * multiple times. Fortunately, SDL2 covers this, but we need
+                 * our own set of checks to prevent duplicate entries.
+                 * -flibit
+                 */
+                return;
+            }
+            INTERNAL_instanceList.Add(instance, which);
+
+            // Initialize the haptics for each joystick.
+            if (SDL.SDL_JoystickIsHaptic(thisJoystick) == 1)
+            {
+                INTERNAL_haptics[which] = SDL.SDL_HapticOpenFromJoystick(thisJoystick);
+                if (INTERNAL_haptics[which] == IntPtr.Zero)
+                {
+                    System.Console.WriteLine("HAPTIC OPEN ERROR: " + SDL.SDL_GetError());
+                }
+            }
+            if (INTERNAL_haptics[which] != IntPtr.Zero)
+            {
+                if (SDL.SDL_HapticEffectSupported(INTERNAL_haptics[which], ref INTERNAL_effect) == 1)
+                {
+                    SDL.SDL_HapticNewEffect(INTERNAL_haptics[which], ref INTERNAL_effect);
+                }
+                else if (SDL.SDL_HapticRumbleSupported(INTERNAL_haptics[which]) == 1)
+                {
+                    SDL.SDL_HapticRumbleInit(INTERNAL_haptics[which]);
+                }
+            }
+
+            // Check for an SDL_GameController configuration first!
+            if (INTERNAL_isGameController[which])
+            {
+                System.Console.WriteLine(
+                    "Controller " + which + ", " +
+                    SDL.SDL_GameControllerName(INTERNAL_devices[which]) +
+                    ", will use SDL_GameController support."
+                );
+            }
+            else
+            {
+                System.Console.WriteLine(
+                    "Controller " + which + ", " +
+                    SDL.SDL_JoystickName(INTERNAL_devices[which]) +
+                    ", will use generic MonoGameJoystick support."
+                );
+            }
+        }
+        
+        internal static void INTERNAL_RemoveInstance(int which)
+        {
+            int output;
+            if (!INTERNAL_instanceList.TryGetValue(which, out output))
+            {
+                System.Console.WriteLine("Ignoring device removal, ID: " + which);
+                return;
+            }
+            INTERNAL_instanceList.Remove(which);
+            if (INTERNAL_haptics[output] != IntPtr.Zero)
+            {
+                SDL.SDL_HapticClose(INTERNAL_haptics[output]);
+            }
+            if (INTERNAL_isGameController[output])
+            {
+                // Not no mores, it ain't.
+                INTERNAL_isGameController[output] = false;
+                SDL.SDL_GameControllerClose(INTERNAL_devices[output]);
+            }
+            else
+            {
+                SDL.SDL_JoystickClose(INTERNAL_devices[output]);
+            }
+            INTERNAL_devices[output] = IntPtr.Zero;
+            INTERNAL_haptics[output] = IntPtr.Zero;
+            
+            // A lot of errors can happen here, but honestly, they can be ignored...
+            SDL.SDL_ClearError();
+            
+            System.Console.WriteLine("Removed device, player: " + output);
+        }
+        
         #endregion
 
         #region Haptic Support Check Helper
@@ -365,58 +491,9 @@ namespace Microsoft.Xna.Framework.Input
 
             // Limit to the first 4 sticks to avoid crashes.
             int numSticks = Math.Min(4, SDL.SDL_NumJoysticks());
-            
             for (int x = 0; x < numSticks; x++)
             {
-                // We use this when dealing with Haptic initialization.
-                IntPtr thisJoystick;
-                
-                // Initialize either a GameController or a Joystick.
-                if (SDL.SDL_IsGameController(x) == SDL.SDL_bool.SDL_TRUE)
-                {
-                    INTERNAL_devices[x] = SDL.SDL_GameControllerOpen(x);
-                    thisJoystick = SDL.SDL_GameControllerGetJoystick(INTERNAL_devices[x]);
-                }
-                else
-                {
-                    INTERNAL_devices[x] = SDL.SDL_JoystickOpen(x);
-                    thisJoystick = INTERNAL_devices[x];
-                }
-                
-                // Initialize the haptics for each joystick.
-                if (SDL.SDL_JoystickIsHaptic(thisJoystick) == 1)
-                {
-                    INTERNAL_haptics[x] = SDL.SDL_HapticOpenFromJoystick(thisJoystick);
-                }
-                if (INTERNAL_haptics[x] != IntPtr.Zero)
-                {
-                    if (SDL.SDL_HapticEffectSupported(INTERNAL_haptics[x], ref INTERNAL_effect) == 1)
-                    {
-                        SDL.SDL_HapticNewEffect(INTERNAL_haptics[x], ref INTERNAL_effect);
-                    }
-                    else if (SDL.SDL_HapticRumbleSupported(INTERNAL_haptics[x]) == 1)
-                    {
-                        SDL.SDL_HapticRumbleInit(INTERNAL_haptics[x]);
-                    }
-                }
-    
-                // Check for an SDL_GameController configuration first!
-                if (SDL.SDL_IsGameController(x) == SDL.SDL_bool.SDL_TRUE)
-                {
-                    System.Console.WriteLine(
-                        "Controller " + x + ", " +
-                        SDL.SDL_GameControllerName(INTERNAL_devices[x]) +
-                        ", will use SDL_GameController support."
-                    );
-                }
-                else
-                {
-                    System.Console.WriteLine(
-                        "Controller " + x + ", " +
-                        SDL.SDL_JoystickName(INTERNAL_devices[x]) +
-                        ", will use generic MonoGameJoystick support."
-                    );
-                }
+                INTERNAL_AddInstance(x);
             }
         }
 
@@ -606,8 +683,7 @@ namespace Microsoft.Xna.Framework.Input
             const float DeadZoneSize = 0.27f;
             
             // SDL_GameController
-            
-            if (SDL.SDL_IsGameController((int) index) == SDL.SDL_bool.SDL_TRUE)
+            if (INTERNAL_isGameController[(int) index])
             {
                 // The "master" button state is built from this.
                 Buttons gc_buttonState = (Buttons) 0;
@@ -824,7 +900,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             // SDL_GameController Capabilities
             
-            if (SDL.SDL_IsGameController((int) playerIndex) == SDL.SDL_bool.SDL_TRUE)
+            if (INTERNAL_isGameController[(int) playerIndex])
             {
                 // An SDL_GameController will _always_ be feature-complete.
                 return new GamePadCapabilities()
