@@ -478,8 +478,17 @@ namespace Microsoft.Xna.Framework.Graphics
                                 data = buffer;
                                 break;							
                             }
-						case EffectParameterType.String:
-							throw new NotImplementedException();
+
+                        case EffectParameterType.String:
+                            // TODO: We have not investigated what a string
+                            // type should do in the parameter list.  Till then
+                            // throw to let the user know.
+							throw new NotSupportedException();
+
+                        default:
+                            // NOTE: We skip over all other types as they 
+                            // don't get added to the constant buffer.
+					        break;
 					}
                 }
 

@@ -69,6 +69,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferMultiSampling;
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
+        private bool _drawBegun;
         bool disposed;
 
 #if !WINRT
@@ -122,12 +123,20 @@ namespace Microsoft.Xna.Framework
 
         public bool BeginDraw()
         {
-            throw new NotImplementedException();
+            if (_graphicsDevice == null)
+                return false;
+
+            _drawBegun = true;
+            return true;
         }
 
         public void EndDraw()
         {
-            throw new NotImplementedException();
+            if (_graphicsDevice != null && _drawBegun)
+            {
+                _drawBegun = false;
+                _graphicsDevice.Present();
+            }
         }
 
         #region IGraphicsDeviceService Members
@@ -249,6 +258,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
+            _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
             _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
             // TODO: We probably should be resetting the whole 

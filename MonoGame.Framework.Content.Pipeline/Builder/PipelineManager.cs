@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
@@ -68,10 +69,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
 
-            ProjectDirectory = PathHelper.Normalize(projectDir + Path.DirectorySeparatorChar);
-            OutputDirectory = PathHelper.Normalize(outputDir + Path.DirectorySeparatorChar);
-            IntermediateDirectory = PathHelper.Normalize(intermediateDir + Path.DirectorySeparatorChar);
+            ProjectDirectory = PathHelper.NormalizeDirectory(projectDir);
+            OutputDirectory = PathHelper.NormalizeDirectory(outputDir);
+            IntermediateDirectory = PathHelper.NormalizeDirectory(intermediateDir);
+
+	    RegisterCustomConverters ();
         }
+
+	public void AssignTypeConverter<IType, IConverterType> ()
+	{
+		TypeDescriptor.AddAttributes (typeof (IType), new TypeConverterAttribute (typeof (IConverterType)));
+	}
+
+	private void RegisterCustomConverters ()
+	{
+		AssignTypeConverter<Microsoft.Xna.Framework.Color, StringToColorConverter> ();
+	}
 
         public void AddAssembly(string assemblyFilePath)
         {
@@ -543,7 +556,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compiler.Compile(stream, content, TargetPlatform.Windows, GraphicsProfile.Reach, false, OutputDirectory, outputFileDir);
+                _compiler.Compile(stream, content, Platform, Profile, false, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.

@@ -341,7 +341,9 @@ namespace Microsoft.Xna.Framework
             window.KeyPress += OnKeyPress;
             
             // Set the window icon.
-            window.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
+            var assembly = Assembly.GetEntryAssembly();
+            if(assembly != null)
+                window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,

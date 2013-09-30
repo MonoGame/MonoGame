@@ -66,12 +66,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         protected void Dispose(bool disposing)
         {
-
         }
 
 	    #endregion
 
 	#region Properties
+
+        /*
 		public Texture2D GamerPicture {
 			get {
 				throw new NotImplementedException ();
@@ -125,6 +126,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 				throw new NotImplementedException ();
 			}
 		}
+        */
+
 	#endregion
 	}
 }

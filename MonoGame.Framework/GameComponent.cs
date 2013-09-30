@@ -49,11 +49,6 @@ namespace Microsoft.Xna.Framework
 
         public Game Game { get; private set; }
 
-        public Graphics.GraphicsDevice GraphicsDevice
-        {
-            get { return this.Game.GraphicsDevice; }
-        }
-
         public bool Enabled
         {
             get { return _enabled; }
