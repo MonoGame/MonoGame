@@ -199,6 +199,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 case ConversionFormat.Pcm:
 #if WINDOWS
                     ConvertWav(new WaveFormat(QualityToSampleRate(quality), format.ChannelCount));
+#elif LINUX
+                    // TODO Do the conversion for Linux platform
 #else
 				targetFileName = Guid.NewGuid().ToString() + ".wav";
 				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.LinearPCM, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
@@ -240,8 +242,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 		    using (var encoder = new MediaFoundationEncoder (mediaType)) {
 			    encoder.Encode (targetFileName, reader);
 		    } 
-#else
-				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
+rtAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
 					throw new InvalidDataException("Failed to convert to AAC");
 				}
 
