@@ -146,7 +146,6 @@
     <Compile Include="Vector4.cs" />
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveContinuity.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />

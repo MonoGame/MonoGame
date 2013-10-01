@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<stetic-interface>
+  <configuration>
+    <images-root-path>..</images-root-path>
+    <target-gtk-version>2.12</target-gtk-version>
+  </configuration>
+  <import>
+    <widget-library name="../../../../../../Program Files (x86)/Xamarin Studio/bin/MonoDevelop.Ide.dll" />
+    <widget-library name="../../../../../../Program Files (x86)/Xamarin Studio/AddIns/MonoDevelop.DesignerSupport/MonoDevelop.DesignerSupport.dll" />
+    <widget-library name="../../../../../../Program Files (x86)/Xamarin Studio/AddIns/MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.dll" internal="true" />
+  </import>
+  <widget class="Gtk.Bin" id="MonoDevelop.MonoGameContent.MonoGameOptions" design-size="466 301">
+    <property name="MemberName" />
+    <property name="Visible">False</property>
+    <child>
+      <widget class="Gtk.Fixed" id="fixed1">
+        <property name="MemberName" />
+        <property name="HasWindow">False</property>
+        <child>
+          <widget class="Gtk.Label" id="label1">
+            <property name="MemberName" />
+            <property name="LabelProp" translatable="yes">Platform</property>
+          </widget>
+          <packing>
+            <property name="X">6</property>
+            <property name="Y">24</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Label" id="label2">
+            <property name="MemberName" />
+            <property name="LabelProp" translatable="yes">Compress Content</property>
+          </widget>
+          <packing>
+            <property name="X">5</property>
+            <property name="Y">59</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.CheckButton" id="chkCompress">
+            <property name="MemberName" />
+            <property name="CanFocus">True</property>
+            <property name="Label" translatable="yes" />
+            <property name="Active">True</property>
+            <property name="DrawIndicator">True</property>
+            <property name="HasLabel">True</property>
+            <property name="UseUnderline">True</property>
+          </widget>
+          <packing>
+            <property name="X">134</property>
+            <property name="Y">58</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.ComboBox" id="cmbPlatforms">
+            <property name="MemberName" />
+            <property name="WidthRequest">200</property>
+            <property name="IsTextCombo">True</property>
+            <property name="Items" translatable="yes" />
+          </widget>
+          <packing>
+            <property name="X">133</property>
+            <property name="Y">21</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</stetic-interface>
