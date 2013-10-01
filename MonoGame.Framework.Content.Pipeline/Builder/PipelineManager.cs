@@ -529,8 +529,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     if (assetCachedEvent == null)
                     {
                         Logger.LogMessage("Cleaning {0}", asset);
-                        File.Delete(asset);
-                        File.Delete(assetEventFilepath);
+                        FileHelper.DeleteIfExists(asset);
+                        FileHelper.DeleteIfExists(assetEventFilepath);
                         continue;
                     }
 
@@ -540,8 +540,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             Logger.LogMessage("Cleaning {0}", outputFilepath);
-            File.Delete(outputFilepath);
-            File.Delete(eventFilepath);
+            FileHelper.DeleteIfExists(outputFilepath);
+            FileHelper.DeleteIfExists(eventFilepath);
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
