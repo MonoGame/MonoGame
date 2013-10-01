@@ -295,7 +295,7 @@ namespace Microsoft.Xna.Framework
 
         public static Vector4 Hermite(Vector4 value1, Vector4 tangent1, Vector4 value2, Vector4 tangent2, float amount)
         {
-            Vector4 result = new Vector4();
+            Vector4 result;
             result.X = MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount);
             result.Y = MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount);
             result.Z = MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount);
@@ -610,7 +610,6 @@ namespace Microsoft.Xna.Framework
         {
             Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
         }
-
 
         public static Vector4 Transform(Vector4 vector, Matrix matrix)
         {
