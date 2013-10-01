@@ -66,6 +66,7 @@
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
+    <Compile Include="Builder\FileHelper.cs" />
     <Compile Include="Builder\Convertors\StringToColorConverter.cs" />
     <Compile Include="Builder\PathHelper.cs" />
     <Compile Include="Builder\PipelineBuildEvent.cs" />
