@@ -445,6 +445,10 @@ namespace Microsoft.Xna.Framework.Media
         #region Private Methods: OpenAL
         private void UpdateVolume()
         {
+            if (audioSourceIndex == -1)
+            {
+                return;
+            }
             if (IsMuted)
             {
                 AL.Source(audioSourceIndex, ALSourcef.Gain, 0.0f);
@@ -459,6 +463,9 @@ namespace Microsoft.Xna.Framework.Media
         #region Public Methods: XNA VideoPlayer Implementation
         public VideoPlayer()
         {
+            // Initialize OpenAL members.
+            audioSourceIndex = -1;
+            
             // Initialize public members.
             IsDisposed = false;
             IsLooped = false;
@@ -849,6 +856,7 @@ namespace Microsoft.Xna.Framework.Media
             
             // Generate the source.
             audioSourceIndex = AL.GenSource();
+            UpdateVolume();
             
             // Generate the alternating buffers.
             int[] buffers = AL.GenBuffers(NUM_BUFFERS);
@@ -892,6 +900,7 @@ namespace Microsoft.Xna.Framework.Media
             
             // Audio is done.
             audioStarted = false;
+            audioSourceIndex = -1;
         }
         #endregion
         
