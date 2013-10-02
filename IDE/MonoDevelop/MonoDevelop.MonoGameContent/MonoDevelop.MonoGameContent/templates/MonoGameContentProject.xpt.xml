@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Content</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<LanguageName>C#</LanguageName>
+		<Icon>monogame-icon</Icon>
+		<_Description>Creates a MonoGame Content Project</_Description>
+	</TemplateConfiguration>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "MonoGameContent">
+			<Options MonoGamePlatform="Windows" XnaCompresssContent="false"/>
+			<References>
+				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+			</References>
+			<Files>
+
+			</Files>
+		</Project>
+	</Combine>
+</Template>
+
