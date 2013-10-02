@@ -35,7 +35,7 @@ namespace MonoGameContentProcessors.Processors
             try
             {
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
-                foreach (var dep in shaderInfo.Dependancies)
+                foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
             }
             catch (Exception ex)

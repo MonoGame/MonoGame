@@ -369,7 +369,7 @@ namespace TwoMGFX
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
         public Dictionary<string, SamplerStateInfo> SamplerStates = new Dictionary<string, SamplerStateInfo>();
 
-        public List<string> Dependancies { get; private set; }
+        public List<string> Dependencies { get; private set; }
 
 		static public ShaderInfo FromFile(string path, Options options)
 		{
@@ -398,8 +398,8 @@ namespace TwoMGFX
 			string newFile;
 		    var full = Path.GetFullPath(filePath);
 		    var dir = Path.GetDirectoryName(full);
-		    var dependancies = new List<string>();
-            using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath)), dependancies))
+		    var dependencies = new List<string>();
+            using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath)), dependencies))
                 newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, Path.GetFullPath(filePath));
 
 			// Parse the resulting file for techniques and passes.
@@ -415,7 +415,7 @@ namespace TwoMGFX
 
 			// Evaluate the results of the parse tree.
 			var result = tree.Eval() as ShaderInfo;
-		    result.Dependancies = dependancies;
+		    result.Dependencies = dependencies;
 			result.fileName = filePath;
 			result.fileContent = newFile;
 
