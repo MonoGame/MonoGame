@@ -294,10 +294,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This method can be called recursively with a null value.</remarks>
         public void WriteObject<T>(T value)
         {
-            if (value == null)
-                Write7BitEncodedInt(0);
-            else
-                WriteObject<T>(value, GetTypeWriter(value.GetType()));
+		if (value == null)
+			Write7BitEncodedInt (0);
+		else {
+			var elementWriter =  GetTypeWriter (value.GetType ());
+			var index = typeWriterMap[elementWriter.GetType ()];
+			// Because zero means null object, we add one to the index before writing it to the file
+			Write7BitEncodedInt (index + 1);
+			elementWriter.Write (this, value);
+		}
         }
 
         /// <summary>
@@ -322,10 +327,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                var index = typeWriterMap[typeWriter.GetType()];
-                // Because zero means null object, we add one to the index before writing it to the file
-                Write7BitEncodedInt(index + 1);
-                typeWriter.Write(this, value);
+		    Type objectType = typeof (T);
+		    if (!objectType.IsValueType) {
+			    var index = typeWriterMap[typeWriter.GetType ()];
+			    // Because zero means null object, we add one to the index before writing it to the file
+			    Write7BitEncodedInt (index + 1);
+		    }
+		    typeWriter.Write (this, value);
             }
         }
 
@@ -388,7 +396,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
         }
 
-        /// <summary>
+	/// <summary>
         /// Writes a Color value.
         /// </summary>
         /// <param name="value">Value of a color using Red, Green, Blue, and Alpha values to write.</param>
@@ -474,5 +482,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.Center);
             Write(value.Radius);
         }
+
+	internal void Write (Rectangle value)
+	{
+		Write (value.X);
+		Write (value.Y);
+		Write (value.Width);
+		Write (value.Height);
+	}
     }
 }

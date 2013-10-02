@@ -56,7 +56,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			value = null;
 			return false;
-			throw new NotImplementedException();
 		}
 
 	}

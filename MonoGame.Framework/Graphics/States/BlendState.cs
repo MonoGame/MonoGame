@@ -213,6 +213,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _additive = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState
             {
+                Name = "BlendState.Additive",
                 ColorSourceBlend = Blend.SourceAlpha,
                 AlphaSourceBlend = Blend.SourceAlpha,
                 ColorDestinationBlend = Blend.One,
@@ -221,6 +222,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_alphaBlend = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
+                Name = "BlendState.AlphaBlend",
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
@@ -229,6 +231,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_nonPremultiplied = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState() 
             {
+                Name = "BlendState.NonPremultiplied",
 				ColorSourceBlend = Blend.SourceAlpha,
 				AlphaSourceBlend = Blend.SourceAlpha,
 				ColorDestinationBlend = Blend.InverseSourceAlpha,
@@ -237,29 +240,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			_opaque = new Utilities.ObjectFactoryWithReset<BlendState>(() => new BlendState()
             {
+                Name = "BlendState.Opaque",
 				ColorSourceBlend = Blend.One,
 				AlphaSourceBlend = Blend.One,			    
 				ColorDestinationBlend = Blend.Zero,
 				AlphaDestinationBlend = Blend.Zero
 			});
 		}
-
-        public override string ToString ()
-        {
-            string blendStateName;
-
-            if(this == BlendState.Additive)
-                blendStateName = "Additive";
-            else if (this == BlendState.AlphaBlend)
-                blendStateName = "AlphaBlend";
-            else if (this == BlendState.NonPremultiplied)
-                blendStateName = "NonPremultiplied";
-            else
-                blendStateName = "Opaque";
-
-            return string.Format("{0}.{1}", base.ToString(), blendStateName);
-        }
-
 
 #if OPENGL
         internal void ApplyState(GraphicsDevice device)

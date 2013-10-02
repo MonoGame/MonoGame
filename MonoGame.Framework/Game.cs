@@ -79,7 +79,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 #endif
-
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -235,11 +235,16 @@ namespace Microsoft.Xna.Framework
                     ContentTypeReaderManager.ClearTypeCreators();
 
 #if WINDOWS_PHONE
-                    TouchPanel.ResetState();
-                    Microsoft.Xna.Framework.Audio.SoundEffect.Shutdown();
+                    TouchPanel.ResetState();                    
+#endif
+
+#if WINDOWS_MEDIA_SESSION
+                    Media.MediaManagerState.CheckShutdown();
 #endif
 
 #if DIRECTX
+                    SoundEffect.Shutdown();
+
                     BlendState.ResetStates();
                     DepthStencilState.ResetStates();
                     RasterizerState.ResetStates();
@@ -472,7 +477,7 @@ namespace Microsoft.Xna.Framework
 				DoExiting();
                 break;
             default:
-                throw new NotImplementedException(string.Format(
+                throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
@@ -738,6 +743,10 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
+
+#if DIRECTX
+		    SoundEffect.Shutdown();
+#endif
 
 #if WINDOWS_MEDIA_SESSION
             Media.MediaManagerState.CheckShutdown();

@@ -1,0 +1,153 @@
+<Addin id="MonoGameContent" 
+		namespace="MonoDevelop" 
+		name="MonoGame Content Support" 
+		author="Dean Ellis" 
+		copyright="MSPL" 
+		url="http://www.monogame.net/" 
+		description="MonoGame Compiled Content Support" 
+		category="Mono Game" 
+		version="3.0.0">
+	<Runtime>
+		<Import file="templates/MonoGameContentProject.xpt.xml" />
+		<Import file="templates/MonoGameContentExtensionProject.xpt.xml" />
+		<Import file="templates/SpriteFont.xft.xml" />
+		<Import file="icons/monogame-icon.png"/>
+		<Import file="AssimpNet.dll"/>
+		<Import file="AssimpNet.dll.config"/>
+		<Import file="Lidgren.Network.dll"/>
+		<Import file="ManagedPVRTC.dll"/>
+		<Import file="ManagedPVRTC.dll.config"/>
+		<Import file="MonoGame.Framework.Content.Pipeline.dll"/>
+		<Import file="MonoGame.Framework.dll"/>
+		<!--Import file="MonoMac.dll"/-->
+		<Import file="NAudio.dll"/>
+		<Import file="Nvidia.TextureTools.dll"/>
+		<Import file="Nvidia.TextureTools.dll.config"/>
+		<Import file="SharpFont.dll"/>
+		<Import file="SharpFont.dll.config"/>
+		<Import file="OpenTK.dll"/>
+		<Import file="OpenTK.dll.config"/>
+		<Import file="Tao.Sdl.dll"/>
+		<Import file="Tao.Sdl.dll.config"/>
+		<Import file="SharpDX.D3DCompiler.dll"/>
+		<Import file="SharpDX.dll"/>
+		<!-- Include Native code -->
+		<Import file="libnvtt.dylib"/>
+		<Import file="libnvimage.dylib"/>
+		<Import file="libnvmath.dylib"/>
+		<Import file="libnvcore.dylib"/>
+		<Import file="libpvrtc.dylib"/>
+		<Import file="libfreetype.6.dylib"/>
+		<Import file="libpng15.15.dylib"/>
+		<Import file="nvtt.dll"/>
+		<Import file="pvrtc.dll"/>
+		<Import file="freetype6.dll"/>
+		<Import file="Assimp32.dll"/>
+		<Import file="Assimp64.dll"/>
+		<!-- Make sure we dont scan native dll's otherwise we get errors -->
+		<ScanExclude path="nvtt.dll"/>
+		<ScanExclude path="freetype6.dll"/>
+		<ScanExclude path="pvrtc.dll"/>
+		<ScanExclude path="Assimp32.dll"/>
+		<ScanExclude path="Assimp64.dll"/>
+		<ScanExclude path="libnvtt.dylib"/>
+		<ScanExclude path="libnvimage.dylib"/>
+		<ScanExclude path="libnvmath.dylib"/>
+		<ScanExclude path="libnvcore.dylib"/>
+		<ScanExclude path="libpvrtc.dylib"/>
+		<ScanExclude path="libfreetype.6.dylib"/>
+		<ScanExclude path="libpng15.15.dylib"/>
+		<Import file="exclude.addins"/>
+	</Runtime>
+	<Dependencies>
+		<Addin id="Core" version="4.0" />
+		<Addin id="Ide" version="4.0" />
+		<Addin id="SourceEditor2" version="4.0" />
+		<Addin id="Refactoring" version="4.0" />
+		<Addin id="Autotools" version="4.0" />
+		<Addin id="DesignerSupport" version="4.0" />
+	</Dependencies>
+	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="monogame-icon" file="icons/monogame-icon.png" />
+		<StockIcon stockid="monogame-font" file="icons/monogame-font.png" />
+	</Extension>
+	<Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
+		<DotNetProjectSubtype
+		  guid="{96E2B04D-8817-42c6-938A-82C39BA4D311}" 
+		  type="MonoDevelop.MonoGameContent.MonoGameContentProject" 
+		  extension="contentproj">
+		</DotNetProjectSubtype>
+	</Extension>
+	<Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
+		<ProjectBinding id="MonoGameContent" class="MonoDevelop.MonoGameContent.MonoGameContentProjectBinding" />
+	</Extension>
+	<Extension path="/MonoDevelop/ProjectModel/SerializableClasses">
+                <DataType class="MonoDevelop.MonoGameContent.MonoGameContentProject" />
+        </Extension>
+	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+		<ProjectTemplate id="MonoGameContent" file="templates/MonoGameContentProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameContentExtension" file="templates/MonoGameContentExtensionProject.xpt.xml" />
+	</Extension>
+	<Extension path="/MonoDevelop/Ide/FileTemplates">
+        <FileTemplate id="MonoGameSpriteFont" file="templates/SpriteFont.xft.xml" />
+    </Extension>
+	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">  
+		<ComplexCondition>
+			<Or>
+				<Condition id="ItemType" value="MonoDevelop.MonoGameContent.MonoGameContentProject" />
+			</Or>
+        	<Class class="MonoDevelop.MonoGameContent.MonoGameContentBuildExtension" insertafter="MidStep"/>  
+        </ComplexCondition>
+    </Extension>
+    <Extension path = "/MonoDevelop/ProjectModel/ExtendedProperties">  
+       <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "Importer"  
+                     type = "System.String" />  
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "Processor"  
+                     type = "System.String" />  
+	  <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "Name"  
+                     type = "System.String" /> 
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_TextureFormat"  
+                     type = "System.String" />  
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ResizeToPowerOfTwo"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_PremultiplyAlpha"  
+                     type = "System.Boolean" />  
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ColorKeyEnabled"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_GenerateMipmaps"  
+                     type = "System.Boolean" />
+      <ItemProperty class = "MonoDevelop.Projects.ProjectFile"  
+                     name = "ProcessorParameters_ColorKeyColor"  
+                     type = "System.String" />                                                                                                                                                       
+     </Extension>    
+     <Extension path="/MonoDevelop/DesignerSupport/PropertyProviders">
+		<Class class="MonoDevelop.MonoGameContent.ContentPropertyProvider"/>
+		<Class class="MonoDevelop.MonoGameContent.TextureProcessorPropertyProvider"/>
+	</Extension>
+	<Extension path = "/MonoDevelop/ProjectModel/Gui/ItemOptionPanels/Build">
+		<ComplexCondition>
+			<Or>
+				<Condition id="ItemType" value="MonoDevelop.MonoGameContent.MonoGameContentProject" />
+			</Or>
+			<Section id = "MonoGameContentOptions"
+				_label = "MonoGame Build"
+				class = "MonoDevelop.MonoGameContent.MonoGameContentOptions" fill="true" />
+		</ComplexCondition>
+	</Extension>
+	<Extension path="/MonoDevelop/Core/SupportPackages">
+	<Condition id="PackageNotInstalled" name="monogame-contentpipeline" version="3.0">
+      <Package name="monogame-contentpipeline" version="3.0" clrVersion="Default">
+        <Assembly file="MonoGame.Framework.Content.Pipeline.dll" /> 
+        <Assembly file="MonoGame.Framework.dll" />  
+      </Package>
+    </Condition>
+	</Extension>
+</Addin>
