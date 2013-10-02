@@ -2587,7 +2587,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Added for XNA compatibility.</remarks>
         public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
         {
-            DrawIndexedInstanced(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount, instanceCount);
+            DrawIndexedInstancedPrimitives(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount, instanceCount);
         }
 
 #if PSM
