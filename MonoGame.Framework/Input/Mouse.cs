@@ -63,12 +63,10 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static GameWindow PrimaryWindow;
 
+        private static MouseState _defaultState = new MouseState();
+
 #if (WINDOWS && OPENGL) || LINUX
 	private static OpenTK.Input.MouseDevice _mouse = null;			
-#endif
-
-#if ANDROID
-        private static MouseState _defaultState = new MouseState();
 #endif
 
 #if (WINDOWS && OPENGL)
@@ -197,8 +195,12 @@ namespace Microsoft.Xna.Framework.Input
             // Related discussion: https://github.com/mono/MonoGame/pull/1749
 
             return _defaultState;
+#else
+            if (PrimaryWindow != null)
+                return GetState(PrimaryWindow);
+
+            return _defaultState;
 #endif
-            return GetState(PrimaryWindow);
         }
 
         /// <summary>
