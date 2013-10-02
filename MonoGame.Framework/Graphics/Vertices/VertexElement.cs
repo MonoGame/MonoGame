@@ -101,7 +101,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #if DIRECTX
 
-        internal SharpDX.Direct3D11.InputElement GetInputElement()
+        /// <summary>
+        /// Retreive DirectX input element
+        /// </summary>
+        /// <param name="forInstancing">true if input element is intended for usage per instance</param>
+        /// <returns>DirectX input element</returns>
+        internal SharpDX.Direct3D11.InputElement GetInputElement(bool forInstancing = false)
         {
             var element = new SharpDX.Direct3D11.InputElement();
 
@@ -201,15 +206,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 default:
                     throw new NotSupportedException("Unknown vertex element format!");
-            }
+            }             
 
-            element.Slot = 0;
             element.AlignedByteOffset = _offset;
             
             // Note that instancing is only supported in 
             // feature level 9.3 and above.
-            element.Classification = SharpDX.Direct3D11.InputClassification.PerVertexData;
-            element.InstanceDataStepRate = 0;
+            if (forInstancing)
+            {
+                element.Slot = 1;
+                element.Classification = SharpDX.Direct3D11.InputClassification.PerInstanceData;
+                element.InstanceDataStepRate = 1;
+            }
+            else
+            {
+                element.Slot = 0;
+                element.Classification = SharpDX.Direct3D11.InputClassification.PerVertexData;
+                element.InstanceDataStepRate = 0;
+            }
 
             return element;
         }

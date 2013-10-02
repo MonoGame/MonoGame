@@ -112,6 +112,12 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
+        private VertexBuffer _instanceBuffer;
+        private bool _instanceBufferDirty;
+
+#if DIRECTX
+        private SharpDX.Direct3D11.VertexBufferBinding[] _vertexInstanceBinding = new SharpDX.Direct3D11.VertexBufferBinding[2]; //store instance-vertex binding array, so it would not be recreated on each DrawInstanced call
+#endif
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
 
@@ -1904,6 +1910,27 @@ namespace Microsoft.Xna.Framework.Graphics
             _indexBufferDirty = true;
         }
 
+        /// <summary>
+        /// Set instance buffer for GPU instancing.
+        /// </summary>
+        /// <param name="instanceBuffer">Vertex buffer which contains information of instances</param>
+        /// <remarks>The way instance buffer is set differs from XNA, but is more simple.</remarks>
+        public void SetInstanceBuffer(VertexBuffer instanceBuffer)
+        {
+#if DIRECTX
+            if (GraphicsProfile != Graphics.GraphicsProfile.HiDef)
+                throw new InvalidOperationException("Instancing is not supported on current grpahics profile.");
+
+            if (_instanceBuffer == instanceBuffer)
+                return;
+
+            _instanceBuffer = instanceBuffer;
+            _instanceBufferDirty = true;
+#else
+            throw new NotImplementedException("GPU instancing is not supported on this platform");
+#endif
+        }
+
         public IndexBuffer Indices { set { SetIndexBuffer(value); } get { return _indexBuffer; } }
 
         internal Shader VertexShader
@@ -2010,7 +2037,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public bool ResourcesLost { get; set; }
 
-        internal void ApplyState(bool applyShaders)
+        internal void ApplyState(bool applyShaders, bool applyVertexBuffer = true)
         {
 #if DIRECTX
             // NOTE: This code assumes _d3dContext has been locked by the caller.
@@ -2073,7 +2100,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _indexBufferDirty = false;
             }
 
-            if (_vertexBufferDirty)
+            if (_vertexBufferDirty && applyVertexBuffer)
             {
 #if DIRECTX
                 if (_vertexBuffer != null)
@@ -2099,7 +2126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexShaderDirty)
                 _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
 
-            if (_vertexShaderDirty || _vertexBufferDirty)
+            if (applyVertexBuffer && (_vertexShaderDirty || _vertexBufferDirty))
             {
                 _d3dContext.InputAssembler.InputLayout = GetInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration);
                 _vertexShaderDirty = _vertexBufferDirty = false;
@@ -2144,6 +2171,27 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!_inputLayouts.TryGetValue(key, out layout))
             {
                 layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, decl.GetInputLayout());
+                _inputLayouts.Add(key, layout);
+            }
+
+            return layout;
+        }
+
+        private SharpDX.Direct3D11.InputLayout GetInstancingInputLayout(Shader shader, VertexDeclaration vertexDeclaration, VertexDeclaration instanceDeclaration)
+        {
+            SharpDX.Direct3D11.InputLayout layout;
+
+            // guess it is not the best way to create hash
+            var key = (uint)vertexDeclaration.HashKey + (uint)instanceDeclaration.HashKey + (uint)shader.HashKey;
+            if (!_inputLayouts.TryGetValue(key, out layout))
+            {
+                SharpDX.Direct3D11.InputElement[] vertexLayout = vertexDeclaration.GetInputLayout();
+                SharpDX.Direct3D11.InputElement[] instanceLayout = instanceDeclaration.GetInputLayout(true);
+                SharpDX.Direct3D11.InputElement[] overalLayout = new SharpDX.Direct3D11.InputElement[vertexLayout.Length + instanceLayout.Length];
+                Array.Copy(vertexLayout, 0, overalLayout, 0, vertexLayout.Length);
+                Array.Copy(instanceLayout, 0, overalLayout, vertexLayout.Length, instanceLayout.Length);
+
+                layout = new SharpDX.Direct3D11.InputLayout(_d3dDevice, shader.Bytecode, overalLayout);
                 _inputLayouts.Add(key, layout);
             }
 
@@ -2485,6 +2533,61 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             throw new NotImplementedException("Not implemented");
 #endif
+        }
+
+        /// <summary>
+        /// Draw geometry using index and instance buffers.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
+        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
+        /// <param name="instanceCount">The number of instance to render.</param>
+        /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored. The name of methos depicts the purpose of methos better then XNA's</remarks>
+        public void DrawIndexedInstanced(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
+        {
+#if DIRECTX
+            Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
+            Debug.Assert(_indexBuffer != null, "The index buffer is null!");
+            Debug.Assert(_instanceBuffer != null, "The instance buffer is null!");
+
+            lock (_d3dContext)
+            {
+                ApplyState(true, false);
+
+                if (_vertexBufferDirty || _instanceBufferDirty || _vertexShaderDirty) {
+                    _vertexInstanceBinding[0] = _vertexBuffer.Binding;
+                    _vertexInstanceBinding[1] = _instanceBuffer.Binding;
+                    _d3dContext.InputAssembler.SetVertexBuffers(0, _vertexInstanceBinding);
+                    _d3dContext.InputAssembler.InputLayout = GetInstancingInputLayout(_vertexShader, _vertexBuffer.VertexDeclaration, _instanceBuffer.VertexDeclaration);
+                    _vertexBufferDirty = _instanceBufferDirty = _vertexShaderDirty = false;
+                }
+
+                _d3dContext.InputAssembler.PrimitiveTopology = ToPrimitiveTopology(primitiveType);
+                var vertexCount = GetElementCountArray(PrimitiveType.TriangleList, primitiveCount);
+                _d3dContext.DrawIndexedInstanced(vertexCount, instanceCount, startIndex, baseVertex, 0);
+            }
+#else
+            throw new NotImplementedException("GPU instancing is not supported on this platform.");
+#endif
+        }
+
+        /// <summary>
+        /// Draw geometry using index and instance buffers.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="baseVertex">Used to offset the vertex range indexed from the vertex buffer.</param>
+        /// <param name="minVertexIndex">A hint of the lowest vertex indexed relative to baseVertex.</param>
+        /// <param name="numVertices">An hint of the maximum vertex indexed.</param>
+        /// <param name="startIndex">The index within the index buffer to start drawing from.</param>
+        /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
+        /// <param name="instanceCount">The number of instance to render.</param>
+        /// <remarks>Added for XNA compatibility.</remarks>
+        public void DrawInstanced(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
+        {
+            DrawIndexedInstanced(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount, instanceCount);
         }
 
 #if PSM
