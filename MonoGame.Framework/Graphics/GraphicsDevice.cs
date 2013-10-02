@@ -2546,7 +2546,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         /// <param name="instanceCount">The number of instance to render.</param>
         /// <remarks>Note that minVertexIndex and numVertices are unused in MonoGame and will be ignored. The name of methos depicts the purpose of methos better then XNA's</remarks>
-        public void DrawIndexedInstanced(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
+        public void DrawIndexedInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
         {
 #if DIRECTX
             Debug.Assert(_vertexBuffer != null, "The vertex buffer is null!");
@@ -2585,7 +2585,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="primitiveCount">The number of primitives to render from the index buffer.</param>
         /// <param name="instanceCount">The number of instance to render.</param>
         /// <remarks>Added for XNA compatibility.</remarks>
-        public void DrawInstanced(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
+        public void DrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int minVertexIndex, int numVertices, int startIndex, int primitiveCount, int instanceCount)
         {
             DrawIndexedInstanced(primitiveType, baseVertex, minVertexIndex, numVertices, startIndex, primitiveCount, instanceCount);
         }
