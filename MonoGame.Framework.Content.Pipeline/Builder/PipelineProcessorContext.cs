@@ -53,7 +53,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var processedObject = processor.Process(input, processContext);
            
             // Add its dependencies and built assets to ours.
-            _pipelineEvent.Dependencies.AddRangeUnique(processContext._pipelineEvent.Dependancies);
+            _pipelineEvent.Dependencies.AddRangeUnique(processContext._pipelineEvent.Dependencies);
             _pipelineEvent.BuildAsset.AddRangeUnique(processContext._pipelineEvent.BuildAsset);
 
             return (TOutput)processedObject;
