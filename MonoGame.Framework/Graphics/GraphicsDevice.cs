@@ -1877,9 +1877,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
                 GraphicsExtensions.CheckGLError();
-                // Disabling the vertex attrib array appears to cause rendering issues
-                //GL.DisableVertexAttribArray(slot);
-                //GraphicsExtensions.CheckGLError();
                 _vertexBuffersDirty[slot] = true;
             }
 #endif
@@ -2202,15 +2199,6 @@ namespace Microsoft.Xna.Framework.Graphics
                             GL.EnableVertexAttribArray(slot);
                             GraphicsExtensions.CheckGLError();
                         }
-                        else
-                        {
-                            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-                            GraphicsExtensions.CheckGLError();
-                            // Disabling the vertex attrib array appears to cause issues
-                            //GL.DisableVertexAttribArray(slot);
-                            //GraphicsExtensions.CheckGLError();
-                        }
-
                         _vertexBuffersDirty[slot] = false;
                     }
                 }
