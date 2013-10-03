@@ -36,8 +36,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public override void AddDependency(string filename)
         {
-            if (!_pipelineEvent.Dependancies.Contains(filename))
-                _pipelineEvent.Dependancies.Add(filename);
+            if (!_pipelineEvent.Dependencies.Contains(filename))
+                _pipelineEvent.Dependencies.Add(filename);
         }
 
         public override void AddOutputFile(string filename)
@@ -52,8 +52,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters } );
             var processedObject = processor.Process(input, processContext);
            
-            // Add its dependancies and built assets to ours.
-            _pipelineEvent.Dependancies.AddRangeUnique(processContext._pipelineEvent.Dependancies);
+            // Add its dependencies and built assets to ours.
+            _pipelineEvent.Dependencies.AddRangeUnique(processContext._pipelineEvent.Dependencies);
             _pipelineEvent.BuildAsset.AddRangeUnique(processContext._pipelineEvent.BuildAsset);
 
             return (TOutput)processedObject;
