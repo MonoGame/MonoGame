@@ -652,19 +652,35 @@ namespace Microsoft.Xna.Framework.Graphics
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
                 lock (d3dContext)
                 {
+                    int recWidth;
                     // Copy the data from the GPU to the staging texture.
                     if (rect.HasValue)
                     {
                         d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
+						recWidth = rect.Value.Width;
                     }
                     else
+					{
                         d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
+                        recWidth = width;
+                    }
 
-                    // Copy the data to the array.
-                    SharpDX.DataStream stream;
-                    d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
-                    stream.ReadRange(data, startIndex, elementCount);
-                    stream.Dispose();
+                    int mipSize = 0;
+                    var box = d3dContext.MapSubresource(stagingTex, 0, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out mipSize);
+                    
+                    var dataPtr = box.DataPointer;
+                    var start = startIndex;
+                    var elementsToGo = elementCount;
+                    for (int i = 0; i < height; i++)
+                    {
+                        var count = Math.Min(recWidth, elementsToGo);
+                        SharpDX.Utilities.Read(dataPtr, data, start, count);
+                        dataPtr += box.RowPitch;
+                        start += recWidth;
+                        elementsToGo -= recWidth;
+                        if (elementsToGo <= 0)
+                            break;
+                    }
                 }
 
 #else
