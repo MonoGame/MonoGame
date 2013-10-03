@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project name="Installer Build Script" default="build" basedir=".">
+	<description>Default Addins Automated Build script</description>
+	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+  <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
+
+  <target name="checkos" description="check the operating system">
+    <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
+    <if test="${os == 'Unix'}">
+      <if test="${directory::exists('/Applications') and directory::exists('/Library')}">
+        <property name="os" value="MacOS"/>
+        <if test="${not directory::exists(mdtooldir)}">
+          <property name="mdtooldir" value="${path::get-full-path('/Applications/Xamarin Studio.app/Contents/MacOS')}"/>
+        </if>
+      </if>
+    </if>
+    <if test="${os == 'Win32NT'}">
+      <property name="mdtooldir" value="${path::get-full-path('c:\Program Files (x86)\Xamarin Studio\bin')}"/>
+    </if>
+    <echo message="mdtool : ${mdtooldir}"/>
+    <echo message="Detected : ${os}"/>
+  </target>
+
+	<target name="build" description="Build Addins" depends="checkos">
+    <if test="${os == 'Win32NT'}">
+      <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Win.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Win.sln /t:Build /p:Configuration=Release" />
+      <if test="${directory::exists(mdtooldir)}">
+        <exec program="mdtool " basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\MonoDevelop.MonoGameContent.dll"/>
+      </if>
+    </if>
+    <if test="${os == 'MacOS'}">
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent/bin/Release/MonoDevelop.MonoGameContent.dll"/>
+    </if>
+  </target>
+
+
+	
+	
+</project>

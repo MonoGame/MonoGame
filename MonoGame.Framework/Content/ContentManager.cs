@@ -68,6 +68,23 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
+	static List<char> targetPlatformIdentifiers = new List<char>()
+        {
+            'w', // Windows
+            'x', // Xbox360
+            'm', // WindowsPhone
+            'i', // iOS
+            'a', // Android
+            'l', // Linux
+            'X', // MacOSX
+            'W', // WindowsStoreApp
+            'n', // NativeClient
+            'u', // Ouya
+            'p', // PlayStationMobile
+            'M', // WindowsPhone8
+            'r', // RaspberryPi
+        };
+
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
@@ -419,7 +436,7 @@ namespace Microsoft.Xna.Framework.Content
             byte platform = xnbReader.ReadByte();
 
             if (x != 'X' || n != 'N' || b != 'B' ||
-                !(platform == 'w' || platform == 'x' || platform == 'm'))
+                !(targetPlatformIdentifiers.Contains((char)platform)))
             {
                 throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
             }

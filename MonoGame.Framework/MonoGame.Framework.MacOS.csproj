@@ -233,7 +233,6 @@
     <Compile Include="MacOS\GameWindow.cs" />
     <Compile Include="PreparingDeviceSettingsEventArgs.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />

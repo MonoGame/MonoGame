@@ -24,7 +24,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             Processor = string.Empty;
             Parameters = new OpaqueDataDictionary();
             ParametersXml = new List<Pair>();
-            Dependancies = new List<string>();
+            Dependencies = new List<string>();
             BuildAsset = new List<string>();
         }
 
@@ -56,7 +56,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [XmlElement("Parameters")]
         public List<Pair> ParametersXml { get; set; }
 
-        public List<string> Dependancies { get; set; }
+        public List<string> Dependencies { get; set; }
 
         public List<string> BuildAsset { get; set; }
 
@@ -122,7 +122,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 return true;
 
             // Are any of the dependancy files newer than the dest file?
-            foreach (var depFile in cachedEvent.Dependancies)
+            foreach (var depFile in cachedEvent.Dependencies)
             {
                 if (File.GetLastWriteTime(depFile) >= destWriteTime)
                     return true;
