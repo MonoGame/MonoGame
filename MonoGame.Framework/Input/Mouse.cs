@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static GameWindow PrimaryWindow;
 
-        private static MouseState _defaultState = new MouseState();
+        private static readonly MouseState _defaultState = new MouseState();
 
 #if (WINDOWS && OPENGL) || LINUX
 	private static OpenTK.Input.MouseDevice _mouse = null;			
