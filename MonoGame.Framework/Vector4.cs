@@ -483,7 +483,7 @@ namespace Microsoft.Xna.Framework
         
         public override string ToString()
         {
-            return "{X:" + this.X + " Y:" + this.Y + " Z:" + this.Z + "}";
+            return "{X:" + this.X + " Y:" + this.Y + " Z:" + this.Z + " W:" + this.W + "}";
         }
 
         public static void Transform(ref Vector4 vector, ref Matrix matrix, out Vector4 result)
