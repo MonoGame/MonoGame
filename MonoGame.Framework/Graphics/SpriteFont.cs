@@ -267,14 +267,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (flippedHorz)
                 {
                     origin.X *= -1;
-                    scale.X *= -1;
                     flipAdjustment.X = -size.X;
                 }
 
                 if (flippedVert)
                 {
                     origin.Y *= -1;
-                    scale.Y *= -1;
                     flipAdjustment.Y = LineSpacing - size.Y;
                 }
             }
@@ -284,7 +282,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Matrix transformation, temp;
             Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
-            Matrix.CreateScale(scale.X, scale.Y, 1f, out temp);
+            Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f, out temp);
             Matrix.Multiply(ref transformation, ref temp, out transformation);
             Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
             Matrix.Multiply(ref temp, ref transformation, out transformation);
@@ -362,11 +360,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 var destRect = new Vector4( p.X, p.Y, 
                                             currentGlyph.BoundsInTexture.Width * scale.X,
                                             currentGlyph.BoundsInTexture.Height * scale.Y);
-
-                // TODO: We're passing SpriteEffects thru here unchanged, but
-                // it seems we're applyting the flips ourselves above.
-                //
-                // This just might be a bug!
 
 				spriteBatch.DrawInternal(
                     _texture, destRect, currentGlyph.BoundsInTexture,
