@@ -290,7 +290,7 @@ namespace Microsoft.Xna.Framework
 
         public override int GetHashCode()
         {
-            return this.X.GetHashCode() + this.Y.GetHashCode() + this.Z.GetHashCode() + this.W.GetHashCode();
+            return (((int)(X * 10) & 0xFF) << 24) | (((int)(Y * 10) & 0xFF) << 16) | (((int)(Z * 10) & 0xFF) << 8) | ((int)(W * 10) & 0xFF);
         }
 
         public static Vector4 Hermite(Vector4 value1, Vector4 tangent1, Vector4 value2, Vector4 tangent2, float amount)
