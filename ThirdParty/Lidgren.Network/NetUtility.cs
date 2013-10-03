@@ -263,7 +263,9 @@ namespace Lidgren.Network
 			{
 				if (unicastAddress != null && unicastAddress.Address != null && unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
 				{
+#if !MONOMAC
 					mask = unicastAddress.IPv4Mask;
+#endif
 					return unicastAddress.Address;
 				}
 			}

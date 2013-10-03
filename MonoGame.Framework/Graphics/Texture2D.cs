@@ -219,7 +219,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * format.Size();
                             break;
                         default:
-                            throw new NotImplementedException();
+                            throw new NotSupportedException();
                     }
 
                     GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, glInternalFormat,
@@ -823,7 +823,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                     ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4) throw new NotImplementedException();
+                if (bitmapData.Stride != image.Width * 4) 
+                    throw new NotImplementedException();
                 Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
                 image.UnlockBits(bitmapData);
 

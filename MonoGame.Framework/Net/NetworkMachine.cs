@@ -63,10 +63,12 @@ namespace Microsoft.Xna.Framework.Net
 		#endregion
 		
 		#region Methods
+        /*
 		public void RemoveFromSession ()
 		{
 			throw new NotImplementedException();
 		}
+        */
 		#endregion
 		
 		#region Methods

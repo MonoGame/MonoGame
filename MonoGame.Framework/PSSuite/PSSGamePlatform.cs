@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-			throw new NotImplementedException();
+            throw new NotSupportedException("The PSM platform does not support asynchronous run loops");
 		}
 
         public override bool BeforeUpdate(GameTime gameTime)

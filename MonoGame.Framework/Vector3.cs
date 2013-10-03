@@ -305,12 +305,20 @@ namespace Microsoft.Xna.Framework
 
         public override bool Equals(object obj)
         {
-            return (obj is Vector3) ? this == (Vector3)obj : false;
+            if (!(obj is Vector3))
+                return false;
+
+            var other = (Vector3)obj;
+            return  X == other.X &&
+                    Y == other.Y &&
+                    Z == other.Z;
         }
 
         public bool Equals(Vector3 other)
         {
-            return this == other;
+            return  X == other.X && 
+                    Y == other.Y &&
+                    Z == other.Z;
         }
 
         public override int GetHashCode()

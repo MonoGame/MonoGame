@@ -21,8 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly SwapChain _swapChain;
 
-        // TODO: We need to add vsync control to this class.
-
+        public PresentInterval PresentInterval;
 
         public SwapChainRenderTarget(   GraphicsDevice graphicsDevice,
                                         IntPtr windowHandle,
@@ -92,6 +91,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 IsWindowed = true,
             };
 
+            PresentInterval = presentInterval;
+
             // Once the desired swap chain description is configured, it must 
             // be created on the same adapter as our D3D Device
             var d3dDevice = graphicsDevice._d3dDevice;
@@ -103,11 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
             using (var dxgiFactory = dxgiAdapter.GetParent<Factory1>())
             {
                 _swapChain = new SwapChain(dxgiFactory, dxgiDevice, desc);
-
-                // Ensure that DXGI does not queue more than one frame at a time. This 
-                // both reduces latency and ensures that the application will only render 
-                // after each VSync, minimizing power consumption.
-                dxgiDevice.MaximumFrameLatency = 1;
             }
 
             // Obtain the backbuffer for this window which will be the final 3D rendertarget.
@@ -160,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 try
                 {
-                    _swapChain.Present(1, PresentFlags.None);
+                    _swapChain.Present(PresentInterval.GetFrameLatency(), PresentFlags.None);
                 }
                 catch (SharpDX.SharpDXException)
                 {

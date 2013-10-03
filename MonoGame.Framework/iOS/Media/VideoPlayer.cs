@@ -63,6 +63,7 @@ namespace Microsoft.Xna.Framework.Media
                 throw new InvalidOperationException("No iOSGamePlatform instance was available");
         }
 
+        /*
         public Texture2D GetTexture()
         {
 			throw new NotImplementedException();
@@ -72,7 +73,8 @@ namespace Microsoft.Xna.Framework.Media
         {
 			throw new NotImplementedException();
         }
-		
+		*/
+
 		 public MediaState State
         {
             get
