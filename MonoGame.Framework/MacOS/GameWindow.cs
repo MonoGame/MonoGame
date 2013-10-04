@@ -559,27 +559,7 @@ namespace Microsoft.Xna.Framework
 				handler(this, new KeysEventArgs(kk));
 			}
 		}
-
-		protected void OnTextInput(TextInputEventArgs e)
-		{
-			if (e == null) 
-			{
-				throw new ArgumentNullException("e");
-			}
-			
-			if (TextInput != null) 
-			{
-				TextInput.Invoke(this, e);
-			}
-		}
 		
-		/// <summary>
-		/// Use this event to retrieve text for objects like textbox's.
-		/// This event is not raised by noncharacter keys.
-		/// This event also supports key repeat.
-		/// </summary>
-		public event EventHandler<TextInputEventArgs> TextInput;
-
 		List<Keys> _flags = new List<Keys> ();
 
 		public override void FlagsChanged (NSEvent theEvent)
