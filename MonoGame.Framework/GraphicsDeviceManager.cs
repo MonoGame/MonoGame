@@ -609,11 +609,13 @@ namespace Microsoft.Xna.Framework
             // Set the veiwport so the (potentially) resized client bounds are drawn in the middle of the screen
             _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
 
-            _game.Window.ClientBounds = newClientBounds;
-
             // Touch panel needs latest buffer size for scaling
             TouchPanel.DisplayWidth = newClientBounds.Width;
             TouchPanel.DisplayHeight = newClientBounds.Height;
+
+            // Must be set after the touch panel is updated,
+            // because it raises a notification which may cause the bounds to be changed again.
+            _game.Window.ClientBounds = newClientBounds;
 
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif

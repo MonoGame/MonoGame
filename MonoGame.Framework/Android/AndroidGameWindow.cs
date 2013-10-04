@@ -387,9 +387,14 @@ namespace Microsoft.Xna.Framework
 			}
             internal set
             {
-                clientBounds = value;
-                //if(ClientSizeChanged != null)
-                //    ClientSizeChanged(this, EventArgs.Empty);
+                if (clientBounds != value)
+                {
+                    clientBounds = value;
+                    if (ClientSizeChanged != null)
+                    {
+                        ClientSizeChanged(this, EventArgs.Empty);
+                    }
+                }
             }
 		}
 		
