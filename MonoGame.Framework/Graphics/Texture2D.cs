@@ -775,11 +775,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 image.Recycle();
 
-                // Convert from ARGB to ABGR
+                // Convert from ARGB to ABGR and apply alpha
                 for (int i = 0; i < width * height; ++i)
                 {
                     uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+                    var alpha = pixel >> 24;
+                    pixels[i] =
+                        (int)(
+                        (pixel & 0xFF000000) | //A
+                        ((((pixel & 0x000000FF) * alpha) >> 8) << 16) | //B
+                        ((((pixel & 0x0000FF00) * alpha) >> 8) & 0x0000FF00) | //G
+                        ((((pixel & 0x00FF0000) * alpha) >> 24) & 0x000000FF) //R
+                        );
                 }
 
                 Texture2D texture = null;
@@ -855,11 +862,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 int[] pixels = new int[width * height];
                 image.GetPixels(pixels, 0, width, 0, 0, width, height);
 
-                // Convert from ARGB to ABGR
+                // Convert from ARGB to ABGR and apply alpha
                 for (int i = 0; i < width * height; ++i)
                 {
                     uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+                    var alpha = pixel >> 24;
+                    pixels[i] =
+                        (int)(
+                            (pixel & 0xFF000000) | //A
+                            ((((pixel & 0x000000FF) * alpha) >> 8) << 16) | //B
+                            ((((pixel & 0x0000FF00) * alpha) >> 8) & 0x0000FF00) | //G
+                            ((((pixel & 0x00FF0000) * alpha) >> 24) & 0x000000FF) //R
+                            );
                 }
 
                 this.SetData<int>(pixels);
