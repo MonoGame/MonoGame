@@ -56,15 +56,13 @@
     </Reference>
     <Reference Include="Mono.Posix" />
     <Reference Include="MonoDevelop.Core">
-      <HintPath>..\..\..\..\..\..\..\..\opt\monodevelop\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.Core.dll</HintPath>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
-      <HintPath>\Applications\Xamarin Studio.app\Contents\Linux\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
-      <Private>False</Private>
-      <Package>monodevelop-core-addins</Package>
+      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.DesignerSupport.dll</HintPath>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
-      <HintPath>..\..\..\..\..\..\..\..\opt\monodevelop\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.Ide.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -112,14 +110,6 @@
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Link>Nvidia.TextureTools.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.so">
-      <Link>libfreetype.6.so</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng15.15.so">
-      <Link>libpng15.15.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
@@ -170,20 +160,14 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll">
-      <Link>SharpDX.D3DCompiler.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll">
-      <Link>SharpDX.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="exclude.addins">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MonoDevelop.MonoGameContent.addin.xml" />
+    <EmbeddedResource Include="MonoDevelop.MonoGameContent.addin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
       <LogicalName>gui.stetic</LogicalName>
     </EmbeddedResource>
@@ -193,5 +177,55 @@
       <Project>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</Project>
       <Name>MonoGame.Framework.Content.Pipeline.Linux</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.so.6">
+      <Link>libfreetype.so.6</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\assimp\AssimpNet.dll">
+      <Link>AssimpNet.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\NAudio\NAudio.dll">
+      <Link>NAudio.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll">
+      <Link>SharpDX.D3DCompiler.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll">
+      <Link>SharpDX.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+      <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+      <Link>libfreetype.6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+      <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
