@@ -179,8 +179,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.so.6">
-      <Link>libfreetype.so.6</Link>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.so">
+      <Link>libfreetype.6.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\..\..\ThirdParty\Libs\assimp\AssimpNet.dll">
@@ -225,6 +225,10 @@
     </None>
     <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
       <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng12.so">
+      <Link>libpng12.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
