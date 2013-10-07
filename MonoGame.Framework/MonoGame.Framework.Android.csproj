@@ -273,7 +273,6 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
@@ -399,7 +398,6 @@
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\KeyboardState.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Android\Media\Song.cs" />

@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public Vector3 Position;
         
         [DataMember]
-		public VertexElementColor Color;
+		public Color Color;
 
 		public static readonly VertexDeclaration VertexDeclaration;
 
