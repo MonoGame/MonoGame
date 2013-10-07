@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
-                throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
+                throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements, you are trying to use " + indexElementSize + " bits");
             _buffer = new ushort[indexCount];
 #else
             Threading.BlockOnUIThread(GenerateIfRequired);
@@ -96,6 +96,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
         {
+#if PSM
+            if(type == typeof(int) || type == typeof(uint)) {
+                return(IndexElementSize.ThirtyTwoBits);
+            }
+            else if(type == typeof(short) || type == typeof(ushort)) {
+                return(IndexElementSize.SixteenBits);
+            }
+            else {
+                throw(new NotSupportedException("Type " + type + " is not supported for IndexElementSize."));
+            }
+#else            
             switch (Marshal.SizeOf(type))
             {
                 case 2:
@@ -107,6 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 default:
                     throw new ArgumentOutOfRangeException("Index buffers can only be created for types that are sixteen or thirty two bits in length");
             }
+#endif
         }
 
         /// <summary>

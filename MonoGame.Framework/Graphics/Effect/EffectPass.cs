@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if PSM
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 
-            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+	#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
 
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
@@ -159,7 +159,17 @@ namespace Microsoft.Xna.Framework.Graphics
             Sce.PlayStation.Core.Matrix4 matrix4 = PSSHelper.ToPssMatrix4(data);
             matrix4 = matrix4.Transpose (); //When .Data is set the matrix is transposed, we need to do it again to undo it
             _shaderProgram.SetUniformValue(0, ref matrix4);
-#endif
+            
+            if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
+                _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
+
+/* Kevin G's PR1604
+	   foreach (var parameter in _effect.Parameters) {
+                if (parameter.InternalSet != null)
+                    parameter.InternalSet(parameter, _shaderProgram);                
+            }
+*/
+	#endif
         }
 		
     }

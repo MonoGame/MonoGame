@@ -142,24 +142,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
 
             // Copy the mutable members of the effect.
-            Parameters = cloneSource.Parameters.Clone();
-            Techniques = cloneSource.Techniques.Clone(this);
+            if(cloneSource.Parameters != null)
+                Parameters = cloneSource.Parameters.Clone();
+            if(cloneSource.Techniques != null)
+                Techniques = cloneSource.Techniques.Clone(this);
 
             // Make a copy of the immutable constant buffers.
-            ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
-            for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
-                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
-
-            // Find and set the current technique.
-            for (var i = 0; i < cloneSource.Techniques.Count; i++)
-            {
-                if (cloneSource.Techniques[i] == cloneSource.CurrentTechnique)
-                {
-                    CurrentTechnique = Techniques[i];
-                    break;
-                }
+            if(cloneSource.ConstantBuffers != null) {
+                ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
+                for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
+                    ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
             }
-
+            if(Techniques != null)
+                CurrentTechnique = Techniques[0];
+            
             // Take a reference to the original shader list.
             _shaders = cloneSource._shaders;
         }
@@ -502,7 +498,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
+			var effectPass = new EffectPass(this, "Pass", null, null, null, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
+// This was Kevin G's from PR1604
+//			var effectPass = new EffectPass(this, "Pass", null, null, null, null, null, EffectAnnotationCollection.Empty);
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
             
@@ -511,7 +509,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			{	
                 parametersArray[i]= EffectParameterForUniform(shaderProgram, i);
 			}
-			
+            
+			/*CONFLICT*/
 			#warning Hacks for BasicEffect as we don't have these parameters yet
             parametersArray[shaderProgram.UniformCount] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
@@ -527,12 +526,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
 
             Parameters = new EffectParameterCollection(parametersArray);
-                       
-            EffectPass []effectsPassArray = new EffectPass[1];
+            
+            EffectPass[] effectsPassArray = new EffectPass[1];
             effectsPassArray[0] = effectPass;
             var effectPassCollection = new EffectPassCollection(effectsPassArray);            
-            
-            EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
+
+            EffectTechnique[] effectTechniqueArray = new EffectTechnique[1]; 
             effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
             Techniques = new EffectTechniqueCollection(effectTechniqueArray);
             
@@ -550,24 +549,66 @@ namespace Microsoft.Xna.Framework.Graphics
             
             //EffectParameter.Semantic => COLOR0 / POSITION0 etc
    
+            EffectParameter result = null;
+            
             //FIXME: bufferOffset in below lines is 0 but should probably be something else
             switch (type)
             {
             case ShaderUniformType.Float4x4:
-                return new EffectParameter(
+                result = new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
-            case ShaderUniformType.Float4:
-                return new EffectParameter(
+                    4, 4, "float4x4",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
+                result.InternalSet = (p, sp) => {
+                    var pssm = PSSHelper.ToPssMatrix4((float[])p.Data);
+                    pssm = pssm.Transpose();
+                    sp.SetUniformValue(index, ref pssm);
+                };
+                break;
+            case ShaderUniformType.Float:
+                result = new EffectParameter(
+                    EffectParameterClass.Scalar, EffectParameterType.Single, name,
+                    1, 1, "float",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[1]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float)p.Data);
+                break;
+            case ShaderUniformType.Float2:
+                result = new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+                    2, 1, "float2",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[2]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
+            case ShaderUniformType.Float3:
+                result = new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    3, 1, "float3",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
+            case ShaderUniformType.Float4:
+                result = new EffectParameter(
+                    EffectParameterClass.Vector, EffectParameterType.Single, name,
+                    4, 1, "float4",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+                result.InternalSet = (p, sp) =>
+                    sp.SetUniformValue(index, (float[])p.Data);
+                break;
             case ShaderUniformType.Sampler2D:
-                return new EffectParameter(
+                result = new EffectParameter(
                     EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
+                    1, 1, "texture2d",
+                    EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
+                // FIXME: No InternalSet
+                break;
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }
+            
+            return result;
         }
         
 #endif

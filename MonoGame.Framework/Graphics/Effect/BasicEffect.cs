@@ -437,7 +437,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         void CacheEffectParameters(BasicEffect cloneSource)
         {
-            textureParam                = Parameters["Texture"];
+            #if !PSM
+                textureParam                = Parameters["Texture"];
+            #else
+                textureParam                = Parameters["Texture0"];
+            #endif
             diffuseColorParam           = Parameters["DiffuseColor"];
             emissiveColorParam          = Parameters["EmissiveColor"];
             specularColorParam          = Parameters["SpecularColor"];
