@@ -234,18 +234,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.Aac:
 #if WINDOWS
-		    reader.Position = 0;
-		    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
-		    if (mediaType == null) {
-			    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
-		    }
-		    using (var encoder = new MediaFoundationEncoder (mediaType)) {
-			    encoder.Encode (targetFileName, reader);
-		    } 
-rtAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
-					throw new InvalidDataException("Failed to convert to AAC");
-				}
-
+				    reader.Position = 0;
+				    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
+				    if (mediaType == null) {
+					    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
+				    }
+				    using (var encoder = new MediaFoundationEncoder (mediaType)) {
+					    encoder.Encode (targetFileName, reader);
+				    } 
+#elif LINUX
+					// TODO: Code for Linux convertion
+#else
+					if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
+						throw new InvalidDataException("Failed to convert to AAC");
+					}
 #endif
 				break;
 
