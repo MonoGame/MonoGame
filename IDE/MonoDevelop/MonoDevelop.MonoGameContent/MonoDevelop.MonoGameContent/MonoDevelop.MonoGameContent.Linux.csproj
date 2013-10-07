@@ -56,13 +56,15 @@
     </Reference>
     <Reference Include="Mono.Posix" />
     <Reference Include="MonoDevelop.Core">
-      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoDevelop.DesignerSupport">
-      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.DesignerSupport.dll</HintPath>
+      <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
-      <HintPath>..\..\..\..\ThirdParty\Libs\MonoDevelop\Linux\MonoDevelop.Ide.dll</HintPath>
+      <HintPath>\usr\local\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MonoDevelop.DesignerSupport">
+      <HintPath>\usr\local\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
