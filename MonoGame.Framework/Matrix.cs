@@ -883,14 +883,29 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateScale(Vector3 scales)
         {
             Matrix result;
-            CreateScale(scales.X, scales.Y, scales.Z, out result);
+            CreateScale(ref scales, out result);
             return result;
         }
 
 
         public static void CreateScale(ref Vector3 scales, out Matrix result)
         {
-            CreateScale(scales.X, scales.Y, scales.Z, out result);
+            result.M11 = scales.X;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
+            result.M21 = 0;
+            result.M22 = scales.Y;
+            result.M23 = 0;
+            result.M24 = 0;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = scales.Z;
+            result.M34 = 0;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
         }
 
         public static Matrix CreateTranslation(float xPosition, float yPosition, float zPosition)
@@ -903,7 +918,22 @@ namespace Microsoft.Xna.Framework
 
         public static void CreateTranslation(ref Vector3 position, out Matrix result)
         {
-            CreateTranslation(position.X, position.Y, position.Z, out result);
+            result.M11 = 1;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
+            result.M21 = 0;
+            result.M22 = 1;
+            result.M23 = 0;
+            result.M24 = 0;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = 1;
+            result.M34 = 0;
+            result.M41 = xPosition;
+            result.M42 = yPosition;
+            result.M43 = zPosition;
+            result.M44 = 1;
         }
 
 
