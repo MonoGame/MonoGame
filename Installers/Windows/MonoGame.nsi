@@ -14,16 +14,16 @@ SetCompressor /SOLID /FINAL lzma
 
 !define MUI_UNICON "${FrameworkPath}\monogame.ico"
 
-Name '${APPNAME} ${VERSION}'
-OutFile '${INSTALLERFILENAME}Installer-${VERSION}.exe'
+Name '${APPNAME} ${INSTALLERVERSION}'
+OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development Tools"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2013"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "ï¿½ Copyright MonoGame 2013"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -229,6 +229,25 @@ Section "Visual Studio 2012 Templates" VS2012
   CannotInstallTemplates:
 
     DetailPrint "Visual Studio 2012 not found"
+  EndTemplates:
+
+SectionEnd
+
+Section "Visual Studio 2013 Templates" VS2013
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    ; Set output path to the installation directory.
+    SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
+
+    ; install the Templates for MonoDevelop
+    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
+    ; Install the VS 2010 templates as well 
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+
+    DetailPrint "Visual Studio 2013 not found"
   EndTemplates:
 
 SectionEnd

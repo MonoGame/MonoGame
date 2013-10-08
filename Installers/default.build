@@ -11,7 +11,8 @@
 
         <echo append="false" file="Windows/header.nsh">
 !define FrameworkPath "${project::get-base-directory()}"
-!define VERSION "3.2"
+!define VERSION "3.0"
+!define INSTALLERVERSION "3.2"
 !define REVISION "0.0"
         </echo>
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">
