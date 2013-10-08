@@ -930,9 +930,9 @@ namespace Microsoft.Xna.Framework
             result.M32 = 0;
             result.M33 = 1;
             result.M34 = 0;
-            result.M41 = xPosition;
-            result.M42 = yPosition;
-            result.M43 = zPosition;
+            result.M41 = position.X;
+            result.M42 = position.Y;
+            result.M43 = position.Z;
             result.M44 = 1;
         }
 
@@ -940,7 +940,7 @@ namespace Microsoft.Xna.Framework
         public static Matrix CreateTranslation(Vector3 position)
         {
 			Matrix result;
-            CreateTranslation(xPosition, yPosition, zPosition, out result);
+            CreateTranslation(ref position, out result);
 			return result;
         }
 
