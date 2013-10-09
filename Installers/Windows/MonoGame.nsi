@@ -331,6 +331,7 @@ Section "Uninstall"
   
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}"
   RMDir /r "$SMPROGRAMS\MonoGame"
 
