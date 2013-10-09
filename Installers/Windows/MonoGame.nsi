@@ -23,7 +23,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Copyright MonoGame 2013"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "ï¿½ Copyright MonoGame 2013"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -233,6 +233,25 @@ Section "Visual Studio 2012 Templates" VS2012
 
 SectionEnd
 
+Section "Visual Studio 2013 Templates" VS2013
+
+  IfFileExists `$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    ; Set output path to the installation directory.
+    SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
+
+    ; install the Templates for MonoDevelop
+    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
+    ; Install the VS 2010 templates as well 
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+
+    DetailPrint "Visual Studio 2013 not found"
+  EndTemplates:
+
+SectionEnd
+
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\MonoGame
@@ -312,6 +331,7 @@ Section "Uninstall"
   
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}"
   RMDir /r "$SMPROGRAMS\MonoGame"
 

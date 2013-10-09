@@ -32,6 +32,13 @@
 		<Import file="SharpDX.D3DCompiler.dll"/>
 		<Import file="SharpDX.dll"/>
 		<!-- Include Native code -->
+		<Import file="libnvtt.so"/>
+		<Import file="libnvimage.so"/>
+		<Import file="libnvmath.so"/>
+		<Import file="libnvcore.so"/>
+		<Import file="libPVRTexLib.a"/>
+		<Import file="libfreetype.6.so"/>
+		<Import file="libpng12.so"/>
 		<Import file="libnvtt.dylib"/>
 		<Import file="libnvimage.dylib"/>
 		<Import file="libnvmath.dylib"/>
@@ -50,6 +57,12 @@
 		<ScanExclude path="pvrtc.dll"/>
 		<ScanExclude path="Assimp32.dll"/>
 		<ScanExclude path="Assimp64.dll"/>
+		<ScanExclude path="libnvtt.so"/>
+		<ScanExclude path="libnvimage.so"/>
+		<ScanExclude path="libnvmath.so"/>
+		<ScanExclude path="libnvcore.so"/>
+		<ScanExclude path="libpvrtc.a"/>
+		<ScanExclude path="libpng12.so"/>
 		<ScanExclude path="libnvtt.dylib"/>
 		<ScanExclude path="libnvimage.dylib"/>
 		<ScanExclude path="libnvmath.dylib"/>
