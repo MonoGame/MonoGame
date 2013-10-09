@@ -909,14 +909,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset = (row * (int)pixelWidth * 4) + (col * 4);
 
                     byte B = pixels[offset];
-                    byte G = pixels[offset + 1];
                     byte R = pixels[offset + 2];
-                    byte A = pixels[offset + 3];
 
                     pixels[offset] = R;
-                    pixels[offset + 1] = G;
                     pixels[offset + 2] = B;
-                    pixels[offset + 3] = A;
                 }
             }
         }
