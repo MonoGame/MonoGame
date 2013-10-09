@@ -36,7 +36,7 @@
 		<Import file="libnvimage.so"/>
 		<Import file="libnvmath.so"/>
 		<Import file="libnvcore.so"/>
-		<Import file="libpvrtc.a"/>
+		<Import file="libPVRTexLib.a"/>
 		<Import file="libfreetype.6.so"/>
 		<Import file="libpng12.so"/>
 		<Import file="libnvtt.dylib"/>
