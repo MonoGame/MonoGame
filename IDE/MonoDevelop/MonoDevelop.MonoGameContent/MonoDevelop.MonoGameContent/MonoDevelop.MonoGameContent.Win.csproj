@@ -117,8 +117,20 @@
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.so">
+      <Link>libfreetype.6.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
       <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\Linux\libPVRTexLib.a">
+      <Link>libPVRTexLib.a</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+	<Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvtt.so">
+      <Link>libnvtt.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
@@ -137,12 +149,28 @@
       <Link>libnvtt.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
+      <Link>libnvcore.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvimage.so">
+      <Link>libnvimage.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvmath.so">
+      <Link>libnvmath.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
       <Link>libfreetype.6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
       <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\SharpFont\libpng12.so">
+      <Link>libpng12.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\SpriteFont.xft.xml">
