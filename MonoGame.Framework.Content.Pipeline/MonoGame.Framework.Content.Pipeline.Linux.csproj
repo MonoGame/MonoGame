@@ -236,12 +236,6 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
-      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
-      <Name>MonoGame.Framework.Linux</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
       <Link>libnvcore.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -274,5 +268,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Graphics\Font\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Linux.csproj">
+      <Project>{35253CE1-C864-4CD3-8249-4D1319748E8F}</Project>
+      <Name>MonoGame.Framework.Linux</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
