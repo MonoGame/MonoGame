@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			var outputBitmap = GlyphPacker.ArrangeGlyphs (glyphs.ToArray(), true, true);
 
-			outputBitmap.Save ("fontglyphs.png");
+			//outputBitmap.Save ("fontglyphs.png");
 
 			
 			foreach (Glyph glyph in glyphs) {
