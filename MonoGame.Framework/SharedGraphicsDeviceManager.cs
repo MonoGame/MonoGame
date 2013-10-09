@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINRT && !WINDOWS_PHONE
         [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif 
 
         public event EventHandler<EventArgs> DeviceCreated;
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.MultiSampleCount = MultiSampleCount;
             presentationParameters.PresentationInterval = PresentationInterval;
             presentationParameters.IsFullScreen = false;
-            presentationParameters.SwapChainPanel = SwapChainPanel;
+            presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
 
             if (createDevice)
             {
