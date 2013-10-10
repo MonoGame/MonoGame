@@ -199,6 +199,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 case ConversionFormat.Pcm:
 #if WINDOWS
                     ConvertWav(new WaveFormat(QualityToSampleRate(quality), format.ChannelCount));
+#elif LINUX
+                    // TODO Do the conversion for Linux platform
 #else
 				targetFileName = Guid.NewGuid().ToString() + ".wav";
 				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.LinearPCM, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
@@ -232,19 +234,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
                 case ConversionFormat.Aac:
 #if WINDOWS
-		    reader.Position = 0;
-		    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
-		    if (mediaType == null) {
-			    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
-		    }
-		    using (var encoder = new MediaFoundationEncoder (mediaType)) {
-			    encoder.Encode (targetFileName, reader);
-		    } 
+				    reader.Position = 0;
+				    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
+				    if (mediaType == null) {
+					    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
+				    }
+				    using (var encoder = new MediaFoundationEncoder (mediaType)) {
+					    encoder.Encode (targetFileName, reader);
+				    } 
+#elif LINUX
+					// TODO: Code for Linux convertion
 #else
-				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
-					throw new InvalidDataException("Failed to convert to AAC");
-				}
-
+					if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
+						throw new InvalidDataException("Failed to convert to AAC");
+					}
 #endif
 				break;
 
