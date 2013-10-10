@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -78,12 +78,16 @@
     <Compile Include="ContentStringsConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="templates\" />
-    <Folder Include="Gui\" />
-    <Folder Include="icons\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="..\..\..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll">
+      <Link>Tao.Sdl.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Libs\OpenTK.dll">
+      <Link>OpenTK.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="templates\MonoGameContentProject.xpt.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -125,11 +129,11 @@
       <Link>libpvrtc.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\Linux\libPVRTexLib.a">
+    <Content Include="..\..\..\..\ThirdParty\Libs\ManagedPVRTC\Linux\libPVRTexLib.a">
       <Link>libPVRTexLib.a</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvtt.so">
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvtt.so">
       <Link>libnvtt.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -149,7 +153,7 @@
       <Link>libnvtt.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
+    <Content Include="..\..\..\..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
       <Link>libnvcore.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
