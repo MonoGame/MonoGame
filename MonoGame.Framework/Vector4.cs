@@ -326,7 +326,7 @@ namespace Microsoft.Xna.Framework
 
         public override int GetHashCode()
         {
-            return (int)(this.W + this.X + this.Y + this.Y);
+            return (int)(this.W + this.X + this.Y + this.Z);
         }
 
         public static Vector4 Hermite(Vector4 value1, Vector4 tangent1, Vector4 value2, Vector4 tangent2, float amount)
@@ -538,6 +538,138 @@ namespace Microsoft.Xna.Framework
             result.Z = value1.Z - value2.Z;
         }
 
+        public static void Transform(ref Vector4 vector, ref Matrix matrix, out Vector4 result)
+        {
+            result = new Vector4((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + (vector.W * matrix.M41),
+                                 (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + (vector.W * matrix.M42),
+                                 (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + (vector.W * matrix.M43),
+                                 (vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + (vector.W * matrix.M44));
+        }
+
+        public static void Transform(Vector4[] sourceArray, ref Quaternion rotation, Vector4[] destinationArray)
+        {
+            Transform(sourceArray, 0, ref rotation, destinationArray, 0, sourceArray.Length);
+        }
+
+        public static Vector4 Transform(Vector2 value, Quaternion rotation)
+        {
+            Vector4 result;
+            Transform(ref value, ref rotation, out result);
+            return result;
+        }
+
+        public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
+        {
+            float num1 = rotation.X + rotation.X;
+            float num2 = rotation.Y + rotation.Y;
+            float num3 = rotation.Z + rotation.Z;
+            float num4 = rotation.W * num1;
+            float num5 = rotation.W * num2;
+            float num6 = rotation.W * num3;
+            float num7 = rotation.X * num1;
+            float num8 = rotation.X * num2;
+            float num9 = rotation.X * num3;
+            float num10 = rotation.Y * num2;
+            float num11 = rotation.Y * num3;
+            float num12 = rotation.Z * num3;
+            float num13 = (value.X * (1.0f - num10 - num12) + value.Y * (num8 - num6));
+            float num14 = (value.X * (num8 + num6) + value.Y * (1.0f - num7 - num12));
+            float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4));
+            result = new Vector4(num13, num14, num15, 1.0f);
+        }
+
+        public static Vector4 Transform(Vector3 value, Quaternion rotation)
+        {
+            Vector4 result;
+            Transform(ref value, ref rotation, out result);
+            return result;
+        }
+
+        public static Vector4 Transform(Vector4 value, Quaternion rotation)
+        {
+            Vector4 result;
+            Transform(ref value, ref rotation, out result);
+            return result;
+        }
+
+        public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector4 result)
+        {
+            float num1 = rotation.X + rotation.X;
+            float num2 = rotation.Y + rotation.Y;
+            float num3 = rotation.Z + rotation.Z;
+            float num4 = rotation.W * num1;
+            float num5 = rotation.W * num2;
+            float num6 = rotation.W * num3;
+            float num7 = rotation.X * num1;
+            float num8 = rotation.X * num2;
+            float num9 = rotation.X * num3;
+            float num10 = rotation.Y * num2;
+            float num11 = rotation.Y * num3;
+            float num12 = rotation.Z * num3;
+            float num13 = (value.X * (1.0f - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+            float num14 = (value.X * (num8 + num6) + value.Y * (1.0f - num7 - num12) + value.Z * (num11 - num4));
+            float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0f - num7 - num10));
+            result = new Vector4(num13, num14, num15, 1f);
+        }
+
+        public static void Transform(ref Vector4 value, ref Quaternion rotation, out Vector4 result)
+        {
+            float num1 = rotation.X + rotation.X;
+            float num2 = rotation.Y + rotation.Y;
+            float num3 = rotation.Z + rotation.Z;
+            float num4 = rotation.W * num1;
+            float num5 = rotation.W * num2;
+            float num6 = rotation.W * num3;
+            float num7 = rotation.X * num1;
+            float num8 = rotation.X * num2;
+            float num9 = rotation.X * num3;
+            float num10 = rotation.Y * num2;
+            float num11 = rotation.Y * num3;
+            float num12 = rotation.Z * num3;
+            float num13 = (value.X * (1.0f - num10 - num12) + value.Y * (num8 - num6) + value.Z * (num9 + num5));
+            float num14 = (value.X * (num8 + num6) + value.Y * (1.0f - num7 - num12) + value.Z * (num11 - num4));
+            float num15 = (value.X * (num9 - num5) + value.Y * (num11 + num4) + value.Z * (1.0f - num7 - num10));
+            result = new Vector4(num13, num14, num15, value.W);
+        }
+
+
+        public static void Transform(Vector4[] sourceArray, int sourceIndex, ref Matrix matrix, Vector4[] destinationArray, int destinationIndex, int length)
+        {
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if ((long)sourceArray.Length < (long)sourceIndex + (long)length)
+                throw new ArgumentException("sourceArray.Length < sourceIndex+length");
+            if ((long)destinationArray.Length < (long)destinationIndex + (long)length)
+                throw new ArgumentException("destinationArray.Length < destinationIndex + length");
+            for (; length > 0; --length)
+            {
+                float num1 = sourceArray[sourceIndex].X;
+                float num2 = sourceArray[sourceIndex].Y;
+                float num3 = sourceArray[sourceIndex].Z;
+                float num4 = sourceArray[sourceIndex].W;
+                destinationArray[destinationIndex].X = (num1 * matrix.M11 + num2 * matrix.M21 + num3 * matrix.M31 + num4 * matrix.M41);
+                destinationArray[destinationIndex].Y = (num1 * matrix.M12 + num2 * matrix.M22 + num3 * matrix.M32 + num4 * matrix.M42);
+                destinationArray[destinationIndex].Z = (num1 * matrix.M13 + num2 * matrix.M23 + num3 * matrix.M33 + num4 * matrix.M43);
+                destinationArray[destinationIndex].W = (num1 * matrix.M14 + num2 * matrix.M24 + num3 * matrix.M34 + num4 * matrix.M44);
+                ++sourceIndex;
+                ++destinationIndex;
+            }
+        }
+
+        public static void Transform(Vector4[] sourceArray, ref Matrix matrix, Vector4[] destinationArray)
+        {
+            Transform(sourceArray, 0, ref matrix, destinationArray, 0, sourceArray.Length);
+        }
+
+
+        public static Vector4 Transform(Vector4 vector, Matrix matrix)
+        {
+            Transform(ref vector, ref matrix, out vector);
+            return vector;
+        }
+
         public static Vector4 Transform(Vector2 position, Matrix matrix)
         {
             Vector4 result;
@@ -545,17 +677,50 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
-        public static Vector4 Transform(Vector3 position, Matrix matrix)
+        public static void Transform(Vector4[] sourceArray, int sourceIndex, ref Quaternion rotation, Vector4[] destinationArray, int destinationIndex, int length)
         {
-            Vector4 result;
-            Transform(ref position, ref matrix, out result);
-            return result;
-        }
-
-        public static Vector4 Transform(Vector4 vector, Matrix matrix)
-        {
-            Transform(ref vector, ref matrix, out vector);
-            return vector;
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if ((long)sourceArray.Length < (long)sourceIndex + (long)length)
+                throw new ArgumentException("sourceArray.Length < sourceIndex + length");
+            if ((long)destinationArray.Length < (long)destinationIndex + (long)length)
+                throw new ArgumentException("destinationArray.Length < destinationIndex + length");
+            float num1 = rotation.X + rotation.X;
+            float num2 = rotation.Y + rotation.Y;
+            float num3 = rotation.Z + rotation.Z;
+            float num4 = rotation.W * num1;
+            float num5 = rotation.W * num2;
+            float num6 = rotation.W * num3;
+            float num7 = rotation.X * num1;
+            float num8 = rotation.X * num2;
+            float num9 = rotation.X * num3;
+            float num10 = rotation.Y * num2;
+            float num11 = rotation.Y * num3;
+            float num12 = rotation.Z * num3;
+            float num13 = 1f - num10 - num12;
+            float num14 = num8 - num6;
+            float num15 = num9 + num5;
+            float num16 = num8 + num6;
+            float num17 = 1f - num7 - num12;
+            float num18 = num11 - num4;
+            float num19 = num9 - num5;
+            float num20 = num11 + num4;
+            float num21 = 1f - num7 - num10;
+            for (; length > 0; --length)
+            {
+                float num22 = sourceArray[sourceIndex].X;
+                float num23 = sourceArray[sourceIndex].Y;
+                float num24 = sourceArray[sourceIndex].Z;
+                float num25 = sourceArray[sourceIndex].W;
+                destinationArray[destinationIndex].X = (num22 * num13 + num23 * num14 + num24 * num15);
+                destinationArray[destinationIndex].Y = (num22 * num16 + num23 * num17 + num24 * num18);
+                destinationArray[destinationIndex].Z = (num22 * num19 + num23 * num20 + num24 * num21);
+                destinationArray[destinationIndex].W = num25;
+                ++sourceIndex;
+                ++destinationIndex;
+            }
         }
 
         public static void Transform(ref Vector2 position, ref Matrix matrix, out Vector4 result)
@@ -574,27 +739,16 @@ namespace Microsoft.Xna.Framework
                                  (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44);
         }
 
-        public static void Transform(ref Vector4 vector, ref Matrix matrix, out Vector4 result)
+        public static Vector4 Transform(Vector3 position, Matrix matrix)
         {
-            result = new Vector4((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + (vector.W * matrix.M41),
-                                 (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + (vector.W * matrix.M42),
-                                 (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + (vector.W * matrix.M43),
-                                 (vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + (vector.W * matrix.M44));
-        }
+            Vector4 result;
+            Transform(ref position, ref matrix, out result);
+            return result;
+        } 
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder(32);
-            sb.Append("{X:");
-            sb.Append(this.X);
-            sb.Append(" Y:");
-            sb.Append(this.Y);
-            sb.Append(" Z:");
-            sb.Append(this.Z);
-            sb.Append(" W:");
-            sb.Append(this.W);
-            sb.Append("}");
-            return sb.ToString();
+            return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
         }
 
         #endregion Public Methods
