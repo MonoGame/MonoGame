@@ -64,8 +64,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal SharpDX.Direct3D11.Resource _texture;
 
-        internal SharpDX.Direct3D11.Resource _texture;
-
 	private SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
 #elif OPENGL
