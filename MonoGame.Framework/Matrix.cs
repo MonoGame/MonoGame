@@ -908,6 +908,54 @@ namespace Microsoft.Xna.Framework
             result.M44 = 1;
         }
 
+
+        /// <summary>
+        /// Creates a Matrix that flattens geometry into a specified Plane as if casting a shadow from a specified light source. 
+        /// </summary>
+        /// <param name="lightDirection">A Vector3 specifying the direction from which the light that will cast the shadow is coming.</param>
+        /// <param name="plane">The Plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
+        /// <returns>A Matrix that can be used to flatten geometry onto the specified plane from the specified direction. </returns>
+        public static Matrix CreateShadow(Vector3 lightDirection, Plane plane)
+        {
+            Matrix result;
+            CreateShadow(ref lightDirection, ref plane, out result);
+            return result;
+        }
+
+
+        /// <summary>
+        /// Creates a Matrix that flattens geometry into a specified Plane as if casting a shadow from a specified light source. 
+        /// </summary>
+        /// <param name="lightDirection">A Vector3 specifying the direction from which the light that will cast the shadow is coming.</param>
+        /// <param name="plane">The Plane onto which the new matrix should flatten geometry so as to cast a shadow.</param>
+        /// <param name="result">A Matrix that can be used to flatten geometry onto the specified plane from the specified direction. </param>
+        public static void CreateShadow(ref Vector3 lightDirection, ref Plane plane, out Matrix result)
+        {
+            float dot = (plane.Normal.X * lightDirection.X) + (plane.Normal.Y * lightDirection.Y) + (plane.Normal.Z * lightDirection.Z);
+            float x = -plane.Normal.X;
+            float y = -plane.Normal.Y;
+            float z = -plane.Normal.Z;
+            float d = -plane.D;
+
+            result.M11 = (x * lightDirection.X) + dot;
+            result.M12 = x * lightDirection.Y;
+            result.M13 = x * lightDirection.Z;
+            result.M14 = 0;
+            result.M21 = y * lightDirection.X;
+            result.M22 = (y * lightDirection.Y) + dot;
+            result.M23 = y * lightDirection.Z;
+            result.M24 = 0;            
+            result.M31 = z * lightDirection.X;
+            result.M32 = z * lightDirection.Y;
+            result.M33 = (z * lightDirection.Z) + dot;
+            result.M34 = 0;            
+            result.M41 = d * lightDirection.X;
+            result.M42 = d * lightDirection.Y;
+            result.M43 = d * lightDirection.Z;
+            result.M44 = dot;
+        }
+        
+
         public static Matrix CreateTranslation(float xPosition, float yPosition, float zPosition)
         {
             Matrix result;
