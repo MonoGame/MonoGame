@@ -1531,7 +1531,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
+#if SDL2
+                SDL2_GameWindow window = (SDL2_GameWindow) Game.Instance.Window;
+                return new DisplayMode(
+                    window.INTERNAL_glFramebufferWidth,
+                    window.INTERNAL_glFramebufferHeight,
+                    60, // FIXME: Assumption!
+                    SurfaceFormat.Color
+                );
+#else
                 return Adapter.CurrentDisplayMode;
+#endif
             }
         }
 

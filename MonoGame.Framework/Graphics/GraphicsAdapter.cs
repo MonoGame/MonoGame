@@ -58,13 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static ReadOnlyCollection<GraphicsAdapter> adapters;
         
         
-#if SDL2
-        private SDL2_GameWindow _screen;
-        internal GraphicsAdapter(SDL2_GameWindow sdlWindow)
-        {
-            _screen = sdlWindow;
-        }
-#elif MONOMAC
+#if MONOMAC
 		private NSScreen _screen;
         internal GraphicsAdapter(NSScreen screen)
         {
@@ -97,10 +91,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get
             {
 #if SDL2
+                SDL2.SDL.SDL_DisplayMode mode;
+                SDL2.SDL.SDL_GetCurrentDisplayMode(0, out mode);
                 return new DisplayMode(
-                    _screen.INTERNAL_glFramebufferWidth,
-                    _screen.INTERNAL_glFramebufferHeight,
-                    60, // FIXME: Assumption!
+                    mode.w,
+                    mode.h,
+                    mode.refresh_rate,
                     SurfaceFormat.Color
                 );
 #elif MONOMAC
@@ -136,14 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static ReadOnlyCollection<GraphicsAdapter> Adapters {
             get {
                 if (adapters == null) {
-#if SDL2
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(
-                        new GraphicsAdapter[]
-                        {
-                            new GraphicsAdapter((SDL2_GameWindow) Game.Instance.Window)
-                        }
-                    );
-#elif MONOMAC
+#if MONOMAC
                     GraphicsAdapter[] tmpAdapters = new GraphicsAdapter[NSScreen.Screens.Length];
                     for (int i=0; i<NSScreen.Screens.Length; i++) {
                         tmpAdapters[i] = new GraphicsAdapter(NSScreen.Screens[i]);
