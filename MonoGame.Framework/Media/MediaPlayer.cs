@@ -67,6 +67,7 @@ using Microsoft.Phone.Shell;
 using System.Threading;
 #endif
 #if WINRT
+using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 #endif
 
@@ -122,7 +123,14 @@ namespace Microsoft.Xna.Framework.Media
                     _mediaEngineEx = mediaEngine.QueryInterface<MediaEngineEx>();
                 }
 
-                _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+                if (CoreWindow.GetForCurrentThread() != null)
+                {
+                    _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+                }
+                else
+                {
+                    _dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+                }
 #elif WINDOWS_MEDIA_SESSION
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
