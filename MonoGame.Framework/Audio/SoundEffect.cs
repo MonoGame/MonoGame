@@ -48,6 +48,7 @@ using Microsoft.Xna.Framework.Audio;
 
 #if DIRECTX
 using SharpDX;
+using SharpDX.IO;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.X3DAudio;
@@ -113,14 +114,15 @@ namespace Microsoft.Xna.Framework.Audio
         #region Internal Constructors
 
 #if DIRECTX
-        internal SoundEffect()
+        internal SoundEffect(string filename)
         {
+            InitializeFromStream(new NativeFileStream(filename, NativeFileMode.Open, NativeFileAccess.Read));
         }
 
         // Extended constructor which supports custom formats / compression.
         internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
         {
-            Initialize(format, buffer, offset, count, loopStart, loopLength);
+            Initialize(format, DataStream.Create<byte>(buffer, true, false), offset, count, loopStart, loopLength);
         }
 
 #else
@@ -203,7 +205,7 @@ namespace Microsoft.Xna.Framework.Audio
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
         {
 #if DIRECTX            
-            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
+            Initialize(new WaveFormat(sampleRate, (int)channels), DataStream.Create<byte>(buffer, true, false), 0, buffer.Length, 0, buffer.Length);
 #elif (WINDOWS && OPENGL) || LINUX
             _data = buffer;
             Size = buffer.Length;
@@ -247,7 +249,7 @@ namespace Microsoft.Xna.Framework.Audio
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
 #if DIRECTX
-            Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
+            Initialize(new WaveFormat(sampleRate, (int)channels), DataStream.Create<byte>(buffer, true, false), offset, count, loopStart, loopLength);
 #else
             throw new NotImplementedException();
 #endif
@@ -643,11 +645,18 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        private void InitializeFromStream(Stream stream)
+        {
+            SoundStream soundStream = new SoundStream(stream);
+
+            this.Initialize(soundStream.Format, soundStream.ToDataStream(), 0, (int)soundStream.Length, 0, (int)soundStream.Length);
+        }
+
+        private void Initialize(WaveFormat format, DataStream dataStream, int offset, int count, int loopStart, int loopLength)
         {
             _format = format;
 
-            _dataStream = DataStream.Create<byte>(buffer, true, false);
+            _dataStream = dataStream;
 
             // Use the loopStart and loopLength also as the range
             // when playing this SoundEffect a single time / unlooped.
