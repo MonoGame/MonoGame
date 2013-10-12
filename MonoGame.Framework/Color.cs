@@ -26,16 +26,53 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describe a 32-bit packed color.
+    /// Represents a four-component color using red, green, blue, and alpha data. 
     /// </summary>
     [DataContract]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct Color : IEquatable<Color>
     {
+    	/// <summary>
+    	/// Describe a 32-bit packed color.
+    	/// </summary>
+        [FieldOffset(0)]
+        private uint _packedValue;
+
+        /// <summary>
+        /// Gets or sets the red component of <see cref="Color"/>.
+        /// </summary>
+        [DataMember]
+        [FieldOffset(0)]
+        public byte R;
+
+        /// <summary>
+        /// Gets or sets the green component of <see cref="Color"/>.
+        /// </summary>
+        [DataMember]
+        [FieldOffset(1)]
+        public byte G;
+
+        /// <summary>
+        /// Gets or sets the blue component of <see cref="Color"/>.
+        /// </summary>
+        [DataMember]
+        [FieldOffset(2)]
+        public byte B;
+
+        /// <summary>
+        /// Gets or sets the alpha component of <see cref="Color"/>.
+        /// </summary>
+        [DataMember]
+        [FieldOffset(3)]
+        public byte A;
+
+
         static Color()
         {
             TransparentBlack = new Color(0);
@@ -181,12 +218,16 @@ namespace Microsoft.Xna.Framework
             Yellow = new Color(0xff00ffff);
             YellowGreen = new Color(0xff32cd9a);
         }
-	// ARGB
-        private uint _packedValue;
 	  
         private Color(uint packedValue)
         {
+            R = 0;
+            G = 0;
+            B = 0;
+            A = 0;
+
             _packedValue = packedValue;
+
 			// ARGB
 			//_packedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
 			// ABGR			
@@ -276,6 +317,7 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b)
         {
             _packedValue = 0;
+
             R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
             G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
             B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
@@ -292,6 +334,7 @@ namespace Microsoft.Xna.Framework
         public Color(int r, int g, int b, int alpha)
         {
             _packedValue = 0;
+
             R = (byte)MathHelper.Clamp(r, Byte.MinValue, Byte.MaxValue);
             G = (byte)MathHelper.Clamp(g, Byte.MinValue, Byte.MaxValue);
             B = (byte)MathHelper.Clamp(b, Byte.MinValue, Byte.MaxValue);
@@ -315,71 +358,8 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
         
-	/// <summary>
-        /// Gets or sets the blue component of <see cref="Color"/>.
-        /// </summary>
-        [DataMember]
-        public byte B
-        {
-            get
-            {
-                return (byte)(this._packedValue >> 16);
-            }
-            set
-            {
-                this._packedValue = (this._packedValue & 0xff00ffff) | (uint)(value << 16);
-            }
-        }
-	
-	/// <summary>
-        /// Gets or sets the green component of <see cref="Color"/>.
-        /// </summary>
-        [DataMember]
-        public byte G
-        {
-            get
-            {
-                return (byte)(this._packedValue >> 8);
-            }
-            set
-            {
-                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
-            }
-        }
-	
-	/// <summary>
-        /// Gets or sets the red component of <see cref="Color"/>.
-        /// </summary>
-        [DataMember]
-        public byte R
-        {
-            get
-            {
-                return (byte)(this._packedValue);
-            }
-            set
-            {
-                this._packedValue = (this._packedValue & 0xffffff00) | value;
-            }
-        }
-
-	/// <summary>
-        /// Gets or sets the alpha component of <see cref="Color"/>.
-        /// </summary>
-        [DataMember]
-        public byte A
-        {
-            get
-            {
-                return (byte)(this._packedValue >> 24);
-            }
-            set
-            {
-                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
-            }
-        }
 		
-	/// <summary>
+		/// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
         /// </summary>
         /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
