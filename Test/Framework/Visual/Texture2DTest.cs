@@ -86,7 +86,7 @@ namespace MonoGame.Tests.Visual
                 var dataSize = width * height;
                 var texture2D = new Texture2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Color);
                 var savedData = new Color[dataSize];
-                for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index, index, index);
+                for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index % 255, index % 255, index % 255);
                 texture2D.SetData(savedData);
 
                 var readData = new Color[dataSize];
@@ -95,6 +95,32 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData, readData);
             };
             Game.RunOneFrame();
+        }
+
+        [Test]
+        public void ShouldGetDataFromRectangle()
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                const int dataSize = 128 * 128;
+                var texture2D = new Texture2D(Game.GraphicsDevice, 128, 128, false, SurfaceFormat.Color);
+                var savedData = new Color[dataSize];
+                for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index % 255, index % 255, index % 255);
+                texture2D.SetData(savedData);
+
+                var readData = new Color[4];
+                texture2D.GetData(0, new Rectangle(126, 126, 2, 2), readData, 0, 4);
+
+                var expectedData = new[]
+                {
+                    new Color(189, 189, 189),
+                    new Color(190, 190, 190),
+                    new Color(62, 62, 62),
+                    new Color(63, 63, 63)
+                };
+                Assert.AreEqual(expectedData, readData);
+            };
+            Game.Run();
         }
     }
 }

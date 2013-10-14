@@ -657,9 +657,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     int rows;
                     if (rect.HasValue)
                     {
-                        elementsInRow = rect.Value.Right - rect.Value.Left;
-                        rows = rect.Value.Bottom - rect.Value.Top;
-                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
+                        elementsInRow = rect.Value.Width;
+                        rows = rect.Value.Height;
+                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), stagingTex, 0, 0, 0, 0);
                     }
                     else
                     {
