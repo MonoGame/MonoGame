@@ -2,7 +2,17 @@
 <project name="Installer Build Script" default="build" basedir=".">
 	<description>Default Installer Automated Build script</description>
 	<property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
+  
+  <target name="download" description="Downloads iOS binaries">
+    <if test="${environment::variable-exists('MACBUILDJOB')}">
+      <property name="macbuildjob" value="${environment::get-variable('MACBUILDJOB')}"/>
+      <property name="latestArtifactUrl" value="http://build.monogame.net/job/${macbuildjob}/lastSuccessfulBuild/artifact/"/>
 
+      <mkdir dir="Windows/iOS" failonerror="false"/>
+      <get src="${latestArtifactUrl}MonoGame.Framework/bin/iPhoneSimulator/Release/Lidgren.Network.dll" dest="Windows/iOS/Lidgren.Network.dll" failonerror="false"/>
+      <get src="${latestArtifactUrl}MonoGame.Framework/bin/iPhoneSimulator/Release/MonoGame.Framework.dll" dest="Windows/iOS/MonoGame.Framework.dll" failonerror="false"/>
+    </if>
+  </target>
 
 
 	<target name="build" description="Build Installers">
@@ -15,6 +25,7 @@
 !define INSTALLERVERSION "3.2"
 !define REVISION "0.0"
         </echo>
+        <call target="download"/>
         <exec program="makensis" workingdir="Windows" basedir="C:\Program Files (x86)\NSIS">
 		      <arg value="MonoGame.nsi"/>
 		    </exec>
