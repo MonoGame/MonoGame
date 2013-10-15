@@ -877,6 +877,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
             GetData(pixelData);
 
+            //We Must convert from BGRA to RGBA
+            ConvertToRGBA(height, width, pixelData);
+
             var waitEvent = new ManualResetEventSlim(false);
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
@@ -892,6 +895,26 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             throw new NotImplementedException();
 #endif
+        }
+
+        //Converts Pixel Data from BGRA to RGBA
+        private static void ConvertToRGBA(int pixelHeight, int pixelWidth, byte[] pixels)
+        {
+            int offset = 0;
+
+            for (int row = 0; row < (uint)pixelHeight; row++)
+            {
+                for (int col = 0; col < (uint)pixelWidth; col++)
+                {
+                    offset = (row * (int)pixelWidth * 4) + (col * 4);
+
+                    byte B = pixels[offset];
+                    byte R = pixels[offset + 2];
+
+                    pixels[offset] = R;
+                    pixels[offset + 2] = B;
+                }
+            }
         }
 
         public void SaveAsPng(Stream stream, int width, int height)
