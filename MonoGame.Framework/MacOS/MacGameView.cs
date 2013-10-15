@@ -33,6 +33,7 @@ using MonoMac.AppKit;
 using MonoMac.CoreVideo;
 using MonoMac.CoreGraphics;
 using MonoMac.OpenGL;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
@@ -136,6 +137,44 @@ namespace Microsoft.Xna.Framework
 		private void HandleReshape (NSNotification note)
 		{
 			UpdateView ();
+		}
+
+		public override NSDragOperation DraggingEntered (NSDraggingInfo draggingInfo)
+		{
+			List<string> draggedTypes = new List<string> (RegisteredDragTypes());
+			draggedTypes.Sort ();
+
+			NSPasteboard pasteboard = draggingInfo.DraggingPasteboard;
+			List<string> pasteboardTypes = new List<string> (pasteboard.Types);
+			pasteboardTypes.Sort ();
+
+			// If the available types include at least one in our registered list,
+			// then allow the drag and drop.
+			int draggedTypesIndex = 0;
+			int pasteboardTypesIndex = 0;
+			while (draggedTypesIndex < draggedTypes.Count && pasteboardTypesIndex < pasteboardTypes.Count)
+			{
+				if (draggedTypes[draggedTypesIndex].CompareTo(pasteboardTypes[pasteboardTypesIndex]) == 0) {
+					return NSDragOperation.Link;
+				} else if (draggedTypes[draggedTypesIndex].CompareTo(pasteboardTypes[pasteboardTypesIndex]) < 0) {
+					draggedTypesIndex++;
+				} else if (draggedTypes[draggedTypesIndex].CompareTo(pasteboardTypes[pasteboardTypesIndex]) > 0) {
+					pasteboardTypesIndex++;
+				}
+			}
+
+			// Otherwise, don't.
+			return NSDragOperation.None;
+		}
+
+		public override bool PerformDragOperation (NSDraggingInfo draggingInfo)
+		{
+			EventHandler<DragDropEventArgs> handler = DragDrop;
+			if (handler != null) {
+				handler (this, new DragDropEventArgs(draggingInfo));
+			}
+
+			return true;
 		}
 
 		private void StartAnimation (double updatesPerSecond)
@@ -600,6 +639,7 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> Disposed;
 		public event EventHandler<EventArgs> TitleChanged;
 		public event EventHandler<EventArgs> VisibleChanged;
+		public event EventHandler<DragDropEventArgs> DragDrop;
 
 		event EventHandler<EventArgs> INativeWindow.FocusedChanged {
 			add { throw new NotSupportedException ();}
