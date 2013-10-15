@@ -253,10 +253,9 @@ Section "Visual Studio 2013 Templates" VS2013
     ; Set output path to the installation directory.
     SetOutPath "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
 
-    ; install the Templates for MonoDevelop
-    File /r '..\..\ProjectTemplates\VisualStudio2012\*.zip'
-    ; Install the VS 2010 templates as well 
-    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    ; install the Templates for VS 2013
+    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
+
     GOTO EndTemplates
   CannotInstallTemplates:
 
