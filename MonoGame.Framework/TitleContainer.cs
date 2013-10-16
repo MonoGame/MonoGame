@@ -156,6 +156,21 @@ namespace Microsoft.Xna.Framework
 #endif
             return name;
         }
+        
+        
+        
+        // Takes a filename and maps it into our location folder for content        
+        internal static string GetAbsoluteFilename(string name)
+        {            
+#if WINRT
+            // Replace non-windows seperators.
+            return GetFilename(name);
+#else
+            // Replace Windows path separators with local path separators
+            return Path.Combine(Location,GetFilename(name));             
+#endif
+            
+        }        
     }
 }
 
