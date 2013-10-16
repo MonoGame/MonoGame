@@ -274,6 +274,7 @@ If ((Get-ChildItem *.pdb -Path .\lib -Recurse).Count -gt 0) {
 }
 Else {
     Write-Log (Invoke-Command {.\NuGet.exe pack Package.nuspec -Verbosity Detailed 2>&1})
+    Write-Log (Invoke-Command {.\NuGet.exe pack Package.Binaries.nuspec -Verbosity Detailed 2>&1})
     $ExitCode = $LASTEXITCODE
 }
 
