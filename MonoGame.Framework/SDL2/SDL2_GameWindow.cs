@@ -588,6 +588,9 @@ namespace Microsoft.Xna.Framework
         
         public SDL2_GameWindow()
         {
+            int startWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
+            int startHeight = GraphicsDeviceManager.DefaultBackBufferHeight;
+
             /* SDL2 might complain if an OS that uses SDL_main has not actually
              * used SDL_main by the time you initialize SDL2.
              * The only platform that is affected is Windows, but we can skip
@@ -628,8 +631,8 @@ namespace Microsoft.Xna.Framework
                 "MonoGame-SDL2 Window",
                 SDL.SDL_WINDOWPOS_CENTERED,
                 SDL.SDL_WINDOWPOS_CENTERED,
-                800,
-                600,
+                startWidth,
+                startHeight,
                 INTERNAL_sdlWindowFlags_Next
             );
             
@@ -672,8 +675,8 @@ namespace Microsoft.Xna.Framework
                 TextureTarget.Texture2D,
                 0,
                 PixelInternalFormat.Rgba,
-                800,
-                600,
+                startWidth,
+                startHeight,
                 0,
                 PixelFormat.Rgba,
                 PixelType.UnsignedByte,
@@ -684,8 +687,8 @@ namespace Microsoft.Xna.Framework
                 TextureTarget.Texture2D,
                 0,
                 PixelInternalFormat.DepthComponent16,
-                800,
-                600,
+                startWidth,
+                startHeight,
                 0,
                 PixelFormat.DepthComponent,
                 PixelType.UnsignedByte,
@@ -706,10 +709,10 @@ namespace Microsoft.Xna.Framework
                 0
             );
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            INTERNAL_glFramebufferWidth = 800;
-            INTERNAL_glFramebufferHeight = 600;
-            Mouse.INTERNAL_BackbufferWidth = 800;
-            Mouse.INTERNAL_BackbufferHeight = 600;
+            INTERNAL_glFramebufferWidth = startWidth;
+            INTERNAL_glFramebufferHeight = startHeight;
+            Mouse.INTERNAL_BackbufferWidth = startWidth;
+            Mouse.INTERNAL_BackbufferHeight = startHeight;
             
             INTERNAL_depthFormat = DepthFormat.Depth16;
 
