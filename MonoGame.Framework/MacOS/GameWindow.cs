@@ -449,7 +449,7 @@ namespace Microsoft.Xna.Framework
 			                      	NSTrackingAreaOptions.MouseMoved | 
 			                        NSTrackingAreaOptions.MouseEnteredAndExited |
 			                        NSTrackingAreaOptions.EnabledDuringMouseDrag |
-			                        NSTrackingAreaOptions.ActiveWhenFirstResponder |
+			                        NSTrackingAreaOptions.ActiveAlways |
 			                        NSTrackingAreaOptions.InVisibleRect |
 				NSTrackingAreaOptions.CursorUpdate,
 			                      this, new NSDictionary());
@@ -708,6 +708,14 @@ namespace Microsoft.Xna.Framework
 				//Mouse.Moved = true;
 				break;
 			}			
+		}
+
+		public override NSDragOperation DraggingUpdated(NSDraggingInfo sender)
+		{
+			// Cause the mouse to move. We don't get normal updates during a dragging operation.
+			UpdateMousePosition (sender.DraggingLocation);
+
+			return base.DraggingUpdated (sender);
 		}
 
 		private void UpdateMousePosition (PointF location)
