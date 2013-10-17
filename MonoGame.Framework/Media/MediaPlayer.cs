@@ -545,8 +545,8 @@ namespace Microsoft.Xna.Framework.Media
 
             if (nextSong == null)
                 Stop();
-            else            
-                Play(nextSong);                            
+            else
+                PlaySong(nextSong);
 
             if (ActiveSongChanged != null)
             {
