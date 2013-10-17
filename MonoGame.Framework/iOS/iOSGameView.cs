@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework {
             //UserInteractionEnabled = true;
             //AutosizesSubviews = true;
             //AddSubview (textView);
-            textView.Text = string.Empty;
+            //textView.Text = string.Empty;
 
             //**************
 		}
@@ -471,7 +471,24 @@ namespace Microsoft.Xna.Framework {
         [Export ("insertText:")]
         void InsertText (string text)
         {
-            OnKeyboardTextEntry(new KeyboardEntryEventArgs (text));
+            if (text == " ") {
+                OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
+            } else if (text.Trim () != "") {
+                OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
+
+//                // Create our tokenizer and text storage
+//                tokenizer = new UITextInputStringTokenizer (this);
+//
+//                // Create and set up our SimpleCoreTextView that will do the drawing
+//                textView = new SimpleCoreTextView (new RectangleF ()); //AB: "using UIKit;" is not working!!! should be: Bounds.Inset (5, 5));
+//                textView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+//
+//                textView.UserInteractionEnabled = true;
+//                //UserInteractionEnabled = true;
+//                //AutosizesSubviews = true;
+//                //AddSubview (textView);
+//                  textView.Text = string.Empty;
+            }
         }
 
         // UIKeyInput required method - Delete a character from the displayed text.
@@ -481,6 +498,26 @@ namespace Microsoft.Xna.Framework {
         void DeleteBackward ()
         {
             OnKeyboardTextEntry(new KeyboardEntryEventArgs (Keypresses.backspaceDeleteKey));
+        }
+
+
+        [Export ("insertDictationResult")]
+        void insertDictationResult(NSArray a)
+        {
+            NSNotificationCenter.DefaultCenter.PostNotificationName ("DictationRecognitionSucceededNotification", this);
+        }
+
+
+        [Export ("dictationRecordingDidEnd")]
+        void dictationRecordingDidEnd()
+        {
+            System.Diagnostics.Trace.Assert (true);
+        }
+
+        [Export ("dictationRecognitionFailed")]
+        void dictationRecognitionFailed()
+        {
+            System.Diagnostics.Trace.Assert (true);
         }
 
 
@@ -655,11 +692,17 @@ namespace Microsoft.Xna.Framework {
         [Export ("textRangeFromPosition:toPosition:")]
         IndexedRange GetTextRange (UITextPosition fromPosition, UITextPosition toPosition)
         {
+            try
+            {
             // Generate IndexedPosition instances that wrap the to and from ranges
             IndexedPosition @from = (IndexedPosition) fromPosition;
             IndexedPosition @to = (IndexedPosition) toPosition;
             NSRange range = new NSRange (Math.Min (@from.Index, @to.Index), Math.Abs (to.Index - @from.Index));
             return IndexedRange.GetRange (range);
+            }
+            catch {
+                return null;
+            }
         }
 
         // UITextInput protocol required method - Returns the text position at a given offset 
