@@ -64,11 +64,11 @@
     <Reference Include="Tao.Sdl">
       <HintPath>..\ThirdParty\GamepadConfig\Tao.Sdl.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\ThirdParty\protobuf-net\Debug\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac">
+      <HintPath>..\ThirdParty\MonoMac\MonoMac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
