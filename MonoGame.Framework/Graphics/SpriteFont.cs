@@ -363,8 +363,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 				spriteBatch.DrawInternal(
                     _texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth);
+					color, rotation, Vector2.Zero, effect, depth, false);
 			}
+
+			// We need to flush if we're using Immediate sort mode.
+			spriteBatch.FlushIfNeeded();
 		}
 
         internal struct CharacterSource 
