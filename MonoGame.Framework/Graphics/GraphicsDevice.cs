@@ -1635,9 +1635,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             set
             {
-                // We need to set it dirty even if the value is the same,
-                // because it could be causing us to update after
-                // changing to or from a render target.
+                if (_scissorRectangle == value)
+                    return;
+
                 _scissorRectangle = value;
                 _scissorRectangleDirty = true;
             }
