@@ -375,7 +375,9 @@ namespace Microsoft.Xna.Framework.Audio
                     
                     if (isWma || isM4a) {
                         //WMA data can sometimes be played directly
-#if !WINRT                        
+#if DIRECTX
+                        throw new NotImplementedException();
+#elif !WINRT
                         //hack - NSSound can't play non-wav from data, we have to give a filename
                         string filename = Path.GetTempFileName();
                         if (isWma) {

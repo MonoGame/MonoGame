@@ -34,11 +34,7 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Describe a 32-bit packed color.
     /// </summary>
-#if WINRT
-    [DataContract]
-#else
-    [ProtoContract]
-#endif
+    [Serializable, ProtoContract, DataContract]
     public struct Color : IEquatable<Color>
     {
         static Color()
@@ -323,11 +319,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
-        [DataMember]
-#else
-        [ProtoMember(3)]
-#endif
+        [ProtoMember(1), DataMember]
         public byte B
         {
             get
@@ -343,11 +335,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
-        [DataMember]
-#else
-        [ProtoMember(2)]
-#endif
+		[ProtoMember(2), DataMember]
         public byte G
         {
             get
@@ -360,14 +348,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 	
-	    /// <summary>
+	/// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
-        [DataMember]
-#else
-        [ProtoMember(1)]
-#endif
+		[ProtoMember(3), DataMember]
         public byte R
         {
             get
@@ -383,11 +367,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
-#if WINRT
-        [DataMember]
-#else
-        [ProtoMember(4)]
-#endif
+		[ProtoMember(4), DataMember]
         public byte A
         {
             get

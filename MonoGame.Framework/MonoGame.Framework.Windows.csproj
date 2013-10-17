@@ -76,9 +76,11 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />
+    <Compile Include="GamerServices\GamerServicesDispatcher.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\DisplayMode.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
@@ -173,11 +176,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundState.cs" />
+    <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
     <Compile Include="Content\ContentReaders\BooleanReader.cs" />
@@ -210,9 +217,23 @@
     <Compile Include="Content\LzxDecoder.cs" />
     <Compile Include="GamerServices\Achievement.cs" />
     <Compile Include="GamerServices\AchievementCollection.cs" />
+    <Compile Include="GamerServices\FriendCollection.cs" />
+    <Compile Include="GamerServices\FriendGamer.cs" />
+    <Compile Include="GamerServices\Gamer.cs" />
+    <Compile Include="GamerServices\GamerCollection.cs" />
+    <Compile Include="GamerServices\GamerDefaults.cs" />
+    <Compile Include="GamerServices\GamerPresence.cs" />
+    <Compile Include="GamerServices\GamerPresenceMode.cs" />
+    <Compile Include="GamerServices\GamerPrivileges.cs" />
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs" />
+    <Compile Include="GamerServices\GamerProfile.cs" />
+    <Compile Include="GamerServices\GamerServicesComponent.cs" />
     <Compile Include="GamerServices\GamerZone.cs" />
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs" />
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\MonoLive.cs" />
+    <Compile Include="GamerServices\MonoLiveClient.cs" />
+    <Compile Include="GamerServices\SignedInGamerCollection.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Graphics\ColorWriteChannels.cs" />
     <Compile Include="Graphics\DisplayModeCollection.cs" />
@@ -263,13 +284,46 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\Song.cs" />
     <Compile Include="Media\SongCollection.cs" />
+    <Compile Include="Net\AvailableNetworkSession.cs" />
+    <Compile Include="Net\AvailableNetworkSessionCollection.cs" />
+    <Compile Include="Net\CommandEvent.cs" />
+    <Compile Include="Net\CommandEventType.cs" />
+    <Compile Include="Net\CommandGamerJoined.cs" />
+    <Compile Include="Net\CommandGamerLeft.cs" />
+    <Compile Include="Net\CommandGamerStateChange.cs" />
+    <Compile Include="Net\CommandReceiveData.cs" />
+    <Compile Include="Net\CommandSendData.cs" />
+    <Compile Include="Net\CommandSessionStateChange.cs" />
+    <Compile Include="Net\GamerStates.cs" />
+    <Compile Include="Net\ICommand.cs" />
+    <Compile Include="Net\LocalNetworkGamer.cs" />
+    <Compile Include="Net\MonoGamerPeer.cs" />
+    <Compile Include="Net\NetworkException.cs" />
+    <Compile Include="Net\NetworkGamer.cs" />
+    <Compile Include="Net\NetworkMachine.cs" />
+    <Compile Include="Net\NetworkMessageType.cs" />
+    <Compile Include="Net\NetworkNotAvailableException.cs" />
+    <Compile Include="Net\NetworkSession.cs" />
+    <Compile Include="Net\NetworkSessionEndReason.cs" />
+    <Compile Include="Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Net\NetworkSessionJoinException.cs" />
+    <Compile Include="Net\NetworkSessionProperties.cs" />
+    <Compile Include="Net\NetworkSessionState.cs" />
+    <Compile Include="Net\NetworkSessionType.cs" />
+    <Compile Include="Net\PacketReader.cs" />
+    <Compile Include="Net\PacketWriter.cs" />
+    <Compile Include="Net\QualityOfService.cs" />
+    <Compile Include="Net\SendDataOptions.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Windows8\GamePad.cs" />
     <Compile Include="Windows8\SharpDXHelper.cs" />
+    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs" />
     <Compile Include="Windows\GamerServices\Guide.cs" />
+    <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs" />
+    <Compile Include="Windows\GamerServices\SignedInGamer.cs" />
     <Compile Include="Windows\Media\Video.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -340,7 +394,6 @@
     <Compile Include="Graphics\States\BlendState.cs" />
 	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
@@ -374,7 +427,8 @@
     <Compile Include="GraphicsDeviceManager.cs" />
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Content\ContentReaders\CurveReader.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
+    <Compile Include="Audio\XactClip.cs" />
+    <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs" />
@@ -382,6 +436,13 @@
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
+    <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="GamerServices\LeaderboardEntry.cs" />
+    <Compile Include="GamerServices\LeaderboardIdentity.cs" />
+    <Compile Include="GamerServices\LeaderboardKey.cs" />
+    <Compile Include="GamerServices\LeaderboardReader.cs" />
+    <Compile Include="GamerServices\LeaderboardWriter.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="Windows\WinFormsGameForm.cs" />
     <Compile Include="Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Windows\WinFormsGameWindow.cs" />
@@ -397,6 +458,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj">
+      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Name>Lidgren.Network.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo" />

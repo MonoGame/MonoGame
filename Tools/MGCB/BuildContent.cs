@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -162,6 +163,7 @@ namespace MGCB
             var outputPath = Path.GetFullPath(Path.Combine(projectDirectory, OutputDir));
             var intermediatePath = Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir));
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
+            _manager.Logger = new ConsoleLogger();
 
             // Feed all the assembly references to the pipeline manager
             // so it can resolve importers, processors, writers, and types.
@@ -225,8 +227,7 @@ namespace MGCB
 
             // Delete the old file and write the new content 
             // list if we have any to serialize.
-            if (File.Exists(contentFile))
-                File.Delete(contentFile);
+            FileHelper.DeleteIfExists(contentFile);
             if (newContent.SourceFiles.Count > 0)
                 newContent.Write(contentFile);
         }

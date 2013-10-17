@@ -73,7 +73,7 @@
     <Reference Include="OpenTK" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="protobuf-net">
-      <HintPath>..\ThirdParty\protobuf-net\CoreOnly\protobuf-net.dll</HintPath>
+      <HintPath>..\..\SVNProjects\ThirdParty\protobuf-net_r640\CoreOnly\ios\protobuf-net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -149,7 +149,6 @@
     <Compile Include="Vector4.cs" />
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveContinuity.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
@@ -264,7 +263,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-    <Compile Include="Graphics\States\TargetBlendState.cs" />
+	<Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
@@ -313,7 +312,6 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Game.cs" />
@@ -460,7 +458,7 @@
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" Condition="'$(windir)' != '' " />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
@@ -478,17 +476,17 @@
     <Folder Include="iOS\Audio\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
+      <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
+      <Name>Lidgren.Network.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.ogl.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.ogl.mgfxo" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
-      <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
-      <Name>Lidgren.Network.iOS</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
