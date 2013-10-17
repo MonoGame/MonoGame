@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Binaries</id>
+        <version>3.0.1</version>
+        <title>MonoGame.Binaries</title>
+        <authors>Simon-Darkside</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>http://monogame.net/themes/_bartik/css/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes />
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\Lidgren.Network.dll" target="build\net40\Lidgren.Network.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.dll" target="build\net40\MonoGame.Framework.dll" />
+        <file src="build\net40\MonoGame.targets" target="build\net40\MonoGame.Binaries.targets" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll" target="build\net40\OpenTK.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\Tao.Sdl.dll" target="build\net40\Tao.Sdl.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.dll" target="build\netcore\MonoGame.Framework.dll" />
+        <file src="build\netcore\MonoGame.targets" target="build\netcore\MonoGame.Binaries.targets" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct2D1.dll" target="build\netcore\SharpDX.Direct2D1.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct3D11.dll" target="build\netcore\SharpDX.Direct3D11.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.dll" target="build\netcore\SharpDX.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.DXGI.dll" target="build\netcore\SharpDX.DXGI.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.MediaFoundation.dll" target="build\netcore\SharpDX.MediaFoundation.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XAudio2.dll" target="build\netcore\SharpDX.XAudio2.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XInput.dll" target="build\netcore\SharpDX.XInput.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\MonoGame.Framework.dll" target="build\wp8\ARM\MonoGame.Framework.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Direct3D11.dll" target="build\wp8\ARM\SharpDX.Direct3D11.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.Direct3D11.xml" target="build\wp8\ARM\SharpDX.Direct3D11.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.dll" target="build\wp8\ARM\SharpDX.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.DXGI.dll" target="build\wp8\ARM\SharpDX.DXGI.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.DXGI.xml" target="build\wp8\ARM\SharpDX.DXGI.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.MediaFoundation.dll" target="build\wp8\ARM\SharpDX.MediaFoundation.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.MediaFoundation.xml" target="build\wp8\ARM\SharpDX.MediaFoundation.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.WP8.dll" target="build\wp8\ARM\SharpDX.WP8.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.XAudio2.dll" target="build\wp8\ARM\SharpDX.XAudio2.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.XAudio2.xml" target="build\wp8\ARM\SharpDX.XAudio2.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\ARM\SharpDX.xml" target="build\wp8\ARM\SharpDX.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\MonoGame.Framework.dll" target="build\wp8\x86\MonoGame.Framework.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Direct3D11.dll" target="build\wp8\x86\SharpDX.Direct3D11.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.Direct3D11.xml" target="build\wp8\x86\SharpDX.Direct3D11.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.dll" target="build\wp8\x86\SharpDX.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.DXGI.dll" target="build\wp8\x86\SharpDX.DXGI.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.DXGI.xml" target="build\wp8\x86\SharpDX.DXGI.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.MediaFoundation.dll" target="build\wp8\x86\SharpDX.MediaFoundation.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.MediaFoundation.xml" target="build\wp8\x86\SharpDX.MediaFoundation.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.WP8.dll" target="build\wp8\x86\SharpDX.WP8.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.XAudio2.dll" target="build\wp8\x86\SharpDX.XAudio2.dll" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.XAudio2.xml" target="build\wp8\x86\SharpDX.XAudio2.xml" />
+        <file src="..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsPhone\x86\SharpDX.xml" target="build\wp8\x86\SharpDX.xml" />
+        <file src="build\wp8\MonoGame.targets" target="build\wp8\MonoGame.Binaries.targets" />
+    </files>
+</package>

@@ -257,7 +257,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				rotation,
 				origin * scale,
 				effect,
-				depth);
+				depth,
+				true);
 		}
 
 		public void Draw (Texture2D texture,
@@ -287,7 +288,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				rotation,
 				origin * scale,
 				effect,
-				depth);
+				depth,
+				true);
 		}
 
 		public void Draw (Texture2D texture,
@@ -312,7 +314,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
                         			origin.Y * ((float)destinationRectangle.Height) / (float)( (sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
 			      effect,
-			      depth);
+			      depth,
+			      true);
 		}
 
 		internal void DrawInternal (Texture2D texture,
@@ -322,7 +325,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			float rotation,
 			Vector2 origin,
 			SpriteEffects effect,
-			float depth)
+			float depth,
+			bool autoFlush)
 		{
 			var item = _batcher.CreateBatchItem();
 
@@ -366,8 +370,19 @@ namespace Microsoft.Xna.Framework.Graphics
 					_texCoordTL, 
 					_texCoordBR);			
 			
+			if (autoFlush)
+			{
+				FlushIfNeeded();
+			}
+		}
+
+		// Mark the end of a draw operation for Immediate SpriteSortMode.
+		internal void FlushIfNeeded()
+		{
 			if (_sortMode == SpriteSortMode.Immediate)
-                _batcher.DrawBatch(_sortMode);
+			{
+				_batcher.DrawBatch(_sortMode);
+			}
 		}
 
 		public void Draw (Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)

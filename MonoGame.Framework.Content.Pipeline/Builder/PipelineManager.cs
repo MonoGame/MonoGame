@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
@@ -71,7 +72,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             ProjectDirectory = PathHelper.NormalizeDirectory(projectDir);
             OutputDirectory = PathHelper.NormalizeDirectory(outputDir);
             IntermediateDirectory = PathHelper.NormalizeDirectory(intermediateDir);
+
+	    RegisterCustomConverters ();
         }
+
+	public void AssignTypeConverter<IType, IConverterType> ()
+	{
+		TypeDescriptor.AddAttributes (typeof (IType), new TypeConverterAttribute (typeof (IConverterType)));
+	}
+
+	private void RegisterCustomConverters ()
+	{
+		AssignTypeConverter<Microsoft.Xna.Framework.Color, StringToColorConverter> ();
+	}
 
         public void AddAssembly(string assemblyFilePath)
         {
@@ -516,8 +529,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     if (assetCachedEvent == null)
                     {
                         Logger.LogMessage("Cleaning {0}", asset);
-                        File.Delete(asset);
-                        File.Delete(assetEventFilepath);
+                        FileHelper.DeleteIfExists(asset);
+                        FileHelper.DeleteIfExists(assetEventFilepath);
                         continue;
                     }
 
@@ -527,8 +540,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             Logger.LogMessage("Cleaning {0}", outputFilepath);
-            File.Delete(outputFilepath);
-            File.Delete(eventFilepath);
+            FileHelper.DeleteIfExists(outputFilepath);
+            FileHelper.DeleteIfExists(eventFilepath);
         }
 
         private void WriteXnb(object content, PipelineBuildEvent pipelineEvent)
