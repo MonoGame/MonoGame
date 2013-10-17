@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
-        [ProtoMember(1), DataMember]
+        [ProtoMember(3), DataMember]
         public byte B
         {
             get
@@ -351,7 +351,7 @@ namespace Microsoft.Xna.Framework
 	/// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
-		[ProtoMember(3), DataMember]
+		[ProtoMember(1), DataMember]
         public byte R
         {
             get
