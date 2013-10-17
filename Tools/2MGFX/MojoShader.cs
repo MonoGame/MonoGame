@@ -808,8 +808,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr details;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Explicit)]
@@ -1054,8 +1053,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astNodeType type;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string filename;
+            public IntPtr filename;
 		    
 		    /// unsigned int
 		    public uint line;
@@ -1209,8 +1207,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr datatype;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// int
 		    public int index;
@@ -1252,8 +1249,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr datatype;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string @string;
+            public IntPtr @string;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1295,8 +1291,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr identifier;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string member;
+            public IntPtr member;
 		    
 		    /// int
 		    public int isswizzle;
@@ -1392,12 +1387,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astInputModifier input_modifier;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astInterpolationModifier
 		    public MOJOSHADER_astInterpolationModifier interpolation_modifier;
@@ -1419,8 +1412,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr datatype;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// MOJOSHADER_astFunctionParameters*
 		    public IntPtr @params;
@@ -1429,8 +1421,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astFunctionStorageClass storage_class;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1440,8 +1431,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astNodeInfo ast;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string identifier;
+            public IntPtr identifier;
 		    
 		    /// int
 		    public int isarray;
@@ -1473,12 +1463,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_astNodeInfo ast;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string ident1;
+            public IntPtr ident1;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string ident2;
+            public IntPtr ident2;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1491,8 +1479,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr packoffset;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string register_name;
+            public IntPtr register_name;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -1505,8 +1492,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr datatype;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astScalarOrArray*
 		    public IntPtr details;
@@ -1528,8 +1514,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr datatype;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string name;
+            public IntPtr name;
 		    
 		    /// MOJOSHADER_astStructMembers*
 		    public IntPtr members;
@@ -1554,8 +1539,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr details;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string semantic;
+            public IntPtr semantic;
 		    
 		    /// MOJOSHADER_astAnnotations*
 		    public IntPtr annotations;
@@ -2121,8 +2105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public MOJOSHADER_irNodeType type;
 		    
 		    /// char*
-		    [MarshalAsAttribute(UnmanagedType.LPStr)]
-		    public string filename;
+		    public IntPtr filename;
 		    
 		    /// unsigned int
 		    public uint line;
@@ -2295,8 +2278,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    public IntPtr expr;
 		    
 		    /// char[4]
-		    [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst=4)]
-		    public string channels;
+		    public IntPtr channels;
 		}
 		
 		[StructLayoutAttribute(LayoutKind.Sequential)]
@@ -2588,12 +2570,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// float[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.R4)]
 		    [FieldOffsetAttribute(0)]
-		    public float[] f;
+		    public IntPtr f;
 		    
 		    /// int[4]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=4, ArraySubType=UnmanagedType.I4)]
 		    [FieldOffsetAttribute(0)]
-		    public int[] i;
+		    public IntPtr i;
 		    
 		    /// int
 		    [FieldOffsetAttribute(0)]
@@ -2606,12 +2588,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		    /// int[16]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=16, ArraySubType=UnmanagedType.I4)]
 		    [FieldOffsetAttribute(0)]
-		    public int[] ival;
+		    public IntPtr ival;
 		    
 		    /// float[16]
 		    [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst=16, ArraySubType=UnmanagedType.R4)]
 		    [FieldOffsetAttribute(0)]
-		    public float[] fval;
+            public IntPtr fval;
 		}
 		
 		public enum MOJOSHADER_uniformType {

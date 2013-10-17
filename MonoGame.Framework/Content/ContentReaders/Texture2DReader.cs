@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content
 					surfaceFormat = SurfaceFormat.Color;
 					break;
 				default:
-					throw new NotImplementedException();
+					throw new NotSupportedException("Unsupported legacy surface format.");
 				}
 			}
             else

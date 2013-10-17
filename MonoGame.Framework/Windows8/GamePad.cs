@@ -1,23 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GBF = SharpDX.XInput.GamepadButtonFlags;
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static class GamePad
     {
-        public static Microsoft.Xna.Framework.Input.GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static readonly SharpDX.XInput.Controller[] _controllers = new[]
         {
-            var controller = GetController(playerIndex);
-            if (!controller.IsConnected)
-                return new Microsoft.Xna.Framework.Input.GamePadCapabilities(); // GamePadCapabilities.IsConnected = false by default
+            new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One),
+            new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Two),
+            new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Three),
+            new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Four),
+        };
+
+        private static readonly bool[] _connected = new bool[4];
+        private static readonly long[] _timeout = new long[4];
+        private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
+
+        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        {
+            // Make sure the player index is in range.
+            var index = (int)playerIndex;
+            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
+                throw new InvalidOperationException();
+
+            // If the device was disconneced then wait for 
+            // the timeout to elapsed before we test it again.
+            if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
+                return new GamePadCapabilities();
+      
+            // Check to see if the device is connected.
+            var controller = _controllers[index];
+            _connected[index] = controller.IsConnected;
+
+            // If the device is disconnected retry it after the
+            // timeout period has elapsed to avoid the overhead.
+            if (!_connected[index])
+            {
+                _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
+                return new GamePadCapabilities();
+            }
 
             var capabilities = controller.GetCapabilities(SharpDX.XInput.DeviceQueryType.Any);
-            var ret = new Microsoft.Xna.Framework.Input.GamePadCapabilities();
+            var ret = new GamePadCapabilities();
             switch (capabilities.SubType)
             {
 #if DIRECTX11_1
@@ -42,27 +68,27 @@ namespace Microsoft.Xna.Framework.Input
                     break;
 #endif
                 case SharpDX.XInput.DeviceSubType.ArcadeStick:
-                    ret.GamePadType = Input.GamePadType.ArcadeStick;
+                    ret.GamePadType = GamePadType.ArcadeStick;
                     break;
                 case SharpDX.XInput.DeviceSubType.DancePad:
-                    ret.GamePadType = Input.GamePadType.DancePad;
+                    ret.GamePadType = GamePadType.DancePad;
                     break;
                 case SharpDX.XInput.DeviceSubType.DrumKit:
-                    ret.GamePadType = Input.GamePadType.DrumKit;
+                    ret.GamePadType = GamePadType.DrumKit;
                     break;
 
                 case SharpDX.XInput.DeviceSubType.Gamepad:
-                    ret.GamePadType = Input.GamePadType.GamePad;
+                    ret.GamePadType = GamePadType.GamePad;
                     break;
                 case SharpDX.XInput.DeviceSubType.Guitar:
-                    ret.GamePadType = Input.GamePadType.Guitar;
+                    ret.GamePadType = GamePadType.Guitar;
                     break;
                 case SharpDX.XInput.DeviceSubType.Wheel:
-                    ret.GamePadType = Input.GamePadType.Wheel;
+                    ret.GamePadType = GamePadType.Wheel;
                     break;
                 default:
                     Debug.WriteLine("unexpected XInput DeviceSubType: {0}", capabilities.SubType.ToString());
-                    ret.GamePadType = Input.GamePadType.Unknown;
+                    ret.GamePadType = GamePadType.Unknown;
                     break;
             }
 
@@ -70,21 +96,21 @@ namespace Microsoft.Xna.Framework.Input
 
             // digital buttons
             var buttons = gamepad.Buttons;
-            ret.HasAButton = buttons.HasFlag(GBF.A);
-            ret.HasBackButton = buttons.HasFlag(GBF.Back);
-            ret.HasBButton = buttons.HasFlag(GBF.B);
+            ret.HasAButton = (buttons & GBF.A) == GBF.A;
+            ret.HasBackButton = (buttons & GBF.Back) == GBF.Back;
+            ret.HasBButton = (buttons & GBF.B) == GBF.B;
             ret.HasBigButton = false; // TODO: what IS this? Is it related to GamePadType.BigGamePad?
-            ret.HasDPadDownButton = buttons.HasFlag(GBF.DPadDown);
-            ret.HasDPadLeftButton = buttons.HasFlag(GBF.DPadLeft);
-            ret.HasDPadRightButton = buttons.HasFlag(GBF.DPadLeft);
-            ret.HasDPadUpButton = buttons.HasFlag(GBF.DPadUp);
-            ret.HasLeftShoulderButton = buttons.HasFlag(GBF.LeftShoulder);
-            ret.HasLeftStickButton = buttons.HasFlag(GBF.LeftThumb);
-            ret.HasRightShoulderButton = buttons.HasFlag(GBF.RightShoulder);
-            ret.HasRightStickButton = buttons.HasFlag(GBF.RightThumb);
-            ret.HasStartButton = buttons.HasFlag(GBF.Start);
-            ret.HasXButton = buttons.HasFlag(GBF.X);
-            ret.HasYButton = buttons.HasFlag(GBF.Y);
+            ret.HasDPadDownButton = (buttons & GBF.DPadDown) == GBF.DPadDown;
+            ret.HasDPadLeftButton = (buttons & GBF.DPadLeft) == GBF.DPadLeft;
+            ret.HasDPadRightButton = (buttons & GBF.DPadRight) == GBF.DPadRight;
+            ret.HasDPadUpButton = (buttons & GBF.DPadUp) == GBF.DPadUp;
+            ret.HasLeftShoulderButton = (buttons & GBF.LeftShoulder) == GBF.LeftShoulder;
+            ret.HasLeftStickButton = (buttons & GBF.LeftThumb) == GBF.LeftThumb;
+            ret.HasRightShoulderButton = (buttons & GBF.RightShoulder) == GBF.RightShoulder;
+            ret.HasRightStickButton = (buttons & GBF.RightThumb) == GBF.RightThumb;
+            ret.HasStartButton = (buttons & GBF.Start) == GBF.Start;
+            ret.HasXButton = (buttons & GBF.X) == GBF.X;
+            ret.HasYButton = (buttons & GBF.Y) == GBF.Y;
 
             // analog controls
             ret.HasRightTrigger = gamepad.LeftTrigger > 0;
@@ -96,7 +122,7 @@ namespace Microsoft.Xna.Framework.Input
 
             // vibration
 #if DIRECTX11_1
-            bool hasForceFeedback = capabilities.Flags.HasFlag(SharpDX.XInput.CapabilityFlags.FfbSupported);
+            bool hasForceFeedback = (capabilities.Flags & SharpDX.XInput.CapabilityFlags.FfbSupported) == SharpDX.XInput.CapabilityFlags.FfbSupported;
             ret.HasLeftVibrationMotor = hasForceFeedback && capabilities.Vibration.LeftMotorSpeed > 0;
             ret.HasRightVibrationMotor = hasForceFeedback && capabilities.Vibration.RightMotorSpeed > 0;
 #else
@@ -106,30 +132,41 @@ namespace Microsoft.Xna.Framework.Input
 
             // other
             ret.IsConnected = controller.IsConnected;
-            ret.HasVoiceSupport = capabilities.Flags.HasFlag(SharpDX.XInput.CapabilityFlags.VoiceSupported);
+            ret.HasVoiceSupport = (capabilities.Flags & SharpDX.XInput.CapabilityFlags.VoiceSupported) == SharpDX.XInput.CapabilityFlags.VoiceSupported;
 
             return ret;
         }
 
-        public static Microsoft.Xna.Framework.Input.GamePadState GetState(PlayerIndex playerIndex)
+        public static GamePadState GetState(PlayerIndex playerIndex)
         {
-            return GetState(playerIndex, Microsoft.Xna.Framework.Input.GamePadDeadZone.IndependentAxes);
+            return GetState(playerIndex, GamePadDeadZone.IndependentAxes);
         }
 
-        private static SharpDX.XInput.Controller playerOne = new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.One);
-        private static SharpDX.XInput.Controller playerTwo = new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Two);
-        private static SharpDX.XInput.Controller playerThree = new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Three);
-        private static SharpDX.XInput.Controller playerFour = new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Four);
-        private static SharpDX.XInput.Controller playerAny = new SharpDX.XInput.Controller(SharpDX.XInput.UserIndex.Any);
-
-        public static Microsoft.Xna.Framework.Input.GamePadState GetState(PlayerIndex playerIndex,
-            Microsoft.Xna.Framework.Input.GamePadDeadZone deadZoneMode)
+        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
         {
-            var controller = GetController(playerIndex);
-            if (!controller.IsConnected)
-                return new GamePadState(); // GamePadState.IsConnected = false by default
+            // Make sure the player index is in range.
+            var index = (int)playerIndex;
+            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
+                throw new InvalidOperationException();
 
-            var gamepad = controller.GetState().Gamepad;
+            // If the device was disconneced then wait for 
+            // the timeout to elapsed before we test it again.
+            if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
+                return new GamePadState();
+
+            // Try to get the controller state.
+            SharpDX.XInput.State xistate;
+            var controller = _controllers[index];
+            _connected[index] = controller.GetState(out xistate);
+            var gamepad = xistate.Gamepad;
+
+            // If the device is disconnected retry it after the
+            // timeout period has elapsed to avoid the overhead.
+            if (!_connected[index])
+            {
+                _timeout[index] = DateTime.UtcNow.Ticks + TimeoutTicks;
+                return new GamePadState();
+            }
 
             var thumbSticks = new GamePadThumbSticks(
                 leftPosition: ConvertThumbStick(gamepad.LeftThumbX, gamepad.LeftThumbY,
@@ -141,54 +178,33 @@ namespace Microsoft.Xna.Framework.Input
                     leftTrigger: gamepad.LeftTrigger / (float)byte.MaxValue,
                     rightTrigger: gamepad.RightTrigger / (float)byte.MaxValue);
 
+            var dpadState = new GamePadDPad(
+                upValue: ConvertToButtonState(gamepad.Buttons, SharpDX.XInput.GamepadButtonFlags.DPadUp),
+                downValue: ConvertToButtonState(gamepad.Buttons, SharpDX.XInput.GamepadButtonFlags.DPadDown),
+                leftValue: ConvertToButtonState(gamepad.Buttons, SharpDX.XInput.GamepadButtonFlags.DPadLeft),
+                rightValue: ConvertToButtonState(gamepad.Buttons, SharpDX.XInput.GamepadButtonFlags.DPadRight));
+
+            var buttons = ConvertToButtons(
+                buttonFlags: gamepad.Buttons,
+                leftThumbX: gamepad.LeftThumbX,
+                leftThumbY: gamepad.LeftThumbY,
+                rightThumbX: gamepad.RightThumbX,
+                rightThumbY: gamepad.RightThumbY,
+                leftTrigger: gamepad.LeftTrigger,
+                rightTrigger: gamepad.RightTrigger);
+
             var state = new GamePadState(
                 thumbSticks: thumbSticks,
                 triggers: triggers,
-                buttons: ConvertToButtons(
-                    buttonFlags: gamepad.Buttons,
-                    leftThumbX: gamepad.LeftThumbX,
-                    leftThumbY: gamepad.LeftThumbY,
-                    rightThumbX: gamepad.RightThumbX,
-                    rightThumbY: gamepad.RightThumbY,
-                    leftTrigger: gamepad.LeftTrigger,
-                    rightTrigger: gamepad.RightTrigger),
-                dPad: ConvertToGamePadDPad(gamepad.Buttons));
+                buttons: buttons,
+                dPad: dpadState);
 
             return state;
         }
 
-        private static SharpDX.XInput.Controller GetController(PlayerIndex playerIndex)
+        private static Vector2 ConvertThumbStick(short x, short y, short deadZone, GamePadDeadZone deadZoneMode)
         {
-            SharpDX.XInput.Controller controller = null;
-            switch (playerIndex)
-            {
-                case PlayerIndex.One:
-                    // TODO: need to research XInput vs. XNA behavior with regards to which player controllers
-                    // are assigned to in XInput, and if they are reassigned as controllers are added/removed.
-                    // for now, we won't use playerAny unless you pass (PlayerIndex)0
-                    //controller = !playerOne.IsConnected && playerAny.IsConnected ? playerAny : playerOne;
-                    controller = playerOne;
-                    break;
-                case PlayerIndex.Two:
-                    controller = playerTwo;
-                    break;
-                case PlayerIndex.Three:
-                    controller = playerThree;
-                    break;
-                case PlayerIndex.Four:
-                    controller = playerFour;
-                    break;
-                default:
-                    controller = playerAny;
-                    break;
-            }
-            return controller;
-        }
-
-        private static Vector2 ConvertThumbStick(
-            short x, short y, short deadZone, Microsoft.Xna.Framework.Input.GamePadDeadZone deadZoneMode)
-        {
-            if (deadZoneMode == Microsoft.Xna.Framework.Input.GamePadDeadZone.IndependentAxes)
+            if (deadZoneMode == GamePadDeadZone.IndependentAxes)
             {
                 // using int to prevent overrun
                 int fx = x;
@@ -199,7 +215,7 @@ namespace Microsoft.Xna.Framework.Input
                 if (fy * fy < fdz * fdz)
                     y = 0;
             }
-            else if (deadZoneMode == Microsoft.Xna.Framework.Input.GamePadDeadZone.Circular)
+            else if (deadZoneMode == GamePadDeadZone.Circular)
             {
                 // using int to prevent overrun
                 int fx = x;
@@ -216,107 +232,85 @@ namespace Microsoft.Xna.Framework.Input
                                y < 0 ? -((float)y / (float)short.MinValue) : (float)y / (float)short.MaxValue);
         }
 
-        private static Microsoft.Xna.Framework.Input.ButtonState ConvertToButtonState(
+        private static ButtonState ConvertToButtonState(
             SharpDX.XInput.GamepadButtonFlags buttonFlags,
             SharpDX.XInput.GamepadButtonFlags desiredButton)
         {
-            return buttonFlags.HasFlag(desiredButton) ? 
-                Microsoft.Xna.Framework.Input.ButtonState.Pressed : Microsoft.Xna.Framework.Input.ButtonState.Released;
+            return ((buttonFlags & desiredButton) == desiredButton) ? ButtonState.Pressed : ButtonState.Released;
         }
 
-        private static Microsoft.Xna.Framework.Input.GamePadDPad ConvertToGamePadDPad(
-            SharpDX.XInput.GamepadButtonFlags buttonFlags)
-        {
-            return new Microsoft.Xna.Framework.Input.GamePadDPad(
-                upValue: ConvertToButtonState(buttonFlags, SharpDX.XInput.GamepadButtonFlags.DPadUp),
-                downValue: ConvertToButtonState(buttonFlags, SharpDX.XInput.GamepadButtonFlags.DPadDown),
-                leftValue: ConvertToButtonState(buttonFlags, SharpDX.XInput.GamepadButtonFlags.DPadLeft),
-                rightValue: ConvertToButtonState(buttonFlags, SharpDX.XInput.GamepadButtonFlags.DPadRight));
-        }
-
-        private static Microsoft.Xna.Framework.Input.Buttons AddButtonIfPressed(Microsoft.Xna.Framework.Input.Buttons originalButtonState,
+        private static Buttons AddButtonIfPressed(
             SharpDX.XInput.GamepadButtonFlags buttonFlags,
             SharpDX.XInput.GamepadButtonFlags xInputButton,
-            Microsoft.Xna.Framework.Input.Buttons xnaButton)
+            Buttons xnaButton)
         {
-            Microsoft.Xna.Framework.Input.ButtonState buttonState = ConvertToButtonState(buttonFlags, xInputButton);
-            return buttonState == Microsoft.Xna.Framework.Input.ButtonState.Pressed ? originalButtonState | xnaButton : originalButtonState;
+            var buttonState = ((buttonFlags & xInputButton) == xInputButton) ? ButtonState.Pressed : ButtonState.Released;
+            return buttonState == ButtonState.Pressed ? xnaButton : 0;
         }
 
-        private static readonly List<Tuple<GBF, Microsoft.Xna.Framework.Input.Buttons>> buttonMap
-            = new List<Tuple<GBF, Microsoft.Xna.Framework.Input.Buttons>>()
-            {
-                Tuple.Create(GBF.A, Microsoft.Xna.Framework.Input.Buttons.A),
-                Tuple.Create(GBF.B, Microsoft.Xna.Framework.Input.Buttons.B),
-                Tuple.Create(GBF.Back, Microsoft.Xna.Framework.Input.Buttons.Back),
-                Tuple.Create(GBF.DPadDown, Microsoft.Xna.Framework.Input.Buttons.DPadDown),
-                Tuple.Create(GBF.DPadLeft, Microsoft.Xna.Framework.Input.Buttons.DPadLeft),
-                Tuple.Create(GBF.DPadRight, Microsoft.Xna.Framework.Input.Buttons.DPadRight),
-                Tuple.Create(GBF.DPadUp, Microsoft.Xna.Framework.Input.Buttons.DPadUp),
-                Tuple.Create(GBF.LeftShoulder, Microsoft.Xna.Framework.Input.Buttons.LeftShoulder),
-                Tuple.Create(GBF.RightShoulder, Microsoft.Xna.Framework.Input.Buttons.RightShoulder),
-                Tuple.Create(GBF.LeftThumb, Microsoft.Xna.Framework.Input.Buttons.LeftStick),
-                Tuple.Create(GBF.RightThumb, Microsoft.Xna.Framework.Input.Buttons.RightStick),
-                Tuple.Create(GBF.Start, Microsoft.Xna.Framework.Input.Buttons.Start),
-                Tuple.Create(GBF.X, Microsoft.Xna.Framework.Input.Buttons.X),
-                Tuple.Create(GBF.Y, Microsoft.Xna.Framework.Input.Buttons.Y),
-            };
-
-        private static Microsoft.Xna.Framework.Input.Buttons AddThumbstickButtons(
+        private static Buttons AddThumbstickButtons(
             short thumbX, short thumbY, short deadZone, 
-            Microsoft.Xna.Framework.Input.Buttons bitFieldToAddTo,
-            Microsoft.Xna.Framework.Input.Buttons thumbstickLeft, 
-            Microsoft.Xna.Framework.Input.Buttons thumbStickRight, 
-            Microsoft.Xna.Framework.Input.Buttons thumbStickUp, 
-            Microsoft.Xna.Framework.Input.Buttons thumbStickDown)
+            Buttons thumbstickLeft, 
+            Buttons thumbStickRight, 
+            Buttons thumbStickUp, 
+            Buttons thumbStickDown)
         {
             // TODO: this needs adjustment. Very naive implementation. Doesn't match XNA yet
+            var result = (Buttons)0;
             if (thumbX < -deadZone)
-                bitFieldToAddTo = bitFieldToAddTo | thumbstickLeft;
+                result |= thumbstickLeft;
             if (thumbX > deadZone)
-                bitFieldToAddTo = bitFieldToAddTo | thumbStickRight;
+                result |= thumbStickRight;
             if (thumbY < -deadZone)
-                bitFieldToAddTo = bitFieldToAddTo | thumbStickUp;
+                result |= thumbStickUp;
             else if (thumbY > deadZone)
-                bitFieldToAddTo = bitFieldToAddTo | thumbStickDown;
-            return bitFieldToAddTo;
+                result |= thumbStickDown;
+            return result;
         }
 
-        private static Microsoft.Xna.Framework.Input.GamePadButtons ConvertToButtons(SharpDX.XInput.GamepadButtonFlags buttonFlags,
+        private static GamePadButtons ConvertToButtons(SharpDX.XInput.GamepadButtonFlags buttonFlags,
             short leftThumbX, short leftThumbY,
             short rightThumbX, short rightThumbY,
             byte leftTrigger,
             byte rightTrigger)
         {
-            var ret = new Microsoft.Xna.Framework.Input.Buttons();
-            for (int i = 0; i < buttonMap.Count; i++)
-            {
-                var curMap = buttonMap[i];
-                ret = AddButtonIfPressed(ret, buttonFlags, curMap.Item1, curMap.Item2);
-            }
+            var ret = (Buttons)0;
+            ret |= AddButtonIfPressed(buttonFlags, GBF.A, Buttons.A);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.B, Buttons.B);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.Back, Buttons.Back);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.DPadDown, Buttons.DPadDown);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.DPadLeft, Buttons.DPadLeft);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.DPadRight, Buttons.DPadRight);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.DPadUp, Buttons.DPadUp);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.LeftShoulder, Buttons.LeftShoulder);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.RightShoulder, Buttons.RightShoulder);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.LeftThumb, Buttons.LeftStick);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.RightThumb, Buttons.RightStick);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.Start, Buttons.Start);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.X, Buttons.X);
+            ret |= AddButtonIfPressed(buttonFlags, GBF.Y, Buttons.Y);
 
-            ret = AddThumbstickButtons(leftThumbX, leftThumbY,
-                SharpDX.XInput.Gamepad.LeftThumbDeadZone, ret,
-                Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickLeft, 
-                Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickRight, 
-                Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickUp, 
-                Microsoft.Xna.Framework.Input.Buttons.LeftThumbstickDown);
+            ret |= AddThumbstickButtons(leftThumbX, leftThumbY,
+                SharpDX.XInput.Gamepad.LeftThumbDeadZone,
+                Buttons.LeftThumbstickLeft, 
+                Buttons.LeftThumbstickRight, 
+                Buttons.LeftThumbstickUp, 
+                Buttons.LeftThumbstickDown);
 
-            ret = AddThumbstickButtons(rightThumbX, rightThumbY,
-                SharpDX.XInput.Gamepad.RightThumbDeadZone, ret,
-                Microsoft.Xna.Framework.Input.Buttons.RightThumbstickLeft, 
-                Microsoft.Xna.Framework.Input.Buttons.RightThumbstickRight, 
-                Microsoft.Xna.Framework.Input.Buttons.RightThumbstickUp, 
-                Microsoft.Xna.Framework.Input.Buttons.RightThumbstickDown);
+            ret |= AddThumbstickButtons(rightThumbX, rightThumbY,
+                SharpDX.XInput.Gamepad.RightThumbDeadZone,
+                Buttons.RightThumbstickLeft, 
+                Buttons.RightThumbstickRight, 
+                Buttons.RightThumbstickUp, 
+                Buttons.RightThumbstickDown);
 
             if (leftTrigger >= SharpDX.XInput.Gamepad.TriggerThreshold)
-                ret = ret | Microsoft.Xna.Framework.Input.Buttons.LeftTrigger;
+                ret |= Buttons.LeftTrigger;
 
             if (rightTrigger >= SharpDX.XInput.Gamepad.TriggerThreshold)
-                ret = ret | Microsoft.Xna.Framework.Input.Buttons.RightTrigger;
+                ret |= Buttons.RightTrigger;
 
-            var r = new Microsoft.Xna.Framework.Input.GamePadButtons(ret);
-            return r;
+            return new GamePadButtons(ret);
         }
     }
 }

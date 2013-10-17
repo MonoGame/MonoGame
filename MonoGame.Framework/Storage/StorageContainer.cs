@@ -351,6 +351,7 @@ namespace Microsoft.Xna.Framework.Storage
 #endif
 		}				
 
+        /*
         /// <summary>
         /// Returns list of directory names with given search pattern.
         /// </summary>
@@ -360,6 +361,7 @@ namespace Microsoft.Xna.Framework.Storage
 		{
 			throw new NotImplementedException ();
 		}
+        */
 
         /// <summary>
         /// Returns list of file names in the storage-container.

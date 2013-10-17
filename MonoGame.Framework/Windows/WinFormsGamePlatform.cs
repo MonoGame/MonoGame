@@ -83,7 +83,7 @@ namespace MonoGame.Framework
         internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
-        private List<XnaKeys> _keyState;
+        private readonly List<XnaKeys> _keyState;
 
         public WinFormsGamePlatform(Game game)
             : base(game)
@@ -123,8 +123,7 @@ namespace MonoGame.Framework
 
         public override void StartRunLoop()
         {
-            // We don't support syncronous run loops right now!
-            throw new NotSupportedException();
+            throw new NotSupportedException("The Windows platform does not support asynchronous run loops");
         }
         
         public override void Exit()

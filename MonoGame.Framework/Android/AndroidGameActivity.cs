@@ -23,6 +23,13 @@ namespace Microsoft.Xna.Framework
 		private OrientationListener o;		
 		private ScreenReceiver screenReceiver;
 
+		private bool _AutoPauseAndResumeMediaPlayer = true;
+		public bool AutoPauseAndResumeMediaPlayer
+		{
+			get{return _AutoPauseAndResumeMediaPlayer;}
+			set{_AutoPauseAndResumeMediaPlayer = value;}
+		}
+
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
 		/// has been killed due to a higher priority app needing the memory
@@ -83,6 +90,9 @@ namespace Microsoft.Xna.Framework
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
+            if (Game != null)
+                Game.Dispose();
+            Game = null;
 			base.OnDestroy ();
 		}
     }

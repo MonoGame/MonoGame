@@ -68,6 +68,23 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
+	static List<char> targetPlatformIdentifiers = new List<char>()
+        {
+            'w', // Windows
+            'x', // Xbox360
+            'm', // WindowsPhone
+            'i', // iOS
+            'a', // Android
+            'l', // Linux
+            'X', // MacOSX
+            'W', // WindowsStoreApp
+            'n', // NativeClient
+            'u', // Ouya
+            'p', // PlayStationMobile
+            'M', // WindowsPhone8
+            'r', // RaspberryPi
+        };
+
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
@@ -180,7 +197,10 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			if (!disposed)
 			{
-				Unload();
+                if (disposing)
+                {
+                    Unload();
+                }
 				disposed = true;
 			}
 		}
@@ -416,7 +436,7 @@ namespace Microsoft.Xna.Framework.Content
             byte platform = xnbReader.ReadByte();
 
             if (x != 'X' || n != 'N' || b != 'B' ||
-                !(platform == 'w' || platform == 'x' || platform == 'm'))
+                !(targetPlatformIdentifiers.Contains((char)platform)))
             {
                 throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
             }
@@ -543,23 +563,13 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
-                if (asset.Value is Texture2D)
-                {
-                    ReloadAsset<Texture2D>(asset.Key, asset.Value as Texture2D);
-                }
-                else if (asset.Value is SpriteFont)
-                {
-                    ReloadAsset<SpriteFont>(asset.Key, asset.Value as SpriteFont);
-                }
-                else if (asset.Value is Model)
-                {
-                    ReloadAsset<Model>(asset.Key, asset.Value as Model);
-                }
-                // Not requried as we are recompiling them from cached source in response to DeviceReset event
-                //else if (asset.Value is Effect)
-                //{
-                //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
-                //}
+#if WINDOWS_STOREAPP
+                var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
+#else
+                var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
             }
         }
 

@@ -247,8 +247,8 @@ namespace Microsoft.Xna.Framework {
 			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
             _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
 
-			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService(
-				typeof (IGraphicsDeviceService));
+			var gds = _platform.Game.Services.GetService(
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
 			if (gds != null && gds.GraphicsDevice != null)
 			{
@@ -295,15 +295,6 @@ namespace Microsoft.Xna.Framework {
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
 
-			var ctx = ((IGraphicsContextInternal)__renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			// FIXME: MonoTouch needs to allow null arguments to
-			//        RenderBufferStorage, but it doesn't right now.
-			//        So we call it manually.
-			//ctx.EAGLContext.RenderBufferStorage((uint)All.Renderbuffer, null);
-			var selector = new Selector("renderbufferStorage:fromDrawable:");
-			Messaging.bool_objc_msgSend_UInt32_IntPtr(
-				ctx.EAGLContext.Handle, selector.Handle, (uint)All.Renderbuffer, IntPtr.Zero);
-
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
 			_framebuffer = 0;
 
@@ -344,8 +335,8 @@ namespace Microsoft.Xna.Framework {
 		{
 			base.LayoutSubviews ();
 
-            var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
-                typeof (IGraphicsDeviceService));
+            var gds = _platform.Game.Services.GetService (
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
             if (gds == null || gds.GraphicsDevice == null)
                 return;

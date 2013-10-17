@@ -59,10 +59,12 @@ namespace Microsoft.Xna.Framework.Input
 			}
 		}
 		
+        /*
 		public Matrix GetRotation()
         {
 			throw new NotImplementedException();
         }
+        */
 
         public bool IsConnected { get; internal set; }
 	}

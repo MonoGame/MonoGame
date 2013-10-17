@@ -54,10 +54,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     break;
             }
 
-            string songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
+            // Get the song output path with the target format extension.
+            var songFileName = Path.ChangeExtension(context.OutputFilename, AudioHelper.GetExtension(targetFormat));
+
+            // Make sure the output folder for the song exists.
+            Directory.CreateDirectory(Path.GetDirectoryName(songFileName));
+
+            // Convert and write out the song media file.
             input.ConvertFormat(targetFormat, quality, songFileName);
-            var song = new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
-            return song;
+
+            // Return the XNB song content.
+            return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
         }
     }
 }
