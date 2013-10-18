@@ -60,6 +60,11 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _arraySlice; }
         }
 
+        public CubeMapFace CubeMapFace
+        {
+            get { return (CubeMapFace)_arraySlice; }
+        }
+
 		public RenderTargetBinding(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null) 
