@@ -103,6 +103,30 @@ namespace Microsoft.Xna.Framework.Media
         // HACK: Need SharpDX to fix this.
         private static readonly Guid MRPolicyVolumeService = Guid.Parse("1abaa2ac-9d3b-47c6-ab48-c59506de784d");
         private static readonly Guid SimpleAudioVolumeGuid = Guid.Parse("089EDF13-CF71-4338-8D13-9E569DBDC319");
+
+	    private static Callback _callback;
+
+	    private class Callback : IAsyncCallback
+	    {
+		    public void Dispose()
+		    {
+		    }
+
+		    public IDisposable Shadow { get; set; }
+		    public void Invoke(AsyncResult asyncResultRef)
+		    {
+			    var ev = _session.EndGetEvent(asyncResultRef);
+			
+			    if (ev.TypeInfo == MediaEventTypes.EndOfPresentation)
+				    OnSongFinishedPlaying(null, null);
+
+			    _session.BeginGetEvent(this, null);
+		    }
+
+		    public AsyncCallbackFlags Flags { get; private set; }
+		    public WorkQueueId WorkQueueId { get; private set; }
+	    }
+
 #elif WINDOWS_PHONE
         internal static MediaElement _mediaElement;
         private static Uri source;
@@ -426,6 +450,13 @@ namespace Microsoft.Xna.Framework.Media
             // Get the clock.
             _clock = _session.Clock.QueryInterface<PresentationClock>();
 
+			//create the callback if it hasn't been created yet
+			if (_callback == null)
+			{
+				_callback = new Callback();
+				_session.BeginGetEvent(_callback, null);
+			}
+
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
@@ -457,7 +488,7 @@ namespace Microsoft.Xna.Framework.Media
 				_numSongsInQueuePlayed = 0;
 				if (!IsRepeating)
 				{
-					State = MediaState.Stopped;
+					Stop();
 
 					if (ActiveSongChanged != null)
 					{
