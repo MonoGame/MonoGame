@@ -57,13 +57,20 @@ namespace Microsoft.Xna.Framework.Media
         #region Private Variables: Video Implementation
         private string _fileName;
         private Color _backColor = Color.Black;
-        private bool disposed;
         #endregion
         
         #region Internal Variables: TheoraPlay
         internal IntPtr theoraDecoder;
         internal IntPtr videoStream;
         internal IntPtr audioStream;
+        #endregion
+        
+        #region Internal Properties
+        internal bool IsDisposed
+        {
+            get;
+            private set;
+        }
         #endregion
      
         #region Public Properties
@@ -124,7 +131,7 @@ namespace Microsoft.Xna.Framework.Media
             audioStream = IntPtr.Zero;
             
             // Initialize the decoder nice and early...
-            disposed = true;
+            IsDisposed = true;
             Initialize();
             
             // FIXME: This is a part of the Duration hack!
@@ -163,7 +170,7 @@ namespace Microsoft.Xna.Framework.Media
         #region Internal TheoraPlay Initialization
         internal void Initialize()
         {
-            if (!disposed)
+            if (!IsDisposed)
             {
                 Dispose(); // We need to start from the beginning, don't we? :P
             }
@@ -212,6 +219,8 @@ namespace Microsoft.Xna.Framework.Media
                 Width = (int) frame.width;
                 Height = (int) frame.height;
             }
+            
+            IsDisposed = false;
         }
         #endregion
         
@@ -239,7 +248,7 @@ namespace Microsoft.Xna.Framework.Media
                 audioStream = IntPtr.Zero;
             }
             
-            disposed = true;
+            IsDisposed = true;
         }
         #endregion
     }

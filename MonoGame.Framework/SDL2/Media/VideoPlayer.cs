@@ -687,7 +687,10 @@ namespace Microsoft.Xna.Framework.Media
             State = MediaState.Playing;
             
             // Start the video if it hasn't been yet.
-            video.Initialize();
+            if (Video.IsDisposed)
+            {
+                video.Initialize();
+            }
             
             // Grab the first bit of audio. We're trying to start the decoding ASAP.
             if (TheoraPlay.THEORAPLAY_hasAudioStream(Video.theoraDecoder) != 0)
