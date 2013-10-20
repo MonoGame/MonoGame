@@ -406,7 +406,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { CompareFunction.Greater,       DepthFuncMode.Greater   },
             { CompareFunction.LessEqual,     DepthFuncMode.LEqual    },
             { CompareFunction.Less,          DepthFuncMode.Less      },
-            { CompareFunction.NotEqual,      DepthFuncMode.NotEequal },
+            { CompareFunction.NotEqual,      DepthFuncMode.NotEqual },
             { CompareFunction.Never,         DepthFuncMode.Never     },
         };
         
@@ -417,7 +417,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { CompareFunction.Greater,       StencilFuncMode.Greater   },
             { CompareFunction.LessEqual,     StencilFuncMode.LEqual    },
             { CompareFunction.Less,          StencilFuncMode.Less      },
-            { CompareFunction.NotEqual,      StencilFuncMode.NotEequal },
+            { CompareFunction.NotEqual,      StencilFuncMode.NotEqual },
             { CompareFunction.Never,         StencilFuncMode.Never     },
         };
         
