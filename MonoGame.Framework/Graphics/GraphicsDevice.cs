@@ -1294,6 +1294,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
         public void Dispose()
         {
+            Disposing(null,null);
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -1366,9 +1367,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // WINDOWS_STOREAPP
 
-#endif // DIRECTX
 
-#if OPENGL
+#elif OPENGL
                     // Free all the cached shader programs.
                     _programCache.Dispose();
 
@@ -1380,9 +1380,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             GraphicsExtensions.CheckGLError();
                         }
                     });
-#endif
-
-#if PSM
+#elif PSM
                     if (_graphics != null)
                     {
                         _graphics.Dispose();
@@ -1680,6 +1678,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Clear the current bindings.
             Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 
+            int renderTargetWidth;
+            int renderTargetHeight;
             if (renderTargets == null)
             {
                 _currentRenderTargetCount = 0;
@@ -1696,14 +1696,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
                 GraphicsExtensions.CheckGLError();
 #elif PSM
-                _graphics.SetFrameBuffer(_graphics.Screen);
+                _graphics.SetFrameBuffer(null);
 #endif
                 clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
-                Viewport = new Viewport(0, 0,
-					PresentationParameters.BackBufferWidth, 
-					PresentationParameters.BackBufferHeight);
-			}
+                renderTargetWidth = PresentationParameters.BackBufferWidth;
+                renderTargetHeight = PresentationParameters.BackBufferHeight;
+            }
 			else
 			{
                 // Copy the new bindings.
@@ -1790,12 +1789,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
 
-                // Set the viewport to the size of the first render target.
-                Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
-
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+
+                renderTargetWidth = renderTarget.Width;
+                renderTargetHeight = renderTarget.Height;
             }
+
+            // Set the viewport to the size of the first render target.
+            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // Set the scissor rectangle to the size of the first render target.
+            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
 
             // In XNA 4, because of hardware limitations on Xbox, when
             // a render target doesn't have PreserveContents as its usage
@@ -2338,6 +2343,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Release the handles.
             vbHandle.Free();
+#elif PSM
+             //Create a temporary vertex buffer, set the vertice data and index data, draw and finally remove and dispose the temporary vertex buffer
+            PssVertexBuffer temporaryBuffer = new PssVertexBuffer(vertexData.Length, PSSHelper.ToVertexFormat<T>());
+            
+            //temporaryBuffer.SetVertices(0, vertexData, PSSHelper.ToVertexFormat<T>(), Vector4.Zero.ToPssVector4()
+            //                           , Vector4.One.ToPssVector4(),0,vertexDeclaration.VertexStride,0, vertexOffset, vertexData.Length);
+            
+            
+            temporaryBuffer.SetVertices(0, vertexData);
+            
+            _graphics.SetVertexBuffer(0, temporaryBuffer);
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), 0, primitiveCount);
+            _graphics.SetVertexBuffer(0, null);
+            
+            temporaryBuffer.Dispose();   
 #endif
         }
 
@@ -2378,7 +2398,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
             Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
@@ -2428,6 +2448,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+#elif PSM
+                    DrawUserIndexedPrimitives<T, short>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
 #else
             throw new NotImplementedException("Not implemented");
 #endif
@@ -2487,14 +2509,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Release the handles.
             ibHandle.Free();
-            vbHandle.Free();
-
+            vbHandle.Free();   
+#elif PSM
+                DrawUserIndexedPrimitives<T, int>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
 #else
             throw new NotImplementedException("Not implemented");
 #endif
         }
-
+            
 #if PSM
+        internal void DrawUserIndexedPrimitives<T,TIndex>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, TIndex[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        {
+             //Create a temporary vertex buffer, set the vertice data and index data, draw and finally remove and dispose the temporary vertex buffer
+            PssVertexBuffer temporaryBuffer = new PssVertexBuffer(numVertices, primitiveCount, PSSHelper.ToVertexFormat<T>());
+            
+            temporaryBuffer.SetVertices(0, vertexData, PSSHelper.ToVertexFormat<T>(), Vector4.Zero.ToPssVector4()
+                                        , Vector4.One.ToPssVector4(),0,vertexDeclaration.VertexStride,0, vertexOffset, numVertices);
+            //Convert index data to proper format and copy information to the vertex buffer
+            temporaryBuffer.SetIndices(Array.ConvertAll<TIndex, ushort>(indexData, item => (ushort)(object)item), 0, indexOffset, primitiveCount);
+            
+            _graphics.SetVertexBuffer(0, temporaryBuffer);
+            _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), 0, primitiveCount);
+            _graphics.SetVertexBuffer(0, null);
+            
+            temporaryBuffer.Dispose();   
+        }   
+            
         internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
         {
             int bestMatchIndex = -1;

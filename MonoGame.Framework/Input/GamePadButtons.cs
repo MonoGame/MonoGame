@@ -134,6 +134,38 @@ namespace Microsoft.Xna.Framework.Input
             foreach (Buttons b in buttons)
                 this.buttons |= b;
         }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadButtons"/> are equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
+        public static bool operator ==(GamePadButtons left, GamePadButtons right)
+        {
+            return left.buttons == right.buttons;
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadButtons"/> are not equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
+        public static bool operator !=(GamePadButtons left, GamePadButtons right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare to this instance.</param>
+        /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadButtons"/> and has the same value as this instance; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is GamePadButtons) && (this == (GamePadButtons)obj);
+        }
     }
 }
 

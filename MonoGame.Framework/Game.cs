@@ -658,9 +658,6 @@ namespace Microsoft.Xna.Framework
         private void Components_ComponentAdded(
             object sender, GameComponentCollectionEventArgs e)
         {
-            // Since we only subscribe to ComponentAdded after the graphics
-            // devices are set up, it is safe to just blindly call Initialize.
-            e.GameComponent.Initialize();
             CategorizeComponent(e.GameComponent);
         }
 
@@ -783,8 +780,6 @@ namespace Microsoft.Xna.Framework
         // NOTE: InitializeExistingComponents really should only be called once.
         //       Game.Initialize is the only method in a position to guarantee
         //       that no component will get a duplicate Initialize call.
-        //       Further calls to Initialize occur immediately in response to
-        //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
             // TODO: Would be nice to get rid of this copy, but since it only
