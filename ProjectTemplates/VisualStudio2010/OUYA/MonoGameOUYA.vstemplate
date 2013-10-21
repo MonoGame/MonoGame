@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
     <Name>MonoGame OUYA Project</Name>
-    <Description>A MonoGame game project for OUYA which requires "Mono for Android" by Xamarin.</Description>
+    <Description>A MonoGame game project for OUYA using Xamarin.Android 4.8.2 or greater.</Description>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
@@ -37,6 +37,9 @@
           <ProjectItem ReplaceParameters="false" TargetFileName="ouya_icon.png">ouya_icon.png</ProjectItem>
         </Folder>
         <Folder Name="Layout" TargetFolderName="Layout" />
+        <Folder Name="Raw" TargetFolderName="Raw">
+          <ProjectItem ReplaceParameters="false" TargetFileName="key.der">key.der</ProjectItem>
+        </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="Resource.Designer.cs">Resource.Designer.cs</ProjectItem>
         <Folder Name="Values" TargetFolderName="Values">
           <ProjectItem ReplaceParameters="true" TargetFileName="Strings.xml">Strings.xml</ProjectItem>

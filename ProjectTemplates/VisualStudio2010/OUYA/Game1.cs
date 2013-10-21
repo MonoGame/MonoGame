@@ -1,6 +1,12 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Ouya.Console.Api;
+
+// There are three things that need to be done for each new OUYA project:
+// 1. Insert your OUYA developer key in the Initialize method below.
+// 2. Replace Resources\Raw\key.der with your application key downloaded from the OUYA dev portal.
+// 3. Replace the product IDs in the call to RequestProductListAsync with your product IDs.
 
 namespace $safeprojectname$
 {
@@ -12,6 +18,7 @@ namespace $safeprojectname$
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont font;
+        OuyaFacade facade;
 
         public Game1()  
         {
@@ -34,8 +41,13 @@ namespace $safeprojectname$
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            facade = OuyaFacade.Instance;
+            facade.Init(Activity, "insert your developer key here");
 
             base.Initialize();
+            
+            // Start the IAP test as an async task so it runs in the background.
+            DoIapTest();
         }
 
         /// <summary>
@@ -81,6 +93,24 @@ namespace $safeprojectname$
             spriteBatch.End();
 
             base.Draw (gameTime);
+        }
+
+        async void DoIapTest()
+        {
+            // Retrieve the receipts to see what items the user has previously purchased.
+            var receipts = await facade.RequestReceiptsAsync();
+            // Retrieve the known products from the OUYA Store.
+            var products = await facade.RequestProductListAsync("__TEST__01", "__TEST__02");
+            // Make a purchase of the first product in the list.
+            // NOTE: This would usually be initiated by a user action such as a button press.
+            var purchaseResult = await facade.RequestPurchaseAsync(products[0]);
+            // If the purchase was successful...
+            if (purchaseResult)
+            {
+                // ...retrieve the receipts again from the OUYA Store.
+                // This will include the new purchase.
+                receipts = await facade.RequestReceiptsAsync();
+            }
         }
     }
 }
