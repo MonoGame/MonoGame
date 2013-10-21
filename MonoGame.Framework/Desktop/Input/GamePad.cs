@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Input
 				PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), x);
 				devices[x] = Sdl.SDL_JoystickOpen(pc.Index);
 
-#if MONOGAME
+#if MONOMAC
 
                 pc.Button_A.ID = 11;
                 pc.Button_A.Type = InputType.Button;
