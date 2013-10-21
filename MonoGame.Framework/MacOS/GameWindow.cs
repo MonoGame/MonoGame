@@ -402,7 +402,11 @@ namespace Microsoft.Xna.Framework
                 else
                     Window.StyleMask &= ~NSWindowStyle.Resizable;
 
-				Window.StandardWindowButton(NSWindowButton.ZoomButton).Enabled = value;
+				// Null check here is important because some of the time we don't have a zoom button.
+				NSButton zoomButton = Window.StandardWindowButton(NSWindowButton.ZoomButton);
+				if (zoomButton != null) {
+					zoomButton.Enabled = value;
+				}
 			}
 		}	
 
