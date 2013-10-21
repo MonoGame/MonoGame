@@ -136,11 +136,11 @@ namespace Microsoft.Xna.Framework.Input
                 pc.RightStick.Y.Positive.Type = InputType.Axis;
                 pc.RightStick.Y.Positive.Negative = false;
 
-                pc.RightStick.X.Negative.ID = 4;
+                pc.RightStick.X.Negative.ID = 2;
                 pc.RightStick.X.Negative.Type = InputType.Axis;
                 pc.RightStick.X.Negative.Negative = true;
 
-                pc.RightStick.X.Positive.ID = 4;
+                pc.RightStick.X.Positive.ID = 2;
                 pc.RightStick.X.Positive.Type = InputType.Axis;
                 pc.RightStick.X.Positive.Negative = false;
 
@@ -156,13 +156,13 @@ namespace Microsoft.Xna.Framework.Input
                 pc.Dpad.Right.ID = 3;
                 pc.Dpad.Right.Type = InputType.Button;
 
-                pc.LeftTrigger.ID = 2;
+                pc.LeftTrigger.ID = 4;
                 pc.LeftTrigger.Type = InputType.Axis;
                 pc.LeftTrigger.Negative = false;
 
-                pc.RightTrigger.ID = 2;
+                pc.RightTrigger.ID = 5;
                 pc.RightTrigger.Type = InputType.Axis;
-                pc.RightTrigger.Negative = true;
+                pc.RightTrigger.Negative = false;
 
 #else
 
