@@ -125,12 +125,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="filename">Compiled shader file path.</param>
         public ComputeShader(GraphicsDevice graphics, string filename)
         {
+#if DIRECTX
             device = (Device)graphics.Handle;
 
             if (!File.Exists(filename)) throw new FileNotFoundException("File not found.",filename);
 
             byte[] bytecode;
-            string str = null;
             try
             {
                 bytecode = File.ReadAllBytes(filename);
@@ -142,6 +142,33 @@ namespace Microsoft.Xna.Framework.Graphics
 
             computeShader = new SharpDX.Direct3D11.ComputeShader(device, bytecode);
             context = device.ImmediateContext;
+#elif OPENGL  
+            device = (Device)graphics.Handle;
+
+            if (!File.Exists(filename)) throw new FileNotFoundException("File not found.",filename);
+
+            byte[] bytecode;
+            try
+            {
+                bytecode = File.ReadAllBytes(filename);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("File read access error.");
+            }
+
+             //uint shader = gl.CreateShader(GL.COMPUTE_SHADER); 
+           
+            //gl.ShaderSource(shader, Encoding.Unicode.GetString(bytecode));
+            //gl.CompileShader(shader);
+             
+            //StringBuilder log = new StringBuilder(4096);
+            //gl.GetShaderInfoLog(shader, sizeof(char)*4096, null, log);
+  
+            //program = gl.CreateProgram();
+            //gl.AttachShader(program, shader);
+            //gl.DeleteShader(shader);
+#endif
         }
 #endif
 
@@ -175,6 +202,8 @@ namespace Microsoft.Xna.Framework.Graphics
             ShaderResourceView sv = new ShaderResourceView(device,surface.GetTexture());
             context.ComputeShader.SetShaderResource(0,sv);
             sv.Dispose();
+#elif OPENGL
+
 #endif
         }
 
@@ -189,6 +218,8 @@ namespace Microsoft.Xna.Framework.Graphics
             ShaderResourceView sv = new ShaderResourceView(device, surface.GetTexture());
             context.ComputeShader.SetShaderResource(index, sv);
             sv.Dispose();
+#elif OPENGL
+
 #endif
         }
 
@@ -200,6 +231,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if DIRECTX
             context.ComputeShader.SetUnorderedAccessView(0, surface.view);
+#elif OPENGL
+
 #endif
         }
 
@@ -212,6 +245,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if DIRECTX
             context.ComputeShader.SetUnorderedAccessView(index, surface.view);
+#elif OPENGL
+
 #endif
         }
 
