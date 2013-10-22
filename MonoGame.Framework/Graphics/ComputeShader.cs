@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         /// <summary>
-        /// Creates constant buffer.
+        /// Create a buffer.
         /// </summary>
         /// <param name="sizeinBytes">Buffer size in bytes.</param>
         public void AddBuffer(int sizeinBytes)
@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         
         /// <summary>
-        /// Push input data to buffer.
+        /// Push data to buffer.
         /// </summary>
         /// <typeparam name="T">Data type.</typeparam>
         /// <param name="data">Data.</param>
@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Runs compute shader and performs calculation.
+        /// Run compute shader and performs calculation.
         /// </summary>
         /// <param name="threadGroupCountX"></param>
         /// <param name="threadGroupCountY"></param>
@@ -234,30 +234,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Sets the input surface for computation.
+        /// Set the input surface for computation.
         /// </summary>
         /// <param name="surface">Input surface of <see cref="Texture2D"/> type.</param>
-        public void SetInputSurface(Texture2D surface)
-        {
-#if DIRECTX
-            ShaderResourceView sv = new ShaderResourceView(device,surface.GetTexture());
-            context.ComputeShader.SetShaderResource(0,sv);
-            sv.Dispose();
-#elif OPENGL
-
-#endif
-        }
-
-        /// <summary>
-        /// Sets the input surface for computation.
-        /// </summary>
-        /// <param name="surface">Input surface of <see cref="Texture2D"/> type.</param>
-        /// <param name="index">Index of surface in compute shader.</param>
-        public void SetInputSurface(Texture2D surface,int index)
+        /// <param name="slot">Index of surface in compute shader.</param>
+        public void SetInputSurface(Texture2D surface,int slot=0)
         {
 #if DIRECTX
             ShaderResourceView sv = new ShaderResourceView(device, surface.GetTexture());
-            context.ComputeShader.SetShaderResource(index, sv);
+            context.ComputeShader.SetShaderResource(slot, sv);
             sv.Dispose();
 #elif OPENGL
 
@@ -265,27 +250,14 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Sets the output surface for computation.
+        /// Set the output surface for computation.
         /// </summary>
         /// <param name="surface">Output surface of <see cref="ComputeSurface2D"/> type.</param>
-        public void SetOutputSurface(ComputeSurface2D surface)
+        /// <param name="slot">Index of surface in compute shader.</param>
+        public void SetOutputSurface(ComputeSurface2D surface,int slot=0)
         {
 #if DIRECTX
-            context.ComputeShader.SetUnorderedAccessView(0, surface.view);
-#elif OPENGL
-
-#endif
-        }
-
-        /// <summary>
-        /// Sets the output surface for computation.
-        /// </summary>
-        /// <param name="surface">Output surface of <see cref="ComputeSurface2D"/> type.</param>
-        /// <param name="index">Index of surface in compute shader.</param>
-        public void SetOutputSurface(ComputeSurface2D surface,int index)
-        {
-#if DIRECTX
-            context.ComputeShader.SetUnorderedAccessView(index, surface.view);
+            context.ComputeShader.SetUnorderedAccessView(slot, surface.view);
 #elif OPENGL
 
 #endif
@@ -311,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Releases internal unmanaged resources.
+        /// Releases unmanaged resources.
         /// </summary>
         public void Dispose()
         {
