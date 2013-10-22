@@ -67,7 +67,9 @@ non-infringement.
 #endregion License
 
 using System;
-
+#if !WINRT
+    using System.IO;
+#endif
 #if DIRECTX
     using SharpDX.Direct3D11;
 #else
@@ -114,6 +116,34 @@ namespace Microsoft.Xna.Framework.Graphics
             //gl.DeleteShader(shader);
 #endif
         }
+
+#if !WINRT
+        /// <summary>
+        /// Creates a new instance of <see cref="ComputeShader"/> class.
+        /// </summary>
+        /// <param name="graphics">Valid <see cref="GraphicsDevice"/>.</param>
+        /// <param name="filename">Compiled shader file path.</param>
+        public ComputeShader(GraphicsDevice graphics, string filename)
+        {
+            device = (Device)graphics.Handle;
+
+            if (!File.Exists(filename)) throw new FileNotFoundException("File not found.",filename);
+
+            byte[] bytecode;
+            string str = null;
+            try
+            {
+                bytecode = File.ReadAllBytes(filename);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("File read access error.");
+            }
+
+            computeShader = new SharpDX.Direct3D11.ComputeShader(device, bytecode);
+            context = device.ImmediateContext;
+        }
+#endif
 
         /// <summary>
         /// Runs compute shader and performs calculation.
@@ -210,7 +240,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 computeShader.Dispose();
             }
-#else
+#elif OPENGL
             //if (program != 0)
             //{
             //    gl.DeleteProgram(program);
