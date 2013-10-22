@@ -248,9 +248,10 @@ namespace Microsoft.Xna.Framework.Input
                 pc.RightTrigger.Type = InputType.Axis;
                 pc.RightTrigger.Negative = true;
 
-				// Suggestion: Xbox Guide button <=> BigButton
-				//pc.BigButton.ID = 8;
-				//pc.BigButton.Type = InputType.Button;
+                // Suggestion: Xbox Guide button <=> BigButton
+                //pc.BigButton.ID = 8;
+                //pc.BigButton.Type = InputType.Button;
+#endif
 
 #if DEBUG
 				int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
