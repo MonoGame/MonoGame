@@ -67,6 +67,7 @@ non-infringement.
 #endregion License
 
 using System;
+using System.Collections.Generic;
 #if !WINRT
     using System.IO;
 #endif
@@ -87,6 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private SharpDX.Direct3D11.ComputeShader computeShader;
         private Device device;
         private DeviceContext context;
+        private List<SharpDX.Direct3D11.Buffer> cbuffers = new List<SharpDX.Direct3D11.Buffer>(); 
 #elif OPENGL 
         private uint program = 0U; 
 #endif
@@ -143,7 +145,6 @@ namespace Microsoft.Xna.Framework.Graphics
             computeShader = new SharpDX.Direct3D11.ComputeShader(device, bytecode);
             context = device.ImmediateContext;
 #elif OPENGL  
-            device = (Device)graphics.Handle;
 
             if (!File.Exists(filename)) throw new FileNotFoundException("File not found.",filename);
 
@@ -171,6 +172,46 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 #endif
+
+        /// <summary>
+        /// Creates constant buffer.
+        /// </summary>
+        /// <param name="sizeinBytes">Buffer size in bytes.</param>
+        public void AddBuffer(int sizeinBytes)
+        {
+#if DIRECTX
+
+            SharpDX.Direct3D11.Buffer buffer =
+                new SharpDX.Direct3D11.Buffer(
+                    device,
+                    sizeinBytes,
+                    ResourceUsage.Default,
+                    BindFlags.ConstantBuffer,
+                    CpuAccessFlags.None,
+                    ResourceOptionFlags.None,
+                    0
+                    );
+             cbuffers.Add(buffer);
+#elif OPENGL
+
+#endif
+        }
+        
+        /// <summary>
+        /// Push input data to buffer.
+        /// </summary>
+        /// <typeparam name="T">Data type.</typeparam>
+        /// <param name="data">Data.</param>
+        /// <param name="index">Both index of buffer and slot.</param>
+        public void ApplyBuffer<T>(T[] data,int index=0) where T : struct
+        {
+#if DIRECTX
+            context.UpdateSubresource(data, cbuffers[index]);
+            context.ComputeShader.SetConstantBuffer(index,cbuffers[index]);
+#elif OPENGL
+
+#endif
+        }
 
         /// <summary>
         /// Runs compute shader and performs calculation.
@@ -257,6 +298,10 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 computeShader.Dispose();
             }
+            foreach (var cbuffer in cbuffers)
+            {
+                cbuffer.Dispose();
+            }
 #elif OPENGL
             //if (program != 0)
             //{
@@ -274,6 +319,10 @@ namespace Microsoft.Xna.Framework.Graphics
             if (computeShader != null)
             {
                 computeShader.Dispose();
+            }
+            foreach (var cbuffer in cbuffers)
+            {
+                cbuffer.Dispose();
             }
 #elif OPENGL
             //if (program != 0)
