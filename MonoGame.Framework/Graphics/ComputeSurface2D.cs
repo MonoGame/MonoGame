@@ -86,13 +86,13 @@ namespace Microsoft.Xna.Framework.Graphics
         private int width;
         private int height;
 #if DIRECTX
-        internal Format _format;
-        internal Device _device;
-        internal DeviceContext _context;
-        internal SharpDX.Direct3D11.Texture2D _texture;
-        internal UnorderedAccessView _view;
+        internal Format format;
+        internal Device device;
+        internal DeviceContext context;
+        internal SharpDX.Direct3D11.Texture2D texture;
+        internal UnorderedAccessView view;
 #elif OPENGL
-        internal uint texture = uint.MaxValue;
+        internal uint texture = 0;
 
         public static uint GetBoundTexture2D()
         { 
@@ -101,44 +101,6 @@ namespace Microsoft.Xna.Framework.Graphics
             //return (uint)data[0];
 
             return 0;
-        }
-
-#endif
-        public int Width { get { return width; } }
-        public int Height { get { return height; } }
-
-
-        public ComputeSurface2D(GraphicsDevice graphics, int width, int height)
-        {
-            this.width = width;
-            this.height = height;
-#if DIRECTX
-            _device = (Device)graphics.Handle;
-            _context = _device.ImmediateContext;
-            Texture2DDescription desc = new Texture2DDescription();
-            desc.ArraySize = 1;
-            desc.BindFlags = BindFlags.UnorderedAccess;
-            desc.CpuAccessFlags = CpuAccessFlags.None;
-            desc.Format = _format = Format.R8G8B8A8_UNorm;
-            desc.Width = width;
-            desc.Height = height;
-            desc.MipLevels = 1;
-            desc.SampleDescription.Count = 1;
-            desc.SampleDescription.Quality = 0;
-            desc.Usage = ResourceUsage.Default;
-            _texture = new SharpDX.Direct3D11.Texture2D(_device, desc);
-            _view = new UnorderedAccessView(_device, _texture);
-#elif OPENGL  
-            //// Store the current bound texture.
-            //var prevTexture = GetBoundTexture2D();
-
-            //texture = gl.GenTexture();
-            //gl.BindTexture(GL.TEXTURE_2D, this.texture);
-            //gl.TexStorage2D(GL.TEXTURE_2D, 1, GL.RGBA32F, width, height);
-               
-            //// Restore the bound texture.
-            //gl.BindTexture(GL.TEXTURE_2D, prevTexture);  
-#endif
         }
 
         private Color[] ConvertByteArrayToColorArray(byte[] arr)
@@ -156,6 +118,55 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return carr;
         }
+#endif
+        /// <summary>
+        /// Gets the width of <see cref="ComputeSurface2D"/>.
+        /// </summary>
+        public int Width { get { return width; } }
+        /// <summary>
+        /// Gets the height of <see cref="ComputeSurface2D"/>.
+        /// </summary>
+        public int Height { get { return height; } }
+
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ComputeSurface2D"/> class.
+        /// </summary>
+        /// <param name="graphics">Valid <see cref="GraphicsDevice"/>.</param>
+        /// <param name="width">Width of new surface.</param>
+        /// <param name="height">Height of new surface.</param>
+        public ComputeSurface2D(GraphicsDevice graphics, int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+#if DIRECTX
+            device = (Device)graphics.Handle;
+            context = device.ImmediateContext;
+            Texture2DDescription desc = new Texture2DDescription();
+            desc.ArraySize = 1;
+            desc.BindFlags = BindFlags.UnorderedAccess;
+            desc.CpuAccessFlags = CpuAccessFlags.None;
+            desc.Format = format = Format.R8G8B8A8_UNorm;
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = 1;
+            desc.SampleDescription.Count = 1;
+            desc.SampleDescription.Quality = 0;
+            desc.Usage = ResourceUsage.Default;
+            texture = new SharpDX.Direct3D11.Texture2D(device, desc);
+            view = new UnorderedAccessView(device, texture);
+#elif OPENGL  
+            //// Store the current bound texture.
+            //var prevTexture = GetBoundTexture2D();
+
+            //texture = gl.GenTexture();
+            //gl.BindTexture(GL.TEXTURE_2D, this.texture);
+            //gl.TexStorage2D(GL.TEXTURE_2D, 1, GL.RGBA32F, width, height);
+               
+            //// Restore the bound texture.
+            //gl.BindTexture(GL.TEXTURE_2D, prevTexture);  
+#endif
+        }
 
         public void GetData(int level, Rectangle? rect, Color[] data, int startIndex, int elementCount)
         {
@@ -170,7 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Height = height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
-            desc.Format = _format;
+            desc.Format = format;
             desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
             desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
             desc.SampleDescription.Count = 1;
@@ -178,8 +189,8 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-            var d3dContext = _context;
-            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(_device, desc))
+            var d3dContext = context;
+            using (var stagingTex = new SharpDX.Direct3D11.Texture2D(device, desc))
                 lock (d3dContext)
                 {
                     // Copy the data from the GPU to the staging texture.
@@ -189,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         throw new NotImplementedException();
                     }
                     else
-                        d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
+                        d3dContext.CopySubresourceRegion(texture, level, null, stagingTex, 0, 0, 0, 0);
 
                     // Copy the data to the array.
                     SharpDX.DataStream stream;
@@ -237,6 +248,10 @@ namespace Microsoft.Xna.Framework.Graphics
             this.GetData(0, null, data, startIndex, elementCount);
         }
 
+        /// <summary>
+        /// Fills the array of <see cref="Color"/> with computation result.
+        /// </summary>
+        /// <param name="data"><see cref="Color"/> array.</param>
         public void GetData(Color[] data)
         {
             this.GetData(0, null, data, 0, data.Length);
@@ -245,13 +260,13 @@ namespace Microsoft.Xna.Framework.Graphics
         ~ComputeSurface2D()
         {
 #if DIRECTX
-            if (_view != null)
+            if (view != null)
             {
-                _view.Dispose();
+                view.Dispose();
             }
-            if (_texture != null)
+            if (texture != null)
             {
-                _texture.Dispose();
+                texture.Dispose();
             }
 #elif OPENGL
             //if (texture != uint.MaxValue)
@@ -261,16 +276,19 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /// <summary>
+        /// Releases internal unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
 #if DIRECTX
-            if (_view != null)
+            if (view != null)
             {
-                _view.Dispose();
+                view.Dispose();
             }
-            if (_texture != null)
+            if (texture != null)
             {
-                _texture.Dispose();
+                texture.Dispose();
             }
 #elif OPENGL
             //if (texture != uint.MaxValue)

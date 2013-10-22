@@ -76,19 +76,28 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Shader for calculations on GPU.
+    /// </summary>
     public sealed class ComputeShader : IDisposable
     {
 #if DIRECTX
         private SharpDX.Direct3D11.ComputeShader computeShader;
+        private Device device;
         private DeviceContext context;
 #elif OPENGL 
         private uint program = 0U; 
 #endif
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ComputeShader"/> class.
+        /// </summary>
+        /// <param name="graphics">Valid <see cref="GraphicsDevice"/>.</param>
+        /// <param name="bytecode">Compiled compute shader bytecode.</param>
         public ComputeShader(GraphicsDevice graphics, byte[] bytecode)
         {
 #if DIRECTX
-            Device device = (Device) graphics.Handle;
+            device = (Device) graphics.Handle;
             computeShader = new SharpDX.Direct3D11.ComputeShader(device, bytecode);
             context = device.ImmediateContext;
 #elif OPENGL  
@@ -106,6 +115,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /// <summary>
+        /// Runs compute shader and performs calculation.
+        /// </summary>
+        /// <param name="threadGroupCountX"></param>
+        /// <param name="threadGroupCountY"></param>
+        /// <param name="threadGroupCountZ"></param>
         public void Compute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
         {
 #if DIRECTX
@@ -120,13 +135,53 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /// <summary>
+        /// Sets the input surface for computation.
+        /// </summary>
+        /// <param name="surface">Input surface of <see cref="Texture2D"/> type.</param>
+        public void SetInputSurface(Texture2D surface)
+        {
+#if DIRECTX
+            ShaderResourceView sv = new ShaderResourceView(device,surface.GetTexture());
+            context.ComputeShader.SetShaderResource(0,sv);
+            sv.Dispose();
+#endif
+        }
+
+        /// <summary>
+        /// Sets the input surface for computation.
+        /// </summary>
+        /// <param name="surface">Input surface of <see cref="Texture2D"/> type.</param>
+        /// <param name="index">Index of surface in compute shader.</param>
+        public void SetInputSurface(Texture2D surface,int index)
+        {
+#if DIRECTX
+            ShaderResourceView sv = new ShaderResourceView(device, surface.GetTexture());
+            context.ComputeShader.SetShaderResource(index, sv);
+            sv.Dispose();
+#endif
+        }
+
+        /// <summary>
+        /// Sets the output surface for computation.
+        /// </summary>
+        /// <param name="surface">Output surface of <see cref="ComputeSurface2D"/> type.</param>
         public void SetOutputSurface(ComputeSurface2D surface)
         {
 #if DIRECTX
-            context.ComputeShader.SetUnorderedAccessView(0, surface._view);
-#elif OPENGL
-            //gl.UseProgram(program);
-            //gl.BindImageTexture(0, surface.texture, 0, false, 0, GL.WRITE_ONLY, GL.RGBA32F);
+            context.ComputeShader.SetUnorderedAccessView(0, surface.view);
+#endif
+        }
+
+        /// <summary>
+        /// Sets the output surface for computation.
+        /// </summary>
+        /// <param name="surface">Output surface of <see cref="ComputeSurface2D"/> type.</param>
+        /// <param name="index">Index of surface in compute shader.</param>
+        public void SetOutputSurface(ComputeSurface2D surface,int index)
+        {
+#if DIRECTX
+            context.ComputeShader.SetUnorderedAccessView(index, surface.view);
 #endif
         }
 
@@ -145,6 +200,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        /// <summary>
+        /// Releases internal unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
 #if DIRECTX
