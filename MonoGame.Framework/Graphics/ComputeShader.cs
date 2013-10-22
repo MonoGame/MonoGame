@@ -214,6 +214,58 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// Push data to buffer.
+        /// </summary>
+        /// <typeparam name="T">Data type.</typeparam>
+        /// <param name="data">Data.</param>
+        /// <param name="index">Both index of buffer and slot.</param>
+        public void ApplyBuffer<T>(T data, int index = 0) where T : struct
+        {
+#if DIRECTX
+            T[] t = new T[1];
+            t[0] = data;
+            context.UpdateSubresource(t, cbuffers[index]);
+            context.ComputeShader.SetConstantBuffer(index, cbuffers[index]);
+#elif OPENGL
+
+#endif
+        }
+
+        /// <summary>
+        /// Push data to buffer.
+        /// </summary>
+        /// <typeparam name="T">Data type.</typeparam>
+        /// <param name="data">Data.</param>
+        /// <param name="index">Both index of buffer and slot.</param>
+        public void ApplyBuffer<T>(ref T[] data, int index = 0) where T : struct
+        {
+#if DIRECTX
+            context.UpdateSubresource(data, cbuffers[index]);
+            context.ComputeShader.SetConstantBuffer(index, cbuffers[index]);
+#elif OPENGL
+
+#endif
+        }
+
+        /// <summary>
+        /// Push data to buffer.
+        /// </summary>
+        /// <typeparam name="T">Data type.</typeparam>
+        /// <param name="data">Data.</param>
+        /// <param name="index">Both index of buffer and slot.</param>
+        public void ApplyBuffer<T>(ref T data, int index = 0) where T : struct
+        {
+#if DIRECTX
+            T[] t = new T[1];
+            t[0] = data;
+            context.UpdateSubresource(t, cbuffers[index]);
+            context.ComputeShader.SetConstantBuffer(index, cbuffers[index]);
+#elif OPENGL
+
+#endif
+        }
+
+        /// <summary>
         /// Run compute shader and performs calculation.
         /// </summary>
         /// <param name="threadGroupCountX"></param>
