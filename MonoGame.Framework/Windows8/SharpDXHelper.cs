@@ -198,7 +198,7 @@ namespace Microsoft.Xna.Framework
             };
         }
 
-        static public SharpDX.Direct3D11.Comparison ToComparisson(CompareFunction compare)
+        static public SharpDX.Direct3D11.Comparison ToComparison(CompareFunction compare)
         {
             switch (compare)
             {

@@ -223,7 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // To support feature level 9.1 these must 
                 // be set to these exact values.
                 desc.MaximumLod = float.MaxValue;
-                desc.ComparisonFunction = SharpDXHelper.ToComparisson(CompareFunction);
+                desc.ComparisonFunction = SharpDXHelper.ToComparison(CompareFunction);
 
                 // Create the state.
                 _state = new SharpDX.Direct3D11.SamplerState(GraphicsDevice._d3dDevice, desc);
@@ -234,9 +234,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return _state;
         }
 
-        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter, bool comparisson = false)
+        private static SharpDX.Direct3D11.Filter GetFilter(TextureFilter filter, bool comparison)
         {
-            if (comparisson)
+            if (comparison)
             {
                 switch (filter)
                 {

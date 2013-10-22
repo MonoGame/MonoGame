@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var desc = new SharpDX.Direct3D11.DepthStencilStateDescription();
 
                 desc.IsDepthEnabled = DepthBufferEnable;
-                desc.DepthComparison = SharpDXHelper.ToComparisson(DepthBufferFunction);
+                desc.DepthComparison = SharpDXHelper.ToComparison(DepthBufferFunction);
 
                 if (DepthBufferWriteEnable)
                     desc.DepthWriteMask = SharpDX.Direct3D11.DepthWriteMask.All;
@@ -293,20 +293,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (TwoSidedStencilMode)
                 {
-                    desc.BackFace.Comparison = SharpDXHelper.ToComparisson(CounterClockwiseStencilFunction);
+                    desc.BackFace.Comparison = SharpDXHelper.ToComparison(CounterClockwiseStencilFunction);
                     desc.BackFace.DepthFailOperation = GetStencilOp(CounterClockwiseStencilDepthBufferFail);
                     desc.BackFace.FailOperation = GetStencilOp(CounterClockwiseStencilFail);
                     desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
                 }
                 else
                 {   //use same settings as frontFace 
-                    desc.BackFace.Comparison = SharpDXHelper.ToComparisson(StencilFunction);
+                    desc.BackFace.Comparison = SharpDXHelper.ToComparison(StencilFunction);
                     desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
                     desc.BackFace.FailOperation = GetStencilOp(StencilFail);
                     desc.BackFace.PassOperation = GetStencilOp(StencilPass);
                 }
 
-                desc.FrontFace.Comparison = SharpDXHelper.ToComparisson(StencilFunction);
+                desc.FrontFace.Comparison = SharpDXHelper.ToComparison(StencilFunction);
                 desc.FrontFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
                 desc.FrontFace.FailOperation = GetStencilOp(StencilFail);
                 desc.FrontFace.PassOperation = GetStencilOp(StencilPass);
