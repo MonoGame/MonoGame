@@ -99,6 +99,7 @@
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
+    <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\RayTest.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />

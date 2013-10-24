@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Windows\Release\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -37,7 +37,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug-CLI|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Windows\Debug-CLI\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Debug-CLI\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Debug-CLI\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -86,6 +86,7 @@
     <Compile Include="Framework\Components\UpdateGuard.cs" />
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
+    <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Runner\Desktop\FramePixelData.cs" />
     <Compile Include="Runner\Extensions.cs" />
