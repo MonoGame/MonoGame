@@ -104,28 +104,28 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Reference Include="MonoGame.Framework">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XInput.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct2D1.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct3D11.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.DXGI.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.MediaFoundation">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.MediaFoundation.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.MediaFoundation.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XAudio2.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows8\SharpDX.XAudio2.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

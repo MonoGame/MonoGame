@@ -41,26 +41,26 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenTK">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\OpenTK.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Tao.Sdl">
-       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll</HintPath>
+       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\SDL.dll">
+    <Content Include="$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\SDL.dll">
       <Link>SDL.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\Linux\SDL_Mixer.dll">
+    <Content Include="$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\SDL_Mixer.dll">
       <Link>SDL_Mixer.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
