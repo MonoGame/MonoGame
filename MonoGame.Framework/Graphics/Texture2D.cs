@@ -792,8 +792,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #elif WINDOWS_PHONE
-            throw new NotImplementedException();
-
+        Texture2D texture = null;
+        var waitEvent = new ManualResetEventSlim(false);
+		    Deployment.Current.Dispatcher.BeginInvoke(() =>
+		    {
+		        BitmapImage bitmapImage = new BitmapImage();
+		        bitmapImage.SetSource(stream);
+		        WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+		        texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
+		        texture.SetData<int>(bitmap.Pixels);
+                waitEvent.Set();
+		    });
+		    waitEvent.Wait();
+		    return texture;
 #elif WINDOWS_STOREAPP || DIRECTX
 
             // For reference this implementation was ultimately found through this post:
