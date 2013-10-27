@@ -738,8 +738,6 @@ namespace Microsoft.Xna.Framework
             CategorizeComponents();
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
-
-            return;
         }
 
 		internal void DoExiting()
