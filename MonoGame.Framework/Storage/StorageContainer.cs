@@ -122,16 +122,19 @@ namespace Microsoft.Xna.Framework.Storage
             var saved = "";
 #elif SDL2
             string saved;
-            if (    Environment.OSVersion.Platform == PlatformID.MacOSX ||
-                    Environment.OSVersion.Platform == PlatformID.Unix   )
+            if (SDL2_GamePlatform.OSVersion.Equals("Windows"))
+            {
+                saved = Path.Combine(StorageDevice.StorageRoot, "SavedGames");
+            }
+            else if (   SDL2_GamePlatform.OSVersion.Equals("Mac OS X") ||
+                        SDL2_GamePlatform.OSVersion.Equals("Linux") )
             {
                 // Unix systems are expected to have a dedicated userdata folder.
                 saved = StorageDevice.StorageRoot;
             }
             else
             {
-                string root = StorageDevice.StorageRoot;
-                saved = Path.Combine(root,"SavedGames");
+                throw new Exception("StorageContainer: SDL2 platform not handled!");
             }
 #elif LINUX || MONOMAC
             // We already have a SaveData folder on Mac/Linux.

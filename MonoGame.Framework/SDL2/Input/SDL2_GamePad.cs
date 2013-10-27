@@ -310,9 +310,11 @@ namespace Microsoft.Xna.Framework.Input
             
             // Get the intended config file path.
             string osConfigFile = "";
-            if (    Environment.OSVersion.Platform == PlatformID.MacOSX ||
-                    (   System.IO.Directory.Exists("/Users/") &&
-                        Environment.OSVersion.Platform != PlatformID.Win32NT    )   )
+            if (SDL2_GamePlatform.OSVersion.Equals("Windows"))
+            {
+                osConfigFile = "MonoGameJoystick.cfg"; // Oh well.
+            }
+            else if (SDL2_GamePlatform.OSVersion.Equals("Mac OS X"))
             {
                 osConfigFile += Environment.GetEnvironmentVariable("HOME");
                 if (osConfigFile.Length == 0)
@@ -324,7 +326,7 @@ namespace Microsoft.Xna.Framework.Input
                     osConfigFile += "/Library/Application Support/MonoGame/MonoGameJoystick.cfg";
                 }
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            else if (SDL2_GamePlatform.OSVersion.Equals("Linux"))
             {
                 // Assuming a non-OSX Unix platform will follow the XDG. Which it should.
                 osConfigFile += Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
@@ -347,7 +349,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             else
             {
-                osConfigFile = "MonoGameJoystick.cfg"; // Oh well.
+                throw new Exception("SDL2_GamePad: SDL2 platform not handled!");
             }
             
             // Check to see if we've already got a config...

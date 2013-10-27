@@ -96,6 +96,12 @@ namespace Microsoft.Xna.Framework
         
         #endregion
         
+        #region SDL2 OS String
+        
+        public static readonly string OSVersion = SDL.SDL_GetPlatform();
+        
+        #endregion
+        
         #region Public Properties
         
         public override GameRunBehavior DefaultRunBehavior

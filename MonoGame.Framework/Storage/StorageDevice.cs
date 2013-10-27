@@ -468,11 +468,11 @@ namespace Microsoft.Xna.Framework.Storage
 #if WINRT
                 return ApplicationData.Current.LocalFolder.Path; 
 #elif SDL2
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                if (SDL2_GamePlatform.OSVersion.Equals("Windows"))
                 {
                     return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 }
-                if (Environment.OSVersion.Platform == PlatformID.MacOSX || Directory.Exists("/Users/"))
+                if (SDL2_GamePlatform.OSVersion.Equals("Mac OS X"))
                 {
                     string osConfigDir = Environment.GetEnvironmentVariable("HOME");
                     if (String.IsNullOrEmpty(osConfigDir))
@@ -482,7 +482,7 @@ namespace Microsoft.Xna.Framework.Storage
                     osConfigDir += "/Library/Application Support";
                     return osConfigDir;
                 }
-                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                if (SDL2_GamePlatform.OSVersion.Equals("Linux"))
                 {
                     // Assuming a non-OSX Unix platform will follow the XDG. Which it should.
                     string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
@@ -497,7 +497,7 @@ namespace Microsoft.Xna.Framework.Storage
                     }
                     return osConfigDir;
                 }
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                throw new Exception("StorageDevice: SDL2 platform not handled!");
 #elif LINUX
                 string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
                 if (String.IsNullOrEmpty(osConfigDir))
