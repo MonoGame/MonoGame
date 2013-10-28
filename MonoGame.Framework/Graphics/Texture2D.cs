@@ -1081,7 +1081,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // This method allows games that use Texture2D.FromStream 
         // to reload their textures after the GL context is lost.
-        internal void Reload(Stream textureStream)
+        public void Reload(Stream textureStream)
         {
 #if OPENGL
             GenerateGLTextureIfRequired();
