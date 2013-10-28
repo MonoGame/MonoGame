@@ -343,20 +343,29 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		public virtual void Play ()
 		{
-			if (hasSourceId) {
-				return;
-			}
-			bool isSourceAvailable = controller.ReserveSource (soundBuffer);
-            if (!isSourceAvailable)
+            if (!TryPlay())
                 throw new InstancePlayLimitException();
+		}
+
+        /// <summary>
+        /// Internal implementation of Play that returns false on failure. See comments on Play for workings.
+        /// </summary>
+        internal bool TryPlay()
+        {
+            if (hasSourceId) {
+                return true;
+            }
+            bool isSourceAvailable = controller.ReserveSource (soundBuffer);
+            if (!isSourceAvailable)
+                return false;
 
             int bufferId = soundBuffer.OpenALDataBuffer;
             AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
-			ApplyState ();
+            ApplyState ();
 
-			controller.PlaySound (soundBuffer);            
-			Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-			soundState = SoundState.Playing;
+            controller.PlaySound (soundBuffer);
+            //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
+            soundState = SoundState.Playing;
 
 #if PAUSE_SOUND_ON_APP_SUSPEND
             lock (_instances)
@@ -364,8 +373,9 @@ namespace Microsoft.Xna.Framework.Audio
                 _instances.Add(_weakRef);
             }
 #endif
-		}
 
+            return true;
+        }
         /// <summary>
         /// When the sound state is paused, and the source is available, then the sound
         /// is played using the ResumeSound method from the OpenALSoundController. Otherwise,

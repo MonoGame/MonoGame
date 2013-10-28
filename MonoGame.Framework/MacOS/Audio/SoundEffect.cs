@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Audio
 				instance.Volume = volume;
 				instance.Pitch = pitch;
 				instance.Pan = pan;
-				instance.Play ();
+				return instance.TryPlay();
 			}
 			return false;
 		}

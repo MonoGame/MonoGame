@@ -245,7 +245,21 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 #endif
 		}
-		
+
+		/// <summary>
+		/// Tries to play the sound, returns true if successful
+		/// </summary>
+		/// <returns></returns>
+		internal bool TryPlay()
+		{
+			Play();
+#if ANDROID
+			return _streamId != 0;
+#else
+			return true;
+#endif
+		}
+
 		public void Resume()
         {
 #if DIRECTX
