@@ -143,5 +143,38 @@ namespace Microsoft.Xna.Framework.Input
                     break;
             }
         }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadThumbSticks"/> are equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
+        public static bool operator ==(GamePadThumbSticks left, GamePadThumbSticks right)
+        {
+            return (left.left == right.left)
+                && (left.right == right.right);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadThumbSticks"/> are not equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
+        public static bool operator !=(GamePadThumbSticks left, GamePadThumbSticks right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare to this instance.</param>
+        /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadThumbSticks"/> and has the same value as this instance; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
+        }
     }
 }

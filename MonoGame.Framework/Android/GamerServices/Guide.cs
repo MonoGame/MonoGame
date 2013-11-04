@@ -107,6 +107,10 @@ namespace Microsoft.Xna.Framework.GamerServices
                     {
                         input.SetSelection(defaultText.Length);
                     }
+                    if (usePasswordMode)
+                    {
+                        input.InputType = Android.Text.InputTypes.ClassText | Android.Text.InputTypes.TextVariationPassword;
+                    }
                     alert.SetView(input);
 
                     alert.SetPositiveButton("Ok", (dialog, whichButton) =>
