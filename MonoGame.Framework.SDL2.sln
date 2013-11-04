@@ -5,9 +5,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.SDL2", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.SDL2", "ThirdParty\Lidgren.Network\Lidgren.Network.SDL2.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheoraPlay#", "ThirdParty\TheoraPlay#\TheoraPlay#.csproj", "{47CF0C2E-3710-4188-BB11-30D248B2B5FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheoraPlay-CS", "ThirdParty\TheoraPlay#\TheoraPlay-CS.csproj", "{47CF0C2E-3710-4188-BB11-30D248B2B5FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDL2#", "ThirdParty\SDL2#\SDL2#.csproj", "{85480198-8711-4355-830E-72FD794AD3F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDL2-CS", "ThirdParty\SDL2#\SDL2-CS.csproj", "{85480198-8711-4355-830E-72FD794AD3F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

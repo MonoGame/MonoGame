@@ -409,13 +409,13 @@
       <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
       <Name>Lidgren.Network.SDL2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\TheoraPlay#\TheoraPlay#.csproj">
+    <ProjectReference Include="..\ThirdParty\TheoraPlay#\TheoraPlay-CS.csproj">
       <Project>{47CF0C2E-3710-4188-BB11-30D248B2B5FB}</Project>
-      <Name>TheoraPlay#</Name>
+      <Name>TheoraPlay-CS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\SDL2#\SDL2#.csproj">
+    <ProjectReference Include="..\ThirdParty\SDL2#\SDL2-CS.csproj">
       <Project>{85480198-8711-4355-830E-72FD794AD3F6}</Project>
-      <Name>SDL2#</Name>
+      <Name>SDL2-CS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
