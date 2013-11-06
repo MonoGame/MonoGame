@@ -156,7 +156,10 @@ namespace Microsoft.Xna.Framework.Media
                     if (_mediaElement != null)
                     {
                         if (_mediaElement.Source == null && source != null)
+                        {
+                            _mediaElement.AutoPlay = false;
                             Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+                        }
 
                         // Ensure only one subscription
                         _mediaElement.MediaOpened -= MediaElement_MediaOpened;
