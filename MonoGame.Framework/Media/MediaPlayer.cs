@@ -131,7 +131,10 @@ namespace Microsoft.Xna.Framework.Media
         internal static MediaElement _mediaElement;
         private static Uri source;
         private static TimeSpan elapsedTime;
-        private static bool wasPlaying;
+
+        // track state of player before game is deactivated
+        private static MediaState deactivatedState;
+        private static bool wasDeactivated;
 #endif
 
         static MediaPlayer()
@@ -159,16 +162,7 @@ namespace Microsoft.Xna.Framework.Media
                         if (_mediaElement.Source == null && source != null)
                         {
                             _mediaElement.AutoPlay = false;
-
-                            Deployment.Current.Dispatcher.BeginInvoke(() => 
-                            {
-                                _mediaElement.Source = source;
-                                _mediaElement.AutoPlay = true;
-
-                                // Continue playing the song if it was playing before deactivation
-                                if (wasPlaying)
-                                    Resume();
-                            });
+                            Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
                         }
 
                         // Ensure only one subscription
@@ -183,7 +177,9 @@ namespace Microsoft.Xna.Framework.Media
                     {
                         source = _mediaElement.Source;
                         elapsedTime = _mediaElement.Position;
-                        wasPlaying = _state == MediaState.Playing;
+
+                        wasDeactivated = true;
+                        deactivatedState = _state;
                     }
                 };
 #endif
@@ -198,6 +194,18 @@ namespace Microsoft.Xna.Framework.Media
                     _mediaElement.Position = elapsedTime;
                     elapsedTime = TimeSpan.Zero;
                 });
+
+            if (wasDeactivated)
+            {
+                if (deactivatedState == MediaState.Playing)
+                    _mediaElement.Play();
+
+                //reset the deactivated flag
+                wasDeactivated = false;
+
+                //set auto-play back to default
+                _mediaElement.AutoPlay = true;
+            }
         }
 #endif
 
