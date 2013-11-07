@@ -131,6 +131,7 @@ namespace Microsoft.Xna.Framework.Media
         internal static MediaElement _mediaElement;
         private static Uri source;
         private static TimeSpan elapsedTime;
+        private static bool wasPlaying;
 #endif
 
         static MediaPlayer()
@@ -158,7 +159,16 @@ namespace Microsoft.Xna.Framework.Media
                         if (_mediaElement.Source == null && source != null)
                         {
                             _mediaElement.AutoPlay = false;
-                            Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+
+                            Deployment.Current.Dispatcher.BeginInvoke(() => 
+                            {
+                                _mediaElement.Source = source;
+                                _mediaElement.AutoPlay = true;
+
+                                // Continue playing the song if it was playing before deactivation
+                                if (wasPlaying)
+                                    Resume();
+                            });
                         }
 
                         // Ensure only one subscription
@@ -173,6 +183,7 @@ namespace Microsoft.Xna.Framework.Media
                     {
                         source = _mediaElement.Source;
                         elapsedTime = _mediaElement.Position;
+                        wasPlaying = _state == MediaState.Playing;
                     }
                 };
 #endif
