@@ -63,6 +63,7 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
+using Microsoft.Xna.Framework.Windows8.GamerServices;
 #else
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
@@ -108,17 +109,23 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode);
 
 		private static string ShowKeyboardInput(
-		 PlayerIndex player,           
+         PlayerIndex player,           
          string title,
          string description,
          string defaultText,
 		 bool usePasswordMode)
 		{
 #if WINRT
-            // At this time there is no way to popup the 
-            // software keyboard on a WinRT device unless 
-            // you use a XAML control.
-            throw new NotSupportedException();
+            Task<string> result = null;
+            _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                var inputDialog = new InputDialog();
+                result = inputDialog.ShowAsync(title, description, defaultText, usePasswordMode);
+            }).AsTask().Wait();
+
+            result.Wait();
+
+            return result.Result;
 #else
             throw new NotImplementedException();
 #endif

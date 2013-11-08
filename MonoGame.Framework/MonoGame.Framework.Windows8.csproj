@@ -309,6 +309,8 @@
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Windows8\GameFrameworkViewSource.cs" />
     <Compile Include="Windows8\GamePad.cs" />
+    <Compile Include="Windows8\GamerServices\EventAsync.cs" />
+    <Compile Include="Windows8\GamerServices\InputDialog.cs" />
     <Compile Include="Windows8\InputEvents.cs" />
     <Compile Include="Windows8\MetroFrameworkView.cs" />
     <Compile Include="Windows8\MetroGamePlatform.cs" />
@@ -438,6 +440,12 @@
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
