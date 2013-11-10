@@ -123,7 +123,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
-        private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using CornflowerBlue here, we use black to avoid
+        // performance warnings on Intel/Mesa
+        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
 
         /// <summary>
         /// The active vertex shader.
