@@ -85,6 +85,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 		public DepthFormat DepthStencilFormat { get; private set; }
+
+        public Texture2D DepthTexture { get; private set; }
 		
 		public int MultiSampleCount { get; private set; }
 		
@@ -93,9 +95,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		public bool IsContentLost { get { return false; } }
 		
 		public event EventHandler<EventArgs> ContentLost;
-		
-        public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
-			:base (graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget, shared)
+
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount,
+            RenderTargetUsage usage, bool shared)
+            : this(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, false, preferredMultiSampleCount, usage, shared)
+        {
+
+        }
+
+        public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat,
+            DepthFormat preferredDepthFormat, bool depthToTexture, int preferredMultiSampleCount, RenderTargetUsage usage,
+            bool shared)
+            : base(graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget, shared)
 		{
 			DepthStencilFormat = preferredDepthFormat;
 			MultiSampleCount = preferredMultiSampleCount;
@@ -125,7 +137,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			switch (preferredDepthFormat)
 			{
 				case DepthFormat.Depth16: 
-					glDepthFormat = GLDepthComponent16; 
+					glDepthFormat = GLDepthComponent16;
+                    if(depthToTexture)DepthTexture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Depth16);
 				break;
 #if GLES
 				case DepthFormat.Depth24: 
@@ -138,10 +151,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
 				case DepthFormat.Depth24: 
 				  	glDepthFormat = GLDepthComponent24;
+                    if(depthToTexture)DepthTexture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Depth24);
 				break;
 				case DepthFormat.Depth24Stencil8:
 					glDepthFormat = GLDepthComponent24;
-					glStencilFormat = GLStencilIndex8; 
+					glStencilFormat = GLStencilIndex8;
+			        if (depthToTexture)
+			        {
+                        throw new NotImplementedException();
+                        // not working :-(
+			            //DepthTexture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Depth24Stencil8);
+			        }
 				break;
 #endif
 			}
@@ -155,7 +175,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			GL.GenRenderbuffers(1, out glDepthBuffer);
 #endif
 			GraphicsExtensions.CheckGLError();
-			if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
+			if (preferredDepthFormat == DepthFormat.Depth24Stencil8) 
 			{
 				if (GraphicsCapabilities.SupportsPackedDepthStencil)
 				{

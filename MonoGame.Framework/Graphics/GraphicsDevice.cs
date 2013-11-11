@@ -1752,8 +1752,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
 
 				// Reverted this change, as per @prollin's suggestion
-				GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
-				GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
+				if (renderTarget.DepthTexture == null)
+                {
+                    GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer,
+                        renderTarget.glDepthBuffer);
+                    GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer,
+                        renderTarget.glStencilBuffer);
+                }
+                else
+				{
+                    GL.FramebufferTexture(GLFramebuffer, GLDepthAttachment, renderTarget.DepthTexture.glTexture, 0); 
+                }
 
 #if !GLES
 				for (var i = 0; i < _currentRenderTargetCount; i++)
