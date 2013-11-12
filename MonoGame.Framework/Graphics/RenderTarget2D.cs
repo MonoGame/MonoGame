@@ -207,8 +207,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				GL.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
 				GraphicsExtensions.CheckGLError();
-				GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
-				GraphicsExtensions.CheckGLError();
+			    if (!depthToTexture)
+			    {
+			        GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
+			        GraphicsExtensions.CheckGLError();
+			    }
 			}
 
             });
