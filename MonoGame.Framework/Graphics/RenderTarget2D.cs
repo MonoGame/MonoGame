@@ -321,6 +321,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				    	GL.DeleteRenderbuffers(1, ref this.glStencilBuffer);
 					GL.DeleteRenderbuffers(1, ref this.glDepthBuffer);
 					GraphicsExtensions.CheckGLError();
+                    if(DepthTexture!=null)DepthTexture.Dispose();
+                    GraphicsExtensions.CheckGLError();
 				});
 #endif
             }
