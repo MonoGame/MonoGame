@@ -811,7 +811,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				toReturn._texture = sharpDxTexture;
 			}
             return toReturn;
-<<<<<<< HEAD
 #elif DIRECTX
             // Use WIC to decode the image into the output format
             using (var factory = new SharpDX.WIC.ImagingFactory())  // .ImagingFactory2())
@@ -853,8 +852,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-=======
->>>>>>> 30f90ffa38648589c051486be45eb6dbcb971bf8
 #elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else

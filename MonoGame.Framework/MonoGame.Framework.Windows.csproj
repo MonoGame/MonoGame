@@ -46,6 +46,9 @@
     <DocumentationFile>bin\Windows\Release\MonoGame.Framework.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\ThirdParty\protobuf-net\Debug\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
       <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
@@ -392,7 +395,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />

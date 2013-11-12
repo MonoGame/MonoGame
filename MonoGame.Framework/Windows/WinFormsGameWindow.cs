@@ -60,15 +60,11 @@ namespace MonoGame.Framework
 {
     public class WinFormsGameWindow : GameWindow
     {
-<<<<<<< HEAD
         // Amendment: Added events for integrating our key processing logic with monogame.
         public event EventHandler<KeysEventArgs> TSKeyUp;
         public event EventHandler<KeysEventArgs> TSKeyDown;
 
-        internal Form _form;
-=======
         internal WinFormsGameForm _form;
->>>>>>> 30f90ffa38648589c051486be45eb6dbcb971bf8
 
         private readonly WinFormsGamePlatform _platform;
 
@@ -227,9 +223,8 @@ namespace MonoGame.Framework
                 touchState = TouchLocationState.Released;
 
             if (touchState.HasValue)
-<<<<<<< HEAD
-                TouchPanel.AddEvent(0, touchState.Value, new Vector2(Mouse.State.X, Mouse.State.Y), true);
-        }
+                TouchPanel.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+        } 
 
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
@@ -260,10 +255,6 @@ namespace MonoGame.Framework
                 handler(this, new KeysEventArgs(key));
             }
         }
-=======
-                 TouchPanel.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
-        } 
->>>>>>> 30f90ffa38648589c051486be45eb6dbcb971bf8
 
         private void OnMouseEnter(object sender, EventArgs e)
         {
