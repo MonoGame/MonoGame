@@ -50,14 +50,7 @@ namespace Microsoft.Xna.Framework
 
         public Graphics.GraphicsDevice GraphicsDevice
         {
-            get 
-            {
-                if (!_initialized)
-                {
-                    throw new InvalidOperationException("The GraphicsDevice property cannot be used before Initialize has been called.");
-                }
-                return this.Game.GraphicsDevice; 
-            }
+            get { return this.Game.GraphicsDevice; } 
         }
 
         public int DrawOrder
