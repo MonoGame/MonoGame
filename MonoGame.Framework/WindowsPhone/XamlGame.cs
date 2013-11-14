@@ -117,6 +117,8 @@ namespace MonoGame.Framework.WindowsPhone
                     mediaElement = (MediaElement)child;
                 else if (drawingSurface == null && child is DrawingSurface)
                     drawingSurface = (DrawingSurface)child;
+                else if (drawingSurface == null && child is DrawingSurfaceBackgroundGrid)
+                    drawingSurface = (DrawingSurfaceBackgroundGrid)child;
             }
 
             if (!(drawingSurface is DrawingSurfaceBackgroundGrid) && !(drawingSurface is DrawingSurface))
