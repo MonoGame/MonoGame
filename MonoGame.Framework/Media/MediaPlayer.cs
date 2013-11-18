@@ -263,7 +263,7 @@ namespace Microsoft.Xna.Framework.Media
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
 #elif WINDOWS_PHONE
                 TimeSpan pos = TimeSpan.Zero;
-                Threading.BlockOnUIThread(() =>
+                Threading.BlockOnContainerThread(_mediaElement.Dispatcher, () =>
                     {
                         pos = _mediaElement.Position;
                     });
