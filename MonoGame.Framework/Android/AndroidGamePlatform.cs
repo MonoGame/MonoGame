@@ -111,6 +111,8 @@ namespace Microsoft.Xna.Framework
 				if (!_exiting)
 				{
 					_exiting = true;
+					AndroidGameActivity.Paused -= Activity_Paused;
+					AndroidGameActivity.Resumed -= Activity_Resumed;
 					Game.DoExiting();
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
