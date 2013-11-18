@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Windows\Debug\</OutputPath>
-	<IntermediateOutputPath>obj\Windows\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\Windows\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -87,6 +87,8 @@
     <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
     <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
+    <Compile Include="Framework\Visual\Texture2DTest.cs" />
+    <Compile Include="Framework\Visual\Texture3DTest.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Runner\Desktop\FramePixelData.cs" />
     <Compile Include="Runner\Extensions.cs" />
