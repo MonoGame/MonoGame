@@ -187,6 +187,8 @@ namespace MonoGame.Framework
             _form.ClientSizeChanged += OnClientSizeChanged;
 
             _form.KeyPress += OnKeyPress;
+            _form.KeyDown += OnKeyDown;
+            _form.KeyUp += OnKeyUp;
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -426,17 +428,6 @@ namespace MonoGame.Framework
         }
 
         #endregion
-    }
-
-    // Amendment to OpenTK code to allow us to use our existing key processing logic (with a few slight alterations).
-    public class KeysEventArgs : EventArgs
-    {
-        public Microsoft.Xna.Framework.Input.Keys Keys { get; private set; }
-
-        public KeysEventArgs(Microsoft.Xna.Framework.Input.Keys keys)
-        {
-            this.Keys = keys;
-        }
     }
 }
 
