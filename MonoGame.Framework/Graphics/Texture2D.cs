@@ -653,17 +653,35 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (d3dContext)
                 {
                     // Copy the data from the GPU to the staging texture.
+                    int elementsInRow;
+                    int rows;
                     if (rect.HasValue)
                     {
-                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left,rect.Value.Top,0, rect.Value.Right, rect.Value.Bottom, 0), stagingTex, 0, 0, 0, 0);
+                        elementsInRow = rect.Value.Width;
+                        rows = rect.Value.Height;
+                        d3dContext.CopySubresourceRegion(GetTexture(), level, new SharpDX.Direct3D11.ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), stagingTex, 0, 0, 0, 0);
                     }
                     else
+                    {
+                        elementsInRow = width;
+                        rows = height;
                         d3dContext.CopySubresourceRegion(GetTexture(), level, null, stagingTex, 0, 0, 0, 0);
+                    }
 
                     // Copy the data to the array.
                     SharpDX.DataStream stream;
-                    d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
-                    stream.ReadRange(data, startIndex, elementCount);
+                    var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
+
+                    // Some drivers may add pitch to rows.
+                    // We need to copy each row separatly and skip trailing zeros.
+                    var currentIndex = startIndex;
+                    var elementSize = SharpDX.Utilities.SizeOf<T>();
+                    for (var row = 0; row < rows; row++)
+                    {
+                        stream.ReadRange(data, currentIndex, elementsInRow);
+                        stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
+                        currentIndex += elementsInRow;
+                    }
                     stream.Dispose();
                 }
 
@@ -793,14 +811,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #elif WINDOWS_PHONE
             WriteableBitmap writableBitmap = null;
-            var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+
+            Threading.BlockOnUIThread(() =>
             {
                 // Note that contrary to the method name this works for both JPEG and PNGs.
                 writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
-                waitEvent.Set();
             });
-            waitEvent.Wait();
+            
             // Convert from ARGB to ABGR
             int[] pixels = writableBitmap.Pixels;
             for (int i = 0; i < writableBitmap.PixelWidth * writableBitmap.PixelHeight; ++i)
@@ -897,16 +914,13 @@ namespace Microsoft.Xna.Framework.Graphics
             //We Must convert from BGRA to RGBA
             ConvertToRGBA(height, width, pixelData);
 
-            var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.BlockOnUIThread(() =>
             {
                 var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
-                waitEvent.Set();
             });
 
-            waitEvent.Wait();
 #elif MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else

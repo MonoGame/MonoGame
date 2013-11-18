@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Media
                     if (_mediaElement != null)
                     {
                         if (_mediaElement.Source == null && source != null)
-                            Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+                            Threading.RunOnUIThread(() => _mediaElement.Source = source);
 
                         // Ensure only one subscription
                         _mediaElement.MediaOpened -= MediaElement_MediaOpened;
@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework.Media
         private static void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
         {
             if (elapsedTime != TimeSpan.Zero)
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Threading.RunOnUIThread(() =>
                 {
                     _mediaElement.Position = elapsedTime;
                     elapsedTime = TimeSpan.Zero;
@@ -216,7 +216,7 @@ namespace Microsoft.Xna.Framework.Media
                 if (_volumeController != null)
                     _volumeController.Mute = _isMuted;
 #elif WINDOWS_PHONE
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Threading.RunOnUIThread(() =>
                 {
                     _mediaElement.IsMuted = value;
                 });
@@ -263,18 +263,10 @@ namespace Microsoft.Xna.Framework.Media
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
 #elif WINDOWS_PHONE
                 TimeSpan pos = TimeSpan.Zero;
-                EventWaitHandle Wait = new AutoResetEvent(false);
-                if(_mediaElement.Dispatcher.CheckAccess()) {
-                    pos = _mediaElement.Position;
-                }
-                else {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Threading.BlockOnUIThread(() =>
                     {
                         pos = _mediaElement.Position;
-                        Wait.Set();
                     });
-                    Wait.WaitOne();
-                }
                 return (pos);
 #else
 				if (_queue.ActiveSong == null)
@@ -345,7 +337,7 @@ namespace Microsoft.Xna.Framework.Media
 			    if (_volumeController != null)
                     _volumeController.MasterVolume = _volume;
 #elif WINDOWS_PHONE
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Threading.RunOnUIThread(() =>
                 {
                     _mediaElement.Volume = value;
                 });
@@ -370,7 +362,7 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_MEDIA_SESSION
             _session.Pause();
 #elif WINDOWS_PHONE
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.RunOnUIThread(() =>
             {
                 _mediaElement.Pause();
             });
@@ -461,7 +453,7 @@ namespace Microsoft.Xna.Framework.Media
             var varStart = new Variant();
             _session.Start(null, varStart);
 #elif WINDOWS_PHONE
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.RunOnUIThread(() =>
             {
                 _mediaElement.Source = new Uri(song.FilePath, UriKind.Relative);
                 _mediaElement.Play();
@@ -502,7 +494,7 @@ namespace Microsoft.Xna.Framework.Media
 #if WINDOWS_PHONE
             if (IsRepeating)
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Threading.RunOnUIThread(() =>
                 {
                     _mediaElement.Position = TimeSpan.Zero;
                     _mediaElement.Play();
@@ -523,7 +515,7 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_MEDIA_SESSION
             _session.Start(null, null);
 #elif WINDOWS_PHONE
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.RunOnUIThread(() =>
             {
                 _mediaElement.Play();
             });
@@ -548,7 +540,7 @@ namespace Microsoft.Xna.Framework.Media
             _clock.Dispose();
             _clock = null;
 #elif WINDOWS_PHONE
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.RunOnUIThread(() =>
             {
                 _mediaElement.Stop();
             });

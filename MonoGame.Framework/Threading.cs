@@ -57,6 +57,9 @@ using OpenTK.Platform;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 #endif
+#if WINDOWS_PHONE
+using System.Windows;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -75,7 +78,10 @@ namespace Microsoft.Xna.Framework
 #endif
         static Threading()
         {
+#if WINDOWS_PHONE
+#else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
+#endif
         }
 
         /// <summary>
@@ -84,7 +90,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>true if the code is currently running on the UI thread.</returns>
         public static bool IsOnUIThread()
         {
+#if WINDOWS_PHONE
+            return Deployment.Current.Dispatcher.CheckAccess();
+#else
             return mainThreadId == Thread.CurrentThread.ManagedThreadId;
+#endif
         }
 
         /// <summary>
@@ -93,9 +103,20 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="InvalidOperationException">Thrown if the code is not currently running on the UI thread.</exception>
         public static void EnsureUIThread()
         {
+#if WINDOWS_PHONE
+            if (!Deployment.Current.Dispatcher.CheckAccess())
+#else
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
+#endif
                 throw new InvalidOperationException(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
         }
+
+#if WINDOWS_PHONE
+        internal static void RunOnUIThread(Action action)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(action);
+        }
+#endif
 
         /// <summary>
         /// Runs the given action on the UI thread and blocks the current thread while the action is running.
@@ -159,6 +180,23 @@ namespace Microsoft.Xna.Framework
             });
             resetEvent.Wait();
 #endif
+#endif
+
+#if WINDOWS_PHONE
+            if (Deployment.Current.Dispatcher.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                EventWaitHandle wait = new AutoResetEvent(false);
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    action();
+                    wait.Set();
+                });
+                wait.WaitOne();
+            }
 #endif
         }
 

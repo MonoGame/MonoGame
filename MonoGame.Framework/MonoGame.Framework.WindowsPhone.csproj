@@ -314,6 +314,7 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
+    <Compile Include="Threading.cs" />
     <Compile Include="Windows8\MetroHelper.cs">
       <SubType>Code</SubType>
     </Compile>
