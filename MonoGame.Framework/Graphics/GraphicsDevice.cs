@@ -1312,6 +1312,20 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 #else
 			GL.Clear(bufferMask);
+
+#if MONOMAC
+			try
+			{
+				GraphicsExtensions.CheckGLError();
+			}
+			catch
+			{
+				// As of OS X 10.8, Apple have decided that you are not allowed to draw to an NSView's OpenGL context if it is hidden.
+				// This attempt to clear thus generates a GL_INVALID_FRAMEBUFFER_OPERATION sometimes.
+				// See http://lists.apple.com/archives/mac-opengl/2012/Jul/msg00049.html
+				// We swallow the error if this happens to avoid it making future operations appear to have failed.
+			}
+#endif
 #endif
            		
             // Restore the previous render state.
