@@ -64,9 +64,13 @@ namespace Microsoft.Xna.Framework
 				NSOpenGLPixelFormatAttribute.Accelerated,
 				NSOpenGLPixelFormatAttribute.NoRecovery,
 				NSOpenGLPixelFormatAttribute.DoubleBuffer,
+				NSOpenGLPixelFormatAttribute.Multisample,
+				NSOpenGLPixelFormatAttribute.SampleBuffers, 1,
+				NSOpenGLPixelFormatAttribute.Samples, 4,
 				NSOpenGLPixelFormatAttribute.ColorSize, 24,
 				NSOpenGLPixelFormatAttribute.DepthSize, 32,
-				NSOpenGLPixelFormatAttribute.StencilSize, 8};
+				NSOpenGLPixelFormatAttribute.StencilSize, 8,
+			};
 
 			pixelFormat = new NSOpenGLPixelFormat (attribs);
 
