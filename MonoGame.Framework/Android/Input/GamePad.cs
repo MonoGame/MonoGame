@@ -138,8 +138,8 @@ using System.Collections.Generic;
 
         internal void Update(MotionEvent e)
         {
-			var prevState = GamePad.GetState (PlayerIndex.One);
-			this.Reset ();
+            var prevState = GamePad.GetState (PlayerIndex.One);
+            this.Reset ();
 
             Vector2 location = new Vector2(e.GetX(), e.GetY());
             // Check where is the touch
@@ -230,12 +230,10 @@ using System.Collections.Generic;
                 }
             }
 
-			var newState = GamePad.GetState (PlayerIndex.One);
+            var newState = GamePad.GetState (PlayerIndex.One);
 
-			if (prevState != newState) 
-			{
-				_packetNumberPlayerOne++;
-			} 
+            if (prevState != newState) 
+                _packetNumberPlayerOne++;
         }
 
         private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
@@ -257,7 +255,7 @@ using System.Collections.Generic;
 
             if (hitInButton)
             {
-				_buttons |= (int)button.Type;
+                _buttons |= (int)button.Type;
             }
             return hitInButton;
         }
@@ -265,9 +263,9 @@ using System.Collections.Generic;
         public static GamePadState GetState(PlayerIndex playerIndex)
         {
             var instance = GamePad.Instance;
-			var sticks = new GamePadThumbSticks (Instance._leftStick, Instance._rightStick);
-			var state = new GamePadState(sticks, new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
-			state.PacketNumber = instance._packetNumberPlayerOne;
+            var sticks = new GamePadThumbSticks (Instance._leftStick, Instance._rightStick);
+            var state = new GamePadState(sticks, new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
+            state.PacketNumber = instance._packetNumberPlayerOne;
             return state;
         }
 

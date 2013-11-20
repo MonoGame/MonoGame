@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework
 #if OUYA
 	        GamePad.Initialize();
 #else
-			GamePad.Instance.Reset ();
+            GamePad.Instance.Reset ();
 #endif
         }
 		
@@ -371,11 +371,11 @@ namespace Microsoft.Xna.Framework
             _touchManager.OnTouchEvent(e);
 
 #if ANDROID
-			if(GamePad.Visible)
-				GamePad.Instance.Update(e);
+            if(GamePad.Visible)
+                GamePad.Instance.Update(e);
 #endif
 
-			return true;
+            return true;
         }
         
         public string ScreenDeviceName 
