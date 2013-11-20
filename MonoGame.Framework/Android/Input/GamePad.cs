@@ -232,14 +232,7 @@ using System.Collections.Generic;
 
 			var newState = GamePad.GetState (PlayerIndex.One);
 
-			// TODO: put similar logic in the GamePadState.Equals method? (affects all platforms)
-			bool same = 
-				prevState == newState &&
-				prevState.ThumbSticks.Left.X == _leftStick.X &&
-				prevState.ThumbSticks.Left.Y == _leftStick.Y &&
-				prevState.ThumbSticks.Right.X == _rightStick.X &&
-				prevState.ThumbSticks.Right.Y == _rightStick.Y;
-			if (!same) 
+			if (prevState != newState) 
 			{
 				_packetNumberPlayerOne++;
 			} 
