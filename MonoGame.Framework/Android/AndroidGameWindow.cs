@@ -370,7 +370,7 @@ namespace Microsoft.Xna.Framework
         {
             _touchManager.OnTouchEvent(e);
 
-#if ANDROID
+#if !OUYA
             if(GamePad.Visible)
                 GamePad.Instance.Update(e);
 #endif
