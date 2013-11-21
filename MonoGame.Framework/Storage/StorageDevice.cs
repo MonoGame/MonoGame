@@ -100,8 +100,6 @@ namespace Microsoft.Xna.Framework.Storage
 	{
 		
 		PlayerIndex? player;
-        int sizeInBytes;
-        private int SizeInBytes { get { return this.sizeInBytes; } }
 
 		int directoryCount;
         private int DirectoryCount { get { return this.directoryCount; } }
@@ -117,7 +115,6 @@ namespace Microsoft.Xna.Framework.Storage
 		internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount) 
 		{
 			this.player = player;
-			this.sizeInBytes = sizeInBytes;
 			this.directoryCount = directoryCount;
 		}
 		

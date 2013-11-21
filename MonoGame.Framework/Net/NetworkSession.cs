@@ -106,9 +106,6 @@ namespace Microsoft.Xna.Framework.Net
 		private bool isHost = false;
 		private NetworkGamer hostingGamer;
 
-        private int hostGamerIndex = -1;
-        private int HostGamerIndex { get { return this.hostGamerIndex; } }
-		
 		internal MonoGamerPeer networkPeer;
 		
 		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer)
@@ -150,7 +147,6 @@ namespace Microsoft.Xna.Framework.Net
 			this.privateGamerSlots = privateGamerSlots;
 			this.sessionProperties = sessionProperties;
 			this.isHost = isHost;
-			this.hostGamerIndex = hostGamer;            
             if (isHost)
                 networkPeer = new MonoGamerPeer(this, null);
             else

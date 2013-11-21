@@ -100,9 +100,7 @@ namespace Microsoft.Xna.Framework.Storage
 		internal readonly string _storagePath;
 		private readonly StorageDevice _device;
 		private readonly string _name;
-		private readonly PlayerIndex? _playerIndex;
-        private PlayerIndex? PlayerIndex { get { return this._playerIndex; }}
-		
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Microsoft.Xna.Framework.Storage.StorageContainer"/> class.
 		/// </summary>
@@ -116,8 +114,7 @@ namespace Microsoft.Xna.Framework.Storage
 
 			_device = device;
 			_name = name;
-			_playerIndex = playerIndex;
-			
+
 			// From the examples the root is based on MyDocuments folder
 #if WINDOWS_STOREAPP
             var saved = "";
