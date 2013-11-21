@@ -168,11 +168,9 @@ namespace Microsoft.Xna.Framework.Audio
                 wavebank_offset = wavebankheader.Segments[1].Offset; //METADATASEGMENT
             }
 
-            int compact_format;
-
             if ((wavebankdata.Flags & Flag_Compact) != 0)
             {
-                compact_format = reader.ReadInt32();
+                reader.ReadInt32(); // compact_format
             }
 
             int playregion_offset = wavebankheader.Segments[last_segment].Offset;
@@ -186,7 +184,6 @@ namespace Microsoft.Xna.Framework.Audio
             int segidx_entry_name = 2;
             if (wavebankheader.Version >= 42) segidx_entry_name = 3;
             
-            int waveentry_offset = wavebankheader.Segments[segidx_entry_name].Offset;
             if ((wavebankheader.Segments[segidx_entry_name].Offset != 0) &&
                 (wavebankheader.Segments[segidx_entry_name].Length != 0))
             {
@@ -270,7 +267,7 @@ namespace Microsoft.Xna.Framework.Audio
                 int chans;
                 int rate;
                 int align;
-                int bits;
+                //int bits;
 
                 if (wavebankheader.Version == 1)
                 {         // I'm not 100% sure if the following is correct
@@ -288,7 +285,7 @@ namespace Microsoft.Xna.Framework.Audio
                     chans = (wavebankentry.Format >> (1)) & ((1 << 3) - 1);
                     rate = (wavebankentry.Format >> (1 + 3 + 1)) & ((1 << 18) - 1);
                     align = (wavebankentry.Format >> (1 + 3 + 1 + 18)) & ((1 << 8) - 1);
-                    bits = (wavebankentry.Format >> (1 + 3 + 1 + 18 + 8)) & ((1 << 1) - 1);
+                    //bits = (wavebankentry.Format >> (1 + 3 + 1 + 18 + 8)) & ((1 << 1) - 1);
 
                     /*} else if(wavebankheader.dwVersion == 23) { // I'm not 100% sure if the following is correct
                         // version 23:
@@ -325,7 +322,7 @@ namespace Microsoft.Xna.Framework.Audio
                     chans = (wavebankentry.Format >> (2)) & ((1 << 3) - 1);
                     rate = (wavebankentry.Format >> (2 + 3)) & ((1 << 18) - 1);
                     align = (wavebankentry.Format >> (2 + 3 + 18)) & ((1 << 8) - 1);
-                    bits = (wavebankentry.Format >> (2 + 3 + 18 + 8)) & ((1 << 1) - 1);
+                    //bits = (wavebankentry.Format >> (2 + 3 + 18 + 8)) & ((1 << 1) - 1);
                 }
                 
                 reader.BaseStream.Seek(wavebankentry.PlayRegion.Offset, SeekOrigin.Begin);

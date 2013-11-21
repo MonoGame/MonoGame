@@ -246,7 +246,6 @@ namespace Lidgren.Network
 			}
 			catch // Catch Access Denied errors
 			{
-				return null;
 			}
 				
 #endif			

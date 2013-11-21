@@ -101,6 +101,7 @@ namespace Microsoft.Xna.Framework.Storage
 		private readonly StorageDevice _device;
 		private readonly string _name;
 		private readonly PlayerIndex? _playerIndex;
+        private PlayerIndex? PlayerIndex { get { return this._playerIndex; }}
 		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Microsoft.Xna.Framework.Storage.StorageContainer"/> class.
@@ -174,6 +175,11 @@ namespace Microsoft.Xna.Framework.Storage
         /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
         /// </summary>
 		public event EventHandler<EventArgs> Disposing;
+
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return Disposing != null;
+        }
 
         /// <summary>
         /// Creates a new directory in the storage-container.

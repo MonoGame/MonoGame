@@ -87,7 +87,6 @@ namespace Microsoft.Xna.Framework.Net
 		private GamerCollection<NetworkGamer> _previousGamers;
 		
 		internal Queue<CommandEvent> commandQueue;
-        bool disposed;
 
 		// use the static Create or BeginCreate methods
 		private NetworkSession ()
@@ -105,8 +104,10 @@ namespace Microsoft.Xna.Framework.Net
 		private int privateGamerSlots;
 		private NetworkSessionProperties sessionProperties;
 		private bool isHost = false;
-		private int hostGamerIndex = -1;
 		private NetworkGamer hostingGamer;
+
+        private int hostGamerIndex = -1;
+        private int HostGamerIndex { get { return this.hostGamerIndex; } }
 		
 		internal MonoGamerPeer networkPeer;
 		
@@ -759,7 +760,6 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			networkPeer.SendData(command.data, command.options);
 
-			NetworkGamer sender;
 			CommandReceiveData crd = new CommandReceiveData (command.sender.RemoteUniqueIdentifier,
 								command.data);
 			crd.gamer = command.sender;
@@ -1105,6 +1105,14 @@ namespace Microsoft.Xna.Framework.Net
 		public event EventHandler<HostChangedEventArgs> HostChanged;
 		public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
 		public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
+
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                HostChanged != null &&
+                InviteAccepted != null;
+        }
+
 		#endregion
 
         internal static void Exit()

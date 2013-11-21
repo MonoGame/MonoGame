@@ -252,6 +252,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                DeviceLost != null &&
+                ResourceCreated != null &&
+                ResourceDestroyed != null &&
+                Disposing != null;
+        }
 
 #if OPENGL
         internal int glFramebuffer;
