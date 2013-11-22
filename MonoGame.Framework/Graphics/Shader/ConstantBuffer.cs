@@ -161,14 +161,14 @@ namespace Microsoft.Xna.Framework.Graphics
             const int elementSize = 4;
             const int rowSize = elementSize * 4;
 
-            int rowsUsed = 0;
+            var rowsUsed = 0;
 
-            if (param.Elements.Count > 0)
+            var elements = param.Elements;
+            if (elements.Count > 0)
             {
-                foreach (var subparam in param.Elements)
+                for (var i=0; i < elements.Count; i++)
                 {
-                    int rowsUsedSubParam = SetParameter(offset, subparam);
-
+                    var rowsUsedSubParam = SetParameter(offset, elements[i]);
                     offset += rowsUsedSubParam * rowSize;
                     rowsUsed += rowsUsedSubParam;
                 }
