@@ -367,6 +367,7 @@ namespace Microsoft.Xna.Framework
             get { return Platform.Window; }
         }
 #else
+		[CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }

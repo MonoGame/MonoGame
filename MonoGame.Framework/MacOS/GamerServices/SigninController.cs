@@ -10,6 +10,7 @@ using MonoMac.ObjCRuntime;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+	[CLSCompliant(false)]
 	public partial class SigninController : MonoMac.AppKit.NSWindowController
 	{
 		
@@ -178,7 +179,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 			
 		}		
 	}
-	
+
+	[CLSCompliant(false)]
 	public class GamersDataSource : NSTableViewDataSource
 	{
 		
@@ -210,6 +212,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 	}
 	
+	[CLSCompliant(false)]
 	public class GamersTableDelegate : NSTableViewDelegate
 	{
 		SigninController controller;

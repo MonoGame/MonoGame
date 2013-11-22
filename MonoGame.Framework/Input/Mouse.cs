@@ -144,6 +144,7 @@ namespace Microsoft.Xna.Framework.Input
         /// presses for the provided window
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
+		[CLSCompliant(false)]
         public static MouseState GetState(GameWindow window)
         {
 #if MONOMAC
