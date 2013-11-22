@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
-            if (data is byte[]) {
+			if (typeof(T) == typeof(byte)) {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
                 // Copy from the vertex buffer to the destination array

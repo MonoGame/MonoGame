@@ -162,6 +162,9 @@ namespace Lidgren.Network
 			return new string(c);
 		}
 		
+		/// <summary>
+		/// Gets broadcast IP address, or IPAddress.Broadcast if an exception occurs.
+		/// </summary>
 		public static IPAddress GetBroadcastAddress()
 		{
 #if ANDROID

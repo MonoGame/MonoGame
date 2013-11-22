@@ -72,6 +72,11 @@ namespace Microsoft.Xna.Framework
         private bool _drawBegun;
         bool disposed;
 
+		private bool _SynchronizedWithVerticalRetrace 
+		{
+			get { return _synchronizedWithVerticalRetrace; }
+		}
+
 #if !WINRT
         private bool _wantFullScreen = false;
 #endif
