@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Content
 		/// Removes Version, Culture and PublicKeyToken from a type string.
 		/// </summary>
 		/// <remarks>
-		/// Supports multiple generic types (e.g. Dictionary<TKey,TValue>) and nested generic types (e.g. List<List<int>>).
+        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
 		/// </remarks> 
 		/// <param name="type">
 		/// A <see cref="System.String"/>

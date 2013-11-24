@@ -738,9 +738,12 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
+                if (exc != null)
+                {
 #if DEBUG				
 				Console.WriteLine("Error in NetworkSession Update: " + exc.Message);
-#endif	
+#endif
+                }
 			}
 			finally {
 			}

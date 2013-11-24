@@ -580,12 +580,12 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
-        /// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
-        /// <param name="result">The result of the operation.</param>
+        ///// <summary>
+        ///// Transforms a vector by a quaternion rotation.
+        ///// </summary>
+        ///// <param name="vec">The vector to transform.</param>
+        ///// <param name="quat">The quaternion to rotate the vector by.</param>
+        ///// <param name="result">The result of the operation.</param>
 //        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
 //        {
 //		// Taken from the OpentTK implementation of Vector3
@@ -603,8 +603,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
         {

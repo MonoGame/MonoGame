@@ -92,6 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the relevant IndexElementSize enum value for the given type.
         /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
         /// <param name="type">The type to use for the index buffer</param>
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)

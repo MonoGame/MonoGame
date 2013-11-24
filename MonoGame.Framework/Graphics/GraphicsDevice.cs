@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL
-        internal int glFramebuffer;
+        internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
         internal List<string> _extensions = new List<string>();
@@ -382,6 +382,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
         /// </summary>
+        /// <param name="adapter">The graphics adapter.</param>
         /// <param name="graphicsProfile">The graphics profile.</param>
         /// <param name="presentationParameters">The presentation options.</param>
         /// <exception cref="ArgumentNullException">

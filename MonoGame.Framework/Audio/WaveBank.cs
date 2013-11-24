@@ -93,6 +93,7 @@ namespace Microsoft.Xna.Framework.Audio
             wavebankdata.EntryNameElementSize = 0;
             wavebankdata.CompactFormat = 0;
             wavebankdata.Alignment = 0;
+            wavebankdata.BuildTime = 0;
 
             wavebankentry.Format = 0;
             wavebankentry.PlayRegion.Length = 0;
