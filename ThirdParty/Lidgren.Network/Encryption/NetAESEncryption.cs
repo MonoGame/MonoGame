@@ -17,8 +17,8 @@ namespace Lidgren.Network
 	{
 		private readonly byte[] m_key;
 		private readonly byte[] m_iv;
-		private static readonly List<int> m_keysizes;
-		private static readonly List<int> m_blocksizes;
+		private static readonly List<int> m_keysizes = null;
+		private static readonly List<int> m_blocksizes = null;
 
         private readonly int m_bitSize;
 		private int BitSize { get { return this.m_bitSize; } }

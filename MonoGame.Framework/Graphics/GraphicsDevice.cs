@@ -130,12 +130,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
+        private bool VertexShaderDirty 
+        {
+            get { return _vertexShaderDirty; }
+        }
 
         /// <summary>
         /// The active pixel shader.
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
+        private bool PixelShaderDirty 
+        {
+            get { return _pixelShaderDirty; }
+        }
 
 #if OPENGL
         static List<Action> disposeActions = new List<Action>();

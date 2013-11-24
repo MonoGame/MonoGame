@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static class Mouse
     {
-        internal static GameWindow PrimaryWindow;
+        internal static GameWindow PrimaryWindow = null;
 
         private static readonly MouseState _defaultState = new MouseState();
 
