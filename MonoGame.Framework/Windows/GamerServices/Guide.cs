@@ -63,7 +63,9 @@ using Windows.ApplicationModel.Store;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.System;
+#if WINDOWS_STOREAPP
 using Microsoft.Xna.Framework.Windows8.GamerServices;
+#endif
 #else
 using System.Runtime.Remoting.Messaging;
 #if !(WINDOWS && DIRECTX)
@@ -114,8 +116,8 @@ namespace Microsoft.Xna.Framework.GamerServices
          string description,
          string defaultText,
 		 bool usePasswordMode)
-		{
-#if WINRT
+        {
+#if WINDOWS_STOREAPP
             Task<string> result = null;
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
