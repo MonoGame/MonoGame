@@ -116,9 +116,28 @@ namespace Microsoft.Xna.Framework
         {
             RunOnContainerThread(Deployment.Current.Dispatcher, action);
         }
+        
         internal static void RunOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
         {
             target.BeginInvoke(action);
+        }
+
+        internal static void BlockOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
+        {
+            if (target.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                EventWaitHandle wait = new AutoResetEvent(false);
+                target.BeginInvoke(() =>
+                {
+                    action();
+                    wait.Set();
+                });
+                wait.WaitOne();
+            }
         }
 #endif
 
@@ -128,12 +147,6 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="action">The action to be run on the UI thread</param>
         internal static void BlockOnUIThread(Action action)
-        {
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-        }
-
-
-        internal static void BlockOnContainerThread(System.Windows.Threading.Dispatcher target, Action action)
         {
             if (action == null)
                 throw new ArgumentNullException("action");
@@ -193,20 +206,7 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if WINDOWS_PHONE
-            if (target.CheckAccess())
-            {
-                action();
-            }
-            else
-            {
-                EventWaitHandle wait = new AutoResetEvent(false);
-                target.BeginInvoke(() =>
-                {
-                    action();
-                    wait.Set();
-                });
-                wait.WaitOne();
-            }
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #endif
         }
 
