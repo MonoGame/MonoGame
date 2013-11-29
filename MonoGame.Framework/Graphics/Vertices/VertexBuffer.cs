@@ -169,13 +169,13 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
 #else
             if (data == null)
-                throw new ArgumentNullException ("data is null");
+                throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
             if (data.Length < (startIndex + elementCount))
-                throw new InvalidOperationException ("The array specified in the data parameter is not the correct size for the amount of data requested.");
+                throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
             if (BufferUsage == BufferUsage.WriteOnly)
-                throw new NotSupportedException ("This VertexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
+                throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException ("The vertex stride is larger than the vertex buffer.");
+                throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 
 #if DIRECTX
 
@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var deviceContext = GraphicsDevice._d3dContext;
                 
-                // Copy the texture to a staging resource
+                // Copy the buffer to a staging resource
                 var stagingDesc = _buffer.Description;
                 stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
                 stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
@@ -213,12 +213,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     if (vertexStride == TsizeInBytes)
                     {
-                        SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, vertexStride*data.Length);
+                        SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, vertexStride * elementCount);
                     }
                     else
                     {
                         for (int i = 0; i < data.Length; i++)
-                            SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride, TsizeInBytes);
+                            SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride + offsetInBytes, TsizeInBytes);
                     }
 
                     // Make sure that we unmap the resource in case of an exception

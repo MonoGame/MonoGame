@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 #if OPENGL
@@ -171,6 +172,127 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             dataHandle.Free ();
 		}
+
+        /// <summary>
+        /// Gets a copy of 3D texture data, specifying a mipmap level, source box, start index, and number of elements.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="level">Mipmap level.</param>
+        /// <param name="left">Position of the left side of the box on the x-axis.</param>
+        /// <param name="top">Position of the top of the box on the y-axis.</param>
+        /// <param name="right">Position of the right side of the box on the x-axis.</param>
+        /// <param name="bottom">Position of the bottom of the box on the y-axis.</param>
+        /// <param name="front">Position of the front of the box on the z-axis.</param>
+        /// <param name="back">Position of the back of the box on the z-axis.</param>
+        /// <param name="data">Array of data.</param>
+        /// <param name="startIndex">Index of the first element to get.</param>
+        /// <param name="elementCount">Number of elements to get.</param>
+        public void GetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount) where T : struct
+        {
+            if (data == null || data.Length == 0)
+                throw new ArgumentException("data cannot be null");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
+
+            // Disallow negative box size
+            if ((left < 0 || left >= right)
+                || (top < 0 || top >= bottom)
+                || (front < 0 || front >= back))
+                throw new ArgumentException("Neither box size nor box position can be negative");
+#if IOS
+
+            // Reading back a texture from GPU memory is unsupported
+            // in OpenGL ES 2.0 and no work around has been implemented.           
+            throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
+
+#elif ANDROID
+
+            throw new NotImplementedException();
+
+#elif PSM
+
+            throw new NotImplementedException();
+
+#elif DIRECTX
+
+            // Create a temp staging resource for copying the data.
+            // 
+            // TODO: Like in Texture2D, we should probably be pooling these staging resources
+            // and not creating a new one each time.
+            //
+            var desc = new Texture3DDescription
+            {
+                Width = width,
+                Height = height,
+                Depth = depth,
+                MipLevels = 1,
+                Format = SharpDXHelper.ToFormat(_format),
+                BindFlags = BindFlags.None,
+                CpuAccessFlags = CpuAccessFlags.Read,
+                Usage = ResourceUsage.Staging,
+                OptionFlags = ResourceOptionFlags.None,
+            };
+
+            var d3dContext = GraphicsDevice._d3dContext;
+            using (var stagingTex = new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, desc))
+            {
+                lock (d3dContext)
+                {
+                    // Copy the data from the GPU to the staging texture.
+                    d3dContext.CopySubresourceRegion(GetTexture(), level, new ResourceRegion(left, top, front, right, bottom, back), stagingTex, 0);
+
+                    // Copy the data to the array.
+                    DataStream stream;
+                    var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
+
+                    // Some drivers may add pitch to rows or slices.
+                    // We need to copy each row separatly and skip trailing zeros.
+                    var currentIndex = startIndex;
+                    var elementSize = SharpDX.Utilities.SizeOf<T>();
+                    var elementsInRow = right - left;
+                    var rowsInSlice = bottom - top;
+                    for (var slice = front; slice < back; slice++)
+                    {
+                        for (var row = top; row < bottom; row++)
+                        {
+                            stream.ReadRange(data, currentIndex, elementsInRow);
+                            stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
+                            currentIndex += elementsInRow;
+                        }
+                        stream.Seek(databox.SlicePitch - (databox.RowPitch * rowsInSlice), SeekOrigin.Current);
+                    }
+                    stream.Dispose();
+                }
+            }
+
+#else
+
+            throw new NotImplementedException();
+
+#endif
+        }
+
+        /// <summary>
+        /// Gets a copy of 3D texture data, specifying a start index and number of elements.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="data">Array of data.</param>
+        /// <param name="startIndex">Index of the first element to get.</param>
+        /// <param name="elementCount">Number of elements to get.</param>
+        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            GetData(0, 0, 0, width, height, 0, depth, data, startIndex, elementCount);
+        }
+
+        /// <summary>
+        /// Gets a copy of 3D texture data.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="data">Array of data.</param>
+        public void GetData<T>(T[] data) where T : struct
+        {
+            GetData(data, 0, data.Length);
+        }
 	}
 }
 
