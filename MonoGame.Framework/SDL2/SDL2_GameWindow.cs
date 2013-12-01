@@ -795,6 +795,13 @@ namespace Microsoft.Xna.Framework
                 clientHeight
             );
             
+            // Push the current GL texture state.
+            int oldActiveTexture;
+            int oldTextureBinding;
+            GL.GetInteger(GetPName.ActiveTexture, out oldActiveTexture);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.GetInteger(GetPName.TextureBinding2D, out oldTextureBinding);
+            
             // Update our color attachment to the new resolution
             GL.BindTexture(TextureTarget.Texture2D, INTERNAL_glColorAttachment);
             GL.TexImage2D(
@@ -890,6 +897,10 @@ namespace Microsoft.Xna.Framework
                 
                 INTERNAL_depthFormat = backbufferFormat;
             }
+            
+            // Pop the GL texture state.
+            GL.BindTexture(TextureTarget.Texture2D, oldTextureBinding);
+            GL.ActiveTexture((TextureUnit) oldActiveTexture);
             
             INTERNAL_glFramebufferWidth = clientWidth;
             INTERNAL_glFramebufferHeight = clientHeight;
