@@ -462,7 +462,7 @@ namespace Microsoft.Xna.Framework {
         [Export ("insertText:")]
         void InsertText (string text)
         {
-            if (text == " ") {
+            if (text == " " || text == "\n") {
                 OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
             } else if (text.Trim () != "") {
                 OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
