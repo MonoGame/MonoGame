@@ -1,6 +1,3 @@
-extern alias MicrosoftXnaFramework;
-using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher;
- 
 using System;
 using System.Windows;
 using System.Windows.Controls;
