@@ -73,7 +73,7 @@ namespace MonoGame.Framework.WindowsPhone
                     }
 
                     var pos = new Vector2((float)touchPoint.Position.X, (float)touchPoint.Position.Y);
-                    TouchPanel.AddEvent(touchPoint.TouchDevice.Id + 1, state, pos);
+                    TouchPanel.AddEvent(touchPoint.TouchDevice.Id, state, pos);
                 }
             }
         }
