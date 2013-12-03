@@ -409,9 +409,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(spriteFont, text);
 
-            var source = new SpriteFont.CharacterSource(text);
-			spriteFont.DrawInto (
-                this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+			spriteFont.DrawString(this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -421,8 +419,7 @@ namespace Microsoft.Xna.Framework.Graphics
             CheckValid(spriteFont, text);
 
 			var scaleVec = new Vector2(scale, scale);
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
+            spriteFont.DrawString(this, text, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -431,16 +428,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(spriteFont, text);
 
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
+            spriteFont.DrawString(this, text, position, color, rotation, origin, scale, effect, depth);
 		}
 
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
 		{
             CheckValid(spriteFont, text);
 
-            var source = new SpriteFont.CharacterSource(text);
-			spriteFont.DrawInto(this, ref source, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+            spriteFont.DrawString(this, text, position, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 		}
 
 		public void DrawString (
@@ -450,8 +445,7 @@ namespace Microsoft.Xna.Framework.Graphics
             CheckValid(spriteFont, text);
 
 			var scaleVec = new Vector2 (scale, scale);
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scaleVec, effects, depth);
+            spriteFont.DrawString(this, text, position, color, rotation, origin, scaleVec, effects, depth);
 		}
 
 		public void DrawString (
@@ -460,8 +454,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(spriteFont, text);
 
-            var source = new SpriteFont.CharacterSource(text);
-            spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effect, depth);
+            spriteFont.DrawString(this, text, position, color, rotation, origin, scale, effect, depth);
 		}
 
         protected override void Dispose(bool disposing)
