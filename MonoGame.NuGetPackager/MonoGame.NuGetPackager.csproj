@@ -218,7 +218,7 @@
       <Link>content\net40\SDL.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\MonoGame.Framework\bin\WindowsGL\Release\Lidgren.Network.dll">
+    <None Include="..\MonoGame.Framework\bin\Windows\Release\Lidgren.Network.dll">
       <Link>build\net40\Lidgren.Network.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
