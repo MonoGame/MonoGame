@@ -447,7 +447,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
             else if (fileMode == FileMode.OpenOrCreate)
             {
-                if (fileAccess == FileAccess.Read)
+                if (fileAccess == FileAccess.Read && FileExists(file))
                     return folder.OpenStreamForReadAsync(filePath).GetAwaiter().GetResult();
                 else
                 {
