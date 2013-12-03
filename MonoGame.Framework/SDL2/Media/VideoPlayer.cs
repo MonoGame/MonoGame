@@ -844,7 +844,7 @@ namespace Microsoft.Xna.Framework.Media
             System.Console.Write("Signaled Theora player to stop, waiting...");
             timer.Stop();
             timer.Reset();
-            if (audioDecoderThread.ThreadState == System.Threading.ThreadState.Unstarted)
+            if (audioDecoderThread.ThreadState != System.Threading.ThreadState.Unstarted)
             {
                 audioDecoderThread.Join();
             }
