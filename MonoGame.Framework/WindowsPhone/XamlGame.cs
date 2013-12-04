@@ -25,6 +25,8 @@ namespace MonoGame.Framework.WindowsPhone
     {
         public class TouchEventHandler
         {
+            private const int MouseTouchId = 1;
+        
             private readonly UIElement _manipulationElement;
             private bool _isActivated;
 
@@ -73,7 +75,12 @@ namespace MonoGame.Framework.WindowsPhone
                     }
 
                     var pos = new Vector2((float)touchPoint.Position.X, (float)touchPoint.Position.Y);
-                    TouchPanel.AddEvent(touchPoint.TouchDevice.Id, state, pos);
+                    
+                    // Compute touch id other than MouseTouchId. 
+                    // (Id from FrameReported always starts from 0 for first finger.)
+                    int touchId = touchPoint.TouchDevice.Id + MouseTouchId + 1;
+                    
+                    TouchPanel.AddEvent(touchId, state, pos);
                 }
             }
         }
