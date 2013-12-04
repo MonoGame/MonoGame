@@ -123,7 +123,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using Purple here, we use black (in Release) to avoid
+        // performance warnings on Intel/Mesa
+#if DEBUG
         private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+#else
+        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
+#endif
 
         /// <summary>
         /// The active vertex shader.
@@ -1676,6 +1684,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Clear the current bindings.
             Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 
+            int renderTargetWidth;
+            int renderTargetHeight;
             if (renderTargets == null)
             {
                 _currentRenderTargetCount = 0;
@@ -1696,10 +1706,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
-                Viewport = new Viewport(0, 0,
-					PresentationParameters.BackBufferWidth, 
-					PresentationParameters.BackBufferHeight);
-			}
+                renderTargetWidth = PresentationParameters.BackBufferWidth;
+                renderTargetHeight = PresentationParameters.BackBufferHeight;
+            }
 			else
 			{
                 // Copy the new bindings.
@@ -1786,12 +1795,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
 
-                // Set the viewport to the size of the first render target.
-                Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
-
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+
+                renderTargetWidth = renderTarget.Width;
+                renderTargetHeight = renderTarget.Height;
             }
+
+            // Set the viewport to the size of the first render target.
+            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // Set the scissor rectangle to the size of the first render target.
+            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
 
             // In XNA 4, because of hardware limitations on Xbox, when
             // a render target doesn't have PreserveContents as its usage

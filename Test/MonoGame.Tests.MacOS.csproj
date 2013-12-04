@@ -83,6 +83,7 @@
     <Compile Include="Components\VisualTestGameComponent.cs" />
     <Compile Include="Components\Colored3DCubeComponent.cs" />
     <Compile Include="Components\TexturedQuadComponent.cs" />
+    <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
