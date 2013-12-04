@@ -11,6 +11,8 @@ using Windows.Graphics.Display;
 using Windows.Phone.Input.Interop;
 using Windows.UI.Core;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using System.Windows.Input;
+
 
 namespace MonoGame.Framework.WindowsPhone
 {
@@ -21,43 +23,65 @@ namespace MonoGame.Framework.WindowsPhone
     public static class XamlGame<T>
         where T : Game, new()
     {
-        class SurfaceTouchHandler : IDrawingSurfaceManipulationHandler
+        public class TouchEventHandler
         {
-            public void SetManipulationHost(DrawingSurfaceManipulationHost manipulationHost)
+            private const int MouseTouchId = 1;
+        
+            private readonly UIElement _manipulationElement;
+            private bool _isActivated;
+
+            public TouchEventHandler(UIElement element)
             {
-                manipulationHost.PointerPressed += OnPointerPressed;
-                manipulationHost.PointerMoved += OnPointerMoved;
-                manipulationHost.PointerReleased += OnPointerReleased;
+                _isActivated = false;
+                _manipulationElement = element;
+
+                Activate();
             }
 
-            private static void OnPointerPressed(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            public void Activate()
             {
-                var pointerPoint = args.CurrentPoint;
-
-                // To convert from DIPs (device independent pixels) to screen resolution pixels.
-                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos);
+                if (!_isActivated)
+                {
+                    Touch.FrameReported += Touch_FrameReported;
+                    _isActivated = true;
+                }
             }
 
-            private static void OnPointerMoved(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            public void Deactivate()
             {
-                var pointerPoint = args.CurrentPoint;
-
-                // To convert from DIPs (device independent pixels) to screen resolution pixels.
-                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos);
+                Touch.FrameReported -= Touch_FrameReported;
+                _isActivated = false;
             }
 
-            private static void OnPointerReleased(DrawingSurfaceManipulationHost sender, PointerEventArgs args)
+            void Touch_FrameReported(object sender, TouchFrameEventArgs args)
             {
-                var pointerPoint = args.CurrentPoint;
+                foreach (var touchPoint in args.GetTouchPoints(_manipulationElement))
+                {
+                    TouchLocationState state = TouchLocationState.Invalid;
 
-                // To convert from DIPs (device independent pixels) to screen resolution pixels.
-                var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
-                var pos = new Vector2((float)pointerPoint.Position.X, (float)pointerPoint.Position.Y) * dipFactor;
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos);
+                    switch (touchPoint.Action)
+                    {
+                        case TouchAction.Down:
+                            state = TouchLocationState.Pressed;
+                            break;
+
+                        case TouchAction.Up:
+                            state = TouchLocationState.Released;
+                            break;
+
+                        case TouchAction.Move:
+                            state = TouchLocationState.Moved;
+                            break;
+                    }
+
+                    var pos = new Vector2((float)touchPoint.Position.X, (float)touchPoint.Position.Y);
+                    
+                    // Compute touch id other than MouseTouchId. 
+                    // (Id from FrameReported always starts from 0 for first finger.)
+                    int touchId = touchPoint.TouchDevice.Id + MouseTouchId + 1;
+                    
+                    TouchPanel.AddEvent(touchId, state, pos);
+                }
             }
         }
 
@@ -141,14 +165,13 @@ namespace MonoGame.Framework.WindowsPhone
             if (game.graphicsDeviceManager == null)
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
 
-            SurfaceTouchHandler surfaceTouchHandler = new SurfaceTouchHandler();
+            TouchEventHandler touchEventHandler = new TouchEventHandler(drawingSurface);
 
             if (drawingSurface is DrawingSurfaceBackgroundGrid)
             {
                 // Hookup the handlers for updates and touch.
                 DrawingSurfaceBackgroundGrid drawingSurfaceBackgroundGrid = (DrawingSurfaceBackgroundGrid)drawingSurface;
                 drawingSurfaceBackgroundGrid.SetBackgroundContentProvider(new DrawingSurfaceBackgroundContentProvider(game));
-                drawingSurfaceBackgroundGrid.SetBackgroundManipulationHandler(surfaceTouchHandler);
             }
             else
             {
@@ -164,18 +187,28 @@ namespace MonoGame.Framework.WindowsPhone
                     {
                         // Hook-up native component to DrawingSurface
                         ds.SetContentProvider(drawingSurfaceUpdateHandler.ContentProvider);
-                        ds.SetManipulationHandler(surfaceTouchHandler);
+                        touchEventHandler.Activate();
 
                         // Make sure surface is not initialized twice...
                         initializedSurfaces.Add(ds, true);
                     }
                 };
 
+                RoutedEventHandler onUnloadedHandler = (object sender, RoutedEventArgs e) =>
+                {
+                   DrawingSurface unloadedDrawingSurface = (DrawingSurface)sender;
+                   unloadedDrawingSurface.SetContentProvider(null);
+                   unloadedDrawingSurface.SetManipulationHandler(null);
+                   touchEventHandler.Deactivate();
+
+                   initializedSurfaces.Remove(unloadedDrawingSurface);
+                };
+
                 // Don't wait for loaded event here since control might
                 // be loaded already.
                 onLoadedHandler(ds, null);
 
-                ds.Unloaded += OnDrawingSurfaceUnloaded;
+                ds.Unloaded += onUnloadedHandler;
                 ds.Loaded += onLoadedHandler;
             }
 
@@ -184,14 +217,5 @@ namespace MonoGame.Framework.WindowsPhone
         }
 
         private static readonly System.Collections.Generic.Dictionary<DrawingSurface, bool> initializedSurfaces = new System.Collections.Generic.Dictionary<DrawingSurface, bool>();
-
-        private static void OnDrawingSurfaceUnloaded(object sender, RoutedEventArgs e)
-        {
-            DrawingSurface drawingSurface = (DrawingSurface)sender;
-            drawingSurface.SetContentProvider(null);
-            drawingSurface.SetManipulationHandler(null);
-
-            initializedSurfaces.Remove(drawingSurface);
-        }
     }
 }
