@@ -240,7 +240,8 @@ namespace Microsoft.Xna.Framework
         {
             // DeviceResetting events
             _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            _game.GraphicsDevice.OnDeviceResetting();
+			if(_game.GraphicsDevice != null) 
+				_game.GraphicsDevice.OnDeviceResetting();
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
