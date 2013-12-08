@@ -923,10 +923,53 @@ namespace Microsoft.Xna.Framework
                 INTERNAL_sdlWindow,
                 title
             );
-            
+
+            string fileIn = String.Empty;
             if (System.IO.File.Exists(title + ".bmp"))
             {
-                IntPtr icon = SDL.SDL_LoadBMP(title + ".bmp");
+                // If the title and filename work, it just works. Fine.
+                fileIn = title + ".bmp";
+            }
+            else
+            {
+                // But sometimes the title has invalid characters inside.
+
+                /* In addition to the filesystem's invalid charset, we need to
+                 * blacklist the Windows standard set too, no matter what.
+                 * -flibit
+                 */
+                char[] hardCodeBadChars = new char[]
+                {
+                    '<',
+                    '>',
+                    ':',
+                    '"',
+                    '/',
+                    '\\',
+                    '|',
+                    '?',
+                    '*'
+                };
+                List<char> badChars = new List<char>();
+                badChars.AddRange(System.IO.Path.GetInvalidFileNameChars());
+                badChars.AddRange(hardCodeBadChars);
+
+                string stripChars = title;
+                foreach (char c in badChars)
+                {
+                    stripChars = stripChars.Replace(c.ToString(), "");
+                }
+                stripChars += ".bmp";
+
+                if (System.IO.File.Exists(stripChars))
+                {
+                    fileIn = stripChars;
+                }
+            }
+
+            if (!String.IsNullOrEmpty(fileIn))
+            {
+                IntPtr icon = SDL.SDL_LoadBMP(fileIn);
                 SDL.SDL_SetWindowIcon(INTERNAL_sdlWindow, icon);
                 SDL.SDL_FreeSurface(icon);
             }
