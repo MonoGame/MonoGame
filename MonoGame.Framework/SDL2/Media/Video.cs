@@ -69,6 +69,12 @@ namespace Microsoft.Xna.Framework.Media
             get;
             private set;
         }
+
+        internal bool AttachedToPlayer
+        {
+            get;
+            set;
+        }
         #endregion
      
         #region Public Properties
@@ -129,6 +135,7 @@ namespace Microsoft.Xna.Framework.Media
             
             // Initialize the decoder nice and early...
             IsDisposed = true;
+            AttachedToPlayer = false;
             Initialize();
             
             // FIXME: This is a part of the Duration hack!
@@ -214,6 +221,11 @@ namespace Microsoft.Xna.Framework.Media
         #region Disposal Method
         public void Dispose()
         {
+            if (AttachedToPlayer)
+            {
+                return; // NOPE. VideoPlayer will do the honors.
+            }
+
             // Stop and unassign the decoder.
             if (theoraDecoder != IntPtr.Zero)
             {

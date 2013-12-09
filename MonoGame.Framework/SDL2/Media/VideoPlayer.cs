@@ -558,7 +558,9 @@ namespace Microsoft.Xna.Framework.Media
                         // Free everything and start over.
                         TheoraPlay.THEORAPLAY_freeVideo(previousFrame);
                         previousFrame = IntPtr.Zero;
+                        Video.AttachedToPlayer = false;
                         Video.Dispose();
+                        Video.AttachedToPlayer = true;
                         Video.Initialize();
                         
                         // Grab the initial audio again.
@@ -604,6 +606,7 @@ namespace Microsoft.Xna.Framework.Media
                             audioDecoderThread.Join();
                         }
                         TheoraPlay.THEORAPLAY_freeVideo(previousFrame);
+                        Video.AttachedToPlayer = false;
                         Video.Dispose();
                         
                         // We're done, so give them the last frame.
@@ -749,6 +752,7 @@ namespace Microsoft.Xna.Framework.Media
             
             // We need to assign this regardless of what happens next.
             Video = video;
+            video.AttachedToPlayer = true;
             
             // FIXME: This is a part of the Duration hack!
             Video.Duration = TimeSpan.MaxValue;
@@ -852,6 +856,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 TheoraPlay.THEORAPLAY_freeVideo(previousFrame);
             }
+            Video.AttachedToPlayer = false;
             Video.Dispose();
             System.Console.WriteLine(" Done!");
         }
