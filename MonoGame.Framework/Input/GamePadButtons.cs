@@ -166,6 +166,50 @@ namespace Microsoft.Xna.Framework.Input
         {
             return (obj is GamePadButtons) && (this == (GamePadButtons)obj);
         }
+
+		/// <summary>
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Microsoft.Xna.Framework.Input.GamePadButtons"/>.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that represents the current <see cref="Microsoft.Xna.Framework.Input.GamePadButtons"/>.</returns>
+		public override string ToString ()
+		{
+			var sb = new System.Text.StringBuilder ();
+
+			if (A == ButtonState.Pressed)
+				sb.Append (" A");
+
+			if (B == ButtonState.Pressed)
+				sb.Append (" B");
+
+			if (X == ButtonState.Pressed)
+				sb.Append (" X");
+
+			if (Y == ButtonState.Pressed)
+				sb.Append (" Y");
+
+			if (LeftShoulder == ButtonState.Pressed)
+				sb.Append (" LeftShoulder");
+
+			if (RightShoulder == ButtonState.Pressed)
+				sb.Append (" RightShoulder");
+
+			if (LeftStick == ButtonState.Pressed)
+				sb.Append (" LeftStick");
+
+			if (RightStick == ButtonState.Pressed)
+				sb.Append (" RightStick");
+
+			if (Start == ButtonState.Pressed)
+				sb.Append (" Start");
+
+			if (Back == ButtonState.Pressed)
+				sb.Append (" Back");
+
+			if (sb.Length == 0)
+				sb.Append ("None");
+
+			return "{Buttons:" + sb.ToString ().Trim () + "}";
+		}
     }
 }
 

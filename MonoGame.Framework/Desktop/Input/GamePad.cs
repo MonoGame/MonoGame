@@ -69,9 +69,9 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			Init();
 			if (!sdl) return;
-#if DEBUG
+			#if DEBUG
 			Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
-#endif			
+			#endif			
 			// Limit to the first 4 sticks to avoid crashes
 			int numSticks = Math.Min (4,Sdl.SDL_NumJoysticks());
 			for (int x = 0; x < numSticks; x++)
@@ -80,93 +80,272 @@ namespace Microsoft.Xna.Framework.Input
 				PadConfig pc = new PadConfig(Sdl.SDL_JoystickName(x), x);
 				devices[x] = Sdl.SDL_JoystickOpen(pc.Index);
 
-				pc.Button_A.ID = 0;
-				pc.Button_A.Type = InputType.Button;
+				if(pc.JoystickName != null) 
+				{
+					// Official PS3 Controller (tested on OS X)
+					if (pc.JoystickName.ToUpper().Contains ("PLAYSTATION(R)3")) 
+					{
+						pc.Button_A.ID = 14;
+						pc.Button_A.Type = InputType.Button;
 
-				pc.Button_B.ID = 1;
-				pc.Button_B.Type = InputType.Button;
+						pc.Button_B.ID = 13;
+						pc.Button_B.Type = InputType.Button;
 
-				pc.Button_X.ID = 2;
-				pc.Button_X.Type = InputType.Button;
+						pc.Button_X.ID = 15;
+						pc.Button_X.Type = InputType.Button;
 
-				pc.Button_Y.ID = 3;
-				pc.Button_Y.Type = InputType.Button;
+						pc.Button_Y.ID = 12;
+						pc.Button_Y.Type = InputType.Button;
 
-				pc.Button_LB.ID = 4;
-				pc.Button_LB.Type = InputType.Button;
+						pc.Button_Back.ID = 0;
+						pc.Button_Back.Type = InputType.Button;
 
-				pc.Button_RB.ID = 5;
-				pc.Button_RB.Type = InputType.Button;
+						pc.Button_Start.ID = 3;
+						pc.Button_Start.Type = InputType.Button;
 
-				pc.Button_Back.ID = 6;
-				pc.Button_Back.Type = InputType.Button;
+						pc.Button_LB.ID = 10;
+						pc.Button_LB.Type = InputType.Button;
 
-				pc.Button_Start.ID = 7;
-				pc.Button_Start.Type = InputType.Button;
+						pc.Button_RB.ID = 11;
+						pc.Button_RB.Type = InputType.Button;
 
-				pc.LeftStick.Press.ID = 8;
-				pc.LeftStick.Press.Type = InputType.Button;
+						pc.LeftStick.X.Negative.ID = 0;
+						pc.LeftStick.X.Negative.Type = InputType.Axis;
+						pc.LeftStick.X.Negative.Negative = true;
 
-				pc.RightStick.Press.ID = 9;
-				pc.RightStick.Press.Type = InputType.Button;
+						pc.LeftStick.X.Positive.ID = 0;
+						pc.LeftStick.X.Positive.Type = InputType.Axis;
+						pc.LeftStick.X.Positive.Negative = false;
 
-				pc.LeftStick.X.Negative.ID = 0;
-				pc.LeftStick.X.Negative.Type = InputType.Axis;
-				pc.LeftStick.X.Negative.Negative = true;
+						pc.LeftStick.Y.Negative.ID = 1;
+						pc.LeftStick.Y.Negative.Type = InputType.Axis;
+						pc.LeftStick.Y.Negative.Negative = true;
 
-				pc.LeftStick.X.Positive.ID = 0;
-				pc.LeftStick.X.Positive.Type = InputType.Axis;
-				pc.LeftStick.X.Positive.Negative = false;
+						pc.LeftStick.Y.Positive.ID = 1;
+						pc.LeftStick.Y.Positive.Type = InputType.Axis;
+						pc.LeftStick.Y.Positive.Negative = false;
 
-				pc.LeftStick.Y.Negative.ID = 1;
-				pc.LeftStick.Y.Negative.Type = InputType.Axis;
-				pc.LeftStick.Y.Negative.Negative = true;
+						pc.RightStick.X.Negative.ID = 2;
+						pc.RightStick.X.Negative.Type = InputType.Axis;
+						pc.RightStick.X.Negative.Negative = true;
 
-				pc.LeftStick.Y.Positive.ID = 1;
-				pc.LeftStick.Y.Positive.Type = InputType.Axis;
-				pc.LeftStick.Y.Positive.Negative = false;
+						pc.RightStick.X.Positive.ID = 2;
+						pc.RightStick.X.Positive.Type = InputType.Axis;
+						pc.RightStick.X.Positive.Negative = false;
 
-				pc.RightStick.Y.Negative.ID = 3;
-				pc.RightStick.Y.Negative.Type = InputType.Axis;
-				pc.RightStick.Y.Negative.Negative = true;
+						pc.RightStick.Y.Negative.ID = 3;
+						pc.RightStick.Y.Negative.Type = InputType.Axis;
+						pc.RightStick.Y.Negative.Negative = true;
 
-				pc.RightStick.Y.Positive.ID = 3;
-				pc.RightStick.Y.Positive.Type = InputType.Axis;
-				pc.RightStick.Y.Positive.Negative = false;
+						pc.RightStick.Y.Positive.ID = 3;
+						pc.RightStick.Y.Positive.Type = InputType.Axis;
+						pc.RightStick.Y.Positive.Negative = false;
 
-				pc.RightStick.X.Negative.ID = 4;
-				pc.RightStick.X.Negative.Type = InputType.Axis;
-				pc.RightStick.X.Negative.Negative = true;
+						pc.Dpad.Up.ID = 4;
+						pc.Dpad.Up.Type = InputType.Button;
 
-				pc.RightStick.X.Positive.ID = 4;
-				pc.RightStick.X.Positive.Type = InputType.Axis;
-				pc.RightStick.X.Positive.Negative = false;
+						pc.Dpad.Down.ID = 6;
+						pc.Dpad.Down.Type = InputType.Button;
 
-				pc.Dpad.Up.ID = 0;
-				pc.Dpad.Up.Type = InputType.PovUp;
+						pc.Dpad.Left.ID = 7;
+						pc.Dpad.Left.Type = InputType.Button;
 
-				pc.Dpad.Down.ID = 0;
-				pc.Dpad.Down.Type = InputType.PovDown;
+						pc.Dpad.Right.ID = 5;
+						pc.Dpad.Right.Type = InputType.Button;
 
-				pc.Dpad.Left.ID = 0;
-				pc.Dpad.Left.Type = InputType.PovLeft;
+						// Note that LTrigger is 0f or 1f
+						pc.LeftTrigger.ID = 8;
+						pc.LeftTrigger.Type = InputType.Button;
 
-				pc.Dpad.Right.ID = 0;
-				pc.Dpad.Right.Type = InputType.PovRight;
+						// Note that RTrigger is 0f or 1f
+						pc.RightTrigger.ID = 9;
+						pc.RightTrigger.Type = InputType.Button;
 
-				pc.LeftTrigger.ID = 2;
-				pc.LeftTrigger.Type = InputType.Axis;
-				pc.LeftTrigger.Negative = false;
+						pc.LeftStick.Press.ID = 1;
+						pc.LeftStick.Press.Type = InputType.Button;
 
-				pc.RightTrigger.ID = 2;
-				pc.RightTrigger.Type = InputType.Axis;
-				pc.RightTrigger.Negative = true;
+						pc.RightStick.Press.ID = 2;
+						pc.RightStick.Press.Type = InputType.Button;
+					} 
 
-				// Suggestion: Xbox Guide button <=> BigButton
-				//pc.BigButton.ID = 8;
-				//pc.BigButton.Type = InputType.Button;
+					// Generic PS3 Controller (Tested with GameStop PS3 Controller on OS X)
+					else if (pc.JoystickName.ToUpper().Contains ("PS3") || true) 
+					{
+						pc.Button_A.ID = 0;
+						pc.Button_A.Type = InputType.Button;
 
-#if DEBUG
+						pc.Button_B.ID = 1;
+						pc.Button_B.Type = InputType.Button;
+
+						pc.Button_X.ID = 2;
+						pc.Button_X.Type = InputType.Button;
+
+						pc.Button_Y.ID = 3;
+						pc.Button_Y.Type = InputType.Button;
+
+						pc.Button_LB.ID = 4;
+						pc.Button_LB.Type = InputType.Button;
+
+						pc.Button_RB.ID = 5;
+						pc.Button_RB.Type = InputType.Button;
+
+						pc.Button_Back.ID = 8;
+						pc.Button_Back.Type = InputType.Button;
+
+						pc.Button_Start.ID = 9;
+						pc.Button_Start.Type = InputType.Button;
+
+						pc.LeftStick.Press.ID = 10;
+						pc.LeftStick.Press.Type = InputType.Button;
+
+						pc.RightStick.Press.ID = 11;
+						pc.RightStick.Press.Type = InputType.Button;
+
+						pc.LeftStick.X.Negative.ID = 0;
+						pc.LeftStick.X.Negative.Type = InputType.Axis;
+						pc.LeftStick.X.Negative.Negative = true;
+
+						pc.LeftStick.X.Positive.ID = 0;
+						pc.LeftStick.X.Positive.Type = InputType.Axis;
+						pc.LeftStick.X.Positive.Negative = false;
+
+						pc.LeftStick.Y.Negative.ID = 1;
+						pc.LeftStick.Y.Negative.Type = InputType.Axis;
+						pc.LeftStick.Y.Negative.Negative = true;
+
+						pc.LeftStick.Y.Positive.ID = 1;
+						pc.LeftStick.Y.Positive.Type = InputType.Axis;
+						pc.LeftStick.Y.Positive.Negative = false;
+
+						pc.RightStick.Y.Negative.ID = 3;
+						pc.RightStick.Y.Negative.Type = InputType.Axis;
+						pc.RightStick.Y.Negative.Negative = true;
+
+						pc.RightStick.Y.Positive.ID = 3;
+						pc.RightStick.Y.Positive.Type = InputType.Axis;
+						pc.RightStick.Y.Positive.Negative = false;
+
+						pc.RightStick.X.Negative.ID = 2;
+						pc.RightStick.X.Negative.Type = InputType.Axis;
+						pc.RightStick.X.Negative.Negative = true;
+
+						pc.RightStick.X.Positive.ID = 2;
+						pc.RightStick.X.Positive.Type = InputType.Axis;
+						pc.RightStick.X.Positive.Negative = false;
+
+						pc.Dpad.Up.ID = 0;
+						pc.Dpad.Up.Type = InputType.PovUp;
+
+						pc.Dpad.Down.ID = 0;
+						pc.Dpad.Down.Type = InputType.PovDown;
+
+						pc.Dpad.Left.ID = 0;
+						pc.Dpad.Left.Type = InputType.PovLeft;
+
+						pc.Dpad.Right.ID = 0;
+						pc.Dpad.Right.Type = InputType.PovRight;
+
+						// Note that LTrigger is 0f or 1f
+						pc.LeftTrigger.ID = 6;
+						pc.LeftTrigger.Type = InputType.Button;
+
+						// Note that RTrigger is 0f or 1f
+						pc.RightTrigger.ID = 7;
+						pc.RightTrigger.Type = InputType.Button;
+					} 
+
+					// assume 360 controller (the XNA default)
+					else 
+					{
+						pc.Button_A.ID = 0;
+						pc.Button_A.Type = InputType.Button;
+
+						pc.Button_B.ID = 1;
+						pc.Button_B.Type = InputType.Button;
+
+						pc.Button_X.ID = 2;
+						pc.Button_X.Type = InputType.Button;
+
+						pc.Button_Y.ID = 3;
+						pc.Button_Y.Type = InputType.Button;
+
+						pc.Button_LB.ID = 4;
+						pc.Button_LB.Type = InputType.Button;
+
+						pc.Button_RB.ID = 5;
+						pc.Button_RB.Type = InputType.Button;
+
+						pc.Button_Back.ID = 6;
+						pc.Button_Back.Type = InputType.Button;
+
+						pc.Button_Start.ID = 7;
+						pc.Button_Start.Type = InputType.Button;
+
+						pc.LeftStick.Press.ID = 8;
+						pc.LeftStick.Press.Type = InputType.Button;
+
+						pc.RightStick.Press.ID = 9;
+						pc.RightStick.Press.Type = InputType.Button;
+
+						pc.LeftStick.X.Negative.ID = 0;
+						pc.LeftStick.X.Negative.Type = InputType.Axis;
+						pc.LeftStick.X.Negative.Negative = true;
+
+						pc.LeftStick.X.Positive.ID = 0;
+						pc.LeftStick.X.Positive.Type = InputType.Axis;
+						pc.LeftStick.X.Positive.Negative = false;
+
+						pc.LeftStick.Y.Negative.ID = 1;
+						pc.LeftStick.Y.Negative.Type = InputType.Axis;
+						pc.LeftStick.Y.Negative.Negative = true;
+
+						pc.LeftStick.Y.Positive.ID = 1;
+						pc.LeftStick.Y.Positive.Type = InputType.Axis;
+						pc.LeftStick.Y.Positive.Negative = false;
+
+						pc.RightStick.Y.Negative.ID = 3;
+						pc.RightStick.Y.Negative.Type = InputType.Axis;
+						pc.RightStick.Y.Negative.Negative = true;
+
+						pc.RightStick.Y.Positive.ID = 3;
+						pc.RightStick.Y.Positive.Type = InputType.Axis;
+						pc.RightStick.Y.Positive.Negative = false;
+
+						pc.RightStick.X.Negative.ID = 4;
+						pc.RightStick.X.Negative.Type = InputType.Axis;
+						pc.RightStick.X.Negative.Negative = true;
+
+						pc.RightStick.X.Positive.ID = 4;
+						pc.RightStick.X.Positive.Type = InputType.Axis;
+						pc.RightStick.X.Positive.Negative = false;
+
+						pc.Dpad.Up.ID = 0;
+						pc.Dpad.Up.Type = InputType.PovUp;
+
+						pc.Dpad.Down.ID = 0;
+						pc.Dpad.Down.Type = InputType.PovDown;
+
+						pc.Dpad.Left.ID = 0;
+						pc.Dpad.Left.Type = InputType.PovLeft;
+
+						pc.Dpad.Right.ID = 0;
+						pc.Dpad.Right.Type = InputType.PovRight;
+
+						pc.LeftTrigger.ID = 2;
+						pc.LeftTrigger.Type = InputType.Axis;
+						pc.LeftTrigger.Negative = false;
+
+						pc.RightTrigger.ID = 2;
+						pc.RightTrigger.Type = InputType.Axis;
+						pc.RightTrigger.Negative = true;
+
+						// Suggestion: Xbox Guide button <=> BigButton
+						//pc.BigButton.ID = 8;
+						//pc.BigButton.Type = InputType.Button;
+					}
+				}
+
+				#if DEBUG
 				int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
 				Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
 
@@ -175,7 +354,7 @@ namespace Microsoft.Xna.Framework.Input
 
 				int numhats = Sdl.SDL_JoystickNumHats(devices[x]);
 				Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
-#endif
+				#endif
 
 				settings[x] = pc;
 			}

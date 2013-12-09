@@ -120,5 +120,31 @@ namespace Microsoft.Xna.Framework.Input
         {
             return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
         }
+
+		/// <summary>
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Microsoft.Xna.Framework.Input.GamePadDPad"/>.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that represents the current <see cref="Microsoft.Xna.Framework.Input.GamePadDPad"/>.</returns>
+		public override string ToString ()
+		{
+			var sb = new System.Text.StringBuilder ();
+
+			if (Up == ButtonState.Pressed)
+				sb.Append (" Up");
+
+			if (Down == ButtonState.Pressed)
+				sb.Append (" Down");
+
+			if (Left == ButtonState.Pressed)
+				sb.Append (" Left");
+
+			if (Right == ButtonState.Pressed)
+				sb.Append (" Right");
+
+			if (sb.Length == 0)
+				sb.Append ("None");
+
+			return "{DPad:" + sb.ToString ().Trim () + "}";
+		}
 	}
 }
