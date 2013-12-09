@@ -69,9 +69,9 @@ namespace Microsoft.Xna.Framework.Input
 		{
 			Init();
 			if (!sdl) return;
-			#if DEBUG
+#if DEBUG
 			Console.WriteLine("Number of joysticks: " + Sdl.SDL_NumJoysticks());
-			#endif			
+#endif			
 			// Limit to the first 4 sticks to avoid crashes
 			int numSticks = Math.Min (4,Sdl.SDL_NumJoysticks());
 			for (int x = 0; x < numSticks; x++)
@@ -345,7 +345,7 @@ namespace Microsoft.Xna.Framework.Input
 					}
 				}
 
-				#if DEBUG
+#if DEBUG
 				int numbuttons = Sdl.SDL_JoystickNumButtons(devices[x]);
 				Console.WriteLine("Number of buttons for joystick: " + x + " - " + numbuttons);
 
@@ -354,7 +354,7 @@ namespace Microsoft.Xna.Framework.Input
 
 				int numhats = Sdl.SDL_JoystickNumHats(devices[x]);
 				Console.WriteLine("Number of PovHats for joystick: " + x + " - " + numhats);
-				#endif
+#endif
 
 				settings[x] = pc;
 			}
