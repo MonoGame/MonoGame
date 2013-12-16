@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
         // FIXME: Implement this for all GL operations to prevent redundant calls!
-        public static bool INTERNAL_scissorTestEnable = false;
+        internal static bool INTERNAL_scissorTestEnable = false;
 #endif
 
         public RasterizerState()
