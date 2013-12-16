@@ -42,7 +42,12 @@ namespace Microsoft.Xna.Framework.Graphics
         public static RasterizerState CullClockwise { get { return _cullClockwise.Value; } }
         public static RasterizerState CullCounterClockwise { get { return _cullCounterClockwise.Value; } }
         public static RasterizerState CullNone { get { return _cullNone.Value; } }
-        
+
+#if OPENGL
+        // FIXME: Implement this for all GL operations to prevent redundant calls!
+        public static bool INTERNAL_scissorTestEnable = false;
+#endif
+
         public RasterizerState()
 		{
 			CullMode = CullMode.CullCounterClockwiseFace;
@@ -121,10 +126,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException();
 #endif
 
-			if (ScissorTestEnable)
+			if (ScissorTestEnable && !INTERNAL_scissorTestEnable)
+			{
 				GL.Enable(EnableCap.ScissorTest);
-			else
+				INTERNAL_scissorTestEnable = true;
+			}
+			else if (!ScissorTestEnable && INTERNAL_scissorTestEnable)
+			{
 				GL.Disable(EnableCap.ScissorTest);
+				INTERNAL_scissorTestEnable = false;
+			}
             GraphicsExtensions.CheckGLError();
 
             if (this.DepthBias != 0 || this.SlopeScaleDepthBias != 0)

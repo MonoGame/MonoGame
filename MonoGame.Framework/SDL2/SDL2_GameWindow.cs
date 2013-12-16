@@ -533,6 +533,12 @@ namespace Microsoft.Xna.Framework
         public void INTERNAL_SwapBuffers()
         {
             Rectangle windowRect = ClientBounds;
+            if (RasterizerState.INTERNAL_scissorTestEnable)
+            {
+                // If we don't disable this, you may not get your whole backbuffer back...
+                GL.Disable(EnableCap.ScissorTest);
+                RasterizerState.INTERNAL_scissorTestEnable = false;
+            }
             GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, INTERNAL_glFramebuffer);
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
             GL.BlitFramebuffer(
@@ -789,6 +795,14 @@ namespace Microsoft.Xna.Framework
             
             // Now, update the viewport
             Game.GraphicsDevice.Viewport = new Viewport(
+                0,
+                0,
+                clientWidth,
+                clientHeight
+            );
+            
+            // Update the scissor rectangle to our new default target size
+            Game.GraphicsDevice.ScissorRectangle = new Rectangle(
                 0,
                 0,
                 clientWidth,
