@@ -1,32 +1,33 @@
 using System;
 using System.IO;
-
-using Microsoft.Xna.Framework.Audio;
 ﻿
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed class Song : IEquatable<Song>, IDisposable
     {
-        static internal Android.Media.MediaPlayer _androidPlayer = null;
-        private string _name;
+        static Android.Media.MediaPlayer _androidPlayer;
+        static Song _playingSong;
+
+        private readonly string _name;
+        private readonly TimeSpan _duration = TimeSpan.Zero;
         private int _playCount;
-        bool disposed;
+        private bool _disposed;
 
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
         event FinishedPlayingHandler DonePlaying;
 
-		internal Song (string fileName, int durationMS)
-			:this(fileName)
-		{
-			_Duration = TimeSpan.FromMilliseconds(durationMS);
-		}
-		internal Song(string fileName)
+        internal Song (string fileName, int durationMS)
+            :this(fileName)
+        {
+            _duration = TimeSpan.FromMilliseconds(durationMS);
+        }
+        internal Song(string fileName)
         {
             _name = fileName;
             if (_androidPlayer == null)
             {
                 _androidPlayer = new Android.Media.MediaPlayer();
-                _androidPlayer.Completion += new EventHandler(_androidPlayer_Completion);
+                _androidPlayer.Completion += new EventHandler(AndroidPlayer_Completion);
             }
         }
 
@@ -43,33 +44,34 @@ namespace Microsoft.Xna.Framework.Media
 
         void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 // ...
 
-                disposed = true;
+                _disposed = true;
             }
         }
 
         private void Prepare()
         {
-            if (_androidPlayer != null)
+            var afd = Game.Activity.Assets.OpenFd(_name);
+            if (afd != null)
             {
-                var afd = Game.Activity.Assets.OpenFd(_name);
-                if (afd != null)
-                {
-                    _androidPlayer.Reset();
-                    _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
-                    _androidPlayer.Prepare();
-                    _androidPlayer.Looping = MediaPlayer.IsRepeating;
-                }
+                _androidPlayer.Reset();
+                _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+                _androidPlayer.Prepare();
+                _androidPlayer.Looping = MediaPlayer.IsRepeating;
+                _playingSong = this;
             }
         }
 
-        void _androidPlayer_Completion(object sender, EventArgs e)
+        static void AndroidPlayer_Completion(object sender, EventArgs e)
         {
-            if (DonePlaying != null)
-                DonePlaying(sender, e);
+            var playingSong = _playingSong;
+            _playingSong = null;
+
+            if (playingSong != null && playingSong.DonePlaying != null)
+                playingSong.DonePlaying(sender, e);
         }
 
         /// <summary>
@@ -119,62 +121,26 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Play()
         {
-            if (_androidPlayer != null)
-            {
-                Prepare();
-                _androidPlayer.Start();
-                _playCount++;
-            }
+            Prepare();
+            _androidPlayer.Start();
+            _playCount++;
         }
 
         internal void Resume()
         {
-            if (_androidPlayer != null)
-            {
-                _androidPlayer.Start();
-            }
+            _androidPlayer.Start();
         }
 
         internal void Pause()
         {
-            if (_androidPlayer != null)
-            {
-                _androidPlayer.Pause();
-            }
+            _androidPlayer.Pause();
         }
 
         internal void Stop()
         {
-            if (_androidPlayer != null)
-            {
-                _androidPlayer.Stop();
-                _playCount = 0;
-            }
-        }
-
-        internal bool Loop
-        {
-            get
-            {
-                if (_androidPlayer != null)
-                {
-                    return _androidPlayer.Looping;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            set
-            {
-                if (_androidPlayer != null)
-                {
-                    if (_androidPlayer.Looping != value)
-                    {
-                        _androidPlayer.Looping = value;
-                    }
-                }
-            }
+            _androidPlayer.Stop();
+            _playingSong = null;
+            _playCount = 0;
         }
 
         internal float Volume
@@ -186,10 +152,7 @@ namespace Microsoft.Xna.Framework.Media
 
             set
             {
-                if (_androidPlayer != null)
-                {
-                    _androidPlayer.SetVolume(value, value);
-                }
+                _androidPlayer.SetVolume(value, value);
             }
         }
 
@@ -197,35 +160,21 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-				if(_Duration == TimeSpan.Zero)
-				{
-	                if (_androidPlayer != null)
-	                {
-	                    return new TimeSpan(0, 0, (int)_androidPlayer.Duration);
-	                }
-	                else
-	                {
-						return _Duration;
-	                }
-				}
-				else
-					return _Duration;
+                if (_duration == TimeSpan.Zero && _playingSong == this)
+                    return TimeSpan.FromMilliseconds(_androidPlayer.Duration);
+
+                return _duration;
             }
         }
-		private TimeSpan _Duration = TimeSpan.Zero;
 
         public TimeSpan Position
         {
             get
             {
-                if (_androidPlayer != null)
-                {
-                    return new TimeSpan(0, 0, (int)_androidPlayer.CurrentPosition);
-                }
-                else
-                {
-                    return new TimeSpan(0);
-                }
+                if (_playingSong == this)
+                    return TimeSpan.FromMilliseconds(_androidPlayer.CurrentPosition);
+             
+                return TimeSpan.Zero;
             }
         }
 

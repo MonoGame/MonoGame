@@ -9,12 +9,12 @@ namespace Microsoft.Xna.Framework
     public static class AndroidCompatibility
     {
 		/// <summary>
-		/// Becaue the Kindle Fire devices default orientation is fliped by 180 degrees from all the other android devices
+		/// Because the Kindle Fire devices default orientation is fliped by 180 degrees from all the other android devices
 		/// on the market we need to do some special processing to make sure that LandscapeLeft is the correct way round.
 		/// This list contains all the Build.Model strings of the effected devices, it should be added to if and when
-		/// more devices exxhibit the same issues
+		/// more devices exhibit the same issues.
 		/// </summary>
-		private static readonly string[] Kindles = new[] { "KFTT", "KFJWI", "KFJWA" };
+        private static readonly string[] Kindles = new[] { "KFTT", "KFJWI", "KFJWA", "KFSOWI", "KFTHWA", "KFTHWI", "KFAPWA", "KFAPWI" };
 
         public enum ESVersions
         {

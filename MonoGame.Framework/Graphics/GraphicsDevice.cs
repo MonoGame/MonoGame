@@ -129,7 +129,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using Purple here, we use black (in Release) to avoid
+        // performance warnings on Intel/Mesa
+#if DEBUG
         private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+#else
+        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
+#endif
 
         /// <summary>
         /// The active vertex shader.
@@ -2122,12 +2130,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 #endif
             }
-
+   
+#if !PSM
             if (_vertexShader == null)
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
-                throw new InvalidOperationException("A pixel shader must not set!");
-
+                throw new InvalidOperationException("A pixel shader must be set!");
+#endif
+            
 #if DIRECTX 
 
             if (_vertexShaderDirty)
@@ -2333,6 +2343,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 #elif PSM
             BindVertexBuffer(true);
+            ApplyState(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
         }
@@ -2609,11 +2620,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 var buf = _availableVertexBuffers[i];
                 
 #region Check there is enough space
-                if (buf.VertexCount < requiredVertexLength)
+                if (buf.VertexCount != requiredVertexLength)
                     continue;
                 if (requiredIndexLength == 0 && buf.IndexCount != 0)
                     continue;
-                if (requiredIndexLength > 0 && buf.IndexCount < requiredIndexLength)
+                if (requiredIndexLength > 0 && buf.IndexCount != requiredIndexLength)
                     continue;
 #endregion
                 
@@ -2646,7 +2657,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             if (bestMatch != null)
             {
-                _availableVertexBuffers.RemoveAt(bestMatchIndex);
+                return bestMatch;
             }
             else
             {
