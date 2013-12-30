@@ -66,15 +66,9 @@ non-infringement.
 */
 #endregion License
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 
 //using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
@@ -83,7 +77,7 @@ namespace Microsoft.Xna.Framework
 {
     class MetroGamePlatform : GamePlatform
     {
-		//private OpenALSoundController soundControllerInstance = null;
+        //private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
@@ -173,16 +167,14 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            CompositionTarget.Rendering += (o, a) =>
-            {
-                MetroGameWindow.Instance.Tick();
-            };
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
         }
-        
+
         public override void Exit()
         {
             if (!MetroGameWindow.Instance.IsExiting)
             {
+                CompositionTarget.Rendering -= this.CompositionTarget_Rendering;
                 MetroGameWindow.Instance.IsExiting = true;
             }
         }
@@ -216,7 +208,7 @@ namespace Microsoft.Xna.Framework
         {
             // Metro has no concept of fullscreen vs windowed!
         }
-        
+
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
         }
@@ -233,15 +225,15 @@ namespace Microsoft.Xna.Framework
         public override void Present()
         {
             var device = Game.GraphicsDevice;
-            if ( device != null )
+            if (device != null)
                 device.Present();
         }
 
-        protected override void OnIsMouseVisibleChanged() 
+        protected override void OnIsMouseVisibleChanged()
         {
             MetroGameWindow.Instance.SetCursor(Game.IsMouseVisible);
         }
-		
+
         protected override void Dispose(bool disposing)
         {
             // Make sure we dispose the graphics system.
@@ -250,8 +242,13 @@ namespace Microsoft.Xna.Framework
                 graphicsDeviceManager.Dispose();
 
             MetroGameWindow.Instance.Dispose();
-			
-			base.Dispose(disposing);
+
+            base.Dispose(disposing);
+        }
+
+        private void CompositionTarget_Rendering(object sender, object e)
+        {
+            MetroGameWindow.Instance.Tick();
         }
     }
 }

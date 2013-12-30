@@ -39,19 +39,12 @@ purpose and non-infringement.
 #endregion License
 
 using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
-
+using Microsoft.Xna.Framework.Graphics;
+using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
-using Windows.Graphics.Display;
-
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
@@ -85,7 +78,7 @@ namespace Microsoft.Xna.Framework
         public override bool AllowUserResizing
         {
             get { return false; }
-            set 
+            set
             {
                 // You cannot resize a Metro window!
             }
@@ -96,7 +89,15 @@ namespace Microsoft.Xna.Framework
             get { return _orientation; }
         }
 
-        private MetroGamePlatform Platform { get { return Game.Instance.Platform as MetroGamePlatform; } }
+        private MetroGamePlatform Platform
+        {
+            get
+            {
+                if (Game.Instance != null)
+                    return Game.Instance.Platform as MetroGamePlatform;
+                return null;
+            }
+        }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
@@ -104,9 +105,9 @@ namespace Microsoft.Xna.Framework
             // when no preference is being changed.
             if (_supportedOrientations == orientations)
                 return;
-            
+
             _supportedOrientations = orientations;
-            
+
             DisplayOrientations supported;
             if (orientations == DisplayOrientation.Default)
             {
@@ -151,10 +152,14 @@ namespace Microsoft.Xna.Framework
             SetClientBounds(bounds.Width, bounds.Height);
 
             SetCursor(false);
+            IsExiting = false;
         }
 
         private void Window_FocusChanged(CoreWindow sender, WindowActivatedEventArgs args)
         {
+            if (this.Platform == null)
+                return;
+
             if (args.WindowActivationState == CoreWindowActivationState.Deactivated)
                 Platform.IsActive = false;
             else
@@ -195,7 +200,7 @@ namespace Microsoft.Xna.Framework
                     clientWidth = (float)Math.Min(_clientBounds.Width, _clientBounds.Height);
                     clientHeight = (float)Math.Max(_clientBounds.Width, _clientBounds.Height);
                 }
-                _backBufferScale = new Vector2( manager.PreferredBackBufferWidth / clientWidth, 
+                _backBufferScale = new Vector2(manager.PreferredBackBufferWidth / clientWidth,
                                                 manager.PreferredBackBufferHeight / clientHeight);
             }
 
@@ -204,13 +209,13 @@ namespace Microsoft.Xna.Framework
 
             // Set the default new back buffer size and viewport, but this
             // can be overloaded by the two events below.
-            
+
             var newWidth = (int)((_backBufferScale.X * _clientBounds.Width) + 0.5f);
             var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
             manager.PreferredBackBufferWidth = newWidth;
             manager.PreferredBackBufferHeight = newHeight;
 
-            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
+            manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);
 
             // If we have a valid client bounds then 
             // update the graphics device.
@@ -275,7 +280,7 @@ namespace Microsoft.Xna.Framework
 
         internal void SetCursor(bool visible)
         {
-            if ( _coreWindow == null )
+            if (_coreWindow == null)
                 return;
 
             if (visible)
@@ -313,7 +318,7 @@ namespace Microsoft.Xna.Framework
             _windowEvents.UpdateState();
 
             // Update and render the game.
-            if (Game != null)
+            if (Game != null && !this.IsExiting)
                 Game.Tick();
         }
 
