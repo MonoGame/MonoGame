@@ -174,7 +174,6 @@ namespace Microsoft.Xna.Framework
         {
             if (!MetroGameWindow.Instance.IsExiting)
             {
-                CompositionTarget.Rendering -= this.CompositionTarget_Rendering;
                 MetroGameWindow.Instance.IsExiting = true;
             }
         }
@@ -236,6 +235,9 @@ namespace Microsoft.Xna.Framework
 
         protected override void Dispose(bool disposing)
         {
+            CompositionTarget.Rendering -= this.CompositionTarget_Rendering;
+            this.Exit();
+
             // Make sure we dispose the graphics system.
             var graphicsDeviceManager = Game.graphicsDeviceManager;
             if (graphicsDeviceManager != null)
