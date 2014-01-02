@@ -941,6 +941,14 @@ namespace Microsoft.Xna.Framework.Graphics
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #elif MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Png);
+#elif WINDOWS
+            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            GetData(pixelData);
+            var image = System.Windows.Media.Imaging.BitmapSource.Create(this.Width, this.Height, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null, pixelData, this.Width * 4);
+
+            System.Windows.Media.Imaging.PngBitmapEncoder encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(image));
+            encoder.Save(stream);
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
