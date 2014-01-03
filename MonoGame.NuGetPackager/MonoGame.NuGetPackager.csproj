@@ -55,10 +55,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.pri">
-      <Link>build\netcore\MonoGame.Framework.pri</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\SharpDX.WP8.winmd">
       <Link>build\wp8\ARM\SharpDX.WP8.winmd</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -110,14 +106,6 @@
     <Folder Include="tools\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll">
-      <Link>build\wp8\ARM\MonoGame.Framework.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.pdb">
-      <Link>build\wp8\ARM\MonoGame.Framework.pdb</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\SharpDX.Direct3D11.dll">
       <Link>build\wp8\ARM\SharpDX.Direct3D11.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -160,14 +148,6 @@
     </None>
     <None Include="..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\SharpDX.xml">
       <Link>build\wp8\ARM\SharpDX.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll">
-      <Link>build\wp8\x86\MonoGame.Framework.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.pdb">
-      <Link>build\wp8\x86\MonoGame.Framework.pdb</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\SharpDX.Direct3D11.dll">
@@ -218,24 +198,12 @@
       <Link>content\net40\SDL.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\MonoGame.Framework\bin\Windows\Release\Lidgren.Network.dll">
-      <Link>build\net40\Lidgren.Network.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\MonoGame.Framework\bin\WindowsGL\Release\MonoGame.Framework.dll">
-      <Link>build\net40\MonoGame.Framework.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\MonoGame.Framework\bin\WindowsGL\Release\OpenTK.dll">
       <Link>build\net40\OpenTK.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\MonoGame.Framework\bin\WindowsGL\Release\Tao.Sdl.dll">
       <Link>build\net40\Tao.Sdl.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\MonoGame.Framework\bin\Windows8\Release\MonoGame.Framework.dll">
-      <Link>build\netcore\MonoGame.Framework.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\MonoGame.Framework\bin\Windows8\Release\SharpDX.Direct2D1.dll">
@@ -274,6 +242,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\ThirdParty\Lidgren.Network\bin\Windows\Release\Lidgren.Network.dll">
+      <Link>build\net40\Lidgren.Network.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NuGet.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
