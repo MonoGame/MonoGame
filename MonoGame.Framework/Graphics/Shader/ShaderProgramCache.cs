@@ -122,7 +122,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 GL.DetachShader(program, vertexShader.GetShaderHandle());
                 GL.DetachShader(program, pixelShader.GetShaderHandle());
+#if MONOMAC
+                GL.DeleteProgram(1, ref program);
+#else
                 GL.DeleteProgram(program);
+#endif
                 throw new InvalidOperationException("Unable to link effect program");
             }
 
