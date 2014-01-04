@@ -351,11 +351,7 @@ namespace Microsoft.Xna.Framework
             windowState = window.WindowState;            
 
 #if WINDOWS
-            {
-                var windowInfoType = window.WindowInfo.GetType();
-                var propertyInfo = windowInfoType.GetProperty("WindowHandle");
-                _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
-            }
+            _windowHandle = window.WindowInfo.Handle;
 #endif
             // Provide the graphics context for background loading
             Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
