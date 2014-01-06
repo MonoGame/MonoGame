@@ -556,13 +556,14 @@ namespace Microsoft.Xna.Framework
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
 
-            for (var i = 0; i < sourceArray.Length; i++) {
+            for (var i = 0; i < sourceArray.Length; i++) 
+            {
                 var position = sourceArray[i];
                 destinationArray[i] =
                     new Vector3(
-                        (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
-                        (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
-                        (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+                        (position.X*matrix.M11) + (position.Y*matrix.M21) + (position.Z*matrix.M31) + matrix.M41,
+                        (position.X*matrix.M12) + (position.Y*matrix.M22) + (position.Z*matrix.M32) + matrix.M42,
+                        (position.X*matrix.M13) + (position.Y*matrix.M23) + (position.Z*matrix.M33) + matrix.M43);
             }
         }
 
@@ -575,7 +576,8 @@ namespace Microsoft.Xna.Framework
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
 
-            for (var i = 0; i < length; i++) {
+            for (var i = 0; i < length; i++) 
+            {
                 var position = sourceArray[sourceIndex + i];
                 destinationArray[destinationIndex + i] =
                     new Vector3(
@@ -647,7 +649,8 @@ namespace Microsoft.Xna.Framework
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
 
-            for (var i = 0; i < sourceArray.Length; i++) {
+            for (var i = 0; i < sourceArray.Length; i++) 
+            {
                 var position = sourceArray[i];
 
                 float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
@@ -680,7 +683,8 @@ namespace Microsoft.Xna.Framework
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
 
-            for (var i = 0; i < length; i++) {
+            for (var i = 0; i < length; i++) 
+            {
                 var position = sourceArray[sourceIndex + i];
 
                 float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
