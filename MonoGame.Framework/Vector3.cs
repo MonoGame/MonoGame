@@ -568,9 +568,9 @@ namespace Microsoft.Xna.Framework
 
         public static void Transform (Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
         {
-            Debug.Assert(sourceArray.Length - sourceIndex >= sourceArray.Length, 
+            Debug.Assert(sourceArray.Length - sourceIndex >= length, 
                 "The source array is too small for the given sourceIndex and length.");
-            Debug.Assert(destinationArray.Length - destinationIndex >= destinationArray.Length,
+            Debug.Assert(destinationArray.Length - destinationIndex >= length,
                 "The destination array is too small for the given destinationIndex and length.");
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
@@ -673,9 +673,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="length">The number of vectors to transform.</param>
         public static void Transform (Vector3[] sourceArray, int sourceIndex, ref Quaternion rotation, Vector3[] destinationArray, int destinationIndex, int length)
         {
-            Debug.Assert(sourceArray.Length - sourceIndex >= sourceArray.Length,
+            Debug.Assert(sourceArray.Length - sourceIndex >= length,
                 "The source array is too small for the given sourceIndex and length.");
-            Debug.Assert(destinationArray.Length - destinationIndex >= destinationArray.Length,
+            Debug.Assert(destinationArray.Length - destinationIndex >= length,
                 "The destination array is too small for the given destinationIndex and length.");
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
