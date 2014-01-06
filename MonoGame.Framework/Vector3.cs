@@ -567,7 +567,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public static void Transform (Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
+        public static void Transform(Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
         {
             Debug.Assert(sourceArray.Length - sourceIndex >= length, 
                 "The source array is too small for the given sourceIndex and length.");
@@ -674,7 +674,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="destinationArray">The array to store the result of the operation.</param>
         /// <param name="destinationIndex">The starting index in the destination array.</param>
         /// <param name="length">The number of vectors to transform.</param>
-        public static void Transform (Vector3[] sourceArray, int sourceIndex, ref Quaternion rotation, Vector3[] destinationArray, int destinationIndex, int length)
+        public static void Transform(Vector3[] sourceArray, int sourceIndex, ref Quaternion rotation, Vector3[] destinationArray, int destinationIndex, int length)
         {
             Debug.Assert(sourceArray.Length - sourceIndex >= length,
                 "The source array is too small for the given sourceIndex and length.");
