@@ -408,7 +408,7 @@ namespace Microsoft.Xna.Framework.Media
         private Texture2D videoTexture;
         
         // Used to sync the A/V output on thread start.
-        private bool audioStarted;
+        private volatile bool audioStarted;
         #endregion
         
         #region Private Member Data: TheoraPlay
