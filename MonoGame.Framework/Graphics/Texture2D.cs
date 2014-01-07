@@ -127,10 +127,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if DIRECTX
-        private bool _shared;
+        internal bool _shared;
 
-        private bool _renderTarget;
-        private bool _mipmap;
+        internal bool _renderTarget;
+        internal bool _mipmap;
 #endif
 
         public Rectangle Bounds

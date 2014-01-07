@@ -77,6 +77,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
         internal RenderTargetView _renderTargetView;
         internal DepthStencilView _depthStencilView;
+
+        private SharpDX.Direct3D11.Texture2D _multiSampledTexture; //need to save it separately because multisampled texture cannot be bind to shaders
+        private int _subresourceIndex = SharpDX.Direct3D11.Resource.CalculateSubResourceIndex(0, 0, 1); //cached - will not need to call it when copying multisampled target
 #elif OPENGL
     internal uint glDepthBuffer;
     internal uint glStencilBuffer;
@@ -233,7 +236,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             // Create a view interface on the rendertarget to use on bind.
-            _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture());
+            if (MultiSampleCount > 1)
+            {
+                _multiSampledTexture = GetMultiSampledTexture();
+                _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, _multiSampledTexture);
+            }
+            else
+                _renderTargetView = new RenderTargetView(GraphicsDevice._d3dDevice, GetTexture());
 
             // If we don't need a depth buffer then we're done.
             if (DepthStencilFormat == DepthFormat.None)
@@ -262,13 +271,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }))
             {
                 // Create the view for binding to the device.
-                _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer,
-                    new DepthStencilViewDescription()
-                    {
-                        Format = SharpDXHelper.ToFormat(DepthStencilFormat),
-                        Dimension = DepthStencilViewDimension.Texture2D
-                    });
+                _depthStencilView = new DepthStencilView(GraphicsDevice._d3dDevice, depthBuffer);
             }
+        }
+
+        internal override SharpDX.Direct3D11.Resource GetTexture()
+        {
+            SharpDX.Direct3D11.Resource texture = base.GetTexture();
+            if (MultiSampleCount > 1)
+            {
+                //copy multisampled texture to non-multisampled texture
+                var d3dContext = GraphicsDevice._d3dContext;
+                d3dContext.ResolveSubresource(_multiSampledTexture, _subresourceIndex, texture, _subresourceIndex, SharpDXHelper.ToFormat(_format));
+            }
+            return texture;
+
         }
 
 #endif
@@ -319,6 +336,29 @@ namespace Microsoft.Xna.Framework.Graphics
             GenerateIfRequired();
             return _depthStencilView;
 	    }
+
+        private SharpDX.Direct3D11.Texture2D GetMultiSampledTexture()
+        {
+            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            desc.Width = width;
+            desc.Height = height;
+            desc.MipLevels = _levelCount;
+            desc.ArraySize = 1;
+            desc.Format = SharpDXHelper.ToFormat(_format);
+            desc.BindFlags = SharpDX.Direct3D11.BindFlags.RenderTarget;
+            desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            desc.SampleDescription.Count = MultiSampleCount;
+            desc.SampleDescription.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
+            desc.Usage = SharpDX.Direct3D11.ResourceUsage.Default;
+            desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+            if (_mipmap)
+                desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.GenerateMipMaps;
+
+            if (_shared)
+                desc.OptionFlags |= SharpDX.Direct3D11.ResourceOptionFlags.Shared;
+
+            return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
 #endif
 	}
 }
