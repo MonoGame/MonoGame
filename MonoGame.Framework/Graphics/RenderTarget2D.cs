@@ -275,17 +275,21 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal override SharpDX.Direct3D11.Resource GetTexture()
+        internal override SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             SharpDX.Direct3D11.Resource texture = base.GetTexture();
+
+            if (_resourceView == null)
+                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, texture);
+
             if (MultiSampleCount > 1)
             {
                 //copy multisampled texture to non-multisampled texture
                 var d3dContext = GraphicsDevice._d3dContext;
                 d3dContext.ResolveSubresource(_multiSampledTexture, _subresourceIndex, texture, _subresourceIndex, SharpDXHelper.ToFormat(_format));
             }
-            return texture;
 
+            return _resourceView;
         }
 
 #endif

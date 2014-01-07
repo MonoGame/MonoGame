@@ -64,8 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 
         internal SharpDX.Direct3D11.Resource _texture;
-
-	private SharpDX.Direct3D11.ShaderResourceView _resourceView;
+	    internal SharpDX.Direct3D11.ShaderResourceView _resourceView;
 
 #elif OPENGL
 		internal int glTexture = -1;
@@ -144,7 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal abstract SharpDX.Direct3D11.Resource CreateTexture();
 
-        internal virtual SharpDX.Direct3D11.Resource GetTexture()
+        internal SharpDX.Direct3D11.Resource GetTexture()
         {
             if (_texture == null)
                 _texture = CreateTexture();
@@ -152,7 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return _texture;
         }
 
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
+        internal virtual SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
         {
             if (_resourceView == null)
                 _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
