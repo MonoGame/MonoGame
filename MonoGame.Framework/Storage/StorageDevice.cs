@@ -487,6 +487,8 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 osConfigDir += "/Library/Application Support";
                 return osConfigDir;
+#elif PSM
+				return "/Documents/";
 #else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif
