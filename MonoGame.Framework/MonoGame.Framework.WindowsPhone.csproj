@@ -179,13 +179,10 @@
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
-    <Compile Include="Graphics\Vertices\IndexBuffer.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
-    <Compile Include="Graphics\Vertices\VertexBuffer.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
@@ -206,9 +203,7 @@
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\KeyState.cs" />
-    <Compile Include="Input\Mouse.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
@@ -219,28 +214,14 @@
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="LaunchParameters.cs" />
-    <Compile Include="Media\MediaPlayer.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaQueue.cs" />
-    <Compile Include="Media\MediaSourceType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Media\MediaState.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Media\Playlist.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Media\PlaylistCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Media\Song.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Media\SongCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Media\MediaSourceType.cs" />
+    <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\Playlist.cs" />
+    <Compile Include="Media\PlaylistCollection.cs" />
+    <Compile Include="Media\Song.cs" />
+    <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentReaders\ArrayReader.cs" />
@@ -314,12 +295,8 @@
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
-    <Compile Include="Windows8\MetroHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Windows8\SharpDXHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Windows8\MetroHelper.cs" />
+    <Compile Include="Windows8\SharpDXHelper.cs" />
     <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs" />
     <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs" />
     <Compile Include="WindowsPhone\GamePad.cs" />

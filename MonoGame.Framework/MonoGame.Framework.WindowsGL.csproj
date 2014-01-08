@@ -136,6 +136,7 @@
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Desktop\Input\PadConfig.cs" />
     <Compile Include="Desktop\Input\Settings.cs" />

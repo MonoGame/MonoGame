@@ -254,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL && !GLES
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);

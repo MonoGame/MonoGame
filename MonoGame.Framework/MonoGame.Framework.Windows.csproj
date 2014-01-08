@@ -118,6 +118,7 @@
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\SwapChainRenderTarget.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GamePlatform.cs" />

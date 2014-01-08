@@ -178,6 +178,7 @@
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBufferBinding.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
