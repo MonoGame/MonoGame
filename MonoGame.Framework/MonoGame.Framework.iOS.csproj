@@ -146,7 +146,6 @@
     <Compile Include="Vector4.cs" />
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveContinuity.cs" />
-    <Compile Include="Graphics\DeviceType.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Input\MouseState.cs" />
@@ -310,7 +309,6 @@
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementColor.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
     <Compile Include="Game.cs" />

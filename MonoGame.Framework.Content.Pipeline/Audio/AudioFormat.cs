@@ -5,7 +5,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+#if WINDOWS
 using NAudio.Wave;
+#endif
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
@@ -65,6 +67,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <value>If the audio has not been processed, the source sample rate; otherwise, the new sample rate.</value>
         public int SampleRate { get { return sampleRate; } }
 
+#if WINDOWS
         /// <summary>
         /// Creates a new instance of the AudioFormat class
         /// </summary>
@@ -85,5 +88,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 nativeWaveFormat = new List<byte>(stream.ToArray());
             }
         }
+#elif MACOS
+		internal AudioFormat(List<byte> nativeWaveFormat) {
+			this.nativeWaveFormat = nativeWaveFormat;
+		}
+#endif
     }
 }

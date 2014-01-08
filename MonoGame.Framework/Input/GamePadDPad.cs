@@ -85,5 +85,40 @@ namespace Microsoft.Xna.Framework.Input
             if ((b & Buttons.DPadUp) == Buttons.DPadUp)
                 Up = ButtonState.Pressed;
         }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadDPad"/> are equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
+        public static bool operator ==(GamePadDPad left, GamePadDPad right)
+        {
+            return (left.Down == right.Down)
+                && (left.Left == right.Left)
+                && (left.Right == right.Right)
+                && (left.Up == right.Up);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="GamePadDPad"/> are not equal.
+        /// </summary>
+        /// <param name="left">The first object to compare.</param>
+        /// <param name="right">The second object to compare.</param>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
+        public static bool operator !=(GamePadDPad left, GamePadDPad right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare to this instance.</param>
+        /// <returns>true if <paramref name="obj"/> is a <see cref="GamePadDPad"/> and has the same value as this instance; otherwise, false.</returns>
+        public override bool Equals(object obj)
+        {
+            return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
+        }
 	}
 }
