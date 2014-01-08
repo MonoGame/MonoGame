@@ -134,7 +134,7 @@ namespace MonoDevelop.MonoGameContent
 			{
 				valid.Add(TextureProcessorOutputFormat.Color.ToString());
 				valid.Add(TextureProcessorOutputFormat.Compressed.ToString());
-				valid.Add(TextureProcessorOutputFormat.DXTCompressed.ToString());
+				valid.Add(TextureProcessorOutputFormat.DxtCompressed.ToString());
 			}
 
 			#region TypeConverter Overrides
