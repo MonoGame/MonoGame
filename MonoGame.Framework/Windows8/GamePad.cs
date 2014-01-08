@@ -312,5 +312,10 @@ namespace Microsoft.Xna.Framework.Input
 
             return new GamePadButtons(ret);
         }
+
+        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+        {
+            return false;
+        }
     }
 }

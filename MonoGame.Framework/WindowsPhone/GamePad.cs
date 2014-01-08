@@ -1,10 +1,16 @@
-﻿using System;
+﻿using Microsoft.Devices;
+using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static class GamePad
     {
         internal static bool back;
+
+        /// <summary>
+        /// Specifies the total timespan that the vibration motor will be active for.
+        /// </summary>
+        public static TimeSpan VibrationTime = TimeSpan.FromMilliseconds(500);
 
         internal static void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -35,6 +41,13 @@ namespace Microsoft.Xna.Framework.Input
                 state = new GamePadState();
 
             return state;
+        }
+
+        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+        {
+            VibrateController controller = VibrateController.Default;
+            controller.Start(VibrationTime);
+            return true;
         }
     }
 }
