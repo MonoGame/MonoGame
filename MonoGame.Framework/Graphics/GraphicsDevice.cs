@@ -1617,6 +1617,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public int RenderTargetCount
+        {
+            get
+            {
+                return _currentRenderTargetCount;
+            }
+        }
+
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
@@ -1859,6 +1867,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
             return bindings;
 		}
+
+        public void GetRenderTargets(RenderTargetBinding[] outTargets)
+        {
+            Array.Copy(_currentRenderTargetBindings, outTargets, _currentRenderTargetCount);
+        }
 
 #if OPENGL
 
