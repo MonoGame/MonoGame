@@ -568,6 +568,23 @@ namespace Microsoft.Xna.Framework.Graphics
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedInt1010102;
                 break;
+#if OPENGL
+            case SurfaceFormat.Depth16: 
+                glInternalFormat = PixelInternalFormat.DepthComponent16;
+			    glFormat = PixelFormat.DepthComponent;
+                glType = PixelType.Float;
+			    break;
+            case SurfaceFormat.Depth24:
+                glInternalFormat = PixelInternalFormat.DepthComponent24;
+                glFormat = PixelFormat.DepthComponent;
+                glType = PixelType.Float;
+                break;
+            case SurfaceFormat.Depth24Stencil8:
+			    glInternalFormat = PixelInternalFormat.Depth24Stencil8;
+			    glFormat = PixelFormat.DepthStencil;
+			    glType = PixelType.Float;
+                break;
+#endif
 #endif
 				
 #if ANDROID

@@ -83,6 +83,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         // DXT1 also has a 1-bit alpha form
         Dxt1a = 70,
+
+#if OPENGL
+        // for Depth to texture
+        Depth16=80, 
+        Depth24=81,
+        Depth24Stencil8=82,
+#endif
     }
     
     public enum SurfaceFormat_Legacy
