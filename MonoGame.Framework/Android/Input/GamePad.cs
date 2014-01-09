@@ -59,7 +59,8 @@ using System.Collections.Generic;
 		private Color _alphaColor = Color.DarkGray;		
 		private int _buttons;
 		private Vector2 _leftStick, _rightStick;
-		
+		private int _packetNumberPlayerOne = 0;
+
 		protected GamePad()
 		{
 			_visible = true;
@@ -137,14 +138,14 @@ using System.Collections.Generic;
 
         internal void Update(MotionEvent e)
         {
+            var prevState = GamePad.GetState (PlayerIndex.One);
+            this.Reset ();
+
             Vector2 location = new Vector2(e.GetX(), e.GetY());
             // Check where is the touch
             bool hitInButton = false;
 
             if (e.Action == MotionEventActions.Down) {
-
-                Reset();
-
                 if (Visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         hitInButton |= UpdateButton(button, location);
@@ -228,6 +229,11 @@ using System.Collections.Generic;
                     }
                 }
             }
+
+            var newState = GamePad.GetState (PlayerIndex.One);
+
+            if (prevState != newState) 
+                _packetNumberPlayerOne++;
         }
 
         private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
@@ -257,8 +263,9 @@ using System.Collections.Generic;
         public static GamePadState GetState(PlayerIndex playerIndex)
         {
             var instance = GamePad.Instance;
-            var state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
-            instance.Reset();
+            var sticks = new GamePadThumbSticks (Instance._leftStick, Instance._rightStick);
+            var state = new GamePadState(sticks, new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
+            state.PacketNumber = instance._packetNumberPlayerOne;
             return state;
         }
 
