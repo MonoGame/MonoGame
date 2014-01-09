@@ -129,7 +129,16 @@ namespace Microsoft.Xna.Framework
 
         public override GameRunBehavior DefaultRunBehavior
         {
+#if JSIL
+            get { 
+                if (JSIL.Builtins.IsJavascript)
+                    return GameRunBehavior.Asynchronous; 
+                else
+                    return GameRunBehavior.Synchronous;
+            }
+#else
             get { return GameRunBehavior.Synchronous; }
+#endif
         }
 
 #if WINDOWS
@@ -147,7 +156,11 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
+#if JSIL
+            JSIL.OpenTKService.Instance.StartRunLoop(this);
+#else
+            throw new NotImplementedException("The desktop platform does not support asynchronous run loops");
+#endif
         }
         
         public override void Exit()

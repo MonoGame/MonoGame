@@ -172,6 +172,11 @@ namespace Microsoft.Xna.Framework.Content
 
             return contentReaders;
         }
+
+        private static readonly Regex BracketedVersionRegex
+            = new Regex(@"\[(.+?), Version=.+?\]", RegexOptions.ECMAScript);
+        private static readonly Regex VersionRegex
+            = new Regex(@"(.+?), Version=.+?$", RegexOptions.ECMAScript);
 		
 		/// <summary>
 		/// Removes Version, Culture and PublicKeyToken from a type string.
@@ -194,12 +199,12 @@ namespace Microsoft.Xna.Framework.Content
 			
 			for(int i=0; i<count; i++)
 			{
-				preparedType = Regex.Replace(preparedType, @"\[(.+?), Version=.+?\]", "[$1]");
+				preparedType = BracketedVersionRegex.Replace(preparedType, "[$1]");
 			}
 						
 			//Handle non generic types
 			if(preparedType.Contains("PublicKeyToken"))
-				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
+                preparedType = VersionRegex.Replace(preparedType, "$1");
 
 			// TODO: For WinRT this is most likely broken!
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));

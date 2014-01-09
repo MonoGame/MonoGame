@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Internal;
 
 #if OPENGL
 #if MONOMAC
@@ -185,7 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if GLES
+#if GLES || JSIL
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
@@ -251,7 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if OPENGL && !GLES
+#if OPENGL && !GLES && !JSIL
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, ibo);
@@ -259,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
-            ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
+            ptr = ptr + offsetInBytes;
             if (data is byte[])
             {
                 byte[] buffer = data as byte[];
@@ -396,7 +397,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var sizeInBytes = elementSizeInByte * elementCount;
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+            var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
             var bufferSize = IndexCount * (IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
             
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);

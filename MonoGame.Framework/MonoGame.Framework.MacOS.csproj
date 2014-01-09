@@ -445,6 +445,7 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="TextInputEventArgs.cs" />
+    <Compile Include="Utilities\Unsafe.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

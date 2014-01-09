@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Internal;
 
 #if OPENGL
 #if MONOMAC
@@ -147,7 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var elementSizeInByte = Marshal.SizeOf(typeof(T));
 			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+			var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
             int width = right - left;
             int height = bottom - top;
             int depth = back - front;

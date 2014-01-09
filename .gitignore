@@ -52,3 +52,9 @@ monodroid*.msi
 
 #Unix temporary files
 *~
+
+#JSIL
+*.metaproj
+*.buildlog
+*.jsillog
+JSILSkeletons/*.js

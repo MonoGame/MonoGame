@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Internal;
 
 #if OPENGL
 #if MONOMAC
@@ -163,7 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-#if GLES
+#if GLES || JSIL
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
@@ -243,7 +244,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if OPENGL && !GLES
+#if OPENGL && !GLES && !JSIL
 
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -253,7 +254,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr ptr = GL.MapBuffer (BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             GraphicsExtensions.CheckGLError();
             // Pointer to the start of data to read in the index buffer
-            ptr = new IntPtr (ptr.ToInt64 () + offsetInBytes);
+            ptr = ptr + offsetInBytes;
             if (data is byte[]) {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
@@ -266,7 +267,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Marshal.Copy(ptr, buffer, 0, buffer.Length);
                 
                 var dataHandle = GCHandle.Alloc (data, GCHandleType.Pinned);
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject ().ToInt64 () + startIndex * elementSizeInByte);
+                var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInByte);
                 
                 // Copy from the temporary buffer to the destination array
                 
@@ -279,7 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     for (int i = 0; i < elementCount; i++)
                     {
                         Marshal.Copy(buffer, i * vertexStride, dataPtr, dataSize);
-                        dataPtr = (IntPtr)(dataPtr.ToInt64() + dataSize);
+                        dataPtr = dataPtr + dataSize;
                     }
                 }
                 
@@ -415,7 +416,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInBytes);
+            var dataPtr = dataHandle.AddressWithOffset(startIndex * elementSizeInBytes);
 
             GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)offsetInBytes, (IntPtr)sizeInBytes, dataPtr);
             GraphicsExtensions.CheckGLError();

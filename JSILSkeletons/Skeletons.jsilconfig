@@ -1,0 +1,15 @@
+{
+  "OutputDirectory": "%configdirectory%",
+  "GenerateSkeletonsForStubbedAssemblies": true,
+  "AssemblyCollectionName": "mgasms",
+
+  "Assemblies": {
+  	"Redirects": {
+      "mscorlib, Version=2.0.0.0,": "mscorlib",
+      "System, Version=2.0.0.0,": "System",
+      "System.Drawing, Version=2.0.0.0,": "System.Drawing",
+      "System.Windows.Forms, Version=2.0.0.0,": "System.Windows.Forms",
+      "System.Xml, Version=2.0.0.0,": "System.Xml"
+  	}
+  }
+}

@@ -40,6 +40,9 @@
 // 
 
 using System.Collections.Generic;
+#if JSIL
+using JSIL.Meta;
+#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -89,6 +92,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private short[] _index;
 
+#if JSIL
+        [JSPackedArray]
+#endif
         private VertexPositionColorTexture[] _vertexArray;
 
 		public SpriteBatcher (GraphicsDevice device)

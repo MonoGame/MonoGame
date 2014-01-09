@@ -160,17 +160,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 shaderAttributeInfo.Add(shaderHash, attrInfo);
             }
 
-            // Apply the vertex attribute info
-            foreach (var element in attrInfo.Elements)
-            {
-                GL.VertexAttribPointer(element.AttributeLocation,
-                    element.NumberOfElements,
-                    element.VertexAttribPointerType,
-                    element.Normalized,
-                    this.VertexStride,
-                    (IntPtr)(offset.ToInt64() + element.Offset));
+#if JSIL
+            if (JSIL.Builtins.IsJavascript) {
+                JSIL.OpenTKService.Instance.VertexAttribPointers(
+                    offset, this.VertexStride, attrInfo.Elements
+                );
                 GraphicsExtensions.CheckGLError();
+            } else {
+#endif
+
+                // Apply the vertex attribute info
+                foreach (var element in attrInfo.Elements) {
+                    GL.VertexAttribPointer(element.AttributeLocation,
+                        element.NumberOfElements,
+                        element.VertexAttribPointerType,
+                        element.Normalized,
+                        this.VertexStride,
+                        offset + element.Offset);
+                    GraphicsExtensions.CheckGLError();
+                }
+
+#if JSIL
             }
+#endif
+
             GraphicsDevice.SetVertexAttributeArray(attrInfo.EnabledAttributes);
 		}
 
