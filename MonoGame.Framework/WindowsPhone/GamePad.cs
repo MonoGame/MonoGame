@@ -1,5 +1,4 @@
-﻿using Microsoft.Devices;
-using System;
+﻿using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -43,11 +42,11 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
+        /* TODO Implement Vibration Functionality
         public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
         {
-            VibrateController controller = VibrateController.Default;
-            controller.Start(VibrationTime);
-            return true;
+            return false;
         }
+        */
     }
 }
