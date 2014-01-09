@@ -79,6 +79,27 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
         
+        /// <summary>
+        /// Converts a 'T' generic to vertex format.
+        /// </summary>
+        /// <returns>
+        /// The vertex format as in PSM.
+        /// </returns>
+        /// <typeparam name='T'>
+        /// The generic type to parse
+        /// </typeparam>
+        public static PssVertexFormat ToVertexFormat<T>()
+        {
+            try
+            {
+                return ToVertexFormat((VertexElementFormat)Enum.Parse(typeof(VertexElementFormat), typeof(T).Name));
+            }
+            catch(ArgumentException)
+            {
+                return PssVertexFormat.None;
+            }
+        }
+        
         public static PssVertexFormat ToVertexFormat(VertexElementFormat format)
         {
             switch (format)

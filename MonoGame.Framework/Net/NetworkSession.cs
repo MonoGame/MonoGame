@@ -758,7 +758,8 @@ namespace Microsoft.Xna.Framework.Net
 		private void ProcessSendData(CommandSendData command)
 		{
 			networkPeer.SendData(command.data, command.options);
-
+   
+#warning This part seems bugged, shouldn't it be using the sender and not the reciever
 			NetworkGamer sender;
 			CommandReceiveData crd = new CommandReceiveData (command.sender.RemoteUniqueIdentifier,
 								command.data);
