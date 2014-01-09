@@ -230,12 +230,13 @@ namespace Microsoft.Xna.Framework.Input
         {
             return base.GetHashCode();
         }
-        //
-        // Summary:
-        //     Retrieves a string representation of this object.
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+
+		//
+		// Summary:
+		//     Retrieves a string representation of this object.
+		public override string ToString()
+		{
+			return string.Format ("{{IsConnected:{0}}}", this.IsConnected);
+		}
     }
 }
