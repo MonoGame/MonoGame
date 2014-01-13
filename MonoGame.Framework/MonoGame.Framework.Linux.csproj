@@ -44,7 +44,7 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition=" '$(DefaultLanguageSourceExtension)' != '.cs' " />
   <ItemGroup>
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />

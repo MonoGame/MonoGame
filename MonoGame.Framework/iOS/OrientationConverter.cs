@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework
 {
     public static class OrientationConverter
     {
+        [CLSCompliant(false)]
         public static DisplayOrientation UIDeviceOrientationToDisplayOrientation(UIDeviceOrientation orientation)
         {
             switch (orientation)
@@ -89,6 +90,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        [CLSCompliant(false)]
         public static DisplayOrientation ToDisplayOrientation(UIInterfaceOrientation orientation)
         {
             switch (orientation)
@@ -103,6 +105,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        [CLSCompliant(false)]
         public static UIInterfaceOrientationMask ToUIInterfaceOrientationMask (DisplayOrientation orientation)
         {
             switch (Normalize(orientation))
@@ -130,7 +133,7 @@ namespace Microsoft.Xna.Framework
             var normalized = orientation;
 			
 			// Xna's "default" displayorientation is Landscape Left/Right.
-            if ((normalized & DisplayOrientation.Default) != 0)
+            if (normalized == DisplayOrientation.Default)
             {
                 normalized |= DisplayOrientation.LandscapeLeft;
 				normalized |= DisplayOrientation.LandscapeRight;

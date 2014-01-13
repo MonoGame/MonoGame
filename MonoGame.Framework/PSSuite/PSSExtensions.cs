@@ -4,6 +4,7 @@ using PssVector4 = Sce.PlayStation.Core.Vector4;
 
 namespace Microsoft.Xna.Framework
 {
+    [CLSCompliant(false)]
     public static class PSSExtensions
     {
         public static PssVector4 ToPssVector4(this Vector4 v)

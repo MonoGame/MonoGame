@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content
 			byte[] data = input.ReadBytes(input.ReadInt32());
 			int loopStart = input.ReadInt32();
 			int loopLength = input.ReadInt32();
-			int num = input.ReadInt32();
+			input.ReadInt32();
 
 #if DIRECTX            
             var count = data.Length;
@@ -114,6 +114,10 @@ namespace Microsoft.Xna.Framework.Content
                 Name = input.AssetName,
             };
 #else
+            if(loopStart == loopLength) 
+            {
+                // do nothing. just killing the warning for non-DirectX path 
+            }
             if (header[0] == 2 && header[1] == 0)
             {
                 // We've found MSADPCM data! Let's decode it here.

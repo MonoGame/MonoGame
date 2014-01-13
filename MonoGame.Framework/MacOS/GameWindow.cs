@@ -58,6 +58,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
 	public class GameWindow : MonoMacGameView
 	{
 		//private readonly Rectangle clientBounds;
@@ -165,6 +166,11 @@ namespace Microsoft.Xna.Framework
             //        Game.Tick-centric architecture may eliminate this problem
             //        automatically.
 			if (_game != null && _platform.IsRunning) {
+                if (_needsToResetElapsedTime) 
+                {
+                    _game.ResetElapsedTime ();
+					_needsToResetElapsedTime = false;
+                }
 				_game.Tick();
 			}
 		}
@@ -419,6 +425,11 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+
+		private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+		{
+			return ScreenDeviceNameChanged != null;
+		}
 		
 		// make sure we get mouse move events.
 		public override bool AcceptsFirstResponder ()
