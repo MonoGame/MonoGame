@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static bool isVisible;
 		private static bool simulateTrialMode;
 		private static bool isMessageBoxShowing = false;
-		private static bool isKeyboardInputShowing = false;
+		//private static bool isKeyboardInputShowing = false;
 
         internal static void Initialise(Game game)
         {

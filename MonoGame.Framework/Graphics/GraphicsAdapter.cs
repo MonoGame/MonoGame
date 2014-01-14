@@ -257,7 +257,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
 #if (WINDOWS && OPENGL) || LINUX
-                    IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
+                    
+					//IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
+					var displays = new List<OpenTK.DisplayDevice>();
+
+					OpenTK.DisplayIndex[] displayIndices = {
+						OpenTK.DisplayIndex.First,
+						OpenTK.DisplayIndex.Second,
+						OpenTK.DisplayIndex.Third,
+						OpenTK.DisplayIndex.Fourth,
+						OpenTK.DisplayIndex.Fifth,
+						OpenTK.DisplayIndex.Sixth,
+					};
+
+					foreach(var displayIndex in displayIndices) 
+					{
+						var currentDisplay = OpenTK.DisplayDevice.GetDisplay(displayIndex);
+						if(currentDisplay!= null) displays.Add(currentDisplay);
+					}
+
                     if (displays.Count > 0)
                     {
                         modes.Clear();

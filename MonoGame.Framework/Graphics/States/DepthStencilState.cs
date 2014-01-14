@@ -213,7 +213,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static GLStencilFunction GetStencilFunc(CompareFunction function)
         {
-            GLStencilFunction func;
             switch (function)
             {
             case CompareFunction.Always:

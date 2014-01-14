@@ -92,6 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the relevant IndexElementSize enum value for the given type.
         /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
         /// <param name="type">The type to use for the index buffer</param>
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
@@ -272,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-            if (data is byte[])
+			if (typeof(T) == typeof(byte))
             {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
