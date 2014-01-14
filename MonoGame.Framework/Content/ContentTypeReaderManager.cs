@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework.Content
                         {
                             contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
                         }
-                        catch (TargetInvocationException)
+                        catch (TargetInvocationException ex)
                         {
                             // If you are getting here, the Mono runtime is most likely not able to JIT the type.
                             // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
