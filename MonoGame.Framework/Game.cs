@@ -486,6 +486,7 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
         private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private long _previousTicks = 0;
 
         public void Tick()
         {
@@ -496,10 +497,13 @@ namespace Microsoft.Xna.Framework
 
         RetryTick:
 
+            var currentTicks = _gameTimer.Elapsed.Ticks;
+
+            var elapsedTicksSinceLastTick = currentTicks - _previousTicks;
+            _previousTicks = currentTicks;
+
             // Advance the accumulated elapsed time.
-            _accumulatedElapsedTime += _gameTimer.Elapsed;
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            _accumulatedElapsedTime += new TimeSpan(elapsedTicksSinceLastTick);
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
