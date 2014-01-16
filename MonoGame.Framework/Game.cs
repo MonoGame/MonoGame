@@ -497,13 +497,10 @@ namespace Microsoft.Xna.Framework
 
         RetryTick:
 
-            var currentTicks = _gameTimer.Elapsed.Ticks;
-
-            var elapsedTicksSinceLastTick = currentTicks - _previousTicks;
-            _previousTicks = currentTicks;
-
             // Advance the accumulated elapsed time.
-            _accumulatedElapsedTime += new TimeSpan(elapsedTicksSinceLastTick);
+            var currentTicks = _gameTimer.Elapsed.Ticks;
+            _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
+            _previousTicks = currentTicks;
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
