@@ -100,8 +100,10 @@ namespace Microsoft.Xna.Framework.Storage
 	{
 		
 		PlayerIndex? player;
-		int sizeInBytes;
+
 		int directoryCount;
+        private int DirectoryCount { get { return this.directoryCount; } }
+
 		StorageContainer storageContainer;
 		
         /// <summary>
@@ -113,7 +115,6 @@ namespace Microsoft.Xna.Framework.Storage
 		internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount) 
 		{
 			this.player = player;
-			this.sizeInBytes = sizeInBytes;
 			this.directoryCount = directoryCount;
 		}
 		
@@ -203,6 +204,11 @@ namespace Microsoft.Xna.Framework.Storage
         /// Fired when a device is removed or inserted.
         /// </summary>
 		public static event EventHandler<EventArgs> DeviceChanged;
+
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return DeviceChanged != null;
+        }
 
 #if WINRT
         // Dirty trick to avoid the need to get the delegate from the IAsyncResult (can't be done in WinRT)

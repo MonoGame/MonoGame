@@ -367,6 +367,7 @@ namespace Microsoft.Xna.Framework
             get { return Platform.Window; }
         }
 #else
+		[CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }
@@ -485,6 +486,7 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
         private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private long _previousTicks = 0;
 
         public void Tick()
         {
@@ -496,9 +498,9 @@ namespace Microsoft.Xna.Framework
         RetryTick:
 
             // Advance the accumulated elapsed time.
-            _accumulatedElapsedTime += _gameTimer.Elapsed;
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            var currentTicks = _gameTimer.Elapsed.Ticks;
+            _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
+            _previousTicks = currentTicks;
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
@@ -593,15 +595,7 @@ namespace Microsoft.Xna.Framework
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
-
-            // 1. Categorize components into IUpdateable and IDrawable lists.
-            // 2. Subscribe to Added/Removed events to keep the categorized
-            //    lists synced and to Initialize future components as they are
-            //    added.
-            // 3. Initialize all existing components
-            CategorizeComponents();
-            _components.ComponentAdded += Components_ComponentAdded;
-            _components.ComponentRemoved += Components_ComponentRemoved;
+            // Initialize all existing components
             InitializeExistingComponents();
 
             _graphicsDeviceService = (IGraphicsDeviceService)
@@ -658,6 +652,9 @@ namespace Microsoft.Xna.Framework
         private void Components_ComponentAdded(
             object sender, GameComponentCollectionEventArgs e)
         {
+            // Since we only subscribe to ComponentAdded after the graphics
+            // devices are set up, it is safe to just blindly call Initialize.
+            e.GameComponent.Initialize();
             CategorizeComponent(e.GameComponent);
         }
 
@@ -734,6 +731,15 @@ namespace Microsoft.Xna.Framework
             AssertNotDisposed();
             Platform.BeforeInitialize();
             Initialize();
+
+            // We need to do this after virtual Initialize(...) is called.
+            // 1. Categorize components into IUpdateable and IDrawable lists.
+            // 2. Subscribe to Added/Removed events to keep the categorized
+            //    lists synced and to Initialize future components as they are
+            //    added.            
+            CategorizeComponents();
+            _components.ComponentAdded += Components_ComponentAdded;
+            _components.ComponentRemoved += Components_ComponentRemoved;
         }
 
 		internal void DoExiting()
@@ -780,6 +786,8 @@ namespace Microsoft.Xna.Framework
         // NOTE: InitializeExistingComponents really should only be called once.
         //       Game.Initialize is the only method in a position to guarantee
         //       that no component will get a duplicate Initialize call.
+        //       Further calls to Initialize occur immediately in response to
+        //       Components.ComponentAdded.
         private void InitializeExistingComponents()
         {
             // TODO: Would be nice to get rid of this copy, but since it only

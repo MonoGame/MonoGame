@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame.ContentProcessors</id>
-        <version>3.1.2-alpha</version>
+        <version>3.1.3-alpha</version>
         <title>MonoGame.ContentProcessors</title>
         <authors>Simon-Darkside</authors>
         <owners>MonoGameTeam</owners>
@@ -14,7 +14,7 @@
 		MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
       The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
-        <releaseNotes>Updated dev release - 10 December 2013</releaseNotes>
+        <releaseNotes>Updated dev release - 07 January 2014</releaseNotes>
         <copyright>Copyright  2013</copyright>
         <language>en-US</language>
         <references>

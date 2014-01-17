@@ -138,12 +138,20 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
+        private bool VertexShaderDirty 
+        {
+            get { return _vertexShaderDirty; }
+        }
 
         /// <summary>
         /// The active pixel shader.
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
+        private bool PixelShaderDirty 
+        {
+            get { return _pixelShaderDirty; }
+        }
 
 #if OPENGL
         static List<Action> disposeActions = new List<Action>();
@@ -260,9 +268,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                DeviceLost != null &&
+                ResourceCreated != null &&
+                ResourceDestroyed != null &&
+                Disposing != null;
+        }
 
 #if OPENGL
-        internal int glFramebuffer;
+        internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
         internal List<string> _extensions = new List<string>();
@@ -382,6 +398,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
         /// </summary>
+        /// <param name="adapter">The graphics adapter.</param>
         /// <param name="graphicsProfile">The graphics profile.</param>
         /// <param name="presentationParameters">The presentation options.</param>
         /// <exception cref="ArgumentNullException">
@@ -1617,6 +1634,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public int RenderTargetCount
+        {
+            get
+            {
+                return _currentRenderTargetCount;
+            }
+        }
+
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
@@ -1859,6 +1884,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
             return bindings;
 		}
+
+        public void GetRenderTargets(RenderTargetBinding[] outTargets)
+        {
+            Debug.Assert(outTargets.Length == _currentRenderTargetCount, "Invalid outTargets array length!");
+            Array.Copy(_currentRenderTargetBindings, outTargets, _currentRenderTargetCount);
+        }
 
 #if OPENGL
 

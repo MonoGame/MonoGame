@@ -166,6 +166,11 @@ namespace Microsoft.Xna.Framework.Input
         {
             return (obj is GamePadButtons) && (this == (GamePadButtons)obj);
         }
+
+		public override int GetHashCode ()
+		{
+			return (int)this.buttons;
+		}
     }
 }
 

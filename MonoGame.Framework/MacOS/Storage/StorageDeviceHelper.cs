@@ -48,9 +48,13 @@ namespace Microsoft.Xna.Framework.Storage
 	{
 		static NSFileManager fileManager;
 		static NSDictionary attributes;
-		static NSError error;
 		static string path = "/";
-		
+
+        static NSError error;
+        private static NSError Error { 
+            get { return StorageDeviceHelper.error; } 
+        }
+
 		static StorageDeviceHelper ()
 		{
 			if (fileManager == null) {

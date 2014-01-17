@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					if (!output.CharacterMap.Contains(glyph.Character))
 						output.CharacterMap.Add(glyph.Character);
 					output.Glyphs.Add(new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-					output.Cropping.Add(new Rectangle(0,0,glyph.Subrect.Width, glyph.Subrect.Height));
+                    output.Cropping.Add(new Rectangle(0, (int)(glyph.YOffset + glyphs.Select(x => x.YOffset).Max()), glyph.Subrect.Width, glyph.Subrect.Height));
 					ABCFloat abc = glyph.CharacterWidths;
 					output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
 				}

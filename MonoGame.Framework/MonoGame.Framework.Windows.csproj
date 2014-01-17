@@ -31,6 +31,7 @@
     <DefineConstants>DEBUG;TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Windows\Debug\MonoGame.Framework.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -44,6 +45,7 @@
     <DefineConstants>TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Windows\Release\MonoGame.Framework.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
