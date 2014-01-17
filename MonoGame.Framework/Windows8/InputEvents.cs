@@ -38,10 +38,9 @@ purpose and non-infringement.
 */
 #endregion License
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using System.Collections.Generic;
 using Windows.Devices.Input;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
@@ -62,22 +61,24 @@ namespace Microsoft.Xna.Framework
             window.KeyDown += CoreWindow_KeyDown;
             window.KeyUp += CoreWindow_KeyUp;
 
-            if (inputElement != null)
-            {
-                // If we have an input UIElement then we bind input events
-                // to it else we'll get events for overlapping XAML controls.
-                inputElement.PointerPressed += UIElement_PointerPressed;
-                inputElement.PointerReleased += UIElement_PointerReleased;
-                inputElement.PointerMoved += UIElement_PointerMoved;
-                inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
-            }
-            else
+            // if (inputElement != null)
+            // {
+            //     // If we have an input UIElement then we bind input events
+            //     // to it else we'll get events for overlapping XAML controls.
+            //     inputElement.PointerPressed += UIElement_PointerPressed;
+            //     inputElement.PointerReleased += UIElement_PointerReleased;
+            //     inputElement.PointerMoved += UIElement_PointerMoved;
+            //     inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
+            //     //inputElement.PointerExited += UIElement_PointerReleased;
+            // }
+            // else
             {
                 // If we only have a CoreWindow then use it for input events.
                 window.PointerPressed += CoreWindow_PointerPressed;
                 window.PointerReleased += CoreWindow_PointerReleased;
                 window.PointerMoved += CoreWindow_PointerMoved;
                 window.PointerWheelChanged += CoreWindow_PointerWheelChanged;
+                //window.PointerExited += CoreWindow_PointerReleased;
             }
         }
 
@@ -150,7 +151,7 @@ namespace Microsoft.Xna.Framework
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
             TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
-            
+
             if (!isTouch)
             {
                 // Mouse or stylus event.
@@ -239,11 +240,11 @@ namespace Microsoft.Xna.Framework
                 case Windows.System.VirtualKey.Shift:
                     // we can detect right shift by checking the scancode value.
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
-                    return (keyStatus.ScanCode==0x36) ? Keys.RightShift : Keys.LeftShift;
+                    return (keyStatus.ScanCode == 0x36) ? Keys.RightShift : Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 // ALT key doesn't get fired by KeyUp/KeyDown events.
                 // One solution could be to check CoreWindow.GetKeyState(...) on every tick.
-                case Windows.System.VirtualKey.Menu:                    
+                case Windows.System.VirtualKey.Menu:
                     return Keys.LeftAlt;
 
                 default:
