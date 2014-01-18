@@ -776,11 +776,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.Recycle();
 
                 // Convert from ARGB to ABGR
-                for (int i = 0; i < width * height; ++i)
-                {
-                    uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
-                }
+                ConvertToABGR(height, width, pixels);
 
                 Texture2D texture = null;
                 Threading.BlockOnUIThread(() =>
@@ -792,18 +788,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #elif WINDOWS_PHONE
-        Texture2D texture = null;
-        var waitEvent = new ManualResetEventSlim(false);
+            WriteableBitmap bitmap = null;
+            var waitEvent = new ManualResetEventSlim(false);
 		    Deployment.Current.Dispatcher.BeginInvoke(() =>
 		    {
-		        BitmapImage bitmapImage = new BitmapImage();
+                BitmapImage bitmapImage = new BitmapImage();
 		        bitmapImage.SetSource(stream);
-		        WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
-		        texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
-		        texture.SetData<int>(bitmap.Pixels);
+                bitmap = new WriteableBitmap(bitmapImage);
                 waitEvent.Set();
 		    });
 		    waitEvent.Wait();
+
+            // Convert from ARGB to ABGR 
+            ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+            Texture2D texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
+            texture.SetData<int>(bitmap.Pixels);
 		    return texture;
 #elif WINDOWS_STOREAPP || DIRECTX
 
@@ -846,7 +846,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #endif
-        }
+		}
 
         private void FillTextureFromStream(Stream stream)
         {
@@ -906,6 +906,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             throw new NotImplementedException();
 #endif
+        }
+
+        //Converts Pixel Data from ARGB to ABGR 
+        private static void ConvertToABGR(int pixelHeight, int pixelWidth, int[] pixels)
+        {
+            int pixelCount = pixelWidth * pixelHeight;
+            for (int i = 0; i < pixelCount; ++i)
+            {
+                uint pixel = (uint)pixels[i];
+                pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
         }
 
         //Converts Pixel Data from BGRA to RGBA
@@ -1097,8 +1108,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #if OPENGL
             GenerateGLTextureIfRequired();
             FillTextureFromStream(textureStream);
+#elif WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(textureStream);
+                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+
+                // Convert from ARGB to ABGR 
+                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+                this.SetData<int>(bitmap.Pixels);
+            });
 #endif
-}
+        }
 
 #if OPENGL
         private void GenerateGLTextureIfRequired()
