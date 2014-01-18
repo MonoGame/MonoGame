@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseGetStateAndIsMouseVisi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.MacOS", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.MacOS", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj", "{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamePadTest", "MacOS\GamePadTest\GamePadTest.csproj", "{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}"
 EndProject
@@ -70,12 +70,12 @@ Global
 		{ABF4BDBE-C7DE-43E5-98BC-4547FE27A64A}.Distribution|Any CPU.Build.0 = Debug|x86
 		{ABF4BDBE-C7DE-43E5-98BC-4547FE27A64A}.Release|x86.ActiveCfg = Release|x86
 		{ABF4BDBE-C7DE-43E5-98BC-4547FE27A64A}.Release|x86.Build.0 = Release|x86
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|x86.Build.0 = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Distribution|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Distribution|Any CPU.Build.0 = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.ActiveCfg = Release|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|x86.Build.0 = Release|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Debug|x86.Build.0 = Debug|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Distribution|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Distribution|Any CPU.Build.0 = Debug|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Release|x86.ActiveCfg = Release|Any CPU
+		{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}.Release|x86.Build.0 = Release|Any CPU
 		{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}.Debug|x86.ActiveCfg = Debug|x86
 		{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}.Debug|x86.Build.0 = Debug|x86
 		{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}.Distribution|Any CPU.ActiveCfg = Debug|x86
