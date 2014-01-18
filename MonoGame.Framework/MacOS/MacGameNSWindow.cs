@@ -49,6 +49,7 @@ using MonoMac.Foundation;
 /// </summary>
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
 	public class MacGameNSWindow : NSWindow
 	{
 		[Export ("initWithContentRect:styleMask:backing:defer:")]

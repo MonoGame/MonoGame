@@ -481,15 +481,12 @@ namespace Microsoft.Xna.Framework.Content
 				{
 					int dataend = outLen - 10;
 					uint curpos = (uint)m_state.intel_curpos;
-					uint filesize = (uint)m_state.intel_filesize;
-					//uint abs_off, rel_off;
 					
 					m_state.intel_curpos = (int)curpos + outLen;
 					
 					while(outData.Position < dataend)
 					{
 						if(outData.ReadByte() != 0xE8) { curpos++; continue; }
-						//abs_off = 
 					}
 				}
 				return -1;
@@ -672,7 +669,7 @@ namespace Microsoft.Xna.Framework.Content
 				while(bitsleft < bits) {
 					int lo = (byte)byteStream.ReadByte();
 					int hi = (byte)byteStream.ReadByte();
-					int amount2shift = sizeof(uint)*8 - 16 - bitsleft;
+                    //int amount2shift = sizeof(uint)*8 - 16 - bitsleft;
 					buffer |= (uint)(((hi << 8) | lo) << (sizeof(uint)*8 - 16 - bitsleft));
 					bitsleft += 16;
 				}

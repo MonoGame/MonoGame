@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			uint category = soundReader.ReadUInt16 ();
 			soundReader.ReadByte (); //unkn
-			uint volume = soundReader.ReadUInt16 (); //maybe pitch?
+            soundReader.ReadUInt16 (); // volume, maybe pitch?
 			soundReader.ReadByte (); //unkn
-			uint entryLength = soundReader.ReadUInt16 ();
+            soundReader.ReadUInt16 (); // entryLength
 			
 			uint numClips = 0;
 			if (complexSound) {
