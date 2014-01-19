@@ -100,13 +100,12 @@ namespace Microsoft.Xna.Framework.Storage
 		internal readonly string _storagePath;
 		private readonly StorageDevice _device;
 		private readonly string _name;
-		private readonly PlayerIndex? _playerIndex;
-		
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Microsoft.Xna.Framework.Storage.StorageContainer"/> class.
 		/// </summary>
-		/// <param name='_device'>The attached storage-device.</param>
-        /// <param name='_name'> name.</param>
+		/// <param name='device'>The attached storage-device.</param>
+        /// <param name='name'> name.</param>
 		/// <param name='playerIndex'>The player index of the player to save the data.</param>
 		internal StorageContainer(StorageDevice device, string name, PlayerIndex? playerIndex)
 		{
@@ -115,8 +114,7 @@ namespace Microsoft.Xna.Framework.Storage
 
 			_device = device;
 			_name = name;
-			_playerIndex = playerIndex;
-			
+
 			// From the examples the root is based on MyDocuments folder
 #if WINDOWS_STOREAPP
             var saved = "";
@@ -190,6 +188,11 @@ namespace Microsoft.Xna.Framework.Storage
         /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
         /// </summary>
 		public event EventHandler<EventArgs> Disposing;
+
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return Disposing != null;
+        }
 
         /// <summary>
         /// Creates a new directory in the storage-container.
@@ -463,7 +466,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
             else if (fileMode == FileMode.OpenOrCreate)
             {
-                if (fileAccess == FileAccess.Read)
+                if (fileAccess == FileAccess.Read && FileExists(file))
                     return folder.OpenStreamForReadAsync(filePath).GetAwaiter().GetResult();
                 else
                 {

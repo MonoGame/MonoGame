@@ -123,19 +123,35 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public SamplerStateCollection SamplerStates { get; private set; }
 
+        // On Intel Integrated graphics, there is a fast hw unit for doing
+        // clears to colors where all components are either 0 or 255.
+        // Despite XNA4 using Purple here, we use black (in Release) to avoid
+        // performance warnings on Intel/Mesa
+#if DEBUG
         private static readonly Color DiscardColor = new Color(68, 34, 136, 255);
+#else
+        private static readonly Color DiscardColor = new Color(0, 0, 0, 255);
+#endif
 
         /// <summary>
         /// The active vertex shader.
         /// </summary>
         private Shader _vertexShader;
         private bool _vertexShaderDirty;
+        private bool VertexShaderDirty 
+        {
+            get { return _vertexShaderDirty; }
+        }
 
         /// <summary>
         /// The active pixel shader.
         /// </summary>
         private Shader _pixelShader;
         private bool _pixelShaderDirty;
+        private bool PixelShaderDirty 
+        {
+            get { return _pixelShaderDirty; }
+        }
 
 #if OPENGL
         static List<Action> disposeActions = new List<Action>();
@@ -252,9 +268,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		public event EventHandler<ResourceDestroyedEventArgs> ResourceDestroyed;
         public event EventHandler<EventArgs> Disposing;
 
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                DeviceLost != null &&
+                ResourceCreated != null &&
+                ResourceDestroyed != null &&
+                Disposing != null;
+        }
 
 #if OPENGL
-        internal int glFramebuffer;
+        internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
         internal int MaxVertexAttributes;        
         internal List<string> _extensions = new List<string>();
@@ -374,6 +398,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphicsDevice" /> class.
         /// </summary>
+        /// <param name="adapter">The graphics adapter.</param>
         /// <param name="graphicsProfile">The graphics profile.</param>
         /// <param name="presentationParameters">The presentation options.</param>
         /// <exception cref="ArgumentNullException">
@@ -1619,6 +1644,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public int RenderTargetCount
+        {
+            get
+            {
+                return _currentRenderTargetCount;
+            }
+        }
+
 		public void SetRenderTarget(RenderTarget2D renderTarget)
 		{
 			if (renderTarget == null)
@@ -1686,6 +1719,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // Clear the current bindings.
             Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 
+            int renderTargetWidth;
+            int renderTargetHeight;
             if (renderTargets == null)
             {
                 _currentRenderTargetCount = 0;
@@ -1706,10 +1741,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
-                Viewport = new Viewport(0, 0,
-					PresentationParameters.BackBufferWidth, 
-					PresentationParameters.BackBufferHeight);
-			}
+                renderTargetWidth = PresentationParameters.BackBufferWidth;
+                renderTargetHeight = PresentationParameters.BackBufferHeight;
+            }
 			else
 			{
                 // Copy the new bindings.
@@ -1796,12 +1830,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
 
-                // Set the viewport to the size of the first render target.
-                Viewport = new Viewport(0, 0, renderTarget.Width, renderTarget.Height);
-
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+
+                renderTargetWidth = renderTarget.Width;
+                renderTargetHeight = renderTarget.Height;
             }
+
+            // Set the viewport to the size of the first render target.
+            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // Set the scissor rectangle to the size of the first render target.
+            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
 
             // In XNA 4, because of hardware limitations on Xbox, when
             // a render target doesn't have PreserveContents as its usage
@@ -1854,6 +1894,12 @@ namespace Microsoft.Xna.Framework.Graphics
             Array.Copy(_currentRenderTargetBindings, bindings, _currentRenderTargetCount);
             return bindings;
 		}
+
+        public void GetRenderTargets(RenderTargetBinding[] outTargets)
+        {
+            Debug.Assert(outTargets.Length == _currentRenderTargetCount, "Invalid outTargets array length!");
+            Array.Copy(_currentRenderTargetBindings, outTargets, _currentRenderTargetCount);
+        }
 
 #if OPENGL
 
@@ -2098,12 +2144,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 #endif
             }
-
+   
+#if !PSM
             if (_vertexShader == null)
                 throw new InvalidOperationException("A vertex shader must be set!");
             if (_pixelShader == null)
-                throw new InvalidOperationException("A pixel shader must not set!");
-
+                throw new InvalidOperationException("A pixel shader must be set!");
+#endif
+            
 #if DIRECTX 
 
             if (_vertexShaderDirty)
@@ -2288,6 +2336,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 #elif PSM
             BindVertexBuffer(true);
+            ApplyState(true);
             _graphics.DrawArrays(PSSHelper.ToDrawMode(primitiveType), startIndex, GetElementCountArray(primitiveType, primitiveCount));
 #endif
         }
@@ -2509,11 +2558,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 var buf = _availableVertexBuffers[i];
                 
 #region Check there is enough space
-                if (buf.VertexCount < requiredVertexLength)
+                if (buf.VertexCount != requiredVertexLength)
                     continue;
                 if (requiredIndexLength == 0 && buf.IndexCount != 0)
                     continue;
-                if (requiredIndexLength > 0 && buf.IndexCount < requiredIndexLength)
+                if (requiredIndexLength > 0 && buf.IndexCount != requiredIndexLength)
                     continue;
 #endregion
                 
@@ -2546,7 +2595,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             if (bestMatch != null)
             {
-                _availableVertexBuffers.RemoveAt(bestMatchIndex);
+                return bestMatch;
             }
             else
             {

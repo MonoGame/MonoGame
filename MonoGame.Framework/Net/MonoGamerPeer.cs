@@ -738,7 +738,7 @@ namespace Microsoft.Xna.Framework.Net
 					string gamerTag = im.ReadString ();
 					int openPrivateGamerSlots = im.ReadInt32 ();
 					int openPublicGamerSlots = im.ReadInt32 ();
-					bool isHost = im.ReadBoolean ();
+					im.ReadBoolean (); //isHost
 
 					NetworkSessionProperties properties = new NetworkSessionProperties ();
 					int[] propertyData = new int[properties.Count * 2];
@@ -763,7 +763,7 @@ namespace Microsoft.Xna.Framework.Net
 						gamerTag = im.ReadString ();
 						openPrivateGamerSlots = im.ReadInt32 ();
 						openPublicGamerSlots = im.ReadInt32 ();
-						isHost = im.ReadBoolean ();
+						im.ReadBoolean (); // isHost
 						IPEndPoint hostInternal = im.ReadIPEndpoint ();
 						IPEndPoint hostExternal = im.ReadIPEndpoint ();
 						available.SessionType = NetworkSessionType.PlayerMatch;

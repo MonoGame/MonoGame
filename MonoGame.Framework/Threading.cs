@@ -90,13 +90,13 @@ namespace Microsoft.Xna.Framework
     internal class Threading
     {
         static int mainThreadId;
-        static int currentThreadId;
+        //static int currentThreadId;
 #if SDL2 && THREADED_GL
         public static GL_ContextHandle BackgroundContext;
         public static IntPtr WindowInfo;
 #elif ANDROID || SDL2
         static List<Action> actions = new List<Action>();
-        static Mutex actionsMutex = new Mutex();
+        //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
 #elif WINDOWS || LINUX

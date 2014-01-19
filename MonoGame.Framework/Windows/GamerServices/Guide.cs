@@ -79,9 +79,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 	public static class Guide
 	{
 		private static bool isScreenSaverEnabled;
-		private static bool isTrialMode;
+		private static bool isTrialMode = false;
 		private static bool isVisible;
-		private static bool simulateTrialMode;		
+		private static bool simulateTrialMode;
 
 #if WINDOWS_STOREAPP
 	    private static readonly CoreDispatcher _dispatcher;
@@ -419,7 +419,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// If simulate trial mode is enabled then 
 				// we're in the trial mode.
 #if DEBUG
-                return simulateTrialMode;
+                return simulateTrialMode || isTrialMode;
 #elif WINDOWS_PHONE
 			    return MsXna_Guide.IsTrialMode;
 #else
