@@ -151,7 +151,9 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if DIRECTX || PSM
+#if WINDOWS_PHONE
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+#elif DIRECTX || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
@@ -205,9 +207,6 @@ namespace Microsoft.Xna.Framework
 #endif
 #endif
 
-#if WINDOWS_PHONE
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-#endif
         }
 
 #if ANDROID
