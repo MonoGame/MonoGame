@@ -113,6 +113,7 @@
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
     <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\RenderTarget3D.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
