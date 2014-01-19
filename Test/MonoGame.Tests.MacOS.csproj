@@ -74,6 +74,7 @@
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Runner\Utility.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Constants.cs" />
