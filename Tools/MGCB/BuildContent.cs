@@ -221,6 +221,8 @@ namespace MGCB
                 catch (PipelineException ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.Write(ex.InnerException.ToString());
                     ++errorCount;
                 }
             }
