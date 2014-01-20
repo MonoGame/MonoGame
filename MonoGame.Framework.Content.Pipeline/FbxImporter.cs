@@ -25,6 +25,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             var identity = new ContentIdentity(filename, GetType().Name);
             var importer = new AssimpImporter();
+
+            // Disable the FBX import from generating extra nodes with
+            // pivot points for transformations.
+            importer.SetConfig(new BooleanPropertyConfig("IMPORT_FBX_PRESERVE_PIVOTS", false));
+
             importer.AttachLogStream(new LogStream((msg, userData) => context.Logger.LogMessage(msg)));
             var scene = importer.ImportFile(filename,
                                             PostProcessSteps.FlipUVs | // So far appears necessary
