@@ -151,6 +151,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return rootNode;
         }
 
+        public static Color ToXna(Color4D color)
+        {
+            return new Color(color.R, color.G, color.B, color.A);
+        }
+
         public static Matrix ToXna(Matrix4x4 matrix)
         {
             var result = Matrix.Identity;
