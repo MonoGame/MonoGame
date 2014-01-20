@@ -46,18 +46,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 Transform = ToXna(scene.RootNode.Transform)
             };
 
-            // TODO: Materials
             var materials = new List<MaterialContent>();
             foreach (var sceneMaterial in scene.Materials)
             {
-                var diffuse = sceneMaterial.GetTexture(TextureType.Diffuse, 0);
-
-                materials.Add(new BasicMaterialContent()
+                var mat = new BasicMaterialContent()
                 {
                     Name = sceneMaterial.Name,
                     Identity = identity,
-                    Texture = new ExternalReference<TextureContent>(diffuse.FilePath, identity)
-                });
+                };
+
+                if (sceneMaterial.HasColorDiffuse)
+                    mat.DiffuseColor = ToXna(sceneMaterial.ColorDiffuse);
+
+                if (sceneMaterial.HasColorEmissive)
+                    mat.EmissiveColor = ToXna(sceneMaterial.ColorEmissive);
+
+                if (sceneMaterial.HasColorSpecular)
+                    mat.SpecularColor = ToXna(sceneMaterial.ColorSpecular);
+
+                if (sceneMaterial.HasOpacity)
+                    mat.Alpha = sceneMaterial.Opacity;
+
+                var diffuse = sceneMaterial.GetTexture(TextureType.Diffuse, 0);
+                if (!string.IsNullOrEmpty(diffuse.FilePath))
+                    mat.Texture = new ExternalReference<TextureContent>(diffuse.FilePath, identity);
+
+                var normals = sceneMaterial.GetTexture(TextureType.Normals, 0);
+                if (!string.IsNullOrEmpty(normals.FilePath))
+                    mat.Textures.Add("NormalMap", new ExternalReference<TextureContent>(normals.FilePath, identity));
+               
+                materials.Add(mat);
             }
 
             // Meshes
