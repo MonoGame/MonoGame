@@ -126,24 +126,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var hierarchyNodes = scene.RootNode.Children.SelectDeep(n => n.Children).ToList();
             foreach (var node in hierarchyNodes)
             {
-                var bone = new BoneContent
+                // Copy the bone's name to the MeshContent - this appears to be
+                // the way it comes out of XNA's FBXImporter.
+                if (node.MeshIndices != null && node.MeshIndices.Length > 0)
+                {
+                    foreach (var meshIndex in node.MeshIndices)
                     {
-                        Name = node.Name,
-                        Transform = Matrix.Transpose(ToXna(node.Transform))
-                    };
+                        var mesh = meshes[scene.Meshes[meshIndex]];
+                        mesh.Name = node.Name;
+                    }
 
+                    continue;
+                }
+
+                var bone = new BoneContent
+                {
+                    Name = node.Name,
+                    Transform = Matrix.Transpose(ToXna(node.Transform))
+                };
+
+                // Add the node.
                 if (node.Parent == scene.RootNode)
                     rootNode.Children.Add(bone);
                 else
                 {
-                    var parent = bones[node.Parent];
-                    parent.Children.Add(bone);
+                    BoneContent parent;
+                    if (bones.TryGetValue(node.Parent, out parent))
+                        parent.Children.Add(bone);
                 }
-
-                // Copy the bone's name to the MeshContent - this appears to be
-                // the way it comes out of XNA's FBXImporter.
-                foreach (var meshIndex in node.MeshIndices)
-                    meshes[scene.Meshes[meshIndex]].Name = node.Name;
 
                 bones.Add(node, bone);
             }
