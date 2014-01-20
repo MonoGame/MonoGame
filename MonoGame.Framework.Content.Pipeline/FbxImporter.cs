@@ -95,10 +95,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     mesh.Positions.Add(new Vector3(vert.X, vert.Y, vert.Z));
 
                 var geom = new GeometryContent
-                    {
-                        Name = string.Empty,
-                        //Material = materials[sceneMesh.MaterialIndex]
-                    };
+                {
+                    Name = string.Empty,                       
+                };
+
+                if (materials.Count > 0 && sceneMesh.MaterialIndex > -1)
+                    geom.Material = materials[sceneMesh.MaterialIndex];
 
                 // Geometry vertices reference 1:1 with the MeshContent parent,
                 // no indirection is necessary.
