@@ -15,10 +15,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         private static UInt16 Pack(float x, float y, float z, float w)
         {
-            return (UInt16)((((int)(MathHelper.Clamp(x, 0, 1) * 15.0f) & 0x0F) << 12) |
-                (((int)(MathHelper.Clamp(y, 0, 1) * 15.0f) & 0x0F) << 8) |
-                (((int)(MathHelper.Clamp(z, 0, 1) * 15.0f) & 0x0F) << 4) |
-                ((int)(MathHelper.Clamp(w, 0, 1) * 15.0f) & 0x0F));            
+            return (UInt16)((((int)(MathHelper.Clamp(w, 0, 1) * 15.0f) & 0x0F) << 12) |
+                (((int)(MathHelper.Clamp(x, 0, 1) * 15.0f) & 0x0F) << 8) |
+                (((int)(MathHelper.Clamp(y, 0, 1) * 15.0f) & 0x0F) << 4) |
+                ((int)(MathHelper.Clamp(z, 0, 1) * 15.0f) & 0x0F));            
         }
 
         /// <summary>
@@ -64,11 +64,12 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>The packed vector in Vector4 format</returns>
         public Vector4 ToVector4()
         {
-            return new Vector4((float)(((_packedValue >> 12) & 0x0F) * (1.0f / 15.0f)),
-                (float)(((_packedValue >> 12) & 0x0F) * (1.0f / 15.0f)),
-                (float)(((_packedValue >> 8) & 0x0F) * (1.0f / 15.0f)),
-                (float)((_packedValue & 0x0F) * (1.0f / 15.0f))
-                );
+            const float maxVal = 1 / 15.0f;
+
+            return new Vector4( ((_packedValue >> 8) & 0x0F) * maxVal,
+                                ((_packedValue >> 4) & 0x0F) * maxVal,
+                                (_packedValue & 0x0F) * maxVal,
+                                ((_packedValue >> 12) & 0x0F) * maxVal);
         }
 
         /// <summary>
