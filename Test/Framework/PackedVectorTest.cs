@@ -67,5 +67,18 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector4(1, 1, 0, 1), ((IPackedVector)new NormalizedShort2(Vector2.One)).ToVector4());
             Assert.AreEqual(new Vector4(0, 0, 0, 1), ((IPackedVector)new NormalizedShort2(Vector2.Zero)).ToVector4());
         }
+
+        [Test]
+        public void Bgra4444()
+        {
+            Assert.AreEqual(0x0, new Bgra4444(Vector4.Zero).PackedValue);
+            Assert.AreEqual(0xFFFF, new Bgra4444(Vector4.One).PackedValue);
+            Assert.AreEqual(0x0, new Bgra4444(-Vector4.One).PackedValue);
+
+            Assert.AreEqual(Vector4.One, new Bgra4444(Vector4.One).ToVector4());
+            Assert.AreEqual(Vector4.Zero, new Bgra4444(Vector4.Zero).ToVector4());
+            Assert.AreEqual(Vector4.Zero, new Bgra4444(-Vector4.One).ToVector4());
+            Assert.AreEqual(Vector4.One, new Bgra4444(Vector4.One * 1234.0f).ToVector4());
+        }
     }
 }
