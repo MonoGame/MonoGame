@@ -276,6 +276,8 @@
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\Effect\EffectParameterClass.cs" />
     <Compile Include="Graphics\Effect\EffectParameterType.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Audio\Cue.cs" />

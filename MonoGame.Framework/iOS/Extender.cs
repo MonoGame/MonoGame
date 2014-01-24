@@ -50,11 +50,13 @@ namespace  Microsoft.Xna.Framework.Graphics
 {
 	public static class Extender
 	{
+        [CLSCompliant(false)]
 		public static UIImage FromPdf(string name)
 		{
 			return imageWithPDFNamed(name,UIScreen.MainScreen.Scale);
 		}
 				
+        [CLSCompliant(false)]
 		public static UIImage FromPdf(string name, float width,float height)
 		{
 			CGPDFDocument doc = CreatePDFDocumentWithName(name ) ;

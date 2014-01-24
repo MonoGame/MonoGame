@@ -10,12 +10,10 @@ namespace Microsoft.Xna.Framework.Graphics
 	public sealed class ModelMesh
 	{
 		private GraphicsDevice graphicsDevice;
-		private System.Collections.Generic.List<ModelMeshPart> parts;
 
 		public ModelMesh(GraphicsDevice graphicsDevice, System.Collections.Generic.List<ModelMeshPart> parts)
 		{
 			// TODO: Complete member initialization
-			this.parts = parts;
 			this.graphicsDevice = graphicsDevice;
 			
 			MeshParts = new ModelMeshPartCollection(parts);
