@@ -125,10 +125,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             const float minNeg = ~(int)maxPos; // two's complement
 
             // clamp the value between min and max values
-            var word4 = (ulong)((int)Math.Max(Math.Min(vector.X, maxPos), minNeg) & 0xFFFF);
-            var word3 = (ulong)(((int)Math.Max(Math.Min(vector.Y, maxPos), minNeg) & 0xFFFF) << 0x10);
-            var word2 = (ulong)(((int)Math.Max(Math.Min(vector.Z, maxPos), minNeg) & 0xFFFF) << 0x20);
-            var word1 = (ulong)(((int)Math.Max(Math.Min(vector.W, maxPos), minNeg) & 0xFFFF) << 0x30);
+            var word4 = ((ulong)MathHelper.Clamp(vector.X, minNeg, maxPos) & 0xFFFF) << 0x00;
+            var word3 = ((ulong)MathHelper.Clamp(vector.Y, minNeg, maxPos) & 0xFFFF) << 0x10;
+            var word2 = ((ulong)MathHelper.Clamp(vector.Z, minNeg, maxPos) & 0xFFFF) << 0x20;
+            var word1 = ((ulong)MathHelper.Clamp(vector.W, minNeg, maxPos) & 0xFFFF) << 0x30;
 
             return word4 | word3 | word2 | word1;
         }
