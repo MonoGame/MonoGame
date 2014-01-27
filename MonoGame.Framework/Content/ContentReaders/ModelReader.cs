@@ -48,10 +48,10 @@ namespace Microsoft.Xna.Framework.Content
 {
 	public class ModelReader : ContentTypeReader<Model>
 	{
-		List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
-        List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
-		List<Effect> effects = new List<Effect>();
-		List<GraphicsResource> sharedResources = new List<GraphicsResource>();
+//      List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
+//      List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
+//      List<Effect> effects = new List<Effect>();
+//      List<GraphicsResource> sharedResources = new List<GraphicsResource>();
 
 		public ModelReader ()
 		{

@@ -377,6 +377,13 @@ namespace Microsoft.Xna.Framework
 			{
 				throw new System.NotImplementedException ();
 			}
+
+            private set 
+            {
+                if (ScreenDeviceNameChanged != null)
+                    ScreenDeviceNameChanged (null, EventArgs.Empty);
+                throw new System.NotImplementedException ();
+            }
 		}
    
 
@@ -389,8 +396,8 @@ namespace Microsoft.Xna.Framework
             internal set
             {
                 clientBounds = value;
-                //if(ClientSizeChanged != null)
-                //    ClientSizeChanged(this, EventArgs.Empty);
+                if(ClientSizeChanged != null)
+                    ClientSizeChanged(this, EventArgs.Empty);
             }
 		}
 		
@@ -512,6 +519,7 @@ namespace Microsoft.Xna.Framework
 		}
 
         public event EventHandler<EventArgs> OrientationChanged;
+
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 

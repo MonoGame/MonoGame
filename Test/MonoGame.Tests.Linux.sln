@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tests.Linux", "MonoGame.Tests.Linux.csproj", "{B3AA784F-A3DF-49CD-8C7B-8B9E1D66E5E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "..\MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
@@ -28,12 +28,12 @@ Global
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|Any CPU.Build.0 = Release|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.ActiveCfg = Release|x86
 		{35253CE1-C864-4CD3-8249-4D1319748E8F}.Release|x86.Build.0 = Release|x86
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug-CLI|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug-CLI|Any CPU.Build.0 = Debug|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Debug-CLI|Any CPU.ActiveCfg = Debug|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Debug-CLI|Any CPU.Build.0 = Debug|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3AA784F-A3DF-49CD-8C7B-8B9E1D66E5E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B3AA784F-A3DF-49CD-8C7B-8B9E1D66E5E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3AA784F-A3DF-49CD-8C7B-8B9E1D66E5E3}.Debug-CLI|Any CPU.ActiveCfg = Debug-CLI|Any CPU

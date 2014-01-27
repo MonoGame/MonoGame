@@ -120,5 +120,14 @@ namespace Microsoft.Xna.Framework.Input
         {
             return (obj is GamePadDPad) && (this == (GamePadDPad)obj);
         }
+
+        public override int GetHashCode ()
+        {
+            return 
+                (this.Down  == ButtonState.Pressed ? 1 : 0) +
+                (this.Left  == ButtonState.Pressed ? 2 : 0) +
+                (this.Right == ButtonState.Pressed ? 4 : 0) +
+                (this.Up    == ButtonState.Pressed ? 8 : 0);
+        }
 	}
 }
