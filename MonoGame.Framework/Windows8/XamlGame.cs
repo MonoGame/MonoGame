@@ -64,5 +64,12 @@ namespace MonoGame.Framework
 
             return Create(args.Arguments, window, swapChainBackgroundPanel);
         }
+
+        static public T Create(ProtocolActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapPanel)
+        {
+            MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
+
+            return Create(args.Uri.AbsoluteUri, window, swapPanel);
+        }
     }
 }

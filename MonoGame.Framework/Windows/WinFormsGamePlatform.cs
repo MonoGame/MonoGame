@@ -80,7 +80,7 @@ namespace MonoGame.Framework
 {
     class WinFormsGamePlatform : GamePlatform
     {
-        internal static string LaunchParameters;
+        //internal static string LaunchParameters;
 
         private WinFormsGameWindow _window;
         private readonly List<XnaKeys> _keyState;
