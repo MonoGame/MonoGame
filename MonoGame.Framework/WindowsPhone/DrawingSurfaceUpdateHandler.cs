@@ -40,14 +40,6 @@ namespace MonoGame.Framework.WindowsPhone
 
             _renderTarget = ToDispose(new Texture2D(_device, renderTargetDesc));
             _renderTargetView = ToDispose(new RenderTargetView(_device, _renderTarget));
-            
-            using (var dxgiDevice2 = _device.QueryInterface<SharpDX.DXGI.Device2>())
-            {
-                // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
-                // latency and ensures that the application will only render after each VSync, minimizing 
-                // power consumption.
-                dxgiDevice2.MaximumFrameLatency = 1;
-            }
 
             var viewport = new SharpDX.ViewportF(0, 0, (float)size.Width, (float)size.Height);
             _deviceContext.Rasterizer.SetViewport(viewport);
