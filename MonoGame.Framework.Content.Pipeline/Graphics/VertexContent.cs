@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Number of vertices for the content.
         /// </summary>
         /// <value>Number of vertices.</value>
-        public int VertexCount { get { return positions.Count; } }
+        public int VertexCount { get { return positionIndices.Count; } }
 
         /// <summary>
         /// Constructs a VertexContent instance.
