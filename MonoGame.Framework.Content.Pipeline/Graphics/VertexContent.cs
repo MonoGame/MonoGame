@@ -50,11 +50,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Constructs a VertexContent instance.
         /// </summary>
-        internal VertexContent()
+        internal VertexContent(GeometryContent geom)
         {
-            channels = new VertexChannelCollection(this);
             positionIndices = new VertexChannel<int>("PositionIndices");
-            positions = new IndirectPositionCollection();
+            positions = new IndirectPositionCollection(geom, positionIndices);
+            channels = new VertexChannelCollection(this);
         }
 
         /// <summary>

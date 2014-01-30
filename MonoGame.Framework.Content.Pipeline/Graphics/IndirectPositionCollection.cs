@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,35 +11,59 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Provides methods for maintaining a list of vertex positions.
     /// </summary>
-    /// <remarks>This class is designed to collect the vertex positions for a VertexContent object. Use the contents of the PositionIndices property (of the contained VertexContent object) to index into the Positions property of the parent mesh.</remarks>
-    public sealed class IndirectPositionCollection : IList<Vector3>, ICollection<Vector3>, IEnumerable<Vector3>, IEnumerable
+    /// <remarks>
+    /// This class is designed to collect the vertex positions for a VertexContent object. Use the contents
+    /// of the PositionIndices property (of the contained VertexContent object) to index into the Positions 
+    /// property of the parent mesh.
+    /// </remarks>
+    public sealed class IndirectPositionCollection : IList<Vector3>
     {
-        List<Vector3> items;
+        private readonly VertexChannel<int> _positionIndicies;
+        private readonly GeometryContent _geometry;
 
         /// <summary>
         /// Number of positions in the collection.
         /// </summary>
         /// <value>Number of positions.</value>
-        public int Count { get { return items.Count; } }
+        public int Count
+        {
+            get { return _positionIndicies.Count; }
+        }
 
         /// <summary>
         /// Gets or sets the position at the specified index.
         /// </summary>
         /// <value>Position located at index.</value>
-        public Vector3 this[int index] { get { return items[index]; } set { items[index] = value; } }
+        public Vector3 this[int index]
+        {
+            get
+            {
+                var remap = _positionIndicies[index];
+                return _geometry.Parent.Positions[remap];
+            } 
+
+            set
+            {
+                throw Readonly();
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this object is read-only.
         /// </summary>
         /// <value>true if this object is read-only; false otherwise.</value>
-        bool ICollection<Vector3>.IsReadOnly { get { return false; } }
+        bool ICollection<Vector3>.IsReadOnly
+        {
+            get { return true; }
+        }
 
         /// <summary>
         /// Initializes a new instance of IndirectPositionCollection.
         /// </summary>
-        internal IndirectPositionCollection()
+        internal IndirectPositionCollection(GeometryContent geom, VertexChannel<int> positionIndicies)
         {
-            items = new List<Vector3>();
+            _geometry = geom;
+            _positionIndicies = positionIndicies;
         }
 
         /// <summary>
@@ -48,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>true if the position was found; false otherwise.</returns>
         public bool Contains(Vector3 item)
         {
-            return items.Contains(item);
+            return IndexOf(item) > -1;
         }
 
         /// <summary>
@@ -58,7 +83,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="arrayIndex">Index of the first copied position.</param>
         public void CopyTo(Vector3[] array, int arrayIndex)
         {
-            items.CopyTo(array, arrayIndex);
+            foreach (var vec in this)
+                array[arrayIndex++] = vec;
         }
 
         /// <summary>
@@ -67,68 +93,52 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Interface for enumerating the collection of position values.</returns>
         public IEnumerator<Vector3> GetEnumerator()
         {
-            return items.GetEnumerator();
+            for (var i = 0; i < Count; i++)
+                yield return this[i];
         }
 
         /// <summary>
         /// Gets the index of the specified position in a collection.
         /// </summary>
         /// <param name="item">Position being searched for.</param>
-        /// <returns>Index of the specified position.</returns>
+        /// <returns>Index of the specified position or -1 if not found.</returns>
         public int IndexOf(Vector3 item)
         {
-            return items.IndexOf(item);
+            for (var i = 0; i < Count; i++)
+                if (this[i] == item)
+                    return i;
+
+            return -1;
         }
 
-        /// <summary>
-        /// Adds a new element to the end of the collection.
-        /// </summary>
-        /// <param name="item">The item to add.</param>
+        internal Exception Readonly()
+        {
+            return new NotSupportedException("The collection is read only!");
+        }
+
         void ICollection<Vector3>.Add(Vector3 item)
         {
-            items.Add(item);
+            throw Readonly();
         }
 
-        public void AddRange(IEnumerable<Vector3> collection)
-        {
-            items.AddRange(collection);
-        }
-
-        /// <summary>
-        /// Removes all elements from the collection.
-        /// </summary>
         void ICollection<Vector3>.Clear()
         {
-            items.Clear();
+            throw Readonly();
         }
 
-        /// <summary>
-        /// Removes the specified element from the collection.
-        /// </summary>
-        /// <param name="item">The item to be removed.</param>
-        /// <returns>true if the element was removed; false otherwise.</returns>
         bool ICollection<Vector3>.Remove(Vector3 item)
         {
-            return items.Remove(item);
+            throw Readonly();
         }
 
-        /// <summary>
-        /// Inserts a new element into the collection.
-        /// </summary>
-        /// <param name="index">Index for element insertion.</param>
-        /// <param name="item">Element to insert.</param>
         void IList<Vector3>.Insert(int index, Vector3 item)
         {
-            items.Insert(index, item);
+            throw Readonly();
         }
 
-        /// <summary>
-        /// Removes the element at the specified index position.
-        /// </summary>
-        /// <param name="index">Index of the element to be removed.</param>
         void IList<Vector3>.RemoveAt(int index)
         {
-            items.RemoveAt(index);
+            throw Readonly();
         }
 
         /// <summary>
@@ -137,7 +147,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Enumerator that can iterate through the collection.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return GetEnumerator();
         }
     }
 }
