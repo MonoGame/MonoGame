@@ -72,7 +72,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             ContentTypeWriter result = null;
             var contentTypeWriterType = typeof(ContentTypeWriter<>).MakeGenericType(type);
             Type typeWriterType;
-            if (!typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
+            if (typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
+                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            else if (type.IsArray)
+            {
+                if (type.GetArrayRank() != 1)
+                    throw new NotSupportedException("We don't support multidimensional arrays!");
+
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ArrayWriter<>).MakeGenericType(type.GetElementType()));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+            }
+            else
             {
 				var inputTypeDef = type.GetGenericTypeDefinition ();
 
@@ -109,10 +119,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
                 }
 				
-            }
-            else
-            {
-                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
             }
 
             if (result != null)
