@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 		private static uint PackInTwo (float vectorX, float vectorY)
 		{
 			const float maxPos = 0x7FFF;
-			const float minNeg = ~(int)maxPos;
+            const float minNeg = -maxPos;
 
 			// clamp the value between min and max values
             // Round rather than truncate.
@@ -131,9 +131,11 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
 		Vector4 IPackedVector.ToVector4 ()
 		{
+            const float maxVal = 0x7FFF;
+
 			var v4 = new Vector4 (0,0,0,1);
-			v4.X = (short)(short2Packed & 0xFFFF);
-			v4.Y = (short)(short2Packed >> 0x10);
+            v4.X = ((short)((short2Packed >> 0x00) & 0xFFFF)) / maxVal;
+            v4.Y = ((short)((short2Packed >> 0x10) & 0xFFFF)) / maxVal;
 			return v4;
 		}
 	}
