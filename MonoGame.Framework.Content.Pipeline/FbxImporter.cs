@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 // Geometry vertices reference 1:1 with the MeshContent parent,
                 // no indirection is necessary.
-                geom.Vertices.Positions.AddRange(mesh.Positions);
+                //geom.Vertices.Positions.AddRange(mesh.Positions);
                 geom.Vertices.AddRange(Enumerable.Range(0, sceneMesh.VertexCount));
                 geom.Indices.AddRange(sceneMesh.GetIntIndices());
 
