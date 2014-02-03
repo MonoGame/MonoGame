@@ -16,9 +16,114 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return IsFinite(v.X) && IsFinite(v.Y) && IsFinite(v.Z);
         }
 
+        /// <summary>
+        /// Generates vertex normals by accumulation of triangle face normals.
+        /// </summary>
+        /// <param name="mesh">The mesh which will recieve the normals.</param>
+        /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
+        /// <remarks>
+        /// This calls <see cref="CalculateNormals(GeometryContent, bool)"/> to do the work.
+        /// </remarks>
         public static void CalculateNormals(MeshContent mesh, bool overwriteExistingNormals)
         {
-            throw new NotImplementedException();
+            foreach (var geom in mesh.Geometry)
+                CalculateNormals(geom, overwriteExistingNormals);
+        }
+
+        /// <summary>
+        /// Generates vertex normals by accumulation of triangle face normals.
+        /// </summary>
+        /// <param name="geom">The geometry which will recieve the normals.</param>
+        /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
+        /// <remarks>
+        /// We use a "Mean Weighted Equally" method generate vertex normals from triangle 
+        /// face normals.  If normal cannot be calculated from the geometry we set it to zero.
+        /// </remarks>
+        public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
+        {
+            // Look for an existing normals channel.
+            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
+            if (channel == null)
+            {
+                // We don't have existing normals, so add a new channel.
+                channel = geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
+            }
+            else
+            {
+                // If we're not supposed to overwrite the existing
+                // normals then we're done here.
+                if (!overwriteExistingNormals)
+                    return;
+            }
+
+            var positionIndices = geom.Vertices.PositionIndices;
+            Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
+
+            // Accumulate all the triangle face normals for each vertex.
+            var normals = new Vector3[positionIndices.Count];
+            for (var i = 0; i < geom.Indices.Count; i += 3)
+            {
+                var ia = geom.Indices[i + 0];
+                var ib = geom.Indices[i + 1];
+                var ic = geom.Indices[i + 2];
+
+                var aa = geom.Vertices.Positions[ia];
+                var bb = geom.Vertices.Positions[ib];
+                var cc = geom.Vertices.Positions[ic];                
+                
+                var faceNormal = Vector3.Cross(cc - bb, bb - aa);
+                var len = faceNormal.Length();
+                if (len > 0.0f)
+                {
+                    faceNormal = faceNormal / len;
+
+                    // We are using the "Mean Weighted Equally" method where each
+                    // face has an equal weight in the final normal calculation.
+                    //
+                    // We could maybe switch to "Mean Weighted by Angle" which is said
+                    // to look best in most cases, but is more expensive to calculate.
+                    //
+                    // There is also an idea of weighting by triangle area, but IMO the
+                    // triangle area doesn't always have a direct relationship to the 
+                    // shape of a mesh.
+                    //
+                    // For more ideas see:
+                    //
+                    // "A Comparison of Algorithms for Vertex Normal Computation"
+                    // by Shuangshuang Jin, Robert R. Lewis, David West.
+                    //
+
+                    normals[positionIndices[ia]] += faceNormal;
+                    normals[positionIndices[ib]] += faceNormal;
+                    normals[positionIndices[ic]] += faceNormal;
+                }
+            }
+
+            // Normalize the gathered vertex normals.
+            for (var i = 0; i < normals.Length; i++)
+            {
+                var normal = normals[i];
+                var len = normal.Length();
+                if (len > 0.0f)
+                    normals[i] = normal / len;
+                else
+                {
+                    // TODO: It would be nice to be able to log this to
+                    // the pipeline so that it can be fixed in the model.
+
+                    // TODO: We could maybe void this by a better algorithm
+                    // above for generating the normals.
+                    
+                    // We have a zero length normal.  You can argue that putting
+                    // anything here is better than nothing, but by leaving it to
+                    // zero it allows the caller to detect this and react to it.
+                    normals[i] = Vector3.Zero;
+                }
+            }
+
+            // Set the new normals on the vertex channel.
+            for (var i = 0; i < channel.Count; i++)
+                channel[i] = normals[positionIndices[i]];
         }
 
         /// <summary>
