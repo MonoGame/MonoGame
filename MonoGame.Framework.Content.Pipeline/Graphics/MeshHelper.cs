@@ -366,7 +366,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public static void MergeDuplicateVertices(MeshContent mesh)
         {
-            throw new NotImplementedException();
+            foreach (var geom in mesh.Geometry)
+                MergeDuplicateVertices(geom);
         }
 
         public static void OptimizeForCache(MeshContent mesh)
