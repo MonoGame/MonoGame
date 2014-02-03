@@ -328,6 +328,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+      <Link>Assimp32.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
       <Link>Dependencies\x64\libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
