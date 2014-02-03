@@ -589,6 +589,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dContext = context;
 
             SharpDX.Utilities.Dispose(ref _depthStencilView);
+
+            using (var dxgiDevice2 = device.QueryInterface<SharpDX.DXGI.Device2>())
+            {
+                // Ensure that DXGI does not queue more than one frame at a time. This both reduces 
+                // latency and ensures that the application will only render after each VSync, minimizing 
+                // power consumption.
+                dxgiDevice2.MaximumFrameLatency = 1;
+            }
         }
 
         internal void UpdateTarget(RenderTargetView renderTargetView)
