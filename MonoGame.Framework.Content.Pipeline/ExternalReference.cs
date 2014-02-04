@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Content.Pipeline.Builder;
 using System;
 using System.IO;
 
@@ -53,22 +54,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
                 throw new ArgumentNullException("relativeToContent.SourceFilename");
 
-#if WINRT
-            const char notSeparator = '/';
-            const char separator = '\\';
-#else
-            const char notSeparator = '\\';
-            var separator = Path.DirectorySeparatorChar;
-#endif
-            // Get a uri for the asset path using the file:// schema and no host
-            var src = new Uri("file:///" + relativeToContent.SourceFilename.Replace(notSeparator, separator));
-
-            // Add the relative path to the external reference
-            var dst = new Uri(src, filename.Replace(notSeparator, separator));
-
-            // The uri now contains the path to the external reference
-            // Get the local path and skip the first character (the path separator)
-            Filename = dst.LocalPath.Substring(1);
+            // The intermediate serializer from XNA has the external reference
+            // path walking up to the content project directory and then back
+            // down to the asset path. We don't appear to have any way to do
+            // that from here, so we'll work with the absolute path and let the
+            // higher level process sort out any relative paths they need.
+            var basePath = Path.GetDirectoryName(relativeToContent.SourceFilename);
+            Filename = PathHelper.NormalizeOS(Path.GetFullPath(Path.Combine(basePath, filename)));
         }
     }
 }
