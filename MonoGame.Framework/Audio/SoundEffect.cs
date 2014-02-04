@@ -37,6 +37,10 @@ permitted under your local laws, the contributors exclude the implied warranties
 purpose and non-infringement.
 */
 #endregion License
+
+#if ANDROID
+#define TRACK_SOUNDEFFECTS
+#endif
 ﻿
 using System;
 using System.Collections.Generic;
@@ -51,7 +55,7 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.X3DAudio;
-#elif (WINDOWS && OPENGL) || LINUX
+#elif OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
 
@@ -65,22 +69,28 @@ namespace Microsoft.Xna.Framework.Audio
 
         private string _name;
 
-#if DIRECTX
-        internal DataStream _dataStream;
-        internal AudioBuffer _buffer;
-        internal AudioBuffer _loopedBuffer;
-        internal WaveFormat _format;
-        
+#if TRACK_SOUNDEFFECTS
+        static List<SoundEffect> _soundEffects = new List<SoundEffect>();
+#endif
+
+#if DIRECTX || OPENAL
         // These three fields are used for keeping track of instances created
         // internally when Play is called directly on SoundEffect.
         private List<SoundEffectInstance> _playingInstances;
         private List<SoundEffectInstance> _availableInstances;
         private List<SoundEffectInstance> _toBeRecycledInstances;
+#endif
+
+#if DIRECTX
+        internal DataStream _dataStream;
+        internal AudioBuffer _buffer;
+        internal AudioBuffer _loopedBuffer;
+        internal WaveFormat _format;
 #else
         private string _filename = "";
         internal byte[] _data;
 
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
 
         // OpenAL-specific information
 
@@ -112,15 +122,28 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Internal Constructors
 
+        static SoundEffect()
+        {
+#if DIRECTX
+            InitializeSoundEffect();
+#endif
+        }
+
 #if DIRECTX
         internal SoundEffect()
         {
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
+#endif
         }
 
         // Extended constructor which supports custom formats / compression.
         internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
         {
             Initialize(format, buffer, offset, count, loopStart, loopLength);
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
+#endif
         }
 
 #else
@@ -130,26 +153,43 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (_filename == string.Empty )
             {
-                throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
+                throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, aac, aiff");
             }
 
             _name = Path.GetFileNameWithoutExtension(fileName);
 
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
             Stream s;
             try
             {
-                s = File.OpenRead(fileName);
+                s = TitleContainer.OpenStream(fileName);
+#if ANDROID
+                // Copy to a MemoryStream a) to decrease load time, and b) because the Android Asset stream does not support some of the Stream properties
+                MemoryStream memStream = new MemoryStream();
+                s.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                s.Close();
+                s = memStream;
+#endif
             }
             catch (IOException e)
             {
                 throw new Content.ContentLoadException("Could not load audio data", e);
             }
 
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
+            try
+            {
+                _data = LoadAudioStream(s, 1.0f, false);
+            }
+            finally
+            {
+                s.Dispose();
+            }
 #else
             _sound = new Sound(_filename, 1.0f, false);
+#endif
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
 #endif
         }
 
@@ -159,7 +199,7 @@ namespace Microsoft.Xna.Framework.Audio
             _data = data;
             _name = name;
 
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
             Stream s;
             try
             {
@@ -169,17 +209,27 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 throw new Content.ContentLoadException("Could not load audio data", e);
             }
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
+
+            try
+            {
+                _data = LoadAudioStream(s, 1.0f, false);
+            }
+            finally
+            {
+                s.Dispose();
+            }
 #else
             _sound = new Sound(_data, 1.0f, false);
+#endif
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
 #endif
         }        
 #endif
 
         internal SoundEffect(Stream s)
         {
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
             _data = LoadAudioStream(s, 1.0f, false);
 #elif !DIRECTX
             var data = new byte[s.Length];
@@ -188,12 +238,20 @@ namespace Microsoft.Xna.Framework.Audio
             _data = data;
             _sound = new Sound(_data, 1.0f, false);
 #endif
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
+#endif
         }
 
         internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
             : this(buffer, sampleRate, channels)
         {
             _name = name;
+        }
+
+        ~SoundEffect()
+        {
+            Dispose(false);
         }
 
         #endregion
@@ -204,7 +262,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if DIRECTX            
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
-#elif (WINDOWS && OPENGL) || LINUX
+#elif OPENAL
             _data = buffer;
             Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -242,12 +300,18 @@ namespace Microsoft.Xna.Framework.Audio
 
             _sound = new Sound(_data, 1.0f, false);
 #endif
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
+#endif
         }
 
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
 #if DIRECTX
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
+#if TRACK_SOUNDEFFECTS
+            _soundEffects.Add(this);
+#endif
 #else
             throw new NotImplementedException();
 #endif
@@ -265,7 +329,7 @@ namespace Microsoft.Xna.Framework.Audio
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
             var instance = new SoundEffectInstance(this, voice);
-#elif (WINDOWS && OPENGL) || LINUX
+#elif OPENAL
             var instance = new SoundEffectInstance(this);
 #else
             var instance = new SoundEffectInstance();
@@ -285,7 +349,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
             return Play(MasterVolume, 0.0f, 0.0f);
 #else
             return Play(1.0f, 0.0f, 0.0f);
@@ -294,7 +358,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play(float volume, float pitch, float pan)
         {
-#if DIRECTX
+            if (isDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+#if DIRECTX || OPENAL
             if (MasterVolume > 0.0f)
             {
                 if (_playingInstances == null)
@@ -349,16 +415,6 @@ namespace Microsoft.Xna.Framework.Audio
             // XNA documentation says this method returns false if the sound limit
             // has been reached. However, there is no limit on PC.
             return true;
-#elif (WINDOWS && OPENGL) || LINUX
-            if (MasterVolume > 0.0f)
-            {
-                SoundEffectInstance instance = CreateInstance();
-                instance.Volume = volume;
-                instance.Pitch = pitch;
-                instance.Pan = pan;
-                instance.Play();
-            }
-            return false;
 #else
             if ( MasterVolume > 0.0f )
             {
@@ -370,7 +426,7 @@ namespace Microsoft.Xna.Framework.Audio
                 _instance.Play();
                 return _instance.Sound.Playing;
             }
-            return false;
+            return true;
 #endif
         }
 
@@ -378,7 +434,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Properties
 
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
         private TimeSpan _duration = TimeSpan.Zero;
 #endif
 
@@ -391,7 +447,7 @@ namespace Microsoft.Xna.Framework.Audio
                 var avgBPS = _format.AverageBytesPerSecond;
                 
                 return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
-#elif (WINDOWS && OPENGL) || LINUX
+#elif OPENAL
                 return _duration;
 #else
                 if ( _sound != null )
@@ -505,25 +561,60 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-#if (WINDOWS && OPENGL) || LINUX
-            // No-op. Note that isDisposed remains false!
-#else
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+#if DIRECTX || OPENAL
+                    if (_playingInstances != null)
+                    {
+                        foreach (var instance in _playingInstances)
+                            instance.Dispose();
+                        _playingInstances = null;
+                    }
+                    if (_toBeRecycledInstances != null)
+                    {
+                        foreach (var instance in _toBeRecycledInstances)
+                            instance.Dispose();
+                        _toBeRecycledInstances = null;
+                    }
+                    if (_availableInstances != null)
+                    {
+                        foreach (var instance in _availableInstances)
+                            instance.Dispose();
+                        _availableInstances = null;
+                    }
+#endif
 
 #if DIRECTX
-            _dataStream.Dispose();
-#else
-            _sound.Dispose();
+                    if (_dataStream != null)
+                    {
+                        _dataStream.Dispose();
+                        _dataStream = null;
+                    }
+#elif !OPENAL
+                    if (_sound != null)
+                    {
+                        _sound.Dispose();
+                        _sound = null;
+                    }
 #endif
-            isDisposed = true;
-
-#endif
+                }
+                isDisposed = true;
+            }
         }
 
         #endregion
 
         #region Additional OpenTK SoundEffect Code
 
-#if (WINDOWS && OPENGL) || LINUX
+#if OPENAL
         byte[] LoadAudioStream(Stream s, float volume, bool looping)
         {
             ALFormat format;
@@ -671,11 +762,6 @@ namespace Microsoft.Xna.Framework.Audio
                 LoopCount = AudioBuffer.LoopInfinite,
                 Context = new IntPtr(42),
             };            
-        }
-
-        static SoundEffect()
-        {
-            InitializeSoundEffect();
         }
 
         // Does someone actually need to call this if it only happens when the whole

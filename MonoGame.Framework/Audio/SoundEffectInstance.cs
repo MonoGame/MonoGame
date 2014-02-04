@@ -51,7 +51,7 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
+	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 #if !DIRECTX

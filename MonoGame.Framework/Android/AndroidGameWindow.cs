@@ -59,6 +59,7 @@ using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Android.Media;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -127,10 +128,16 @@ namespace Microsoft.Xna.Framework
 #endif
 
             if (keyCode == Keycode.VolumeUp)
-                Sound.IncreaseMediaVolume();
+            {
+                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+                audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+            }
 
             if (keyCode == Keycode.VolumeDown)
-                Sound.DecreaseMediaVolume();
+            {
+                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+                audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
+            }
 
             return true;
         }

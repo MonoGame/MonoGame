@@ -1,11 +1,13 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
-
-#if IOS || WINDOWS || LINUX
-using OpenTK.Audio.OpenAL;
-#elif MONOMAC
+#if MONOMAC
 using MonoMac.OpenAL;
+#else
+using OpenTK.Audio.OpenAL;
 #endif
-
 
 namespace Microsoft.Xna.Framework.Audio
 {
