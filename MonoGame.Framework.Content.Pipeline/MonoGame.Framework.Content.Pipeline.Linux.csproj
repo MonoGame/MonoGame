@@ -104,6 +104,7 @@
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
     <Compile Include="Graphics\MeshContent.cs" />
+    <Compile Include="Graphics\MeshHelper.cs" />
     <Compile Include="Graphics\MipmapChain.cs" />
     <Compile Include="Graphics\MipmapChainCollection.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
+    <Compile Include="OpenAssetImporter.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
     <Compile Include="PipelineException.cs" />
     <Compile Include="ProcessorParameter.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Processors\FontTextureProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+    <Compile Include="Processors\PassThroughProcessor.cs" />
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
     <Compile Include="Processors\SoundEffectContent.cs" />

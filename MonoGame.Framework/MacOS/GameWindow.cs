@@ -58,8 +58,8 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-	public class GameWindow : MacGameView
-	{
+	[CLSCompliant(false)]
+	public class GameWindow : MacGameView	{
 		// Amendment: Added events for integrating out key processing logic with monogame.
 		// These events are triggered when keyboard keys are released and pressed down respectively.
 		public event EventHandler<KeysEventArgs> TSKeyUp;
@@ -171,6 +171,11 @@ namespace Microsoft.Xna.Framework
             //        Game.Tick-centric architecture may eliminate this problem
             //        automatically.
 			if (_game != null && _platform.IsRunning) {
+                if (_needsToResetElapsedTime) 
+                {
+                    _game.ResetElapsedTime ();
+					_needsToResetElapsedTime = false;
+                }
 				_game.Tick();
 			}
 		}
@@ -429,6 +434,11 @@ namespace Microsoft.Xna.Framework
 		public event EventHandler<EventArgs> ClientSizeChanged;
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
+
+		private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+		{
+			return ScreenDeviceNameChanged != null;
+		}
 		
 		// make sure we get mouse move events.
 		public override bool AcceptsFirstResponder ()

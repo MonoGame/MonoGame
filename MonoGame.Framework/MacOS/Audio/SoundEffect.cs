@@ -181,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
 			//long pac = afs.DataPacketCount;
-			AudioFileStreamStatus status = afs.ParseBytes (audiodata, false);
+            afs.ParseBytes (audiodata, false); // AudioFileStreamStatus status
             AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
             
             Rate = (float)asbd.SampleRate;

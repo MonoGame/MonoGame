@@ -48,10 +48,10 @@ namespace Microsoft.Xna.Framework.Content
 {
 	public class ModelReader : ContentTypeReader<Model>
 	{
-		List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
-        List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
-		List<Effect> effects = new List<Effect>();
-		List<GraphicsResource> sharedResources = new List<GraphicsResource>();
+//      List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
+//      List<IndexBuffer> indexBuffers = new List<IndexBuffer>();
+//      List<Effect> effects = new List<Effect>();
+//      List<GraphicsResource> sharedResources = new List<GraphicsResource>();
 
 		public ModelReader ()
 		{
@@ -87,11 +87,11 @@ namespace Microsoft.Xna.Framework.Content
 		
 		protected internal override Model Read(ContentReader reader, Model existingInstance)
 		{
-			List<ModelBone> bones = new List<ModelBone>();
-
             // Read the bone names and transforms.
             uint boneCount = reader.ReadUInt32();
             //Debug.WriteLine("Bone count: {0}", boneCount);
+
+            List<ModelBone> bones = new List<ModelBone>((int)boneCount);
 
             for (uint i = 0; i < boneCount; i++)
             {
@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Content
                 int partCount = reader.ReadInt32();
                 //Debug.WriteLine("Mesh part count: {0}", partCount);
 
-                List<ModelMeshPart> parts = new List<ModelMeshPart>();
+                List<ModelMeshPart> parts = new List<ModelMeshPart>(partCount);
 
                 for (uint j = 0; j < partCount; j++)
                 {

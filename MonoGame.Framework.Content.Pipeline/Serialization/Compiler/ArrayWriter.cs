@@ -25,6 +25,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             elementWriter = compiler.GetTypeWriter(typeof(T));
         }
 
+        public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        {
+            return string.Concat(   typeof(ContentTypeReader).Namespace, 
+                                    ".", 
+                                    "ArrayReader`1[[", 
+                                    elementWriter.GetRuntimeType(targetPlatform), 
+                                    "]]");
+        }
+
         /// <summary>
         /// Writes the value to the output.
         /// </summary>
