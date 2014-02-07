@@ -151,9 +151,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if WINDOWS_PHONE
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-#elif DIRECTX || PSM
+#if DIRECTX || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
@@ -188,6 +186,8 @@ namespace Microsoft.Xna.Framework
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
+#elif WINDOWS_PHONE
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
@@ -206,7 +206,6 @@ namespace Microsoft.Xna.Framework
             resetEvent.Wait();
 #endif
 #endif
-
         }
 
 #if ANDROID
