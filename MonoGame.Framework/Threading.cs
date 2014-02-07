@@ -65,6 +65,8 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
+        public const int kMaxWaitForUIThread = 12000; // In milliseconds
+
         static int mainThreadId;
         //static int currentThreadId;
 #if ANDROID
@@ -79,6 +81,10 @@ namespace Microsoft.Xna.Framework
         static Threading()
         {
 #if WINDOWS_PHONE
+            if (Thread.CurrentThread.IsBackground)
+            {
+                mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
 #else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 #endif
@@ -136,7 +142,7 @@ namespace Microsoft.Xna.Framework
                     action();
                     wait.Set();
                 });
-                wait.WaitOne();
+                wait.WaitOne(kMaxWaitForUIThread);
             }
         }
 #endif
@@ -151,7 +157,7 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if DIRECTX || PSM
+#if (DIRECTX && !WINDOWS_PHONE) || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
