@@ -134,8 +134,9 @@ namespace Microsoft.Xna.Framework {
 			if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
 			    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
             {
-                keyboardSize.Width = Math.Max(keyboardSize.Height, keyboardSize.Width);
-                keyboardSize.Height = Math.Min(keyboardSize.Height, keyboardSize.Width);
+                var tmpkeyboardSize = keyboardSize;
+                keyboardSize.Width = Math.Max(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
+                keyboardSize.Height = Math.Min(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
 			}
 
 			var view = (KeyboardInputView)View;
