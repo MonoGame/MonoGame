@@ -240,13 +240,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
                 typeWriters.Add(typeWriter);
-		if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
-			typeWriterMap.Add(typeWriter.GetType(), index);
+
+		        if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+			        typeWriterMap.Add(typeWriter.GetType(), index);
+
                 typeMap.Add(type, typeWriter);
 
-                var args = type.GetGenericArguments();
-                foreach (var arg in args)
-                    GetTypeWriter(arg);
+                // TODO: This is kinda messy.. seems like there could
+                // be a better way for generics and arrays to register
+                // their inner types with the typeWriterMap.
+                if (type.IsGenericType)
+                {
+                    var args = type.GetGenericArguments();
+                    foreach (var arg in args)
+                        GetTypeWriter(arg);
+                }
+                else if (type.IsArray)
+                {
+                    GetTypeWriter(type.GetElementType());
+                }
             }
             return typeWriter;
         }
