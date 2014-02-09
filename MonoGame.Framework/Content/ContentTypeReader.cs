@@ -128,7 +128,10 @@ namespace Microsoft.Xna.Framework.Content
             if (MetroHelper.AppDataFileExists(fileName))
                 return fileName;
 #else
-            if (File.Exists(fileName))
+            
+            // If we are checking for file location, We need to take the real location into account.
+            var absolutePath = Path.Combine(TitleContainer.Location, fileName);            
+            if (File.Exists(absolutePath))
 				return fileName;
 #endif
 			
