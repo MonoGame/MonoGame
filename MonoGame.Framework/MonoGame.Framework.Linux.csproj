@@ -44,10 +44,12 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition=" '$(DefaultLanguageSourceExtension)' != '.cs' " />
   <ItemGroup>
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -427,6 +429,10 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Libs\OpenTK.dll.config">
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Linux\Graphics\" />
@@ -443,7 +449,7 @@
   </ProjectExtensions>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Project>{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}</Project>
       <Name>Lidgren.Network.Linux</Name>
     </ProjectReference>
   </ItemGroup>

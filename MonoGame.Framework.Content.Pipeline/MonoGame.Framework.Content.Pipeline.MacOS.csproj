@@ -95,6 +95,7 @@
     <Compile Include="Graphics\AnimationContent.cs" />
     <Compile Include="Graphics\AnimationContentDictionary.cs" />
     <Compile Include="Graphics\AnimationKeyframe.cs" />
+    <Compile Include="Graphics\BasicMaterialContent.cs" />
     <Compile Include="Graphics\BitmapContent.cs" />
     <Compile Include="Graphics\BoneContent.cs" />
     <Compile Include="Graphics\BoneWeight.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Graphics\IndirectPositionCollection.cs" />
     <Compile Include="Graphics\MaterialContent.cs" />
     <Compile Include="Graphics\MeshContent.cs" />
+    <Compile Include="Graphics\MeshHelper.cs" />
     <Compile Include="Graphics\MipmapChain.cs" />
     <Compile Include="Graphics\MipmapChainCollection.cs" />
     <Compile Include="Graphics\NodeContent.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Mp3Importer.cs" />
     <Compile Include="NamedValueDictionary.cs" />
     <Compile Include="OpaqueDataDictionary.cs" />
+    <Compile Include="OpenAssetImporter.cs" />
     <Compile Include="PipelineComponentScanner.cs" />
     <Compile Include="PipelineException.cs" />
     <Compile Include="ProcessorParameter.cs" />
@@ -140,6 +143,15 @@
     <Compile Include="Processors\FontTextureProcessor.cs" />
     <Compile Include="Processors\MaterialProcessor.cs" />
     <Compile Include="Processors\MaterialProcessorDefaultEffect.cs" />
+    <Compile Include="Processors\ModelBoneContent.cs" />
+    <Compile Include="Processors\ModelBoneContentCollection.cs" />
+    <Compile Include="Processors\ModelContent.cs" />
+    <Compile Include="Processors\ModelMeshContent.cs" />
+    <Compile Include="Processors\ModelMeshContentCollection.cs" />
+    <Compile Include="Processors\ModelMeshPartContent.cs" />
+    <Compile Include="Processors\ModelMeshPartContentCollection.cs" />
+    <Compile Include="Processors\ModelProcessor.cs" />
+    <Compile Include="Processors\PassThroughProcessor.cs" />
     <Compile Include="Processors\SongContent.cs" />
     <Compile Include="Processors\SongProcessor.cs" />
     <Compile Include="Processors\SoundEffectContent.cs" />
@@ -182,11 +194,13 @@
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
+    <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
     <Compile Include="Serialization\Compiler\Int32Writer.cs" />
     <Compile Include="Serialization\Compiler\Int64Writer.cs" />
     <Compile Include="Serialization\Compiler\ListWriter.cs" />
     <Compile Include="Serialization\Compiler\MatrixWriter.cs" />
+    <Compile Include="Serialization\Compiler\ModelWriter.cs" />
     <Compile Include="Serialization\Compiler\NullableWriter.cs" />
     <Compile Include="Serialization\Compiler\PlaneWriter.cs" />
     <Compile Include="Serialization\Compiler\PointWriter.cs" />
@@ -203,6 +217,8 @@
     <Compile Include="Serialization\Compiler\Vector2Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector3Writer.cs" />
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
+    <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
+    <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
     <Compile Include="Graphics\Dxt1BitmapContent.cs" />
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
     <Compile Include="Graphics\Dxt5BitmapContent.cs" />

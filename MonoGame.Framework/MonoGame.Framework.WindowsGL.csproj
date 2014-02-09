@@ -132,6 +132,8 @@
     <Compile Include="Desktop\Input\Axis.cs" />
     <Compile Include="Desktop\Input\Capabilities.cs" />
     <Compile Include="Desktop\Input\DPad.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Desktop\Input\GamePad.cs" />
     <Compile Include="Desktop\Input\Input.cs" />
     <Compile Include="Desktop\Input\Joystick.cs" />

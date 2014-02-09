@@ -104,13 +104,13 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         private static ulong PackInFour(float vectorX, float vectorY, float vectorZ, float vectorW)
 		{
 			const float maxPos = 0x7FFF;
-			const float minNeg = ~(int)maxPos;
+            const float minNeg = -maxPos;
 
 			// clamp the value between min and max values
-            var word4 = (ulong)((int)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFFFFFF);
-            var word3 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x10);
-            var word2 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorZ * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x20);
-            var word1 = (ulong)(((int)MathHelper.Clamp((float)Math.Round(vectorW * maxPos), minNeg, maxPos) & 0xFFFFFFFF) << 0x30);
+            var word4 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorX * maxPos), minNeg, maxPos) & 0xFFFF) << 0x00;
+            var word3 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorY * maxPos), minNeg, maxPos) & 0xFFFF) << 0x10;
+            var word2 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorZ * maxPos), minNeg, maxPos) & 0xFFFF) << 0x20;
+            var word1 = ((ulong)MathHelper.Clamp((float)Math.Round(vectorW * maxPos), minNeg, maxPos) & 0xFFFF) << 0x30;
 
 			return ( word4 | word3 | word2 | word1 );
 		}
@@ -125,10 +125,10 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             const float maxVal = 0x7FFF;
 
 			var v4 = new Vector4 ();
-            v4.X = ((short)(short4Packed & 0xFFFFFFFF)) / maxVal;
-            v4.Y = ((short)(short4Packed >> 0x10) & 0xFFFFFFFF) / maxVal;
-            v4.Z = ((short)(short4Packed >> 0x20) & 0xFFFFFFFF) / maxVal;
-            v4.W = (short)(short4Packed >> 0x30) / maxVal;
+            v4.X = ((short)((short4Packed >> 0x00) & 0xFFFF)) / maxVal;
+            v4.Y = ((short)((short4Packed >> 0x10) & 0xFFFF)) / maxVal;
+            v4.Z = ((short)((short4Packed >> 0x20) & 0xFFFF)) / maxVal;
+            v4.W = ((short)((short4Packed >> 0x30) & 0xFFFF)) / maxVal;
 			return v4;
 		}
 	}

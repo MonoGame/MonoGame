@@ -87,7 +87,6 @@ namespace Microsoft.Xna.Framework.Net
 		private GamerCollection<NetworkGamer> _previousGamers;
 		
 		internal Queue<CommandEvent> commandQueue;
-        bool disposed;
 
 		// use the static Create or BeginCreate methods
 		private NetworkSession ()
@@ -105,9 +104,8 @@ namespace Microsoft.Xna.Framework.Net
 		private int privateGamerSlots;
 		private NetworkSessionProperties sessionProperties;
 		private bool isHost = false;
-		private int hostGamerIndex = -1;
 		private NetworkGamer hostingGamer;
-		
+
 		internal MonoGamerPeer networkPeer;
 		
 		private NetworkSession (NetworkSessionType sessionType, int maxGamers, int privateGamerSlots, NetworkSessionProperties sessionProperties, bool isHost, int hostGamer)
@@ -149,7 +147,6 @@ namespace Microsoft.Xna.Framework.Net
 			this.privateGamerSlots = privateGamerSlots;
 			this.sessionProperties = sessionProperties;
 			this.isHost = isHost;
-			this.hostGamerIndex = hostGamer;            
             if (isHost)
                 networkPeer = new MonoGamerPeer(this, null);
             else
@@ -741,9 +738,12 @@ namespace Microsoft.Xna.Framework.Net
 				}
 			} 
 			catch (Exception exc) {
+                if (exc != null)
+                {
 #if DEBUG				
 				Console.WriteLine("Error in NetworkSession Update: " + exc.Message);
-#endif	
+#endif
+                }
 			}
 			finally {
 			}
@@ -759,7 +759,6 @@ namespace Microsoft.Xna.Framework.Net
 		{
 			networkPeer.SendData(command.data, command.options);
 
-			NetworkGamer sender;
 			CommandReceiveData crd = new CommandReceiveData (command.sender.RemoteUniqueIdentifier,
 								command.data);
 			crd.gamer = command.sender;
@@ -1105,6 +1104,14 @@ namespace Microsoft.Xna.Framework.Net
 		public event EventHandler<HostChangedEventArgs> HostChanged;
 		public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
 		public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
+
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return
+                HostChanged != null &&
+                InviteAccepted != null;
+        }
+
 		#endregion
 
         internal static void Exit()

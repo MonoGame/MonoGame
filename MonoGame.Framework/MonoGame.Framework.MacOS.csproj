@@ -73,6 +73,8 @@
   <ItemGroup>
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
+    <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
@@ -204,7 +206,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
@@ -470,7 +472,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Project>{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
   </ItemGroup>
