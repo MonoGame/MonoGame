@@ -324,7 +324,7 @@ namespace Microsoft.Xna.Framework.Content
             {
 				//MonoGame try to load as a non-content file
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
+                assetName = TitleContainer.GetAbsoluteFilename(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 	

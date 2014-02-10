@@ -62,8 +62,10 @@ namespace Microsoft.Xna.Framework
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-#elif IOS || MONOMAC
+#elif IOS
 			Location = NSBundle.MainBundle.ResourcePath;
+#elif MONOMAC
+			Location = NSBundle.MainBundle.BundlePath;
 #elif PSM
 			Location = "/Application";
 #else
@@ -109,7 +111,16 @@ namespace Microsoft.Xna.Framework
         public static Stream OpenStream(string name)
         {
             // Normalize the file path.
-            var safeName = GetFilename(name);
+			var safeName = GetFilename(name);
+
+			if (safeName.StartsWith (Location)) 
+			{
+				safeName = safeName.Substring (Location.Length);
+				if (safeName [0] == Path.DirectorySeparatorChar) 
+				{
+					safeName = safeName.Substring(1);
+				}
+			}
 
             // We do not accept absolute paths here.
             if (Path.IsPathRooted(safeName))
@@ -156,6 +167,21 @@ namespace Microsoft.Xna.Framework
 #endif
             return name;
         }
+        
+        
+        
+        // Takes a filename and maps it into our location folder for content        
+        internal static string GetAbsoluteFilename(string name)
+        {            
+#if WINRT
+            // Replace non-windows seperators.
+            return GetFilename(name);
+#else
+            // Replace Windows path separators with local path separators
+            return Path.Combine(Location,GetFilename(name));             
+#endif
+            
+        }        
     }
 }
 
