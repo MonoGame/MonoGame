@@ -269,7 +269,38 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			return stream;
 		}
-
+  
+        /// <summary>
+        /// Reads the asset.
+        /// This will attempt to load the asset by calling OpenStream which will
+        /// add .xnb on the end and hope for the best. Then an exception is thrown
+        /// and it will attempt to load the resource via normalising the filename name
+        /// and reading it using ReadRawAsset
+        /// </summary>
+        /// <returns>
+        /// The asset.
+        /// </returns>
+        /// <param name='assetName'>
+        /// Asset name.
+        /// </param>
+        /// <param name='recordDisposableObject'>
+        /// Record disposable object.
+        /// </param>
+        /// <typeparam name='T'>
+        /// The 1st type parameter.
+        /// </typeparam>
+        /// <exception cref='ArgumentNullException'>
+        /// Is thrown when the argument null exception.
+        /// </exception>
+        /// <exception cref='ObjectDisposedException'>
+        /// Is thrown when the object disposed exception.
+        /// </exception>
+        /// <exception cref='InvalidOperationException'>
+        /// Is thrown when the invalid operation exception.
+        /// </exception>
+        /// <exception cref='ContentLoadException'>
+        /// Is thrown when the content load exception.
+        /// </exception>
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
 			if (string.IsNullOrEmpty(assetName))
@@ -323,9 +354,13 @@ namespace Microsoft.Xna.Framework.Content
             catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
-
+    
+#if PSM || OSX
+                assetName = TitleContainer.GetAbsoluteFilename(Path.Combine(RootDirectory, assetName));
+#else                
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
-
+#endif                
+                    
                 assetName = Normalize<T>(assetName);
 	
 				if (string.IsNullOrEmpty(assetName))

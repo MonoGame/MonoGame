@@ -369,7 +369,7 @@ namespace Microsoft.Xna.Framework.Storage
 			return new StorageDevice (null, sizeInBytes, directoryCount);
 		}
 		
-		/*
+		
 		//
 		//
 		// Parameters:
@@ -378,9 +378,8 @@ namespace Microsoft.Xna.Framework.Storage
 		public void DeleteContainer (string titleName)
 		{
 			throw new NotImplementedException ();
-		}			
-        */
 
+		}			
 		//
 		// Summary:
 		//     Ends the process for opening a StorageContainer.
@@ -493,8 +492,6 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 osConfigDir += "/Library/Application Support";
                 return osConfigDir;
-#elif PSM
-				return "/Documents/";
 #else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 #endif
