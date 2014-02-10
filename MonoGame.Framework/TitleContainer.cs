@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework
             // Normalize the file path.
 			var safeName = GetFilename(name);
    
-#if OSX || PSM            
+#if PSM || MONOMAC
             // Code below wants path to be non root which is an 
             // issue because the code that feeds this seems to 
             // use ContentManger.RootPath to create the path, so we            
