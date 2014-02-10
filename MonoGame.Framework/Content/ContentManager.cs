@@ -355,7 +355,7 @@ namespace Microsoft.Xna.Framework.Content
             {
 				//MonoGame try to load as a non-content file
     
-#if PSM || OSX
+#if PSM || MONOMAC
                 assetName = TitleContainer.GetAbsoluteFilename(Path.Combine(RootDirectory, assetName));
 #else                
                 assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
