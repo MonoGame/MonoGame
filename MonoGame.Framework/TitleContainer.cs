@@ -62,10 +62,8 @@ namespace Microsoft.Xna.Framework
             Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
             Location = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-#elif IOS
+#elif IOS || MONOMAC
 			Location = NSBundle.MainBundle.ResourcePath;
-#elif MONOMAC
-			Location = NSBundle.MainBundle.BundlePath;
 #elif PSM
 			Location = "/Application";
 #else
@@ -113,7 +111,7 @@ namespace Microsoft.Xna.Framework
             // Normalize the file path.
 			var safeName = GetFilename(name);
    
-#if PSM || MONOMAC
+#if PSM            
             // Code below wants path to be non root which is an 
             // issue because the code that feeds this seems to 
             // use ContentManger.RootPath to create the path, so we            
