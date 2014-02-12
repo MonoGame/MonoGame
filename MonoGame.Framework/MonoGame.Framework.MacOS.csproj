@@ -17,6 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\MacOS\Debug</OutputPath>
+    <IntermediateOutputPath>obj\MacOS\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;MONOMAC;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,6 +33,7 @@
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\MacOS\Release</OutputPath>
+    <IntermediateOutputPath>obj\MacOS\Release</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -47,6 +49,7 @@
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\MacOS\Distribution</OutputPath>
+    <IntermediateOutputPath>obj\MacOS\Distribution</IntermediateOutputPath>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>MONOMAC;OPENGL</DefineConstants>

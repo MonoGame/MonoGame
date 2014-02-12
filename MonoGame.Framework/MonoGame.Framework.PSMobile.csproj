@@ -16,6 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\PSMobile\Debug</OutputPath>
+    <IntermediateOutputPath>obj\PSMobile\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;PSM</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,6 +27,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\PSMobile\Release</OutputPath>
+    <IntermediateOutputPath>obj\PSMobile\Release</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
