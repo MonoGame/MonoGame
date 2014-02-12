@@ -138,38 +138,22 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public SoundEffect (byte[] buffer, int sampleRate, AudioChannels channels)
 		{
-			//buffer should contain 16-bit PCM wave data
-			short bitsPerSample = 16;
+            //buffer should contain 16-bit PCM wave data
+            short bitsPerSample = 16;
 
-			MemoryStream mStream = new MemoryStream (44 + buffer.Length);
-			BinaryWriter writer = new BinaryWriter (mStream);
+            Rate = (float)sampleRate;
+            Size = (int)buffer.Length;
 
-			writer.Write ("RIFF".ToCharArray ()); //chunk id
-			writer.Write ((int)(36 + buffer.Length)); //chunk size
-			writer.Write ("WAVE".ToCharArray ()); //RIFF type
+            if ((int)channels <= 1)
+                Format = bitsPerSample == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
+            else
+                Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
-			writer.Write ("fmt ".ToCharArray ()); //chunk id
-			writer.Write ((int)16); //format header size
-			writer.Write ((short)1); //format (PCM)
-			writer.Write ((short)channels);
-			writer.Write ((int)sampleRate);
-			short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
-			writer.Write ((int)(sampleRate * blockAlign)); //byte rate
-			writer.Write ((short)blockAlign);
-			writer.Write ((short)bitsPerSample);
+            var _dblDuration = (Size / ((bitsPerSample / 8) * (((int)channels == 0) ? 1 : (int)channels))) / Rate;
+            _duration = TimeSpan.FromSeconds(_dblDuration);
 
-			writer.Write ("data".ToCharArray ()); //chunk id
-			writer.Write ((int)buffer.Length); //data size
-			writer.Write (buffer);
-
-			writer.Close ();
-			mStream.Close ();
-
-			_data = mStream.ToArray ();
-			_name = "";
-
-			LoadAudioStream (_data);
-
+            _name = "";
+            _data = buffer;
 		}        
         /// <summary>
         /// Loads the audio stream from the given byte array. If the AudioFileStream does not return an Ok status
@@ -192,9 +176,12 @@ namespace Microsoft.Xna.Framework.Audio
             else
                 Format = asbd.BitsPerChannel == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
-            _data = audiodata;
+            byte []d = new byte[afs.DataByteCount];
+            Array.Copy (audiodata, afs.DataOffset, d, 0, afs.DataByteCount);
 
-            var _dblDuration = (Size / ((asbd.BitsPerChannel / 8) * asbd.ChannelsPerFrame == 0 ? 1 : asbd.ChannelsPerFrame)) / asbd.SampleRate;
+            _data = d;
+
+            var _dblDuration = (Size / ((asbd.BitsPerChannel / 8) * ((asbd.ChannelsPerFrame == 0) ? 1 : asbd.ChannelsPerFrame))) / asbd.SampleRate;
             _duration = TimeSpan.FromSeconds(_dblDuration);
 
 			afs.Close ();
