@@ -8,8 +8,11 @@ namespace Microsoft.Xna.Framework.Input
 
         internal static void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            back = true;
-            e.Cancel = true;
+            if (!e.Cancel)
+            {
+                back = true;
+                e.Cancel = true;
+            }
         }
 
         public static Microsoft.Xna.Framework.Input.GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)

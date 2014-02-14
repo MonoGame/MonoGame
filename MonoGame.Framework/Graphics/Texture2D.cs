@@ -249,7 +249,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if PSM
         private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
-        {
+        {            
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+           
+            GraphicsDevice = graphicsDevice;
+                       
             byte[] bytes = new byte[stream.Length];
             stream.Read(bytes, 0, (int)stream.Length);
             _texture2D = new PssTexture2D(bytes, false);
