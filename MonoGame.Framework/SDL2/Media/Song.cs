@@ -154,6 +154,12 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
+		public bool IsDisposed
+		{
+			get;
+			private set;
+		}
+
 		#endregion
 
 		#region Internal Properties
@@ -190,6 +196,7 @@ namespace Microsoft.Xna.Framework.Media
 			FilePath = fileName;
 			initializeMixer();
 			INTERNAL_mixMusic = SDL_mixer.Mix_LoadMUS(fileName);
+			IsDisposed = false;
 		}
 
 		~Song()
@@ -213,6 +220,7 @@ namespace Microsoft.Xna.Framework.Media
 					SDL_mixer.Mix_FreeMusic(INTERNAL_mixMusic);
 				}
 			}
+			IsDisposed = true;
 		}
 
 		#endregion

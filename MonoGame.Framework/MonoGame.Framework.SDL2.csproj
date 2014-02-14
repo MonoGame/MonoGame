@@ -15,6 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\SDL2\Debug</OutputPath>
+    <IntermediateOutputPath>obj\SDL2\Debug</IntermediateOutputPath>
     <DefineConstants>DEBUG;SDL2;OPENGL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,6 +27,7 @@
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\SDL2\Release</OutputPath>
+    <IntermediateOutputPath>obj\SDL2\Release</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
