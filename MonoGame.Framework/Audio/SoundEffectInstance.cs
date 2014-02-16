@@ -322,7 +322,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if DIRECTX            
             if (_voice != null)
+            {   
                 _voice.Stop(immediate ? 0 : (int)PlayFlags.Tails);
+                if (immediate) _voice.FlushSourceBuffers();
+            }
 
             _paused = false;
 #else
