@@ -92,6 +92,13 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
   File '..\..\ThirdParty\Libs\lame_enc.dll'
 
+  ; Install the MonoGame Content Builder to a subfolder both
+  ; to avoid conflicting assemblies and to make it easy for end
+  ; users to copy all the necessary files for distribution.
+  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\MGCB
+  File /r '..\..\Tools\MGCB\bin\Release\*.exe'
+  File /r '..\..\Tools\MGCB\bin\Release\*.dll'
+
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\Release\*.xml'  

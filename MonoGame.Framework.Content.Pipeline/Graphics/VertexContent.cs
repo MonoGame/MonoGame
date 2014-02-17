@@ -45,16 +45,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Number of vertices for the content.
         /// </summary>
         /// <value>Number of vertices.</value>
-        public int VertexCount { get { return positions.Count; } }
+        public int VertexCount { get { return positionIndices.Count; } }
 
         /// <summary>
         /// Constructs a VertexContent instance.
         /// </summary>
-        internal VertexContent()
+        internal VertexContent(GeometryContent geom)
         {
-            channels = new VertexChannelCollection(this);
             positionIndices = new VertexChannel<int>("PositionIndices");
-            positions = new IndirectPositionCollection();
+            positions = new IndirectPositionCollection(geom, positionIndices);
+            channels = new VertexChannelCollection(this);
         }
 
         /// <summary>
