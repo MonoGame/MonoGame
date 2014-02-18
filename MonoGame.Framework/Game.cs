@@ -608,6 +608,8 @@ namespace Microsoft.Xna.Framework
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
 
+            Platform.IsActive = true;
+
             // FIXME: If this test fails, is LoadContent ever called?  This
             //        seems like a condition that warrants an exception more
             //        than a silent failure.
