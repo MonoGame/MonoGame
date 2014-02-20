@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #endif
@@ -20,104 +19,24 @@ using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
-#endif
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class VertexBuffer
     {
-        internal bool _isDynamic;
-
-#if DIRECTX
-        private SharpDX.Direct3D11.VertexBufferBinding _binding;
-        private SharpDX.Direct3D11.Buffer _buffer;
-
-        internal SharpDX.Direct3D11.VertexBufferBinding Binding
-        {
-            get
-            {
-                GenerateIfRequired();
-                return _binding;
-            }
-        }
-#endif
-#if PSM
-        internal Array _vertexArray;
-#endif
-#if OPENGL
 		//internal uint vao;
 		internal uint vbo;
-#endif
-	
-		public int VertexCount { get; private set; }
-		public VertexDeclaration VertexDeclaration { get; private set; }
-		public BufferUsage BufferUsage { get; private set; }
-		
-		protected VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage, bool dynamic)
-		{
-			if (graphicsDevice == null)
-                throw new ArgumentNullException("Graphics Device Cannot Be null");
-
-            this.GraphicsDevice = graphicsDevice;
-            this.VertexDeclaration = vertexDeclaration;
-            this.VertexCount = vertexCount;
-            this.BufferUsage = bufferUsage;
-
-            // Make sure the graphics device is assigned in the vertex declaration.
-            if (vertexDeclaration.GraphicsDevice != graphicsDevice)
-                vertexDeclaration.GraphicsDevice = graphicsDevice;
-
-            _isDynamic = dynamic;
-
-            PlatformConstruct();
-		}
 
         private void PlatformConstruct()
         {
-#if DIRECTX
-            GenerateIfRequired();
-#endif
-#if OPENGL
             Threading.BlockOnUIThread(GenerateIfRequired);
-#endif
-        }
-
-        public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
-			this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false)
-        {
-        }
-		
-		public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
-			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
-		{
-        }
-
-        /// <summary>
-        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
-        /// </summary>
-        internal protected override void GraphicsDeviceResetting()
-        {
-            PlatformGraphicsDeviceResetting();
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
-#if OPENGL
             vbo = 0;
-#endif
-
-#if DIRECTX
-
-            _binding = new SharpDX.Direct3D11.VertexBufferBinding();
-            SharpDX.Utilities.Dispose(ref _buffer);
-
-#endif
         }
 
-#if OPENGL
         /// <summary>
         /// If the VBO does not exist, create it.
         /// </summary>
@@ -141,54 +60,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
         }
-#endif
-
-#if DIRECTX
-
-        void GenerateIfRequired()
-        {
-            if (_buffer != null)
-                return;
-
-            // TODO: To use Immutable resources we would need to delay creation of 
-            // the Buffer until SetData() and recreate them if set more than once.
-
-            var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            var usage = SharpDX.Direct3D11.ResourceUsage.Default;
-
-            if (_isDynamic)
-            {
-                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
-                usage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
-            }
-
-            _buffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice,
-                                                        VertexDeclaration.VertexStride * VertexCount,
-                                                        usage,
-                                                        SharpDX.Direct3D11.BindFlags.VertexBuffer,
-                                                        accessflags,
-                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
-                                                        0  // StructureSizeInBytes
-                                                        );
-
-            _binding = new SharpDX.Direct3D11.VertexBufferBinding(_buffer, VertexDeclaration.VertexStride, 0);
-        }
-
-#endif
-
-        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
-        {
-            if (data == null)
-                throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
-            if (data.Length < (startIndex + elementCount))
-                throw new ArgumentOutOfRangeException("elementCount", "This parameter must be a valid index within the array.");
-            if (BufferUsage == BufferUsage.WriteOnly)
-                throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
-			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
-                throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
-
-            PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
-        }
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -197,61 +68,6 @@ namespace Microsoft.Xna.Framework.Graphics
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
             throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
 #endif
-
-#if DIRECTX
-
-            GenerateIfRequired();
-
-            if (_isDynamic)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                var deviceContext = GraphicsDevice._d3dContext;
-
-                // Copy the buffer to a staging resource
-                var stagingDesc = _buffer.Description;
-                stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
-                stagingDesc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read | SharpDX.Direct3D11.CpuAccessFlags.Write;
-                stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
-                stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
-                var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
-
-                lock (GraphicsDevice._d3dContext)
-                    deviceContext.CopyResource(_buffer, stagingBuffer);
-
-                int TsizeInBytes = SharpDX.Utilities.SizeOf<T>();
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * vertexStride;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, data.Length * TsizeInBytes);
-
-                lock (GraphicsDevice._d3dContext)
-                {
-                    // Map the staging resource to a CPU accessible memory
-                    var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
-
-                    if (vertexStride == TsizeInBytes)
-                    {
-                        SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, vertexStride * elementCount);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < data.Length; i++)
-                            SharpDX.Utilities.CopyMemory(dataPtr + i * TsizeInBytes, box.DataPointer + i * vertexStride + offsetInBytes, TsizeInBytes);
-                    }
-
-                    // Make sure that we unmap the resource in case of an exception
-                    deviceContext.UnmapSubresource(stagingBuffer, 0);
-                }
-                stagingBuffer.Dispose();
-            }
-#endif
-#if PSM
-            throw new NotImplementedException();
-#endif
-#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride);
@@ -260,10 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
             }
-#endif
         }
 
-#if OPENGL && !GLES
+#if !GLES
 
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -311,103 +126,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         
 #endif
-        
-        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+
+        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes) where T : struct
         {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            this.GetData<T>(0, data, startIndex, elementCount, elementSizeInByte);
-        }
-
-        public void GetData<T>(T[] data) where T : struct
-        {
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-            this.GetData<T>(0, data, 0, data.Count(), elementSizeInByte);
-        }
-
-        public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
-        {
-            SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
-        }
-        		
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-        {
-            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
-		}
-		
-        public void SetData<T>(T[] data) where T : struct
-        {
-            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.None);
-        }
-
-        protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
-        {
-            if (data == null)
-                throw new ArgumentNullException("data is null");
-            if (data.Length < (startIndex + elementCount))
-                throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
-
-            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
-            if ((vertexStride > bufferSize) || (vertexStride < VertexDeclaration.VertexStride))
-                throw new ArgumentOutOfRangeException("One of the following conditions is true:\nThe vertex stride is larger than the vertex buffer.\nThe vertex stride is too small for the type of data requested.");
-   
-#if !PSM
-            var elementSizeInBytes = Marshal.SizeOf(typeof(T));
-#endif
-
-            PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options, elementSizeInBytes);
-        }
-
-        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options, int elementSizeInBytes) where T : struct
-        {
-#if DIRECTX
-
-            GenerateIfRequired();
-
-            if (_isDynamic)
-            {
-                // We assume discard by default.
-                var mode = SharpDX.Direct3D11.MapMode.WriteDiscard;
-                if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
-                    mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
-
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                {
-                    var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
-                    SharpDX.Utilities.Write(IntPtr.Add(dataBox.DataPointer, offsetInBytes), data, startIndex,
-                                            elementCount);
-                    d3dContext.UnmapSubresource(_buffer, 0);
-                }
-            }
-            else
-            {
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                var startBytes = startIndex * elementSizeInBytes;
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-
-                var box = new SharpDX.DataBox(dataPtr, 1, 0);
-
-                var region = new SharpDX.Direct3D11.ResourceRegion();
-                region.Top = 0;
-                region.Front = 0;
-                region.Back = 1;
-                region.Bottom = 1;
-                region.Left = offsetInBytes;
-                region.Right = offsetInBytes + (elementCount * elementSizeInBytes);
-
-                lock (GraphicsDevice._d3dContext)
-                    GraphicsDevice._d3dContext.UpdateSubresource(box, _buffer, 0, region);
-
-                dataHandle.Free();
-            }
-
-#endif
-#if PSM
-            if (_vertexArray == null)
-                _vertexArray = new T[VertexCount];
-            Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
-#endif
-#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options);
@@ -416,10 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() => SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options));
             }
-#endif
         }
-
-#if OPENGL
 
         private void SetBufferData<T>(int bufferSize, int elementSizeInBytes, int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
@@ -448,41 +166,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             dataHandle.Free();
         }
-        
-#endif
-        
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose(disposing);
-            }
-            base.Dispose(disposing);
-		}
 
         private void PlatformDispose(bool disposing)
         {
-#if DIRECTX
-            if (disposing)
-            {
-                if (_buffer != null)
-                {
-                    _buffer.Dispose();
-                    _buffer = null;
-                }
-            }
-#endif
-#if PSM
-                //Do nothing
-                _vertexArray = null;
-#endif
-#if OPENGL
+
                 GraphicsDevice.AddDisposeAction(() =>
                     {
                         GL.DeleteBuffers(1, ref vbo);
                         GraphicsExtensions.CheckGLError();
                     });
-#endif
         }
     }
 }
