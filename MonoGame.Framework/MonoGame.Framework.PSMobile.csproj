@@ -334,6 +334,7 @@
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="GameWindow.cs" />

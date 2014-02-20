@@ -27,7 +27,7 @@ using Sce.PlayStation.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class VertexBuffer : GraphicsResource
+    public partial class VertexBuffer : GraphicsResource
     {
         internal bool _isDynamic;
 
@@ -72,13 +72,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _isDynamic = dynamic;
 
+            PlatformConstruct();
+		}
+
+        private void PlatformConstruct()
+        {
 #if DIRECTX
             GenerateIfRequired();
 #endif
 #if OPENGL
             Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
-		}
+        }
 
         public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false)
@@ -94,6 +99,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The GraphicsDevice is resetting, so GPU resources must be recreated.
         /// </summary>
         internal protected override void GraphicsDeviceResetting()
+        {
+            PlatformGraphicsDeviceResetting();
+        }
+
+        private void PlatformGraphicsDeviceResetting()
         {
 #if OPENGL
             vbo = 0;
@@ -177,6 +187,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
                 throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
 
+            PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride);
+        }
+
+        private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
+        {
 #if GLES
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
@@ -194,7 +209,7 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 var deviceContext = GraphicsDevice._d3dContext;
-                
+
                 // Copy the buffer to a staging resource
                 var stagingDesc = _buffer.Description;
                 stagingDesc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
@@ -202,7 +217,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 stagingDesc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
                 stagingDesc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
                 var stagingBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice, stagingDesc);
-                
+
                 lock (GraphicsDevice._d3dContext)
                     deviceContext.CopyResource(_buffer, stagingBuffer);
 
@@ -339,6 +354,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
 #endif
 
+            PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options, elementSizeInBytes);
+        }
+
+        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options, int elementSizeInBytes) where T : struct
+        {
 #if DIRECTX
 
             GenerateIfRequired();
@@ -435,15 +455,22 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
+                PlatformDispose(disposing);
+            }
+            base.Dispose(disposing);
+		}
+
+        private void PlatformDispose(bool disposing)
+        {
 #if DIRECTX
-                if (disposing)
+            if (disposing)
+            {
+                if (_buffer != null)
                 {
-                    if (_buffer != null)
-                    {
-                        _buffer.Dispose();
-                        _buffer = null;
-                    }
+                    _buffer.Dispose();
+                    _buffer = null;
                 }
+            }
 #endif
 #if PSM
                 //Do nothing
@@ -456,8 +483,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         GraphicsExtensions.CheckGLError();
                     });
 #endif
-            }
-            base.Dispose(disposing);
-		}
+        }
     }
 }
