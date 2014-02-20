@@ -109,6 +109,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private static int _nextTouchId = 2;
 
         /// <summary>
+        /// The currently enabled gestures.
+        /// </summary>
+        private static GestureType _enabledGestures;
+
+        /// <summary>
         /// The mapping between platform specific touch ids
         /// and the touch ids we assign to touch locations.
         /// </summary>
@@ -391,11 +396,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 UpdateTouchScale();
             }
         }
-		
+        
         /// <summary>
         /// Gets or sets enabled gestures.
         /// </summary>
-        public static GestureType EnabledGestures { get; set; }
+        public static GestureType EnabledGestures
+        {
+            get { return _enabledGestures; }
+            set
+            {
+                if (_enabledGestures != value)
+                {
+                    _enabledGestures = value;
+                    ReleaseAllTouches();
+                }
+            }
+        }
 
         public static bool EnableMouseTouchPoint { get; set; }
 
