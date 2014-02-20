@@ -296,33 +296,22 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Stop()
         {
-#if DIRECTX
-            if (_voice != null)
-            {
-                _voice.Stop(0);
-                _voice.FlushSourceBuffers();
-            }
-
-		    _paused = false;
-#else
-            if ( _sound != null )
-			{
-#if ANDROID
-				_sound.Stop(_streamId);
-				_streamId = -1;
-#else
-                _sound.Stop();
-#endif
-                soundState = SoundState.Stopped;
-			}
-#endif
+            Stop(true);
         }
 
         public void Stop(bool immediate)
         {
 #if DIRECTX            
             if (_voice != null)
-                _voice.Stop(immediate ? 0 : (int)PlayFlags.Tails);
+            {   
+                if (immediate)
+                {
+                    _voice.Stop(0);
+                    _voice.FlushSourceBuffers();
+                }
+                else 
+                    _voice.Stop((int)PlayFlags.Tails);
+            }
 
             _paused = false;
 #else

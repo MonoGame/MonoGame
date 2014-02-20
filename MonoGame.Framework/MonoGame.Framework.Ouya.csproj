@@ -25,6 +25,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\OUYA\Debug\</OutputPath>
+    <IntermediateOutputPath>obj\OUYA\Debug\</IntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;ANDROID;GLES;GLSL;OPENGL;OUYA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -36,6 +37,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\OUYA\Release\</OutputPath>
+    <IntermediateOutputPath>obj\OUYA\Release\</IntermediateOutputPath>
     <DefineConstants>TRACE;ANDROID;GLES;OPENGL;OUYA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
