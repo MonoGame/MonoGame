@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,14 +11,17 @@ using System.Runtime.InteropServices;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#endif
+#if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif GLES
+#endif
+#if GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
-#elif PSM
+#endif
+#if PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
 
@@ -36,10 +43,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _binding;
             }
         }
-
-#elif PSM
+#endif
+#if PSM
         internal Array _vertexArray;
-#else
+#endif
+#if OPENGL
 		//internal uint vao;
 		internal uint vbo;
 #endif
@@ -65,12 +73,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _isDynamic = dynamic;
 
 #if DIRECTX
-
             GenerateIfRequired();
-
-#elif PSM
-            //Do nothing, we cannot create the storage array yet
-#else
+#endif
+#if OPENGL
             Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
 		}
@@ -163,11 +168,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-#if GLES
-            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
-            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
-            throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
-#else
             if (data == null)
                 throw new ArgumentNullException("data", "This method does not accept null for this parameter.");
             if (data.Length < (startIndex + elementCount))
@@ -176,6 +176,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 			if ((elementCount * vertexStride) > (VertexCount * VertexDeclaration.VertexStride))
                 throw new InvalidOperationException("The array is not the correct size for the amount of data requested.");
+
+#if GLES
+            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
+            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
+            throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
+#endif
 
 #if DIRECTX
 
@@ -226,10 +232,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 stagingBuffer.Dispose();
             }
-#elif PSM
+#endif
+#if PSM
             throw new NotImplementedException();
-#else
-
+#endif
+#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride);
@@ -238,8 +245,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread (() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
             }
-
-#endif
 #endif
         }
 
@@ -376,12 +381,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 dataHandle.Free();
             }
 
-#elif PSM
+#endif
+#if PSM
             if (_vertexArray == null)
                 _vertexArray = new T[VertexCount];
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
-#else
-
+#endif
+#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 SetBufferData(bufferSize, elementSizeInBytes, offsetInBytes, data, startIndex, elementCount, vertexStride, options);
@@ -438,10 +444,12 @@ namespace Microsoft.Xna.Framework.Graphics
                         _buffer = null;
                     }
                 }
-#elif PSM
+#endif
+#if PSM
                 //Do nothing
                 _vertexArray = null;
-#else
+#endif
+#if OPENGL
                 GraphicsDevice.AddDisposeAction(() =>
                     {
                         GL.DeleteBuffers(1, ref vbo);
