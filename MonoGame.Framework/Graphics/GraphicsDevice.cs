@@ -421,13 +421,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
-   
+
+            PlatformSetup();
+
+            Textures = new TextureCollection (MaxTextureSlots);
+			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+
+        }
+
+        private void PlatformSetup()
+        {
 #if PSM
             MaxTextureSlots = 8;
 #else
             MaxTextureSlots = 16;
 #endif
-            
+
 #if OPENGL
 #if GLES
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
@@ -457,10 +466,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             _extensions = GetGLExtensions();
 #endif // OPENGL
-
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
-
         }
 
         ~GraphicsDevice()
@@ -503,6 +508,43 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             GraphicsCapabilities.Initialize(this);
 
+            PlatformInitialize();
+
+            // Force set the default render states.
+            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
+            BlendState = BlendState.Opaque;
+            DepthStencilState = DepthStencilState.Default;
+            RasterizerState = RasterizerState.CullCounterClockwise;
+
+            // Clear the texture and sampler collections forcing
+            // the state to be reapplied.
+            Textures.Clear();
+            SamplerStates.Clear();
+
+            ClearLayouts();
+
+            // Clear constant buffers
+            _vertexConstantBuffers.Clear();
+            _pixelConstantBuffers.Clear();
+
+            // Force set the buffers and shaders on next ApplyState() call
+            _indexBufferDirty = true;
+            _vertexBufferDirty = true;
+            _vertexShaderDirty = true;
+            _pixelShaderDirty = true;
+
+            // Set the default scissor rect.
+            _scissorRectangleDirty = true;
+            ScissorRectangle = _viewport.Bounds;
+
+            // Set the default render target.
+            ApplyRenderTargets(null);
+
+            PlatformPostInitialize();
+        }
+
+        private void PlatformInitialize()
+        {
 #if DIRECTX
 
 #if WINDOWS_PHONE
@@ -531,43 +573,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics = new GraphicsContext();
 #elif OPENGL
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
-#endif
 
-            // Force set the default render states.
-            _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
-            BlendState = BlendState.Opaque;
-            DepthStencilState = DepthStencilState.Default;
-            RasterizerState = RasterizerState.CullCounterClockwise;
-
-            // Clear the texture and sampler collections forcing
-            // the state to be reapplied.
-            Textures.Clear();
-            SamplerStates.Clear();
-
-            ClearLayouts();
-
-            // Clear constant buffers
-            _vertexConstantBuffers.Clear();
-            _pixelConstantBuffers.Clear();
-
-#if OPENGL
             // Ensure the vertex attributes are reset
             _enabledVertexAttributes.Clear();
 #endif
+        }
 
-            // Force set the buffers and shaders on next ApplyState() call
-            _indexBufferDirty = true;
-            _vertexBufferDirty = true;
-            _vertexShaderDirty = true;
-            _pixelShaderDirty = true;
-
-            // Set the default scissor rect.
-            _scissorRectangleDirty = true;
-            ScissorRectangle = _viewport.Bounds;
-
-            // Set the default render target.
-            ApplyRenderTargets(null);
-
+        private void PlatformPostInitialize()
+        {
 #if OPENGL
             // Free all the cached shader programs. 
             _programCache.Clear();
@@ -1205,7 +1218,21 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Clear(Color color)
         {
 			var options = ClearOptions.Target;
+            PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
+        }
 
+        public void Clear(ClearOptions options, Color color, float depth, int stencil)
+        {
+            PlatformClear(options, color.ToVector4(), depth, stencil);
+        }
+
+		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
+		{
+            PlatformClear(options, color, depth, stencil);
+        }
+
+        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        {
 #if DIRECTX
 
             if (_currentDepthStencilView != null)
@@ -1216,24 +1243,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     options |= ClearOptions.Stencil;
             }
 
-#else
-            // TODO: We need to figure out how to detect if
-            // we have a depth stencil buffer or not!
-            options |= ClearOptions.DepthBuffer;
-            options |= ClearOptions.Stencil;
-#endif
-
-            Clear(options, color.ToVector4(), _viewport.MaxDepth, 0);
-        }
-
-        public void Clear(ClearOptions options, Color color, float depth, int stencil)
-        {
-            Clear (options, color.ToVector4 (), depth, stencil);
-        }
-
-		public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
-		{
-#if DIRECTX
             lock (_d3dContext)
             {
                 // Clear the diffuse render buffer.
@@ -1258,10 +1267,19 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #elif PSM
+            // TODO: We need to figure out how to detect if
+            // we have a depth stencil buffer or not!
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
 
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
 #elif OPENGL
+
+            // TODO: We need to figure out how to detect if
+            // we have a depth stencil buffer or not!
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
 
             // Unlike with XNA and DirectX...  GL.Clear() obeys several
             // different render states:
@@ -1346,13 +1364,22 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Dispose of all remaining graphics resources before disposing of the graphics device
                     GraphicsResource.DisposeAll();
 
+                    PlatformDispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        private void PlatformDispose()
+        {
 #if DIRECTX
 
-                    ClearLayouts();
-                    SharpDX.Utilities.Dispose(ref _renderTargetView);
-                    SharpDX.Utilities.Dispose(ref _depthStencilView);
-                    SharpDX.Utilities.Dispose(ref _d3dDevice);
-                    SharpDX.Utilities.Dispose(ref _d3dContext);
+            ClearLayouts();
+            SharpDX.Utilities.Dispose(ref _renderTargetView);
+            SharpDX.Utilities.Dispose(ref _depthStencilView);
+            SharpDX.Utilities.Dispose(ref _d3dDevice);
+            SharpDX.Utilities.Dispose(ref _d3dContext);
 
 #if WINDOWS_STOREAPP
 
@@ -1418,10 +1445,6 @@ namespace Microsoft.Xna.Framework.Graphics
                         _graphics = null;
                     }
 #endif
-                }
-
-                _isDisposed = true;
-            }
         }
 
 #if OPENGL
@@ -1592,13 +1615,19 @@ namespace Microsoft.Xna.Framework.Graphics
             set
             {
                 _viewport = value;
+                PlatformSetViewport(ref value);
+            }
+        }
+
+        private void PlatformSetViewport(ref Viewport value)
+        {
 #if DIRECTX
-                if (_d3dContext != null)
-                {
-                    var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
-                    lock (_d3dContext)
-                        _d3dContext.Rasterizer.SetViewport(viewport);
-                }
+            if (_d3dContext != null)
+            {
+                var viewport = new SharpDX.ViewportF(_viewport.X, _viewport.Y, (float)_viewport.Width, (float)_viewport.Height, _viewport.MinDepth, _viewport.MaxDepth);
+                lock (_d3dContext)
+                    _d3dContext.Rasterizer.SetViewport(viewport);
+            }
 #elif OPENGL
                 if (IsRenderTargetBound)
                     GL.Viewport(value.X, value.Y, value.Width, value.Height);
@@ -1620,7 +1649,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     value.X, value.Y, value.Width, value.Height
                 );
 #endif
-            }
         }
 
         public GraphicsProfile GraphicsProfile { get; set; }
@@ -1723,20 +1751,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _currentRenderTargetCount = 0;
 
-#if DIRECTX
-                // Set the default swap chain.
-                Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
-                _currentRenderTargets[0] = _renderTargetView;
-                _currentDepthStencilView = _depthStencilView;
-
-                lock (_d3dContext) 
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
-#elif OPENGL
-				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
-                GraphicsExtensions.CheckGLError();
-#elif PSM
-                _graphics.SetFrameBuffer(_graphics.Screen);
-#endif
+                PlatformApplyDefaultRenderTarget();
                 clearTarget = PresentationParameters.RenderTargetUsage == RenderTargetUsage.DiscardContents;
 
                 renderTargetWidth = PresentationParameters.BackBufferWidth;
@@ -1748,30 +1763,74 @@ namespace Microsoft.Xna.Framework.Graphics
                 Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
                 _currentRenderTargetCount = renderTargets.Length;
 
+                var renderTarget = PlatformApplyRenderTargets();
+
+                // We clear the render target if asked.
+                clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
+
+                renderTargetWidth = renderTarget.Width;
+                renderTargetHeight = renderTarget.Height;
+            }
+
+            // Set the viewport to the size of the first render target.
+            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // Set the scissor rectangle to the size of the first render target.
+            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
+
+            // In XNA 4, because of hardware limitations on Xbox, when
+            // a render target doesn't have PreserveContents as its usage
+            // it is cleared before being rendered to.
+            if (clearTarget)
+                Clear(DiscardColor);
+
+            PlatformPostApplyRenderTargets();
+        }
+
+        private void PlatformApplyDefaultRenderTarget()
+        {
 #if DIRECTX
-                // Clear the current render targets.
-                Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
-                _currentDepthStencilView = null;
+            // Set the default swap chain.
+            Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
+            _currentRenderTargets[0] = _renderTargetView;
+            _currentDepthStencilView = _depthStencilView;
 
-                // Make sure none of the new targets are bound
-                // to the device as a texture resource.
-                lock (_d3dContext)
-                    Textures.ClearTargets(this, _currentRenderTargetBindings);
+            lock (_d3dContext)
+                _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
+#elif OPENGL
+				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+                GraphicsExtensions.CheckGLError();
+#elif PSM
+                _graphics.SetFrameBuffer(_graphics.Screen);
+#endif
+        }
 
-                for (var i = 0; i < _currentRenderTargetCount; i++)
-                {
-                    var binding = _currentRenderTargetBindings[i];
-                    var target = (IRenderTarget)binding.RenderTarget;
-                    _currentRenderTargets[i] = target.GetRenderTargetView(binding.ArraySlice);
-                }
+        private IRenderTarget PlatformApplyRenderTargets()
+        {
+#if DIRECTX
+            // Clear the current render targets.
+            Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
+            _currentDepthStencilView = null;
 
-                // Use the depth from the first target.
-                var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
-                _currentDepthStencilView = renderTarget.GetDepthStencilView();
+            // Make sure none of the new targets are bound
+            // to the device as a texture resource.
+            lock (_d3dContext)
+                Textures.ClearTargets(this, _currentRenderTargetBindings);
 
-                // Set the targets.
-                lock (_d3dContext)
-                    _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
+            for (var i = 0; i < _currentRenderTargetCount; i++)
+            {
+                var binding = _currentRenderTargetBindings[i];
+                var target = (IRenderTarget)binding.RenderTarget;
+                _currentRenderTargets[i] = target.GetRenderTargetView(binding.ArraySlice);
+            }
+
+            // Use the depth from the first target.
+            var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
+            _currentDepthStencilView = renderTarget.GetDepthStencilView();
+
+            // Set the targets.
+            lock (_d3dContext)
+                _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
 #elif OPENGL
                 if (_currentRenderTargetBindings[0].RenderTarget is RenderTargetCube)
                     throw new NotImplementedException("RenderTargetCube not yet implemented.");
@@ -1827,26 +1886,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;
                 _graphics.SetFrameBuffer(renderTarget._frameBuffer);
 #endif
+            return renderTarget;
+        }
 
-                // We clear the render target if asked.
-                clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;
-
-                renderTargetWidth = renderTarget.Width;
-                renderTargetHeight = renderTarget.Height;
-            }
-
-            // Set the viewport to the size of the first render target.
-            Viewport = new Viewport(0, 0, renderTargetWidth, renderTargetHeight);
-
-            // Set the scissor rectangle to the size of the first render target.
-            ScissorRectangle = new Rectangle(0, 0, renderTargetWidth, renderTargetHeight);
-
-            // In XNA 4, because of hardware limitations on Xbox, when
-            // a render target doesn't have PreserveContents as its usage
-            // it is cleared before being rendered to.
-            if (clearTarget)
-                Clear(DiscardColor);
-            
+        private void PlatformPostApplyRenderTargets()
+        {
 #if OPENGL
 			// Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
@@ -2300,6 +2344,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // They will only be used if the graphics API can use
             // this range hint to optimize rendering.
 
+            PlatformDrawIndexedPrimitives(primitiveType, baseVertex, startIndex, primitiveCount);
+        }
+
+        private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
+        {
 #if DIRECTX
 
             lock (_d3dContext)
@@ -2311,7 +2360,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
                 _d3dContext.DrawIndexed(vertexCount, startIndex, baseVertex);
             }
-			
+
 #elif OPENGL
 
             ApplyState(true);
@@ -2350,6 +2399,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
+            PlatformDrawUserPrimitives<T>(primitiveType, vertexData, vertexOffset, vertexDeclaration, vertexCount);
+        }
+
+        private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
+        {
 #if DIRECTX
 
             var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
@@ -2397,6 +2451,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
+            PlatformDrawPrimitives(primitiveType, vertexStart, vertexCount);
+        }
+
+        private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
+        {
 #if DIRECTX
 
             lock (_d3dContext)
@@ -2433,6 +2492,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
             Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
 
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
+        }
+
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        {
 #if DIRECTX
 
             var indexCount = GetElementCountArray(primitiveType, primitiveCount);
@@ -2493,6 +2557,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
             Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
 
+            PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
+        }
+
+        private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
+        {
 #if DIRECTX
 
             var indexCount = GetElementCountArray(primitiveType, primitiveCount);
