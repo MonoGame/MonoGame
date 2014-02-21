@@ -98,17 +98,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                _blendState.PlatformApplyState(this);
+                _blendState.ApplyState(this);
                 _blendStateDirty = false;
             }
 	        if ( _depthStencilStateDirty )
             {
-	            _depthStencilState.PlatformApplyState(this);
+                _depthStencilState.ApplyState(this);
                 _depthStencilStateDirty = false;
             }
 	        if ( _rasterizerStateDirty )
             {
-	            _rasterizerState.PlatformApplyState(this);
+                _rasterizerState.ApplyState(this);
 	            _rasterizerStateDirty = false;
             }
 
