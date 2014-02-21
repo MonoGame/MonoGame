@@ -175,11 +175,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        internal SharpDX.Direct3D11.InputElement[] GetInputLayout()
+        internal SharpDX.Direct3D11.InputElement[] GetInputLayout(bool forInstancing = false)
         {
             var inputs = new SharpDX.Direct3D11.InputElement[_elements.Length];
             for (var i = 0; i < _elements.Length; i++)
-                inputs[i] = _elements[i].GetInputElement();
+                inputs[i] = _elements[i].GetInputElement(forInstancing);
 
             return inputs;
         }
