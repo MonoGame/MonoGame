@@ -74,6 +74,7 @@ namespace Microsoft.Xna.Framework
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
+        internal TouchPanelState TouchPanelState;
 
         public bool TouchEnabled
         {
@@ -89,7 +90,9 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
-			Initialize();
+            TouchPanelState = new TouchPanelState(this);
+            Initialize();
+
         }		
 						
         private void Initialize()
@@ -506,7 +509,7 @@ namespace Microsoft.Xna.Framework
                         // so we need to clear them out.
                         if (wasPortrait != requestPortrait)
                         {
-                            TouchPanel.ReleaseAllTouches();
+                            TouchPanelState.ReleaseAllTouches();
                         }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;

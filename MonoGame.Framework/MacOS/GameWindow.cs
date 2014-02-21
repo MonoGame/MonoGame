@@ -66,6 +66,7 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private MacGamePlatform _platform;
         internal MouseState MouseState;
+        internal TouchPanelState TouchPanelState;
 
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
@@ -83,6 +84,7 @@ namespace Microsoft.Xna.Framework
                 throw new ArgumentNullException("game");
             _game = game;
             _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
+            TouchPanelState = new TouchPanelState(this);
 
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
