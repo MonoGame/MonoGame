@@ -49,6 +49,10 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition=" '$(DefaultLanguageSourceExtension)' != '.cs' " />
   <ItemGroup>
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />
+    <Compile Include="Graphics\GLWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\ArbFboWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\ExtFboWrapper.cs" />
+    <Compile Include="Graphics\GLWrappers\IFboWrapper.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />

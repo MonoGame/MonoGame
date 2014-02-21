@@ -154,45 +154,37 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 
-#if GLES
-			GL.GenRenderbuffers(1, ref glDepthBuffer);
-#else
-			GL.GenRenderbuffers(1, out glDepthBuffer);
-#endif
+			GLWrapper.Fbo.GenRenderbuffers(1, out glDepthBuffer);
 			GraphicsExtensions.CheckGLError();
 			if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
 			{
 				if (GraphicsCapabilities.SupportsPackedDepthStencil)
 				{
 					  this.glStencilBuffer = this.glDepthBuffer;
-					  GL.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
+					  GLWrapper.Fbo.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
 					  GraphicsExtensions.CheckGLError();
-					  GL.RenderbufferStorage(GLRenderbuffer, GLDepth24Stencil8, this.width, this.height);
+					  GLWrapper.Fbo.RenderbufferStorage(GLRenderbuffer, GLDepth24Stencil8, this.width, this.height);
 					  GraphicsExtensions.CheckGLError();
 				}
 				else
 				{
-					GL.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
+					GLWrapper.Fbo.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
 					GraphicsExtensions.CheckGLError();
-					GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
+					GLWrapper.Fbo.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
 					GraphicsExtensions.CheckGLError();
-#if GLES
-					GL.GenRenderbuffers(1, ref glStencilBuffer);
-#else
-					GL.GenRenderbuffers(1, out glStencilBuffer);
-#endif
+					GLWrapper.Fbo.GenRenderbuffers(1, out glStencilBuffer);
 					GraphicsExtensions.CheckGLError();
-					GL.BindRenderbuffer(GLRenderbuffer, this.glStencilBuffer);
+					GLWrapper.Fbo.BindRenderbuffer(GLRenderbuffer, this.glStencilBuffer);
 					GraphicsExtensions.CheckGLError();
-					GL.RenderbufferStorage(GLRenderbuffer, glStencilFormat, this.width, this.height);
+					GLWrapper.Fbo.RenderbufferStorage(GLRenderbuffer, glStencilFormat, this.width, this.height);
 					GraphicsExtensions.CheckGLError();
 				}
 			}
 			else
 			{
-				GL.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
+				GLWrapper.Fbo.BindRenderbuffer(GLRenderbuffer, this.glDepthBuffer);
 				GraphicsExtensions.CheckGLError();
-				GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
+				GLWrapper.Fbo.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
 				GraphicsExtensions.CheckGLError();
 			}
 
@@ -303,8 +295,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				GraphicsDevice.AddDisposeAction(() =>
 				{
 					if (this.glStencilBuffer != 0 && this.glStencilBuffer != this.glDepthBuffer)
-				    	GL.DeleteRenderbuffers(1, ref this.glStencilBuffer);
-					GL.DeleteRenderbuffers(1, ref this.glDepthBuffer);
+				    	GLWrapper.Fbo.DeleteRenderbuffers(1, ref this.glStencilBuffer);
+					GLWrapper.Fbo.DeleteRenderbuffers(1, ref this.glDepthBuffer);
 					GraphicsExtensions.CheckGLError();
 				});
 #endif

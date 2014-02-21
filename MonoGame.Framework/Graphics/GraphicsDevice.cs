@@ -530,6 +530,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
             _graphics = new GraphicsContext();
 #elif OPENGL
+            GLWrapper.Initialize(this);
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
 #endif
 
@@ -1405,7 +1406,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                                     {
                         if (this.glRenderTargetFrameBuffer > 0)
                         {
-                            GL.DeleteFramebuffers(1, ref this.glRenderTargetFrameBuffer);
+                            GLWrapper.Fbo.DeleteFramebuffers(1, ref this.glRenderTargetFrameBuffer);
                             GraphicsExtensions.CheckGLError();
                         }
                     });
@@ -1732,7 +1733,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 lock (_d3dContext) 
                     _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);                
 #elif OPENGL
-				GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+				GLWrapper.Fbo.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
                 GraphicsExtensions.CheckGLError();
 #elif PSM
                 _graphics.SetFrameBuffer(_graphics.Screen);
@@ -1779,29 +1780,25 @@ namespace Microsoft.Xna.Framework.Graphics
                 var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 				if (this.glRenderTargetFrameBuffer == 0)
 				{
-#if GLES
-                    GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-#else
-                    GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
-#endif
+                    GLWrapper.Fbo.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
                     GraphicsExtensions.CheckGLError();
                 }
 
-                GL.BindFramebuffer(GLFramebuffer, this.glRenderTargetFrameBuffer);
+                GLWrapper.Fbo.BindFramebuffer(GLFramebuffer, this.glRenderTargetFrameBuffer);
                 GraphicsExtensions.CheckGLError();
-                GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
+                GLWrapper.Fbo.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
                 GraphicsExtensions.CheckGLError();
 
 				// Reverted this change, as per @prollin's suggestion
-				GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
-				GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
+				GLWrapper.Fbo.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+				GLWrapper.Fbo.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
 				for (var i = 0; i < _currentRenderTargetCount; i++)
 				{
 					GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 					GraphicsExtensions.CheckGLError();
-					GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
+					GLWrapper.Fbo.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 					GraphicsExtensions.CheckGLError();
 				}
 
@@ -1810,7 +1807,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
                 // Test that the FBOs are attached and correct.
-				var status = GL.CheckFramebufferStatus(GLFramebuffer);
+				var status = GLWrapper.Fbo.CheckFramebufferStatus(GLFramebuffer);
 				if (status != GLFramebufferComplete)
 				{
 					string message = "Framebuffer Incomplete.";

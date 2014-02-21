@@ -1152,33 +1152,33 @@ namespace Microsoft.Xna.Framework.Graphics
 			int framebufferId = -1;
             int renderBufferID = -1;
             
-			GL.GenFramebuffers(1, ref framebufferId);
+			GLWrapper.Fbo.GenFramebuffers(1, out framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.BindFramebuffer(All.Framebuffer, framebufferId);
+            GLWrapper.Fbo.BindFramebuffer(All.Framebuffer, framebufferId);
             GraphicsExtensions.CheckGLError();
             //renderBufferIDs = new int[currentRenderTargets];
-            GL.GenRenderbuffers(1, ref renderBufferID);
+            GLWrapper.Fbo.GenRenderbuffers(1, out renderBufferID);
             GraphicsExtensions.CheckGLError();
 
             // attach the texture to FBO color attachment point
-            GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0,
+            GLWrapper.Fbo.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0,
                 All.Texture2D, this.glTexture, 0);
             GraphicsExtensions.CheckGLError();
 
             // create a renderbuffer object to store depth info
-            GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
+            GLWrapper.Fbo.BindRenderbuffer(All.Renderbuffer, renderBufferID);
             GraphicsExtensions.CheckGLError();
 
 			var glDepthFormat = GraphicsCapabilities.SupportsDepth24 ? All.DepthComponent24Oes : GraphicsCapabilities.SupportsDepthNonLinear ? (OpenTK.Graphics.ES20.All)0x8E2C /*GLDepthComponent16NonLinear */: All.DepthComponent16;
-			GL.RenderbufferStorage(All.Renderbuffer, glDepthFormat, Width, Height);
+			GLWrapper.Fbo.RenderbufferStorage(All.Renderbuffer, glDepthFormat, Width, Height);
             GraphicsExtensions.CheckGLError();
 
             // attach the renderbuffer to depth attachment point
-            GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
+            GLWrapper.Fbo.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment,
                 All.Renderbuffer, renderBufferID);
             GraphicsExtensions.CheckGLError();
 
-            All status = GL.CheckFramebufferStatus(All.Framebuffer);
+            All status = GLWrapper.Fbo.CheckFramebufferStatus(All.Framebuffer);
 
             if (status != All.FramebufferComplete)
                 throw new Exception("Error creating framebuffer: " + status);	
@@ -1212,13 +1212,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.ReadPixels(0,0,Width, Height, All.Rgba, All.UnsignedByte, imageInfo);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, 0);
+            GLWrapper.Fbo.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, 0);
             GraphicsExtensions.CheckGLError();
-            GL.DeleteRenderbuffers(1, ref renderBufferID);
+            GLWrapper.Fbo.DeleteRenderbuffers(1, ref renderBufferID);
             GraphicsExtensions.CheckGLError();
-            GL.DeleteFramebuffers(1, ref framebufferId);
+            GLWrapper.Fbo.DeleteFramebuffers(1, ref framebufferId);
             GraphicsExtensions.CheckGLError();
-            GL.BindFramebuffer(All.Framebuffer, 0);
+            GLWrapper.Fbo.BindFramebuffer(All.Framebuffer, 0);
             GraphicsExtensions.CheckGLError();
             return imageInfo;
 		}
