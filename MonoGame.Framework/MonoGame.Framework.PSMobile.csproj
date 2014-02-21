@@ -333,6 +333,7 @@
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs" />
     <Compile Include="LaunchParameters.cs" />

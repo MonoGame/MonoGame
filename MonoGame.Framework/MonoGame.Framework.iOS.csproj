@@ -224,6 +224,7 @@
     <Compile Include="Graphics\States\StencilOperation.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs" />
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
