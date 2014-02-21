@@ -316,6 +316,7 @@
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDevice.PSM.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Game.cs" />
