@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,22 +11,23 @@ using System.Runtime.InteropServices;
 #if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#endif
+#if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif GLES
+#endif
+#if GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
 #endif
-#elif PSM
+#endif
+#if PSM
 using Sce.PlayStation.Core.Graphics;
 using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
-
     public class IndexBuffer : GraphicsResource
     {
         private bool _isDynamic;
@@ -38,9 +43,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _buffer;
             }
         }
-#elif PSM
+#endif
+#if PSM
         internal ushort[] _buffer;
-#else
+#endif
+#if OPENGL
 		internal uint ibo;	
 #endif
 
@@ -65,19 +72,25 @@ namespace Microsoft.Xna.Framework.Graphics
             this.BufferUsage = usage;
 			
             _isDynamic = dynamic;
-            
+
+            PlatformConstruct(indexElementSize, indexCount);
+		}
+
+        private void PlatformConstruct(IndexElementSize indexElementSize, int indexCount)
+        {
 #if DIRECTX
 
             GenerateIfRequired();
-
-#elif PSM
+#endif
+#if PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
             _buffer = new ushort[indexCount];
-#else
+#endif
+#if OPENGL
             Threading.BlockOnUIThread(GenerateIfRequired);
 #endif
-		}
+        }
 		
 		public IndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, indexElementSize, indexCount, bufferUsage, false)
@@ -114,6 +127,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The GraphicsDevice is resetting, so GPU resources must be recreated.
         /// </summary>
         internal protected override void GraphicsDeviceResetting()
+        {
+            PlatformGraphicsDeviceResetting();
+        }
+
+        private void PlatformGraphicsDeviceResetting()
         {
 #if OPENGL
             ibo = 0;
@@ -186,11 +204,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if GLES
-            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
-            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
-            throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
-#else
             if (data == null)
                 throw new ArgumentNullException("data is null");
             if (data.Length < (startIndex + elementCount))
@@ -198,6 +211,16 @@ namespace Microsoft.Xna.Framework.Graphics
             if (BufferUsage == BufferUsage.WriteOnly)
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
+            PlatformGetData<T>(offsetInBytes, data, startIndex, elementCount);
+        }
+
+        private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
+        {
+#if GLES
+            // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
+            // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
+            throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
+#endif
 #if DIRECTX
             GenerateIfRequired();
 
@@ -232,14 +255,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
                     SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, TsizeInBytes * data.Length);
-                    
+
                     // Make sure that we unmap the resource in case of an exception
                     deviceContext.UnmapSubresource(stagingBuffer, 0);
                 }
             }
-#elif PSM
+#endif
+#if PSM
             throw new NotImplementedException();
-#else        
+#endif
+#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount);
@@ -248,7 +273,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() => GetBufferData(offsetInBytes, data, startIndex, elementCount));
             }
-#endif
 #endif
         }
 
@@ -314,8 +338,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data.Length < (startIndex + elementCount))
                 throw new InvalidOperationException("The array specified in the data parameter is not the correct size for the amount of data requested.");
 
-#if DIRECTX
+            PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
+        }
 
+        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        {
+#if DIRECTX
             GenerateIfRequired();
 
             if (_isDynamic)
@@ -358,8 +386,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 dataHandle.Free();
             }
-
-#elif PSM
+#endif
+#if PSM
             if (typeof(T) == typeof(ushort))
             {
                 Array.Copy(data, offsetInBytes / sizeof(ushort), _buffer, startIndex, elementCount);
@@ -374,8 +402,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     _buffer[i + startIndex] = (ushort)(object)data[i + indexOffset];
                 */
             }
-#else
-
+#endif
+#if OPENGL
             if (Threading.IsOnUIThread())
             {
                 BufferData(offsetInBytes, data, startIndex, elementCount, options);
@@ -384,7 +412,6 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() => BufferData(offsetInBytes, data, startIndex, elementCount, options));
             }
-
 #endif
         }
 
@@ -426,27 +453,34 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-#if DIRECTX
-                if (disposing)
-                {
-                    if (_buffer != null)
-                    {
-                        _buffer.Dispose();
-                        _buffer = null;
-                    }
-                }
-#elif PSM
-                //Do nothing
-                _buffer = null;
-#else
-                GraphicsDevice.AddDisposeAction(() =>
-                    {
-                        GL.DeleteBuffers(1, ref ibo);
-                        GraphicsExtensions.CheckGLError();
-                    });
-#endif
+                PlatformDispose(disposing);
             }
             base.Dispose(disposing);
 		}
+
+        private void PlatformDispose(bool disposing)
+        {
+#if DIRECTX
+            if (disposing)
+            {
+                if (_buffer != null)
+                {
+                    _buffer.Dispose();
+                    _buffer = null;
+                }
+            }
+#endif
+#if PSM
+            //Do nothing
+            _buffer = null;
+#endif
+#if OPENGL
+            GraphicsDevice.AddDisposeAction(() =>
+                {
+                    GL.DeleteBuffers(1, ref ibo);
+                    GraphicsExtensions.CheckGLError();
+                });
+#endif
+        }
 	}
 }
