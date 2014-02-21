@@ -2,7 +2,7 @@
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif (WINDOWS && !DIRECTX) || LINUX
+#elif SDL2 || (WINDOWS && !DIRECTX) || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSM
 using Sce.PlayStation.Core.Graphics;

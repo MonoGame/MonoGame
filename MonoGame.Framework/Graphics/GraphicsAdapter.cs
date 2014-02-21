@@ -90,7 +90,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-#if MONOMAC
+#if SDL2
+                SDL2.SDL.SDL_DisplayMode mode;
+                SDL2.SDL.SDL_GetCurrentDisplayMode(0, out mode);
+                return new DisplayMode(
+                    mode.w,
+                    mode.h,
+                    mode.refresh_rate,
+                    SurfaceFormat.Color
+                );
+#elif MONOMAC
                 //Dummy values until MonoMac implements Quartz Display Services
                 int refreshRate = 60;
                 SurfaceFormat format = SurfaceFormat.Color;
@@ -256,7 +265,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (supportedDisplayModes == null)
                 {
                     List<DisplayMode> modes = new List<DisplayMode>(new DisplayMode[] { CurrentDisplayMode, });
-#if (WINDOWS && OPENGL) || LINUX
+#if SDL2
+                    SDL2.SDL.SDL_DisplayMode filler = new SDL2.SDL.SDL_DisplayMode();
+                    int numModes = SDL2.SDL.SDL_GetNumDisplayModes(0);
+                    for (int i = 0; i < numModes; i++)
+                    {
+                        SDL2.SDL.SDL_GetDisplayMode(0, i, out filler);
+                        modes.Add(
+                            new DisplayMode(
+                                filler.w,
+                                filler.h,
+                                filler.refresh_rate,
+                                SurfaceFormat.Color // FIXME: Assumption!
+                            )
+                        );
+                    }
+#elif (WINDOWS && OPENGL) || LINUX
                     
 					//IList<OpenTK.DisplayDevice> displays = OpenTK.DisplayDevice.AvailableDisplays;
 					var displays = new List<OpenTK.DisplayDevice>();

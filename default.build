@@ -33,6 +33,7 @@
     <call target="buildmac" />
     <call target="buildios" />
     <call target="buildpsm" />
+    <call target="buildsdl2" />
 
     <call target="buildtools"/>
     <call target="buildcontentprocessor"/>
@@ -54,6 +55,17 @@
         <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
         <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
       </if>
+    </if>
+  </target>
+
+  <target name="buildsdl2" description="Build SDL2" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <exec program="msbuild " commandline="MonoGame.Framework.SDL2.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.SDL2.sln /t:Build /p:Configuration=Release" />
+    </if>
+    <if test="${os == 'Unix'}">
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.SDL2.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.SDL2.sln" />
     </if>
   </target>
 

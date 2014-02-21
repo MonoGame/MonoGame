@@ -50,6 +50,8 @@ namespace Microsoft.Xna.Framework.Content
 	{
 #if ANDROID
         static string[] supportedExtensions = new string[] { ".mp3", ".ogg", ".mid" };
+#elif SDL2
+        static string[] supportedExtensions = new string[] { ".flac", ".ogg" };
 #else
         static string[] supportedExtensions = new string[] { ".mp3" };
 #endif

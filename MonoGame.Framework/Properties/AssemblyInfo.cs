@@ -12,6 +12,8 @@ using System.Resources;
 [assembly: AssemblyDescription("MonoGame for OUYA")]
 #elif ANDROID
 [assembly: AssemblyDescription("MonoGame for Android")]
+#elif SDL2
+[assembly: AssemblyDescription("MonoGame for SDL2 Desktop")]
 #elif WINDOWS_STOREAPP
 [assembly: AssemblyDescription("MonoGame for Windows Store")]
 #elif WINDOWS

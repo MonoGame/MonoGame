@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework
 
             _supportedOrientations = DisplayOrientation.Default;
 
-#if WINDOWS || MONOMAC || LINUX
+#if SDL2 || WINDOWS || MONOMAC || LINUX
             _preferredBackBufferHeight = DefaultBackBufferHeight;
             _preferredBackBufferWidth = DefaultBackBufferWidth;
 #else
@@ -279,6 +279,26 @@ namespace Microsoft.Xna.Framework
 
             _game.ResizeWindow(false);
 
+#elif SDL2
+            // Apply the GraphicsDevice changes internally.
+            GraphicsDevice.PresentationParameters.BackBufferFormat = PreferredBackBufferFormat;
+            GraphicsDevice.PresentationParameters.BackBufferWidth = PreferredBackBufferWidth;
+            GraphicsDevice.PresentationParameters.BackBufferHeight = PreferredBackBufferHeight;
+            GraphicsDevice.PresentationParameters.DepthStencilFormat = PreferredDepthStencilFormat;
+            IsFullScreen = _wantFullScreen;
+            
+            // Make the Platform device changes.
+            _game.Platform.BeginScreenDeviceChange(
+                GraphicsDevice.PresentationParameters.IsFullScreen
+            );
+            _game.Platform.EndScreenDeviceChange(
+                "SDL2",
+                GraphicsDevice.PresentationParameters.BackBufferWidth,
+                GraphicsDevice.PresentationParameters.BackBufferHeight
+            );
+            
+            // This platform uses VSyncEnabled rather than PresentationInterval.
+            _game.Platform.VSyncEnabled = SynchronizeWithVerticalRetrace;
 #elif WINDOWS || LINUX
             _game.ResizeWindow(false);
 #elif MONOMAC
@@ -354,7 +374,8 @@ namespace Microsoft.Xna.Framework
 
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
-#elif LINUX
+#elif SDL2 || LINUX
+            // It's bad practice to start fullscreen.
             presentationParameters.IsFullScreen = false;
 #else
             // Set "full screen"  as default

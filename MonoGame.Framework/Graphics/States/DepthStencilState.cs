@@ -6,7 +6,7 @@ using System.Collections.Generic;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
 #elif GLES

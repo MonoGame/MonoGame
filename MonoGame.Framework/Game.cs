@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
 
-#if MONOMAC || WINDOWS || LINUX
+#if SDL2 || MONOMAC || WINDOWS || LINUX
             
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.

@@ -62,7 +62,7 @@ using MonoTouch.Foundation;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#elif WINDOWS || LINUX
+#elif SDL2 || WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
@@ -80,7 +80,7 @@ using ErrorCode = OpenTK.Graphics.ES20.All;
 using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 #endif
 
-#if WINDOWS || LINUX || MONOMAC
+#if SDL2 || WINDOWS || LINUX || MONOMAC
 using System.Drawing.Imaging;
 #endif
 using Microsoft.Xna.Framework.Content;
@@ -913,7 +913,7 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             waitEvent.Wait();
-#elif MONOMAC
+#elif SDL2 || MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -944,7 +944,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
-#elif MONOMAC
+#elif SDL2 || MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             // TODO: We need to find a simple stand alone
@@ -953,7 +953,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-#if MONOMAC
+#if SDL2 || MONOMAC
 		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
