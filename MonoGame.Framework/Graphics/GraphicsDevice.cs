@@ -154,6 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if OPENGL
+        private bool _vertexBufferBound;
         static List<Action> disposeActions = new List<Action>();
         static object disposeActionsLock = new object();
 #endif
@@ -560,6 +561,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
+            _vertexBufferBound = false;
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
@@ -2122,6 +2124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer.ibo);
                     GraphicsExtensions.CheckGLError();
+                    _vertexBufferBound = true;
 #endif
                 }
                 _indexBufferDirty = false;
@@ -2139,6 +2142,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.vbo);
                     GraphicsExtensions.CheckGLError();
+                    _vertexBufferBound = true;
                 }
 #endif
             }
@@ -2367,11 +2371,15 @@ namespace Microsoft.Xna.Framework.Graphics
             ApplyState(true);
 
             // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            if (_vertexBufferBound)
+            {
+            	GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	_vertexBufferDirty = _indexBufferDirty = true;
+             	_vertexBufferBound = false;
+            }
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -2452,11 +2460,15 @@ namespace Microsoft.Xna.Framework.Graphics
             ApplyState(true);
 
             // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            if (_vertexBufferBound)
+            {
+            	GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	_vertexBufferDirty = _indexBufferDirty = true;
+            	_vertexBufferBound = false;
+            }
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
@@ -2512,11 +2524,15 @@ namespace Microsoft.Xna.Framework.Graphics
             ApplyState(true);
 
             // Unbind current VBOs.
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GraphicsExtensions.CheckGLError();
-            _vertexBufferDirty = _indexBufferDirty = true;
+            if (_vertexBufferBound)
+            {
+            	GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            	GraphicsExtensions.CheckGLError();
+            	_vertexBufferDirty = _indexBufferDirty = true;
+            	_vertexBufferBound = false;
+            }
 
             // Pin the buffers.
             var vbHandle = GCHandle.Alloc(vertexData, GCHandleType.Pinned);
