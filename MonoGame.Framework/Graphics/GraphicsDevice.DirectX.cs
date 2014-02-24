@@ -844,7 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif
-#if DIRECTX && !WINDOWS_PHONE
+#if !WINDOWS_PHONE
 
             try
             {
