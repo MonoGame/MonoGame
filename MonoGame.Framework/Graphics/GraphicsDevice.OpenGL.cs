@@ -144,8 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
             List<string> extensions = new List<string>();
 #if GLES
             var extstring = GL.GetString(RenderbufferStorage.Extensions);            			
-#endif
-#if !GLES
+#else
             var extstring = GL.GetString(StringName.Extensions);
 #endif
             GraphicsExtensions.CheckGLError();
@@ -154,15 +153,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 extensions.AddRange(extstring.Split(' '));
 #if ANDROID
                 Android.Util.Log.Debug("MonoGame", "Supported extensions:");
-#endif
-#if !ANDROID
+#else
                 System.Diagnostics.Debug.WriteLine("Supported extensions:");
 #endif
                 foreach (string extension in extensions)
 #if ANDROID
                     Android.Util.Log.Debug("MonoGame", extension);
-#endif
-#if !ANDROID
+#else
                     System.Diagnostics.Debug.WriteLine(extension);
 #endif
             }
@@ -226,8 +223,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
                 GL.ClearDepth (depth);
                 GraphicsExtensions.CheckGLError();
-#endif
-#if !GLES
+#else
                 GL.ClearDepth ((double)depth);
 #endif
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
@@ -236,8 +232,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
 			GL.Clear((uint)bufferMask);
             GraphicsExtensions.CheckGLError();
-#endif
-#if !GLES
+#else
 			GL.Clear(bufferMask);
 #endif
            		
@@ -310,8 +305,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.Viewport");
 #if GLES
             GL.DepthRange(value.MinDepth, value.MaxDepth);
-#endif
-#if !GLES
+#else
             GL.DepthRange((double)value.MinDepth, (double)value.MaxDepth);
 #endif
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
@@ -345,8 +339,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 #if GLES
                 GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-#endif
-#if !GLES
+#else
                 GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
 #endif
                 GraphicsExtensions.CheckGLError();
