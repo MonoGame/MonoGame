@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var d3dContext = GraphicsDevice._d3dContext;
+            var d3dContext = (GraphicsDevice ?? device)._d3dContext;
 
             // Update the hardware buffer.
             if (_dirty)
