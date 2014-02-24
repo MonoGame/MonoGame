@@ -844,7 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
 #endif
-#if !WINDOWS_PHONE
+#if WINDOWS
 
             try
             {
