@@ -165,6 +165,7 @@
     <Compile Include="Android\AndroidGameActivity.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />

@@ -386,7 +386,8 @@
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
-    <Compile Include="MacOS\Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
