@@ -67,6 +67,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool _paused;
         private bool _loop;
+        private float _pitch;
 #else
         private Sound _sound;
 		internal Sound Sound 
@@ -176,8 +177,8 @@ namespace Microsoft.Xna.Framework.Audio
             // Apply Volume settings (from distance attenuation) ...
             _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, dpsSettings.MatrixCoefficients, 0);
 
-            // Apply Pitch settings (from doppler) ...
-            _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
+            // Apply doppler pitch settings by combining it with the current pitch value.
+            _voice.SetFrequencyRatio(_pitch * dpsSettings.DopplerFactor);
 #endif
         }
 		
@@ -505,12 +506,12 @@ namespace Microsoft.Xna.Framework.Audio
 
                     // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
                     // which avoids the native call and is actually more accurate.
-                    var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
+                    var pitch = 39.86313713864835 * Math.Log10(_pitch);
 
                     // Convert from semitones to octaves.
                     pitch /= 12.0;
 
-                    return (float)pitch;
+                    return (float)_pitch;
 #else
                 if ( _sound != null)
 				    {
@@ -527,8 +528,8 @@ namespace Microsoft.Xna.Framework.Audio
 
                     // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
                     // which avoids the native call and is actually more accurate.
-                    var ratio = Math.Pow(2.0, value);
-                    _voice.SetFrequencyRatio((float)ratio);                  
+                    _pitch = (float)Math.Pow(2.0, value);
+                    _voice.SetFrequencyRatio(_pitch);                  
 #else
                 if ( _sound != null && _sound.Rate != value)
 				    {
@@ -602,7 +603,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
 #if DIRECTX
                 if (_voice != null)
-                    _voice.SetVolume(value, XAudio2.CommitNow);
+                    _voice.SetVolume(value, XAudio2.CommitAll);
 #else
                 if ( _sound != null )
 				{
