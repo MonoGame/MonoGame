@@ -259,16 +259,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         public SoundEffectInstance CreateInstance()
         {
+            SoundEffectInstance instance;
+            instance = PlatformCreateInstance();
+            return instance;
+        }
+
+        private SoundEffectInstance PlatformCreateInstance()
+        {
+            SoundEffectInstance instance;
 #if DIRECTX
             SourceVoice voice = null;
             if (Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
-            var instance = new SoundEffectInstance(this, voice);
+            instance = new SoundEffectInstance(this, voice);
 #elif (WINDOWS && OPENGL) || LINUX
-            var instance = new SoundEffectInstance(this);
+            instance = new SoundEffectInstance(this);
 #else
-            var instance = new SoundEffectInstance();
+            instance = new SoundEffectInstance();
             instance.Sound = _sound;
 #endif
             return instance;
@@ -285,6 +293,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
+            return PlatformPlay();
+        }
+
+        private bool PlatformPlay()
+        {
 #if (WINDOWS && OPENGL) || LINUX
             return Play(MasterVolume, 0.0f, 0.0f);
 #else
@@ -293,6 +306,11 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         public bool Play(float volume, float pitch, float pan)
+        {
+            return PlatformPlay(volume, pitch, pan);
+        }
+
+        private bool PlatformPlay(float volume, float pitch, float pan)
         {
 #if DIRECTX
             if (MasterVolume > 0.0f)
@@ -386,11 +404,17 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
-#if DIRECTX                    
-                var sampleCount = _buffer.PlayLength;
-                var avgBPS = _format.AverageBytesPerSecond;
-                
-                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
+                return PlatformGetDuration();
+            }
+        }
+
+        private TimeSpan PlatformGetDuration()
+        {
+#if DIRECTX
+            var sampleCount = _buffer.PlayLength;
+            var avgBPS = _format.AverageBytesPerSecond;
+
+            return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
 #elif (WINDOWS && OPENGL) || LINUX
                 return _duration;
 #else
@@ -403,19 +427,12 @@ namespace Microsoft.Xna.Framework.Audio
                     return new TimeSpan(0);
                 }
 #endif
-            }
         }
 
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            set 
-            {
-                _name = value;
-            }
+            get { return _name; }
+            set { _name = value; }
         }
 
         #endregion
@@ -425,35 +442,32 @@ namespace Microsoft.Xna.Framework.Audio
         static float _masterVolume = 1.0f;
         public static float MasterVolume 
         { 
-            get
-            {
-                return _masterVolume;
-            }
+            get { return _masterVolume; }
             set
             {
                 if (_masterVolume != value)
-                {
                     _masterVolume = value;
-                }
-#if DIRECTX
-                MasterVoice.SetVolume(_masterVolume, 0);
-#endif
+
+                PlatformSetMasterVolume();
             }
+        }
+
+        private static void PlatformSetMasterVolume()
+        {
+#if DIRECTX
+            MasterVoice.SetVolume(_masterVolume, 0);
+#endif
         }
 
         static float _distanceScale = 1.0f;
         public static float DistanceScale
         {
-            get
-            {
-                return _distanceScale;
-            }
+            get { return _distanceScale; }
             set
             {
                 if (value <= 0f)
-                {
                     throw new ArgumentOutOfRangeException ("value of DistanceScale");
-                }
+
                 _distanceScale = value;
             }
         }
@@ -461,19 +475,15 @@ namespace Microsoft.Xna.Framework.Audio
         static float _dopplerScale = 1f;
         public static float DopplerScale
         {
-            get
-            {
-                return _dopplerScale;
-            }
+            get { return _dopplerScale; }
             set
             {
                 // As per documenation it does not look like the value can be less than 0
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
                 if (value < 0f)
-                {
                     throw new ArgumentOutOfRangeException ("value of DopplerScale");
-                }
+
                 _dopplerScale = value;
             }
         }
@@ -481,29 +491,22 @@ namespace Microsoft.Xna.Framework.Audio
         static float speedOfSound = 343.5f;
         public static float SpeedOfSound
         {
-            get
-            {
-                return speedOfSound;
-            }
-            set
-            {
-                speedOfSound = value;
-            }
+            get { return speedOfSound; }
+            set { speedOfSound = value; }
         }
 
         #endregion
 
         #region IDisposable Members
 
-        public bool IsDisposed
-        {
-            get
-            {
-                return isDisposed;
-            }
-        }
+        public bool IsDisposed { get { return isDisposed; } }
 
         public void Dispose()
+        {
+            PlatformDispose();
+        }
+
+        private void PlatformDispose()
         {
 #if (WINDOWS && OPENGL) || LINUX
             // No-op. Note that isDisposed remains false!
