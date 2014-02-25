@@ -51,9 +51,9 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	public sealed class SoundEffectInstance : IDisposable
-	{
-		private bool isDisposed = false;
+    public sealed class SoundEffectInstance : IDisposable
+    {
+        private bool isDisposed = false;
 #if !DIRECTX
         private SoundState soundState = SoundState.Stopped;
 #endif
@@ -69,18 +69,18 @@ namespace Microsoft.Xna.Framework.Audio
         private bool _loop;
 #else
         private Sound _sound;
-		internal Sound Sound 
-		{ 
-			get
-			{
-				return _sound;
-			} 
-			
-			set
-			{
-				_sound = value;
-			} 
-		}
+        internal Sound Sound
+        {
+            get
+            {
+                return _sound;
+            }
+
+            set
+            {
+                _sound = value;
+            }
+        }
 #endif
 
 #if DIRECTX
@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Audio
             _voice = voice;
         }
 #else
-        internal SoundEffectInstance(){}
+        internal SoundEffectInstance() { }
 
         /* Creates a standalone SoundEffectInstance from given wavedata. */
         internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Audio
             // buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
 
-            using (var mStream = new MemoryStream(44+buffer.Length))
+            using (var mStream = new MemoryStream(44 + buffer.Length))
             using (var writer = new BinaryWriter(mStream))
             {
                 writer.Write("RIFF".ToCharArray()); //chunk id
@@ -129,8 +129,8 @@ namespace Microsoft.Xna.Framework.Audio
         public void Dispose()
         {
             PlatformDispose();
-			isDisposed = true;
-		}
+            isDisposed = true;
+        }
 
         private void PlatformDispose()
         {
@@ -151,8 +151,8 @@ namespace Microsoft.Xna.Framework.Audio
             _sound.Stop();
 #endif
         }
-		
-		public void Apply3D (AudioListener listener, AudioEmitter emitter)
+
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
         {
             PlatformApply3D(listener, emitter);
         }
@@ -190,17 +190,17 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
 #endif
         }
-		
-		public void Apply3D (AudioListener[] listeners,AudioEmitter emitter)
-		{
-            foreach ( var l in listeners )
-                Apply3D(l, emitter);            
-		}		
-		
-		public void Pause ()
+
+        public void Apply3D(AudioListener[] listeners, AudioEmitter emitter)
+        {
+            foreach (var l in listeners)
+                Apply3D(l, emitter);
+        }
+
+        public void Pause()
         {
             PlatformPause();
-		}
+        }
 
         private void PlatformPause()
         {
@@ -209,25 +209,25 @@ namespace Microsoft.Xna.Framework.Audio
                 _voice.Stop();
             _paused = true;
 #else
-            if ( _sound != null )
-			{
+            if (_sound != null)
+            {
 #if ANDROID
 				_sound.Pause(_streamId);
 #else
-				_sound.Pause();
+                _sound.Pause();
 #endif
                 soundState = SoundState.Paused;
-			}
+            }
 #endif
         }
-		
-		public void Play ()
+
+        public void Play()
         {
             if (State == SoundState.Playing)
                 return;
 
             PlatformPlay();
-		}
+        }
 
         private void PlatformPlay()
         {
@@ -249,42 +249,42 @@ namespace Microsoft.Xna.Framework.Audio
 
             _paused = false;
 #else
-            if ( _sound != null )
-			{
+            if (_sound != null)
+            {
 #if ANDROID
 				if (soundState == SoundState.Paused)
 					_sound.Resume(_streamId);
 				else
 					_streamId = _sound.Play();
 #else
-				if (soundState == SoundState.Paused)
-					_sound.Resume();
-				else
-					_sound.Play();
+                if (soundState == SoundState.Paused)
+                    _sound.Resume();
+                else
+                    _sound.Play();
 #endif
-				soundState = SoundState.Playing;
-			}
+                soundState = SoundState.Playing;
+            }
 #endif
         }
 
-		/// <summary>
-		/// Tries to play the sound, returns true if successful
-		/// </summary>
-		/// <returns></returns>
-		internal bool TryPlay()
-		{
-			Play();
+        /// <summary>
+        /// Tries to play the sound, returns true if successful
+        /// </summary>
+        /// <returns></returns>
+        internal bool TryPlay()
+        {
+            Play();
 #if ANDROID
 			return _streamId != 0;
 #else
-			return true;
+            return true;
 #endif
-		}
+        }
 
-		public void Resume()
+        public void Resume()
         {
             PlatformResume();
-		}
+        }
 
         private void PlatformResume()
         {
@@ -305,22 +305,22 @@ namespace Microsoft.Xna.Framework.Audio
             }
             _paused = false;
 #else
-            if ( _sound != null )
-			{
-				if (soundState == SoundState.Paused)
-				{
+            if (_sound != null)
+            {
+                if (soundState == SoundState.Paused)
+                {
 #if ANDROID
 					_sound.Resume(_streamId);
 #else
                     _sound.Resume();
 #endif
                 }
-				soundState = SoundState.Playing;
- 			}
+                soundState = SoundState.Playing;
+            }
 #endif
         }
-		
-		public void Stop()
+
+        public void Stop()
         {
             Stop(true);
         }
@@ -346,63 +346,68 @@ namespace Microsoft.Xna.Framework.Audio
 
             _paused = false;
 #else
-            if ( _sound != null )
-			{
+            if (_sound != null)
+            {
 #if ANDROID
                 _sound.Stop(_streamId);
                 _streamId = -1;
 #else
                 _sound.Stop();
 #endif
-				soundState = SoundState.Stopped;
-			}
+                soundState = SoundState.Stopped;
+            }
 #endif
-        }		
-		
-		public bool IsDisposed 
-		{ 
-			get
-			{
-				return isDisposed;
-			}
-		}
-		
-		public bool IsLooped 
-		{ 
-			get
-            {
-                return PlatformIsLooped();
-			}
-			
-			set
-            {
-#if DIRECTX
-                _loop = value;
-#else
-                if ( _sound != null )
-				{
-					if ( _sound.Looping != value )
-					{
-						_sound.Looping = value;
-					}
-				}
-#endif
-			}
-		}
+        }
 
-        private bool PlatformIsLooped()
+        public bool IsDisposed
+        {
+            get
+            {
+                return isDisposed;
+            }
+        }
+
+        public bool IsLooped
+        {
+            get
+            {
+                return PlatformGetIsLooped();
+            }
+
+            set
+            {
+                PlatformSetIsLooped(value);
+            }
+        }
+
+        private void PlatformSetIsLooped(bool value)
+        {
+#if DIRECTX
+            _loop = value;
+#else
+            if (_sound != null)
+            {
+                if (_sound.Looping != value)
+                {
+                    _sound.Looping = value;
+                }
+            }
+#endif
+        }
+
+        private bool PlatformGetIsLooped()
         {
 #if DIRECTX
             return _loop;
 #else
-                if ( _sound != null )
-				{
-					return _sound.Looping;
-				}
-				else
-				{
-					return false;
-				}
+            if (_sound != null)
+            {
+                return _sound.Looping;
+            }
+            else
+            {
+                return false;
+            }
 #endif
         }
 
@@ -411,18 +416,18 @@ namespace Microsoft.Xna.Framework.Audio
         private static float[] _panMatrix;
 #endif
 
-        public float Pan 
-		{ 
-			get
+        public float Pan
+        {
+            get
             {
                 return PlatformGetPan();
-			}
-			
-			set
+            }
+
+            set
             {
                 PlatformSetPan(value);
             }
-		}
+        }
 
         private void PlatformSetPan(float value)
         {
@@ -515,13 +520,13 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
 
 #else
-                if ( _sound != null )
-				{
-					if ( _sound.Pan != value )
-					{
-						_sound.Pan = value;
-					}
-				}
+            if (_sound != null)
+            {
+                if (_sound.Pan != value)
+                {
+                    _sound.Pan = value;
+                }
+            }
 #endif
         }
 
@@ -530,73 +535,90 @@ namespace Microsoft.Xna.Framework.Audio
 #if DIRECTX
             return _pan;
 #else
-                if ( _sound != null )
-				{
-					return _sound.Pan;
-				}
-				else
-				{
-					return 0.0f;
-				}
+            if (_sound != null)
+            {
+                return _sound.Pan;
+            }
+            else
+            {
+                return 0.0f;
+            }
 #endif
         }
-		
-		public float Pitch         
-		{             
-	        get
+
+        public float Pitch
+        {
+            get
             {
+                return PlatformGetPitch();
+            }
+            set
+            {
+                PlatformSetPitch(value);
+            }
+        }
+
+        private void PlatformSetPitch(float value)
+        {
 #if DIRECTX
-                    if (_voice == null)
-                        return 0.0f;
+            if (_voice == null)
+                return;
 
-                    // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
-                    // which avoids the native call and is actually more accurate.
-                    var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
-
-                    // Convert from semitones to octaves.
-                    pitch /= 12.0;
-
-                    return (float)pitch;
+            // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
+            // which avoids the native call and is actually more accurate.
+            var ratio = Math.Pow(2.0, value);
+            _voice.SetFrequencyRatio((float)ratio);
 #else
-                if ( _sound != null)
-				    {
-	                   return _sound.Rate;
-				    }
-				    return 0.0f;
+            if (_sound != null && _sound.Rate != value)
+                _sound.Rate = value;
 #endif
-	        }
-	        set
-            {
+        }
+
+        private float PlatformGetPitch()
+        {
 #if DIRECTX
-                if (_voice == null)
-                    return;
+            if (_voice == null)
+                return 0.0f;
 
-                // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
-                // which avoids the native call and is actually more accurate.
-                var ratio = Math.Pow(2.0, value);
-                _voice.SetFrequencyRatio((float)ratio);                  
+            // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
+            // which avoids the native call and is actually more accurate.
+            var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
+
+            // Convert from semitones to octaves.
+            pitch /= 12.0;
+
+            return (float)pitch;
 #else
-                if ( _sound != null && _sound.Rate != value)
-	                _sound.Rate = value;
-#endif
-	        }        
-		 }				
-		
-		public SoundState State 
-		{ 
-			get
+            if (_sound != null)
             {
-#if DIRECTX           
-                // If no voice or no buffers queued the sound is stopped.
-                if (_voice == null || _voice.State.BuffersQueued == 0)
-                    return SoundState.Stopped;
-                
-                // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
-                // we have to save the "paused" state ourself.
-                if (_paused)
-                    return SoundState.Paused;
+                return _sound.Rate;
+            }
 
-                return SoundState.Playing;                                
+            return 0.0f;
+#endif
+        }
+
+        public SoundState State
+        {
+            get
+            {
+                return PlatformGetState();
+            }
+        }
+
+        private SoundState PlatformGetState()
+        {
+#if DIRECTX
+            // If no voice or no buffers queued the sound is stopped.
+            if (_voice == null || _voice.State.BuffersQueued == 0)
+                return SoundState.Stopped;
+
+            // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
+            // we have to save the "paused" state ourself.
+            if (_paused)
+                return SoundState.Paused;
+
+            return SoundState.Playing;
 #elif ANDROID
                 // Android SoundPool can't tell us when a sound is finished playing.
                 // TODO: Remove this code when OpenAL for Android is implemented
@@ -611,54 +633,63 @@ namespace Microsoft.Xna.Framework.Audio
                     return SoundState.Stopped;
                 }
 #else
-                if (_sound != null && soundState == SoundState.Playing && !_sound.Playing) 
-                {
-                    soundState = SoundState.Stopped;
-                }
+            if (_sound != null && soundState == SoundState.Playing && !_sound.Playing)
+            {
+                soundState = SoundState.Stopped;
+            }
 
-                return soundState;
+            return soundState;
 #endif
-			} 
-		}
-		
-		public float Volume
-		{ 
-			get
+        }
+
+        public float Volume
+        {
+            get
             {
-#if DIRECTX
-                if (_voice == null)
-                    return 0.0f;
-                else
-                    return _voice.Volume;
-#else
-                if (_sound != null)
-				{
-					return _sound.Volume;
-				}
-				else
-				{
-					return 0.0f;
-				}
-#endif
-			}
-			
-			set
+                return PlatformGetVolume();
+            }
+
+            set
             {
+                PlatformSetVolume(value);
+            }
+        }
+
+        private void PlatformSetVolume(float value)
+        {
 #if DIRECTX
-                if (_voice != null)
-                    _voice.SetVolume(value, XAudio2.CommitNow);
+            if (_voice != null)
+                _voice.SetVolume(value, XAudio2.CommitNow);
 #else
-                if ( _sound != null )
-				{
-					if ( _sound.Volume != value )
-					{
-						_sound.Volume = value;
-					}
-				}
+            if (_sound != null)
+            {
+                if (_sound.Volume != value)
+                {
+                    _sound.Volume = value;
+                }
+            }
 #endif
-			}
-		}	
-		
-		
-	}
+        }
+
+        private float PlatformGetVolume()
+        {
+#if DIRECTX
+            if (_voice == null)
+                return 0.0f;
+            else
+                return _voice.Volume;
+#else
+            if (_sound != null)
+            {
+                return _sound.Volume;
+            }
+            else
+            {
+                return 0.0f;
+            }
+#endif
+        }
+
+
+    }
 }
