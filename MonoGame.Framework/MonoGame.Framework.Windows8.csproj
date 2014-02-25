@@ -44,6 +44,7 @@
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.XAudio.cs" />
+    <Compile Include="Audio\SoundEffectInstance.XAudio.cs" />
     <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
