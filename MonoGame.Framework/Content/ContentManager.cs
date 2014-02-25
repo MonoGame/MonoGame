@@ -49,10 +49,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Path = System.IO.Path;
 using System.Diagnostics;
 
-#if !WINRT
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -363,7 +361,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return SpriteFontReader.Normalize(assetName);
             }
-#if !WINRT
             else if ((typeof(T) == typeof(Song)))
             {
                 return SongReader.Normalize(assetName);
@@ -372,6 +369,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return SoundEffectReader.Normalize(assetName);
             }
+#if !WINRT
             else if ((typeof(T) == typeof(Video)))
             {
                 return Video.Normalize(assetName);
@@ -401,7 +399,6 @@ namespace Microsoft.Xna.Framework.Content
                 //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
                 throw new NotImplementedException();
             }
-#if !DIRECTX
             else if ((typeof(T) == typeof(Song)))
             {
                 return new Song(assetName);
@@ -410,6 +407,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return new SoundEffect(assetName);
             }
+#if !DIRECTX
             else if ((typeof(T) == typeof(Video)))
             {
                 return new Video(assetName);
