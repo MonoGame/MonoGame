@@ -112,88 +112,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Internal Constructors
 
-#if DIRECTX
         internal SoundEffect()
         {
-        }
-
-        // Extended constructor which supports custom formats / compression.
-        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
-        {
-            Initialize(format, buffer, offset, count, loopStart, loopLength);
-        }
-
-#else
-        internal SoundEffect(string fileName)
-        {
-            _filename = fileName;
-
-            if (_filename == string.Empty )
-            {
-                throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
-            }
-
-            _name = Path.GetFileNameWithoutExtension(fileName);
-
-#if (WINDOWS && OPENGL) || LINUX
-            Stream s;
-            try
-            {
-                s = File.OpenRead(fileName);
-            }
-            catch (IOException e)
-            {
-                throw new Content.ContentLoadException("Could not load audio data", e);
-            }
-
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
-#else
-            _sound = new Sound(_filename, 1.0f, false);
-#endif
-        }
-
-        //SoundEffect from playable audio data
-        internal SoundEffect(string name, byte[] data)
-        {
-            _data = data;
-            _name = name;
-
-#if (WINDOWS && OPENGL) || LINUX
-            Stream s;
-            try
-            {
-                s = new MemoryStream(data);
-            }
-            catch (IOException e)
-            {
-                throw new Content.ContentLoadException("Could not load audio data", e);
-            }
-            _data = LoadAudioStream(s, 1.0f, false);
-            s.Close();
-#else
-            _sound = new Sound(_data, 1.0f, false);
-#endif
-        }        
-#endif
-
-        internal SoundEffect(Stream s)
-        {
-#if (WINDOWS && OPENGL) || LINUX
-            _data = LoadAudioStream(s, 1.0f, false);
-#elif !DIRECTX
-            var data = new byte[s.Length];
-            s.Read(data, 0, (int)s.Length);
-
-            _data = data;
-            _sound = new Sound(_data, 1.0f, false);
-#endif
-        }
-
-        internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
-            : this(buffer, sampleRate, channels)
-        {
-            _name = name;
         }
 
         #endregion
@@ -282,9 +202,23 @@ namespace Microsoft.Xna.Framework.Audio
             return instance;
         }
 
-        public static SoundEffect FromStream(Stream stream)
-        {            
-            return new SoundEffect(stream);
+        public static SoundEffect FromStream(Stream s)
+        {
+            var sfx = new SoundEffect();
+
+#if (WINDOWS && OPENGL) || LINUX
+
+            sfx.LoadAudioStream(s, 1.0f, false);
+
+#elif !DIRECTX
+
+            var data = new byte[s.Length];
+            s.Read(data, 0, (int)s.Length);
+
+            sfx._data = data;
+            sfx._sound = new Sound(_data, 1.0f, false);
+#endif
+            return sfx;
         }
 
         #endregion
@@ -527,19 +461,17 @@ namespace Microsoft.Xna.Framework.Audio
         #region Additional OpenTK SoundEffect Code
 
 #if (WINDOWS && OPENGL) || LINUX
-        byte[] LoadAudioStream(Stream s, float volume, bool looping)
+        void LoadAudioStream(Stream s, float volume, bool looping)
         {
             ALFormat format;
             int size;
             int freq;
-            byte[] data;
 
-            data = AudioLoader.Load(s, out format, out size, out freq);
+            _data = AudioLoader.Load(s, out format, out size, out freq);
 
             Format = format;
             Size = size;
             Rate = freq;
-            return data;
         }
 #endif
 
