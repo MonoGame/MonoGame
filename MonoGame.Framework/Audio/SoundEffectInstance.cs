@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private bool isDisposed = false;
 #if !DIRECTX
-        private SoundState soundState = SoundState.Stopped;
+        //private SoundState soundState = SoundState.Stopped;
 #endif
 
 #if ANDROID
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if !DIRECTX
-        private Sound _sound;
+        /*private Sound _sound;
 		internal Sound Sound 
 		{ 
 			get
@@ -71,10 +71,38 @@ namespace Microsoft.Xna.Framework.Audio
 			{
 				_sound = value;
 			} 
-		}
+		}*/
 #endif
 
-#if !DIRECTX
+        public bool IsLooped
+        { 
+            get { return PlatformGetIsLooped(); }
+            set { PlatformSetIsLooped(value); }
+        }
+
+        public float Pan
+        {
+            get { return PlatformGetPan(); } 
+            set { PlatformSetPan(value); }
+        }
+
+        public float Pitch
+        {
+            get { return PlatformGetPitch(); }
+            set { PlatformSetPitch(value); }
+        }
+
+        public SoundState State { get { return PlatformGetState(); } }
+
+        public bool IsDisposed { get { return isDisposed; } }
+
+        public float Volume
+        {
+            get { return PlatformGetVolume(); } 
+            set { PlatformSetVolume(value); }
+        }
+
+#if !DIRECTX && !(WINDOWS && OPENGL) && !LINUX && !MONOMAC
 
         internal SoundEffectInstance(){}
 
@@ -111,12 +139,6 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 #endif
-
-        public void Dispose()
-        {
-            PlatformDispose();
-            isDisposed = true;
-        }
 
         public void Apply3D(AudioListener listener, AudioEmitter emitter)
         {
@@ -163,7 +185,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop()
         {
-            Stop(true);
+            PlatformStop(true);
         }
 
         public void Stop(bool immediate)
@@ -171,71 +193,14 @@ namespace Microsoft.Xna.Framework.Audio
             PlatformStop(immediate);
         }
 
-        public bool IsDisposed
+        public void Dispose()
         {
-            get
-            {
-                return isDisposed;
-            }
-        }
+            if (isDisposed)
+                return;
 
-        public bool IsLooped
-        {
-            get
-            {
-                return PlatformGetIsLooped();
-            }
+            PlatformDispose();
 
-            set
-            {
-                PlatformSetIsLooped(value);
-            }
-        }
-
-        public float Pan
-        {
-            get
-            {
-                return PlatformGetPan();
-            }
-
-            set
-            {
-                PlatformSetPan(value);
-            }
-        }
-
-        public float Pitch
-        {
-            get
-            {
-                return PlatformGetPitch();
-            }
-            set
-            {
-                PlatformSetPitch(value);
-            }
-        }
-
-        public SoundState State
-        {
-            get
-            {
-                return PlatformGetState();
-            }
-        }
-
-        public float Volume
-        {
-            get
-            {
-                return PlatformGetVolume();
-            }
-
-            set
-            {
-                PlatformSetVolume(value);
-            }
+            isDisposed = true;
         }
     }
 }

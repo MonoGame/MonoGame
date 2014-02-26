@@ -40,534 +40,366 @@
 
 #region Using Statements
 using System;
-#if DIRECTX
-using SharpDX.XAudio2;
-using SharpDX.X3DAudio;
-using SharpDX.Multimedia;
-#else
 using System.IO;
+
+#if MONOMAC
+using MonoMac.OpenAL;
+#else
+using OpenTK.Audio.OpenAL;
 #endif
 #endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed class SoundEffectInstance : IDisposable
+    public sealed partial class SoundEffectInstance : IDisposable
     {
-        private bool isDisposed = false;
-#if !DIRECTX
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
         private SoundState soundState = SoundState.Stopped;
-#endif
-#if ANDROID
-        private int _streamId = -1;
-#endif
+        private OALSoundBuffer soundBuffer;
+        private OpenALSoundController controller;
 
-#if DIRECTX        
-        private SourceVoice _voice { get; set; }
-        private SoundEffect _effect { get; set; }
+        private float _volume = 1.0f;
+        private bool _looped = false;
+        private float _pan = 0f;
+        private float _pitch = 0f;
 
-        private bool _paused;
-        private bool _loop;
-#else
-        private Sound _sound;
-        internal Sound Sound
-        {
-            get
-            {
-                return _sound;
-            }
+        bool hasSourceId = false;
+        int sourceId;
 
-            set
-            {
-                _sound = value;
-            }
-        }
 #endif
 
-#if DIRECTX
-        internal SoundEffectInstance(SoundEffect effect, SourceVoice voice)
-        {
-            _effect = effect;
-            _voice = voice;
-        }
-#else
-        internal SoundEffectInstance() { }
+        #region Initialization
 
-        /* Creates a standalone SoundEffectInstance from given wavedata. */
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+        /// <summary>
+        /// Creates a standalone SoundEffectInstance from given wavedata.
+        /// </summary>
         internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
         {
-            // buffer should contain 16-bit PCM wave data
-            short bitsPerSample = 16;
-
-            using (var mStream = new MemoryStream(44 + buffer.Length))
-            using (var writer = new BinaryWriter(mStream))
-            {
-                writer.Write("RIFF".ToCharArray()); //chunk id
-                writer.Write((int)(36 + buffer.Length)); //chunk size
-                writer.Write("WAVE".ToCharArray()); //RIFF type
-
-                writer.Write("fmt ".ToCharArray()); //chunk id
-                writer.Write((int)16); //format header size
-                writer.Write((short)1); //format (PCM)
-                writer.Write((short)channels);
-                writer.Write((int)sampleRate);
-                short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
-                writer.Write((int)(sampleRate * blockAlign)); //byte rate
-                writer.Write((short)blockAlign);
-                writer.Write((short)bitsPerSample);
-
-                writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size
-
-                writer.Write(buffer);
-
-                _sound = new Sound(mStream.ToArray(), 1.0f, false);
-                _sound.Rate = sampleRate;
-            }
+            InitializeSound();
+            BindDataBuffer(
+                buffer,
+                (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16,
+                buffer.Length,
+                sampleRate
+            );
         }
+
+        /// <summary>
+        /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
+        /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
+        /// </summary>
+        /// <param name="parent"></param>
+        public SoundEffectInstance(SoundEffect parent)
+        {
+            InitializeSound();
+            BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
+        }
+
+        /// <summary>
+        /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
+        /// that is created in the InitializeSound method.
+        /// </summary>
+        /// <param name="data">The sound data buffer</param>
+        /// <param name="format">The sound buffer data format, e.g. Mono, Mono16 bit, Stereo, etc.</param>
+        /// <param name="size">The size of the data buffer</param>
+        /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
+        [CLSCompliant(false)]
+        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        {
+            soundBuffer.BindDataBuffer(data, format, size, rate);
+        }
+
+        /// <summary>
+        /// Gets the OpenAL sound controller, constructs the sound buffer, and sets up the event delegates for
+        /// the reserved and recycled events.
+        /// </summary>
+        private void InitializeSound()
+        {
+            controller = OpenALSoundController.GetInstance;
+            soundBuffer = new OALSoundBuffer();
+            soundBuffer.Reserved += HandleSoundBufferReserved;
+            soundBuffer.Recycled += HandleSoundBufferRecycled;
+        }
+
 #endif
 
-        public void Dispose()
+        #endregion
+
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+        /// <summary>
+        /// Event handler that resets internal state of this instance. The sound state will report
+        /// SoundState.Stopped after this event handler.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandleSoundBufferRecycled(object sender, EventArgs e)
         {
-            PlatformDispose();
-            isDisposed = true;
+            sourceId = 0;
+            hasSourceId = false;
+            soundState = SoundState.Stopped;
+            //Console.WriteLine ("recycled: " + soundEffect.Name);
         }
 
-        private void PlatformDispose()
+        /// <summary>
+        /// Called after the hardware has allocated a sound buffer, this event handler will
+        /// maintain the numberical ID of the source ID.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandleSoundBufferReserved(object sender, EventArgs e)
         {
-#if DIRECTX
-            if (_voice != null)
-            {
-                _voice.DestroyVoice();
-                _voice.Dispose();
-                _voice = null;
-            }
-            _effect = null;
-#elif ANDROID
-            if (_streamId >= 0)
-                _sound.Stop(_streamId);
-#else
-            // When disposing a SoundEffectInstance, the Sound should
-            // just be stopped as it will likely be reused later
-            _sound.Stop();
+            sourceId = soundBuffer.SourceId;
+            hasSourceId = true;
+        }
+
+        /// <summary>
+        /// Converts the XNA [-1,1] pitch range to OpenAL (-1,+INF].
+        /// <param name="xnaPitch">The pitch of the sound in the Microsoft XNA range.</param>
+        /// </summary>
+        private float XnaPitchToAlPitch(float xnaPitch)
+        {
+            /*XNA sets pitch bounds to [-1.0f, 1.0f], each end being one octave.
+            •OpenAL's AL_PITCH boundaries are (0.0f, INF). *
+            •Consider the function f(x) = 2 ^ x
+            •The domain is (-INF, INF) and the range is (0, INF). *
+            •0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
+            •Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
+            •XNA's pitch values are on the domain, OpenAL's are on the range.
+            •Remember: the XNA limit is arbitrarily between two octaves on the domain. *
+            •To convert, we just plug XNA pitch into f(x).*/
+
+            if (xnaPitch < -1.0f || xnaPitch > 1.0f)
+                throw new ArgumentOutOfRangeException("XNA PITCH MUST BE WITHIN [-1.0f, 1.0f]!");
+
+            return (float)Math.Pow(2, xnaPitch);
+        }
+
 #endif
-        }
-
-        public void Apply3D(AudioListener listener, AudioEmitter emitter)
-        {
-            PlatformApply3D(listener, emitter);
-        }
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
-#if DIRECTX
-            // If we have no voice then nothing to do.
-            if (_voice == null)
-                return;
 
-            // Convert from XNA Emitter to a SharpDX Emitter
-            var e = emitter.ToEmitter();
-            e.CurveDistanceScaler = SoundEffect.DistanceScale;
-            e.DopplerScaler = SoundEffect.DopplerScale;
-            e.ChannelCount = _effect._format.Channels;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
-            // Convert from XNA Listener to a SharpDX Listener
-            var l = listener.ToListener();
+            // get AL's listener position
+            float x, y, z;
+            AL.GetListener(ALListener3f.Position, out x, out y, out z);
 
-            // Number of channels in the sound being played.
-            // Not actually sure if XNA supported 3D attenuation of sterio sounds, but X3DAudio does.
-            var srcChannelCount = _effect._format.Channels;
+            // get the emitter offset from origin
+            Vector3 posOffset = emitter.Position - listener.Position;
+            // set up orientation matrix
+            Matrix orientation = Matrix.CreateWorld(Vector3.Zero, listener.Forward, listener.Up);
+            // set up our final position and velocity according to orientation of listener
+            Vector3 finalPos = new Vector3(x + posOffset.X, y + posOffset.Y, z + posOffset.Z);
+            finalPos = Vector3.Transform(finalPos, orientation);
+            Vector3 finalVel = emitter.Velocity;
+            finalVel = Vector3.Transform(finalVel, orientation);
 
-            // Number of output channels.
-            var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
-
-            // XNA supports distance attenuation and doppler.            
-            var dpsSettings = SoundEffect.Device3D.Calculate(l, e, CalculateFlags.Matrix | CalculateFlags.Doppler, srcChannelCount, dstChannelCount);
-
-            // Apply Volume settings (from distance attenuation) ...
-            _voice.SetOutputMatrix(SoundEffect.MasterVoice, srcChannelCount, dstChannelCount, dpsSettings.MatrixCoefficients, 0);
-
-            // Apply Pitch settings (from doppler) ...
-            _voice.SetFrequencyRatio(dpsSettings.DopplerFactor);
+            // set the position based on relative positon
+            AL.Source(sourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
+            AL.Source(sourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
 #endif
-        }
-
-        public void Apply3D(AudioListener[] listeners, AudioEmitter emitter)
-        {
-            foreach (var l in listeners)
-                Apply3D(l, emitter);
-        }
-
-        public void Pause()
-        {
-            PlatformPause();
         }
 
         private void PlatformPause()
         {
-#if DIRECTX
-            if (_voice != null)
-                _voice.Stop();
-            _paused = true;
-#else
-            if (_sound != null)
-            {
-#if ANDROID
-				_sound.Pause(_streamId);
-#else
-                _sound.Pause();
-#endif
-                soundState = SoundState.Paused;
-            }
-#endif
-        }
 
-        public void Play()
-        {
-            if (State == SoundState.Playing)
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+            if (!hasSourceId || soundState != SoundState.Playing)
                 return;
 
-            PlatformPlay();
+            controller.PauseSound(soundBuffer);
+#else
+            if (_sound == null)
+                return;
+#if ANDROID
+			_sound.Pause(_streamId);
+#else
+            _sound.Pause();
+#endif
+#endif
+            soundState = SoundState.Paused;
+            
         }
 
         private void PlatformPlay()
         {
-#if DIRECTX
-            if (_voice != null)
-            {
-                // Choose the correct buffer depending on if we are looped.            
-                var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
-                if (_voice.State.BuffersQueued > 0)
-                {
-                    _voice.Stop();
-                    _voice.FlushSourceBuffers();
-                }
+            if (hasSourceId)
+                return;
+            
+            bool isSourceAvailable = controller.ReserveSource (soundBuffer);
+            if (!isSourceAvailable)
+                throw new InstancePlayLimitException();
 
-                _voice.SubmitSourceBuffer(buffer, null);
-                _voice.Start();
-            }
+            int bufferId = soundBuffer.OpenALDataBuffer;
+            AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
 
-            _paused = false;
+            // Send the position, gain, looping, pitch, and distance model to the OpenAL driver.
+            if (!hasSourceId)
+				return;
+
+			// Distance Model
+			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
+			// Pan
+			AL.Source (sourceId, ALSource3f.Position, _pan, 0, 0.1f);
+			// Volume
+			AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
+			// Looping
+			AL.Source (sourceId, ALSourceb.Looping, IsLooped);
+			// Pitch
+			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+
+            controller.PlaySound (soundBuffer);            
+            //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 #else
-            if (_sound != null)
-            {
+
+            if (_sound== null)
+                return;
 #if ANDROID
-				if (soundState == SoundState.Paused)
-					_sound.Resume(_streamId);
-				else
-					_streamId = _sound.Play();
+			if (soundState == SoundState.Paused)
+				_sound.Resume(_streamId);
+			else
+				_streamId = _sound.Play();
 #else
-                if (soundState == SoundState.Paused)
-                    _sound.Resume();
-                else
-                    _sound.Play();
+            if (soundState == SoundState.Paused)
+                _sound.Resume();
+            else
+                _sound.Play();
 #endif
-                soundState = SoundState.Playing;
-            }
 #endif
-        }
-
-        /// <summary>
-        /// Tries to play the sound, returns true if successful
-        /// </summary>
-        /// <returns></returns>
-        internal bool TryPlay()
-        {
-            Play();
-#if ANDROID
-			return _streamId != 0;
-#else
-            return true;
-#endif
-        }
-
-        public void Resume()
-        {
-            PlatformResume();
+            soundState = SoundState.Playing;
         }
 
         private void PlatformResume()
         {
-#if DIRECTX
-            if (_voice != null)
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+            if (!hasSourceId)
             {
-                // Restart the sound if (and only if) it stopped playing
-                if (!_loop)
-                {
-                    if (_voice.State.BuffersQueued == 0)
-                    {
-                        _voice.Stop();
-                        _voice.FlushSourceBuffers();
-                        _voice.SubmitSourceBuffer(_effect._buffer, null);
-                    }
-                }
-                _voice.Start();
+                Play();
+                return;
             }
-            _paused = false;
+            
+            if (soundState == SoundState.Paused)
+                controller.ResumeSound(soundBuffer);
 #else
-            if (_sound != null)
+            if (_sound == null)
+                return;
+            
+            if (soundState == SoundState.Paused)
             {
-                if (soundState == SoundState.Paused)
-                {
 #if ANDROID
-					_sound.Resume(_streamId);
+				_sound.Resume(_streamId);
 #else
-                    _sound.Resume();
+                _sound.Resume();
 #endif
-                }
-                soundState = SoundState.Playing;
             }
 #endif
-        }
-
-        public void Stop()
-        {
-            Stop(true);
-        }
-
-        public void Stop(bool immediate)
-        {
-            PlatformStop(immediate);
+            soundState = SoundState.Playing;
         }
 
         private void PlatformStop(bool immediate)
         {
-#if DIRECTX
-            if (_voice != null)
-            {
-                if (immediate)
-                {
-                    _voice.Stop(0);
-                    _voice.FlushSourceBuffers();
-                }
-                else
-                    _voice.Stop((int)PlayFlags.Tails);
-            }
 
-            _paused = false;
-#else
-            if (_sound != null)
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+            if (hasSourceId)
             {
+                //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
+                controller.StopSound(soundBuffer);
+            }
+#else
+            if (_sound == null)
+                return;
+            
 #if ANDROID
-                _sound.Stop(_streamId);
-                _streamId = -1;
+            _sound.Stop(_streamId);
+            _streamId = -1;
 #else
-                _sound.Stop();
+            _sound.Stop();
 #endif
-                soundState = SoundState.Stopped;
-            }
 #endif
-        }
-
-        public bool IsDisposed
-        {
-            get
-            {
-                return isDisposed;
-            }
-        }
-
-        public bool IsLooped
-        {
-            get
-            {
-                return PlatformGetIsLooped();
-            }
-
-            set
-            {
-                PlatformSetIsLooped(value);
-            }
+            soundState = SoundState.Stopped;
         }
 
         private void PlatformSetIsLooped(bool value)
         {
-#if DIRECTX
-            _loop = value;
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+            
+            _looped = value;
+            
+            if (hasSourceId)
+                AL.Source(sourceId, ALSourceb.Looping, _looped);
+            
 #else
-            if (_sound != null)
-            {
-                if (_sound.Looping != value)
-                {
-                    _sound.Looping = value;
-                }
-            }
+            if (_sound != null && _sound.Looping != value)
+                _sound.Looping = value;
 #endif
         }
 
         private bool PlatformGetIsLooped()
         {
-#if DIRECTX
-            return _loop;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+            
+            return _looped;
 #else
+
             if (_sound != null)
-            {
                 return _sound.Looping;
-            }
-            else
-            {
-                return false;
-            }
+            
+            return false;
 #endif
-        }
-
-#if DIRECTX
-        private float _pan;
-        private static float[] _panMatrix;
-#endif
-
-        public float Pan
-        {
-            get
-            {
-                return PlatformGetPan();
-            }
-
-            set
-            {
-                PlatformSetPan(value);
-            }
         }
 
         private void PlatformSetPan(float value)
         {
-#if DIRECTX
-            // According to XNA documentation:
-            // "Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered."
-            _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
-            // If we have no voice then nothing more to do.
-            if (_voice == null)
-                return;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
-            var srcChannelCount = _effect._format.Channels;
-            var dstChannelCount = SoundEffect.MasterVoice.VoiceDetails.InputChannelCount;
-
-            if (_panMatrix == null || _panMatrix.Length < dstChannelCount)
-                _panMatrix = new float[Math.Max(dstChannelCount, 8)];
-
-            // Default to full volume for all channels/destinations   
-            for (var i = 0; i < _panMatrix.Length; i++)
-                _panMatrix[i] = 1.0f;
-
-            // From X3DAudio documentation:
-            /*
-                For submix and mastering voices, and for source voices without a channel mask or a channel mask of 0, 
-                   XAudio2 assumes default speaker positions according to the following table. 
-
-                Channels
-
-                Implicit Channel Positions
-
-                1 Always maps to FrontLeft and FrontRight at full scale in both speakers (special case for mono sounds) 
-                2 FrontLeft, FrontRight (basic stereo configuration) 
-                3 FrontLeft, FrontRight, LowFrequency (2.1 configuration) 
-                4 FrontLeft, FrontRight, BackLeft, BackRight (quadraphonic) 
-                5 FrontLeft, FrontRight, FrontCenter, SideLeft, SideRight (5.0 configuration) 
-                6 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight (5.1 configuration) (see the following remarks) 
-                7 FrontLeft, FrontRight, FrontCenter, LowFrequency, SideLeft, SideRight, BackCenter (6.1 configuration) 
-                8 FrontLeft, FrontRight, FrontCenter, LowFrequency, BackLeft, BackRight, SideLeft, SideRight (7.1 configuration) 
-                9 or more No implicit positions (one-to-one mapping)                      
-             */
-
-            // Notes:
-            //
-            // Since XNA does not appear to expose any 'master' voice channel mask / speaker configuration,
-            // I assume the mappings listed above should be used.
-            //
-            // Assuming it is correct to pan all channels which have a left/right component.
-
-            var lVal = 1.0f - _pan;
-            var rVal = 1.0f + _pan;
-
-            switch (SoundEffect.Speakers)
-            {
-                case Speakers.Stereo:
-                case Speakers.TwoPointOne:
-                case Speakers.Surround:
-                    _panMatrix[0] = lVal;
-                    _panMatrix[1] = rVal;
-                    break;
-
-                case Speakers.Quad:
-                    _panMatrix[0] = _panMatrix[2] = lVal;
-                    _panMatrix[1] = _panMatrix[3] = rVal;
-                    break;
-
-                case Speakers.FourPointOne:
-                    _panMatrix[0] = _panMatrix[3] = lVal;
-                    _panMatrix[1] = _panMatrix[4] = rVal;
-                    break;
-
-                case Speakers.FivePointOne:
-                case Speakers.SevenPointOne:
-                case Speakers.FivePointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = rVal;
-                    break;
-
-                case Speakers.SevenPointOneSurround:
-                    _panMatrix[0] = _panMatrix[4] = _panMatrix[6] = lVal;
-                    _panMatrix[1] = _panMatrix[5] = _panMatrix[7] = rVal;
-                    break;
-
-                case Speakers.Mono:
-                default:
-                    // don't do any panning here   
-                    break;
-            }
-
-            _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
+            _pan = value;
+            if (hasSourceId)
+                AL.Source(sourceId, ALSource3f.Position, _pan, 0.0f, 0.1f);
 
 #else
-            if (_sound != null)
-            {
-                if (_sound.Pan != value)
-                {
-                    _sound.Pan = value;
-                }
-            }
+
+            if (_sound != null && _sound.Pan != value)
+                _sound.Pan = value;
 #endif
         }
 
         private float PlatformGetPan()
         {
-#if DIRECTX
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
             return _pan;
 #else
-            if (_sound != null)
-            {
-                return _sound.Pan;
-            }
-            else
-            {
+            if (_sound == null)
                 return 0.0f;
-            }
+            
+            return _sound.Pan;
 #endif
-        }
-
-        public float Pitch
-        {
-            get
-            {
-                return PlatformGetPitch();
-            }
-            set
-            {
-                PlatformSetPitch(value);
-            }
         }
 
         private void PlatformSetPitch(float value)
         {
-#if DIRECTX
-            if (_voice == null)
-                return;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+            _pitch = value;
 
-            // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
-            // which avoids the native call and is actually more accurate.
-            var ratio = Math.Pow(2.0, value);
-            _voice.SetFrequencyRatio((float)ratio);
+			if (hasSourceId)
+				AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 #else
             if (_sound != null && _sound.Rate != value)
                 _sound.Rate = value;
@@ -576,120 +408,90 @@ namespace Microsoft.Xna.Framework.Audio
 
         private float PlatformGetPitch()
         {
-#if DIRECTX
-            if (_voice == null)
-                return 0.0f;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
-            // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
-            // which avoids the native call and is actually more accurate.
-            var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
-
-            // Convert from semitones to octaves.
-            pitch /= 12.0;
-
-            return (float)pitch;
+            return _pitch;
 #else
-            if (_sound != null)
-            {
-                return _sound.Rate;
-            }
-
-            return 0.0f;
+            if (_sound == null)
+                return 0.0f;
+            
+            return _sound.Rate
 #endif
-        }
-
-        public SoundState State
-        {
-            get
-            {
-                return PlatformGetState();
-            }
         }
 
         private SoundState PlatformGetState()
         {
-#if DIRECTX
-            // If no voice or no buffers queued the sound is stopped.
-            if (_voice == null || _voice.State.BuffersQueued == 0)
-                return SoundState.Stopped;
 
-            // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
-            // we have to save the "paused" state ourself.
-            if (_paused)
-                return SoundState.Paused;
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
-            return SoundState.Playing;
+            return soundState;
+
 #elif ANDROID
-                // Android SoundPool can't tell us when a sound is finished playing.
-                // TODO: Remove this code when OpenAL for Android is implemented
-                if (_sound != null && IsLooped)
-                {
-                    // Looping sounds use our stored state
-                    return soundState;
-                }
-                else
-                {
-                    // Non looping sounds always return Stopped
-                    return SoundState.Stopped;
-                }
+            // Android SoundPool can't tell us when a sound is finished playing.
+            // TODO: Remove this code when OpenAL for Android is implemented
+            if (_sound != null && IsLooped)
+            {
+                // Looping sounds use our stored state
+                return soundState;
+            }
+            else
+            {
+                // Non looping sounds always return Stopped
+                return SoundState.Stopped;
+            }
 #else
             if (_sound != null && soundState == SoundState.Playing && !_sound.Playing)
-            {
                 soundState = SoundState.Stopped;
-            }
 
             return soundState;
 #endif
         }
 
-        public float Volume
-        {
-            get
-            {
-                return PlatformGetVolume();
-            }
-
-            set
-            {
-                PlatformSetVolume(value);
-            }
-        }
-
         private void PlatformSetVolume(float value)
         {
-#if DIRECTX
-            if (_voice != null)
-                _voice.SetVolume(value, XAudio2.CommitNow);
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+            _volume = value;
+			if (hasSourceId)
+				AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
+
 #else
-            if (_sound != null)
-            {
-                if (_sound.Volume != value)
-                {
-                    _sound.Volume = value;
-                }
-            }
+            if (_sound != null && _sound.Volume != value)
+                _sound.Volume = value;
 #endif
         }
 
         private float PlatformGetVolume()
         {
-#if DIRECTX
-            if (_voice == null)
-                return 0.0f;
-            else
-                return _voice.Volume;
+
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+
+            return _volume;
 #else
-            if (_sound != null)
-            {
-                return _sound.Volume;
-            }
-            else
-            {
+            if (_sound == null)
                 return 0.0f;
-            }
+            
+            return _sound.Volume;
+
 #endif
         }
 
+        private void PlatformDispose()
+        {
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC
 
+            this.Stop(true);
+            soundBuffer.Reserved -= HandleSoundBufferReserved;
+            soundBuffer.Recycled -= HandleSoundBufferRecycled;
+            soundBuffer.Dispose();
+            soundBuffer = null;
+
+#else
+            // When disposing a SoundEffectInstance, the Sound should
+            // just be stopped as it will likely be reused later
+            _sound.Stop();
+#endif
+        }
     }
 }
