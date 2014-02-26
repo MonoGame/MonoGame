@@ -381,7 +381,7 @@
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\MultiSampleType.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs">
-      <Platforms>MacOS,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
@@ -535,13 +535,11 @@
     </Compile>
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs">
-      <ExcludePlatforms>Android,Ouya</ExcludePlatforms>	
+      <ExcludePlatforms>Android,Ouya,Linux</ExcludePlatforms>	
     </Compile>
-    <Compile Include="Media\VideoSoundtrackType.cs">
-      <Platforms>Linux,MacOS,Windows,WindowsGL</Platforms>
-    </Compile>
+    <Compile Include="Media\VideoSoundtrackType.cs" />
+	
 
-    
     <!-- Microsoft.Devices.Sensors -->
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
       <Platforms>Android,iOS,Ouya</Platforms>
