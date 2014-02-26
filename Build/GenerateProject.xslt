@@ -33,12 +33,40 @@
       }
     }
     
-    public bool ProjectIsActive(string platformString, string activePlatform)
+    public bool ProjectIsActive(
+      string platformString,
+      string includePlatformString,
+      string excludePlatformString,
+      string activePlatform)
     {
+      // Choose either <Platforms> or <IncludePlatforms>
+      if (string.IsNullOrEmpty(platformString))
+      {
+        platformString = includePlatformString;
+      }
+      
+      // If the exclude string is set, then we must check this first.
+      if (!string.IsNullOrEmpty(excludePlatformString))
+      {
+        var excludePlatforms = excludePlatformString.Split(',');
+        foreach (var i in excludePlatforms)
+        {
+          if (i == activePlatform)
+          {
+            // This platform is excluded.
+            return false;
+          }
+        }
+      }
+      
+      // If the platform string is empty at this point, then we allow
+      // all platforms since there's no whitelist of platforms configured.
       if (string.IsNullOrEmpty(platformString))
       {
         return true;
       }
+      
+      // Otherwise ensure the platform is in the include list.
       var platforms = platformString.Split(',');
       foreach (var i in platforms)
       {
@@ -47,6 +75,7 @@
           return true;
         }
       }
+      
       return false;
     }
     public bool IsTrue(string text)
@@ -386,6 +415,7 @@
               <xsl:value-of select="$project/@Name" />
             </xsl:otherwise>
           </xsl:choose>
+
         </AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <xsl:call-template name="profile_and_version" />
@@ -807,6 +837,8 @@
         <xsl:for-each select="$project/Files/Compile">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -824,6 +856,8 @@
         <xsl:for-each select="$project/Files/None">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -841,6 +875,8 @@
         <xsl:for-each select="$project/Files/Content">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -858,6 +894,8 @@
         <xsl:for-each select="$project/Files/EmbeddedResource">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -875,6 +913,8 @@
         <xsl:for-each select="$project/Files/EmbeddedShaderProgram">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -892,6 +932,8 @@
         <xsl:for-each select="$project/Files/ShaderProgram">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -908,6 +950,8 @@
         <xsl:for-each select="$project/Files/ApplicationDefinition">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -924,6 +968,8 @@
         <xsl:for-each select="$project/Files/Page">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -940,6 +986,8 @@
         <xsl:for-each select="$project/Files/AppxManifest">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -957,6 +1005,8 @@
         <xsl:for-each select="$project/Files/BundleResource">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -973,6 +1023,8 @@
         <xsl:for-each select="$project/Files/InterfaceDefinition">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -989,6 +1041,8 @@
         <xsl:for-each select="$project/Files/AndroidResource">
           <xsl:if test="user:ProjectIsActive(
               ./Platforms,
+              ./IncludePlatforms,
+              ./ExcludePlatforms,
               /Input/Generation/Platform)">
             <xsl:element
               name="{name()}"
@@ -1116,33 +1170,6 @@
 
       {ADDITIONAL_TRANSFORMS}
 
-      <xsl:if test="$project/NuGet">
-        <UsingTask
-          TaskName="Protobuild.Tasks.NugetPackTask">
-          <xsl:attribute name="AssemblyFile">
-            <xsl:value-of select="/Input/Generation/RootPath" />
-            <xsl:text>Protobuild.exe</xsl:text>
-          </xsl:attribute>
-        </UsingTask>
-
-        <Target Name="AfterBuild">
-          <NugetPackTask
-            ProjectPath="$(ProjectDir)"
-            ContinueOnError="WarnAndContinue">
-            <xsl:attribute name="NuspecFile">
-              <xsl:value-of select="concat(
-                $project/@Name,
-                '.',
-                /Input/Generation/Platform,
-                '.nuspec')" />
-            </xsl:attribute>
-            <xsl:attribute name="RootPath">
-              <xsl:value-of select="/Input/Generation/RootPath" />
-            </xsl:attribute>
-          </NugetPackTask>
-        </Target>
-      </xsl:if>
-
       <ItemGroup>
         <xsl:for-each select="$project/References/Reference">
           <xsl:variable name="include-name" select="./@Include" />
@@ -1214,6 +1241,8 @@
 
               <xsl:if test="user:ProjectIsActive(
                 $project/@Platforms,
+                '',
+                '',
                 /Input/Generation/Platform)">
 
                 <ProjectReference>
