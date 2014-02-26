@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Audio
             set { PlatformSetVolume(value); }
         }
 
-#if !DIRECTX && !(WINDOWS && OPENGL) && !LINUX && !MONOMAC
+#if !DIRECTX && !(WINDOWS && OPENGL) && !LINUX && !MONOMAC && !IOS
 
         internal SoundEffectInstance(){}
 

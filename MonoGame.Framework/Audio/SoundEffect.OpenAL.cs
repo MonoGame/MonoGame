@@ -112,6 +112,9 @@ namespace Microsoft.Xna.Framework.Audio
 #elif (MONOMAC || IOS)
 
             AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
+
+			var audiodata = new byte[s.Length];
+			s.Read(audiodata, 0, (int)s.Length);
             afs.ParseBytes (audiodata, false); // AudioFileStreamStatus status
             AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
             
@@ -222,7 +225,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SoundEffectInstance PlatformCreateInstance()
         {
-#if (WINDOWS && OPENGL) || LINUX
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
             return new SoundEffectInstance(this);
 
 #elif ANDROID
@@ -310,7 +313,8 @@ namespace Microsoft.Xna.Framework.Audio
 			instance.Volume = volume;
 			instance.Pitch = pitch;
 			instance.Pan = pan;
-			return instance.TryPlay();
+            instance.Play();
+            return true;
 #elif ANDROID
 
 			if(_instance == null)
@@ -342,7 +346,7 @@ namespace Microsoft.Xna.Framework.Audio
         private TimeSpan PlatformGetDuration()
         {
 
-#if (WINDOWS && OPENGL) || LINUX
+#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
 
              return _duration;
 
