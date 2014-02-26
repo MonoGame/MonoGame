@@ -160,25 +160,23 @@
   <Platform Type="WindowsPhone">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.dll" />
-    <Binary
-      Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.XAudio2.dll" />
-    <Binary
-      Name="SharpDX.XInput"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/x86/SharpDX.XInput.dll" />  
+      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
+	<Reference	Include="Microsoft.Xna.Framework.GamerServices" 
+				Aliases="MicrosoftXnaGamerServices" />
+	<Reference	Include="Microsoft.Xna.Framework" 
+				Aliases="MicrosoftXnaFramework" />
   </Platform>
  
 </ExternalProject>
