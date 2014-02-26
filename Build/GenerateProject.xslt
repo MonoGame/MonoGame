@@ -110,6 +110,11 @@
         <TargetFrameworkProfile></TargetFrameworkProfile>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:choose>
+		<xsl:when test="/Input/Generation/Platform = 'Windows8'">
+			<DefaultLanguage>en-US</DefaultLanguage>
+		</xsl:when>
+	</xsl:choose>
   </xsl:template>
 
   <xsl:template name="configuration"
@@ -1087,7 +1092,7 @@
           </Target>
         </xsl:when>
         <xsl:otherwise>
-          <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+          <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
         </xsl:otherwise>
       </xsl:choose>
 
