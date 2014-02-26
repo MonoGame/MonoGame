@@ -1,42 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 ﻿
 using System;
 using System.Collections.Generic;
@@ -46,7 +10,7 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if (WINDOWS && OPENGL) || LINUX
+#if WINDOWS || LINUX
 using OpenTK.Audio.OpenAL;
 #elif ANDROID
 using Android.Content;
@@ -80,15 +44,16 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal float Rate { get; set; }
 
-#if (WINDOWS && OPENGL) || LINUX || IOS || MONOMAC
+#if WINDOWS || LINUX || IOS || MONOMAC
 
         private TimeSpan _duration = TimeSpan.Zero;
 
         internal int Size { get; set; }
 
         internal ALFormat Format { get; set; }
-#elif ANDROID
+#endif
 
+#if ANDROID
 		private SoundEffectInstance _instance;
 		private int _soundID = -1;
 #endif
@@ -97,7 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
-#if (WINDOWS && OPENGL) || LINUX
+#if WINDOWS || LINUX
             
             ALFormat format;
             int size;
@@ -108,8 +73,9 @@ namespace Microsoft.Xna.Framework.Audio
             Format = format;
             Size = size;
             Rate = freq;
+#endif
 
-#elif (MONOMAC || IOS)
+#if MONOMAC || IOS
 
             AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
 
@@ -136,7 +102,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 			afs.Close ();
 
-#elif ANDROID
+#endif
+
+#if ANDROID
 
 			// Creating a soundeffect from a stream
 			// doesn't seem to be supported in Android
@@ -147,13 +115,15 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			Rate = (float)sampleRate;
 
-#if (WINDOWS && OPENGL) || LINUX
+#if WINDOWS || LINUX
 
             _data = buffer;
             Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
 
-#elif MONOMAC || IOS
+#endif
+
+#if MONOMAC || IOS
 
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
@@ -171,7 +141,9 @@ namespace Microsoft.Xna.Framework.Audio
             _name = "";
             _data = buffer;
 
-#else
+#endif
+
+#if ANDROID
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
 
@@ -225,10 +197,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SoundEffectInstance PlatformCreateInstance()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
             return new SoundEffectInstance(this);
+#endif
 
-#elif ANDROID
+#if ANDROID
 			var instance = new SoundEffectInstance();
 			instance._soundId = _soundID;
 			instance._sampleRate = Rate;
@@ -242,9 +215,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool PlatformPlay()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
             return PlatformPlay(MasterVolume, 0.0f, 0.0f);
-#else
+#endif
+
+#if ANDROID
             return PlatformPlay(1.0f, 0.0f, 0.0f);
 #endif
         }
@@ -254,7 +229,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (MasterVolume <= 0.0f)
                 return false;
 
-#if (WINDOWS && OPENGL) || LINUX
+#if WINDOWS || LINUX
 
             SoundEffectInstance instance = PlatformCreateInstance();
             instance.Volume = volume;
@@ -262,7 +237,9 @@ namespace Microsoft.Xna.Framework.Audio
             instance.Pan = pan;
             instance.Play();
 
-#elif MONOMAC || IOS
+#endif
+
+#if MONOMAC || IOS
             
 			if (playing == null)
             {
@@ -315,7 +292,9 @@ namespace Microsoft.Xna.Framework.Audio
 			instance.Pan = pan;
             instance.Play();
             return true;
-#elif ANDROID
+#endif
+
+#if ANDROID
 
 			if(_instance == null)
 				_instance = CreateInstance();
@@ -324,17 +303,7 @@ namespace Microsoft.Xna.Framework.Audio
 			_instance.Pitch = pitch;
 			_instance.Pan = pan;
 			_instance.Play();
-			return true;
-#else
-            if(_instance == null)
-                _instance = CreateInstance();
-
-            _instance.Volume = volume;
-            _instance.Pitch = pitch;
-            _instance.Pan = pan;
-            _instance.Play();
-            return _instance.Sound.Playing;
-            
+			return true;            
 #endif
             return false;
         }
@@ -346,11 +315,12 @@ namespace Microsoft.Xna.Framework.Audio
         private TimeSpan PlatformGetDuration()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
              return _duration;
+#endif
 
-#elif ANDROID
+#if ANDROID
 
 			return new TimeSpan(0); // cant get this from soundpool.
 #endif
@@ -371,10 +341,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-#if (WINDOWS && OPENGL) || LINUX
+#if WINDOWS || LINUX
             // No-op. Note that isDisposed remains false!
+#endif
 
-#elif ANDROID
+#if ANDROID
             if (!isDisposed)
             {
 				if (_soundID != -1)

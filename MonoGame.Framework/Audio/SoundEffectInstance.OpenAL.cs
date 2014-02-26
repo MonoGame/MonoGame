@@ -1,42 +1,6 @@
-﻿#region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 #region Using Statements
 using System;
@@ -66,7 +30,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private bool _looped = false;
 		int sourceId;
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
@@ -88,10 +52,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 #endif
 
+#if WINDOWS || LINUX || MONOMAC || IOS
+
         #region Initialization
-
-
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
 
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
@@ -144,12 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
             soundBuffer.Recycled += HandleSoundBufferRecycled;
         }
 
-#endif
-
-        #endregion
-
-
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+         #endregion // Initialization
 
         /// <summary>
         /// Event handler that resets internal state of this instance. The sound state will report
@@ -199,7 +157,7 @@ namespace Microsoft.Xna.Framework.Audio
             return (float)Math.Pow(2, xnaPitch);
         }
 
-#endif
+#endif // WINDOWS || LINUX || MONOMAC || IOS
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
@@ -208,7 +166,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Appears to be a no-op on Android?
 #endif
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             // get AL's listener position
             float x, y, z;
@@ -233,22 +191,19 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformPause()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             if (!hasSourceId || soundState != SoundState.Playing)
                 return;
 
             controller.PauseSound(soundBuffer);
-#else
+#endif
 
 #if ANDROID
 			if (sourceId == 0)
 				return;
 
 			s_soundPool.Pause(sourceId);
-#else
-            _sound.Pause();
-#endif
 #endif
             soundState = SoundState.Paused;
             
@@ -256,7 +211,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             if (hasSourceId)
                 return;
@@ -283,10 +238,10 @@ namespace Microsoft.Xna.Framework.Audio
 			// Pitch
 			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 
-            controller.PlaySound (soundBuffer);            
+            controller.PlaySound (soundBuffer);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-#else
 
+#endif // WINDOWS || LINUX || MONOMAC || IOS
 
 #if ANDROID
 
@@ -307,13 +262,6 @@ namespace Microsoft.Xna.Framework.Audio
 
 				sourceId = s_soundPool.Play(_soundId, volumeLeft, volumeRight, 1, _looped ? -1 : 0, _sampleRate);
 			}
-				
-#else
-            if (soundState == SoundState.Paused)
-                _sound.Resume();
-            else
-                _sound.Play();
-#endif
 #endif
             soundState = SoundState.Playing;
         }
@@ -321,7 +269,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformResume()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             if (!hasSourceId)
             {
@@ -331,19 +279,16 @@ namespace Microsoft.Xna.Framework.Audio
             
             if (soundState == SoundState.Paused)
                 controller.ResumeSound(soundBuffer);
-#else
+       
+#endif 
 
-            
+#if ANDROID
             if (soundState == SoundState.Paused)
             {
-#if ANDROID
 				if (sourceId == 0)
 					return;
 
 				s_soundPool.Resume(sourceId);
-#else
-                _sound.Resume();
-#endif
             }
 #endif
             soundState = SoundState.Playing;
@@ -352,23 +297,23 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformStop(bool immediate)
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             if (hasSourceId)
             {
                 //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
                 controller.StopSound(soundBuffer);
             }
-#else
-			if (sourceId == 0)
-                return;
-            
+
+#endif
+           
 #if ANDROID
+
+            if (sourceId == 0)
+                return;
+
 			s_soundPool.Stop(sourceId);
 			sourceId = 0;
-#else
-            _sound.Stop();
-#endif
 #endif
             soundState = SoundState.Stopped;
         }
@@ -376,14 +321,16 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetIsLooped(bool value)
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
             
             _looped = value;
             
             if (hasSourceId)
                 AL.Source(sourceId, ALSourceb.Looping, _looped);
 
-#else
+#endif
+
+#if ANDROID
 			if (sourceId != 0 && _looped != value)
 				_looped = value;
 #endif
@@ -391,10 +338,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool PlatformGetIsLooped()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
             
             return _looped;
-#else
+#endif
+
+#if ANDROID
 
 			if (sourceId != 0)
 				return _looped;
@@ -406,14 +355,16 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetPan(float value)
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             _pan = value;
 			if (!hasSourceId)
 				return;
                 AL.Source(sourceId, ALSource3f.Position, _pan, 0.0f, 0.1f);
 
-#else
+#endif
+            
+#if ANDROID
 
 			if (sourceId != 0 && _pan != value)
 				_pan = value;
@@ -423,10 +374,12 @@ namespace Microsoft.Xna.Framework.Audio
         private float PlatformGetPan()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             return _pan;
-#else
+#endif
+
+#if ANDROID
 			if (sourceId == 0)
                 return 0.0f;
             
@@ -436,12 +389,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPitch(float value)
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
             _pitch = value;
 
 			if (hasSourceId)
 				AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
-#else
+#endif
+
+#if ANDROID
 			if (sourceId != 0 && _sampleRate != value)
 				_sampleRate = value;
 #endif
@@ -449,10 +404,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         private float PlatformGetPitch()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             return _pitch;
-#else
+#endif
+
+#if ANDROID
 			if (sourceId == 0)
                 return 0.0f;
             
@@ -463,11 +420,13 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState PlatformGetState()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             return soundState;
 
-#elif ANDROID
+#endif
+
+#if ANDROID
             // Android SoundPool can't tell us when a sound is finished playing.
             // TODO: Remove this code when OpenAL for Android is implemented
 			if (sourceId != 0 && IsLooped)
@@ -480,24 +439,21 @@ namespace Microsoft.Xna.Framework.Audio
                 // Non looping sounds always return Stopped
                 return SoundState.Stopped;
             }
-#else
-            if (_sound != null && soundState == SoundState.Playing && !_sound.Playing)
-                soundState = SoundState.Stopped;
-
-            return soundState;
 #endif
         }
 
         private void PlatformSetVolume(float value)
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             _volume = value;
 			if (hasSourceId)
 				AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 
-#else
+#endif
+
+#if ANDROID
 			if (sourceId != 0 && _volume != value)
 				_volume = value;
 #endif
@@ -506,11 +462,14 @@ namespace Microsoft.Xna.Framework.Audio
         private float PlatformGetVolume()
         {
 
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             return _volume;
-#else
-			if (sourceId == 0)
+#endif
+
+#if ANDROID
+
+            if (sourceId == 0)
                 return 0.0f;
             
 			return _volume;
@@ -519,14 +478,17 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-#if (WINDOWS && OPENGL) || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS
 
             this.Stop(true);
             soundBuffer.Reserved -= HandleSoundBufferReserved;
             soundBuffer.Recycled -= HandleSoundBufferRecycled;
             soundBuffer.Dispose();
             soundBuffer = null;
-#else
+
+#endif
+
+#if ANDROID
             // When disposing a SoundEffectInstance, the Sound should
             // just be stopped as it will likely be reused later
 			PlatformStop(true);
