@@ -5,7 +5,6 @@
   <References>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
 
     <!-- See FrameworkReferences.definition for the platform specific references -->
@@ -17,16 +16,16 @@
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 
     <CustomDefinitions>
-      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;</Platform>
-      <Platform Name="iOS">IOS;GLES;OPENGL;</Platform>
-      <Platform Name="Linux">TRACE;LINUX;OPENGL;</Platform>
-      <Platform Name="MacOS">MONOMAC;OPENGL;</Platform>
-      <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;</Platform>
-      <Platform Name="PSMobile">PSM;</Platform>
-      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION;</Platform>
-      <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE;</Platform>
-      <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;</Platform>
-      <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX;</Platform>
+      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL</Platform>
+      <Platform Name="iOS">IOS;GLES;OPENGL</Platform>
+      <Platform Name="Linux">TRACE;LINUX;OPENGL</Platform>
+      <Platform Name="MacOS">MONOMAC;OPENGL</Platform>
+      <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA</Platform>
+      <Platform Name="PSMobile">PSM</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
+      <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL</Platform>
+      <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
     </CustomDefinitions>
 
   </Properties>
@@ -36,7 +35,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
 
     <None Include="..\ThirdParty\GamepadConfig\Tao.Sdl.dll.config">
-      <Platforms>WindowsGL,Linux,MacOS</Platforms>
+      <Platforms>Linux,MacOS</Platforms>
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -388,21 +387,15 @@
     <Compile Include="Graphics\PackedVector\Byte4.cs" />
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
-    <Compile Include="Graphics\PackedVector\HalfVector2.cs">
-      <Platforms>Android,iOS,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="Graphics\PackedVector\HalfVector4.cs">
-      <Platforms>Android,iOS,Linux,MacOS,PSMobile,Windows8,Windows,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Graphics\PackedVector\HalfVector2.cs" />
+    <Compile Include="Graphics\PackedVector\HalfVector4.cs" />
     <Compile Include="Graphics\PackedVector\IPackedVector.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedByte2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedByte4.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort4.cs" />
     <Compile Include="Graphics\PackedVector\Short2.cs" />
-    <Compile Include="Graphics\PackedVector\Short4.cs">
-      <Platforms>Android,iOS,Linux,MacOS,PSMobile,Windows8,Windows,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Graphics\PackedVector\Short4.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
@@ -414,21 +407,18 @@
     <Compile Include="Graphics\RenderTargetUsage.cs" />
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
-    <Compile Include="Graphics\ResourceType.cs">
-      <Platforms>Android,iOS,Linux,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ShaderStage.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\SpriteBatcher.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\SpriteBatchItem.cs" />
     <Compile Include="Graphics\SpriteBlendMode.cs" />
@@ -456,7 +446,7 @@
     </Compile>
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Texture3D.cs">
-      <Platforms>Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>iOS,Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
@@ -537,14 +527,14 @@
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\PlaylistCollection.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Playlist.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Media\Song.cs">
-      <Platforms>iOS,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Android,Ouya</ExcludePlatforms>	
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs">
       <Platforms>Linux,MacOS,Windows,WindowsGL</Platforms>
@@ -889,6 +879,9 @@
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs">
       <Platforms>Linux</Platforms>
     </Compile>
+
+
+    <!-- MacOS Platform -->
     <Compile Include="MacOS\Audio\OpenALSupport.cs">
       <Platforms>iOS,MacOS</Platforms>
     </Compile>
@@ -1042,9 +1035,18 @@
     <Compile Include="Windows\Media\Video.cs">
       <Platforms>Windows,WindowsGL</Platforms>
     </Compile>
+    <Compile Include="Windows\WinFormsGameForm.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\WinFormsGamePlatform.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\WinFormsGameWindow.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+	
 
-
-    <!-- Windows Phone Platform -->
+	<!-- Windows Phone Platform -->
     <Compile Include="WindowsPhone\DrawingSurfaceInterop.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
@@ -1066,18 +1068,9 @@
     <Compile Include="WindowsPhone\XamlGame.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="Windows\WinFormsGameForm.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\WinFormsGamePlatform.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
-    <Compile Include="Windows\WinFormsGameWindow.cs">
-      <Platforms>Windows</Platforms>
-    </Compile>
 
-
-    <!-- OpenGL Stock Effects -->
+	
+	<!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </EmbeddedResource>

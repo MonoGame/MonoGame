@@ -6,6 +6,7 @@
     <Reference Include="OpenTK" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
     <Project
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
@@ -14,6 +15,7 @@
   
   <Platform Type="iOS">
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
     <Project 
@@ -23,6 +25,7 @@
   </Platform>
   
   <Platform Type="Linux">
+    <Reference Include="System.Drawing" />
     <Binary
       Name="Tao.Sdl" 
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
@@ -37,6 +40,7 @@
   
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Binary
@@ -53,6 +57,7 @@
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
     <Binary
       Name="Ouya.Console.Api"
       Path="ThirdParty/Libs/OUYA/Ouya.Console.Api.dll" />
@@ -64,6 +69,7 @@
   
   <Platform Type="PSMobile">
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="Sce.PlayStation.Core" />
     <Project 
       Name="Lidgren.Network.PSMobile"
@@ -73,6 +79,7 @@
   
   <Platform Type="Windows">
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
@@ -133,7 +140,8 @@
 
   <Platform Type="WindowsGL">
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
+    <Reference Include="System.Drawing" />
+	<Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
