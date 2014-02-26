@@ -101,6 +101,10 @@
     <Binary
       Name="SharpDX.XInput"
       Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.XInput.dll" />
+    <Project 
+      Name="Lidgren.Network.Windows"
+      Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
   </Platform>
 
   <Platform Type="Windows8">
