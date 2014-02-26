@@ -46,6 +46,7 @@ using System.ComponentModel;
 using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
+using Android.Media;
 using Android.Util;
 using Android.Views;
 using Microsoft.Xna.Framework.Audio;
@@ -129,11 +130,17 @@ namespace Microsoft.Xna.Framework
                 GamePad.Instance.SetBack();
 #endif
 
-            if (keyCode == Keycode.VolumeUp)
-                Sound.IncreaseMediaVolume();
+			if (keyCode == Keycode.VolumeUp)
+			{
+				AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+				audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+			}
 
-            if (keyCode == Keycode.VolumeDown)
-                Sound.DecreaseMediaVolume();
+			if (keyCode == Keycode.VolumeDown)
+			{
+				AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+				audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
+			}
 
             return true;
         }

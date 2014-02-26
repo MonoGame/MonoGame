@@ -48,6 +48,12 @@ using Microsoft.Xna.Framework.Audio;
 
 #if (WINDOWS && OPENGL) || LINUX
 using OpenTK.Audio.OpenAL;
+#elif ANDROID
+using Android.Content;
+using Android.Content.Res;
+using Android.Media;
+using Android.Util;
+using Stream = System.IO.Stream;
 #elif IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AudioUnit;
@@ -55,7 +61,6 @@ using OpenTK.Audio.OpenAL;
 #elif MONOMAC
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
-
 using MonoMac.OpenAL;
 #endif
 
@@ -65,7 +70,6 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal byte[] _data;
 
-
 #if IOS || MONOMAC
 
         private List<SoundEffectInstance> playing = null;
@@ -74,25 +78,25 @@ namespace Microsoft.Xna.Framework.Audio
 
 #endif
 
+		internal float Rate { get; set; }
+
 #if (WINDOWS && OPENGL) || LINUX || IOS || MONOMAC
 
         private TimeSpan _duration = TimeSpan.Zero;
 
         internal int Size { get; set; }
 
-        internal float Rate { get; set; }
-
         internal ALFormat Format { get; set; }
-#else
-        private Sound _sound;
-        private SoundEffectInstance _instance;
+#elif ANDROID
+
+		private SoundEffectInstance _instance;
+		private int _soundID = -1;
 #endif
 
         #region Public Constructors
 
         private void PlatformLoadAudioStream(Stream s)
         {
-
 #if (WINDOWS && OPENGL) || LINUX
             
             ALFormat format;
@@ -128,30 +132,29 @@ namespace Microsoft.Xna.Framework.Audio
             _duration = TimeSpan.FromSeconds(_dblDuration);
 
 			afs.Close ();
-#else
 
-            _data = new byte[s.Length];
-            s.Read(_data, 0, (int)s.Length);
-            _sound = new Sound(_data, 1.0f, false);
+#elif ANDROID
+
+			// Creating a soundeffect from a stream
+			// doesn't seem to be supported in Android
 #endif
         }
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
+			Rate = (float)sampleRate;
 
 #if (WINDOWS && OPENGL) || LINUX
 
             _data = buffer;
             Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-            Rate = sampleRate;
 
 #elif MONOMAC || IOS
 
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
 
-            Rate = (float)sampleRate;
             Size = (int)buffer.Length;
 
             if ((int)channels <= 1)
@@ -195,10 +198,18 @@ namespace Microsoft.Xna.Framework.Audio
 
                 _data = mStream.ToArray();
             }
-
-            _sound = new Sound(_data, 1.0f, false);
 #endif
         }
+
+#if ANDROID
+
+		internal SoundEffect(string fileName)
+		{
+			using (AssetFileDescriptor fd = Game.Activity.Assets.OpenFd(fileName))
+				_soundID = SoundEffectInstance.SoundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
+		}
+
+#endif
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
@@ -213,10 +224,12 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if (WINDOWS && OPENGL) || LINUX
             return new SoundEffectInstance(this);
-#else
-            var instance = new SoundEffectInstance();
-            instance.Sound = _sound;
-            return instance;
+
+#elif ANDROID
+			var instance = new SoundEffectInstance();
+			instance._soundId = _soundID;
+			instance._sampleRate = Rate;
+			return instance;
 #endif
         }
 
@@ -298,7 +311,16 @@ namespace Microsoft.Xna.Framework.Audio
 			instance.Pitch = pitch;
 			instance.Pan = pan;
 			return instance.TryPlay();
+#elif ANDROID
 
+			if(_instance == null)
+				_instance = CreateInstance();
+
+			_instance.Volume = volume;
+			_instance.Pitch = pitch;
+			_instance.Pan = pan;
+			_instance.Play();
+			return true;
 #else
             if(_instance == null)
                 _instance = CreateInstance();
@@ -323,11 +345,10 @@ namespace Microsoft.Xna.Framework.Audio
 #if (WINDOWS && OPENGL) || LINUX
 
              return _duration;
-#else
-            if ( _sound != null ) 
-                return new TimeSpan(0, 0, (int)_sound.Duration); 
-            else 
-                return new TimeSpan(0);
+
+#elif ANDROID
+
+			return new TimeSpan(0); // cant get this from soundpool.
 #endif
         }
 
@@ -335,7 +356,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Static Members
 
-        private static void PlatformSetMasterVolume() { }
+        private static void PlatformSetMasterVolume()
+        {
+			// Appears to be a no-op outside of DirectX Platforms.
+        }
 
         #endregion
 
@@ -345,10 +369,17 @@ namespace Microsoft.Xna.Framework.Audio
         {
 #if (WINDOWS && OPENGL) || LINUX
             // No-op. Note that isDisposed remains false!
-#else
 
-            _sound.Dispose();
-            isDisposed = true;
+#elif ANDROID
+            if (!isDisposed)
+            {
+				if (_soundID != -1)
+					SoundEffectInstance.SoundPool.Unload(_soundID);
+
+				_soundID = -1;
+
+                isDisposed = true;
+            }
 #endif
         }
 

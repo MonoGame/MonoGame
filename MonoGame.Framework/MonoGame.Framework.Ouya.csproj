@@ -176,7 +176,7 @@
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
@@ -207,7 +207,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="Android\Audio\Sound.cs" />
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -425,13 +424,14 @@
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
-	<Compile Include="Utilities\ObjectFactoryWithReset.cs" />
+    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
     <Compile Include="GamerServices\LeaderboardReader.cs" />
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">

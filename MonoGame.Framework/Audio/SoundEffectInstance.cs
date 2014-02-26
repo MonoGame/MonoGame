@@ -50,29 +50,6 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class SoundEffectInstance : IDisposable
     {
         private bool isDisposed = false;
-#if !DIRECTX
-        //private SoundState soundState = SoundState.Stopped;
-#endif
-
-#if ANDROID
-        private int _streamId = -1;
-#endif
-
-#if !DIRECTX
-        /*private Sound _sound;
-		internal Sound Sound 
-		{ 
-			get
-			{
-				return _sound;
-			} 
-			
-			set
-			{
-				_sound = value;
-			} 
-		}*/
-#endif
 
         public bool IsLooped
         { 
@@ -133,9 +110,6 @@ namespace Microsoft.Xna.Framework.Audio
                 writer.Write((int)buffer.Length); //data size
 
                 writer.Write(buffer);
-
-                _sound = new Sound(mStream.ToArray(), 1.0f, false);
-                _sound.Rate = sampleRate;
             }
         }
 #endif
@@ -148,7 +122,7 @@ namespace Microsoft.Xna.Framework.Audio
         public void Apply3D(AudioListener[] listeners, AudioEmitter emitter)
         {
             foreach (var l in listeners)
-                Apply3D(l, emitter);
+				PlatformApply3D(l, emitter);
         }
 
         public void Pause()
@@ -162,20 +136,6 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
 
             PlatformPlay();
-        }
-
-        /// <summary>
-        /// Tries to play the sound, returns true if successful
-        /// </summary>
-        /// <returns></returns>
-        internal bool TryPlay()
-        {
-            Play();
-#if ANDROID
-			return _streamId != 0;
-#else
-            return true;
-#endif
         }
 
         public void Resume()
