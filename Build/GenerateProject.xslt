@@ -49,6 +49,10 @@
       }
       return false;
     }
+    public bool IsTrue(string text)
+    {
+      return text.ToLower() == "true";
+    }
     ]]>
   </msxsl:script>
 
@@ -695,6 +699,9 @@
                   <xsl:attribute name="Include">
                     <xsl:value-of select="@Include" />
                   </xsl:attribute>
+					<xsl:if test="@Aliases != ''">
+					  <Aliases><xsl:value-of select="@Aliases" /></Aliases>
+					</xsl:if>
                 </Reference>
               </xsl:for-each>
               <xsl:for-each select="$extern/Platform
@@ -704,6 +711,9 @@
                     <xsl:attribute name="Include">
                       <xsl:value-of select="@Include" />
                     </xsl:attribute>
+					<xsl:if test="@Aliases != ''">
+					  <Aliases><xsl:value-of select="@Aliases" /></Aliases>
+					</xsl:if>
                   </Reference>
                 </xsl:for-each>
               </xsl:for-each>
@@ -726,6 +736,9 @@
                   <xsl:attribute name="Include">
                     <xsl:value-of select="@Name" />
                   </xsl:attribute>
+					<xsl:if test="@Aliases != ''">
+					  <Aliases><xsl:value-of select="@Aliases" /></Aliases>
+					</xsl:if>
                   <HintPath>
                     <xsl:value-of
                       select="user:GetRelativePath(
@@ -747,6 +760,9 @@
                     <xsl:attribute name="Include">
                       <xsl:value-of select="@Name" />
                     </xsl:attribute>
+					<xsl:if test="@Aliases != ''">
+					  <Aliases><xsl:value-of select="@Aliases" /></Aliases>
+					</xsl:if>
                     <HintPath>
                       <xsl:value-of
                         select="user:GetRelativePath(
