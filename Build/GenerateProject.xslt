@@ -139,6 +139,8 @@
           <xsl:value-of select="/Input/Properties/FrameworkVersions/Profile" />
         </TargetFrameworkProfile>
       </xsl:when>
+      <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+      </xsl:when>
       <xsl:otherwise>
         <TargetFrameworkProfile></TargetFrameworkProfile>
       </xsl:otherwise>
@@ -292,7 +294,14 @@
             <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
           </xsl:otherwise>
         </xsl:choose>
-        <ProductVersion>10.0.0</ProductVersion>
+        <xsl:choose>
+            <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+                <ProductVersion>8.0.30703</ProductVersion>
+            </xsl:when>
+            <xsl:otherwise>
+                <ProductVersion>10.0.0</ProductVersion>
+            </xsl:otherwise>
+        </xsl:choose>
         <SchemaVersion>2.0</SchemaVersion>
         <ProjectGuid>{<xsl:value-of select="$project/@Guid" />}</ProjectGuid>
         <xsl:choose>
@@ -1142,7 +1151,7 @@
           <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'Windows8'">
-          <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
+          <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
             <VisualStudioVersion>11.0</VisualStudioVersion>
           </PropertyGroup>
           <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
