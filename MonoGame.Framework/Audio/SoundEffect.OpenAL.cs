@@ -203,6 +203,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool PlatformPlay(float volume, float pitch, float pan)
         {
+            // TODO: While merging the SoundEffect classes together
+            // I noticed that the return values seem to widly differ
+            // between platforms. It also doesn't seem to match
+            // what's written in the XNA docs.
+
             if (MasterVolume <= 0.0f)
                 return false;
 
