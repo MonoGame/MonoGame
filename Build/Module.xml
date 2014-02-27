@@ -4,6 +4,6 @@
   <ModuleAssemblies />
   <DefaultAction>Generate</DefaultAction>
   <DefaultWindowsPlatforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,iOS</DefaultWindowsPlatforms>
-  <DefaultMacOSPlatforms>MacOS,iOS,Android</DefaultMacOSPlatforms>
-  <DefaultLinuxPlatforms>Linux</DefaultLinuxPlatforms>
+  <DefaultMacOSPlatforms>MacOS,iOS,WindowsGL,Android</DefaultMacOSPlatforms>
+  <DefaultLinuxPlatforms>Linux,WindowsGL</DefaultLinuxPlatforms>
 </ModuleInfo>
