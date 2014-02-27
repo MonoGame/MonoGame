@@ -71,9 +71,7 @@
     <Compile Include="GameTimerEventArgs.cs">
       <Platforms>Windows8,WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="GameUpdateRequiredException.cs">
-      <Platforms>Android,iOS,PSMobile,Windows8</Platforms>
-    </Compile>
+    <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs">
 		<ExcludePlatforms>MacOS</ExcludePlatforms>
 	</Compile>
