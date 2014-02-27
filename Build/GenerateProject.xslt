@@ -274,10 +274,12 @@
       select="/Input/Projects/Project[@Name=/Input/Generation/ProjectName]" />
 
     <Project
-      DefaultTargets="Build"
       ToolsVersion="4.0"
+      DefaultTargets="Build"
       xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
+        <xsl:if test="/Input/Generation/Platform = 'Windows8'">
+                <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+        </xsl:if>
       <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <xsl:choose>
@@ -1140,7 +1142,7 @@
           <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
         </xsl:when>
         <xsl:when test="/Input/Generation/Platform = 'Windows8'">
-          <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
+          <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' ">
             <VisualStudioVersion>11.0</VisualStudioVersion>
           </PropertyGroup>
           <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
