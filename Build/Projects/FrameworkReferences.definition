@@ -8,7 +8,10 @@
     <Project 
       Name="Lidgren.Network.iOS"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj" />
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj">
+        <ConfigurationMapping Old="Debug" New="Debug|AnyCPU" />
+        <ConfigurationMapping Old="Release" New="Release|AnyCPU" />
+    </Project>
   </Platform>
   
   <Platform Type="Linux">
