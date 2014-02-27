@@ -1172,6 +1172,9 @@
               </Target>
           </xsl:if>
         </xsl:when>
+        <xsl:when test="/Input/Generation/Platform = 'PSMobile'">
+          <Import Project="$(MSBuildExtensionsPath)\Sce\Sce.Psm.CSharp.targets" />
+        </xsl:when>
         <xsl:otherwise>
           <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
         </xsl:otherwise>
