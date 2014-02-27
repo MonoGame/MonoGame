@@ -448,7 +448,7 @@
     </Compile>
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Texture3D.cs">
-      <ExcludePlatforms>iOS,Android</ExcludePlatforms>
+      <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
