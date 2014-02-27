@@ -1195,12 +1195,8 @@
                           '.csproj'),
                         ./@Path)" />
                   </xsl:attribute>
-                  <Project>
-                    {<xsl:value-of select="./@Guid" />}
-                  </Project>
-                  <Name>
-                    <xsl:value-of select="./@Name" />
-                  </Name>
+                  <Project>{<xsl:value-of select="./@Guid" />}</Project>
+                  <Name><xsl:value-of select="./@Name" /></Name>
                 </ProjectReference>
               </xsl:for-each>
               <xsl:for-each select="$extern/Platform
@@ -1219,12 +1215,8 @@
                             '.csproj'),
                           ./@Path)" />
                     </xsl:attribute>
-                    <Project>
-                      {<xsl:value-of select="./@Guid" />}
-                    </Project>
-                    <Name>
-                      <xsl:value-of select="./@Name" />
-                    </Name>
+                    <Project>{<xsl:value-of select="./@Guid" />}</Project>
+                    <Name><xsl:value-of select="./@Name" /></Name>
                   </ProjectReference>
                 </xsl:for-each>
               </xsl:for-each>
@@ -1264,15 +1256,8 @@
                           /Input/Generation/Platform,
                           '.csproj'))" />
                   </xsl:attribute>
-                  <Project>
-                    {<xsl:value-of
-select="/Input/Projects/Project[@Name=$include-path]/@Guid" />}
-                  </Project>
-                  <Name>
-                    <xsl:value-of select="@Include" />
-                    <xsl:text>.</xsl:text>
-                    <xsl:value-of select="/Input/Generation/Platform" />
-                  </Name>
+                  <Project>{<xsl:value-of select="/Input/Projects/Project[@Name=$include-path]/@Guid" />}</Project>
+                  <Name><xsl:value-of select="@Include" /><xsl:text>.</xsl:text><xsl:value-of select="/Input/Generation/Platform" /></Name>
                 </ProjectReference>
               </xsl:if>
             </xsl:if>
