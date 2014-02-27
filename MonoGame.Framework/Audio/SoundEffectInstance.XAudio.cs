@@ -28,6 +28,11 @@ namespace Microsoft.Xna.Framework.Audio
             _voice = voice;
         }
 
+        private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
             // If we have no voice then nothing to do.

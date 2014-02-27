@@ -14,11 +14,12 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffect : IDisposable
     {
-        private bool isDisposed = false;
-
         #region Internal Audio Data
 
         private string _name;
+        
+        private bool isDisposed = false;
+        private TimeSpan _duration = TimeSpan.Zero;
 
         #endregion
 
@@ -31,12 +32,12 @@ namespace Microsoft.Xna.Framework.Audio
         #region Public Constructors
 
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
-        {
+        {            
             PlatformInitialize(buffer, sampleRate, channels);
         }
 
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {
+        {            
             PlatformInitialize(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
         }
 
@@ -46,9 +47,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public SoundEffectInstance CreateInstance()
         {
-            SoundEffectInstance instance;
-            instance = PlatformCreateInstance();
-            return instance;
+            return PlatformCreateInstance();
         }
 
         public static SoundEffect FromStream(Stream s)

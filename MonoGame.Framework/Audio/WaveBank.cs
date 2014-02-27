@@ -333,6 +333,10 @@ namespace Microsoft.Xna.Framework.Audio
                     
                     //write PCM data into a wav
 #if DIRECTX
+                    
+                    // TODO: Wouldn't storing a SoundEffectInstance like this
+                    // result in the "parent" SoundEffect being garbage collected?
+                    
 					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
                     var sfx = new SoundEffect(audiodata, 0, audiodata.Length, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
                         {
@@ -392,7 +396,7 @@ namespace Microsoft.Xna.Framework.Audio
                         {
                             audioFile.Write(audiodata, 0, audiodata.Length);
                             audioFile.Seek(0, SeekOrigin.Begin);
-
+       
                             sounds[current_entry] = SoundEffect.FromStream(audioFile).CreateInstance();
                         }
 #else

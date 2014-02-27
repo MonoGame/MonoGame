@@ -46,8 +46,6 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if WINDOWS || LINUX || IOS || MONOMAC
 
-        private TimeSpan _duration = TimeSpan.Zero;
-
         internal int Size { get; set; }
 
         internal ALFormat Format { get; set; }
@@ -73,6 +71,8 @@ namespace Microsoft.Xna.Framework.Audio
             Format = format;
             Size = size;
             Rate = freq;
+
+            return;
 #endif
 
 #if MONOMAC || IOS
@@ -121,6 +121,8 @@ namespace Microsoft.Xna.Framework.Audio
             Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
 
+            return;
+
 #endif
 
 #if MONOMAC || IOS
@@ -144,35 +146,9 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
-            //buffer should contain 16-bit PCM wave data
-            short bitsPerSample = 16;
-
             _name = "";
 
-            using (var mStream = new MemoryStream(44+buffer.Length))
-            using (var writer = new BinaryWriter(mStream))
-            {
-                writer.Write("RIFF".ToCharArray()); //chunk id
-                writer.Write((int)(36 + buffer.Length)); //chunk size
-                writer.Write("WAVE".ToCharArray()); //RIFF type
-
-                writer.Write("fmt ".ToCharArray()); //chunk id
-                writer.Write((int)16); //format header size
-                writer.Write((short)1); //format (PCM)
-                writer.Write((short)channels);
-                writer.Write((int)sampleRate);
-                short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
-                writer.Write((int)(sampleRate * blockAlign)); //byte rate
-                writer.Write((short)blockAlign);
-                writer.Write((short)bitsPerSample);
-
-                writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size   MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199    C#
-
-                writer.Write(buffer);
-
-                _data = mStream.ToArray();
-            }
+            _data = AudioUtil.FormatWavData(buffer, sampleRate, (int)channels);
 #endif
         }
 
@@ -202,10 +178,11 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
-			var instance = new SoundEffectInstance();
-			instance._soundId = _soundID;
-			instance._sampleRate = Rate;
-			return instance;
+			return new SoundEffectInstance()
+            {
+                _soundId = _soundID,
+                _sampleRate = Rate
+            };
 #endif
         }
 
@@ -236,6 +213,9 @@ namespace Microsoft.Xna.Framework.Audio
             instance.Pitch = pitch;
             instance.Pan = pan;
             instance.Play();
+
+            // Why is this always returning false?
+            return false;
 
 #endif
 
@@ -305,7 +285,6 @@ namespace Microsoft.Xna.Framework.Audio
 			_instance.Play();
 			return true;            
 #endif
-            return false;
         }
 
         #endregion
@@ -314,16 +293,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private TimeSpan PlatformGetDuration()
         {
-
-#if WINDOWS || LINUX || MONOMAC || IOS
-
              return _duration;
-#endif
-
-#if ANDROID
-
-			return new TimeSpan(0); // cant get this from soundpool.
-#endif
         }
 
         #endregion
@@ -341,9 +311,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-#if WINDOWS || LINUX
-            // No-op. Note that isDisposed remains false!
-#endif
+            // A No-op for WINDOWS and LINUX. Note that isDisposed remains false!
 
 #if ANDROID
             if (!isDisposed)

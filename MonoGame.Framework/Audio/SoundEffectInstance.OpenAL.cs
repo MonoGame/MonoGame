@@ -52,15 +52,14 @@ namespace Microsoft.Xna.Framework.Audio
 
 #endif
 
-#if WINDOWS || LINUX || MONOMAC || IOS
-
         #region Initialization
 
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
         /// </summary>
-        internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
+        internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
+#if WINDOWS || LINUX || MONOMAC || IOS
             InitializeSound();
             BindDataBuffer(
                 buffer,
@@ -68,14 +67,20 @@ namespace Microsoft.Xna.Framework.Audio
                 buffer.Length,
                 sampleRate
             );
+
+#endif
+
+            // No-op on Android
         }
+
+#if WINDOWS || LINUX || MONOMAC || IOS
 
         /// <summary>
         /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
         /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
         /// </summary>
         /// <param name="parent"></param>
-        public SoundEffectInstance(SoundEffect parent)
+        internal SoundEffectInstance(SoundEffect parent)
         {
             InitializeSound();
             BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
@@ -106,8 +111,6 @@ namespace Microsoft.Xna.Framework.Audio
             soundBuffer.Reserved += HandleSoundBufferReserved;
             soundBuffer.Recycled += HandleSoundBufferRecycled;
         }
-
-         #endregion // Initialization
 
         /// <summary>
         /// Event handler that resets internal state of this instance. The sound state will report
@@ -158,6 +161,8 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
 #endif // WINDOWS || LINUX || MONOMAC || IOS
+
+        #endregion // Initialization
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
@@ -328,6 +333,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (hasSourceId)
                 AL.Source(sourceId, ALSourceb.Looping, _looped);
 
+            return;
 #endif
 
 #if ANDROID
@@ -360,7 +366,10 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = value;
 			if (!hasSourceId)
 				return;
-                AL.Source(sourceId, ALSource3f.Position, _pan, 0.0f, 0.1f);
+            
+            AL.Source(sourceId, ALSource3f.Position, _pan, 0.0f, 0.1f);
+
+            return;
 
 #endif
             
@@ -394,6 +403,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 			if (hasSourceId)
 				AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
+
+            return;
 #endif
 
 #if ANDROID
@@ -451,6 +462,7 @@ namespace Microsoft.Xna.Framework.Audio
 			if (hasSourceId)
 				AL.Source (sourceId, ALSourcef.Gain, _volume * SoundEffect.MasterVolume);
 
+            return;
 #endif
 
 #if ANDROID
@@ -485,6 +497,8 @@ namespace Microsoft.Xna.Framework.Audio
             soundBuffer.Recycled -= HandleSoundBufferRecycled;
             soundBuffer.Dispose();
             soundBuffer = null;
+
+            return;
 
 #endif
 
