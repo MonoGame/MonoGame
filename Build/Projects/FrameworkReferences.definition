@@ -140,7 +140,7 @@
   <Platform Type="WindowsGL">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-	<Reference Include="System.Web" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -172,10 +172,10 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
-	<Reference	Include="Microsoft.Xna.Framework.GamerServices" 
-				Aliases="MicrosoftXnaGamerServices" />
-	<Reference	Include="Microsoft.Xna.Framework" 
-				Aliases="MicrosoftXnaFramework" />
+    <Reference  Include="Microsoft.Xna.Framework.GamerServices" 
+                Aliases="MicrosoftXnaGamerServices" />
+    <Reference  Include="Microsoft.Xna.Framework" 
+                Aliases="MicrosoftXnaFramework" />
   </Platform>
  
 </ExternalProject>
