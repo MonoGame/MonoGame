@@ -441,13 +441,11 @@
               </xsl:otherwise>
             </xsl:choose>
             <DeployExternal>False</DeployExternal>
-            <AndroidApplication>True</AndroidApplication>
-            <xsl:choose>
-              <xsl:when test="$project/@Type = 'App'">
+			<xsl:if test="$project/@Type = 'App'">
+				<AndroidApplication>True</AndroidApplication>
                 <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
                 <AndroidResgenClass>Resource</AndroidResgenClass>
-              </xsl:when>
-            </xsl:choose>
+			</xsl:if>
           </xsl:when>
           <xsl:when test="/Input/Generation/Platform = 'iOS'">
             <SynchReleaseVersion>False</SynchReleaseVersion>
