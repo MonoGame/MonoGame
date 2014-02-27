@@ -102,8 +102,8 @@
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release  MonoGame.Framework.iOS.sln" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release  MonoGame.Framework.iOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
       </if>
     </if>
   </target>
