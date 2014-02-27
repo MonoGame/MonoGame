@@ -58,6 +58,7 @@
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK" />
+    <Reference Include="System.Core" />
     <Binary
       Name="Ouya.Console.Api"
       Path="ThirdParty/Libs/OUYA/Ouya.Console.Api.dll" />
