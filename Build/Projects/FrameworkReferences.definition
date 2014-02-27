@@ -3,7 +3,6 @@
  
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
     <Project 
