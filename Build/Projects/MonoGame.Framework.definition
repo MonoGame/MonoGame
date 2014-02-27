@@ -4,7 +4,6 @@
   <!-- Common assembly references -->
   <References>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Runtime.Serialization" />
 
     <!-- See FrameworkReferences.definition for the platform specific references -->
@@ -75,7 +74,9 @@
     <Compile Include="GameUpdateRequiredException.cs">
       <Platforms>Android,iOS,PSMobile,Windows8</Platforms>
     </Compile>
-    <Compile Include="GameWindow.cs" />
+    <Compile Include="GameWindow.cs">
+		<ExcludePlatforms>MacOS</ExcludePlatforms>
+	</Compile>
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
