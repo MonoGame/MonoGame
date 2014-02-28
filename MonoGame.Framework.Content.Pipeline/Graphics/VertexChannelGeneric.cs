@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -144,7 +145,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // - Vector4 Structure
             // - Any implementation of IPackedVector Interface.
 
-            throw new NotImplementedException();
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (!converter.CanConvertTo(typeof(TargetType)))
+            {
+                throw new NotImplementedException(
+                    string.Format("TypeConverter for {0} -> {1} is not implemented.",
+                    typeof(T).Name, typeof(TargetType).Name));
+            }
+
+            foreach (var item in items)
+                yield return (TargetType)converter.ConvertTo(item, typeof(TargetType));
         }
 
         /// <summary>
