@@ -303,7 +303,21 @@
             </xsl:otherwise>
         </xsl:choose>
         <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{<xsl:value-of select="$project/@Guid" />}</ProjectGuid>
+
+        <!-- Use the user defined GUID or the automaticly generated one -->
+        <ProjectGuid>
+        <xsl:choose>
+            <xsl:when test="$project/ProjectGuids">
+              <xsl:for-each select="$project/ProjectGuids/Platform">
+                <xsl:if test="/Input/Generation/Platform = ./@Name">
+                  <xsl:value-of select="." />
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>{<xsl:value-of select="$project/@Guid" />}</xsl:otherwise>
+        </xsl:choose>
+        </ProjectGuid>
+
         <xsl:choose>
           <xsl:when test="$project/@Type = 'Website'">
             <ProjectTypeGuids>
