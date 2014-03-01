@@ -1,6 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
 
+  <ProjectGuids>
+	<Platform Name="Android">{BA9476CF-99BA-4D03-92F2-73D2C5E58883}</Platform>
+	<Platform Name="iOS">{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Platform>
+	<Platform Name="Linux">{35253CE1-C864-4CD3-8249-4D1319748E8F}</Platform>
+	<Platform Name="MacOS">{36C538E6-C32A-4A8D-A39C-566173D7118E}</Platform>
+	<Platform Name="Ouya">{8BEA875D-66D2-4A5F-B137-83D262A3851D}</Platform>
+	<Platform Name="PSMobile">{EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9}</Platform>
+	<Platform Name="Windows">{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Platform>
+	<Platform Name="Windows8">{0518563C-ACCA-4A14-8C5D-DDBE93E2605F}</Platform>
+	<Platform Name="WindowsGL">{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Platform>
+	<Platform Name="WindowsPhone">{BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739}</Platform>
+  </ProjectGuids>
+
   <!-- Common assembly references -->
   <References>
     <Reference Include="System" />
