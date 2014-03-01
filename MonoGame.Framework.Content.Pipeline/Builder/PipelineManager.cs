@@ -417,7 +417,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
             if (!File.Exists(pipelineEvent.SourceFile))
-                throw new PipelineException("The source file does not exist!");
+                throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
 
             Logger.PushFile(pipelineEvent.SourceFile);            
 
