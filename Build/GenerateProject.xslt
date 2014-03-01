@@ -116,7 +116,7 @@
             <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
             <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
           </xsl:when>
-          <xsl:when test="/Input/Generation/Platform = 'iOS'">
+          <xsl:when test="/Input/Generation/Platform = 'iOS' or /Input/Generation/Platform = 'PSMobile'">
           </xsl:when>
           <xsl:otherwise>
             <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -139,7 +139,7 @@
           <xsl:value-of select="/Input/Properties/FrameworkVersions/Profile" />
         </TargetFrameworkProfile>
       </xsl:when>
-      <xsl:when test="/Input/Generation/Platform = 'Windows8'">
+      <xsl:when test="/Input/Generation/Platform = 'Windows8' or /Input/Generation/Platform = 'PSMobile'">
       </xsl:when>
       <xsl:otherwise>
         <TargetFrameworkProfile></TargetFrameworkProfile>

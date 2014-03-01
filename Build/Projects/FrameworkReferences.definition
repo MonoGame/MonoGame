@@ -69,9 +69,8 @@
   </Platform>
   
   <Platform Type="PSMobile">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
     <Project 
       Name="Lidgren.Network.PSMobile"
