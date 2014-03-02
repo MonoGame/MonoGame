@@ -17,5 +17,10 @@ namespace MonoGame.Tools.Pipeline
         {
             _controller = controller;
         }
+
+        private void NewMenuItemClick(object sender, System.EventArgs e)
+        {
+            _controller.NewProject();
+        }
     }
 }

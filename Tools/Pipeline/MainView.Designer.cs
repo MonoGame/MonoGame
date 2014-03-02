@@ -73,36 +73,37 @@
             this._saveMenuItem,
             this._toolStripSeparator1,
             this._exitMenuItem});
-            this._fileMenu.Name = "fileToolStripMenuItem";
+            this._fileMenu.Name = "_fileMenu";
             this._fileMenu.Size = new System.Drawing.Size(37, 20);
             this._fileMenu.Text = "&File";
             // 
             // _newMenuItem
             // 
-            this._newMenuItem.Name = "newToolStripMenuItem";
+            this._newMenuItem.Name = "_newMenuItem";
             this._newMenuItem.Size = new System.Drawing.Size(152, 22);
             this._newMenuItem.Text = "New...";
+            this._newMenuItem.Click += new System.EventHandler(this.NewMenuItemClick);
             // 
             // _openMenuItem
             // 
-            this._openMenuItem.Name = "openToolStripMenuItem";
+            this._openMenuItem.Name = "_openMenuItem";
             this._openMenuItem.Size = new System.Drawing.Size(152, 22);
             this._openMenuItem.Text = "Open...";
             // 
             // _saveMenuItem
             // 
-            this._saveMenuItem.Name = "saveToolStripMenuItem";
+            this._saveMenuItem.Name = "_saveMenuItem";
             this._saveMenuItem.Size = new System.Drawing.Size(152, 22);
             this._saveMenuItem.Text = "Save";
             // 
             // _toolStripSeparator1
             // 
-            this._toolStripSeparator1.Name = "toolStripSeparator1";
+            this._toolStripSeparator1.Name = "_toolStripSeparator1";
             this._toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // _exitMenuItem
             // 
-            this._exitMenuItem.Name = "exitToolStripMenuItem";
+            this._exitMenuItem.Name = "_exitMenuItem";
             this._exitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this._exitMenuItem.Size = new System.Drawing.Size(152, 22);
             this._exitMenuItem.Text = "E&xit";
@@ -113,26 +114,26 @@
             this._buildMenuItem,
             this._rebuilMenuItem,
             this._cleanMenuItem});
-            this._buildMenu.Name = "buildToolStripMenuItem";
+            this._buildMenu.Name = "_buildMenu";
             this._buildMenu.Size = new System.Drawing.Size(46, 20);
             this._buildMenu.Text = "&Build";
             // 
             // _buildMenuItem
             // 
-            this._buildMenuItem.Name = "buildToolStripMenuItem1";
+            this._buildMenuItem.Name = "_buildMenuItem";
             this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
             this._buildMenuItem.Size = new System.Drawing.Size(120, 22);
             this._buildMenuItem.Text = "&Build";
             // 
             // _rebuilMenuItem
             // 
-            this._rebuilMenuItem.Name = "rebuildToolStripMenuItem";
+            this._rebuilMenuItem.Name = "_rebuilMenuItem";
             this._rebuilMenuItem.Size = new System.Drawing.Size(120, 22);
             this._rebuilMenuItem.Text = "&Rebuild";
             // 
             // _cleanMenuItem
             // 
-            this._cleanMenuItem.Name = "cleanToolStripMenuItem";
+            this._cleanMenuItem.Name = "_cleanMenuItem";
             this._cleanMenuItem.Size = new System.Drawing.Size(120, 22);
             this._cleanMenuItem.Text = "&Clean";
             // 
@@ -142,25 +143,25 @@
             this._viewHelpMenuItem,
             this._toolStripSeparator2,
             this._aboutMenuItem});
-            this._helpMenu.Name = "helpToolStripMenuItem";
+            this._helpMenu.Name = "_helpMenu";
             this._helpMenu.Size = new System.Drawing.Size(44, 20);
             this._helpMenu.Text = "&Help";
             // 
             // _viewHelpMenuItem
             // 
-            this._viewHelpMenuItem.Name = "viewHelptF1ToolStripMenuItem";
+            this._viewHelpMenuItem.Name = "_viewHelpMenuItem";
             this._viewHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
             this._viewHelpMenuItem.Size = new System.Drawing.Size(146, 22);
             this._viewHelpMenuItem.Text = "&View Help";
             // 
             // _toolStripSeparator2
             // 
-            this._toolStripSeparator2.Name = "toolStripSeparator2";
+            this._toolStripSeparator2.Name = "_toolStripSeparator2";
             this._toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
             // _aboutMenuItem
             // 
-            this._aboutMenuItem.Name = "aboutToolStripMenuItem";
+            this._aboutMenuItem.Name = "_aboutMenuItem";
             this._aboutMenuItem.Size = new System.Drawing.Size(146, 22);
             this._aboutMenuItem.Text = "&About...";
             // 
