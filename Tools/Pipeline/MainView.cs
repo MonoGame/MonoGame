@@ -22,6 +22,24 @@ namespace MonoGame.Tools.Pipeline
             _controller = controller;
         }
 
+        public AskResult AskSave()
+        {
+            var result = MessageBox.Show(
+                _mainMenu,
+                "Do you want to save the project first?",
+                "Save Project",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Exclamation,
+                MessageBoxDefaultButton.Button3);
+
+            if (result == DialogResult.Yes)
+                return AskResult.Yes;
+            if (result == DialogResult.No)
+                return AskResult.No;
+
+            return AskResult.Cancel;
+        }
+
         private void NewMenuItemClick(object sender, System.EventArgs e)
         {
             _controller.NewProject();
