@@ -21,6 +21,6 @@ namespace MonoGame.Tools.Pipeline
 
         AskResult AskSaveOrCancel();
 
-        bool AskSaveName(out string filePath);
+        bool AskSaveName(ref string filePath);
     }
 }

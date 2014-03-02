@@ -39,6 +39,24 @@ namespace MonoGame.Tools.Pipeline
             _project.CloseProject();
         }
 
+        public bool SaveProject(bool saveAs)
+        {
+            // Do we need file name?
+            if (saveAs || string.IsNullOrEmpty(_project.FilePath))
+            {
+                string newFilePath = _project.FilePath;
+                if (!_view.AskSaveName(ref newFilePath))
+                    return false;
+
+                _project.FilePath = newFilePath;
+            }
+
+            // Do the save.
+            _project.IsDirty = false;
+
+            return true;
+        }
+
         public bool Exit()
         {            
             // If the project is not dirty 
@@ -57,19 +75,8 @@ namespace MonoGame.Tools.Pipeline
             if (result == AskResult.No)
                 return true;
 
-            // Do we need file name?
-            if (string.IsNullOrEmpty(_project.FilePath))
-            {
-                string newFilePath;
-                if (!_view.AskSaveName(out newFilePath))
-                    return false;
-
-                _project.FilePath = newFilePath;
-            }
-
             // Perform the save.
-
-            return true;
+            return SaveProject(false);
         }
     }
 }

@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.IO;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
@@ -40,10 +41,13 @@ namespace MonoGame.Tools.Pipeline
             return AskResult.Cancel;
         }
 
-        public bool AskSaveName(out string filePath)
+        public bool AskSaveName(ref string filePath)
         {
             var dialog = new SaveFileDialog
             {
+                RestoreDirectory = true,
+                InitialDirectory = Path.GetDirectoryName(filePath),
+                FileName = Path.GetFileName(filePath),
                 AddExtension = true,
                 CheckPathExists = true,
                 Filter = "Pipeline Project (*.pipline)|*.pipeline"
@@ -71,6 +75,16 @@ namespace MonoGame.Tools.Pipeline
                 if (!_controller.Exit())
                     e.Cancel = true;
             }
+        }
+
+        private void SaveMenuItemClick(object sender, System.EventArgs e)
+        {
+            _controller.SaveProject(false);
+        }
+
+        private void SaveAsMenuItemClick(object sender, System.EventArgs e)
+        {
+            _controller.SaveProject(true);
         }
     }
 }

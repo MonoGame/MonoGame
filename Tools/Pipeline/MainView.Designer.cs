@@ -36,7 +36,9 @@ namespace MonoGame.Tools.Pipeline
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._saveAsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._buildMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -74,7 +76,9 @@ namespace MonoGame.Tools.Pipeline
             this._fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._newMenuItem,
             this._openMenuItem,
+            this._toolStripSeparator3,
             this._saveMenuItem,
+            this._saveAsMenuItem,
             this._toolStripSeparator1,
             this._exitMenuItem});
             this._fileMenu.Name = "_fileMenu";
@@ -94,11 +98,24 @@ namespace MonoGame.Tools.Pipeline
             this._openMenuItem.Size = new System.Drawing.Size(152, 22);
             this._openMenuItem.Text = "Open...";
             // 
+            // _toolStripSeparator3
+            // 
+            this._toolStripSeparator3.Name = "_toolStripSeparator3";
+            this._toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+            // 
             // _saveMenuItem
             // 
             this._saveMenuItem.Name = "_saveMenuItem";
             this._saveMenuItem.Size = new System.Drawing.Size(152, 22);
-            this._saveMenuItem.Text = "Save";
+            this._saveMenuItem.Text = "&Save";
+            this._saveMenuItem.Click += new System.EventHandler(this.SaveMenuItemClick);
+            // 
+            // _saveAsMenuItem
+            // 
+            this._saveAsMenuItem.Name = "_saveAsMenuItem";
+            this._saveAsMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._saveAsMenuItem.Text = "Save &As";
+            this._saveAsMenuItem.Click += new System.EventHandler(this.SaveAsMenuItemClick);
             // 
             // _toolStripSeparator1
             // 
@@ -247,6 +264,8 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _viewHelpMenuItem;
         private System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem _aboutMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem _saveAsMenuItem;
     }
 }
 

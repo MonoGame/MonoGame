@@ -12,6 +12,8 @@ namespace MonoGame.Tools.Pipeline
 
         void CloseProject();
 
+        bool SaveProject(bool saveAs);
+
         bool Exit();
     }
 }
