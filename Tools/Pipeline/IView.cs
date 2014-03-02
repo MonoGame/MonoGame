@@ -19,6 +19,8 @@ namespace MonoGame.Tools.Pipeline
 
         void Attach(IController controller);
 
-        AskResult AskSave();
+        AskResult AskSaveOrCancel();
+
+        bool AskSaveName(out string filePath);
     }
 }

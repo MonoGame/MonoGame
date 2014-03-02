@@ -41,21 +41,33 @@ namespace MonoGame.Tools.Pipeline
 
         public bool Exit()
         {            
-            // If it's dirty then ask about saving first.
-            if (true)
-            {
-                var result = _view.AskSave();
+            // If the project is not dirty 
+            // then we can simply exit.
+            if (!_project.IsDirty)
+                return true;
 
-                // Did we cancel exit?
-                if (result == AskResult.Cancel)
+            // Ask the user if they want to save or cancel.
+            var result = _view.AskSaveOrCancel();
+
+            // Did we cancel the exit?
+            if (result == AskResult.Cancel)
+                return false;
+
+            // Did we want to skip saving?
+            if (result == AskResult.No)
+                return true;
+
+            // Do we need file name?
+            if (string.IsNullOrEmpty(_project.FilePath))
+            {
+                string newFilePath;
+                if (!_view.AskSaveName(out newFilePath))
                     return false;
 
-                // Did we want to save?
-                if (result == AskResult.Yes)
-                {
-                    // TODO: Save project!
-                }
+                _project.FilePath = newFilePath;
             }
+
+            // Perform the save.
 
             return true;
         }

@@ -23,6 +23,8 @@ namespace MonoGame.Tools.Pipeline
     {
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
+        public string FilePath { get; set; }
+
         [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
@@ -123,6 +125,11 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public bool IsDirty { get; set; }
+
+        public PipelineProject()
+        {
+            IsDirty = true;
+        }
 
         public void Attach(IProjectObserver observer)
         {            

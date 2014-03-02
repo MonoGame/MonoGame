@@ -22,10 +22,10 @@ namespace MonoGame.Tools.Pipeline
             _controller = controller;
         }
 
-        public AskResult AskSave()
+        public AskResult AskSaveOrCancel()
         {
             var result = MessageBox.Show(
-                _mainMenu,
+                this,
                 "Do you want to save the project first?",
                 "Save Project",
                 MessageBoxButtons.YesNoCancel,
@@ -38,6 +38,19 @@ namespace MonoGame.Tools.Pipeline
                 return AskResult.No;
 
             return AskResult.Cancel;
+        }
+
+        public bool AskSaveName(out string filePath)
+        {
+            var dialog = new SaveFileDialog
+            {
+                AddExtension = true,
+                CheckPathExists = true,
+                Filter = "Pipeline Project (*.pipline)|*.pipeline"
+            };
+            var result = dialog.ShowDialog(this);
+            filePath = dialog.FileName;
+            return result != DialogResult.Cancel;
         }
 
         private void NewMenuItemClick(object sender, System.EventArgs e)
