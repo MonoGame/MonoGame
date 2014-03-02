@@ -19,7 +19,7 @@ namespace MonoGame.Tools.Pipeline
     /// NOTE: This class should never have any dependancy on the 
     /// controller or view... it is only the data "model".
     /// </remarks>
-    class PipelineProject : IModel
+    class PipelineProject
     {
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
@@ -124,7 +124,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool IsDirty { get; set; }
 
-        public void Attach(IModelObserver observer)
+        public void Attach(IProjectObserver observer)
         {            
         }
 

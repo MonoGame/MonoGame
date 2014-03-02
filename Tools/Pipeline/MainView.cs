@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class MainView : Form, IView, IModelObserver
+    public partial class MainView : Form, IView, IProjectObserver
     {
         IController _controller;
 

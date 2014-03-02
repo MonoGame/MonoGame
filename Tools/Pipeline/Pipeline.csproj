@@ -49,8 +49,7 @@
     </Compile>
     <Compile Include="ContentItem.cs" />
     <Compile Include="IController.cs" />
-    <Compile Include="IModel.cs" />
-    <Compile Include="IModelObserver.cs" />
+    <Compile Include="IProjectObserver.cs" />
     <Compile Include="IView.cs" />
     <Compile Include="MainView.cs">
       <SubType>Form</SubType>
