@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
@@ -16,7 +13,11 @@ namespace MonoGame.Tools.Pipeline
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainView());
+
+            var view = new MainView();
+            var model = new PipelineModel();
+            var controller = new PipelineController(view, model);          
+            Application.Run(view);
         }
     }
 }
