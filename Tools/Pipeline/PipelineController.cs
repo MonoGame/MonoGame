@@ -6,30 +6,43 @@ namespace MonoGame.Tools.Pipeline
 {
     class PipelineController : IController
     {
-        private readonly MainView _view;
-        private readonly PipelineModel _model;
+        private readonly IView _view;
+        private readonly IModel _model;
 
-        public PipelineController(MainView view, PipelineModel model)
+        public PipelineController(IView view, IModel model)
         {
             _view = view;
             _view.Attach(this);
             _model = model;
-            _model.Attach(_view);
+            _model.Attach(_view as IModelObserver);
         }
 
         public void NewProject()
         {
+            // If the project is dirty then confirm to
+            // save or discard it.
+            //if (IsDirty)
+
+            // Clear the existing model data.
             _model.NewProject();
+            
+            // Setup a default project.
         }
 
         public void OpenProject(string filePath)
         {
-            _model.OpenProject(filePath);
+            _model.LoadProject(filePath);
         }
 
         public void CloseProject()
         {
             _model.CloseProject();
+        }
+
+        public bool Exit()
+        {            
+            //_view.Exit();
+            return true;
         }
     }
 }

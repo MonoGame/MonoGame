@@ -111,6 +111,7 @@ namespace MonoGame.Tools.Pipeline
             this._exitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this._exitMenuItem.Size = new System.Drawing.Size(152, 22);
             this._exitMenuItem.Text = "E&xit";
+            this._exitMenuItem.Click += new System.EventHandler(this.ExitMenuItemClick);
             // 
             // _buildMenu
             // 
@@ -214,6 +215,7 @@ namespace MonoGame.Tools.Pipeline
             this.MaximizeBox = false;
             this.Name = "MainView";
             this.Text = "Pipeline";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
             this._mainMenu.ResumeLayout(false);
             this._mainMenu.PerformLayout();
             this._splitContainer.Panel1.ResumeLayout(false);

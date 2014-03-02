@@ -26,5 +26,20 @@ namespace MonoGame.Tools.Pipeline
         {
             _controller.NewProject();
         }
+
+        private void ExitMenuItemClick(object sender, System.EventArgs e)
+        {
+            if (_controller.Exit())
+                Application.Exit();
+        }
+
+        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (!_controller.Exit())
+                    e.Cancel = true;
+            }
+        }
     }
 }

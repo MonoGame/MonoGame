@@ -19,7 +19,7 @@ namespace MonoGame.Tools.Pipeline
             Application.SetCompatibleTextRenderingDefault(false);
 
             var view = new MainView();
-            var model = new PipelineModel();
+            var model = new PipelineProject();
             var controller = new PipelineController(view, model);          
             Application.Run(view);
         }
