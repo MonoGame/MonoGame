@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Pipeline
+namespace MonoGame.Tools.Pipeline
 {
     public partial class MainView : Form, IView, IModelObserver
     {

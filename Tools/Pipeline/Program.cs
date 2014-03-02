@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Pipeline
+namespace MonoGame.Tools.Pipeline
 {
     static class Program
     {

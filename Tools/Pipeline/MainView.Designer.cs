@@ -1,4 +1,4 @@
-﻿namespace Pipeline
+﻿namespace MonoGame.Tools.Pipeline
 {
     partial class MainView
     {
