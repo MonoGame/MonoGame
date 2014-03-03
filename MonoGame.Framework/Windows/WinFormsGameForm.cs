@@ -21,12 +21,13 @@ namespace Microsoft.Xna.Framework.Windows
                            X = (short)(lowword),
                            Y = (short)(lowword >> 16),
                        };
-        }                
+        }
     }
 
     [System.ComponentModel.DesignerCategory("Code")]
     internal class WinFormsGameForm : Form
     {
+        GameWindow _window;
         public const int WM_POINTERUP = 0x0247;
         public const int WM_POINTERDOWN = 0x0246;
         public const int WM_POINTERUPDATE = 0x0245;
@@ -34,6 +35,11 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_TABLET_QUERYSYSTEMGESTURESTA = (0x02C0 + 12);
 
         public const int WM_SYSCOMMAND = 0x0112;
+
+        public WinFormsGameForm(GameWindow window)
+        {
+            _window = window;
+        }
 
         [System.Security.Permissions.PermissionSet(System.Security.Permissions.SecurityAction.Demand, Name = "FullTrust")]
         protected override void WndProc(ref Message m)
@@ -88,7 +94,7 @@ namespace Microsoft.Xna.Framework.Windows
                 position = PointToClient(position);
                 var vec = new Vector2(position.X, position.Y);
 
-                TouchPanel.AddEvent(id, state, vec, false);
+                _window.TouchPanelState.AddEvent(id, state, vec, false);
             }
 
             base.WndProc(ref m);

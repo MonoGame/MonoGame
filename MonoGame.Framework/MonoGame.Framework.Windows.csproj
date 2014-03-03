@@ -141,6 +141,7 @@
     <Compile Include="Graphics\Effect\SkinnedEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDevice.DirectX.cs" />
     <Compile Include="Graphics\Model.cs" />
     <Compile Include="Graphics\ModelBone.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -176,6 +177,7 @@
     <Compile Include="Input\GamePadDeadZone.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\VideoSoundtrackType.cs" />

@@ -165,6 +165,10 @@ namespace MonoGame.Framework.WindowsPhone
         
         public override void Exit()
         {
+            // Closing event is not fired when termiate is called. We need to deactivate the game manually.
+            if (Game.Instance != null)
+                this.IsActive = false;
+
             System.Windows.Application.Current.Terminate();
         }
 

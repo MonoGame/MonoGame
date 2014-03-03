@@ -158,6 +158,7 @@
     <Compile Include="Input\Touch\TouchLocation.cs" />
     <Compile Include="Input\Touch\TouchLocationState.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
+    <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="GameComponentCollection.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
+    <Compile Include="Graphics\GraphicsDevice.PSM.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Game.cs" />
