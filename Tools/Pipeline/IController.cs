@@ -8,7 +8,7 @@ namespace MonoGame.Tools.Pipeline
     {
         void NewProject();
 
-        void OpenProject(string filePath);
+        void OpenProject();
 
         void CloseProject();
 

@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace MonoGame.Tools.Pipeline
 {
     class PipelineController : IController
@@ -19,9 +21,9 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewProject()
         {
-            // If the project is dirty then let the user
-            // save it or cancel out of creating a new project.
-            if (_project.IsDirty && !SaveProject(false))
+            // Make sure we give the user a chance to
+            // save the project if they need too.
+            if (!AskSaveProject())
                 return;
 
             // Clear the existing model data.
@@ -30,9 +32,26 @@ namespace MonoGame.Tools.Pipeline
             // Setup a default project.
         }
 
-        public void OpenProject(string filePath)
+        public void OpenProject()
         {
-            _project.LoadProject(filePath);
+            // Make sure we give the user a chance to
+            // save the project if they need too.
+            if (!AskSaveProject())
+                return;
+
+            string projectFilePath;
+            if (!_view.AskOpenProject(out projectFilePath))
+                return;
+
+            try
+            {
+                _project.OpenProject(projectFilePath);
+            }
+            catch (Exception)
+            {
+                _view.ShowError("Open Project", "Failed to open project!");
+                return;
+            }
         }
 
         public void CloseProject()
@@ -58,10 +77,10 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
-        public bool Exit()
-        {            
+        private bool AskSaveProject()
+        {
             // If the project is not dirty 
-            // then we can simply exit.
+            // then we can simply skip it.
             if (!_project.IsDirty)
                 return true;
 
@@ -76,8 +95,14 @@ namespace MonoGame.Tools.Pipeline
             if (result == AskResult.No)
                 return true;
 
-            // Perform the save.
             return SaveProject(false);
+        }
+
+        public bool Exit()
+        {
+            // Make sure we give the user a chance to
+            // save the project if they need too.
+            return AskSaveProject();
         }
     }
 }

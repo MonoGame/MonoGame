@@ -141,19 +141,25 @@ namespace MonoGame.Tools.Pipeline
             IsDirty = false;
         }
 
-        public void LoadProject(string filePath)
+        public void OpenProject(string projectFilePath)
         {
             _content.Clear();
 
             var parser = new CommandLineParser(this);
             parser.Title = "Pipeline";
 
-            var commands =  File.ReadAllLines(filePath).
+            var commands = File.ReadAllLines(projectFilePath).
                             Select(x => x.Trim()).
                             Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
                             ToArray();
 
             parser.ParseCommandLine(commands);
+
+            // Store the file name for saving later.
+            FilePath = projectFilePath;
+
+            // We're not dirty.
+            IsDirty = false;
         }
 
         public void CloseProject()

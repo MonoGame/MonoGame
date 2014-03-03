@@ -57,6 +57,26 @@ namespace MonoGame.Tools.Pipeline
             return result != DialogResult.Cancel;
         }
 
+        public bool AskOpenProject(out string projectFilePath)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                RestoreDirectory = true,
+                AddExtension = true,
+                CheckPathExists = true,
+                CheckFileExists = true,
+                Filter = "Pipeline Project (*.pipline)|*.pipeline"
+            };
+            var result = dialog.ShowDialog(this);
+            projectFilePath = dialog.FileName;
+            return result != DialogResult.Cancel;
+        }
+
+        public void ShowError(string title, string message)
+        {
+            MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+        }
+
         private void NewMenuItemClick(object sender, System.EventArgs e)
         {
             _controller.NewProject();
@@ -85,6 +105,11 @@ namespace MonoGame.Tools.Pipeline
         private void SaveAsMenuItemClick(object sender, System.EventArgs e)
         {
             _controller.SaveProject(true);
+        }
+
+        private void OpenMenuItemClick(object sender, System.EventArgs e)
+        {
+            _controller.OpenProject();
         }
     }
 }
