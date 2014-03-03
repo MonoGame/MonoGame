@@ -81,6 +81,11 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
+        public void OnTreeSelect(IProjectItem item)
+        {
+            _view.ShowProperties(item);
+        }
+
         private bool AskSaveProject()
         {
             // If the project is not dirty 
@@ -104,7 +109,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateTree()
         {
-            _view.ClearTree();
+            _view.SetTreeRoot(_project);
             foreach (var item in _project.ContentItems)
                 _view.AddTreeItem(item);
         }

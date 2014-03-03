@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -78,9 +79,10 @@ namespace MonoGame.Tools.Pipeline
             MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
         }
 
-        public void ClearTree()
+        public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();
+            _treeView.Nodes.Add(string.Empty, item.Label, -1).Tag = item;
         }
 
         public void AddTreeItem(IProjectItem item)
@@ -88,7 +90,7 @@ namespace MonoGame.Tools.Pipeline
             var path = item.Path;
             var folders = path.Split(new [] {'/'}, StringSplitOptions.RemoveEmptyEntries);
 
-            var root = _treeView.Nodes;
+            var root = _treeView.Nodes[0].Nodes;
             foreach (var folder in folders)
             {
                 var found = root.Find(folder, false);
@@ -99,6 +101,11 @@ namespace MonoGame.Tools.Pipeline
             }
 
             root.Add(string.Empty, item.Label, -1).Tag = item;
+        }
+
+        public void ShowProperties(IProjectItem item)
+        {
+            _propertyGrid.SelectedObject = item;
         }
 
         private void NewMenuItemClick(object sender, System.EventArgs e)
@@ -134,6 +141,31 @@ namespace MonoGame.Tools.Pipeline
         private void OpenMenuItemClick(object sender, System.EventArgs e)
         {
             _controller.OpenProject();
+        }
+
+        private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
+        {
+            _controller.OnTreeSelect(e.Node.Tag as IProjectItem);
+        }
+
+        private void TreeViewMouseUp(object sender, MouseEventArgs e)
+        {
+            // Show menu only if the right mouse button is clicked.
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            // Point where the mouse is clicked.
+            var p = new Point(e.X, e.Y);
+
+            // Get the node that the user has clicked.
+            var node = _treeView.GetNodeAt(p);
+            if (node == null) 
+                return;
+
+            // Select the node the user has clicked.
+            _treeView.SelectedNode = node;
+
+            // TODO: Show context menu!
         }
     }
 }

@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
     /// NOTE: This class should never have any dependancy on the 
     /// controller or view... it is only the data "model".
     /// </remarks>
-    class PipelineProject
+    class PipelineProject : IProjectItem
     {
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
@@ -103,7 +103,7 @@ namespace MonoGame.Tools.Pipeline
         public void OnBuild(string sourceFile)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = Path.GetDirectoryName(FilePath);
+            var projectDir = System.IO.Path.GetDirectoryName(FilePath);
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
@@ -133,7 +133,6 @@ namespace MonoGame.Tools.Pipeline
         public PipelineProject()
         {
             ContentItems = new ReadOnlyCollection<ContentItem>(_content);
-            IsDirty = true;
         }
 
         public void Attach(IProjectObserver observer)
@@ -180,5 +179,23 @@ namespace MonoGame.Tools.Pipeline
         {
             _content.Clear();
         }
+
+#region IPipelineItem
+
+        public string Label 
+        { 
+            get
+            {
+                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
+            }
+        }
+
+        public string Path
+        {
+            get { return string.Empty; }
+        }
+
+        public string Icon { get; private set; }
+#endregion
     }
 }

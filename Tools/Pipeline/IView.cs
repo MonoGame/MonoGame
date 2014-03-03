@@ -27,8 +27,10 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowError(string title, string message);
 
-        void ClearTree();
+        void SetTreeRoot(IProjectItem item);
 
         void AddTreeItem(IProjectItem item);
+
+        void ShowProperties(IProjectItem item);
     }
 }

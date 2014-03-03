@@ -88,46 +88,46 @@ namespace MonoGame.Tools.Pipeline
             // _newMenuItem
             // 
             this._newMenuItem.Name = "_newMenuItem";
-            this._newMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._newMenuItem.Size = new System.Drawing.Size(134, 22);
             this._newMenuItem.Text = "New...";
             this._newMenuItem.Click += new System.EventHandler(this.NewMenuItemClick);
             // 
             // _openMenuItem
             // 
             this._openMenuItem.Name = "_openMenuItem";
-            this._openMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._openMenuItem.Size = new System.Drawing.Size(134, 22);
             this._openMenuItem.Text = "Open...";
             this._openMenuItem.Click += new System.EventHandler(this.OpenMenuItemClick);
             // 
             // _toolStripSeparator3
             // 
             this._toolStripSeparator3.Name = "_toolStripSeparator3";
-            this._toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+            this._toolStripSeparator3.Size = new System.Drawing.Size(131, 6);
             // 
             // _saveMenuItem
             // 
             this._saveMenuItem.Name = "_saveMenuItem";
-            this._saveMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._saveMenuItem.Size = new System.Drawing.Size(134, 22);
             this._saveMenuItem.Text = "&Save";
             this._saveMenuItem.Click += new System.EventHandler(this.SaveMenuItemClick);
             // 
             // _saveAsMenuItem
             // 
             this._saveAsMenuItem.Name = "_saveAsMenuItem";
-            this._saveAsMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._saveAsMenuItem.Size = new System.Drawing.Size(134, 22);
             this._saveAsMenuItem.Text = "Save &As";
             this._saveAsMenuItem.Click += new System.EventHandler(this.SaveAsMenuItemClick);
             // 
             // _toolStripSeparator1
             // 
             this._toolStripSeparator1.Name = "_toolStripSeparator1";
-            this._toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this._toolStripSeparator1.Size = new System.Drawing.Size(131, 6);
             // 
             // _exitMenuItem
             // 
             this._exitMenuItem.Name = "_exitMenuItem";
             this._exitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this._exitMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._exitMenuItem.Size = new System.Drawing.Size(134, 22);
             this._exitMenuItem.Text = "E&xit";
             this._exitMenuItem.Click += new System.EventHandler(this.ExitMenuItemClick);
             // 
@@ -145,19 +145,19 @@ namespace MonoGame.Tools.Pipeline
             // 
             this._buildMenuItem.Name = "_buildMenuItem";
             this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this._buildMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._buildMenuItem.Size = new System.Drawing.Size(120, 22);
             this._buildMenuItem.Text = "&Build";
             // 
             // _rebuilMenuItem
             // 
             this._rebuilMenuItem.Name = "_rebuilMenuItem";
-            this._rebuilMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rebuilMenuItem.Size = new System.Drawing.Size(120, 22);
             this._rebuilMenuItem.Text = "&Rebuild";
             // 
             // _cleanMenuItem
             // 
             this._cleanMenuItem.Name = "_cleanMenuItem";
-            this._cleanMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._cleanMenuItem.Size = new System.Drawing.Size(120, 22);
             this._cleanMenuItem.Text = "&Clean";
             // 
             // _helpMenu
@@ -213,6 +213,8 @@ namespace MonoGame.Tools.Pipeline
             this._treeView.Name = "_treeView";
             this._treeView.Size = new System.Drawing.Size(273, 128);
             this._treeView.TabIndex = 0;
+            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
+            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
             // 
             // _propertyGrid
             // 

@@ -4,7 +4,7 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-    public interface IController
+    interface IController
     {
         void NewProject();
 
@@ -13,6 +13,8 @@ namespace MonoGame.Tools.Pipeline
         void CloseProject();
 
         bool SaveProject(bool saveAs);
+
+        void OnTreeSelect(IProjectItem item);
 
         bool Exit();
     }
