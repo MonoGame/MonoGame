@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -22,6 +24,8 @@ namespace MonoGame.Tools.Pipeline
     class PipelineProject
     {
         private readonly List<ContentItem> _content = new List<ContentItem>();
+
+        public ReadOnlyCollection<ContentItem> ContentItems { get; private set; }
 
         public string FilePath { get; set; }
 
@@ -98,9 +102,9 @@ namespace MonoGame.Tools.Pipeline
             Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
         {
-            // Make sure the source file is absolute.
-            if (!Path.IsPathRooted(sourceFile))
-                sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+            // Make sure the source file is relative to the project.
+            var projectDir = Path.GetDirectoryName(FilePath);
+            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
             var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
@@ -128,6 +132,7 @@ namespace MonoGame.Tools.Pipeline
 
         public PipelineProject()
         {
+            ContentItems = new ReadOnlyCollection<ContentItem>(_content);
             IsDirty = true;
         }
 
@@ -138,12 +143,24 @@ namespace MonoGame.Tools.Pipeline
         public void NewProject()
         {
             _content.Clear();
+            References.Clear();
+            OutputDir = null;
+            IntermediateDir = null;
+            Config = null;
+            Importer = null;
+            Platform = TargetPlatform.Windows;
+            Profile = GraphicsProfile.HiDef;
+            Processor = null;
+            FilePath = null;
             IsDirty = false;
         }
 
         public void OpenProject(string projectFilePath)
         {
             _content.Clear();
+
+            // Store the file name for saving later.
+            FilePath = projectFilePath;
 
             var parser = new CommandLineParser(this);
             parser.Title = "Pipeline";
@@ -155,10 +172,7 @@ namespace MonoGame.Tools.Pipeline
 
             parser.ParseCommandLine(commands);
 
-            // Store the file name for saving later.
-            FilePath = projectFilePath;
-
-            // We're not dirty.
+            // We're not dirty as we just loaded.
             IsDirty = false;
         }
 

@@ -30,6 +30,7 @@ namespace MonoGame.Tools.Pipeline
             _project.NewProject();
             
             // Setup a default project.
+            UpdateTree();
         }
 
         public void OpenProject()
@@ -52,11 +53,14 @@ namespace MonoGame.Tools.Pipeline
                 _view.ShowError("Open Project", "Failed to open project!");
                 return;
             }
+
+            UpdateTree();
         }
 
         public void CloseProject()
         {
             _project.CloseProject();
+            UpdateTree();
         }
 
         public bool SaveProject(bool saveAs)
@@ -96,6 +100,13 @@ namespace MonoGame.Tools.Pipeline
                 return true;
 
             return SaveProject(false);
+        }
+
+        private void UpdateTree()
+        {
+            _view.ClearTree();
+            foreach (var item in _project.ContentItems)
+                _view.AddTreeItem(item);
         }
 
         public bool Exit()

@@ -4,16 +4,16 @@
 
 namespace MonoGame.Tools.Pipeline
 {
-    public delegate void SelectionChanged();
+    delegate void SelectionChanged();
 
-    public enum AskResult
+    enum AskResult
     {
         Yes,
         No,
         Cancel
     }
 
-    public interface IView
+    interface IView
     {
         event SelectionChanged OnSelectionChanged;
 
@@ -26,5 +26,9 @@ namespace MonoGame.Tools.Pipeline
         bool AskOpenProject(out string projectFilePath);
 
         void ShowError(string title, string message);
+
+        void ClearTree();
+
+        void AddTreeItem(IProjectItem item);
     }
 }

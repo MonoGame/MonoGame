@@ -2,12 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.IO;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public partial class MainView : Form, IView, IProjectObserver
+    partial class MainView : Form, IView, IProjectObserver
     {
         IController _controller;
 
@@ -75,6 +76,29 @@ namespace MonoGame.Tools.Pipeline
         public void ShowError(string title, string message)
         {
             MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+        }
+
+        public void ClearTree()
+        {
+            _treeView.Nodes.Clear();
+        }
+
+        public void AddTreeItem(IProjectItem item)
+        {
+            var path = item.Path;
+            var folders = path.Split(new [] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+
+            var root = _treeView.Nodes;
+            foreach (var folder in folders)
+            {
+                var found = root.Find(folder, false);
+                if (found.Length == 0)
+                    root = root.Add(folder, folder, -1).Nodes;
+                else
+                    root = found[0].Nodes;
+            }
+
+            root.Add(string.Empty, item.Label, -1).Tag = item;
         }
 
         private void NewMenuItemClick(object sender, System.EventArgs e)

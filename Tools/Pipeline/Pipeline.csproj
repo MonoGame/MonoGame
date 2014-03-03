@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,6 +50,7 @@
     </Compile>
     <Compile Include="ContentItem.cs" />
     <Compile Include="IController.cs" />
+    <Compile Include="IProjectItem.cs" />
     <Compile Include="IProjectObserver.cs" />
     <Compile Include="IView.cs" />
     <Compile Include="MainView.cs">
@@ -72,6 +74,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
