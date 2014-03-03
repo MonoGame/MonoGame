@@ -34,14 +34,14 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\bin\Windows\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>..\bin\Windows\</OutputPath>
     <DefineConstants>WINDOWS</DefineConstants>
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
