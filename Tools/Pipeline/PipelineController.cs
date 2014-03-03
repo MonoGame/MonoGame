@@ -19,9 +19,10 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewProject()
         {
-            // If the project is dirty then confirm to
-            // save or discard it.
-            //if (IsDirty)
+            // If the project is dirty then let the user
+            // save it or cancel out of creating a new project.
+            if (_project.IsDirty && !SaveProject(false))
+                return;
 
             // Clear the existing model data.
             _project.NewProject();

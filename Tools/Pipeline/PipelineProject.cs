@@ -138,6 +138,7 @@ namespace MonoGame.Tools.Pipeline
         public void NewProject()
         {
             _content.Clear();
+            IsDirty = false;
         }
 
         public void LoadProject(string filePath)
