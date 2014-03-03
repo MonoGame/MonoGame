@@ -275,13 +275,11 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Gives derived classes an opportunity to do work before any
-        /// components are initialized.  Note that the base implementation sets
-        /// IsActive to true, so derived classes should either call the base
-        /// implementation or set IsActive to true by their own means.
+        /// components are initialized.  IsActive is set to true after initialization
+        /// (see OpenTKGamePlatform in RunLoop)
         /// </summary>
         public virtual void BeforeInitialize()
         {
-            IsActive = true;
             if (this.Game.GraphicsDevice == null) 
             {
                 var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   

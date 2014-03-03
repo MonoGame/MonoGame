@@ -139,9 +139,13 @@ namespace Microsoft.Xna.Framework
         }
 #endif
 
+        //IsActive is set to true here to avoid firing deactivated events early.
+        //The only other possible method for WindowsGL to fire instead of this one
+        //is StartRunLoop, which just throws a NotSupportedException.
         public override void RunLoop()
         {
             ResetWindowBounds(false);
+            IsActive = true;
             _view.Window.Run(0);
         }
 
