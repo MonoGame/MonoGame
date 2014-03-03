@@ -124,8 +124,11 @@ namespace Microsoft.Xna.Framework.GamerServices
                             result = null;
                             isVisible = false;
                         });
-                    
-                    alert.Show();
+
+                    var inputDialog = alert.Create();
+                    inputDialog.SetCancelable(false);
+                    inputDialog.SetCanceledOnTouchOutside(false);
+                    inputDialog.Show();
                 });
 
             while (isVisible)
