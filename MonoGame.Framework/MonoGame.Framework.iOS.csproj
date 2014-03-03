@@ -149,6 +149,7 @@
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
+    <Compile Include="Vector4TypeConverter.cs" />
     <Compile Include="CurveLoopType.cs" />
     <Compile Include="CurveContinuity.cs" />
     <Compile Include="Input\ThumbStickDefinition.cs" />
