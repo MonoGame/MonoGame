@@ -112,6 +112,26 @@ namespace MonoGame.Tools.Pipeline
             _propertyGrid.SelectedObject = item;
         }
 
+        public void OutputAppend(string text)
+        {
+            if (text == null)
+                return;
+
+            // We need to append newlines.
+            var line = string.Concat(text, Environment.NewLine);
+
+            // Write the output... safely if needed.
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
+            else
+                _outputWindow.AppendText(line);
+        }
+
+        public void OutputClear()
+        {
+            _outputWindow.Clear();
+        }
+
         private void NewMenuItemClick(object sender, System.EventArgs e)
         {
             _controller.NewProject();
@@ -170,6 +190,21 @@ namespace MonoGame.Tools.Pipeline
             _treeView.SelectedNode = node;
 
             // TODO: Show context menu!
+        }
+
+        private void BuildMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.Build(false);
+        }
+
+        private void RebuilMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.Build(true);
+        }
+
+        private void CleanMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.Clean();
         }
     }
 }

@@ -32,5 +32,9 @@ namespace MonoGame.Tools.Pipeline
         void AddTreeItem(IProjectItem item);
 
         void ShowProperties(IProjectItem item);
+
+        void OutputAppend(string text);
+
+        void OutputClear();
     }
 }

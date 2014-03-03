@@ -37,6 +37,9 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
             System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
+            this._treeView = new System.Windows.Forms.TreeView();
+            this._propertyGrid = new System.Windows.Forms.PropertyGrid();
+            this._outputWindow = new System.Windows.Forms.TextBox();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,15 +54,11 @@ namespace MonoGame.Tools.Pipeline
             this._helpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._viewHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._treeView = new System.Windows.Forms.TreeView();
-            this._propertyGrid = new System.Windows.Forms.PropertyGrid();
-            this._outputWindow = new System.Windows.Forms.TextBox();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             _splitTreeProps = new System.Windows.Forms.SplitContainer();
             _splitEditorOutput = new System.Windows.Forms.SplitContainer();
-            this._mainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).BeginInit();
             _splitTreeProps.Panel1.SuspendLayout();
             _splitTreeProps.Panel2.SuspendLayout();
@@ -68,136 +67,23 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.Panel1.SuspendLayout();
             _splitEditorOutput.Panel2.SuspendLayout();
             _splitEditorOutput.SuspendLayout();
+            this._mainMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // _mainMenu
-            // 
-            this._mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._fileMenu,
-            this._buildMenu,
-            this._helpMenu});
-            this._mainMenu.Location = new System.Drawing.Point(0, 0);
-            this._mainMenu.Name = "_mainMenu";
-            this._mainMenu.Size = new System.Drawing.Size(717, 24);
-            this._mainMenu.TabIndex = 0;
-            this._mainMenu.Text = "menuStrip1";
-            // 
-            // _fileMenu
-            // 
-            this._fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._newMenuItem,
-            this._openMenuItem,
-            _toolStripSeparator3,
-            this._saveMenuItem,
-            this._saveAsMenuItem,
-            _toolStripSeparator1,
-            this._exitMenuItem});
-            this._fileMenu.Name = "_fileMenu";
-            this._fileMenu.Size = new System.Drawing.Size(37, 20);
-            this._fileMenu.Text = "&File";
-            // 
-            // _newMenuItem
-            // 
-            this._newMenuItem.Name = "_newMenuItem";
-            this._newMenuItem.Size = new System.Drawing.Size(134, 22);
-            this._newMenuItem.Text = "New...";
-            this._newMenuItem.Click += new System.EventHandler(this.NewMenuItemClick);
-            // 
-            // _openMenuItem
-            // 
-            this._openMenuItem.Name = "_openMenuItem";
-            this._openMenuItem.Size = new System.Drawing.Size(134, 22);
-            this._openMenuItem.Text = "Open...";
-            this._openMenuItem.Click += new System.EventHandler(this.OpenMenuItemClick);
             // 
             // _toolStripSeparator3
             // 
             _toolStripSeparator3.Name = "_toolStripSeparator3";
-            _toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
-            // 
-            // _saveMenuItem
-            // 
-            this._saveMenuItem.Name = "_saveMenuItem";
-            this._saveMenuItem.Size = new System.Drawing.Size(134, 22);
-            this._saveMenuItem.Text = "&Save";
-            this._saveMenuItem.Click += new System.EventHandler(this.SaveMenuItemClick);
-            // 
-            // _saveAsMenuItem
-            // 
-            this._saveAsMenuItem.Name = "_saveAsMenuItem";
-            this._saveAsMenuItem.Size = new System.Drawing.Size(134, 22);
-            this._saveAsMenuItem.Text = "Save &As";
-            this._saveAsMenuItem.Click += new System.EventHandler(this.SaveAsMenuItemClick);
+            _toolStripSeparator3.Size = new System.Drawing.Size(131, 6);
             // 
             // _toolStripSeparator1
             // 
             _toolStripSeparator1.Name = "_toolStripSeparator1";
-            _toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // _exitMenuItem
-            // 
-            this._exitMenuItem.Name = "_exitMenuItem";
-            this._exitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this._exitMenuItem.Size = new System.Drawing.Size(134, 22);
-            this._exitMenuItem.Text = "E&xit";
-            this._exitMenuItem.Click += new System.EventHandler(this.ExitMenuItemClick);
-            // 
-            // _buildMenu
-            // 
-            this._buildMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._buildMenuItem,
-            this._rebuilMenuItem,
-            this._cleanMenuItem});
-            this._buildMenu.Name = "_buildMenu";
-            this._buildMenu.Size = new System.Drawing.Size(46, 20);
-            this._buildMenu.Text = "&Build";
-            // 
-            // _buildMenuItem
-            // 
-            this._buildMenuItem.Name = "_buildMenuItem";
-            this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this._buildMenuItem.Size = new System.Drawing.Size(120, 22);
-            this._buildMenuItem.Text = "&Build";
-            // 
-            // _rebuilMenuItem
-            // 
-            this._rebuilMenuItem.Name = "_rebuilMenuItem";
-            this._rebuilMenuItem.Size = new System.Drawing.Size(120, 22);
-            this._rebuilMenuItem.Text = "&Rebuild";
-            // 
-            // _cleanMenuItem
-            // 
-            this._cleanMenuItem.Name = "_cleanMenuItem";
-            this._cleanMenuItem.Size = new System.Drawing.Size(120, 22);
-            this._cleanMenuItem.Text = "&Clean";
-            // 
-            // _helpMenu
-            // 
-            this._helpMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._viewHelpMenuItem,
-            _toolStripSeparator2,
-            this._aboutMenuItem});
-            this._helpMenu.Name = "_helpMenu";
-            this._helpMenu.Size = new System.Drawing.Size(44, 20);
-            this._helpMenu.Text = "&Help";
-            // 
-            // _viewHelpMenuItem
-            // 
-            this._viewHelpMenuItem.Name = "_viewHelpMenuItem";
-            this._viewHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this._viewHelpMenuItem.Size = new System.Drawing.Size(146, 22);
-            this._viewHelpMenuItem.Text = "&View Help";
+            _toolStripSeparator1.Size = new System.Drawing.Size(131, 6);
             // 
             // _toolStripSeparator2
             // 
             _toolStripSeparator2.Name = "_toolStripSeparator2";
-            _toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
-            // 
-            // _aboutMenuItem
-            // 
-            this._aboutMenuItem.Name = "_aboutMenuItem";
-            this._aboutMenuItem.Size = new System.Drawing.Size(146, 22);
-            this._aboutMenuItem.Text = "&About...";
+            _toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
             // _splitTreeProps
             // 
@@ -267,6 +153,123 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.TabIndex = 0;
             this._outputWindow.WordWrap = false;
             // 
+            // _mainMenu
+            // 
+            this._mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._fileMenu,
+            this._buildMenu,
+            this._helpMenu});
+            this._mainMenu.Location = new System.Drawing.Point(0, 0);
+            this._mainMenu.Name = "_mainMenu";
+            this._mainMenu.Size = new System.Drawing.Size(717, 24);
+            this._mainMenu.TabIndex = 0;
+            this._mainMenu.Text = "menuStrip1";
+            // 
+            // _fileMenu
+            // 
+            this._fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._newMenuItem,
+            this._openMenuItem,
+            _toolStripSeparator3,
+            this._saveMenuItem,
+            this._saveAsMenuItem,
+            _toolStripSeparator1,
+            this._exitMenuItem});
+            this._fileMenu.Name = "_fileMenu";
+            this._fileMenu.Size = new System.Drawing.Size(37, 20);
+            this._fileMenu.Text = "&File";
+            // 
+            // _newMenuItem
+            // 
+            this._newMenuItem.Name = "_newMenuItem";
+            this._newMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._newMenuItem.Text = "New...";
+            this._newMenuItem.Click += new System.EventHandler(this.NewMenuItemClick);
+            // 
+            // _openMenuItem
+            // 
+            this._openMenuItem.Name = "_openMenuItem";
+            this._openMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._openMenuItem.Text = "Open...";
+            this._openMenuItem.Click += new System.EventHandler(this.OpenMenuItemClick);
+            // 
+            // _saveMenuItem
+            // 
+            this._saveMenuItem.Name = "_saveMenuItem";
+            this._saveMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._saveMenuItem.Text = "&Save";
+            this._saveMenuItem.Click += new System.EventHandler(this.SaveMenuItemClick);
+            // 
+            // _saveAsMenuItem
+            // 
+            this._saveAsMenuItem.Name = "_saveAsMenuItem";
+            this._saveAsMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._saveAsMenuItem.Text = "Save &As";
+            this._saveAsMenuItem.Click += new System.EventHandler(this.SaveAsMenuItemClick);
+            // 
+            // _exitMenuItem
+            // 
+            this._exitMenuItem.Name = "_exitMenuItem";
+            this._exitMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this._exitMenuItem.Size = new System.Drawing.Size(134, 22);
+            this._exitMenuItem.Text = "E&xit";
+            this._exitMenuItem.Click += new System.EventHandler(this.ExitMenuItemClick);
+            // 
+            // _buildMenu
+            // 
+            this._buildMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._buildMenuItem,
+            this._rebuilMenuItem,
+            this._cleanMenuItem});
+            this._buildMenu.Name = "_buildMenu";
+            this._buildMenu.Size = new System.Drawing.Size(46, 20);
+            this._buildMenu.Text = "&Build";
+            // 
+            // _buildMenuItem
+            // 
+            this._buildMenuItem.Name = "_buildMenuItem";
+            this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
+            this._buildMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._buildMenuItem.Text = "&Build";
+            this._buildMenuItem.Click += new System.EventHandler(this.BuildMenuItemClick);
+            // 
+            // _rebuilMenuItem
+            // 
+            this._rebuilMenuItem.Name = "_rebuilMenuItem";
+            this._rebuilMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rebuilMenuItem.Text = "&Rebuild";
+            this._rebuilMenuItem.Click += new System.EventHandler(this.RebuilMenuItemClick);
+            // 
+            // _cleanMenuItem
+            // 
+            this._cleanMenuItem.Name = "_cleanMenuItem";
+            this._cleanMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._cleanMenuItem.Text = "&Clean";
+            this._cleanMenuItem.Click += new System.EventHandler(this.CleanMenuItemClick);
+            // 
+            // _helpMenu
+            // 
+            this._helpMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._viewHelpMenuItem,
+            _toolStripSeparator2,
+            this._aboutMenuItem});
+            this._helpMenu.Name = "_helpMenu";
+            this._helpMenu.Size = new System.Drawing.Size(44, 20);
+            this._helpMenu.Text = "&Help";
+            // 
+            // _viewHelpMenuItem
+            // 
+            this._viewHelpMenuItem.Name = "_viewHelpMenuItem";
+            this._viewHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this._viewHelpMenuItem.Size = new System.Drawing.Size(146, 22);
+            this._viewHelpMenuItem.Text = "&View Help";
+            // 
+            // _aboutMenuItem
+            // 
+            this._aboutMenuItem.Name = "_aboutMenuItem";
+            this._aboutMenuItem.Size = new System.Drawing.Size(146, 22);
+            this._aboutMenuItem.Text = "&About...";
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -279,8 +282,6 @@ namespace MonoGame.Tools.Pipeline
             this.Name = "MainView";
             this.Text = "Pipeline";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
-            this._mainMenu.ResumeLayout(false);
-            this._mainMenu.PerformLayout();
             _splitTreeProps.Panel1.ResumeLayout(false);
             _splitTreeProps.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).EndInit();
@@ -290,6 +291,8 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(_splitEditorOutput)).EndInit();
             _splitEditorOutput.ResumeLayout(false);
+            this._mainMenu.ResumeLayout(false);
+            this._mainMenu.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

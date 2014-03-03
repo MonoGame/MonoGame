@@ -16,6 +16,10 @@ namespace MonoGame.Tools.Pipeline
 
         void OnTreeSelect(IProjectItem item);
 
+        void Build(bool rebuild);
+
+        void Clean();
+
         bool Exit();
     }
 }
