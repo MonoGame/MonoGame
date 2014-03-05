@@ -491,6 +491,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
             // Get the Color values
+            else if (typeof(T) == typeof(int))
+            {
+                Color[] colors = new Color[elementCount];
+                GetData<Color>(level, rect, colors, startIndex, elementCount);
+                int[] final = data as int[];
+                for (int i = 0; i < final.Length; i++)
+                {
+                    final[i] = (int)
+                    (
+                        // use correct xna byte order (and remember to convert it yourself as needed)
+                        colors[i].A << 24 |
+                        colors[i].B << 16 |
+                        colors[i].G << 8 |
+                        colors[i].R
+                    );
+                }
+            }
+            // Get the Color values
             else if ((typeof(T) == typeof(Color)))
             {
 				byte[] imageInfo = GetTextureData(0);
@@ -928,6 +946,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #elif MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
             throw new NotImplementedException();
 #endif
@@ -959,6 +979,8 @@ namespace Microsoft.Xna.Framework.Graphics
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
 #elif MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Png);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
@@ -1023,6 +1045,43 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
+#elif ANDROID
+        private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream", "'stream' cannot be null (Nothing in Visual Basic)");
+            }
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException("width", width, "'width' cannot be less than or equal to zero");
+            }
+            if (height <= 0)
+            {
+                throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
+            }
+            if (format == null)
+            {
+                throw new ArgumentNullException("format", "'format' cannot be null (Nothing in Visual Basic)");
+            }
+
+            int[] data = new int[width * height];
+            GetData(data);
+
+            // internal structure is BGR while bitmap expects RGB
+            for (int i = 0; i < data.Length; ++i)
+            {
+                uint pixel = (uint)data[i];
+                data[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+
+            using (Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+            {
+                bitmap.SetPixels(data, 0, width, 0, 0, width, height);
+                bitmap.Compress(format, 100, stream);
+                bitmap.Recycle();
+            }
+        }
 #endif
 
 #if WINDOWS_STOREAPP
