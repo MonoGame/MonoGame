@@ -131,6 +131,10 @@ namespace Microsoft.Xna.Framework.Media
         internal static MediaElement _mediaElement;
         private static Uri source;
         private static TimeSpan elapsedTime;
+
+        // track state of player before game is deactivated
+        private static MediaState deactivatedState;
+        private static bool wasDeactivated;
 #endif
 
         static MediaPlayer()
@@ -156,7 +160,10 @@ namespace Microsoft.Xna.Framework.Media
                     if (_mediaElement != null)
                     {
                         if (_mediaElement.Source == null && source != null)
+                        {
+                            _mediaElement.AutoPlay = false;
                             Deployment.Current.Dispatcher.BeginInvoke(() => _mediaElement.Source = source);
+                        }
 
                         // Ensure only one subscription
                         _mediaElement.MediaOpened -= MediaElement_MediaOpened;
@@ -170,6 +177,9 @@ namespace Microsoft.Xna.Framework.Media
                     {
                         source = _mediaElement.Source;
                         elapsedTime = _mediaElement.Position;
+
+                        wasDeactivated = true;
+                        deactivatedState = _state;
                     }
                 };
 #endif
@@ -184,6 +194,18 @@ namespace Microsoft.Xna.Framework.Media
                     _mediaElement.Position = elapsedTime;
                     elapsedTime = TimeSpan.Zero;
                 });
+
+            if (wasDeactivated)
+            {
+                if (deactivatedState == MediaState.Playing)
+                    _mediaElement.Play();
+ 
+                //reset the deactivated flag
+                wasDeactivated = false;
+ 
+                //set auto-play back to default
+                _mediaElement.AutoPlay = true;
+            }
         }
 #endif
 
