@@ -107,12 +107,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-#if WINDOWS || WINRT || LINUX || MONOMAC || IOS
-
+#if WINRT
             return Play(MasterVolume, 0.0f, 0.0f);
 #endif
 
-#if ANDROID || PSM
+#if ANDROID || PSM || LINUX || MONOMAC || IOS || WINDOWS
             return Play(1.0f, 0.0f, 0.0f);
 #endif
         }
@@ -157,8 +156,10 @@ namespace Microsoft.Xna.Framework.Audio
                 if (value < 0.0f || value > 1.0f)
                     throw new ArgumentOutOfRangeException();
 
-                if (_masterVolume != value)
-                    _masterVolume = value;
+                if (_masterVolume == value)
+                    return;
+                
+                _masterVolume = value;
 
                 PlatformSetMasterVolume();
             }

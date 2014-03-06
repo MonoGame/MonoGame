@@ -58,6 +58,29 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        internal static List<SoundEffectInstance> GetAllPooledSounds()
+        {
+            var sounds = new List<SoundEffectInstance>();
+
+            sounds.AddRange(_playingInstances);
+            sounds.AddRange(_availableInstances);
+
+            foreach(var weakRef in _callersInstances)
+            {
+                if (!weakRef.IsAlive)
+                    continue;
+
+                var data = weakRef.Target as SoundEffectInstance;
+
+                if (data == null)
+                    continue;
+
+                sounds.Add(data);
+            }
+
+            return sounds;
+        }
+
         private static bool SFXInstanceIsPlaying(WeakReference instanceRef)
         {
             if (!instanceRef.IsAlive)

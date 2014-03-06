@@ -187,7 +187,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static void PlatformSetMasterVolume()
         {
-			// Appears to be a no-op outside of DirectX Platforms.
+            var activeSounds = SFXInstancePool.GetAllPooledSounds();
+
+            // A little gross here, but there's
+            // no if(value == value) check in SFXInstance.Volume
+            // This'll allow the sound's current volume to be recalculated
+            // against SoundEffect.MasterVolume.
+            foreach(var sound in activeSounds)
+                sound.Volume = sound.Volume;
         }
 
         #endregion

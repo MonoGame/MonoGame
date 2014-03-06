@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
             _audioBuffer = new Sound(audioData);
                 
             _soundPlayer = _audioBuffer.CreatePlayer();
+            _soundPlayer.Volume = SoundEffect.MasterVolume;
         }
 
         private void PlatformDispose()
@@ -146,13 +147,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetVolume(float value)
         {
-            if (_soundPlayer != null)
-            {
-                if (_soundPlayer.Volume != value)
-                {
-                    _soundPlayer.Volume = value;
-                }
-            }
+            if (_soundPlayer == null)
+                return;
+            
+            _soundPlayer.Volume = value * SoundEffect.MasterVolume;
         }
 
         private float PlatformGetVolume()
