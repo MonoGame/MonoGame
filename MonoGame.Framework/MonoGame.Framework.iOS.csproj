@@ -461,6 +461,7 @@
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="Audio\SFXInstancePool.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>

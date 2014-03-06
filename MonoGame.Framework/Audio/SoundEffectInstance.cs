@@ -15,6 +15,8 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private bool isDisposed = false;
 
+        internal bool _isInternal;
+
         public bool IsLooped
         { 
             get { return PlatformGetIsLooped(); }
@@ -75,7 +77,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
+            if (!SFXInstancePool.SoundsAvailable)
+                throw new InstancePlayLimitException();
+
             PlatformPlay();
+
+            SFXInstancePool.Remove(this);
         }
 
         public void Resume()
@@ -90,7 +97,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop(bool immediate)
         {
+            
             PlatformStop(immediate);
+
+            // Return this SFXInstance back
+            // to the pool to be used later.
+            SFXInstancePool.Add(this);
         }
 
         public void Dispose()

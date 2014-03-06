@@ -34,14 +34,6 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal byte[] _data;
 
-#if IOS || MONOMAC
-
-        private List<SoundEffectInstance> playing = null;
-        private List<SoundEffectInstance> available = null;
-        private List<SoundEffectInstance> toBeRecycled = null;
-
-#endif
-
 		internal float Rate { get; set; }
 
 #if WINDOWS || LINUX || IOS || MONOMAC
@@ -52,7 +44,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
-		private SoundEffectInstance _instance;
 		private int _soundID = -1;
 #endif
 
@@ -171,124 +162,17 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
 
-        private SoundEffectInstance PlatformCreateInstance()
+        private void PlatformSetupInstance(SoundEffectInstance inst)
         {
 #if WINDOWS || LINUX || MONOMAC || IOS
-            return new SoundEffectInstance(this);
+
+            inst.InitializeSound();
+            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
 #endif
 
 #if ANDROID
-			return new SoundEffectInstance()
-            {
-                _soundId = _soundID,
-                _sampleRate = Rate
-            };
-#endif
-        }
-
-        #endregion
-
-        #region Play
-
-        private bool PlatformPlay()
-        {
-#if WINDOWS || LINUX || MONOMAC || IOS
-            return PlatformPlay(MasterVolume, 0.0f, 0.0f);
-#endif
-
-#if ANDROID
-            return PlatformPlay(1.0f, 0.0f, 0.0f);
-#endif
-        }
-
-        private bool PlatformPlay(float volume, float pitch, float pan)
-        {
-            // TODO: While merging the SoundEffect classes together
-            // I noticed that the return values seem to widly differ
-            // between platforms. It also doesn't seem to match
-            // what's written in the XNA docs.
-
-            if (MasterVolume <= 0.0f)
-                return false;
-
-#if WINDOWS || LINUX
-
-            SoundEffectInstance instance = PlatformCreateInstance();
-            instance.Volume = volume;
-            instance.Pitch = pitch;
-            instance.Pan = pan;
-            instance.Play();
-
-            // Why is this always returning false?
-            return false;
-
-#endif
-
-#if MONOMAC || IOS
-            
-			if (playing == null)
-            {
-				playing = new List<SoundEffectInstance>();
-				available = new List<SoundEffectInstance>();
-				toBeRecycled = new List<SoundEffectInstance>();
-			}
-			else
-            {
-				// Lets cycle through our playing list and see if any are stopped
-				// so that we can recycle them.
-				if (playing.Count > 0)
-                {
-					foreach(var instance2 in playing)
-                    {
-						if (instance2.State == SoundState.Stopped)
-							toBeRecycled.Add(instance2);
-					}
-				}
-			}
-
-			SoundEffectInstance instance = null;
-			if (toBeRecycled.Count > 0)
-            {
-				foreach(var recycle in toBeRecycled)
-                {
-					available.Add(recycle);
-					playing.Remove(recycle);
-				}
-
-				toBeRecycled.Clear();
-			}
-
-			if (available.Count > 0)
-            {
-				instance = available[0];
-				playing.Add(instance);
-				available.Remove(instance);
-				//System.Console.WriteLine("from pool = " + playing.Count);
-			}
-			else
-            {
-				instance = CreateInstance ();
-				playing.Add (instance);
-				//System.Console.WriteLine("pooled = "  + playing.Count);
-			}
-
-			instance.Volume = volume;
-			instance.Pitch = pitch;
-			instance.Pan = pan;
-            instance.Play();
-            return true;
-#endif
-
-#if ANDROID
-
-			if(_instance == null)
-				_instance = CreateInstance();
-
-			_instance.Volume = volume;
-			_instance.Pitch = pitch;
-			_instance.Pan = pan;
-			_instance.Play();
-			return true;            
+            inst._soundId = _soundID,
+            inst._sampleRate = Rate
 #endif
         }
 

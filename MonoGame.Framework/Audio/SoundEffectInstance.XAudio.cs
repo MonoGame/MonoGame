@@ -13,20 +13,14 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public sealed partial class SoundEffectInstance : IDisposable
     {
-        private SourceVoice _voice { get; set; }
-        private SoundEffect _effect { get; set; }
+        internal SourceVoice _voice;
+        internal SoundEffect _effect;
 
         private float _pan;
         private static float[] _panMatrix;
 
         private bool _paused;
         private bool _loop;
-
-        internal SoundEffectInstance(SoundEffect effect, SourceVoice voice)
-        {
-            _effect = effect;
-            _voice = voice;
-        }
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {

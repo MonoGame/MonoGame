@@ -42,6 +42,7 @@
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\Cue.cs" />
+    <Compile Include="Audio\SFXInstancePool.cs" />
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.XAudio.cs" />
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs" />

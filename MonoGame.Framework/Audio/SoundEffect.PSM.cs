@@ -39,47 +39,10 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
-        private void PlatformInitializeInstance(SoundEffectInstance instance)
-        {
-            instance._audioBuffer = _audioBuffer;
-            instance._soundPlayer = _audioBuffer.CreatePlayer();
-        }
-        
-        private SoundEffectInstance PlatformCreateInstance()
-        {
-            var inst = new SoundEffectInstance();
-            
+        private void PlatformSetupInstance(SoundEffectInstance inst)
+        {   
             inst._audioBuffer = _audioBuffer;
             inst._soundPlayer = _audioBuffer.CreatePlayer();
-            
-            return inst;
-        }
-
-        private bool PlatformPlay()
-        {
-            return Play(1.0f, 0.0f, 0.0f);
-        }
-
-        private bool PlatformPlay(float volume, float pitch, float pan)
-        {
-            // TODO: While merging the SoundEffect classes together
-            // I noticed that the return values seem to widly differ
-            // between platforms. It also doesn't seem to match
-            // what's written in the XNA docs.
-
-            if ( MasterVolume > 0.0f )
-            {
-                if(_instance == null)
-                    _instance = CreateInstance();
-                
-                _instance.Volume = volume;
-                _instance.Pitch = pitch;
-                _instance.Pan = pan;
-                _instance.Play();
-                
-                return _instance._soundPlayer.Status == SoundStatus.Playing;
-            }
-            return false;
         }
 
         private TimeSpan PlatformGetDuration()

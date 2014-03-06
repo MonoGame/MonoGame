@@ -76,17 +76,6 @@ namespace Microsoft.Xna.Framework.Audio
 #if WINDOWS || LINUX || MONOMAC || IOS
 
         /// <summary>
-        /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
-        /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
-        /// </summary>
-        /// <param name="parent"></param>
-        internal SoundEffectInstance(SoundEffect parent)
-        {
-            InitializeSound();
-            BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
-        }
-
-        /// <summary>
         /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
         /// that is created in the InitializeSound method.
         /// </summary>
@@ -95,7 +84,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="size">The size of the data buffer</param>
         /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
         [CLSCompliant(false)]
-        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        internal void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
             soundBuffer.BindDataBuffer(data, format, size, rate);
         }
@@ -104,7 +93,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Gets the OpenAL sound controller, constructs the sound buffer, and sets up the event delegates for
         /// the reserved and recycled events.
         /// </summary>
-        private void InitializeSound()
+        internal void InitializeSound()
         {
             controller = OpenALSoundController.GetInstance;
             soundBuffer = new OALSoundBuffer();

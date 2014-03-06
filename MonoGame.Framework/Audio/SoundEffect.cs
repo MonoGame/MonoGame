@@ -47,7 +47,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public SoundEffectInstance CreateInstance()
         {
-            return PlatformCreateInstance();
+            var inst = SFXInstancePool.GetInstance(true);
+            PlatformSetupInstance(inst);
+
+            return inst;
         }
 
         public static SoundEffect FromStream(Stream s)
@@ -65,12 +68,29 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-            return PlatformPlay();
+#if WINDOWS || WINRT || LINUX || MONOMAC || IOS
+
+            return Play(MasterVolume, 0.0f, 0.0f);
+#endif
+
+#if ANDROID || PSM
+            return Play(1.0f, 0.0f, 0.0f);
+#endif
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
-            return PlatformPlay(volume, pitch, pan);
+            if (!SFXInstancePool.SoundsAvailable)
+                return false;
+           
+            var inst = SFXInstancePool.GetInstance(false);
+
+            inst.Volume = volume;
+            inst.Pitch = pitch;
+            inst.Pan = pan;
+            inst.Play();
+
+            return true;
         }
 
         #endregion
