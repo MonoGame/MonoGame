@@ -167,10 +167,14 @@ namespace Microsoft.Xna.Framework
                 {
                     action();
                 }
-                catch (UnauthorizedAccessException)
+                catch (UnauthorizedAccessException ex)
                 {
                     // Need to be on a different thread
+#if WINDOWS_PHONE
                     BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+#else
+                    throw (ex);
+#endif
                 }
                 return;
             }
