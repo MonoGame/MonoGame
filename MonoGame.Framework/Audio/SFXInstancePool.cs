@@ -129,6 +129,12 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 inst = _availableInstances[0];
                 _availableInstances.Remove(inst);
+
+                // Reset used instance to the "default" state.
+                inst.Volume = 1.0f;
+                inst.Pan = 0.0f;
+                inst.Pitch = 0.0f;
+                inst.IsLooped = false;
             }
             else
                 inst = new SoundEffectInstance();
