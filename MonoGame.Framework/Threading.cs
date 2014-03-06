@@ -163,7 +163,15 @@ namespace Microsoft.Xna.Framework
             // If we are already on the UI thread, just call the action and be done with it
             if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-                action();
+                try
+                {
+                    action();
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Need to be on a different thread
+                    BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+                }
                 return;
             }
 
