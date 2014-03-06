@@ -32,12 +32,16 @@ namespace Microsoft.Xna.Framework.Audio
         #region Public Constructors
 
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
-        {            
+        {
+            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
+
             PlatformInitialize(buffer, sampleRate, channels);
         }
 
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {            
+        {
+            _duration = GetSampleDuration(count, sampleRate, channels);
+
             PlatformInitialize(buffer, offset, count, sampleRate, channels, loopStart, loopLength);
         }
 
@@ -79,9 +83,9 @@ namespace Microsoft.Xna.Framework.Audio
             // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
             var numChannels = (int)channels;
 
-            var dur = sizeInBytes / (sampleRate * numChannels * 16 / 8);
+            var dur = sizeInBytes / (sampleRate * numChannels * 16f / 8f);
 
-            var duration = TimeSpan.FromMilliseconds(dur);
+            var duration = TimeSpan.FromSeconds(dur);
 
             return duration;
         }
@@ -92,7 +96,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             var numChannels = (int)channels;
 
-            var sizeInBytes = duration.Milliseconds * (sampleRate * numChannels * 16 / 8);
+            var sizeInBytes = duration.TotalSeconds * (sampleRate * numChannels * 16f / 8f);
 
             return (int)sizeInBytes;
         }

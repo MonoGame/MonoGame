@@ -105,13 +105,12 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
 			Rate = (float)sampleRate;
+            Size = (int)buffer.Length;
 
 #if WINDOWS || LINUX
 
             _data = buffer;
-            Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-
             return;
 
 #endif
@@ -121,15 +120,10 @@ namespace Microsoft.Xna.Framework.Audio
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
 
-            Size = (int)buffer.Length;
-
             if ((int)channels <= 1)
                 Format = bitsPerSample == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
             else
                 Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
-
-            var _dblDuration = (Size / ((bitsPerSample / 8) * (((int)channels == 0) ? 1 : (int)channels))) / Rate;
-            _duration = TimeSpan.FromSeconds(_dblDuration);
 
             _name = "";
             _data = buffer;
@@ -155,6 +149,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
+            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
+
             throw new NotImplementedException();
         }
 
