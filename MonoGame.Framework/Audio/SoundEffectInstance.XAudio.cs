@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Audio
         internal SourceVoice _voice;
         internal SoundEffect _effect;
 
-        private float _pan;
         private static float[] _panMatrix;
 
         private bool _paused;
@@ -221,35 +220,17 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetOutputMatrix(srcChannelCount, dstChannelCount, _panMatrix);
         }
 
-        private float PlatformGetPan()
-        {
-            return _pan;
-        }
-
         private void PlatformSetPitch(float value)
         {
             if (_voice == null)
                 return;
 
+            _pitch = value;
+
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.
-            var ratio = Math.Pow(2.0, value);
-            _voice.SetFrequencyRatio((float)ratio);
-        }
-
-        private float PlatformGetPitch()
-        {
-            if (_voice == null)
-                return 0.0f;
-
-            // NOTE: This is copy of what XAudio2.FrequencyRatioToSemitones() does
-            // which avoids the native call and is actually more accurate.
-            var pitch = 39.86313713864835 * Math.Log10(_voice.FrequencyRatio);
-
-            // Convert from semitones to octaves.
-            pitch /= 12.0;
-
-            return (float)pitch;
+             var pitch = (float)Math.Pow(2.0, value);
+             _voice.SetFrequencyRatio(pitch);
         }
 
         private SoundState PlatformGetState()
@@ -270,14 +251,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (_voice != null)
                 _voice.SetVolume(value, XAudio2.CommitNow);
-        }
-
-        private float PlatformGetVolume()
-        {
-            if (_voice == null)
-                return 0.0f;
-
-            return _voice.Volume;
         }
 
         private void PlatformDispose()

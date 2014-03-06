@@ -25,8 +25,6 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class SoundEffectInstance : IDisposable
     {
 		private SoundState soundState = SoundState.Stopped;
-		private float _pan = 0f;
-		private float _volume = 1.0f;
 		private bool _looped = false;
 		int sourceId;
 
@@ -35,7 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
 
-        private float _pitch = 0f;
+        
         bool hasSourceId = false;
 
 #endif
@@ -369,22 +367,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-        private float PlatformGetPan()
-        {
-
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _pan;
-#endif
-
-#if ANDROID
-			if (sourceId == 0)
-                return 0.0f;
-            
-			return sourceId;
-#endif
-        }
-
         private void PlatformSetPitch(float value)
         {
 #if WINDOWS || LINUX || MONOMAC || IOS
@@ -397,23 +379,11 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
+
+            // TODO: This doesn't look right...
+
 			if (sourceId != 0 && _sampleRate != value)
 				_sampleRate = value;
-#endif
-        }
-
-        private float PlatformGetPitch()
-        {
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _pitch;
-#endif
-
-#if ANDROID
-			if (sourceId == 0)
-                return 0.0f;
-            
-			return _sampleRate;
 #endif
         }
 
@@ -477,23 +447,6 @@ namespace Microsoft.Xna.Framework.Audio
 #if ANDROID
 			if (sourceId != 0 && _volume != value)
 				_volume = value;
-#endif
-        }
-
-        private float PlatformGetVolume()
-        {
-
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _volume;
-#endif
-
-#if ANDROID
-
-            if (sourceId == 0)
-                return 0.0f;
-            
-			return _volume;
 #endif
         }
 

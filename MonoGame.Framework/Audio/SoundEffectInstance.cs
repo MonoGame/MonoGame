@@ -17,6 +17,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal bool _isInternal;
 
+        private float _pan = 0.0f;
+        private float _volume = 1.0f;
+        private float _pitch = 0.0f;
+
         public bool IsLooped
         { 
             get { return PlatformGetIsLooped(); }
@@ -25,7 +29,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public float Pan
         {
-            get { return PlatformGetPan(); } 
+            get { return _pan; } 
             set
             {
                 if (value < -1.0f || value > 1.0f)
@@ -37,7 +41,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public float Pitch
         {
-            get { return PlatformGetPitch(); }
+            get { return _pitch; }
             set
             {
                 if (value < -1.0f || value > 1.0f)
@@ -47,13 +51,9 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public SoundState State { get { return PlatformGetState(); } }
-
-        public bool IsDisposed { get { return isDisposed; } }
-
         public float Volume
         {
-            get { return PlatformGetVolume(); } 
+            get { return _volume; }
             set
             {
                 if (value < 0.0f || value > 1.0f)
@@ -62,6 +62,10 @@ namespace Microsoft.Xna.Framework.Audio
                 PlatformSetVolume(value);
             }
         }
+
+        public SoundState State { get { return PlatformGetState(); } }
+
+        public bool IsDisposed { get { return isDisposed; } }
 
         internal SoundEffectInstance(){}
         
