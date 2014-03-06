@@ -438,7 +438,6 @@
     <Compile Include="GamerServices\NotificationPosition.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs" />
     <Compile Include="iOS\GamerServices\KeyboardInputView.cs" />
-    <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs" />
     <Compile Include="iOS\iOSGameWindow.cs" />
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs" />
     <Compile Include="Utilities\Hash.cs" />
