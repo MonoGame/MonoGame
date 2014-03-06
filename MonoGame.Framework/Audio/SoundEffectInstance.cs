@@ -26,13 +26,25 @@ namespace Microsoft.Xna.Framework.Audio
         public float Pan
         {
             get { return PlatformGetPan(); } 
-            set { PlatformSetPan(value); }
+            set
+            {
+                if (value < -1.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetPan(value);
+            }
         }
 
         public float Pitch
         {
             get { return PlatformGetPitch(); }
-            set { PlatformSetPitch(value); }
+            set
+            {
+                if (value < -1.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetPitch(value);
+            }
         }
 
         public SoundState State { get { return PlatformGetState(); } }
@@ -42,7 +54,13 @@ namespace Microsoft.Xna.Framework.Audio
         public float Volume
         {
             get { return PlatformGetVolume(); } 
-            set { PlatformSetVolume(value); }
+            set
+            {
+                if (value < 0.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetVolume(value);
+            }
         }
 
         internal SoundEffectInstance(){}

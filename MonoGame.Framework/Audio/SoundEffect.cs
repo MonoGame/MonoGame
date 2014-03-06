@@ -55,11 +55,46 @@ namespace Microsoft.Xna.Framework.Audio
 
         public static SoundEffect FromStream(Stream s)
         {
+            if (s == null)
+                throw new ArgumentNullException();
+
+            // Notes from the docs:
+
+            /*The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.
+              The audio format has the following restrictions:
+              Must be a PCM wave file
+              Can only be mono or stereo
+              Must be 8 or 16 bit
+              Sample rate must be between 8,000 Hz and 48,000 Hz*/
+
             var sfx = new SoundEffect();
 
             sfx.PlatformLoadAudioStream(s);
 
             return sfx;
+        }
+
+        public static TimeSpan GetSampleDuration(int sizeInBytes, int sampleRate, AudioChannels channels)
+        {
+            // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
+            var numChannels = (int)channels;
+
+            var dur = sizeInBytes / (sampleRate * numChannels * 16 / 8);
+
+            var duration = TimeSpan.FromMilliseconds(dur);
+
+            return duration;
+        }
+
+        public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
+        {
+            // Reference: http://social.msdn.microsoft.com/Forums/windows/en-US/5a92be69-3b4e-4d92-b1d2-141ef0a50c91/how-to-calculate-duration-of-wave-file-from-its-size?forum=winforms
+
+            var numChannels = (int)channels;
+
+            var sizeInBytes = duration.Milliseconds * (sampleRate * numChannels * 16 / 8);
+
+            return (int)sizeInBytes;
         }
 
         #endregion
@@ -115,6 +150,9 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _masterVolume; }
             set
             {
+                if (value < 0.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
                 if (_masterVolume != value)
                     _masterVolume = value;
 
@@ -144,7 +182,7 @@ namespace Microsoft.Xna.Framework.Audio
                 // As per documenation it does not look like the value can be less than 0
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
-                if (value < 0f)
+                if (value < 0.0f)
                     throw new ArgumentOutOfRangeException ("value of DopplerScale");
 
                 _dopplerScale = value;
@@ -155,7 +193,13 @@ namespace Microsoft.Xna.Framework.Audio
         public static float SpeedOfSound
         {
             get { return speedOfSound; }
-            set { speedOfSound = value; }
+            set
+            {
+                if (value <= 0.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                speedOfSound = value;
+            }
         }
 
         #endregion
