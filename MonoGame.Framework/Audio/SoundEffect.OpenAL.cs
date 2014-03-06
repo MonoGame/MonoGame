@@ -36,9 +36,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal float Rate { get; set; }
 
-#if WINDOWS || LINUX || IOS || MONOMAC
-
         internal int Size { get; set; }
+
+#if WINDOWS || LINUX || IOS || MONOMAC
 
         internal ALFormat Format { get; set; }
 #endif
@@ -167,8 +167,8 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
-            inst._soundId = _soundID,
-            inst._sampleRate = Rate
+            inst._soundId = _soundID;
+            inst._sampleRate = Rate;
 #endif
         }
 
