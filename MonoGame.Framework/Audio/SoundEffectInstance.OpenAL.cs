@@ -422,8 +422,28 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if WINDOWS || LINUX || MONOMAC || IOS
 
-            return soundState;
+            if (!hasSourceId)
+                return SoundState.Stopped;
+            
+            var alState = AL.GetSourceState(sourceId);
 
+            switch (alState)
+            {
+                case ALSourceState.Initial:
+                case ALSourceState.Stopped:
+                    soundState = SoundState.Stopped;
+                    break;
+
+                case ALSourceState.Paused:
+                    soundState = SoundState.Paused;
+                    break;
+
+                case ALSourceState.Playing:
+                    soundState = SoundState.Playing;
+                    break;
+            }
+
+            return soundState;
 #endif
 
 #if ANDROID
