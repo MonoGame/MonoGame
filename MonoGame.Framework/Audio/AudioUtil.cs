@@ -3,12 +3,12 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public static class AudioUtil
+    internal static class AudioUtil
     {
         /// <summary>
         /// Takes WAV data and appends a header to it.
         /// </summary>
-        public static byte[] FormatWavData(byte[] buffer, int sampleRate, int channels)
+        internal static byte[] FormatWavData(byte[] buffer, int sampleRate, int channels)
         {
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
