@@ -107,13 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play()
         {
-#if WINRT
-            return Play(MasterVolume, 0.0f, 0.0f);
-#endif
-
-#if ANDROID || PSM || LINUX || MONOMAC || IOS || WINDOWS
             return Play(1.0f, 0.0f, 0.0f);
-#endif
         }
 
         public bool Play(float volume, float pitch, float pan)
