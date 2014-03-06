@@ -431,6 +431,24 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		public SoundState State {
 			get {
+                if(hasSourceId)
+                {
+                    var state = AL.GetSourceState(sourceId);
+                    switch (state)
+                    {
+                        case ALSourceState.Initial:
+                            return SoundState.Stopped;
+                        case ALSourceState.Paused:
+                            return SoundState.Paused;
+                        case ALSourceState.Playing:
+                            return SoundState.Playing;
+                        case ALSourceState.Stopped:
+                            return SoundState.Stopped;
+                        default:
+                            return SoundState.Stopped;
+                    }
+                }
+                else
 				return soundState;
 			}
 		}
