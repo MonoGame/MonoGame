@@ -153,18 +153,38 @@ namespace Microsoft.Xna.Framework
 #else
             char seperatorChar = Path.DirectorySeparatorChar;
 #endif
-            StringBuilder stringBuilder = new StringBuilder();
             // Replace non-windows seperators.
             string[] parts = name.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 1; i < parts.Length; i++)
-            {
-                if (parts[i] != ".." && parts[i - 1] != "..")
+
+            int start = 0, to = 0;
+            for (int from = 0; from < parts.Length; from++, to++)
+                switch (parts[from])
                 {
-                    stringBuilder.Append(parts[i - 1]);
-                    stringBuilder.Append(seperatorChar);
+                    case ".":
+                        to--;
+                        break;
+                    case "..":
+                        if (to > start)
+                            to -= 2;
+                        else
+                        {
+                            parts[to] = "..";
+                            start++;
+                        }
+                        break;
+                    default:
+                        parts[to] = parts[from];
+                        break;
                 }
+
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < to; i++)
+            {
+                if (i != 0)
+                    stringBuilder.Append(seperatorChar);
+                stringBuilder.Append(parts[i]);
             }
-            stringBuilder.Append(parts[parts.Length - 1]);
 
             return stringBuilder.ToString();
         }
