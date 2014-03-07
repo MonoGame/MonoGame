@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
 
             var meshes = nodes.FindAll(n => n is MeshContent).Cast<MeshContent>().ToList();
-            var geometries = meshes.SelectMany(m => m.Geometry).Distinct().ToList();
+            var geometries = meshes.SelectMany(m => m.Geometry).ToList();
             var distinctMaterials = geometries.Select(g => g.Material).Distinct().ToList();
 
             // Loop through all distinct materials, passing them through the conversion method

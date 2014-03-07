@@ -33,7 +33,6 @@ using System.ComponentModel;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    [TypeConverter(typeof(Vector4TypeConverter))]
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields
