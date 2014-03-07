@@ -181,14 +181,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 
-        private TimeSpan PlatformGetDuration()
-        {
-            var sampleCount = _buffer.PlayLength;
-            var avgBPS = _format.AverageBytesPerSecond;
-
-            return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
-        }
-
         private static void PlatformSetMasterVolume()
         {
             MasterVoice.SetVolume(_masterVolume, 0);

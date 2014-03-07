@@ -45,11 +45,6 @@ namespace Microsoft.Xna.Framework.Audio
             inst._soundPlayer = _audioBuffer.CreatePlayer();
         }
 
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
-        }
-
         private static void PlatformSetMasterVolume()
         {
             var activeSounds = SFXInstancePool.GetAllPooledSounds();

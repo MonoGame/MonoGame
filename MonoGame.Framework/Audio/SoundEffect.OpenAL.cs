@@ -174,15 +174,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 
-        #region Public Properties
-
-        private TimeSpan PlatformGetDuration()
-        {
-             return _duration;
-        }
-
-        #endregion
-
         #region Static Members
 
         private static void PlatformSetMasterVolume()

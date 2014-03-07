@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Properties
 
-        public TimeSpan Duration { get { return PlatformGetDuration(); } }
+        public TimeSpan Duration { get { return _duration; } }
 
         public string Name
         {
