@@ -122,6 +122,12 @@ namespace Microsoft.Xna.Framework.Audio
             
             PlatformStop(immediate);
 
+            // instances typically call Stop
+            // as they dispose. Prevent this
+            // from being added to the SFXInstancePool
+            if (isDisposed)
+                return;
+
             // Return this SFXInstance back
             // to the pool to be used later.
             SFXInstancePool.Add(this);
@@ -132,9 +138,9 @@ namespace Microsoft.Xna.Framework.Audio
             if (isDisposed)
                 return;
 
-            PlatformDispose();
-
             isDisposed = true;
+
+            PlatformDispose();
         }
     }
 }
