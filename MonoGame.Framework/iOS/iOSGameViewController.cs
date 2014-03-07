@@ -160,10 +160,5 @@ namespace Microsoft.Xna.Framework {
 		{
 			base.TouchesCancelled (touches, evt);
 		}
-
-        public override bool PrefersStatusBarHidden()
-        {
-            return true;
-        }
 	}
 }
