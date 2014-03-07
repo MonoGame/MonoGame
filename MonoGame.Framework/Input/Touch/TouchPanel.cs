@@ -168,10 +168,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     {
                         stateChanged |= touch.UpdateState(newTouch);
                         foundEvent = true;
-                        events.RemoveAt(j--);
-                        //consume unchanged events
-                        if (!stateChanged)
-                            continue;
+                        events.RemoveAt(j);
                         break;
                     }
                 }
@@ -240,7 +237,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // and release events.
             // 
             if (state == TouchLocationState.Pressed)
-            {
+        {
                 if (isMouse)
                 {
                     // Mouse pointing devices always use a reserved Id
@@ -273,12 +270,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _touchEvents.Add(evt);
                     if (_touchEvents.Count > MaxEvents)
                         _touchEvents.RemoveRange(0, _touchEvents.Count - MaxEvents);
-                }
+        }
 
                 // If we have gestures enabled then start to collect 
                 // events for those too.
                 if (EnabledGestures != GestureType.None && (!isMouse || EnableMouseGestures))
-                {
+        {
                     _gestureEvents.Add(evt);
                     if (_gestureEvents.Count > MaxEvents)
                         _gestureEvents.RemoveRange(0, _gestureEvents.Count - MaxEvents);
@@ -307,7 +304,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     _touchEvents.Add(new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
             }
             foreach (var touch in _gestureState)
-            {
+        {
                 if (touch.State != TouchLocationState.Released)
                     _gestureEvents.Add(new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
             }
@@ -413,15 +410,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // Process the pending gesture events.
                 while (_gestureEvents.Count > 0)
-                {
+        {
                     var stateChanged = RefreshState(true, _gestureState, _gestureEvents);
                     UpdateGestures(stateChanged);
-                }
+        }
 
                 return GestureList.Count > 0;				
             }
         }
-		
+
 		#region Gesture Recognition
 		
         /// <summary>
@@ -445,9 +442,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 		
 
 		private static bool GestureIsEnabled(GestureType gestureType)
-		{
+        {
             return (EnabledGestures & gestureType) != 0;
-		}
+        }
 
         /// <summary>
         /// Used to disable emitting of tap gestures.
@@ -799,7 +796,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // If we were already in a drag state then fire
             // off the drag completion event.
             if (_dragGestureStarted != GestureType.None)
-            {
+        {
                 if (GestureIsEnabled(GestureType.DragComplete))
                     GestureList.Enqueue(new GestureSample(
                                             GestureType.DragComplete, timestamp,
@@ -807,7 +804,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                             Vector2.Zero, Vector2.Zero));
 
                 _dragGestureStarted = GestureType.None;
-            }
+        }
 
 			GestureList.Enqueue (new GestureSample (
 				GestureType.Pinch,
@@ -846,7 +843,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             _dragGestureStarted = GestureType.None;
             _lastTap = new TouchLocation();
-      }
+        }
 #endif
     }
 }
