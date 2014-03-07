@@ -171,7 +171,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\Effect\EffectMaterial.cs" />
     <Compile Include="Graphics\Effect\EffectParameterCollection.cs" />
     <Compile Include="Graphics\Effect\EffectPassCollection.cs" />
@@ -297,7 +297,6 @@
     <Compile Include="PSSuite\PSSGameWindow.cs" />
     <Compile Include="GamePlatform.cs" />
     <Compile Include="Vector2.cs" />
-    <Compile Include="PSSuite\Audio\Sound.cs" />
     <Compile Include="PSSuite\GamerServices\Guide.cs" />
     <Compile Include="PSSuite\GamerServices\MonoGameGamerServicesHelper.cs" />
     <Compile Include="PSSuite\GamerServices\SignedInGamer.cs" />
@@ -389,6 +388,9 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="GameUpdateRequiredException.cs" />
+    <Compile Include="Audio\SoundEffect.PSM.cs" />
+    <Compile Include="Audio\SoundEffectInstance.PSM.cs" />
+    <Compile Include="Audio\AudioUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

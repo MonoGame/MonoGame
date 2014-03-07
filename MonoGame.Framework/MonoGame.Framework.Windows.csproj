@@ -86,7 +86,9 @@
   <ItemGroup>
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.XAudio.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.XAudio.cs" />
     <Compile Include="Content\ContentExtensions.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />

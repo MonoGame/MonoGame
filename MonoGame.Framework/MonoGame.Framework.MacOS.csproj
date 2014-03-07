@@ -387,8 +387,8 @@
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
-    <Compile Include="MacOS\Audio\SoundEffect.cs" />
-    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="PrimaryThreadLoader.cs" />
     <Compile Include="Graphics\Effect\EffectPass.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
@@ -452,6 +452,8 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="TextInputEventArgs.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />

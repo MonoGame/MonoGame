@@ -266,7 +266,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
@@ -327,8 +327,8 @@
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="MacOS\Audio\OpenALSupport.cs" />
-    <Compile Include="MacOS\Audio\SoundEffect.cs" />
-    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
@@ -462,6 +462,8 @@
     <Compile Include="GamerServices\PropertyDictionary.cs" />
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

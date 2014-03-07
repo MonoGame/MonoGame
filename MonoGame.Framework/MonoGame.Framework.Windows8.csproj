@@ -43,6 +43,8 @@
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\SoundBank.cs" />
+    <Compile Include="Audio\SoundEffect.XAudio.cs" />
+    <Compile Include="Audio\SoundEffectInstance.XAudio.cs" />
     <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Audio\XactClip.cs" />
     <Compile Include="Audio\XactSound.cs" />
@@ -376,7 +378,7 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\ClearOptions.cs" />
     <Compile Include="Graphics\GraphicsDeviceStatus.cs" />
     <Compile Include="Graphics\GraphicsProfile.cs" />

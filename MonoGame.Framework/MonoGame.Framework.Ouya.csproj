@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Android\IResumeManager.cs" />
     <Compile Include="Android\ResumeManager.cs" />
+    <Compile Include="Audio\AudioUtil.cs" />
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
@@ -137,11 +138,8 @@
     <Compile Include="Graphics\ModelMeshPart.cs" />
     <Compile Include="Graphics\ModelMeshPartCollection.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
-	
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
-	
     <Compile Include="Graphics\PackedVector\Byte4.cs" />
-	
     <Compile Include="Graphics\PackedVector\HalfSingle.cs" />
     <Compile Include="Graphics\PackedVector\HalfTypeHelper.cs" />
     <Compile Include="Graphics\PackedVector\NormalizedShort2.cs" />
@@ -165,6 +163,7 @@
     <Compile Include="Android\AndroidGameActivity.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\Effect.cs" />
@@ -175,7 +174,7 @@
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
@@ -206,7 +205,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="Android\Audio\Sound.cs" />
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
@@ -425,13 +423,14 @@
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
-	<Compile Include="Utilities\ObjectFactoryWithReset.cs" />
+    <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
     <Compile Include="GamerServices\LeaderboardReader.cs" />
     <Compile Include="GamerServices\LeaderboardWriter.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">

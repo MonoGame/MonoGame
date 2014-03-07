@@ -337,7 +337,9 @@
     <Compile Include="Desktop\Audio\OALSoundBuffer.cs" />
     <Compile Include="Desktop\Audio\OpenALSoundController.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Desktop\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs" />

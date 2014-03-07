@@ -1,0 +1,172 @@
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#region Using Statements
+using System;
+using System.IO;
+using Sce.PlayStation.Core.Audio;
+#endregion Statements
+
+namespace Microsoft.Xna.Framework.Audio
+{
+    public sealed partial class SoundEffectInstance : IDisposable
+    {
+        private SoundState soundState = SoundState.Stopped;
+        
+        internal Sound _audioBuffer;
+        internal SoundPlayer _soundPlayer;
+        
+        private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
+        {            
+            var audioData = AudioUtil.FormatWavData(buffer, sampleRate, channels);
+            _audioBuffer = new Sound(audioData);
+                
+            _soundPlayer = _audioBuffer.CreatePlayer();
+        }
+
+        private void PlatformDispose()
+        {
+            // When disposing a SoundEffectInstance, the Sound should
+            // just be stopped as it will likely be reused later
+            if (_soundPlayer != null)
+                _soundPlayer.Stop();
+        }
+
+        private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            // Looks like a no-op on PSM?
+        }
+
+        private void PlatformPause()
+        {
+            if (_soundPlayer != null)
+                _soundPlayer.Stop();
+
+            soundState = SoundState.Paused;
+        }
+
+        private void PlatformPlay()
+        {
+            if (_soundPlayer != null)
+                _soundPlayer.Play();
+
+            soundState = SoundState.Playing;
+        }
+
+        private void PlatformResume()
+        {
+            PlatformPlay();
+        }
+
+        private void PlatformStop(bool immediate)
+        {
+            if (_soundPlayer != null )
+			{
+				_soundPlayer.Stop();
+			}
+            
+            soundState = SoundState.Stopped;
+        }
+
+        private void PlatformSetIsLooped(bool value)
+        {
+            if (_soundPlayer != null)
+            {
+                if (_soundPlayer.Loop != value)
+                {
+                    _soundPlayer.Loop = value;
+                }
+            }
+        }
+
+        private bool PlatformGetIsLooped()
+        {
+            if (_soundPlayer != null)
+            {
+                return _soundPlayer.Loop;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void PlatformSetPan(float value)
+        {
+            if (_soundPlayer != null)
+            {
+                if (_soundPlayer.Pan != value)
+                {
+                    _soundPlayer.Pan = value;
+                }
+            }
+        }
+
+        private float PlatformGetPan()
+        {
+            if (_soundPlayer != null)
+            {
+                return _soundPlayer.Pan;
+            }
+            else
+            {
+                return 0.0f;
+            }
+        }
+
+        private void PlatformSetPitch(float value)
+        {
+            if (_soundPlayer != null)
+                _soundPlayer.PlaybackRate = value + 1.0f;
+        }
+
+        private float PlatformGetPitch()
+        {
+            if (_soundPlayer != null)
+            {
+                return _soundPlayer.PlaybackRate - 1.0f;
+            }
+
+            return 0.0f;
+        }
+
+        private SoundState PlatformGetState()
+        {
+            if (_soundPlayer != null)
+            {
+                if (soundState == SoundState.Playing && _soundPlayer.Status != SoundStatus.Playing)
+                {
+                    soundState = SoundState.Stopped;
+                }
+            }
+
+            return soundState;
+        }
+
+        private void PlatformSetVolume(float value)
+        {
+            if (_soundPlayer != null)
+            {
+                if (_soundPlayer.Volume != value)
+                {
+                    _soundPlayer.Volume = value;
+                }
+            }
+        }
+
+        private float PlatformGetVolume()
+        {
+            if (_soundPlayer != null)
+            {
+                return _soundPlayer.Volume;
+            }
+            else
+            {
+                return 0.0f;
+            }
+        }
+
+
+    }
+}

@@ -53,6 +53,7 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioUtil.cs" />
     <Compile Include="GamerServices\LeaderboardEntry.cs" />
     <Compile Include="GamerServices\LeaderboardIdentity.cs" />
     <Compile Include="GamerServices\LeaderboardKey.cs" />
@@ -165,7 +166,7 @@
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
-	<Compile Include="Graphics\States\TargetBlendState.cs" />
+    <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\CompareFunction.cs" />
@@ -196,7 +197,6 @@
     <Compile Include="Graphics\Vertices\VertexPositionColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionNormalTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexPositionTexture.cs" />
-    <Compile Include="Android\Audio\Sound.cs" />
     <Compile Include="Android\Input\GamePad.cs" />
     <Compile Include="Android\Media\Video.cs" />
     <Compile Include="Android\Media\VideoPlayer.cs" />
@@ -428,6 +428,8 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs" />
     <Compile Include="GameUpdateRequiredException.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
