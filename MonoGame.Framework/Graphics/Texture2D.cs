@@ -708,6 +708,7 @@ namespace Microsoft.Xna.Framework.Graphics
 							w++;
 						}
 						z++;
+						w = 0;
 					}
 				} else {
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
