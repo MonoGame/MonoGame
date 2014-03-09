@@ -333,8 +333,17 @@ namespace Microsoft.Xna.Framework.Audio
                     
                     //write PCM data into a wav
 #if DIRECTX
+                    
+                    // TODO: Wouldn't storing a SoundEffectInstance like this
+                    // result in the "parent" SoundEffect being garbage collected?
+                    
 					SharpDX.Multimedia.WaveFormat waveFormat = new SharpDX.Multimedia.WaveFormat(rate, chans);
-					sounds[current_entry] = new SoundEffect(waveFormat, audiodata, 0, audiodata.Length, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length).CreateInstance();
+                    var sfx = new SoundEffect(audiodata, 0, audiodata.Length, rate, (AudioChannels)chans, wavebankentry.LoopRegion.Offset, wavebankentry.LoopRegion.Length)
+                        {
+                            _format = waveFormat
+                        };
+
+					sounds[current_entry] = sfx.CreateInstance();
 #else
 					sounds[current_entry] = new SoundEffectInstance(audiodata, rate, chans);
 #endif                    
@@ -384,9 +393,12 @@ namespace Microsoft.Xna.Framework.Audio
                             filename = filename.Replace(".tmp", ".m4a");
                         }
                         using (var audioFile = File.Create(filename))
+                        {
                             audioFile.Write(audiodata, 0, audiodata.Length);
-                        
-                        sounds[current_entry] = new SoundEffect(filename).CreateInstance();
+                            audioFile.Seek(0, SeekOrigin.Begin);
+       
+                            sounds[current_entry] = SoundEffect.FromStream(audioFile).CreateInstance();
+                        }
 #else
 						throw new NotImplementedException();
 #endif
