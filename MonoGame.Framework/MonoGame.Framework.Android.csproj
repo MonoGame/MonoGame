@@ -145,6 +145,7 @@
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.OpenGL.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
     <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />

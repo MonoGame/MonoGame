@@ -194,6 +194,7 @@
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Texture2D.OpenGL.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.OpenGL.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />

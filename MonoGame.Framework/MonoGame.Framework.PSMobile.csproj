@@ -329,6 +329,7 @@
     <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.PSM.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\Shader.cs" />

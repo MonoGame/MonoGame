@@ -416,6 +416,7 @@
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.OpenGL.cs" />
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs" />
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Content\ContentReaders\TextureReader.cs" />

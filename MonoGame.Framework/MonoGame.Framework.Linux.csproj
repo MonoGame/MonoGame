@@ -399,6 +399,7 @@
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.OpenGL.cs" />
     <Compile Include="GameWindow.cs" />
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="TitleContainer.cs" />
