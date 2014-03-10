@@ -364,63 +364,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotImplementedException("GetData not implemented for type.");
             }
 #endif
-#if PSM
-            Rectangle r;
-            if (rect.HasValue)
-            {
-                r = rect.Value;
-            }
-            else
-            {
-                r = new Rectangle(0, 0, Width, Height);
-            }
-            
-            int rWidth = r.Width;
-            int rHeight = r.Height;
-            
-            var sz = 4;         
-            
-            // Loop through and extract the data but we need to load it 
-            var dataRowColOffset = 0;
-            
-            var pixelOffset = 0;
-            var result = new Color(0, 0, 0, 0);
-            
-            byte[] imageInfo = new byte[(rWidth * rHeight) * sz];
-            
-            ImageRect old_scissor = GraphicsDevice.Context.GetScissor();
-            ImageRect old_viewport = GraphicsDevice.Context.GetViewport();
-            FrameBuffer old_frame_buffer = GraphicsDevice.Context.GetFrameBuffer();
-
-            ColorBuffer color_buffer = new ColorBuffer(rWidth, rHeight, PixelFormat.Rgba);
-            FrameBuffer frame_buffer = new FrameBuffer();
-            frame_buffer.SetColorTarget(color_buffer);
-             
-            GraphicsDevice.Context.SetFrameBuffer(frame_buffer);
-
-            GraphicsDevice.Context.SetTexture(0, this._texture2D);
-            GraphicsDevice.Context.ReadPixels(imageInfo, PixelFormat.Rgba, 0, 0, rWidth, rHeight);
-
-            GraphicsDevice.Context.SetFrameBuffer(old_frame_buffer);
-            GraphicsDevice.Context.SetScissor(old_scissor);
-            GraphicsDevice.Context.SetViewport(old_viewport);
-            
-            for (int y = r.Top; y < rHeight; y++)
-            {
-                for (int x = r.Left; x < rWidth; x++)
-                {
-                    dataRowColOffset = ((y * r.Width) + x);
-                    
-                    pixelOffset = dataRowColOffset * sz;
-                    result.R = imageInfo[pixelOffset];
-                    result.G = imageInfo[pixelOffset + 1];
-                    result.B = imageInfo[pixelOffset + 2];
-                    result.A = imageInfo[pixelOffset + 3];
-                    
-                    data[dataRowColOffset] = (T)(object)result;
-                }
-            }
-#endif
+#if !GLES
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
             if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -451,6 +395,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
                 }
             }
+#endif
         }
 
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
