@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -8,11 +12,10 @@ using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #endif
-#elif DIRECTX
+#endif
+#if DIRECTX
 using SharpDX;
 using SharpDX.Direct3D11;
-#elif PSM
-// TODO!
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -66,23 +69,29 @@ namespace Microsoft.Xna.Framework.Graphics
             this._levelCount = 1;
 		    this._format = format;
 
+            PlatformConstruct(graphicsDevice, width, height, depth, mipMap, format, renderTarget);
+        }
+
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
+        {
 #if OPENGL
-			this.glTarget = TextureTarget.Texture3D;
-            
+            this.glTarget = TextureTarget.Texture3D;
+
             GL.GenTextures(1, out this.glTexture);
             GraphicsExtensions.CheckGLError();
 
-			GL.BindTexture (glTarget, glTexture);
+            GL.BindTexture(glTarget, glTexture);
             GraphicsExtensions.CheckGLError();
 
-			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
+            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
-			GL.TexImage3D (glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
+            GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
             GraphicsExtensions.CheckGLError();
 
-			if (mipMap) 
+            if (mipMap)
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
-#elif DIRECTX
+#endif
+#if DIRECTX
             this.renderTarget = renderTarget;
             this.mipMap = mipMap;
 
@@ -152,12 +161,21 @@ namespace Microsoft.Xna.Framework.Graphics
             int height = bottom - top;
             int depth = back - front;
 
+            PlatformSetData(level, left, top, right, bottom, front, back, dataPtr, width, height, depth);
+            dataHandle.Free ();
+		}
+
+        private void PlatformSetData(int level,
+                                     int left, int top, int right, int bottom, int front, int back,
+                                     IntPtr dataPtr, int width, int height, int depth)
+        {
 #if OPENGL
             GL.BindTexture(glTarget, glTexture);
             GraphicsExtensions.CheckGLError();
-			GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
+            GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
             GraphicsExtensions.CheckGLError();
-#elif DIRECTX
+#endif
+#if DIRECTX
             int rowPitch = GetPitch(width);
             int slicePitch = rowPitch * height; // For 3D texture: Size of 2D image.
             var box = new DataBox(dataPtr, rowPitch, slicePitch);
@@ -170,8 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
             lock (d3dContext)
                 d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
 #endif
-            dataHandle.Free ();
-		}
+        }
 
         /// <summary>
         /// Gets a copy of 3D texture data, specifying a mipmap level, source box, start index, and number of elements.
@@ -199,21 +216,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 || (top < 0 || top >= bottom)
                 || (front < 0 || front >= back))
                 throw new ArgumentException("Neither box size nor box position can be negative");
+
+            PlatformGetData(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
+        }
+
+        private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
+             where T : struct
+        {
 #if IOS
 
             // Reading back a texture from GPU memory is unsupported
             // in OpenGL ES 2.0 and no work around has been implemented.           
             throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
-
-#elif ANDROID
-
-            throw new NotImplementedException();
-
-#elif PSM
+#endif
+#if ANDROID
 
             throw new NotImplementedException();
 
-#elif DIRECTX
+#endif
+#if PSM
+
+            throw new NotImplementedException();
+
+#endif
+#if DIRECTX
 
             // Create a temp staging resource for copying the data.
             // 
@@ -264,8 +290,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     stream.Dispose();
                 }
             }
-
-#else
+#endif
+#if OPENGL
 
             throw new NotImplementedException();
 
