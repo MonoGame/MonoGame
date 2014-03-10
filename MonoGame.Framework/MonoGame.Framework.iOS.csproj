@@ -261,6 +261,7 @@
     <Compile Include="Media\PlaylistCollection.cs" />
     <Compile Include="Media\SongCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\Texture.OpenGL.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\States\Blend.cs" />

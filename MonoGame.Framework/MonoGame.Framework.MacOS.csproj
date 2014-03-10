@@ -120,6 +120,7 @@
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\Texture.OpenGL.cs" />
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Content\ContentLoadException.cs" />
     <Compile Include="GamerServices\Achievement.cs" />

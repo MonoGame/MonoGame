@@ -5,39 +5,13 @@
 using System;
 using System.Diagnostics;
 
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using TextureTarget = OpenTK.Graphics.ES20.All;
-using TextureUnit = OpenTK.Graphics.ES20.All;
-#endif
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract class Texture : GraphicsResource
+	public abstract partial class Texture : GraphicsResource
 	{
 		internal SurfaceFormat _format;
 		internal int _levelCount;
 
-#if DIRECTX
-
-
-        internal SharpDX.Direct3D11.Resource _texture;
-
-	private SharpDX.Direct3D11.ShaderResourceView _resourceView;
-
-#elif OPENGL
-		internal int glTexture = -1;
-		internal TextureTarget glTarget;
-        internal TextureUnit glTextureUnit = TextureUnit.Texture0;
-        internal SamplerState glLastSamplerState = null;
-#endif
-		
 		public SurfaceFormat Format
 		{
 			get { return _format; }
@@ -47,21 +21,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _levelCount; }
 		}
-
-#if DIRECTX
-        /// <summary>
-        /// Gets the handle to a shared resource.
-        /// </summary>
-        /// <returns>
-        /// The handle of the shared resource, or <see cref="IntPtr.Zero"/> if the texture was not
-        /// created as a shared resource.
-        /// </returns>
-        public IntPtr GetSharedHandle()
-        {
-            using (var resource = _texture.QueryInterface<SharpDX.DXGI.Resource>())
-                return resource.SharedHandle;
-        }
-#endif
 
         internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
         {
@@ -104,46 +63,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return pitch;
         }
 
-#if DIRECTX
-
-        internal abstract SharpDX.Direct3D11.Resource CreateTexture();
-
-        internal SharpDX.Direct3D11.Resource GetTexture()
-        {
-            if (_texture == null)
-                _texture = CreateTexture();
-
-            return _texture;
-        }
-
-        internal SharpDX.Direct3D11.ShaderResourceView GetShaderResourceView()
-        {
-            if (_resourceView == null)
-                _resourceView = new SharpDX.Direct3D11.ShaderResourceView(GraphicsDevice._d3dDevice, GetTexture());
-
-            return _resourceView;
-        }
-
-#endif
-
         internal protected override void GraphicsDeviceResetting()
         {
             PlatformGraphicsDeviceResetting();
-        }
-
-        private void PlatformGraphicsDeviceResetting()
-        {
-#if OPENGL
-            this.glTexture = -1;
-            this.glLastSamplerState = null;
-#endif
-
-#if DIRECTX
-
-            SharpDX.Utilities.Dispose(ref _resourceView);
-            SharpDX.Utilities.Dispose(ref _texture);
-
-#endif
         }
 
         protected override void Dispose(bool disposing)
@@ -154,28 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             base.Dispose(disposing);
 		}
-
-        private void PlatformDispose(bool disposing)
-        {
-#if DIRECTX
-            if (disposing)
-            {
-                SharpDX.Utilities.Dispose(ref _resourceView);
-                SharpDX.Utilities.Dispose(ref _texture);
-            }
-#endif
-#if OPENGL
-            GraphicsDevice.AddDisposeAction(() =>
-            {
-                GL.DeleteTextures(1, ref glTexture);
-                GraphicsExtensions.CheckGLError();
-                glTexture = -1;
-            });
-
-            glLastSamplerState = null;
-#endif
-        }
-		
 	}
 }
 

@@ -347,6 +347,7 @@
     <Compile Include="GameTime.cs" />
     <Compile Include="GraphicsDeviceInformation.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\Texture.DirectX.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
