@@ -359,6 +359,8 @@
     <Compile Include="Graphics\CubeMapFace.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Texture2D.OpenGL.cs" />
+    <Compile Include="Graphics\Texture3D.cs" />
+    <Compile Include="Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Graphics\PackedVector\Bgr565.cs" />
     <Compile Include="Graphics\PackedVector\Bgra4444.cs" />
     <Compile Include="Graphics\PackedVector\Byte4.cs" />

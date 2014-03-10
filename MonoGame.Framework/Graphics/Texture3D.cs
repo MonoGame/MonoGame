@@ -6,36 +6,13 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#endif
-#endif
-#if DIRECTX
-using SharpDX;
-using SharpDX.Direct3D11;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Texture3D : Texture
+	public partial class Texture3D : Texture
 	{
         private int width;
         private int height;
         private int depth;
-
-#if DIRECTX
-        private bool renderTarget;
-        private bool mipMap;
-#endif
-		
-#if OPENGL
-		PixelInternalFormat glInternalFormat;
-		PixelFormat glFormat;
-		PixelType glType;
-#endif
 
         public int Width
         {
@@ -72,71 +49,6 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformConstruct(graphicsDevice, width, height, depth, mipMap, format, renderTarget);
         }
 
-        private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
-        {
-#if OPENGL
-            this.glTarget = TextureTarget.Texture3D;
-
-            GL.GenTextures(1, out this.glTexture);
-            GraphicsExtensions.CheckGLError();
-
-            GL.BindTexture(glTarget, glTexture);
-            GraphicsExtensions.CheckGLError();
-
-            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
-
-            GL.TexImage3D(glTarget, 0, glInternalFormat, width, height, depth, 0, glFormat, glType, IntPtr.Zero);
-            GraphicsExtensions.CheckGLError();
-
-            if (mipMap)
-                throw new NotImplementedException("Texture3D does not yet support mipmaps.");
-#endif
-#if DIRECTX
-            this.renderTarget = renderTarget;
-            this.mipMap = mipMap;
-
-            if (mipMap)
-                this._levelCount = CalculateMipLevels(width, height, depth);
-
-            // Create texture
-            GetTexture();
-#endif
-        }
-
-#if DIRECTX
-
-        internal override SharpDX.Direct3D11.Resource CreateTexture()
-        {
-            var description = new Texture3DDescription
-            {
-                Width = width,
-                Height = height,
-                Depth = depth,
-                MipLevels = _levelCount,
-                Format = SharpDXHelper.ToFormat(_format),
-                BindFlags = BindFlags.ShaderResource,
-                CpuAccessFlags = CpuAccessFlags.None,
-                Usage = ResourceUsage.Default,
-                OptionFlags = ResourceOptionFlags.None,
-            };
-
-            if (renderTarget)
-            {
-                description.BindFlags |= BindFlags.RenderTarget;
-                if (mipMap)
-                {
-                    // Note: XNA 4 does not have a method Texture.GenerateMipMaps() 
-                    // because generation of mipmaps is not supported on the Xbox 360.
-                    // TODO: New method Texture.GenerateMipMaps() required.
-                    description.OptionFlags |= ResourceOptionFlags.GenerateMipMaps;
-                }
-            }
-
-            return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
-        }
-
-#endif
-        
         public void SetData<T>(T[] data) where T : struct
 		{
 			SetData<T>(data, 0, data.Length);
@@ -164,31 +76,6 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformSetData(level, left, top, right, bottom, front, back, dataPtr, width, height, depth);
             dataHandle.Free ();
 		}
-
-        private void PlatformSetData(int level,
-                                     int left, int top, int right, int bottom, int front, int back,
-                                     IntPtr dataPtr, int width, int height, int depth)
-        {
-#if OPENGL
-            GL.BindTexture(glTarget, glTexture);
-            GraphicsExtensions.CheckGLError();
-            GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
-            GraphicsExtensions.CheckGLError();
-#endif
-#if DIRECTX
-            int rowPitch = GetPitch(width);
-            int slicePitch = rowPitch * height; // For 3D texture: Size of 2D image.
-            var box = new DataBox(dataPtr, rowPitch, slicePitch);
-
-            int subresourceIndex = level;
-
-            var region = new ResourceRegion(left, top, front, right, bottom, back);
-
-            var d3dContext = GraphicsDevice._d3dContext;
-            lock (d3dContext)
-                d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
-#endif
-        }
 
         /// <summary>
         /// Gets a copy of 3D texture data, specifying a mipmap level, source box, start index, and number of elements.
@@ -218,84 +105,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("Neither box size nor box position can be negative");
 
             PlatformGetData(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
-        }
-
-        private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
-             where T : struct
-        {
-#if IOS
-
-            // Reading back a texture from GPU memory is unsupported
-            // in OpenGL ES 2.0 and no work around has been implemented.           
-            throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
-#endif
-#if ANDROID
-
-            throw new NotImplementedException();
-
-#endif
-#if PSM
-
-            throw new NotImplementedException();
-
-#endif
-#if DIRECTX
-
-            // Create a temp staging resource for copying the data.
-            // 
-            // TODO: Like in Texture2D, we should probably be pooling these staging resources
-            // and not creating a new one each time.
-            //
-            var desc = new Texture3DDescription
-            {
-                Width = width,
-                Height = height,
-                Depth = depth,
-                MipLevels = 1,
-                Format = SharpDXHelper.ToFormat(_format),
-                BindFlags = BindFlags.None,
-                CpuAccessFlags = CpuAccessFlags.Read,
-                Usage = ResourceUsage.Staging,
-                OptionFlags = ResourceOptionFlags.None,
-            };
-
-            var d3dContext = GraphicsDevice._d3dContext;
-            using (var stagingTex = new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, desc))
-            {
-                lock (d3dContext)
-                {
-                    // Copy the data from the GPU to the staging texture.
-                    d3dContext.CopySubresourceRegion(GetTexture(), level, new ResourceRegion(left, top, front, right, bottom, back), stagingTex, 0);
-
-                    // Copy the data to the array.
-                    DataStream stream;
-                    var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);
-
-                    // Some drivers may add pitch to rows or slices.
-                    // We need to copy each row separatly and skip trailing zeros.
-                    var currentIndex = startIndex;
-                    var elementSize = SharpDX.Utilities.SizeOf<T>();
-                    var elementsInRow = right - left;
-                    var rowsInSlice = bottom - top;
-                    for (var slice = front; slice < back; slice++)
-                    {
-                        for (var row = top; row < bottom; row++)
-                        {
-                            stream.ReadRange(data, currentIndex, elementsInRow);
-                            stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
-                            currentIndex += elementsInRow;
-                        }
-                        stream.Seek(databox.SlicePitch - (databox.RowPitch * rowsInSlice), SeekOrigin.Current);
-                    }
-                    stream.Dispose();
-                }
-            }
-#endif
-#if OPENGL
-
-            throw new NotImplementedException();
-
-#endif
         }
 
         /// <summary>

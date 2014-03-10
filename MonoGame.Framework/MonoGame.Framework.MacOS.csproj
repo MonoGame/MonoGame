@@ -438,6 +438,7 @@
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Graphics\OcclusionQuery.cs" />
     <Compile Include="Graphics\Texture3D.cs" />
+    <Compile Include="Graphics\Texture3D.OpenGL.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaSource.cs" />
     <Compile Include="FrameworkDispatcher.cs" />
