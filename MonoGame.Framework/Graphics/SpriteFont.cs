@@ -66,213 +66,164 @@ non-infringement.
 */
 #endregion License
 
-// Original code from SilverSprite Project
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace Microsoft.Xna.Framework.Graphics 
+namespace Microsoft.Xna.Framework.Graphics
 {
-
-	public sealed class SpriteFont 
+    /// <summary>
+    /// Represents a font texture.
+    /// </summary>
+    public sealed class SpriteFont
     {
-		static class Errors 
+        private static class Errors
         {
-			public const string TextContainsUnresolvableCharacters =
-				"Text contains characters that cannot be resolved by this SpriteFont.";
-		}
+            public const string TextContainsUnresolvableCharacters =
+                "Text contains characters that cannot be resolved by this SpriteFont.";
+        }
 
-		private readonly Dictionary<char, Glyph> _glyphs;
-		
-		internal readonly Texture2D _texture;
+        private readonly Dictionary<char, Glyph> _glyphs;
+        private readonly ReadOnlyCollection<char> _characters;
+        internal readonly Texture2D _texture;
 
-		internal SpriteFont (
-			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
-			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
-		{
-			_characters = new ReadOnlyCollection<char> (characters.ToArray ());
-			_texture = texture;
-			LineSpacing = lineSpacing;
-			Spacing = spacing;
-			DefaultCharacter = defaultCharacter;
+        internal SpriteFont(Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
+            int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
+        {
+            this.LineSpacing = lineSpacing;
+            this.Spacing = spacing;
+            this.DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph>(characters.Count);
+            _characters = new ReadOnlyCollection<char>(characters.ToArray());
+            _texture = texture;
+            _glyphs = new Dictionary<char, Glyph>(characters.Count);
 
-			for (var i = 0; i < characters.Count; i++) 
+            for (var i = 0; i < characters.Count; i++)
             {
-				var glyph = new Glyph 
+                var glyph = new Glyph
                 {
-					BoundsInTexture = glyphBounds[i],
-					Cropping = cropping[i],
+                    BoundsInTexture = glyphBounds[i],
+                    Cropping = cropping[i],
                     Character = characters[i],
-
                     LeftSideBearing = kerning[i].X,
                     Width = kerning[i].Y,
-                    RightSideBearing = kerning[i].Z,
+                    RightSideBearing = kerning[i].Z
+                };
+                _glyphs.Add(glyph.Character, glyph);
+            }
+        }
 
-                    WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
-				};
-				_glyphs.Add (glyph.Character, glyph);
-			}
-		}
+        /// <summary>
+        /// Gets a collection of the characters in the font.
+        /// </summary>
+        public ReadOnlyCollection<char> Characters
+        {
+            get { return _characters; }
+        }
 
-		private ReadOnlyCollection<char> _characters;
+        /// <summary>
+        /// Gets or sets the character that will be substituted when a
+        /// given character is not included in the font.
+        /// </summary>
+        public char? DefaultCharacter { get; set; }
 
-		/// <summary>
-		/// Gets a collection of the characters in the font.
-		/// </summary>
-		public ReadOnlyCollection<char> Characters { get { return _characters; } }
+        /// <summary>
+        /// Gets or sets the line spacing (the distance from baseline
+        /// to baseline) of the font.
+        /// </summary>
+        public int LineSpacing { get; set; }
 
-		/// <summary>
-		/// Gets or sets the character that will be substituted when a
-		/// given character is not included in the font.
-		/// </summary>
-		public char? DefaultCharacter { get; set; }
+        /// <summary>
+        /// Gets or sets the spacing (tracking) between characters in
+        /// the font.
+        /// </summary>
+        public float Spacing { get; set; }
 
-		/// <summary>
-		/// Gets or sets the line spacing (the distance from baseline
-		/// to baseline) of the font.
-		/// </summary>
-		public int LineSpacing { get; set; }
+        /// <summary>
+        /// Returns the size of a string when rendered in this font.
+        /// </summary>
+        /// <param name="text">The text to measure.</param>
+        /// <returns>The size, in pixels, of 'text' when rendered in
+        /// this font.</returns>
+        public Vector2 MeasureString(string text)
+        {
+            var source = new CharacterSource(text);
+            return this.MeasureString(ref source);
+        }
 
-		/// <summary>
-		/// Gets or sets the spacing (tracking) between characters in
-		/// the font.
-		/// </summary>
-		public float Spacing { get; set; }
+        /// <summary>
+        /// Returns the size of the contents of a StringBuilder when
+        /// rendered in this font.
+        /// </summary>
+        /// <param name="text">The text to measure.</param>
+        /// <returns>The size, in pixels, of 'text' when rendered in
+        /// this font.</returns>
+        public Vector2 MeasureString(StringBuilder text)
+        {
+            var source = new CharacterSource(text);
+            return this.MeasureString(ref source);
+        }
 
-		/// <summary>
-		/// Returns the size of a string when rendered in this font.
-		/// </summary>
-		/// <param name="text">The text to measure.</param>
-		/// <returns>The size, in pixels, of 'text' when rendered in
-		/// this font.</returns>
-		public Vector2 MeasureString(string text)
-		{
-			var source = new CharacterSource(text);
-			Vector2 size;
-			MeasureString(ref source, out size);
-			return size;
-		}
+        private Vector2 MeasureString(ref CharacterSource text)
+        {
+            var width = 0.0f;
+            var finalLineHeight = (float)this.LineSpacing;
+            var lineCount = 0;
 
-		/// <summary>
-		/// Returns the size of the contents of a StringBuilder when
-		/// rendered in this font.
-		/// </summary>
-		/// <param name="text">The text to measure.</param>
-		/// <returns>The size, in pixels, of 'text' when rendered in
-		/// this font.</returns>
-		public Vector2 MeasureString(StringBuilder text)
-		{
-			var source = new CharacterSource(text);
-			Vector2 size;
-			MeasureString(ref source, out size);
-			return size;
-		}
-
-		private void MeasureString(ref CharacterSource text, out Vector2 size)
-		{
-			if (text.Length == 0)
+            this.ProcessText(ref text, (isFirstGlyphOfLine, offset, currentGlyph) =>
             {
-				size = Vector2.Zero;
-				return;
-			}
-
-            // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if ( DefaultCharacter.HasValue )
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
-
-			var width = 0.0f;
-			var finalLineHeight = (float)LineSpacing;
-			var fullLineCount = 0;
-            var currentGlyph = Glyph.Empty;
-			var offset = Vector2.Zero;
-            var hasCurrentGlyph = false;
-            var firstGlyphOfLine = true;
-
-            for (var i = 0; i < text.Length; ++i)
-            {
-                var c = text[i];
-                if (c == '\r')
+                if (isFirstGlyphOfLine)
                 {
-                    hasCurrentGlyph = false;
-                    continue;
+                    lineCount++;
+                    finalLineHeight = this.LineSpacing;
                 }
 
-                if (c == '\n')
-                {
-                    fullLineCount++;
-                    finalLineHeight = LineSpacing;
-
-                    offset.X = 0;
-                    offset.Y = LineSpacing * fullLineCount;
-                    hasCurrentGlyph = false;
-                    firstGlyphOfLine = true;
-                    continue;
-                }
-
-                if (hasCurrentGlyph) {
-                    offset.X += Spacing;
-                
-                    // The first character on a line might have a negative left side bearing.
-                    // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                    //  so that text does not hang off the left side of its rectangle.
-                    if (firstGlyphOfLine) {
-                        offset.X = Math.Max(offset.X + Math.Abs(currentGlyph.LeftSideBearing), 0);
-                        firstGlyphOfLine = false;
-                    } else {
-                        offset.X += currentGlyph.LeftSideBearing;
-                    }
-                    
-                    offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
-                }
-
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
-                {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;                        
-                }
-
-                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings;
+                var proposedWidth = offset.X + currentGlyph.Width;
                 if (proposedWidth > width)
                     width = proposedWidth;
 
                 if (currentGlyph.Cropping.Height > finalLineHeight)
                     finalLineHeight = currentGlyph.Cropping.Height;
-            }
+            });
 
-            size.X = width;
-            size.Y = fullLineCount * LineSpacing + finalLineHeight;
-		}
+            return new Vector2(width, (lineCount - 1) * this.LineSpacing + finalLineHeight);
+        }
 
-        internal void DrawInto( SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
-			                    float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
-		{
+        internal void DrawString(SpriteBatch spriteBatch, string text, Vector2 position, Color color,
+            float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+        {
+            var source = new CharacterSource(text);
+            this.DrawString(spriteBatch, ref source, position, color, rotation, origin, scale, effect, depth);
+        }
+
+        internal void DrawString(SpriteBatch spriteBatch, StringBuilder text, Vector2 position, Color color,
+            float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+        {
+            var source = new CharacterSource(text);
+            this.DrawString(spriteBatch, ref source, position, color, rotation, origin, scale, effect, depth);
+        }
+
+        private void DrawString(SpriteBatch spriteBatch, ref CharacterSource text, Vector2 position, Color color,
+            float rotation, Vector2 origin, Vector2 scale, SpriteEffects effect, float depth)
+        {
             var flipAdjustment = Vector2.Zero;
+            var isFlippedVertically = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
+            var isFlippedHorizontally = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
 
-            var flippedVert = (effect & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
-            var flippedHorz = (effect & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally;
-
-            if (flippedVert || flippedHorz)
+            if (isFlippedVertically || isFlippedHorizontally)
             {
-                Vector2 size;
-                MeasureString(ref text, out size);
+                Vector2 size = this.MeasureString(ref text);
 
-                if (flippedHorz)
+                if (isFlippedHorizontally)
                 {
-                    origin.X *= -1;
+                    origin.X = -origin.X;
                     flipAdjustment.X = -size.X;
                 }
 
-                if (flippedVert)
+                if (isFlippedVertically)
                 {
-                    origin.Y *= -1;
+                    origin.Y = -origin.Y;
                     flipAdjustment.Y = LineSpacing - size.Y;
                 }
             }
@@ -282,143 +233,126 @@ namespace Microsoft.Xna.Framework.Graphics
 
             Matrix transformation, temp;
             Matrix.CreateTranslation(-origin.X, -origin.Y, 0f, out transformation);
-            Matrix.CreateScale((flippedHorz ? -scale.X : scale.X), (flippedVert ? -scale.Y : scale.Y), 1f, out temp);
+            Matrix.CreateScale((isFlippedHorizontally ? -scale.X : scale.X), (isFlippedVertically ? -scale.Y : scale.Y), 1f, out temp);
             Matrix.Multiply(ref transformation, ref temp, out transformation);
-            Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
-            Matrix.Multiply(ref temp, ref transformation, out transformation);
-            Matrix.CreateRotationZ(rotation, out temp);
-            Matrix.Multiply(ref transformation, ref temp, out transformation);
+            if (flipAdjustment != Vector2.Zero)
+            {
+                Matrix.CreateTranslation(flipAdjustment.X, flipAdjustment.Y, 0, out temp);
+                Matrix.Multiply(ref temp, ref transformation, out transformation);
+            }
+            if (rotation < -float.Epsilon || float.Epsilon < rotation)
+            {
+                Matrix.CreateRotationZ(rotation, out temp);
+                Matrix.Multiply(ref transformation, ref temp, out transformation);
+            }
             Matrix.CreateTranslation(position.X, position.Y, 0f, out temp);
             Matrix.Multiply(ref transformation, ref temp, out transformation);
 
-            // Get the default glyph here once.
-            Glyph? defaultGlyph = null;
-            if (DefaultCharacter.HasValue)
-                defaultGlyph = _glyphs[DefaultCharacter.Value];
-
-            var currentGlyph = Glyph.Empty;
-            var offset = Vector2.Zero;
-            var hasCurrentGlyph = false;
-            var firstGlyphOfLine = true;
-
-			for (var i = 0; i < text.Length; ++i)
+            this.ProcessText(ref text, (isFirstGlyphOfLine, offset, currentGlyph) =>
             {
-                var c = text[i];
-                if (c == '\r')
-                {
-                    hasCurrentGlyph = false;
-                    continue;
-                }
+                var glyphPosition = offset;
+                glyphPosition.X += (isFlippedHorizontally ? currentGlyph.BoundsInTexture.Width : 0) + currentGlyph.Cropping.X;
+                glyphPosition.Y += (isFlippedVertically ? currentGlyph.BoundsInTexture.Height - LineSpacing : 0) + currentGlyph.Cropping.Y;
 
-                if (c == '\n')
+                Vector2.Transform(ref glyphPosition, ref transformation, out glyphPosition);
+
+                var destRect = new Vector4(glyphPosition.X, glyphPosition.Y,
+                    currentGlyph.BoundsInTexture.Width * scale.X, currentGlyph.BoundsInTexture.Height * scale.Y);
+
+                spriteBatch.DrawInternal(_texture, destRect, currentGlyph.BoundsInTexture,
+                    color, rotation, Vector2.Zero, effect, depth, false);
+            });
+
+            // We need to flush if we're using Immediate sort mode.
+            spriteBatch.FlushIfNeeded();
+        }
+
+        private void ProcessText(ref CharacterSource text, Action<bool, Vector2, Glyph> processGlyph)
+        {
+            Glyph defaultGlyph = null;
+            var offset = Vector2.Zero;
+            var isFirstGlyphOfLine = true;
+
+            for (var i = 0; i < text.Length; ++i)
+            {
+                var currentCharacter = text[i];
+                if (currentCharacter == '\r')
+                    continue;
+
+                if (currentCharacter == '\n')
                 {
                     offset.X = 0;
-                    offset.Y += LineSpacing;
-                    hasCurrentGlyph = false;
-                    firstGlyphOfLine = true;
+                    offset.Y += this.LineSpacing;
+                    isFirstGlyphOfLine = true;
                     continue;
                 }
 
-                if (hasCurrentGlyph) {
-                    offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
-                }
-
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
+                Glyph currentGlyph;
+                if (!_glyphs.TryGetValue(currentCharacter, out currentGlyph))
                 {
-                    if (!defaultGlyph.HasValue)
-                        throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                    currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;
-                }
-
-                if (hasCurrentGlyph) {
-                    // The first character on a line might have a negative left side bearing.
-                    // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                    //  so that text does not hang off the left side of its rectangle.
-                    if (firstGlyphOfLine) {
-                        offset.X = Math.Max(offset.X, 0);
-                        firstGlyphOfLine = false;
-                    } else {
-                        offset.X += currentGlyph.LeftSideBearing;
+                    if (defaultGlyph == null)
+                    {
+                        if (!this.DefaultCharacter.HasValue || !_glyphs.TryGetValue(this.DefaultCharacter.Value, out defaultGlyph))
+                            throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
                     }
+
+                    currentGlyph = defaultGlyph;
                 }
 
-                var p = offset;
+                // The first character on a line might have a negative left side bearing.
+                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
+                // so that text does not hang off the left side of its rectangle.
+                offset.X += (isFirstGlyphOfLine && currentGlyph.LeftSideBearing < 0 ? 0 : currentGlyph.LeftSideBearing);
 
-				if (flippedHorz)
-                    p.X += currentGlyph.BoundsInTexture.Width;
-                p.X += currentGlyph.Cropping.X;
+                processGlyph(isFirstGlyphOfLine, offset, currentGlyph);
 
-				if (flippedVert)
-                    p.Y += currentGlyph.BoundsInTexture.Height - LineSpacing;
-                p.Y += currentGlyph.Cropping.Y;
+                offset.X += currentGlyph.Width + currentGlyph.RightSideBearing + Spacing;
+                isFirstGlyphOfLine = false;
+            }
+        }
 
-				Vector2.Transform(ref p, ref transformation, out p);
-
-                var destRect = new Vector4( p.X, p.Y, 
-                                            currentGlyph.BoundsInTexture.Width * scale.X,
-                                            currentGlyph.BoundsInTexture.Height * scale.Y);
-
-				spriteBatch.DrawInternal(
-                    _texture, destRect, currentGlyph.BoundsInTexture,
-					color, rotation, Vector2.Zero, effect, depth, false);
-			}
-
-			// We need to flush if we're using Immediate sort mode.
-			spriteBatch.FlushIfNeeded();
-		}
-
-        internal struct CharacterSource 
+        private struct CharacterSource
         {
-			private readonly string _string;
-			private readonly StringBuilder _builder;
+            private readonly string _string;
+            private readonly StringBuilder _builder;
 
-			public CharacterSource(string s)
-			{
-				_string = s;
-				_builder = null;
-				Length = s.Length;
-			}
+            public readonly int Length;
 
-			public CharacterSource(StringBuilder builder)
-			{
-				_builder = builder;
-				_string = null;
-				Length = _builder.Length;
-			}
-
-			public readonly int Length;
-			public char this [int index] 
+            public CharacterSource(string s)
             {
-				get 
-                {
-					if (_string != null)
-						return _string[index];
-					return _builder[index];
-				}
-			}
-		}
+                _string = s;
+                _builder = null;
+                this.Length = s.Length;
+            }
 
-		struct Glyph 
+            public CharacterSource(StringBuilder builder)
+            {
+                _builder = builder;
+                _string = null;
+                this.Length = builder.Length;
+            }
+
+            public char this[int index]
+            {
+                get { return _string != null ? _string[index] : _builder[index]; }
+            }
+        }
+
+        private class Glyph
         {
-			public char Character;
-			public Rectangle BoundsInTexture;
-			public Rectangle Cropping;
+            public char Character;
+            public Rectangle BoundsInTexture;
+            public Rectangle Cropping;
             public float LeftSideBearing;
             public float RightSideBearing;
             public float Width;
-            public float WidthIncludingBearings;
 
-			public static readonly Glyph Empty = new Glyph();
-
-			public override string ToString ()
-			{
-				return string.Format(
-					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3},{4},{5}",
+            public override string ToString()
+            {
+                return string.Format(
+                    "CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3},{4},{5}",
                     Character, BoundsInTexture, Cropping, LeftSideBearing, Width, RightSideBearing);
-			}
-		}
-	}
+            }
+        }
+    }
 }
