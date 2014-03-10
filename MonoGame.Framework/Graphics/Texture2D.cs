@@ -1,58 +1,30 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-#if !PSM
-using System.Drawing;
-#else
-using Sce.PlayStation.Core.Graphics;
-using Sce.PlayStation.Core.Imaging;
-#endif
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
+
+#if !PSM
+using System.Drawing;
+#endif
+
+#if PSM
+using Sce.PlayStation.Core.Graphics;
+using Sce.PlayStation.Core.Imaging;
+using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
+#endif
 
 #if MONOMAC
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
 using MonoMac.Foundation;
-#elif IOS
+#endif
+
+#if IOS
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
@@ -62,10 +34,14 @@ using MonoTouch.Foundation;
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#elif WINDOWS || LINUX
+#endif
+
+#if WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#elif GLES
+#endif
+
+#if GLES
 using OpenTK.Graphics.ES20;
 using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
@@ -76,15 +52,16 @@ using PixelType = OpenTK.Graphics.ES20.All;
 using PixelStoreParameter = OpenTK.Graphics.ES20.All;
 using ErrorCode = OpenTK.Graphics.ES20.All;
 #endif
-#elif PSM
-using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
+
+#if ANDROID
+using Android.Graphics;
 #endif
+#endif // OPENGL
 
 #if WINDOWS || LINUX || MONOMAC
 using System.Drawing.Imaging;
 #endif
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
+
 
 #if WINRT
 #if WINDOWS_PHONE
@@ -97,10 +74,6 @@ using Windows.UI.Xaml.Media.Imaging;
 #endif
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
-#endif
-
-#if ANDROID
-using Android.Graphics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -119,8 +92,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if PSM
 		internal PssTexture2D _texture2D;
-
-#elif OPENGL
+#endif
+#if OPENGL
 		PixelInternalFormat glInternalFormat;
 		GLPixelFormat glFormat;
 		PixelType glType;
@@ -171,6 +144,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		    if (type == SurfaceType.SwapChainRenderTarget)
 		        return;
 
+            PlatformConstruct(width, height, mipmap, format, type, shared);
+        }
+
+        private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
+        {
 #if DIRECTX
             _shared = shared;
 
@@ -179,14 +157,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Create texture
             GetTexture();
-
-#elif PSM
+#endif
+#if PSM
             PixelBufferOption option = PixelBufferOption.None;
             if (type == SurfaceType.RenderTarget)
 			    option = PixelBufferOption.Renderable;
             _texture2D = new Sce.PlayStation.Core.Graphics.Texture2D(width, height, mipmap, PSSHelper.ToFormat(format),option);
-#else
-
+#endif
+#if OPENGL
             this.glTarget = TextureTarget.Texture2D;
             
             Threading.BlockOnUIThread(() =>
@@ -286,75 +264,81 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
 				throw new ArgumentNullException("data");
 
+            PlatformSetData<T>(level, rect, data, startIndex, elementCount);
+        }
+
+        private void PlatformSetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
 #if OPENGL
             Threading.BlockOnUIThread(() =>
             {
 #endif
 #if !PSM
-                var elementSizeInByte = Marshal.SizeOf(typeof(T));
-                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                // Use try..finally to make sure dataHandle is freed in case of an error
-                try
-                {
-                    var startBytes = startIndex * elementSizeInByte;
-                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            // Use try..finally to make sure dataHandle is freed in case of an error
+            try
+            {
+                var startBytes = startIndex * elementSizeInByte;
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 #endif
-                    int x, y, w, h;
-                    if (rect.HasValue)
-                    {
-                        x = rect.Value.X;
-                        y = rect.Value.Y;
-                        w = rect.Value.Width;
-                        h = rect.Value.Height;
-                    }
-                    else
-                    {
-                        x = 0;
-                        y = 0;
-                        w = Math.Max(width >> level, 1);
-                        h = Math.Max(height >> level, 1);
+                int x, y, w, h;
+                if (rect.HasValue)
+                {
+                    x = rect.Value.X;
+                    y = rect.Value.Y;
+                    w = rect.Value.Width;
+                    h = rect.Value.Height;
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    w = Math.Max(width >> level, 1);
+                    h = Math.Max(height >> level, 1);
 
-                        // For DXT textures the width and height of each level is a multiple of 4.
-                        // OpenGL only: The last two mip levels require the width and height to be 
-                        // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                        // a 4x4 block. 
-                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                        if (_format == SurfaceFormat.Dxt1 ||
-                            _format == SurfaceFormat.Dxt1a ||
-                            _format == SurfaceFormat.Dxt3 ||
-                            _format == SurfaceFormat.Dxt5)
-                        {
+                    // For DXT textures the width and height of each level is a multiple of 4.
+                    // OpenGL only: The last two mip levels require the width and height to be 
+                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
+                    // a 4x4 block. 
+                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                    if (_format == SurfaceFormat.Dxt1 ||
+                        _format == SurfaceFormat.Dxt1a ||
+                        _format == SurfaceFormat.Dxt3 ||
+                        _format == SurfaceFormat.Dxt5)
+                    {
 #if DIRECTX
-                            w = (w + 3) & ~3;
-                            h = (h + 3) & ~3;
+                        w = (w + 3) & ~3;
+                        h = (h + 3) & ~3;
 #else
                             if (w > 4)
                                 w = (w + 3) & ~3;
                             if (h > 4)
                                 h = (h + 3) & ~3;
 #endif
-                        }
                     }
+                }
 
 #if DIRECTX
-                    var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
+                var box = new SharpDX.DataBox(dataPtr, GetPitch(w), 0);
 
-                    var region = new SharpDX.Direct3D11.ResourceRegion();
-                    region.Top = y;
-                    region.Front = 0;
-                    region.Back = 1;
-                    region.Bottom = y + h;
-                    region.Left = x;
-                    region.Right = x + w;
+                var region = new SharpDX.Direct3D11.ResourceRegion();
+                region.Top = y;
+                region.Front = 0;
+                region.Back = 1;
+                region.Bottom = y + h;
+                region.Left = x;
+                region.Right = x + w;
 
-                    // TODO: We need to deal with threaded contexts here!
-                    var d3dContext = GraphicsDevice._d3dContext;
-                    lock (d3dContext)
-						d3dContext.UpdateSubresource(box, GetTexture(), level, region);
-
-#elif PSM
+                // TODO: We need to deal with threaded contexts here!
+                var d3dContext = GraphicsDevice._d3dContext;
+                lock (d3dContext)
+                    d3dContext.UpdateSubresource(box, GetTexture(), level, region);
+#endif
+#if PSM
                     _texture2D.SetPixels(level, data, _texture2D.Format, startIndex, 0, x, y, w, h);
-#elif OPENGL
+#endif
+#if OPENGL
 
                     // Store the current bound texture.
                     var prevTexture = GraphicsExtensions.GetBoundTexture2D();
@@ -420,11 +404,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif // OPENGL
 
 #if !PSM
-                }
-                finally
-                {
-                    dataHandle.Free();
-                }
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
 #endif
 
 #if OPENGL
@@ -454,13 +438,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data.Length < startIndex + elementCount)
                 throw new ArgumentException("The data passed has a length of " + data.Length + " but " + elementCount + " pixels have been requested.");
 
+            PlatformGetData<T>(level, rect, data, startIndex, elementCount);
+        }
+
+        private void PlatformGetData<T>(int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        {
 #if IOS
 
             // Reading back a texture from GPU memory is unsupported
             // in OpenGL ES 2.0 and no work around has been implemented.           
             throw new NotSupportedException("OpenGL ES 2.0 does not support texture reads.");
-
-#elif ANDROID
+#endif
+#if ANDROID
 
             Rectangle r;
             if (rect != null)
@@ -576,7 +565,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new NotImplementedException("GetData not implemented for type.");
             }
-#elif PSM
+#endif
+#if PSM
             Rectangle r;
             if (rect.HasValue)
             {
@@ -632,8 +622,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     data[dataRowColOffset] = (T)(object)result;
                 }
             }
-
-#elif DIRECTX
+#endif
+#if DIRECTX
 
             // Create a temp staging resource for copying the data.
             // 
@@ -653,7 +643,7 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
             desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
 
-		    var d3dContext = GraphicsDevice._d3dContext;
+            var d3dContext = GraphicsDevice._d3dContext;
             using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
                 lock (d3dContext)
                 {
@@ -689,8 +679,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     stream.Dispose();
                 }
-
-#else
+#endif
+#if OPENGL
             GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
             if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
@@ -736,10 +726,13 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
 		{
+            return PlatformFromStream(graphicsDevice, stream);
+        }
+
+        private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
+        {
             //todo: partial classes would be cleaner
 #if IOS || MONOMAC
-            
-
 
 #if IOS
 			using (var uiImage = UIImage.LoadFromData(NSData.FromStream(stream)))
@@ -774,7 +767,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 				return texture;
 			}
-#elif ANDROID
+#endif
+#if ANDROID
             using (Bitmap image = BitmapFactory.DecodeStream(stream, null, new BitmapFactory.Options
             {
                 InScaled = false,
@@ -821,29 +815,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 return texture;
             }
-#elif WINDOWS_PHONE
+#endif
+#if WINDOWS_PHONE
             throw new NotImplementedException();
-
-#elif WINDOWS_STOREAPP || DIRECTX
+#endif
+#if DIRECTX && !WINDOWS_PHONE
 
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;
-			SharpDX.WIC.BitmapDecoder decoder;
-			
-            using(var bitmap = LoadBitmap(stream, out decoder))
-			using (decoder)
-			{
-				SharpDX.Direct3D11.Texture2D sharpDxTexture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
+            SharpDX.WIC.BitmapDecoder decoder;
 
-				toReturn = new Texture2D(graphicsDevice, bitmap.Size.Width, bitmap.Size.Height);
+            using (var bitmap = LoadBitmap(stream, out decoder))
+            using (decoder)
+            {
+                SharpDX.Direct3D11.Texture2D sharpDxTexture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
 
-				toReturn._texture = sharpDxTexture;
-			}
+                toReturn = new Texture2D(graphicsDevice, bitmap.Size.Width, bitmap.Size.Height);
+
+                toReturn._texture = sharpDxTexture;
+            }
             return toReturn;
-#elif PSM
+#endif
+#if PSM
             return new Texture2D(graphicsDevice, stream);
-#else
+#endif
+#if WINDOWS
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {
                 // Fix up the Image to match the expected format
@@ -900,9 +897,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SaveAsJpeg(Stream stream, int width, int height)
         {
+            PlatformSaveAsJpeg(stream, width, height);
+        }
+
+        private void PlatformSaveAsJpeg(Stream stream, int width, int height)
+        {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.JpegEncoderId, stream, width, height);
-#elif WINDOWS_PHONE
+#endif
+#if WINDOWS_PHONE
 
             var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
             GetData(pixelData);
@@ -920,7 +923,8 @@ namespace Microsoft.Xna.Framework.Graphics
             });
 
             waitEvent.Wait();
-#elif MONOMAC
+#endif
+#if MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -948,6 +952,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public void SaveAsPng(Stream stream, int width, int height)
+        {
+            PlatformSaveAsPng(stream, width, height);
+        }
+
+        private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
@@ -1151,7 +1160,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
             }
         }
-#endif
+#endif // OPENGL
 
 #if ANDROID
 		private byte[] GetTextureData(int ThreadPriorityLevel)
