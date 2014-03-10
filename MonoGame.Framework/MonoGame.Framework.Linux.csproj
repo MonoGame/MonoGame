@@ -395,6 +395,7 @@
     <Compile Include="Graphics\SpriteBatcher.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture2D.OpenGL.cs" />
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="GameWindow.cs" />

@@ -426,6 +426,7 @@
     <Compile Include="Input\MouseState.cs" />
     <Compile Include="Content\ContentReaders\AlphaTestEffectReader.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture2D.OpenGL.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Media\Playlist.cs" />
     <Compile Include="Media\PlaylistCollection.cs" />

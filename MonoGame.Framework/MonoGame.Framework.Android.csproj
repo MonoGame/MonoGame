@@ -141,6 +141,7 @@
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Graphics\Texture2D.OpenGL.cs" />
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
