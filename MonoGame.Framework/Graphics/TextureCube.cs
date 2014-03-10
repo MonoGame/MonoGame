@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -15,10 +19,12 @@ using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 #endif
-#elif DIRECTX
+#endif
+#if DIRECTX
 using SharpDX;
 using SharpDX.Direct3D11;
-#elif PSM
+#endif
+#if PSM
 using Sce.PlayStation.Core.Graphics;
 #endif
 
@@ -45,9 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _renderTarget;
         private bool _mipMap;
 
-#elif PSM
+#endif
+#if PSM
 		//TODO
-#else
+#endif
+#if OPENGL
 		PixelInternalFormat glInternalFormat;
 		PixelFormat glFormat;
 		PixelType glType;
@@ -68,6 +76,11 @@ namespace Microsoft.Xna.Framework.Graphics
             this._format = format;
             this._levelCount = mipMap ? CalculateMipLevels(size) : 1;
 
+            PlatformConstruct(graphicsDevice, size, mipMap, format, renderTarget);
+        }
+
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
+        {
 #if DIRECTX
 
             _renderTarget = renderTarget;
@@ -76,63 +89,65 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create texture
             GetTexture();
 
-#elif PSM
+#endif
+#if PSM
 			//TODO
-#else
-			this.glTarget = TextureTarget.TextureCubeMap;
+#endif
+#if OPENGL
+            this.glTarget = TextureTarget.TextureCubeMap;
 #if IOS || ANDROID
 			GL.GenTextures(1, ref this.glTexture);
 #else
-			GL.GenTextures(1, out this.glTexture);
+            GL.GenTextures(1, out this.glTexture);
 #endif
             GraphicsExtensions.CheckGLError();
             GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
-			                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                            mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
-			                (int)TextureMagFilter.Linear);
+                            (int)TextureMagFilter.Linear);
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
-			                (int)TextureWrapMode.ClampToEdge);
+                            (int)TextureWrapMode.ClampToEdge);
             GraphicsExtensions.CheckGLError();
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
-			                (int)TextureWrapMode.ClampToEdge);
+                            (int)TextureWrapMode.ClampToEdge);
             GraphicsExtensions.CheckGLError();
 
 
-			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
-			
-			for (int i=0; i<6; i++) 
-            {
-				TextureTarget target = GetGLCubeFace((CubeMapFace)i);
+            format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
 
-				if (glFormat == (PixelFormat)All.CompressedTextureFormats) 
+            for (int i = 0; i < 6; i++)
+            {
+                TextureTarget target = GetGLCubeFace((CubeMapFace)i);
+
+                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
                 {
-					throw new NotImplementedException();
-				} 
-                else 
+                    throw new NotImplementedException();
+                }
+                else
                 {
 #if IOS || ANDROID
 					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #else
-					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+                    GL.TexImage2D(target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
 #endif
                     GraphicsExtensions.CheckGLError();
                 }
-			}
-			
-			if (mipMap)
-			{
+            }
+
+            if (mipMap)
+            {
 #if IOS || ANDROID
 				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
-				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
                 GraphicsExtensions.CheckGLError();
-			}
-#endif
+            }
+#endif // OPENGL
         }
 
 #if DIRECTX
@@ -173,8 +188,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">The data.</param>
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
-            //FIXME Does not compile on Android or iOS
-#if MONOMAC
+            PlatformGetData<T>(cubeMapFace, data);
+        }
+
+        private static void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        {
+#if OPENGL && MONOMAC
             TextureTarget target = GetGLCubeFace(cubeMapFace);
             GL.BindTexture(target, this.glTexture);
             // 4 bytes per pixel
@@ -184,7 +203,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetTexImage<T>(target, 0, PixelFormat.Bgra,
                 PixelType.UnsignedByte, data);
 #else
-			throw new NotImplementedException();
+            throw new NotImplementedException();
 #endif
         }
 
@@ -246,6 +265,16 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                     }
                 }
+                PlatformSetData(face, level, dataPtr, xOffset, yOffset, width, height);
+            }
+            finally
+            {
+                dataHandle.Free();
+            }
+		}
+
+        private void PlatformSetData(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        {
 
 #if DIRECTX
                 var box = new DataBox(dataPtr, GetPitch(width), 0);
@@ -265,29 +294,26 @@ namespace Microsoft.Xna.Framework.Graphics
             var d3dContext = GraphicsDevice._d3dContext;
             lock (d3dContext)
                 d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
-#elif PSM
-			    //TODO
-#else
-                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-                GraphicsExtensions.CheckGLError();
-
-                TextureTarget target = GetGLCubeFace(face);
-                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
-                    GraphicsExtensions.CheckGLError();
-                }
 #endif
-            }
-            finally
+#if PSM
+			    //TODO
+#endif
+#if OPENGL
+            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+            GraphicsExtensions.CheckGLError();
+
+            TextureTarget target = GetGLCubeFace(face);
+            if (glFormat == (PixelFormat)All.CompressedTextureFormats)
             {
-                dataHandle.Free();
+                throw new NotImplementedException();
             }
-		}
+            else
+            {
+                GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
+                GraphicsExtensions.CheckGLError();
+            }
+#endif
+        }
 		
 #if OPENGL
 		private TextureTarget GetGLCubeFace(CubeMapFace face) 
