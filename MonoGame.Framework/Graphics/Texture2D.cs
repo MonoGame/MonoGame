@@ -694,26 +694,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
-			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
+			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+            {
 				throw new NotImplementedException();
-			} else {
-				if (rect.HasValue) {
-					var temp = new T[this.width*this.height];
+			}
+            else
+            {
+				if (rect.HasValue)
+                {
+					var temp = new T[this.width * this.height];
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
 					int z = 0, w = 0;
 
-					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
-						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
-							data[z*rect.Value.Width+w] = temp[(y*width)+x];
-							w++;
+					for (int y = rect.Value.Y; y < rect.Value.Y + rect.Value.Height; ++y)
+                    {
+						for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
+                        {
+							data[z * rect.Value.Width + w] = temp[(y * width) + x];
+							++w;
 						}
-						z++;
+						++z;
+                        w = 0;
 					}
-				} else {
+				}
+                else
+                {
 					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
 				}
 			}
-
 #endif
         }
 
