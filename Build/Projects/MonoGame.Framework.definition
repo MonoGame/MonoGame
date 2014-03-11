@@ -138,11 +138,25 @@
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\SoundBank.cs" />
-    <Compile Include="Audio\SoundEffect.cs">
-      <Platforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.OpenAL.cs">
+      <Platforms>Android,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
-    <Compile Include="Audio\SoundEffectInstance.cs">
-      <Platforms>Android,Ouya,PSMobile,Windows8,Windows,WindowsPhone</Platforms>
+    <Compile Include="Audio\SoundEffect.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.XAudio.cs">
+      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
+      <Platforms>Android,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffectInstance.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Audio\SoundEffect.XAudio.cs">
+      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
@@ -470,10 +484,28 @@
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\IndexBuffer.DirectX.cs">
+      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs">
+      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\IndexBuffer.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\IndexElementSize.cs" />
     <Compile Include="Graphics\Vertices\IVertexType.cs" />
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
+    <Compile Include="Graphics\Vertices\VertexBuffer.DirectX.cs">
+      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.OpenGL.cs">
+      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexBuffer.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
@@ -702,9 +734,6 @@
     <Compile Include="Android\AndroidGameWindow.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Audio\Sound.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
     <Compile Include="Android\Devices\Sensors\Accelerometer.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -753,7 +782,10 @@
     <Compile Include="Android\ScreenReciever.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-
+    <Compile Include="Audio\AudioUtil.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+	
 
     <!-- Common Desktop Platform -->
     <Compile Include="Desktop\Audio\AudioLoader.cs">
@@ -763,9 +795,6 @@
       <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Audio\OpenALSoundController.cs">
-      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Audio\SoundEffectInstance.cs">
       <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Input\Axis.cs">
@@ -895,9 +924,6 @@
 
     <!-- MacOS Platform -->
     <Compile Include="MacOS\Audio\OpenALSupport.cs">
-      <Platforms>iOS,MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\Audio\SoundEffect.cs">
       <Platforms>iOS,MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\GamerServices\Guide.cs">
