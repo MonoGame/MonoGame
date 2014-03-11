@@ -721,7 +721,7 @@ namespace Microsoft.Xna.Framework
                 // Once per frame, we need to check currently 
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
-                SFXInstancePool.Update();
+                SoundEffectInstancePool.Update();
                 Update(gameTime);
             }
                 

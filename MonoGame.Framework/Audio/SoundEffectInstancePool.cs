@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    internal static class SFXInstancePool
+    internal static class SoundEffectInstancePool
     {
 
 #if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || ANDROID

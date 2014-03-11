@@ -96,7 +96,7 @@
     <NoWarn>0436</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Audio\SFXInstancePool.cs" />
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundEffect.XAudio.cs" />
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs" />

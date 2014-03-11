@@ -393,7 +393,7 @@
     <Compile Include="Audio\SoundEffect.PSM.cs" />
     <Compile Include="Audio\SoundEffectInstance.PSM.cs" />
     <Compile Include="Audio\AudioUtil.cs" />
-    <Compile Include="Audio\SFXInstancePool.cs" />
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PSSuite\" />

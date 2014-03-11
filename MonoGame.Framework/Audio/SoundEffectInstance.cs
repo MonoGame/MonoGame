@@ -99,12 +99,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
-            if (!SFXInstancePool.SoundsAvailable)
+            if (!SoundEffectInstancePool.SoundsAvailable)
                 throw new InstancePlayLimitException();
 
             PlatformPlay();
 
-            SFXInstancePool.Remove(this);
+            SoundEffectInstancePool.Remove(this);
         }
 
         public void Resume()
@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Return this SFXInstance back
             // to the pool to be used later.
-            SFXInstancePool.Add(this);
+            SoundEffectInstancePool.Add(this);
         }
 
         public void Dispose()

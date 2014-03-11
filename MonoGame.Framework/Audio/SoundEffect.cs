@@ -120,10 +120,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool Play(float volume, float pitch, float pan)
         {
-            if (!SFXInstancePool.SoundsAvailable)
+            if (!SoundEffectInstancePool.SoundsAvailable)
                 return false;
            
-            var inst = SFXInstancePool.GetInstance(false);
+            var inst = SoundEffectInstancePool.GetInstance(false);
 
             inst.Volume = volume;
             inst.Pitch = pitch;

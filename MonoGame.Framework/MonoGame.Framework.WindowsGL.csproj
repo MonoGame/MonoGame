@@ -104,7 +104,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\SFXInstancePool.cs" />
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />

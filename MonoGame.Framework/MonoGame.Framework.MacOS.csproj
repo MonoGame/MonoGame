@@ -456,7 +456,7 @@
     <Compile Include="TextInputEventArgs.cs" />
     <Compile Include="Audio\SoundEffectInstance.cs" />
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs" />
-    <Compile Include="Audio\SFXInstancePool.cs" />
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MacOS\" />
