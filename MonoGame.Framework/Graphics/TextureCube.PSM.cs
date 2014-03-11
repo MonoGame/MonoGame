@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private static void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             throw new NotImplementedException();
         }

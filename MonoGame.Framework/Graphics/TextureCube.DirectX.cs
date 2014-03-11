@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, description);
         }
 
-        private static void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
+        private void PlatformGetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             throw new NotImplementedException();
         }
