@@ -33,102 +33,42 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MAX_PLAYING_INSTANCES = 32;
 #endif
 
-        private static List<SoundEffectInstance> _playingInstances = new List<SoundEffectInstance>();
-        private static List<SoundEffectInstance> _availableInstances = new List<SoundEffectInstance>();
-        private static List<WeakReference> _callersInstances = new List<WeakReference>();
-
-        private static bool _playCountDirty = true;
-        private static int _playingInstCount;
+        private static readonly List<SoundEffectInstance> _playingInstances = new List<SoundEffectInstance>();
+        private static readonly List<SoundEffectInstance> _pooledInstances = new List<SoundEffectInstance>();
 
         internal static bool SoundsAvailable
         {
             get
             {
-                if (!_playCountDirty)
-                    return _playingInstCount < MAX_PLAYING_INSTANCES;
-
-                _playCountDirty = false;
-
-                _playingInstCount = 0;
-
-                _playingInstCount += _playingInstances.Count(s => s.State != SoundState.Stopped);
-                _playingInstCount += _callersInstances.Count(SFXInstanceIsPlaying);
-
-                return _playingInstCount < MAX_PLAYING_INSTANCES;
+                return _playingInstances.Count < MAX_PLAYING_INSTANCES;
             }
         }
 
-        internal static List<SoundEffectInstance> GetAllPooledSounds()
+        internal static List<SoundEffectInstance> GetAllPlayingSounds()
         {
-            var sounds = new List<SoundEffectInstance>();
-
-            sounds.AddRange(_playingInstances);
-            sounds.AddRange(_availableInstances);
-
-            foreach(var weakRef in _callersInstances)
-            {
-                if (!weakRef.IsAlive)
-                    continue;
-
-                var data = weakRef.Target as SoundEffectInstance;
-
-                if (data == null)
-                    continue;
-
-                sounds.Add(data);
-            }
-
-            return sounds;
-        }
-
-        private static bool SFXInstanceIsPlaying(WeakReference instanceRef)
-        {
-            if (!instanceRef.IsAlive)
-                return false;
-
-            var data = instanceRef.Target as SoundEffectInstance;
-
-            if (data == null || data.State == SoundState.Stopped)
-                return false;
-
-            return true;
+            return new List<SoundEffectInstance>(_playingInstances);
         }
 
         internal static void Add(SoundEffectInstance inst)
         {
-            if (inst._isInternal)
-                return;
+            if (inst._IsPooled)
+                _pooledInstances.Add(inst);
 
-            _playCountDirty = true;
-
-            System.Diagnostics.Debug.Assert(!_availableInstances.Contains(inst));
-
-            _availableInstances.Add(inst);
             _playingInstances.Remove(inst);
         }
 
         internal static void Remove(SoundEffectInstance inst)
         {
-            if (inst._isInternal)
-                return;
-
-            _playCountDirty = true;
-
-            System.Diagnostics.Debug.Assert(_availableInstances.Contains(inst));
-
-            _availableInstances.Remove(inst);
             _playingInstances.Add(inst);
         }
 
         internal static SoundEffectInstance GetInstance(bool releaseToCaller)
         {
-            _playCountDirty = true;
-
             SoundEffectInstance inst = null;
-            if (_availableInstances.Count > 0)
+            if (_pooledInstances.Count > 0)
             {
-                inst = _availableInstances[0];
-                _availableInstances.Remove(inst);
+                inst = _pooledInstances[0];
+                _pooledInstances.Remove(inst);
 
                 // Reset used instance to the "default" state.
                 inst.Volume = 1.0f;
@@ -139,66 +79,22 @@ namespace Microsoft.Xna.Framework.Audio
             else
                 inst = new SoundEffectInstance();
 
-            // If we're going to release this instance
-            // to the caller, keep a WeakReference of it. This lets it be garbage
-            // collected, but still allows us to keep
-            // track of it to maintain a count of sounds playing
-            // in the system.
-            if (releaseToCaller)
-                _callersInstances.Add(new WeakReference(inst));
-
-            inst._isInternal = !releaseToCaller;
+            inst._IsPooled = !releaseToCaller;
 
             return inst;
         }
 
         internal static void Update()
         {
-            _playCountDirty = false;
-            _playingInstCount = 0;
-
             SoundEffectInstance inst = null;
             // Cleanup instances which have finished playing.                    
-            for (var x = 0; x < _playingInstances.Count; )
+            for (var x = 0; x < _playingInstances.Count;)
             {
                 inst = _playingInstances[x];
 
                 if (inst.State == SoundState.Stopped)
                 {
-                    _playingInstances.Remove(inst);
-                    _availableInstances.Add(inst);
-
-                    continue;
-                }
-
-                _playingInstCount++;
-
-                x++;
-            }
-
-            // Loop through SoundEffectInstances that have been
-            // released to the caller and check their state
-            // Stop tracking them once they've been GCed.
-            for (var x = 0; x < _callersInstances.Count; )
-            {
-                var weakRef = _callersInstances[x];
-
-                if (weakRef.IsAlive)
-                {
-                    var data = weakRef.Target as SoundEffectInstance;
-
-                    if (data == null)
-                    {
-                        _callersInstances.Remove(weakRef);
-                        continue;
-                    }
-
-                    if (data.State != SoundState.Stopped)
-                        _playingInstCount++;
-                }
-                else
-                {
-                    _callersInstances.Remove(weakRef);
+                    Add(inst);
                     continue;
                 }
 

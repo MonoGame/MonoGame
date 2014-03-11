@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private bool isDisposed = false;
 
-        internal bool _isInternal;
+        internal bool _IsPooled = true;
 
         private float _pan = 0.0f;
         private float _volume = 1.0f;

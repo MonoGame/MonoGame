@@ -51,8 +51,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         public SoundEffectInstance CreateInstance()
         {
-            var inst = SFXInstancePool.GetInstance(true);
+            var inst = new SoundEffectInstance();
             PlatformSetupInstance(inst);
+
+            inst._IsPooled = false;
 
             return inst;
         }
@@ -222,4 +224,3 @@ namespace Microsoft.Xna.Framework.Audio
 
     }
 }
-

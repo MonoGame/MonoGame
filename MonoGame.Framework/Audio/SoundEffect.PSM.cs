@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static void PlatformSetMasterVolume()
         {
-            var activeSounds = SFXInstancePool.GetAllPooledSounds();
+            var activeSounds = SFXInstancePool.GetAllPlayingSounds();
 
             // A little gross here, but there's
             // no if(value == value) check in SFXInstance.Volume
