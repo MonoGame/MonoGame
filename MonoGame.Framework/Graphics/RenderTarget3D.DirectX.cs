@@ -3,71 +3,19 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-
-#if DIRECTX
 using SharpDX.Direct3D11;
-#endif
-
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using RenderbufferTarget = OpenTK.Graphics.ES20.All;
-using RenderbufferStorage = OpenTK.Graphics.ES20.All;
-#endif
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class RenderTarget3D : Texture3D, IRenderTarget
-	{
-#if DIRECTX
-	    private int _currentSlice;
+    public partial class RenderTarget3D
+    {
+        private int _currentSlice;
         private RenderTargetView _renderTargetView;
         private DepthStencilView _depthStencilView;
-#endif
-
-		public DepthFormat DepthStencilFormat { get; private set; }
-		
-		public int MultiSampleCount { get; private set; }
-		
-		public RenderTargetUsage RenderTargetUsage { get; private set; }
-		
-		public bool IsContentLost { get { return false; } }
-		
-		public event EventHandler<EventArgs> ContentLost;
-
-        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
-        {
-            return ContentLost != null;
-        }
-
-		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
-			:base (graphicsDevice, width, height, depth, mipMap, preferredFormat, true)
-		{
-			DepthStencilFormat = preferredDepthFormat;
-			MultiSampleCount = preferredMultiSampleCount;
-			RenderTargetUsage = usage;
-
-            // If we don't need a depth buffer then we're done.
-            if (preferredDepthFormat == DepthFormat.None)
-                return;
-
-            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
-        }
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {
-#if DIRECTX
-
             // Setup the multisampling description.
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (preferredMultiSampleCount > 1)
@@ -97,30 +45,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     Dimension = DepthStencilViewDimension.Texture2D
                 });
             }
-
-#endif // DIRECTX
         }
-		
-		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
-			:this (graphicsDevice, width, height, depth, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents) 
-		{}
-		
-		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth)
-			: this(graphicsDevice, width, height, depth, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
-		{}
-
-		protected override void Dispose(bool disposing)
-		{
-            if (!IsDisposed)
-            {
-                PlatformDispose(disposing);
-            }
-            base.Dispose(disposing);
-		}
 
         private void PlatformDispose(bool disposing)
         {
-#if DIRECTX
             if (disposing)
             {
                 if (_renderTargetView != null)
@@ -134,10 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _depthStencilView = null;
                 }
             }
-#endif
         }
-
-#if DIRECTX
 
 	    RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
 	    {
@@ -178,7 +103,5 @@ namespace Microsoft.Xna.Framework.Graphics
 	    {
 	        return _depthStencilView;
 	    }
-
-#endif
-	}
+    }
 }
