@@ -873,16 +873,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
             return new Texture2D(graphicsDevice, stream);
 #else
-            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            try
             {
                 // Fix up the Image to match the expected format
-                image.RGBToBGR();
+                ImageEx.RGBToBGR(ref image);
 
                 var data = new byte[image.Width * image.Height * 4];
 
                 BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                     ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4) 
+                if (bitmapData.Stride != image.Width * 4)
                     throw new NotImplementedException();
                 Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
                 image.UnlockBits(bitmapData);
@@ -892,6 +893,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 texture.SetData(data);
 
                 return texture;
+            }
+            finally
+            {
+                image.Dispose();
             }
 #endif
         }

@@ -506,7 +506,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Set our DepthBufferFormat correctly.
             int stencilSize = 0;
             int depthSize = 0;
-#if MONOMAC
+#if MONOMAC || (OPENGL && WINDOWS)
            GL.GetInteger(GetPName.DepthBits, out depthSize);
   	       GL.GetInteger(GetPName.StencilBits, out stencilSize);
 #elif OPENGL
