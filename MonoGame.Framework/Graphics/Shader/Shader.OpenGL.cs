@@ -6,7 +6,6 @@ using System;
 using System.Runtime.InteropServices;
 using System.IO;
 
-#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -19,57 +18,16 @@ using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
-#endif
-
-#if DIRECTX
-using SharpDX;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-#endif
-
-#if PSM
-enum ShaderType //FIXME: Major Hack
-{
-	VertexShader,
-	FragmentShader
-}
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal enum SamplerType
+    internal partial class Shader
     {
-        Sampler2D = 0,
-        SamplerCube = 1,
-        SamplerVolume = 2,
-        Sampler1D = 3,
-    }
-
-    // TODO: We should convert the sampler info below 
-    // into the start of a Shader reflection API.
-
-    internal struct SamplerInfo
-    {
-        public SamplerType type;
-        public int textureSlot;
-        public int samplerSlot;
-        public string name;
-		public SamplerState state;
-
-        // TODO: This should be moved to EffectPass.
-        public int parameter;
-    }
-
-    internal class Shader : GraphicsResource
-	{
-#if OPENGL
-
         // The shader handle.
-	    private int _shaderHandle = -1;
+        private int _shaderHandle = -1;
 
         // We keep this around for recompiling on context lost and debugging.
-        private readonly string _glslCode;
+        private string _glslCode;
 
         private struct Attribute
         {
@@ -81,114 +39,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private Attribute[] _attributes;
-#endif
-#if DIRECTX
-
-        private VertexShader _vertexShader;
-        private PixelShader _pixelShader;
-        private byte[] _shaderBytecode;
-
-        public byte[] Bytecode { get; private set; }
-
-        internal VertexShader VertexShader
-        {
-            get
-            {
-                if (_vertexShader == null)
-                    CreateVertexShader();
-                return _vertexShader;
-            }
-        }
-
-        internal PixelShader PixelShader
-        {
-            get
-            {
-                if (_pixelShader == null)
-                    CreatePixelShader();
-                return _pixelShader;
-            }
-        }
-
-#endif
-
-        /// <summary>
-        /// A hash value which can be used to compare shaders.
-        /// </summary>
-        internal int HashKey { get; private set; }
-
-        public SamplerInfo[] Samplers { get; private set; }
-
-	    public int[] CBuffers { get; private set; }
-
-        public ShaderStage Stage { get; private set; }
-		
-        internal Shader(GraphicsDevice device, BinaryReader reader)
-        {
-            GraphicsDevice = device;
-
-            var isVertexShader = reader.ReadBoolean();
-            Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
-
-            var shaderLength = reader.ReadInt32();
-            var shaderBytecode = reader.ReadBytes(shaderLength);
-
-            var samplerCount = (int)reader.ReadByte();
-            Samplers = new SamplerInfo[samplerCount];
-            for (var s = 0; s < samplerCount; s++)
-            {
-                Samplers[s].type = (SamplerType)reader.ReadByte();
-                Samplers[s].textureSlot = reader.ReadByte();
-                Samplers[s].samplerSlot = reader.ReadByte();
-
-				if (reader.ReadBoolean())
-				{
-					Samplers[s].state = new SamplerState();
-					Samplers[s].state.AddressU = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressV = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.AddressW = (TextureAddressMode)reader.ReadByte();
-					Samplers[s].state.Filter = (TextureFilter)reader.ReadByte();
-					Samplers[s].state.MaxAnisotropy = reader.ReadInt32();
-					Samplers[s].state.MaxMipLevel = reader.ReadInt32();
-					Samplers[s].state.MipMapLevelOfDetailBias = reader.ReadSingle();
-				}
-
-#if OPENGL
-                Samplers[s].name = reader.ReadString();
-#else
-                Samplers[s].name = null;
-#endif
-                Samplers[s].parameter = reader.ReadByte();
-            }
-
-            var cbufferCount = (int)reader.ReadByte();
-            CBuffers = new int[cbufferCount];
-            for (var c = 0; c < cbufferCount; c++)
-                CBuffers[c] = reader.ReadByte();
-
-            PlatformConstruct(reader, isVertexShader, shaderBytecode);
-        }
 
         private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
         {
-#if DIRECTX
-
-            _shaderBytecode = shaderBytecode;
-
-            // We need the bytecode later for allocating the
-            // input layout from the vertex declaration.
-            Bytecode = shaderBytecode;
-
-            HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
-
-            if (isVertexShader)
-                CreateVertexShader();
-            else
-                CreatePixelShader();
-
-#endif // DIRECTX
-
-#if OPENGL
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(shaderBytecode);
@@ -202,11 +55,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].index = reader.ReadByte();
                 _attributes[a].format = reader.ReadInt16();
             }
-
-#endif // OPENGL
         }
 
-#if OPENGL
         internal int GetShaderHandle()
         {
             // If the shader has already been created then return it.
@@ -298,16 +148,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#endif // OPENGL
-
-        internal protected override void GraphicsDeviceResetting()
-        {
-            PlatformGraphicsDeviceResetting();
-        }
-
         private void PlatformGraphicsDeviceResetting()
         {
-#if OPENGL
             if (_shaderHandle != -1)
             {
                 if (GL.IsShader(_shaderHandle))
@@ -317,65 +159,22 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
                 _shaderHandle = -1;
             }
-#endif
-
-#if DIRECTX
-
-            SharpDX.Utilities.Dispose(ref _vertexShader);
-            SharpDX.Utilities.Dispose(ref _pixelShader);
-
-#endif
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose();
-            }
-
-            base.Dispose(disposing);
         }
 
         private void PlatformDispose()
         {
-#if OPENGL
-                GraphicsDevice.AddDisposeAction(() =>
+            GraphicsDevice.AddDisposeAction(() =>
+            {
+                if (_shaderHandle != -1)
+                {
+                    if (GL.IsShader(_shaderHandle))
                     {
-                        if (_shaderHandle != -1)
-                        {
-                            if (GL.IsShader(_shaderHandle))
-                            {
-                                GL.DeleteShader(_shaderHandle);
-                                GraphicsExtensions.CheckGLError();
-                            }
-                            _shaderHandle = -1;
-                        }
-                    });
-#endif
-
-#if DIRECTX
-
-            GraphicsDeviceResetting();
-
-#endif
+                        GL.DeleteShader(_shaderHandle);
+                        GraphicsExtensions.CheckGLError();
+                    }
+                    _shaderHandle = -1;
+                }
+            });
         }
-
-#if DIRECTX
-
-        private void CreatePixelShader()
-        {
-            System.Diagnostics.Debug.Assert(Stage == ShaderStage.Pixel);
-            _pixelShader = new PixelShader(GraphicsDevice._d3dDevice, _shaderBytecode);
-        }
-
-        private void CreateVertexShader()
-        {
-            System.Diagnostics.Debug.Assert(Stage == ShaderStage.Vertex);
-            _vertexShader = new VertexShader(GraphicsDevice._d3dDevice, _shaderBytecode, null);
-        }
-
-#endif
-	}
+    }
 }
-
