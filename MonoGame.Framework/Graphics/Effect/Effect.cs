@@ -213,8 +213,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal protected override void GraphicsDeviceResetting()
         {
-            for (var i = 0; i < ConstantBuffers.Length; i++)
-                ConstantBuffers[i].Clear();
+            if (!IsDisposed)
+            {
+                for (var i = 0; i < ConstantBuffers.Length; i++)
+                    ConstantBuffers[i].Clear();
+            }
         }
 
         #region Effect File Reader
