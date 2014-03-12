@@ -484,7 +484,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #endif
-#if WINDOWS
+#if WINDOWS || LINUX
             using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
             {
                 // Fix up the Image to match the expected format
