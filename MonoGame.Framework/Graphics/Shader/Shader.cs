@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -15,12 +19,16 @@ using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
-#elif DIRECTX
+#endif
+
+#if DIRECTX
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-#elif PSM
+#endif
+
+#if PSM
 enum ShaderType //FIXME: Major Hack
 {
 	VertexShader,
@@ -73,8 +81,8 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private Attribute[] _attributes;
-
-#elif DIRECTX
+#endif
+#if DIRECTX
 
         private VertexShader _vertexShader;
         private PixelShader _pixelShader;
@@ -158,6 +166,11 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var c = 0; c < cbufferCount; c++)
                 CBuffers[c] = reader.ReadByte();
 
+            PlatformConstruct(reader, isVertexShader, shaderBytecode);
+        }
+
+        private void PlatformConstruct(BinaryReader reader, bool isVertexShader, byte[] shaderBytecode)
+        {
 #if DIRECTX
 
             _shaderBytecode = shaderBytecode;
@@ -165,7 +178,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // We need the bytecode later for allocating the
             // input layout from the vertex declaration.
             Bytecode = shaderBytecode;
-                
+
             HashKey = MonoGame.Utilities.Hash.ComputeHash(Bytecode);
 
             if (isVertexShader)
@@ -289,6 +302,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal protected override void GraphicsDeviceResetting()
         {
+            PlatformGraphicsDeviceResetting();
+        }
+
+        private void PlatformGraphicsDeviceResetting()
+        {
 #if OPENGL
             if (_shaderHandle != -1)
             {
@@ -313,6 +331,14 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
+                PlatformDispose();
+            }
+
+            base.Dispose(disposing);
+        }
+
+        private void PlatformDispose()
+        {
 #if OPENGL
                 GraphicsDevice.AddDisposeAction(() =>
                     {
@@ -330,12 +356,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-                GraphicsDeviceResetting();
+            GraphicsDeviceResetting();
 
 #endif
-            }
-
-            base.Dispose(disposing);
         }
 
 #if DIRECTX
