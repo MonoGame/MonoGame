@@ -131,6 +131,9 @@
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioStopOptions.cs" />
+    <Compile Include="Audio\AudioUtil.cs">
+      <Platforms>Android,Ouya,PSMobile</Platforms>
+    </Compile>
     <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
@@ -782,10 +785,7 @@
     <Compile Include="Android\ScreenReciever.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Audio\AudioUtil.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
-	
+
 
     <!-- Common Desktop Platform -->
     <Compile Include="Desktop\Audio\AudioLoader.cs">
