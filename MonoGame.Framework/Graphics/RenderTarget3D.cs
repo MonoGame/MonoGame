@@ -3,11 +3,16 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+
 #if PSM
 using Sce.PlayStation.Core.Graphics;
-#elif DIRECTX
+#endif
+
+#if DIRECTX
 using SharpDX.Direct3D11;
-#elif OPENGL
+#endif
+
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -55,11 +60,17 @@ namespace Microsoft.Xna.Framework.Graphics
             if (preferredDepthFormat == DepthFormat.None)
                 return;
 
+            PlatformConstruct(graphicsDevice, width, height, mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
+        }
+
+        private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
+            SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
+        {
 #if DIRECTX
 
             // Setup the multisampling description.
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
-            if ( preferredMultiSampleCount > 1 )
+            if (preferredMultiSampleCount > 1)
             {
                 multisampleDesc.Count = preferredMultiSampleCount;
                 multisampleDesc.Quality = (int)StandardMultisampleQualityLevels.StandardMultisamplePattern;
@@ -81,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Create the view for binding to the device.
                 _depthStencilView = new DepthStencilView(graphicsDevice._d3dDevice, depthBuffer, new DepthStencilViewDescription()
-                { 
+                {
                     Format = SharpDXHelper.ToFormat(preferredDepthFormat),
                     Dimension = DepthStencilViewDimension.Texture2D
                 });
@@ -102,24 +113,29 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             if (!IsDisposed)
             {
-#if DIRECTX
-                if (disposing)
-                {
-                    if (_renderTargetView != null)
-                    {
-                        _renderTargetView.Dispose();
-                        _renderTargetView = null;
-                    }
-                    if (_depthStencilView != null)
-                    {
-                        _depthStencilView.Dispose();
-                        _depthStencilView = null;
-                    }
-                }
-#endif
+                PlatformDispose(disposing);
             }
             base.Dispose(disposing);
 		}
+
+        private void PlatformDispose(bool disposing)
+        {
+#if DIRECTX
+            if (disposing)
+            {
+                if (_renderTargetView != null)
+                {
+                    _renderTargetView.Dispose();
+                    _renderTargetView = null;
+                }
+                if (_depthStencilView != null)
+                {
+                    _depthStencilView.Dispose();
+                    _depthStencilView = null;
+                }
+            }
+#endif
+        }
 
 #if DIRECTX
 
