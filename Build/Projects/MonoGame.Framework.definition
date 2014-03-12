@@ -968,9 +968,6 @@
 
 
     <!-- PlayStation Mobile Platform -->
-    <Compile Include="PSSuite\Audio\Sound.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="PSSuite\GamerServices\Guide.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
