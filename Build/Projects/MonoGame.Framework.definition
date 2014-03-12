@@ -439,15 +439,11 @@
     <Compile Include="Graphics\RenderTarget2D.PSM.cs">
         <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="Graphics\RenderTarget3D.cs" />
+    <Compile Include="Graphics\RenderTarget3D.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
     <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="Graphics\RenderTarget3D.OpenGL.cs">
-      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Graphics\RenderTarget3D.PSM.cs">
-      <Platforms>PSMobile</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
