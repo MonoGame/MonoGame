@@ -155,7 +155,7 @@
     <Compile Include="Audio\SoundEffectInstance.PSM.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="Audio\SoundEffect.XAudio.cs">
+    <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Audio\SoundState.cs" />
