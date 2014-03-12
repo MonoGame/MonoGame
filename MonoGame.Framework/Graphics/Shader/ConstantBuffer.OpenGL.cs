@@ -21,6 +21,16 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class ConstantBuffer
     {
+        private int _program = -1;
+        private int _location;
+
+        static ConstantBuffer _lastConstantBufferApplied = null;
+
+        /// <summary>
+        /// A hash value which can be used to compare constant buffers.
+        /// </summary>
+        internal int HashKey { get; private set; }
+
         private void PlatformInitialize()
         {
             var data = new byte[_parameters.Length];
