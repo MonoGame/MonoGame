@@ -74,7 +74,8 @@ namespace MonoGame.Framework.WindowsPhone
                             break;
                     }
 
-                    var pos = new Vector2((float)touchPoint.Position.X, (float)touchPoint.Position.Y);
+                    var dipFactor = DisplayProperties.LogicalDpi / 96.0f;
+                    var pos = new Vector2((float)touchPoint.Position.X, (float)touchPoint.Position.Y) * dipFactor;
                     
                     // Compute touch id other than MouseTouchId. 
                     // (Id from FrameReported always starts from 0 for first finger.)
