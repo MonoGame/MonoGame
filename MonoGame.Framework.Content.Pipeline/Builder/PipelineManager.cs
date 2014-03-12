@@ -13,11 +13,13 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
+using System.Diagnostics;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
     public class PipelineManager
     {
+        [DebuggerDisplay("ImporterInfo: {type.Name}")]
         private struct ImporterInfo
         {
             public ContentImporterAttribute attribue;
@@ -26,6 +28,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         private List<ImporterInfo> _importers;
 
+        [DebuggerDisplay("ProcessorInfo: {type.Name}")]
         private struct ProcessorInfo
         {
             public ContentProcessorAttribute attribue;
@@ -135,8 +138,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         exportedTypes = a.GetExportedTypes();
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
                     // The assembly failed to load... nothing
                     // we can do but ignore it.
                     continue;
@@ -381,10 +385,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
                 importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
+            if (string.IsNullOrEmpty(importerName))
+                throw new Exception(string.Format("Couldn't find a default importer for '{0}'!", sourceFilepath));
 
             // Resolve the processor name.
             if (string.IsNullOrEmpty(processorName))
                 processorName = FindDefaultProcessor(importerName);
+
+            if (string.IsNullOrEmpty(processorName))
+                throw new Exception(string.Format("Couldn't find a default processor for importer '{0}'!", importerName));
 
             // Record what we're building and how.
             var contentEvent = new PipelineBuildEvent
@@ -408,7 +417,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public void BuildContent(PipelineBuildEvent pipelineEvent, PipelineBuildEvent cachedEvent, string eventFilepath)
         {
             if (!File.Exists(pipelineEvent.SourceFile))
-                throw new PipelineException("The source file does not exist!");
+                throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
 
             Logger.PushFile(pipelineEvent.SourceFile);            
 
