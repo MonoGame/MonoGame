@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -66,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clone the mutable types.
             _buffer = (byte[])cloneSource._buffer.Clone();
-            Initialize();
+            PlatformInitialize();
         }
 
         public ConstantBuffer(GraphicsDevice device,
@@ -84,10 +88,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _name = name;
 
-            Initialize();
+            PlatformInitialize();
         }
 
-        private void Initialize()
+        private void PlatformInitialize()
         {
 #if DIRECTX
 
@@ -114,6 +118,11 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal void Clear()
+        {
+            PlatformClear();
+        }
+
+        private void PlatformClear()
         {
 #if OPENGL
             // Force the uniform location to be looked up again
@@ -240,10 +249,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
-        internal void Apply(GraphicsDevice device, ShaderStage stage, int slot)
+        internal void PlatformApply(GraphicsDevice device, ShaderStage stage, int slot)
         {
             if (_cbuffer == null)
-                Initialize();
+                PlatformInitialize();
 
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
@@ -263,11 +272,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
         }
 
-#elif OPENGL || PSM
-
-        public unsafe void Apply(GraphicsDevice device, int program)
-        {
+#endif
 #if OPENGL
+        public unsafe void PlatformApply(GraphicsDevice device, int program)
+        {
             // NOTE: We assume here the program has 
             // already been set on the device.
 
@@ -308,13 +316,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _dirty = false;
 
             _lastConstantBufferApplied = this;
-#endif
-            
-#if PSM
-#warning Unimplemented
-#endif
         }
+#endif
 
+#if PSM
+        public unsafe void PlatformApply(GraphicsDevice device, int program)
+        {
+#warning Unimplemented
+        }
 #endif
 
     }

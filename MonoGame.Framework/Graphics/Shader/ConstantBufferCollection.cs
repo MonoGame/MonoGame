@@ -75,9 +75,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (buffer != null)
                 {
 #if DIRECTX
-                    buffer.Apply(device, _stage, i);
+                    buffer.PlatformApply(device, _stage, i);
 #elif OPENGL || PSM
-                    buffer.Apply(device, shaderProgram);
+                    buffer.PlatformApply(device, shaderProgram);
 #endif
                 }
 
