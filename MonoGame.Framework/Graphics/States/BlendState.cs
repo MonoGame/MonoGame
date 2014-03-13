@@ -287,8 +287,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 (this.ColorWriteChannels & ColorWriteChannels.Alpha) != 0);
             GraphicsExtensions.CheckGLError();
         }
-
-#elif DIRECTX
+#endif
+#if DIRECTX
 
         protected internal override void GraphicsDeviceResetting()
         {
@@ -357,12 +357,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-#if DIRECTX
-                SharpDX.Utilities.Dispose(ref _state);
-#endif
+                PlatformDispose();
             }
 
             base.Dispose(disposing);
+        }
+
+        private void PlatformDispose()
+        {
+#if DIRECTX
+            SharpDX.Utilities.Dispose(ref _state);
+#endif
         }
 	}
 }
