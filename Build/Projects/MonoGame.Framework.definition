@@ -520,6 +520,12 @@
         <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\States\SamplerState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
     <Compile Include="Graphics\States\TargetBlendState.cs" />
