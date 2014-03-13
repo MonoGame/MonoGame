@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformSetSamplers(GraphicsDevice device)
+        internal void PlatformSetSamplers(GraphicsDevice device)
         {
             for (var i = 0; i < _samplers.Length; i++)
             {

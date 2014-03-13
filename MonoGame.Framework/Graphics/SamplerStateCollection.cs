@@ -52,10 +52,5 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformDirty();
         }
-
-        internal void SetSamplers(GraphicsDevice device)
-        {
-            PlatformSetSamplers(device);
-        }
 	}
 }

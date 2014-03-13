@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _d3dDirty = int.MaxValue;
         }
 
-        private void PlatformSetSamplers(GraphicsDevice device)
+        internal void PlatformSetSamplers(GraphicsDevice device)
         {
             // Skip out if nothing has changed.
             if (_d3dDirty == 0)

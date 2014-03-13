@@ -81,11 +81,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				DepthBufferWriteEnable = false
 			});
 		}
-
-        internal void ApplyState(GraphicsDevice device)
-        {
-            PlatformApplyState(device);
-        }
 	}
 }
 

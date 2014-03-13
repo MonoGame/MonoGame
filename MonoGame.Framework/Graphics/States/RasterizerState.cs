@@ -58,10 +58,5 @@ namespace Microsoft.Xna.Framework.Graphics
 				CullMode = CullMode.None
 			});
 		}
-
-        internal void ApplyState(GraphicsDevice device)
-        {
-            PlatformApplyState(device);
-        }
     }
 }

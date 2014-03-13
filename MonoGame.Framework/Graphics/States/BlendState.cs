@@ -228,11 +228,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 
-        internal void ApplyState(GraphicsDevice device)
-        {
-            PlatformApplyState(device);
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
