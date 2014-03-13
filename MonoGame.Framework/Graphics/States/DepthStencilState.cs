@@ -102,9 +102,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 
+        internal void ApplyState(GraphicsDevice device)
+        {
+            PlatformApplyState(device);
+        }
+
 #if OPENGL
 
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
             if (!DepthBufferEnable)
             {
@@ -267,7 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.GraphicsDeviceResetting();
         }
 
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
             if (_state == null)
             {
@@ -420,7 +425,7 @@ namespace Microsoft.Xna.Framework.Graphics
             { CompareFunction.Never,         StencilFuncMode.Never     },
         };
         
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
             var g = device.Context;
             
