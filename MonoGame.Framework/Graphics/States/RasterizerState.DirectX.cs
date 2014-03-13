@@ -6,149 +6,11 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
-using OpenTK.Graphics.ES20;
-using EnableCap = OpenTK.Graphics.ES20.All;
-using FrontFaceDirection = OpenTK.Graphics.ES20.All;
-using CullFaceMode = OpenTK.Graphics.ES20.All;
-#endif
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class RasterizerState : GraphicsResource
-	{
-#if DIRECTX 
+    public partial class RasterizerState
+    {
         private SharpDX.Direct3D11.RasterizerState _state;
-#endif
-
-        // TODO: We should be asserting if the state has
-        // been changed after it has been bound to the device!
-
-        public CullMode CullMode { get; set; }
-        public float DepthBias { get; set; }
-        public FillMode FillMode { get; set; }
-        public bool MultiSampleAntiAlias { get; set; }
-        public bool ScissorTestEnable { get; set; }
-        public float SlopeScaleDepthBias { get; set; }
-
-		private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullClockwise;
-        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullCounterClockwise;
-        private static readonly Utilities.ObjectFactoryWithReset<RasterizerState> _cullNone;
-
-        public static RasterizerState CullClockwise { get { return _cullClockwise.Value; } }
-        public static RasterizerState CullCounterClockwise { get { return _cullCounterClockwise.Value; } }
-        public static RasterizerState CullNone { get { return _cullNone.Value; } }
-        
-        public RasterizerState()
-		{
-			CullMode = CullMode.CullCounterClockwiseFace;
-			FillMode = FillMode.Solid;
-			DepthBias = 0;
-			MultiSampleAntiAlias = true;
-			ScissorTestEnable = false;
-			SlopeScaleDepthBias = 0;
-		}
-
-		static RasterizerState ()
-		{
-			_cullClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullClockwise",
-				CullMode = CullMode.CullClockwiseFace
-			});
-
-			_cullCounterClockwise = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullCounterClockwise",
-				CullMode = CullMode.CullCounterClockwiseFace
-			});
-
-			_cullNone = new Utilities.ObjectFactoryWithReset<RasterizerState>(() => new RasterizerState
-            {
-                Name = "RasterizerState.CullNone",
-				CullMode = CullMode.None
-			});
-		}
-
-        internal void ApplyState(GraphicsDevice device)
-        {
-            PlatformApplyState(device);
-        }
-
-#if OPENGL
-
-        internal void PlatformApplyState(GraphicsDevice device)
-        {
-        	// When rendering offscreen the faces change order.
-            var offscreen = device.GetRenderTargets().Length > 0;
-
-            if (CullMode == CullMode.None)
-            {
-                GL.Disable(EnableCap.CullFace);
-                GraphicsExtensions.CheckGLError();
-            }
-            else
-            {
-                GL.Enable(EnableCap.CullFace);
-                GraphicsExtensions.CheckGLError();
-                GL.CullFace(CullFaceMode.Back);
-                GraphicsExtensions.CheckGLError();
-
-                if (CullMode == CullMode.CullClockwiseFace)
-                {
-                    if (offscreen)
-                        GL.FrontFace(FrontFaceDirection.Cw);
-                    else
-                        GL.FrontFace(FrontFaceDirection.Ccw);
-                    GraphicsExtensions.CheckGLError();
-                }
-                else
-                {
-                    if (offscreen)
-                        GL.FrontFace(FrontFaceDirection.Ccw);
-                    else
-                        GL.FrontFace(FrontFaceDirection.Cw);
-                    GraphicsExtensions.CheckGLError();
-                }
-            }
-
-#if MONOMAC || WINDOWS || LINUX
-			if (FillMode == FillMode.Solid) 
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-            else
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-#else
-            if (FillMode != FillMode.Solid)
-                throw new NotImplementedException();
-#endif
-
-			if (ScissorTestEnable)
-				GL.Enable(EnableCap.ScissorTest);
-			else
-				GL.Disable(EnableCap.ScissorTest);
-            GraphicsExtensions.CheckGLError();
-
-            if (this.DepthBias != 0 || this.SlopeScaleDepthBias != 0)
-            {   
-                GL.Enable(EnableCap.PolygonOffsetFill);
-                GL.PolygonOffset(this.SlopeScaleDepthBias, this.DepthBias);
-            }
-            else
-                GL.Disable(EnableCap.PolygonOffsetFill);
-            GraphicsExtensions.CheckGLError();
-
-            // TODO: Implement MultiSampleAntiAlias
-        }
-
-#elif DIRECTX
 
         protected internal override void GraphicsDeviceResetting()
         {
@@ -221,24 +83,5 @@ namespace Microsoft.Xna.Framework.Graphics
             _cullCounterClockwise.Reset();
             _cullNone.Reset();
         }
-
-#endif // DIRECTX
-#if PSM
-        static readonly Dictionary<CullMode, CullFaceMode> MapCullMode = new Dictionary<CullMode, CullFaceMode> {
-            {CullMode.None, CullFaceMode.None},
-            {CullMode.CullClockwiseFace, CullFaceMode.Front}, // Cull cw
-            {CullMode.CullCounterClockwiseFace, CullFaceMode.Back}, // Cull ccw
-        };
-        
-        internal void PlatformApplyState(GraphicsDevice device)
-        {
-            var g = device.Context;
-            
-            g.SetCullFace(MapCullMode[CullMode], CullFaceDirection.Cw); // Front == cw
-            g.Enable(EnableMode.CullFace, this.CullMode != CullMode.None);
-            
-            // FIXME: Everything else
-        }
-#endif
     }
 }

@@ -510,6 +510,15 @@
     </Compile>
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
