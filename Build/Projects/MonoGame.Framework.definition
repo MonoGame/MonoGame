@@ -486,6 +486,15 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\States\BlendState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
     <Compile Include="Graphics\States\DepthFormat.cs" />
