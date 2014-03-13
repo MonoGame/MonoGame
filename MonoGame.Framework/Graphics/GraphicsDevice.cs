@@ -514,7 +514,11 @@ namespace Microsoft.Xna.Framework.Graphics
            GL.GetInteger(All.StencilBits, ref stencilSize);
 #endif
 
-#if MONOMAC || OPENGL
+#if IOS
+            // iPad hardware will falsely claim to not support a stencil buffer, because it only supports a packed stencil buffer.
+            // Deal with this by forcing the DepthStencilFormat to Depth24Stencil8, and ignoring detected capabilities.
+            PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+#elif MONOMAC || OPENGL
             if (depthSize >= 24)
             {
                 if (stencilSize >= 8)
