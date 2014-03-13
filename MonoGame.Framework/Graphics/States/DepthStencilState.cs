@@ -81,6 +81,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				DepthBufferWriteEnable = false
 			});
 		}
+
+        internal static void ResetStates()
+        {
+            _default.Reset();
+            _depthRead.Reset();
+            _none.Reset();
+        }
 	}
 }
 

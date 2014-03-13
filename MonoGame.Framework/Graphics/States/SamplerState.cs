@@ -125,6 +125,16 @@ namespace Microsoft.Xna.Framework.Graphics
             this.MaxMipLevel = 0;
             this.MipMapLevelOfDetailBias = 0.0f;
         }
+
+        internal static void ResetStates()
+        {
+            _anisotropicClamp.Reset();
+            _anisotropicWrap.Reset();
+            _linearClamp.Reset();
+            _linearWrap.Reset();
+            _pointClamp.Reset();
+            _pointWrap.Reset();
+        }
     }
 }
 

@@ -58,5 +58,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				CullMode = CullMode.None
 			});
 		}
+
+        internal static void ResetStates()
+        {
+            _cullClockwise.Reset();
+            _cullCounterClockwise.Reset();
+            _cullNone.Reset();
+        }
     }
 }

@@ -11,16 +11,6 @@ namespace Microsoft.Xna.Framework.Graphics
   {
         private SharpDX.Direct3D11.SamplerState _state;
 
-        internal static void ResetStates()
-        {
-            _anisotropicClamp.Reset();
-            _anisotropicWrap.Reset();
-            _linearClamp.Reset();
-            _linearWrap.Reset();
-            _pointClamp.Reset();
-            _pointWrap.Reset();
-        }
-
         protected internal override void GraphicsDeviceResetting()
         {
             SharpDX.Utilities.Dispose(ref _state);

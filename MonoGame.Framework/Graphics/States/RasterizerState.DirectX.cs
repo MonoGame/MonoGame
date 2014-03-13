@@ -76,12 +76,5 @@ namespace Microsoft.Xna.Framework.Graphics
             // Apply the state!
             device._d3dContext.Rasterizer.State = _state;
         }
-
-        internal static void ResetStates()
-        {
-            _cullClockwise.Reset();
-            _cullCounterClockwise.Reset();
-            _cullNone.Reset();
-        }
     }
 }

@@ -74,13 +74,6 @@ namespace Microsoft.Xna.Framework.Graphics
             device._d3dContext.OutputMerger.SetDepthStencilState(_state, ReferenceStencil);
         }
 
-        internal static void ResetStates()
-        {
-            _default.Reset();
-            _depthRead.Reset();
-            _none.Reset();
-        }
-
         static private SharpDX.Direct3D11.Comparison GetComparison( CompareFunction compare)
         {
             switch (compare)

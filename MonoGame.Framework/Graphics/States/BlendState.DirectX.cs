@@ -51,14 +51,6 @@ namespace Microsoft.Xna.Framework.Graphics
             device._d3dContext.OutputMerger.SetBlendState(_state, blendFactor);
         }
 
-        internal static void ResetStates()
-        {
-            _additive.Reset();
-            _alphaBlend.Reset();
-            _nonPremultiplied.Reset();
-            _opaque.Reset();
-        }
-
         private void PlatformDispose()
         {
             SharpDX.Utilities.Dispose(ref _state);

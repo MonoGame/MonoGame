@@ -228,6 +228,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 
+        internal static void ResetStates()
+        {
+            _additive.Reset();
+            _alphaBlend.Reset();
+            _nonPremultiplied.Reset();
+            _opaque.Reset();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
