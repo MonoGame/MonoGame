@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Audio
             _playingInstances.Add(inst);
         }
 
-        internal static SoundEffectInstance GetInstance(bool releaseToCaller)
+        internal static SoundEffectInstance GetInstance()
         {
             SoundEffectInstance inst = null;
             if (_pooledInstances.Count > 0)
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Audio
             else
                 inst = new SoundEffectInstance();
 
-            inst._IsPooled = !releaseToCaller;
+            inst._IsPooled = true;
 
             return inst;
         }

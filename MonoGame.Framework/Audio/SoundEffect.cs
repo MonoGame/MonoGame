@@ -123,7 +123,9 @@ namespace Microsoft.Xna.Framework.Audio
             if (!SoundEffectInstancePool.SoundsAvailable)
                 return false;
            
-            var inst = SoundEffectInstancePool.GetInstance(false);
+            var inst = SoundEffectInstancePool.GetInstance();
+
+            PlatformSetupInstance(inst);
 
             inst.Volume = volume;
             inst.Pitch = pitch;
