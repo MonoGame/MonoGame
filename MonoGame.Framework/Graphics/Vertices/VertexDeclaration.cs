@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -10,9 +14,11 @@ using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
 #endif
-#elif PSM
+#endif
+#if PSM
 using Sce.PlayStation.Core.Graphics;
-#elif DIRECTX
+#endif
+#if DIRECTX
 using System.Reflection;
 #endif
 
