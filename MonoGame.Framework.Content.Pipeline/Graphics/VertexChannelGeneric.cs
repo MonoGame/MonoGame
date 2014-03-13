@@ -2,9 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -72,6 +74,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             : base(name)
         {
             items = new List<T>();
+        }
+
+        static VertexChannel()
+        {
+            // Some platforms (such as Windows Store) don't support TypeConverter, which
+            // is normally referenced with an attribute on the target type. To keep them
+            // out of the main assembly, they are registered here before their use.
+
+            //TypeDescriptor.AddAttributes(typeof(Single), new TypeConverterAttribute(typeof(SingleTypeConverter)));
+            //TypeDescriptor.AddAttributes(typeof(Vector2), new TypeConverterAttribute(typeof(Vector2TypeConverter)));
+            //TypeDescriptor.AddAttributes(typeof(Vector3), new TypeConverterAttribute(typeof(Vector3TypeConverter)));
+            TypeDescriptor.AddAttributes(typeof(Vector4), new TypeConverterAttribute(typeof(Vector4TypeConverter)));
+            //TypeDescriptor.AddAttributes(typeof(IPackedVector), new TypeConverterAttribute(typeof(PackedVectorTypeConverter)));
         }
 
         /// <summary>
@@ -144,7 +159,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // - Vector4 Structure
             // - Any implementation of IPackedVector Interface.
 
-            throw new NotImplementedException();
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (!converter.CanConvertTo(typeof(TargetType)))
+            {
+                // If you got this exception, check out the static constructor above
+                // to make sure your type is registered.
+                throw new NotImplementedException(
+                    string.Format("TypeConverter for {0} -> {1} is not implemented.",
+                    typeof(T).Name, typeof(TargetType).Name));
+            }
+
+            foreach (var item in items)
+                yield return (TargetType)converter.ConvertTo(item, typeof(TargetType));
         }
 
         /// <summary>

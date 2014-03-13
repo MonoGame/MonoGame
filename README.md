@@ -26,6 +26,16 @@ There are four quick start options available:
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop.zip).
 * Fork and clone the repo: `https://github.com/mono/MonoGame.git`.
 
+### Protobuild project generator
+
+As of March 12 2014, there are no sln or csproj files stored in the GitHub repository for the MonoGame.Framework project (other modules such as the tools and content pipeline will be migrated in the near future). These are now generated using a tool called [Protobuild](https://github.com/hach-que/Protobuild). This uses a single definition file to describes the source files that each supported platform requires and generates the sln and csproj files. The definition file is located in `Build/Projects/MonoGame.Framework.definition`.
+
+Once you update your repository to the latest source, run Protobuild to generate the project files. On Windows, simply run Protobuild.exe in the root of the repository. On Mac OS X and Linux, you may have to run it using the mono command, e.g. `mono Protobuild.exe`. Run it with `/?` or `--help` to see the full list of supported options.
+
+If you are adding files or removing files from MonoGame, Protobuild can synchronize the changes made in the IDE back to the definition file. Or you can manually edit the definition file and re-generate the project files.
+
+### Samples
+
 Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame-Samples](https://github.com/CartBlanche/MonoGame-Samples) to help get you started on your first project.
 
 ## Bug Tracker
