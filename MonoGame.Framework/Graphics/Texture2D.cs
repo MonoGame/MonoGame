@@ -145,10 +145,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Reload(Stream textureStream)
         {
             PlatformReload(textureStream);
-#if OPENGL
-            GenerateGLTextureIfRequired();
-            FillTextureFromStream(textureStream);
-#endif
         }
 	}
 }
