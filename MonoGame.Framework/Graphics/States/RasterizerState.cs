@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -74,9 +78,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			});
 		}
 
+        internal void ApplyState(GraphicsDevice device)
+        {
+            PlatformApplyState(device);
+        }
+
 #if OPENGL
 
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
         	// When rendering offscreen the faces change order.
             var offscreen = device.GetRenderTargets().Length > 0;
@@ -147,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             base.GraphicsDeviceResetting();
         }
 
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
             if (_state == null)
             {
@@ -221,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {CullMode.CullCounterClockwiseFace, CullFaceMode.Back}, // Cull ccw
         };
         
-        internal void ApplyState(GraphicsDevice device)
+        internal void PlatformApplyState(GraphicsDevice device)
         {
             var g = device.Context;
             
