@@ -149,44 +149,14 @@ namespace Microsoft.Xna.Framework
         internal static string GetFilename(string name)
         {
 #if WINRT
-            char seperatorChar = '\\';
+            const char notSeparator = '/';
+            const char separator = '\\';
 #else
-            char seperatorChar = Path.DirectorySeparatorChar;
+            const char notSeparator = '\\';
+            var separator = Path.DirectorySeparatorChar;
 #endif
-            // Replace non-windows seperators.
-            string[] parts = name.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            int start = 0, to = 0;
-            for (int from = 0; from < parts.Length; from++, to++)
-                switch (parts[from])
-                {
-                    case ".":
-                        to--;
-                        break;
-                    case "..":
-                        if (to > start)
-                            to -= 2;
-                        else
-                        {
-                            parts[to] = "..";
-                            start++;
-                        }
-                        break;
-                    default:
-                        parts[to] = parts[from];
-                        break;
-                }
-
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < to; i++)
-            {
-                if (i != 0)
-                    stringBuilder.Append(seperatorChar);
-                stringBuilder.Append(parts[i]);
-            }
-
-            return stringBuilder.ToString();
+            return new Uri("file:///" + name).LocalPath.Substring(1).Replace(notSeparator, separator);
         }
     }
 }
