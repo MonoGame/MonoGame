@@ -99,12 +99,17 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
-            if (!SoundEffectInstancePool.SoundsAvailable)
-                throw new InstancePlayLimitException();
+            // We don't need to check if we're at the instance play limit
+            // if we're resuming from a paused state.
+            if (State != SoundState.Paused)
+            {
+                SoundEffectInstancePool.Remove(this);
+
+                if (!SoundEffectInstancePool.SoundsAvailable)
+                    throw new InstancePlayLimitException();
+            }
 
             PlatformPlay();
-
-            SoundEffectInstancePool.Remove(this);
         }
 
         public void Resume()
