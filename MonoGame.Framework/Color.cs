@@ -1716,7 +1716,17 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.Lerp(value1.B, value2.B, amount),
                 (int)MathHelper.Lerp(value1.A, value2.A, amount) );
         }
-		
+
+        /// <summary>
+        /// Performs <see cref="Color"/> inversion. Does not affect alpha channel.
+        /// </summary>
+        /// <param name="value"><see cref="Color"/> for inversion.</param>
+        /// <returns>Inverted <see cref="Color"/>.</returns>
+        public static Color Invert(Color value)
+        {
+            return new Color(0x00FFFFFFu ^ value._packedValue);
+        }
+
 	/// <summary>
         /// Multiply <see cref="Color"/> by value.
         /// </summary>
