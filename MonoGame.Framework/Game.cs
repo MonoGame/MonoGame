@@ -143,6 +143,12 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
+#if IOS
+            Platform.EnterBackground += OnEnterBackground;
+            Platform.EnterForeground += OnEnterForeground;
+            Platform.MemoryWarningReceived += OnMemoryWarningReceived;
+#endif
+
 #if WINDOWS_STOREAPP
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
@@ -224,6 +230,13 @@ namespace Microsoft.Xna.Framework
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
+
+#if IOS
+                        Platform.EnterBackground -= OnEnterBackground;
+                        Platform.EnterForeground -= OnEnterForeground;
+                        Platform.MemoryWarningReceived -= OnMemoryWarningReceived;
+#endif
+
 #if WINDOWS_STOREAPP
                         Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
 #endif
@@ -395,6 +408,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Deactivated;
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
+
+#if IOS
+        public event EventHandler<EventArgs> EnterBackground;
+        public event EventHandler<EventArgs> EnterForeground;
+        public event EventHandler<EventArgs> MemoryWarningReceived;
+#endif
 
 #if WINDOWS_STOREAPP
         [CLSCompliant(false)]
@@ -651,6 +670,26 @@ namespace Microsoft.Xna.Framework
 			AssertNotDisposed();
 			Raise(Deactivated, args);
 		}
+
+#if IOS
+		protected virtual void OnEnterBackground(object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(EnterBackground, args);
+		}
+
+		protected virtual void OnEnterForeground(object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(EnterForeground, args);
+		}
+
+		protected virtual void OnMemoryWarningReceived(object sender, EventArgs args)
+		{
+			AssertNotDisposed();
+			Raise(MemoryWarningReceived, args);
+		}
+#endif
 
         #endregion Protected Methods
 
