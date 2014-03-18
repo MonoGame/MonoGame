@@ -292,12 +292,16 @@ namespace Microsoft.Xna.Framework
 
         private void Application_WillEnterForeground(NSNotification notification)
         {
-			// Already handled in Application_DidBecomeActive. See below for IsActive state change.	
+			OnEnterForeground();
+
+			// IsActive state change already handled in Application_WillResignActive. See below.
         }
 
         private void Application_DidEnterBackground(NSNotification notification)
         {
-			// Already handled in Application_WillResignActive. See below for IsActive state change.
+			OnEnterBackground();
+
+			// IsActive state change already handled in Application_WillResignActive. See below.
         }
 
         private void Application_DidBecomeActive(NSNotification notification)
@@ -322,6 +326,8 @@ namespace Microsoft.Xna.Framework
 
         private void Application_DidReceiveMemoryWarning(NSNotification notification)
         {
+            OnMemoryWarningReceived();
+
             // FIXME: Possibly add some more sophisticated behavior here.  It's
             //        also possible that this is not iOSGamePlatform's job.
             GC.Collect();

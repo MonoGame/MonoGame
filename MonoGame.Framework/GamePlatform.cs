@@ -167,6 +167,23 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+#if IOS
+		protected void OnEnterBackground()
+		{
+			Raise(EnterBackground, EventArgs.Empty);
+		}
+
+		protected void OnEnterForeground()
+		{
+			Raise(EnterForeground, EventArgs.Empty);
+		}
+
+		protected void OnMemoryWarningReceived()
+		{
+			Raise(MemoryWarningReceived, EventArgs.Empty);
+		}
+#endif
+
 #if WINDOWS_STOREAPP
         private ApplicationViewState _viewState;
         public ApplicationViewState ViewState
@@ -247,6 +264,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> AsyncRunLoopEnded;
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
+
+#if IOS
+		public event EventHandler<EventArgs> EnterBackground;
+		public event EventHandler<EventArgs> EnterForeground;
+		public event EventHandler<EventArgs> MemoryWarningReceived;
+#endif
 
 #if WINDOWS_STOREAPP
         public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
