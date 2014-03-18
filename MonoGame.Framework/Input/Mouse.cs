@@ -91,6 +91,7 @@ namespace Microsoft.Xna.Framework.Input
 #elif LINUX         
         
         static OpenTK.GameWindow Window;
+        private static Point _lastCursorPos;
 
         internal static void setWindows(OpenTK.GameWindow window)
 	{
@@ -103,6 +104,9 @@ namespace Microsoft.Xna.Framework.Input
         internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
 	{          
 	    UpdateStatePosition(e.X, e.Y);
+#if LINUX
+        _lastCursorPos = new Point(e.X,e.Y);
+#endif
 	}
 
 #elif MONOMAC
@@ -212,6 +216,13 @@ namespace Microsoft.Xna.Framework.Input
         public static void SetPosition(int x, int y)
         {
             UpdateStatePosition(x, y);
+
+#if LINUX
+            if(!Window.CursorVisible) {
+                x = Window.Width/2 + x - _lastCursorPos.X;
+                y = Window.Height/2 + y - _lastCursorPos.Y;
+            }
+#endif
 
 #if (WINDOWS && (OPENGL || DIRECTX)) || LINUX
             // correcting the coordinate system
