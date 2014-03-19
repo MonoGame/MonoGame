@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework {
 			get { return (KeyboardInputView) base.View; }
 		}
 
+        [Obsolete]
 		public override void ViewDidUnload ()
 		{
 			base.ViewDidUnload ();
@@ -133,8 +134,9 @@ namespace Microsoft.Xna.Framework {
 			if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft ||
 			    InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
             {
-                keyboardSize.Width = Math.Max(keyboardSize.Height, keyboardSize.Width);
-                keyboardSize.Height = Math.Min(keyboardSize.Height, keyboardSize.Width);
+                var tmpkeyboardSize = keyboardSize;
+                keyboardSize.Width = Math.Max(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
+                keyboardSize.Height = Math.Min(tmpkeyboardSize.Height, tmpkeyboardSize.Width);
 			}
 
 			var view = (KeyboardInputView)View;
@@ -153,6 +155,7 @@ namespace Microsoft.Xna.Framework {
 		}
 
         #region Autorotation for iOS 5 or older
+        [Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
             var requestedOrientation = OrientationConverter.ToDisplayOrientation(toInterfaceOrientation);

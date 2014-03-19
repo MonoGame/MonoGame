@@ -279,6 +279,9 @@ namespace Lidgren.Network
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the broadcast address to bind to. Defaults to IPAddress.Broadcast. Cannot be changed once NetPeer is initialized.
+		/// </summary>
         public IPAddress BroadcastAddress
         {
             get { return m_broadcastAddress; }

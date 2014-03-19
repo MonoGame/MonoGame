@@ -49,7 +49,10 @@ namespace MonoGame.Framework.WindowsPhone
         {
             // This flag adds support for surfaces with a different color channel ordering
             // than the API default. It is required for compatibility with Direct2D.
-            DeviceCreationFlags creationFlags = DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug;
+            DeviceCreationFlags creationFlags = DeviceCreationFlags.BgraSupport;
+#if DEBUG
+            creationFlags |= SharpDX.Direct3D11.DeviceCreationFlags.Debug;
+#endif
 
             // This array defines the set of DirectX hardware feature levels this app will support.
             // Note the ordering should be preserved.

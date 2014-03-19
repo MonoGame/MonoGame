@@ -46,6 +46,7 @@ using System.ComponentModel;
 using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
+using Android.Media;
 using Android.Util;
 using Android.Views;
 using Microsoft.Xna.Framework.Audio;
@@ -74,6 +75,7 @@ namespace Microsoft.Xna.Framework
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
+        internal TouchPanelState TouchPanelState;
 
         public bool TouchEnabled
         {
@@ -89,7 +91,9 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
-			Initialize();
+            TouchPanelState = new TouchPanelState(this);
+            Initialize();
+
         }		
 						
         private void Initialize()
@@ -126,11 +130,17 @@ namespace Microsoft.Xna.Framework
                 GamePad.Instance.SetBack();
 #endif
 
-            if (keyCode == Keycode.VolumeUp)
-                Sound.IncreaseMediaVolume();
+			if (keyCode == Keycode.VolumeUp)
+			{
+				AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+				audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+			}
 
-            if (keyCode == Keycode.VolumeDown)
-                Sound.DecreaseMediaVolume();
+			if (keyCode == Keycode.VolumeDown)
+			{
+				AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+				audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
+			}
 
             return true;
         }
@@ -240,7 +250,8 @@ namespace Microsoft.Xna.Framework
         {
             // DeviceResetting events
             _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            _game.GraphicsDevice.OnDeviceResetting();
+			if(_game.GraphicsDevice != null) 
+				_game.GraphicsDevice.OnDeviceResetting();
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
@@ -376,6 +387,13 @@ namespace Microsoft.Xna.Framework
 			{
 				throw new System.NotImplementedException ();
 			}
+
+            private set 
+            {
+                if (ScreenDeviceNameChanged != null)
+                    ScreenDeviceNameChanged (null, EventArgs.Empty);
+                throw new System.NotImplementedException ();
+            }
 		}
    
 
@@ -388,8 +406,8 @@ namespace Microsoft.Xna.Framework
             internal set
             {
                 clientBounds = value;
-                //if(ClientSizeChanged != null)
-                //    ClientSizeChanged(this, EventArgs.Empty);
+                if(ClientSizeChanged != null)
+                    ClientSizeChanged(this, EventArgs.Empty);
             }
 		}
 		
@@ -498,7 +516,7 @@ namespace Microsoft.Xna.Framework
                         // so we need to clear them out.
                         if (wasPortrait != requestPortrait)
                         {
-                            TouchPanel.ReleaseAllTouches();
+                            TouchPanelState.ReleaseAllTouches();
                         }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;
@@ -511,6 +529,7 @@ namespace Microsoft.Xna.Framework
 		}
 
         public event EventHandler<EventArgs> OrientationChanged;
+
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 

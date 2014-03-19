@@ -176,5 +176,10 @@ namespace Microsoft.Xna.Framework.Input
         {
             return (obj is GamePadThumbSticks) && (this == (GamePadThumbSticks)obj);
         }
+
+        public override int GetHashCode ()
+        {
+            return this.Left.GetHashCode () + 37 * this.Right.GetHashCode ();
+        }
     }
 }

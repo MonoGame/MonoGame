@@ -94,6 +94,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public event EventHandler<EventArgs> ContentLost;
 		
+        private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
+        {
+            return ContentLost != null;
+        }
+
         public RenderTarget2D (GraphicsDevice graphicsDevice, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
 			:base (graphicsDevice, width, height, mipMap, preferredFormat, SurfaceType.RenderTarget, shared)
 		{

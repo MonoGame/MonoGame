@@ -110,6 +110,7 @@ namespace Microsoft.Xna.Framework {
 		}
 
         #region Autorotation for iOS 5 or older
+        [Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
             DisplayOrientation supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);

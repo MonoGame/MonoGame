@@ -30,7 +30,7 @@ namespace MonoGame.Framework.WindowsPhone
             if (_game.GraphicsDevice != null)
                 _game.GraphicsDevice.OnDeviceResetting();
 
-            Microsoft.Xna.Framework.Input.Touch.TouchPanel.ReleaseAllTouches();
+            _game.Window.TouchPanelState.ReleaseAllTouches();
 
             _host = null;
         }

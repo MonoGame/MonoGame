@@ -85,7 +85,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             this.targetProfile = targetProfile;
             this.compressContent = compressContent;
             this.rootDirectory = rootDirectory;
-            this.referenceRelocationPath = referenceRelocationPath;
+
+            // Normalize the directory format so PathHelper.GetRelativePath will compute external references correctly.
+            this.referenceRelocationPath = PathHelper.NormalizeDirectory(referenceRelocationPath);
 
             outputStream = this.OutStream;
             headerStream = new MemoryStream();
@@ -240,13 +242,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
                 typeWriters.Add(typeWriter);
-		if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
-			typeWriterMap.Add(typeWriter.GetType(), index);
+
+		        if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+			        typeWriterMap.Add(typeWriter.GetType(), index);
+
                 typeMap.Add(type, typeWriter);
 
-                var args = type.GetGenericArguments();
-                foreach (var arg in args)
-                    GetTypeWriter(arg);
+                // TODO: This is kinda messy.. seems like there could
+                // be a better way for generics and arrays to register
+                // their inner types with the typeWriterMap.
+                if (type.IsGenericType)
+                {
+                    var args = type.GetGenericArguments();
+                    foreach (var arg in args)
+                        GetTypeWriter(arg);
+                }
+                else if (type.IsArray)
+                {
+                    GetTypeWriter(type.GetElementType());
+                }
             }
             return typeWriter;
         }

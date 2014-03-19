@@ -408,7 +408,8 @@ namespace Microsoft.Xna.Framework.Content
             }
             else if ((typeof(T) == typeof(SoundEffect)))
             {
-                return new SoundEffect(assetName);
+                using (Stream s = TitleContainer.OpenStream(assetName))
+                    return SoundEffect.FromStream(s);
             }
             else if ((typeof(T) == typeof(Video)))
             {
@@ -460,7 +461,6 @@ namespace Microsoft.Xna.Framework.Content
                 //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
                 int compressedSize = xnbLength - 14;
                 int decompressedSize = xnbReader.ReadInt32();
-                int newFileSize = decompressedSize + 10;
 
                 MemoryStream decompressedStream = new MemoryStream(decompressedSize);
 
@@ -515,7 +515,7 @@ namespace Microsoft.Xna.Framework.Content
                     if (block_size == 0 || frame_size == 0)
                         break;
 
-                    int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
+                    dec.Decompress(stream, block_size, decompressedStream, frame_size);
                     pos += block_size;
                     decodedBytes += frame_size;
 

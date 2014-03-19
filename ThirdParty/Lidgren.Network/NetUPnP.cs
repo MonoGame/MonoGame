@@ -98,7 +98,7 @@ namespace Lidgren.Network
 
 			try
 			{
-				XmlDocument xdoc = SOAPRequest(m_serviceUrl,
+				SOAPRequest(m_serviceUrl,
 					"<u:AddPortMapping xmlns:u=\"urn:schemas-upnp-org:service:WANIPConnection:1\">" +
 					"<NewRemoteHost></NewRemoteHost><NewExternalPort>" + port.ToString() + "</NewExternalPort>" +
 					"<NewProtocol>" + ProtocolType.Udp.ToString().ToUpper() + "</NewProtocol>" +
@@ -130,7 +130,7 @@ namespace Lidgren.Network
 				return false;
 			try
 			{
-				XmlDocument xdoc = SOAPRequest(m_serviceUrl,
+				SOAPRequest(m_serviceUrl,
 				"<u:DeletePortMapping xmlns:u=\"urn:schemas-upnp-org:service:WANIPConnection:1\">" +
 				"<NewRemoteHost>" +
 				"</NewRemoteHost>" +

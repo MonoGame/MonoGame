@@ -51,18 +51,20 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework.Net
 {
-
+    [CLSCompliant(false)]
 	public class MonoGamePeerPickerControllerDelegate : MonoTouch.GameKit.GKPeerPickerControllerDelegate
 	{
 		private GKSession gkSession;
 		private EventHandler<GKDataReceivedEventArgs> receivedData;
 		
+        [CLSCompliant(false)]
 		public MonoGamePeerPickerControllerDelegate( GKSession aSession, EventHandler<GKDataReceivedEventArgs> aReceivedData )
 		{
 			gkSession = aSession;
 			receivedData = aReceivedData;
 		}
 		
+        [CLSCompliant(false)]
 		public override void ConnectionTypeSelected(GKPeerPickerController picker, GKPeerPickerConnectionType type)
 		{
 #if DEBUG			
@@ -85,7 +87,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 			return gkSession;
 		}*/
-		
+        [CLSCompliant(false)]
 		public override void PeerConnected(GKPeerPickerController picker, string peerId, GKSession toSession)		
 		{
 #if DEBUG			
@@ -108,6 +110,7 @@ namespace Microsoft.Xna.Framework.Net
 			
 		}
 		
+        [CLSCompliant(false)]
 		public override void ControllerCancelled(GKPeerPickerController picker)
 		{
 #if DEBUG

@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Content
                             // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
                             throw new InvalidOperationException(
                                 "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
-                                "with the following failed type string: " + originalReaderTypeString);
+                                "with the following failed type string: " + originalReaderTypeString, ex);
                         }
                     }
                     else
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Content
 
 				// I think the next 4 bytes refer to the "Version" of the type reader,
                 // although it always seems to be zero
-                int typeReaderVersion = _reader.ReadInt32();
+                _reader.ReadInt32();
             }
 
             return contentReaders;
@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Content
 		/// Removes Version, Culture and PublicKeyToken from a type string.
 		/// </summary>
 		/// <remarks>
-		/// Supports multiple generic types (e.g. Dictionary<TKey,TValue>) and nested generic types (e.g. List<List<int>>).
+        /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
 		/// </remarks> 
 		/// <param name="type">
 		/// A <see cref="System.String"/>

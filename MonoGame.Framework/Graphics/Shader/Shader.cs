@@ -147,6 +147,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if OPENGL
                 Samplers[s].name = reader.ReadString();
+#else
+                Samplers[s].name = null;
 #endif
                 Samplers[s].parameter = reader.ReadByte();
             }

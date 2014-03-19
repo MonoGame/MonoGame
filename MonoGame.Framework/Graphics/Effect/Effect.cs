@@ -502,7 +502,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
+			var effectPass = new EffectPass(this, "Pass", null, null, null, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
             

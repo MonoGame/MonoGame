@@ -437,7 +437,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
             }
-            catch (Exception e)
+            catch
             {
                 MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
             }  

@@ -143,6 +143,11 @@ namespace Microsoft.Xna.Framework.GamerServices
             {
                 return _leaderboardWriter;
             }
+
+            internal set 
+            {
+                _leaderboardWriter = value;
+            }
         }
         #endregion
     }

@@ -95,21 +95,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!vertexType.IsValueType)
 #endif
             {
-                var args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
 
             var type = Activator.CreateInstance(vertexType) as IVertexType;
 			if (type == null)
 			{
-                var objArray3 = new object[] { vertexType };
 				throw new ArgumentException("vertexData does not inherit IVertexType");
 			}
 
             var vertexDeclaration = type.VertexDeclaration;
 			if (vertexDeclaration == null)
 			{
-                var objArray2 = new object[] { vertexType };
 				throw new Exception("VertexDeclaration cannot be null");
 			}
 

@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content
 			byte[] data = input.ReadBytes(input.ReadInt32());
 			int loopStart = input.ReadInt32();
 			int loopLength = input.ReadInt32();
-			int num = input.ReadInt32();
+			input.ReadInt32();
 
 #if DIRECTX            
             var count = data.Length;
@@ -109,11 +109,16 @@ namespace Microsoft.Xna.Framework.Content
             else
                 throw new NotSupportedException("Unsupported wave format!");
 
-            return new SoundEffect(waveFormat, data, 0, count, loopStart, loopLength)
+            return new SoundEffect(data, 0, count, sampleRate, (AudioChannels)channels, loopStart, loopLength)
             {
+                _format = waveFormat,
                 Name = input.AssetName,
             };
 #else
+            if(loopStart == loopLength) 
+            {
+                // do nothing. just killing the warning for non-DirectX path 
+            }
             if (header[0] == 2 && header[1] == 0)
             {
                 // We've found MSADPCM data! Let's decode it here.
@@ -140,13 +145,12 @@ namespace Microsoft.Xna.Framework.Content
                 (header[6] << 16) +
                 (header[7] << 24)
             );
-            
-            return new SoundEffect(
-                input.AssetName,
-                data,
-                sampleRate,
-                (header[2] == 2) ? AudioChannels.Stereo : AudioChannels.Mono
-            );
+
+            var channels = (header[2] == 2) ? AudioChannels.Stereo : AudioChannels.Mono;
+            return new SoundEffect(data, sampleRate, channels)
+                {
+                    Name = input.AssetName
+                };
 #endif
 		}
 	}

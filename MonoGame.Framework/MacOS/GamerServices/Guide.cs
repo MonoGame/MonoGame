@@ -278,6 +278,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
+		[CLSCompliant(false)]
 		public static GameWindow Window { 
 			get;
 			set;

@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public static class Mouse
     {
-        internal static GameWindow PrimaryWindow;
+        internal static GameWindow PrimaryWindow = null;
 
         private static readonly MouseState _defaultState = new MouseState();
 
@@ -144,6 +144,7 @@ namespace Microsoft.Xna.Framework.Input
         /// presses for the provided window
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
+		[CLSCompliant(false)]
         public static MouseState GetState(GameWindow window)
         {
 #if MONOMAC

@@ -78,7 +78,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 return input;
 			try 
 			{
-			if (TextureFormat == TextureProcessorOutputFormat.DXTCompressed || 
+			if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
                 TextureFormat == TextureProcessorOutputFormat.Compressed ) {
                 	context.Logger.LogMessage("Compressing using {0}",TextureFormat);
                 	GraphicsUtil.CompressTexture(input, context, GenerateMipmaps, PremultiplyAlpha);

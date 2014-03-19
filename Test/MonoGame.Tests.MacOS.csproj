@@ -74,6 +74,7 @@
     <Compile Include="Runner\FrameInfo.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Runner\Utility.cs" />
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Constants.cs" />
@@ -105,7 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
-      <Project>{AE483C29-042E-4226-BA52-D247CE7676DA}</Project>
+      <Project>{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}</Project>
       <Name>Lidgren.Network.MacOS</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">

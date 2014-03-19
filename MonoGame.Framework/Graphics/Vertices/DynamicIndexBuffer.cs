@@ -49,6 +49,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal int UserOffset;
 
+        private int SuppressUserOffsetWarningForNonDXBuilds
+        {
+            get { return this.UserOffset; }
+            set { this.UserOffset = value; }
+        }
+
 		public bool IsContentLost { get { return false; } }
 		
 		public DynamicIndexBuffer(GraphicsDevice graphicsDevice, IndexElementSize indexElementSize, int indexCount, BufferUsage usage) :

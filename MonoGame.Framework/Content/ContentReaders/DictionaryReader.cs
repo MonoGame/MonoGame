@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Content
             int count = input.ReadInt32();
             Dictionary<TKey, TValue> dictionary = existingInstance;
             if (dictionary == null)
-                dictionary = new Dictionary<TKey, TValue>();
+                dictionary = new Dictionary<TKey, TValue>(count);
             else
                 dictionary.Clear();
 

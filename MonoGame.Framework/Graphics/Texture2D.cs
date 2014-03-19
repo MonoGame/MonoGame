@@ -249,7 +249,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if PSM
         private Texture2D(GraphicsDevice graphicsDevice, Stream stream)
-        {
+        {            
+            if (graphicsDevice == null)
+                throw new ArgumentNullException("Graphics Device Cannot Be Null");
+           
+            GraphicsDevice = graphicsDevice;
+                       
             byte[] bytes = new byte[stream.Length];
             stream.Read(bytes, 0, (int)stream.Length);
             _texture2D = new PssTexture2D(bytes, false);
@@ -686,29 +691,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
 #else
+            GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
 
-			GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+            if (glFormat == (GLPixelFormat)All.CompressedTextureFormats)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                if (rect.HasValue)
+                {
+                    var temp = new T[this.width * this.height];
+                    GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
+                    int z = 0, w = 0;
 
-			if (glFormat == (GLPixelFormat)All.CompressedTextureFormats) {
-				throw new NotImplementedException();
-			} else {
-				if (rect.HasValue) {
-					var temp = new T[this.width*this.height];
-					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, temp);
-					int z = 0, w = 0;
-
-					for(int y= rect.Value.Y; y < rect.Value.Y+ rect.Value.Height; y++) {
-						for(int x=rect.Value.X; x < rect.Value.X + rect.Value.Width; x++) {
-							data[z*rect.Value.Width+w] = temp[(y*width)+x];
-							w++;
-						}
-						z++;
-					}
-				} else {
-					GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
-				}
-			}
-
+                    for (int y = rect.Value.Y; y < rect.Value.Y + rect.Value.Height; ++y)
+                    {
+                        for (int x = rect.Value.X; x < rect.Value.X + rect.Value.Width; ++x)
+                        {
+                            data[z * rect.Value.Width + w] = temp[(y * width) + x];
+                            ++w;
+                        }
+                        ++z;
+                        w = 0;
+                    }
+                }
+                else
+                {
+                    GL.GetTexImage(TextureTarget.Texture2D, level, this.glFormat, this.glType, data);
+                }
+            }
 #endif
         }
 

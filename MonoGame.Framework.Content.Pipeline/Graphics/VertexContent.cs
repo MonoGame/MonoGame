@@ -45,16 +45,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Number of vertices for the content.
         /// </summary>
         /// <value>Number of vertices.</value>
-        public int VertexCount { get { return positions.Count; } }
+        public int VertexCount { get { return positionIndices.Count; } }
 
         /// <summary>
         /// Constructs a VertexContent instance.
         /// </summary>
-        internal VertexContent()
+        internal VertexContent(GeometryContent geom)
         {
-            channels = new VertexChannelCollection(this);
             positionIndices = new VertexChannel<int>("PositionIndices");
-            positions = new IndirectPositionCollection();
+            positions = new IndirectPositionCollection(geom, positionIndices);
+            channels = new VertexChannelCollection(this);
         }
 
         /// <summary>
@@ -130,16 +130,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 // Try to determine the vertex format
                 // TODO: Add support for additional formats as they become testable
-                if (channel.ElementType == typeof(Vector3))
+                if (channel.ElementType == typeof(Vector4))
+                    format = VertexElementFormat.Vector4;
+                else if (channel.ElementType == typeof(Vector3))
                     format = VertexElementFormat.Vector3;
                 else if (channel.ElementType == typeof(Vector2))
                     format = VertexElementFormat.Vector2;
+                else if (channel.ElementType == typeof(Single))
+                    format = VertexElementFormat.Single;
                 else
-                    throw new InvalidContentException("Unrecognized vertex content type.");
+                    throw new InvalidContentException(string.Format("Unrecognized vertex content type: '{0}'", channel.ElementType));
 
                 // Try to determine the vertex usage
                 if (!VertexChannelNames.TryDecodeUsage(channel.Name, out usage))
-                    throw new InvalidContentException("Unknown vertex element usage.");
+                    throw new InvalidContentException(string.Format("Unknown vertex element usage for channel '{0}'", channel.Name));
 
                 // Try getting the usage index
                 var usageIndex = VertexChannelNames.DecodeUsageIndex(channel.Name);

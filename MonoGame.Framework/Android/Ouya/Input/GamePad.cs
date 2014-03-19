@@ -65,6 +65,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly GamePad[] GamePads = new GamePad[OuyaController.MaxControllers];
 
+		[CLSCompliant(false)]
         protected GamePad(InputDevice device)
         {
             _device = device;

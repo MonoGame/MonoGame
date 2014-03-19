@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework {
 			}
 		}
 
-		public string Description {
+        public new string Description {
 			get { return _description.Text; }
 			set {
 				if (_description.Text != value) {

@@ -15,9 +15,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public const string VertexColorEnabledKey = "VertexColorEnabled";
 
         public float? Alpha { get; set; }
-        public Color? DiffuseColor { get; set; }
-        public Color? EmissiveColor { get; set; }
-        public Color? SpecularColor { get; set; }
+        public Vector3? DiffuseColor { get; set; }
+        public Vector3? EmissiveColor { get; set; }
+        public Vector3? SpecularColor { get; set; }
         public float? SpecularPower { get; set; }
         public ExternalReference<TextureContent> Texture { get; set; }
         public bool? VertexColorEnabled { get; set; }

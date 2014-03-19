@@ -53,6 +53,7 @@ using Microsoft.Xna.Framework.GamerServices;
 namespace Microsoft.Xna.Framework.Net
 {
 
+    [CLSCompliant(false)]
 	public class MonoGameSessionDelegate : GKSessionDelegate
 	{
 		List<LocalNetworkGamer> gamerList;

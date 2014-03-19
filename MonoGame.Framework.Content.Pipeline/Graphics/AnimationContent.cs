@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             get
             {
-                return Channels;
+                return channels;
             }
         }
 

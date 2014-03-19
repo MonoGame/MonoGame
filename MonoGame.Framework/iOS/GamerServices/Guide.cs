@@ -101,6 +101,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         }
 
         #region Autorotation for iOS 5 or older
+        [Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
             return _parent.ShouldAutorotateToInterfaceOrientation(toInterfaceOrientation);
@@ -160,6 +161,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		private static UIWindow _window;
 		private static UIViewController _gameViewController;
 
+        [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
 		internal static void Initialise(Game game)
@@ -465,6 +467,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 		
+        [CLSCompliant(false)]
 		public static void ShowPeerPicker(GKPeerPickerControllerDelegate aPeerPickerControllerDelegate)
 		{
 			AssertInitialised ();

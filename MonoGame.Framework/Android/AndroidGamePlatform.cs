@@ -111,6 +111,8 @@ namespace Microsoft.Xna.Framework
 				if (!_exiting)
 				{
 					_exiting = true;
+					AndroidGameActivity.Paused -= Activity_Paused;
+					AndroidGameActivity.Resumed -= Activity_Resumed;
 					Game.DoExiting();
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
@@ -202,7 +204,7 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
                 Window.Resume();
-                Sound.ResumeAll();
+				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
 				if(!Window.IsFocused)
@@ -220,7 +222,7 @@ namespace Microsoft.Xna.Framework
 				_MediaPlayer_PrevState = MediaPlayer.State;
                 Window.Pause();
 				Window.ClearFocus();
-                Sound.PauseAll();
+				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
             }

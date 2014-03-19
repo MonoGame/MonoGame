@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			{
 				XOffset = -padWidth,
 				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
-				YOffset = -padHeight,
+                YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
 				CharacterWidths = abc
 			};
 		}

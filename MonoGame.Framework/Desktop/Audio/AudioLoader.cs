@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NotSupportedException("Specified stream is not a wave file.");
             }
 
-            int riff_chunck_size = reader.ReadInt32();
+			reader.ReadInt32(); // riff_chunck_size
 
             string wformat = new string(reader.ReadChars(4));
             if (wformat != "WAVE")
@@ -73,8 +73,8 @@ namespace Microsoft.Xna.Framework.Audio
             int audio_format = reader.ReadInt16(); // 2
             int num_channels = reader.ReadInt16(); // 4
             int sample_rate = reader.ReadInt32();  // 8
-            int byte_rate = reader.ReadInt32();    // 12
-            int block_align = reader.ReadInt16();  // 14
+			reader.ReadInt32();    // 12, byte_rate
+			reader.ReadInt16();  // 14, block_align
             int bits_per_sample = reader.ReadInt16(); // 16
 
             if (audio_format != 1)
