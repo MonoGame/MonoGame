@@ -153,6 +153,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             foreach (var geometry in geometryCollection)
             {
+                for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
+                    ProcessVertexChannel(geometry, i, context);
+
                 ProcessBasicMaterial(material as BasicMaterialContent, geometry);
 
                 var vertexBuffer = geometry.Vertices.CreateVertexBuffer();
@@ -169,14 +172,86 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
         }
 
-        protected virtual void ProcessVertexChannel(GeometryContent content,
+        protected virtual void ProcessVertexChannel(GeometryContent geometry,
                                                     int vertexChannelIndex,
                                                     ContentProcessorContext context)
         {
-            // Channels with VertexElementUsage.Color -> Color
-            // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
+            var channel = geometry.Vertices.Channels[vertexChannelIndex];
 
-            throw new NotImplementedException();
+            // TODO: According to docs, channels with VertexElementUsage.Color -> Color
+
+            // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
+            if (channel.Name.StartsWith(VertexChannelNames.Weights()))
+                ProcessWeightsChannel(geometry, vertexChannelIndex);
+        }
+
+        // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
+        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex)
+        {
+            // create a map of Name->Index of the bones
+            var skeleton = MeshHelper.FindSkeleton(geometry.Parent);
+            var boneIndices = new Dictionary<string, int>();
+            var flattenedBones = MeshHelper.FlattenSkeleton(skeleton);
+            for (var i = 0; i < flattenedBones.Count; i++)
+                boneIndices.Add(flattenedBones[i].Name, i);
+
+            var inputWeights = geometry.Vertices.Channels[vertexChannelIndex] as VertexChannel<BoneWeightCollection>;
+            var outputIndices = new Vector4[inputWeights.Count];
+            var outputWeights = new Vector4[inputWeights.Count];
+            for (var i = 0; i < inputWeights.Count; i++)
+                ConvertWeights(inputWeights[i], boneIndices, outputIndices, outputWeights, i);
+
+            // create our new channel names
+            var usageIndex = VertexChannelNames.DecodeUsageIndex(inputWeights.Name);
+            var indicesName = VertexChannelNames.EncodeName(VertexElementUsage.BlendIndices, usageIndex);
+            var weightsName = VertexChannelNames.EncodeName(VertexElementUsage.BlendWeight, usageIndex);
+
+            // add in the index and weight channels
+            geometry.Vertices.Channels.Insert(vertexChannelIndex + 1, indicesName, outputIndices);
+            geometry.Vertices.Channels.Insert(vertexChannelIndex + 2, weightsName, outputWeights);
+
+            // remove the original weights channel
+            geometry.Vertices.Channels.RemoveAt(vertexChannelIndex);
+        }
+
+        // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
+        private static void ConvertWeights(BoneWeightCollection weights, Dictionary<string, int> boneIndices, Vector4[] outIndices, Vector4[] outWeights, int vertexIndex)
+        {
+            // we only handle 4 weights per bone
+            const int maxWeights = 4;
+
+            // create some temp arrays to hold our values
+            var tempIndices = new int[maxWeights];
+            var tempWeights = new float[maxWeights];
+
+            // cull out any extra bones
+            weights.NormalizeWeights(maxWeights);
+
+            // get our indices and weights
+            for (var i = 0; i < weights.Count; i++)
+            {
+                var weight = weights[i];
+
+                if (!boneIndices.ContainsKey(weight.BoneName))
+                {
+                    var errorMessage = string.Format("Bone '{0}' was not found in the skeleton! Skeleton bones are: '{1}'.", weight.BoneName, string.Join("', '", boneIndices.Keys));
+                    throw new Exception(errorMessage);
+                }
+
+                tempIndices[i] = boneIndices[weight.BoneName];
+                tempWeights[i] = weight.Weight;
+            }
+
+            // zero out any remaining spaces
+            for (var i = weights.Count; i < maxWeights; i++)
+            {
+                tempIndices[i] = 0;
+                tempWeights[i] = 0;
+            }
+
+            // output the values
+            outIndices[vertexIndex] = new Vector4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
+            outWeights[vertexIndex] = new Vector4(tempWeights[0], tempWeights[1], tempWeights[2], tempWeights[3]);
         }
 
         private void ProcessBasicMaterial(BasicMaterialContent basicMaterial, GeometryContent geometry)

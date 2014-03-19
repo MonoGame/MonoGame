@@ -349,9 +349,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return null;
         }
 
+        /// <summary>
+        /// Traverses a skeleton depth-first and builds a list of its bones.
+        /// </summary>
         public static IList<BoneContent> FlattenSkeleton(BoneContent skeleton)
         {
-            throw new NotImplementedException();
+            if (skeleton == null)
+                throw new ArgumentNullException("skeleton");
+
+            var results = new List<BoneContent>();
+            var work = new Stack<NodeContent>(new[] { skeleton });
+            while (work.Count > 0)
+            {
+                var top = work.Pop();
+                var bone = top as BoneContent;
+                if (bone != null)
+                    results.Add(bone);
+
+                for (var i = top.Children.Count - 1; i >= 0; i--)
+                    work.Push(top.Children[i]);
+            }
+
+            return results;
         }
 
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
