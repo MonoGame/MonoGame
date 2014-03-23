@@ -10,6 +10,7 @@
 #region Using Statements
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -52,13 +53,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource(
+        static readonly string resourceName = 
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.dx11.mgfxo"
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.DualTextureEffect.ogl.mgfxo"
 #endif
-        );
+        ;
 
         #endregion
 
@@ -245,7 +246,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new DualTextureEffect with default parameter settings.
         /// </summary>
         public DualTextureEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, LoadEffectResource(resourceName))
         {
             CacheEffectParameters();
         }

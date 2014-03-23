@@ -68,13 +68,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource(
+        static readonly string resourceName = 
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.dx11.mgfxo"
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.EnvironmentMapEffect.ogl.mgfxo"
 #endif
-        );
+        ;
 
         #endregion
 
@@ -370,7 +370,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new EnvironmentMapEffect with default parameter settings.
         /// </summary>
         public EnvironmentMapEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, LoadEffectResource(resourceName))
         {
             CacheEffectParameters(null);
 

@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         EffectDirtyFlags dirtyFlags = EffectDirtyFlags.All;
 
-        static readonly byte[] Bytecode = LoadEffectResource(
+        static readonly string resourceName = 
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.dx11.mgfxo"
 #elif PSM
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.AlphaTestEffect.ogl.mgfxo"
 #endif
-        );
+        ;
 
         #endregion
 
@@ -271,7 +271,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new AlphaTestEffect with default parameter settings.
         /// </summary>
         public AlphaTestEffect(GraphicsDevice device)
-            : base(device, Bytecode)
+            : base(device, LoadEffectResource(resourceName))
         {
             CacheEffectParameters();
         }
