@@ -163,6 +163,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // power consumption.
                 dxgiDevice2.MaximumFrameLatency = 1;
             }
+
+            // Set the correct profile based on the feature level.
+            _featureLevel = _d3dDevice.FeatureLevel;
+            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
         }
 
         internal void UpdateTarget(RenderTargetView renderTargetView)
