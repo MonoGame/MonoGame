@@ -1778,7 +1778,17 @@ namespace Microsoft.Xna.Framework
         /// <returns>The string representation of the color value of this instance.</returns>
 	public override string ToString ()
 	{
-	    return "{R:" + R + " G:" + G + " B:" + B + " A:" + A + "}";
+	    StringBuilder sb = new StringBuilder(25);
+            sb.Append("{R:");
+            sb.Append(R);
+            sb.Append(" G:");
+            sb.Append(G);
+            sb.Append(" B:");
+            sb.Append(B);
+            sb.Append(" A:"); 
+            sb.Append(A);
+            sb.Append("}");
+            return sb.ToString();
 	}
 		
 	/// <summary>
