@@ -1,52 +1,17 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
-
 using Microsoft.Xna.Framework.Audio;
 
 #if IOS
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
 using SharpDX;
 using SharpDX.MediaFoundation;
 #endif
@@ -57,15 +22,21 @@ namespace Microsoft.Xna.Framework.Media
     {
 #if IOS
 		private AVAudioPlayer _sound;
-#elif PSM
+#endif
+
+#if PSM
         private PSSuiteSong _sound;
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
         private Topology _topology;
-#elif !WINDOWS_MEDIA_ENGINE
+#endif
+
+#if MONOMAC || (WINDOWS && OPENGL) //!WINDOWS_MEDIA_ENGINE
 		private SoundEffectInstance _sound;
 #endif
-		
-		private string _name;
+
+        private string _name;
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
@@ -84,11 +55,19 @@ namespace Microsoft.Xna.Framework.Media
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
-#elif PSM
+#endif
+
+#if PSM
             _sound = new PSSuiteSong(_name);
-#elif WINDOWS_MEDIA_SESSION 
-            GetTopology();      
-#elif !WINDOWS_MEDIA_ENGINE && !WINDOWS_PHONE
+#endif
+
+#if WINDOWS_MEDIA_SESSION
+
+            GetTopology();
+  
+#endif
+
+#if MONOMAC || (WINDOWS && OPENGL)
 
             using (var s = File.OpenRead(_name))
             {
@@ -129,7 +108,9 @@ namespace Microsoft.Xna.Framework.Media
                         _topology = null;
                     }
 
-#elif !WINDOWS_MEDIA_ENGINE
+#endif
+
+#if IOS || PSM ||  MONOMAC || (WINDOWS && OPENGL) //!WINDOWS_MEDIA_ENGINE
 
                     if (_sound != null)
                     {
@@ -256,7 +237,9 @@ namespace Microsoft.Xna.Framework.Media
             return _topology;
         }
             
-#elif !WINDOWS_MEDIA_ENGINE
+#endif
+
+#if IOS || PSM || MONOMAC || (WINDOWS && OPENGL)
 
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 		event FinishedPlayingHandler DonePlaying;
@@ -350,7 +333,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-#endif // !DIRECTX
+#endif // !WINRT
 
         public TimeSpan Duration
         {

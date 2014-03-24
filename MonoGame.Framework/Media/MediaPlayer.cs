@@ -1,42 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 #if WINDOWS_PHONE
 extern alias MicrosoftXnaFramework;
@@ -45,8 +9,8 @@ using MsXna_MediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.M
 
 
 using System;
-
 using Microsoft.Xna.Framework.Audio;
+using System.Linq;
 
 #if IOS
 using MonoTouch.AudioToolbox;
@@ -60,17 +24,18 @@ using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
 using SharpDX.Win32;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Phone.Shell;
 using System.Threading;
 #endif
+
 #if WINRT
 using Windows.UI.Core;
 #endif
-
-using System.Linq;
 
 
 namespace Microsoft.Xna.Framework.Media
@@ -87,14 +52,13 @@ namespace Microsoft.Xna.Framework.Media
 
 		public static event EventHandler<EventArgs> ActiveSongChanged;
 
+
 #if WINDOWS_MEDIA_ENGINE
         private static readonly MediaEngine _mediaEngineEx;
-#if WINDOWS_PHONE
-        private static System.Windows.Threading.Dispatcher _dispatcher;
-#else
         private static CoreDispatcher _dispatcher;
 #endif
-#elif WINDOWS_MEDIA_SESSION
+
+#if WINDOWS_MEDIA_SESSION
 
         private static readonly MediaSession _session;
         private static SimpleAudioVolume _volumeController;
@@ -126,8 +90,9 @@ namespace Microsoft.Xna.Framework.Media
 		    public AsyncCallbackFlags Flags { get; private set; }
 		    public WorkQueueId WorkQueueId { get; private set; }
 	    }
+#endif
 
-#elif WINDOWS_PHONE
+#if WINDOWS_PHONE
         internal static MediaElement _mediaElement;
         private static Uri source;
         private static TimeSpan elapsedTime;
@@ -151,10 +116,15 @@ namespace Microsoft.Xna.Framework.Media
                 }
 
                 _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
             MediaManagerState.CheckStartup();
             MediaFactory.CreateMediaSession(null, out _session);
-#elif WINDOWS_PHONE
+
+#endif
+
+#if WINDOWS_PHONE
             PhoneApplicationService.Current.Activated += (sender, e) =>
                 {
                     if (_mediaElement != null)
@@ -234,15 +204,21 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINDOWS_MEDIA_ENGINE
                 _mediaEngineEx.Muted = value;
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
                 if (_volumeController != null)
                     _volumeController.Mute = _isMuted;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     _mediaElement.IsMuted = value;
                 });
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
                 if (_queue.Count == 0)
 					return;
 				
@@ -281,9 +257,13 @@ namespace Microsoft.Xna.Framework.Media
             {		
 #if WINDOWS_MEDIA_ENGINE
                 return TimeSpan.FromSeconds(_mediaEngineEx.CurrentTime);
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
                 return _clock != null ? TimeSpan.FromTicks(_clock.Time) : TimeSpan.Zero;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
                 TimeSpan pos = TimeSpan.Zero;
                 EventWaitHandle Wait = new AutoResetEvent(false);
                 if(_mediaElement.Dispatcher.CheckAccess()) {
@@ -298,7 +278,9 @@ namespace Microsoft.Xna.Framework.Media
                     Wait.WaitOne();
                 }
                 return (pos);
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
 				if (_queue.ActiveSong == null)
 					return TimeSpan.Zero;
 
@@ -344,9 +326,13 @@ namespace Microsoft.Xna.Framework.Media
 				    return false;
 				
 				return true;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
                 return State == MediaState.Playing || MsXna_MediaPlayer.GameHasControl;
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX || WINDOWS_MEDIA_SESSION || WINDOWS_MEDIA_ENGINE
                 // TODO: Fix me!
                 return true;
 #endif
@@ -363,15 +349,21 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINDOWS_MEDIA_ENGINE
                 _mediaEngineEx.Volume = value;       
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
 			    if (_volumeController != null)
                     _volumeController.MasterVolume = _volume;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     _mediaElement.Volume = value;
                 });
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
                 if (_queue.ActiveSong == null)
 					return;
 
@@ -389,14 +381,20 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINDOWS_MEDIA_ENGINE
             _mediaEngineEx.Pause();
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
             _session.Pause();
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 _mediaElement.Pause();
             });
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
             _queue.ActiveSong.Pause();
 #endif
 
@@ -438,7 +436,8 @@ namespace Microsoft.Xna.Framework.Media
             _mediaEngineEx.Load();
             _mediaEngineEx.Play();
 
-#elif WINDOWS_MEDIA_SESSION
+#endif
+#if WINDOWS_MEDIA_SESSION
 
             // Cleanup the last song first.
             if (State != MediaState.Stopped)
@@ -482,7 +481,9 @@ namespace Microsoft.Xna.Framework.Media
             // Start playing.
             var varStart = new Variant();
             _session.Start(null, varStart);
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 _mediaElement.Source = new Uri(song.FilePath, UriKind.Relative);
@@ -492,7 +493,9 @@ namespace Microsoft.Xna.Framework.Media
                 _mediaElement.MediaEnded -= OnSongFinishedPlaying;
                 _mediaElement.MediaEnded += OnSongFinishedPlaying;
             });
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
             song.SetEventHandler(OnSongFinishedPlaying);			
 			song.Volume = _isMuted ? 0.0f : _volume;
 			song.Play();
@@ -541,15 +544,21 @@ namespace Microsoft.Xna.Framework.Media
                 return;
 
 #if WINDOWS_MEDIA_ENGINE
-            _mediaEngineEx.Play();       
-#elif WINDOWS_MEDIA_SESSION
+            _mediaEngineEx.Play(); 
+#endif
+
+#if WINDOWS_MEDIA_SESSION
             _session.Start(null, null);
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 _mediaElement.Play();
             });
-#else
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
 			_queue.ActiveSong.Resume();
 #endif
 			State = MediaState.Playing;
@@ -562,19 +571,25 @@ namespace Microsoft.Xna.Framework.Media
 
 #if WINDOWS_MEDIA_ENGINE
             _mediaEngineEx.Source = null;
-#elif WINDOWS_MEDIA_SESSION
+#endif
+
+#if WINDOWS_MEDIA_SESSION
             _session.ClearTopologies();
             _session.Stop();
             _volumeController.Dispose();
             _volumeController = null;
             _clock.Dispose();
             _clock = null;
-#elif WINDOWS_PHONE
+#endif
+
+#if WINDOWS_PHONE
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 _mediaElement.Stop();
             });
-#else		
+#endif
+
+#if ANDROID || IOS || MONOMAC || PSM || (WINDOWS && OPENGL) || LINUX
 			// Loop through so that we reset the PlayCount as well
 			foreach(var song in Queue.Songs)
 				_queue.ActiveSong.Stop();
