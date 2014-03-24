@@ -425,6 +425,7 @@ namespace Microsoft.Xna.Framework
         }
 	
         #region Color Bank
+        
         /// <summary>
         /// TransparentBlack color (R:0,G:0,B:0,A:0).
         /// </summary>
@@ -619,8 +620,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public static Color Crimson
     	{
-             get;
-             private set;
+            get;
+            private set;
     	}
         
         /// <summary>
@@ -1702,6 +1703,7 @@ namespace Microsoft.Xna.Framework
             get;
             private set;
         }
+        
         #endregion
 	
         /// <summary>
