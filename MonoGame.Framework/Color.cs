@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework
 	// ARGB
         private uint _packedValue;
 
-	    /// <summary>
+	/// <summary>
         /// Creates a new instance of <see cref="Color"/> struct.
         /// </summary>
         /// <param name="packedValue">Packed color value.</param>
@@ -192,10 +192,6 @@ namespace Microsoft.Xna.Framework
         public Color(uint packedValue)
         {
             _packedValue = packedValue;
-			// ARGB
-			//_packedValue = (packedValue << 8) | ((packedValue & 0xff000000) >> 24);
-			// ABGR			
-			//_packedValue = (packedValue & 0xff00ff00) | ((packedValue & 0x000000ff) << 16) | ((packedValue & 0x00ff0000) >> 16);
         }
 
 	/// <summary>
@@ -478,10 +474,10 @@ namespace Microsoft.Xna.Framework
         /// Aquamarine color (R:127,G:255,B:212,A:255).
         /// </summary>
         public static Color Aquamarine
-    {
-        get;
-        private set;
-    }
+	{
+	    get;
+	    private set;
+	}
         
         /// <summary>
         /// Azure color (R:240,G:255,B:255,A:255).
@@ -496,10 +492,10 @@ namespace Microsoft.Xna.Framework
         /// Beige color (R:245,G:245,B:220,A:255).
         /// </summary>
         public static Color Beige
-    {
-        get;
-        private set;
-    }
+    	{
+            get;
+            private set;
+    	}
         
         /// <summary>
         /// Bisque color (R:255,G:228,B:196,A:255).
@@ -622,10 +618,10 @@ namespace Microsoft.Xna.Framework
         /// Crimson color (R:220,G:20,B:60,A:255).
         /// </summary>
         public static Color Crimson
-    {
-        get;
-        private set;
-    }
+    	{
+             get;
+             private set;
+    	}
         
         /// <summary>
         /// Cyan color (R:0,G:255,B:255,A:255).
@@ -649,10 +645,10 @@ namespace Microsoft.Xna.Framework
         /// DarkCyan color (R:0,G:139,B:139,A:255).
         /// </summary>
         public static Color DarkCyan
-    {
-        get;
-        private set;
-    }
+    	{
+            get;
+            private set;
+    	}
         
         /// <summary>
         /// DarkGoldenrod color (R:184,G:134,B:11,A:255).
@@ -676,10 +672,10 @@ namespace Microsoft.Xna.Framework
         /// DarkGreen color (R:0,G:100,B:0,A:255).
         /// </summary>
         public static Color DarkGreen
-    {
-        get;
-        private set;
-    }
+    	{
+            get;
+            private set;
+    	}
         
         /// <summary>
         /// DarkKhaki color (R:189,G:183,B:107,A:255).
@@ -1673,10 +1669,10 @@ namespace Microsoft.Xna.Framework
         /// White color (R:255,G:255,B:255,A:255).
         /// </summary>
         public static Color White
-    {
-        get;
-        private set;
-    }
+	{
+	    get;
+	    private set;
+	}
        
         /// <summary>
         /// WhiteSmoke color (R:245,G:245,B:245,A:255).
@@ -1778,7 +1774,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The string representation of the color value of this instance.</returns>
 	public override string ToString ()
 	{
-	    return string.Format("[Color: R={0}, G={1}, B={2}, A={3}, PackedValue={4}]", R, G, B, A, PackedValue);
+	    return string.Format("{R:{0} G:{1} B:{2} A:{3}}", R, G, B, A);
 	}
 	
 	/// <summary>
