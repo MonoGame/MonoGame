@@ -183,8 +183,13 @@ namespace Microsoft.Xna.Framework
         }
 	// ARGB
         private uint _packedValue;
-	  
-        private Color(uint packedValue)
+
+	    /// <summary>
+        /// Creates a new instance of <see cref="Color"/> struct.
+        /// </summary>
+        /// <param name="packedValue">Packed color value.</param>
+        /// <remarks>In XNA this constructor is private, but now its public for adding new developer possibilites and increasing performance for extension methods.</remarks>
+        public Color(uint packedValue)
         {
             _packedValue = packedValue;
 			// ARGB
