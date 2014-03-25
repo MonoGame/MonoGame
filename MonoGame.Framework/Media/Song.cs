@@ -6,19 +6,10 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Audio;
 
-#if IOS
-using MonoTouch.Foundation;
-using MonoTouch.AVFoundation;
-#endif
-
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-#if IOS
-		private AVAudioPlayer _sound;
-#endif
-
         private string _name;
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
@@ -38,15 +29,6 @@ namespace Microsoft.Xna.Framework.Media
 			_name = fileName;
 
             PlatformInitialize(fileName);
-        }
-
-        private void tmpPlatformInitialize(string fileName)
-        {
-#if IOS
-			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
-#endif
         }
 
         ~Song()
