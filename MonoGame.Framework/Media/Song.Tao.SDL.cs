@@ -27,18 +27,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             Dispose(false);
         }
-
-        internal string FilePath
-		{
-			get { return _name; }
-		}
 		
-		public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        
         void PlatformDispose(bool disposing)
         {
             if (_audioData != IntPtr.Zero)
