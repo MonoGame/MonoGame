@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
             //}
 
             Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)

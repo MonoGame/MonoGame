@@ -13,7 +13,7 @@ using PssTexture2D = Sce.PlayStation.Core.Graphics.Texture2D;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public class Texture2D : Texture
+    public partial class Texture2D
     {
 		internal PssTexture2D _texture2D;
 
