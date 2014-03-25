@@ -570,6 +570,18 @@
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.cs" />
+    <Compile Include="Media\MediaPlayer.WME.cs">
+      <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.WMS.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaPlayer.Default.cs">
+      <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile</Platforms>
+    </Compile>
     <Compile Include="Media\MediaQueue.cs" />
     <Compile Include="Media\MediaSource.cs">
       <Platforms>iOS,MacOS,Windows,WindowsGL</Platforms>
@@ -583,11 +595,26 @@
       <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\SongCollection.cs" />
-    <Compile Include="Media\Song.cs">
-      <ExcludePlatforms>Android,Ouya,Linux</ExcludePlatforms>	
+    <Compile Include="Media\Song.cs" />	
+    <Compile Include="Media\Song.Default.cs">
+        <Platforms>WindowsGL,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.Tao.SDL.cs">
+        <Platforms>Linux</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WMS.cs">
+        <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
-	
 
     <!-- Microsoft.Devices.Sensors -->
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
@@ -765,9 +792,6 @@
     <Compile Include="Android\IResumeManager.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Media\Song.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
     <Compile Include="Android\Media\Video.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -912,9 +936,6 @@
     <Compile Include="Linux\Input\KeyboardUtil.cs">
       <Platforms>Linux</Platforms>
     </Compile>
-    <Compile Include="Linux\Media\Song.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
     <Compile Include="Linux\Media\Video.cs">
       <Platforms>Linux</Platforms>
     </Compile>
@@ -997,9 +1018,6 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="PSSuite\Input\Touch\GestureListener.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Media\PSSuiteSong.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="PSSuite\Media\Video.cs">

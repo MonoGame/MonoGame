@@ -11,35 +11,21 @@ using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
 #endif
 
-#if WINDOWS_MEDIA_SESSION
-using SharpDX;
-using SharpDX.MediaFoundation;
-#endif
-
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed class Song : IEquatable<Song>, IDisposable
+    public sealed partial class Song : IEquatable<Song>, IDisposable
     {
 #if IOS
 		private AVAudioPlayer _sound;
-#endif
-
-#if PSM
-        private PSSuiteSong _sound;
-#endif
-
-#if WINDOWS_MEDIA_SESSION
-        private Topology _topology;
-#endif
-
-#if MONOMAC || (WINDOWS && OPENGL) //!WINDOWS_MEDIA_ENGINE
-		private SoundEffectInstance _sound;
 #endif
 
         private string _name;
 		private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
+
+        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
+        event FinishedPlayingHandler DonePlaying;
 
         internal Song(string fileName, int durationMS)
             : this(fileName)
@@ -50,31 +36,16 @@ namespace Microsoft.Xna.Framework.Media
 		internal Song(string fileName)
 		{			
 			_name = fileName;
-			
+
+            PlatformInitialize(fileName);
+        }
+
+        private void tmpPlatformInitialize(string fileName)
+        {
 #if IOS
 			_sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
 			_sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
-#endif
-
-#if PSM
-            _sound = new PSSuiteSong(_name);
-#endif
-
-#if WINDOWS_MEDIA_SESSION
-
-            GetTopology();
-  
-#endif
-
-#if MONOMAC || (WINDOWS && OPENGL)
-
-            using (var s = File.OpenRead(_name))
-            {
-                var soundEffect = SoundEffect.FromStream(s);
-                _sound = soundEffect.CreateInstance();
-            }
-            
 #endif
         }
 
@@ -100,34 +71,27 @@ namespace Microsoft.Xna.Framework.Media
             {
                 if (disposing)
                 {
-#if WINDOWS_MEDIA_SESSION
-
-                    if (_topology != null)
-                    {
-                        _topology.Dispose();
-                        _topology = null;
-                    }
-
-#endif
-
-#if IOS || PSM ||  MONOMAC || (WINDOWS && OPENGL) //!WINDOWS_MEDIA_ENGINE
-
-                    if (_sound != null)
-                    {
-#if IOS
-                       _sound.FinishedPlaying -= OnFinishedPlaying;
-#endif
-                        _sound.Dispose();
-                        _sound = null;
-                    }
-#endif
+                    PlatformDispose(disposing);
                 }
 
                 disposed = true;
             }
         }
-        
-		public bool Equals(Song song)
+
+#if WINDOWS_MEDIA_ENGINE || WINDOWS_PHONE
+
+        private void PlatformDispose(bool disposing)
+        {
+            // NO OP on Win8.
+        }
+
+        private void PlatformInitialize(string fileName)
+        {
+            // NO OP on Win8.
+        }
+#endif
+
+        public bool Equals(Song song)
         {
 #if DIRECTX
             return song != null && song.FilePath == FilePath;
@@ -165,175 +129,6 @@ namespace Microsoft.Xna.Framework.Media
 		{
 		  return ! (song1 == song2);
 		}
-
-#if WINDOWS_MEDIA_SESSION
-
-        internal Topology GetTopology()
-        {
-            if (_topology == null)
-            {
-                MediaManagerState.CheckStartup();
-
-                MediaFactory.CreateTopology(out _topology);
-
-                SharpDX.MediaFoundation.MediaSource mediaSource;
-                {
-                    SourceResolver resolver;
-                    MediaFactory.CreateSourceResolver(out resolver);
-
-                    ObjectType otype;
-                    ComObject source;
-                    resolver.CreateObjectFromURL(FilePath, (int)SourceResolverFlags.MediaSource, null, out otype,
-                                                 out source);
-                    mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
-                    resolver.Dispose();
-                    source.Dispose();
-                }
-
-                PresentationDescriptor presDesc;
-                mediaSource.CreatePresentationDescriptor(out presDesc);
-
-                for (var i = 0; i < presDesc.StreamDescriptorCount; i++)
-                {
-                    Bool selected;
-                    StreamDescriptor desc;
-                    presDesc.GetStreamDescriptorByIndex(i, out selected, out desc);
-
-                    if (selected)
-                    {
-                        TopologyNode sourceNode;
-                        MediaFactory.CreateTopologyNode(TopologyType.SourceStreamNode, out sourceNode);
-
-                        sourceNode.Set(TopologyNodeAttributeKeys.Source, mediaSource);
-                        sourceNode.Set(TopologyNodeAttributeKeys.PresentationDescriptor, presDesc);
-                        sourceNode.Set(TopologyNodeAttributeKeys.StreamDescriptor, desc);
-
-                        TopologyNode outputNode;
-                        MediaFactory.CreateTopologyNode(TopologyType.OutputNode, out outputNode);
-
-                        var majorType = desc.MediaTypeHandler.MajorType;
-                        if (majorType != MediaTypeGuids.Audio)
-                            throw new NotSupportedException("The song contains video data!");
-
-                        Activate activate;
-                        MediaFactory.CreateAudioRendererActivate(out activate);
-                        outputNode.Object = activate;
-
-                        _topology.AddNode(sourceNode);
-                        _topology.AddNode(outputNode);
-                        sourceNode.ConnectOutput(0, outputNode, 0);
-
-                        sourceNode.Dispose();
-                        outputNode.Dispose();
-                    }
-
-                    desc.Dispose();
-                }
-
-                presDesc.Dispose();
-                mediaSource.Dispose();
-            }
-
-            return _topology;
-        }
-            
-#endif
-
-#if IOS || PSM || MONOMAC || (WINDOWS && OPENGL)
-
-        internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
-		event FinishedPlayingHandler DonePlaying;
-
-		internal void OnFinishedPlaying (object sender, EventArgs args)
-		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
-		}
-
-		/// <summary>
-		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
-		/// </summary>
-		internal void SetEventHandler(FinishedPlayingHandler handler)
-		{
-			if (DonePlaying != null)
-				return;
-			
-			DonePlaying += handler;
-		}
-
-		internal void Play()
-		{	
-			if ( _sound == null )
-				return;
-
-#if IOS
-            // AVAudioPlayer sound.Stop() does not reset the playback position as XNA does.
-            // Set Play's currentTime to 0 to ensure playback at the start.
-            _sound.CurrentTime = 0.0;
-#endif
-			_sound.Play();
-
-            _playCount++;
-        }
-
-		internal void Resume()
-		{
-			if (_sound == null)
-				return;			
-#if IOS
-
-			_sound.Play();
-#else
-			_sound.Resume();
-#endif
-		}
-		
-		internal void Pause()
-		{			            
-			if ( _sound == null )
-				return;
-			
-			_sound.Pause();
-        }
-		
-		internal void Stop()
-		{
-			if ( _sound == null )
-				return;
-			
-			_sound.Stop();
-			_playCount = 0;
-		}
-
-		internal float Volume
-		{
-			get
-			{
-				if (_sound != null)
-					return _sound.Volume;
-				else
-					return 0.0f;
-			}
-			
-			set
-			{
-				if ( _sound != null && _sound.Volume != value )
-					_sound.Volume = value;
-			}			
-		}
-
-		internal TimeSpan Position
-        {
-            get
-            {
-                // TODO: Implement
-                return new TimeSpan(0);				
-            }
-        }
-
-#endif // !WINRT
 
         public TimeSpan Duration
         {
