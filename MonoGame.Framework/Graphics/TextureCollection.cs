@@ -104,10 +104,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetTextures(GraphicsDevice device)
         {
-#if !DIRECTX
-            Threading.EnsureUIThread();
-#endif
-
             // Skip out if nothing has changed.
             if (_dirty == 0)
                 return;

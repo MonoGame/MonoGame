@@ -474,6 +474,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
+            Threading.EnsureUIThread();
+
             if ( _scissorRectangleDirty )
 	        {
                 var scissorRect = _scissorRectangle;
