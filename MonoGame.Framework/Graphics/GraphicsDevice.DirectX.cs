@@ -982,17 +982,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                _blendState.ApplyState(this);
+                _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 	        if ( _depthStencilStateDirty )
             {
-	            _depthStencilState.ApplyState(this);
+	            _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
 	        if ( _rasterizerStateDirty )
             {
-	            _rasterizerState.ApplyState(this);
+	            _rasterizerState.PlatformApplyState(this);
 	            _rasterizerStateDirty = false;
             }
 
@@ -1045,7 +1045,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelConstantBuffers.SetConstantBuffers(this);
 
             Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
