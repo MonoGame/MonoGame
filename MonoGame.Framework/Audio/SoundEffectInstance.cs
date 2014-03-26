@@ -15,6 +15,12 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private bool isDisposed = false;
 
+        internal bool _IsPooled = true;
+
+        private float _pan = 0.0f;
+        private float _volume = 1.0f;
+        private float _pitch = 0.0f;
+
         public bool IsLooped
         { 
             get { return PlatformGetIsLooped(); }
@@ -23,25 +29,43 @@ namespace Microsoft.Xna.Framework.Audio
 
         public float Pan
         {
-            get { return PlatformGetPan(); } 
-            set { PlatformSetPan(value); }
+            get { return _pan; } 
+            set
+            {
+                if (value < -1.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetPan(value);
+            }
         }
 
         public float Pitch
         {
-            get { return PlatformGetPitch(); }
-            set { PlatformSetPitch(value); }
+            get { return _pitch; }
+            set
+            {
+                if (value < -1.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetPitch(value);
+            }
+        }
+
+        public float Volume
+        {
+            get { return _volume; }
+            set
+            {
+                if (value < 0.0f || value > 1.0f)
+                    throw new ArgumentOutOfRangeException();
+
+                PlatformSetVolume(value);
+            }
         }
 
         public SoundState State { get { return PlatformGetState(); } }
 
         public bool IsDisposed { get { return isDisposed; } }
-
-        public float Volume
-        {
-            get { return PlatformGetVolume(); } 
-            set { PlatformSetVolume(value); }
-        }
 
         internal SoundEffectInstance(){}
         
@@ -75,6 +99,16 @@ namespace Microsoft.Xna.Framework.Audio
             if (State == SoundState.Playing)
                 return;
 
+            // We don't need to check if we're at the instance play limit
+            // if we're resuming from a paused state.
+            if (State != SoundState.Paused)
+            {
+                SoundEffectInstancePool.Remove(this);
+
+                if (!SoundEffectInstancePool.SoundsAvailable)
+                    throw new InstancePlayLimitException();
+            }
+
             PlatformPlay();
         }
 
@@ -90,7 +124,18 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop(bool immediate)
         {
+            
             PlatformStop(immediate);
+
+            // instances typically call Stop
+            // as they dispose. Prevent this
+            // from being added to the SFXInstancePool
+            if (isDisposed)
+                return;
+
+            // Return this SFXInstance back
+            // to the pool to be used later.
+            SoundEffectInstancePool.Add(this);
         }
 
         public void Dispose()
@@ -98,9 +143,9 @@ namespace Microsoft.Xna.Framework.Audio
             if (isDisposed)
                 return;
 
-            PlatformDispose();
-
             isDisposed = true;
+
+            PlatformDispose();
         }
     }
 }
