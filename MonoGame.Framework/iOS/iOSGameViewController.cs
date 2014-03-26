@@ -138,27 +138,13 @@ namespace Microsoft.Xna.Framework {
 			var handler = InterfaceOrientationChanged;
 			if (handler != null)
 				handler (this, EventArgs.Empty);
-        }       
-		
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			base.TouchesBegan (touches, evt);
-		}
+        }
 
-		public override void TouchesEnded (NSSet touches, UIEvent evt)
-		{
-			base.TouchesEnded (touches, evt);
-			
-		}
-
-		public override void TouchesMoved (NSSet touches, UIEvent evt)
-		{
-			base.TouchesMoved (touches, evt);
-		}
-
-		public override void TouchesCancelled (NSSet touches, UIEvent evt)
-		{
-			base.TouchesCancelled (touches, evt);
-		}
-	}
+        #region Hide statusbar for iOS 7 or newer
+        public override bool PrefersStatusBarHidden()
+        {
+            return _platform.Game.graphicsDeviceManager.IsFullScreen;
+        }
+        #endregion
+    }
 }
