@@ -34,25 +34,16 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal byte[] _data;
 
-#if IOS || MONOMAC
-
-        private List<SoundEffectInstance> playing = null;
-        private List<SoundEffectInstance> available = null;
-        private List<SoundEffectInstance> toBeRecycled = null;
-
-#endif
-
 		internal float Rate { get; set; }
 
-#if WINDOWS || LINUX || IOS || MONOMAC
-
         internal int Size { get; set; }
+
+#if WINDOWS || LINUX || IOS || MONOMAC
 
         internal ALFormat Format { get; set; }
 #endif
 
 #if ANDROID
-		private SoundEffectInstance _instance;
 		private int _soundID = -1;
 #endif
 
@@ -114,13 +105,12 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
         {
 			Rate = (float)sampleRate;
+            Size = (int)buffer.Length;
 
 #if WINDOWS || LINUX
 
             _data = buffer;
-            Size = buffer.Length;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
-
             return;
 
 #endif
@@ -130,15 +120,10 @@ namespace Microsoft.Xna.Framework.Audio
             //buffer should contain 16-bit PCM wave data
             short bitsPerSample = 16;
 
-            Size = (int)buffer.Length;
-
             if ((int)channels <= 1)
                 Format = bitsPerSample == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
             else
                 Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
-
-            var _dblDuration = (Size / ((bitsPerSample / 8) * (((int)channels == 0) ? 1 : (int)channels))) / Rate;
-            _duration = TimeSpan.FromSeconds(_dblDuration);
 
             _name = "";
             _data = buffer;
@@ -164,6 +149,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
+            _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
+
             throw new NotImplementedException();
         }
 
@@ -171,134 +158,18 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
 
-        private SoundEffectInstance PlatformCreateInstance()
+        private void PlatformSetupInstance(SoundEffectInstance inst)
         {
 #if WINDOWS || LINUX || MONOMAC || IOS
-            return new SoundEffectInstance(this);
+
+            inst.InitializeSound();
+            inst.BindDataBuffer(_data, Format, Size, (int)Rate);
 #endif
 
 #if ANDROID
-			return new SoundEffectInstance()
-            {
-                _soundId = _soundID,
-                _sampleRate = Rate
-            };
+            inst._soundId = _soundID;
+            inst._sampleRate = Rate;
 #endif
-        }
-
-        #endregion
-
-        #region Play
-
-        private bool PlatformPlay()
-        {
-#if WINDOWS || LINUX || MONOMAC || IOS
-            return PlatformPlay(MasterVolume, 0.0f, 0.0f);
-#endif
-
-#if ANDROID
-            return PlatformPlay(1.0f, 0.0f, 0.0f);
-#endif
-        }
-
-        private bool PlatformPlay(float volume, float pitch, float pan)
-        {
-            // TODO: While merging the SoundEffect classes together
-            // I noticed that the return values seem to widly differ
-            // between platforms. It also doesn't seem to match
-            // what's written in the XNA docs.
-
-            if (MasterVolume <= 0.0f)
-                return false;
-
-#if WINDOWS || LINUX
-
-            SoundEffectInstance instance = PlatformCreateInstance();
-            instance.Volume = volume;
-            instance.Pitch = pitch;
-            instance.Pan = pan;
-            instance.Play();
-
-            // Why is this always returning false?
-            return false;
-
-#endif
-
-#if MONOMAC || IOS
-            
-			if (playing == null)
-            {
-				playing = new List<SoundEffectInstance>();
-				available = new List<SoundEffectInstance>();
-				toBeRecycled = new List<SoundEffectInstance>();
-			}
-			else
-            {
-				// Lets cycle through our playing list and see if any are stopped
-				// so that we can recycle them.
-				if (playing.Count > 0)
-                {
-					foreach(var instance2 in playing)
-                    {
-						if (instance2.State == SoundState.Stopped)
-							toBeRecycled.Add(instance2);
-					}
-				}
-			}
-
-			SoundEffectInstance instance = null;
-			if (toBeRecycled.Count > 0)
-            {
-				foreach(var recycle in toBeRecycled)
-                {
-					available.Add(recycle);
-					playing.Remove(recycle);
-				}
-
-				toBeRecycled.Clear();
-			}
-
-			if (available.Count > 0)
-            {
-				instance = available[0];
-				playing.Add(instance);
-				available.Remove(instance);
-				//System.Console.WriteLine("from pool = " + playing.Count);
-			}
-			else
-            {
-				instance = CreateInstance ();
-				playing.Add (instance);
-				//System.Console.WriteLine("pooled = "  + playing.Count);
-			}
-
-			instance.Volume = volume;
-			instance.Pitch = pitch;
-			instance.Pan = pan;
-            instance.Play();
-            return true;
-#endif
-
-#if ANDROID
-
-			if(_instance == null)
-				_instance = CreateInstance();
-
-			_instance.Volume = volume;
-			_instance.Pitch = pitch;
-			_instance.Pan = pan;
-			_instance.Play();
-			return true;            
-#endif
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        private TimeSpan PlatformGetDuration()
-        {
-             return _duration;
         }
 
         #endregion
@@ -307,7 +178,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static void PlatformSetMasterVolume()
         {
-			// Appears to be a no-op outside of DirectX Platforms.
+            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
+
+            // A little gross here, but there's
+            // no if(value == value) check in SFXInstance.Volume
+            // This'll allow the sound's current volume to be recalculated
+            // against SoundEffect.MasterVolume.
+            foreach(var sound in activeSounds)
+                sound.Volume = sound.Volume;
         }
 
         #endregion

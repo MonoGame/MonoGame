@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Audio
             _audioBuffer = new Sound(audioData);
                 
             _soundPlayer = _audioBuffer.CreatePlayer();
+            _soundPlayer.Volume = SoundEffect.MasterVolume;
         }
 
         private void PlatformDispose()
@@ -94,6 +95,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
+            _pan = value;
+
             if (_soundPlayer != null)
             {
                 if (_soundPlayer.Pan != value)
@@ -103,32 +106,12 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        private float PlatformGetPan()
-        {
-            if (_soundPlayer != null)
-            {
-                return _soundPlayer.Pan;
-            }
-            else
-            {
-                return 0.0f;
-            }
-        }
-
         private void PlatformSetPitch(float value)
         {
+            _pitch = value;
+
             if (_soundPlayer != null)
                 _soundPlayer.PlaybackRate = value + 1.0f;
-        }
-
-        private float PlatformGetPitch()
-        {
-            if (_soundPlayer != null)
-            {
-                return _soundPlayer.PlaybackRate - 1.0f;
-            }
-
-            return 0.0f;
         }
 
         private SoundState PlatformGetState()
@@ -146,27 +129,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetVolume(float value)
         {
-            if (_soundPlayer != null)
-            {
-                if (_soundPlayer.Volume != value)
-                {
-                    _soundPlayer.Volume = value;
-                }
-            }
+            if (_soundPlayer == null)
+                return;
+
+            _volume = value;
+            
+            _soundPlayer.Volume = value * SoundEffect.MasterVolume;
         }
-
-        private float PlatformGetVolume()
-        {
-            if (_soundPlayer != null)
-            {
-                return _soundPlayer.Volume;
-            }
-            else
-            {
-                return 0.0f;
-            }
-        }
-
-
     }
 }
