@@ -7,4 +7,5 @@
   <DefaultWindowsPlatforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,iOS</DefaultWindowsPlatforms>
   <DefaultMacOSPlatforms>MacOS,iOS,WindowsGL,Android</DefaultMacOSPlatforms>
   <DefaultLinuxPlatforms>Linux,WindowsGL</DefaultLinuxPlatforms>
+  <DisableSynchronisation>true</DisableSynchronisation>
 </ModuleInfo>

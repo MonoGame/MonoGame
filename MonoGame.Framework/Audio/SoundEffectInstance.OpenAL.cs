@@ -25,8 +25,6 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed partial class SoundEffectInstance : IDisposable
     {
 		private SoundState soundState = SoundState.Stopped;
-		private float _pan = 0f;
-		private float _volume = 1.0f;
 		private bool _looped = false;
 		int sourceId;
 
@@ -35,7 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
 
-        private float _pitch = 0f;
+        
         bool hasSourceId = false;
 
 #endif
@@ -76,17 +74,6 @@ namespace Microsoft.Xna.Framework.Audio
 #if WINDOWS || LINUX || MONOMAC || IOS
 
         /// <summary>
-        /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
-        /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
-        /// </summary>
-        /// <param name="parent"></param>
-        internal SoundEffectInstance(SoundEffect parent)
-        {
-            InitializeSound();
-            BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
-        }
-
-        /// <summary>
         /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
         /// that is created in the InitializeSound method.
         /// </summary>
@@ -95,7 +82,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="size">The size of the data buffer</param>
         /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
         [CLSCompliant(false)]
-        protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
+        internal void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
             soundBuffer.BindDataBuffer(data, format, size, rate);
         }
@@ -104,7 +91,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Gets the OpenAL sound controller, constructs the sound buffer, and sets up the event delegates for
         /// the reserved and recycled events.
         /// </summary>
-        private void InitializeSound()
+        internal void InitializeSound()
         {
             controller = OpenALSoundController.GetInstance;
             soundBuffer = new OALSoundBuffer();
@@ -380,22 +367,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
-        private float PlatformGetPan()
-        {
-
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _pan;
-#endif
-
-#if ANDROID
-			if (sourceId == 0)
-                return 0.0f;
-            
-			return sourceId;
-#endif
-        }
-
         private void PlatformSetPitch(float value)
         {
 #if WINDOWS || LINUX || MONOMAC || IOS
@@ -408,23 +379,11 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
+
+            // TODO: This doesn't look right...
+
 			if (sourceId != 0 && _sampleRate != value)
 				_sampleRate = value;
-#endif
-        }
-
-        private float PlatformGetPitch()
-        {
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _pitch;
-#endif
-
-#if ANDROID
-			if (sourceId == 0)
-                return 0.0f;
-            
-			return _sampleRate;
 #endif
         }
 
@@ -433,8 +392,28 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if WINDOWS || LINUX || MONOMAC || IOS
 
-            return soundState;
+            if (!hasSourceId)
+                return SoundState.Stopped;
+            
+            var alState = AL.GetSourceState(sourceId);
 
+            switch (alState)
+            {
+                case ALSourceState.Initial:
+                case ALSourceState.Stopped:
+                    soundState = SoundState.Stopped;
+                    break;
+
+                case ALSourceState.Paused:
+                    soundState = SoundState.Paused;
+                    break;
+
+                case ALSourceState.Playing:
+                    soundState = SoundState.Playing;
+                    break;
+            }
+
+            return soundState;
 #endif
 
 #if ANDROID
@@ -468,23 +447,6 @@ namespace Microsoft.Xna.Framework.Audio
 #if ANDROID
 			if (sourceId != 0 && _volume != value)
 				_volume = value;
-#endif
-        }
-
-        private float PlatformGetVolume()
-        {
-
-#if WINDOWS || LINUX || MONOMAC || IOS
-
-            return _volume;
-#endif
-
-#if ANDROID
-
-            if (sourceId == 0)
-                return 0.0f;
-            
-			return _volume;
 #endif
         }
 

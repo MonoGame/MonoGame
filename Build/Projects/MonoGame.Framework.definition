@@ -161,6 +161,7 @@
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
       <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
+    <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
     <Compile Include="Audio\WaveBank.cs" />
     <Compile Include="Audio\XactClip.cs" />
@@ -430,8 +431,20 @@
     <Compile Include="Graphics\PresentationParameters.cs" />
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Graphics\RenderTarget2D.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget2D.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget2D.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
-      <Platforms>Windows8,Windows,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
@@ -439,10 +452,37 @@
     <Compile Include="Graphics\ResourceCreatedEventArgs.cs" />
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
+    <Compile Include="Graphics\SamplerStateCollection.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\SamplerStateCollection.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\SetDataOptions.cs" />
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
+    <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\ConstantBuffer.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\Shader.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Shader\Shader.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\Shader\ShaderProgramCache.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
@@ -459,13 +499,46 @@
     <Compile Include="Graphics\States\Blend.cs" />
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
+    <Compile Include="Graphics\States\BlendState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\BlendState.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\CompareFunction.cs" />
     <Compile Include="Graphics\States\CullMode.cs" />
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
+    <Compile Include="Graphics\States\DepthStencilState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\DepthStencilState.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
+    <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\RasterizerState.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
+    <Compile Include="Graphics\States\SamplerState.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
     <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
     <Compile Include="Graphics\States\TargetBlendState.cs" />
@@ -476,12 +549,46 @@
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture2D.cs" />
-    <Compile Include="Graphics\Texture3D.cs">
-      <ExcludePlatforms>iOS,Android,Ouya</ExcludePlatforms>
+    <Compile Include="Graphics\Texture2D.DirectX.cs">
+      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture2D.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.cs" />
+    <Compile Include="Graphics\Texture3D.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture3D.PSM.cs">
+        <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\Texture.cs" />
+    <Compile Include="Graphics\Texture.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Texture.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\TextureCube.cs" />
+    <Compile Include="Graphics\TextureCube.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCube.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\TextureUsage.cs" />
     <Compile Include="Graphics\Vertices\BufferUsage.cs" />
     <Compile Include="Graphics\Vertices\DynamicIndexBuffer.cs" />
@@ -512,6 +619,15 @@
     <Compile Include="Graphics\Vertices\VertexColorTexture.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
+    <Compile Include="Graphics\Vertices\VertexDeclaration.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
+        <Platforms>WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\Vertices\VertexDeclaration.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
     <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />

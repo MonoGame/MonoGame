@@ -39,57 +39,22 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
-        private void PlatformInitializeInstance(SoundEffectInstance instance)
-        {
-            instance._audioBuffer = _audioBuffer;
-            instance._soundPlayer = _audioBuffer.CreatePlayer();
-        }
-        
-        private SoundEffectInstance PlatformCreateInstance()
-        {
-            var inst = new SoundEffectInstance();
-            
+        private void PlatformSetupInstance(SoundEffectInstance inst)
+        {   
             inst._audioBuffer = _audioBuffer;
             inst._soundPlayer = _audioBuffer.CreatePlayer();
-            
-            return inst;
-        }
-
-        private bool PlatformPlay()
-        {
-            return Play(1.0f, 0.0f, 0.0f);
-        }
-
-        private bool PlatformPlay(float volume, float pitch, float pan)
-        {
-            // TODO: While merging the SoundEffect classes together
-            // I noticed that the return values seem to widly differ
-            // between platforms. It also doesn't seem to match
-            // what's written in the XNA docs.
-
-            if ( MasterVolume > 0.0f )
-            {
-                if(_instance == null)
-                    _instance = CreateInstance();
-                
-                _instance.Volume = volume;
-                _instance.Pitch = pitch;
-                _instance.Pan = pan;
-                _instance.Play();
-                
-                return _instance._soundPlayer.Status == SoundStatus.Playing;
-            }
-            return false;
-        }
-
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
         }
 
         private static void PlatformSetMasterVolume()
         {
-            // Appears to be a no-op on PSM?
+            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
+
+            // A little gross here, but there's
+            // no if(value == value) check in SFXInstance.Volume
+            // This'll allow the sound's current volume to be recalculated
+            // against SoundEffect.MasterVolume.
+            foreach (var sound in activeSounds)
+                sound.Volume = sound.Volume;
         }
 
         private void PlatformDispose()
