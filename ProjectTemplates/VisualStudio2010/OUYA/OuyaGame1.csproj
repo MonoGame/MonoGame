@@ -83,6 +83,9 @@
     <AndroidResource Include="Resources\Values\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidResource Include="Resources\Raw\key.der" />
+  </ItemGroup>
+  <ItemGroup>
     <AndroidResource Include="Resources\Drawable-xhdpi\ouya_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
