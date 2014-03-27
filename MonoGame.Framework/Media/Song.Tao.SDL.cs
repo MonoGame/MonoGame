@@ -22,11 +22,6 @@ namespace Microsoft.Xna.Framework.Media
         {
             MediaPlayer.OnSongFinishedPlaying(null, null);
         }
-
-        ~Song()
-        {
-            Dispose(false);
-        }
 		
         void PlatformDispose(bool disposing)
         {
