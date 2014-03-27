@@ -961,9 +961,6 @@
     <Compile Include="iOS\GamerServices\Guide.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\KeyboardInputAsyncResult.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs">
       <Platforms>iOS</Platforms>
     </Compile>
