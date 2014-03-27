@@ -468,11 +468,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.Recycle();
 
                 // Convert from ARGB to ABGR
-                for (int i = 0; i < width * height; ++i)
-                {
-                    uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
-                }
+                ConvertToRGBA(height, width, pixels);
 
                 Texture2D texture = null;
                 Threading.BlockOnUIThread(() =>
