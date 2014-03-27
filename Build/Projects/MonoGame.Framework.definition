@@ -249,7 +249,7 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <Platforms>Android,Linux,Ouya</Platforms>
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
@@ -730,6 +730,30 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
+    <Compile Include="Media\Video.cs">
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\Video.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.MacOS.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\Video.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.cs">
+      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.IOS.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.MacOS.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.Android.cs">
+        <Platforms>Android,Ouya</Platforms>
+    </Compile>
 
     <!-- Microsoft.Devices.Sensors -->
     <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs">
@@ -907,12 +931,6 @@
     <Compile Include="Android\IResumeManager.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Media\Video.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Android\Media\VideoPlayer.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
     <Compile Include="Android\OrientationListener.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -1021,12 +1039,6 @@
     <Compile Include="iOS\iOSGameWindow.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Media\Video.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\Media\VideoPlayer.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
       <Platforms>iOS</Platforms>
     </Compile>
@@ -1049,9 +1061,6 @@
       <Platforms>Linux</Platforms>
     </Compile>
     <Compile Include="Linux\Input\KeyboardUtil.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Linux\Media\Video.cs">
       <Platforms>Linux</Platforms>
     </Compile>
     <Compile Include="Linux\Storage\StorageDeviceHelper.cs">
@@ -1093,12 +1102,6 @@
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
-    <Compile Include="MacOS\Media\Video.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\Media\VideoPlayer.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1133,9 +1136,6 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="PSSuite\Input\Touch\GestureListener.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\Media\Video.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="PSSuite\PSSExtensions.cs">
@@ -1200,9 +1200,6 @@
     </Compile>
     <Compile Include="Windows\Input\KeyboardUtil.cs">
       <Platforms>WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Windows\Media\Video.cs">
-      <Platforms>Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>
