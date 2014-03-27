@@ -239,7 +239,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     hasCurrentGlyph = true;                        
                 }
 
-                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings;
+                var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings + Spacing;
                 if (proposedWidth > width)
                     width = proposedWidth;
 
