@@ -126,9 +126,15 @@ namespace Microsoft.Xna.Framework.Graphics
 				GraphicsDevice.AddDisposeAction(() =>
 				{
 					if (this.glStencilBuffer != 0 && this.glStencilBuffer != this.glDepthBuffer)
-				    	GL.DeleteRenderbuffers(1, ref this.glStencilBuffer);
-					GL.DeleteRenderbuffers(1, ref this.glDepthBuffer);
-					GraphicsExtensions.CheckGLError();
+					{
+						GL.DeleteRenderbuffers(1, ref this.glStencilBuffer);
+						GraphicsExtensions.CheckGLError();
+					}
+					if (this.glDepthBuffer != 0)
+					{
+						GL.DeleteRenderbuffers(1, ref this.glDepthBuffer);
+						GraphicsExtensions.CheckGLError();
+					}
 				});
         }
     }
