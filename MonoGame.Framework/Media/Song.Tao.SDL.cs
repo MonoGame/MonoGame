@@ -12,11 +12,14 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         private IntPtr _audioData;
+        private int _volume = 128; // in SDL units from 0 to 128
 
         private void PlatformInitialize(string fileName)
         {
             _audioData = Tao.Sdl.SdlMixer.Mix_LoadMUS(fileName);
         }
+        
+        internal void SetEventHandler(FinishedPlayingHandler handler) { }
 
         internal void OnFinishedPlaying()
         {
