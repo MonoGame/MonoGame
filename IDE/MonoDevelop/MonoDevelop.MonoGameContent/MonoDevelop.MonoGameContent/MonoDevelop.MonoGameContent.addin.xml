@@ -20,7 +20,12 @@
 		<Import file="MonoGame.Framework.Content.Pipeline.dll"/>
 		<Import file="MonoGame.Framework.dll"/>
 		<!--Import file="MonoMac.dll"/-->
-		<Import file="NAudio.dll"/>
+		<!--
+      This isn't available for MonoMac or Linux builds, but is 
+      for Windows builds.  So how do we fix this correctly?
+      
+      <Import file="NAudio.dll"/>
+    -->    
 		<Import file="Nvidia.TextureTools.dll"/>
 		<Import file="Nvidia.TextureTools.dll.config"/>
 		<Import file="SharpFont.dll"/>

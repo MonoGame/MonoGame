@@ -93,7 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				Setup();
 #if PSM   
             GraphicsDevice.BlendState = _blendState;
-            _blendState.ApplyState(GraphicsDevice);
+            _blendState.PlatformApplyState(GraphicsDevice);
 #endif
             
             _batcher.DrawBatch(_sortMode);

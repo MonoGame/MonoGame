@@ -717,7 +717,14 @@ namespace Microsoft.Xna.Framework
         {
             AssertNotDisposed();
             if (Platform.BeforeUpdate(gameTime))
+            {
+                // Once per frame, we need to check currently 
+                // playing sounds to see if they've stopped,
+                // and return them back to the pool if so.
+                SoundEffectInstancePool.Update();
                 Update(gameTime);
+            }
+                
         }
 
         internal void DoDraw(GameTime gameTime)

@@ -8,7 +8,7 @@ Our goal is to make it easy for XNA developers to create cross-platform games wi
 
 * iOS (including Retina displays)
 * Android
-* Windows (OpenGL, a DirectX 11 version is currently in development)
+* Windows (OpenGL & DirectX)
 * Mac OS X
 * Linux
 * [Windows Store Apps](http://dev.windows.com) (for Windows 8 and Windows RT)
@@ -45,7 +45,7 @@ Have a bug or a feature request? [Please open a new issue](https://github.com/mo
 Keep track of development and community news.
 
 * Follow [@MonoGameTeam on Twitter](https://twitter.com/monogameteam).
-* Have a question that's not a feature request or bug report? [Ask on our discussions list.](http://monogame.codeplex.com/discussions)
+* Have a question that's not a feature request or bug report? [Ask on our community site.](http://community.monogame.net)
 * Join us over IRC - [irc://irc.gnome.org/#monogame](http://mibbit.com/?server=irc.gnome.org&channel=%23monogame). 
 
 ## Contributing
