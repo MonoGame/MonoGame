@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
-        protected bool _enableAltF4 = true;
+        public bool _enableAltF4 = true;
 
         public WinFormsGameForm(GameWindow window)
         {
