@@ -80,6 +80,19 @@ namespace MonoGame.Framework
 
         #region Public Properties
 
+        public override bool AllowAltF4
+        {
+            get
+            {
+                return enableAltF4;
+            }
+            set
+            {
+                _form.enableAltF4 = value;
+                enableAltF4 = value;
+            }
+        }
+
         public override IntPtr Handle { get { return _form.Handle; } }
 
         public override string ScreenDeviceName { get { return String.Empty; } }
