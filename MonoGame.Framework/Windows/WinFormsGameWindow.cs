@@ -85,7 +85,7 @@ namespace MonoGame.Framework
             get { return base.AllowAltF4; }
             set
             {
-                _form._enableAltF4 = value;
+                _form.EnableAltF4 = value;
                 base.AllowAltF4 = value;
             }
         }

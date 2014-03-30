@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
-        public bool _enableAltF4 = true;
+        public bool EnableAltF4 = true;
 
         public WinFormsGameForm(GameWindow window)
         {
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Windows
 
                     var wParam = m.WParam.ToInt32();
                     
-                        if (!_enableAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0)
+                        if (!EnableAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0)
                         {
                             m.Result = IntPtr.Zero;
                             return;
