@@ -159,12 +159,12 @@ namespace Microsoft.Xna.Framework {
 
 		#endregion Events
 
-        internal bool enableAltF4 = true;
+        internal bool _enableAltF4 = true;
 
         /// <summary>
         /// Gets or sets the bool that enables the Alt+F4 usage for window closing(works on all platforms except WinRT). Its true by default.
         /// </summary>
-        public virtual bool AllowAltF4 { get { return enableAltF4; } set { enableAltF4 = value; } }
+        public virtual bool AllowAltF4 { get { return _enableAltF4; } set { _enableAltF4 = value; } }
 
 		public abstract void BeginScreenDeviceChange (bool willBeFullScreen);
 

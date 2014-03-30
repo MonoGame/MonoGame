@@ -82,14 +82,11 @@ namespace MonoGame.Framework
 
         public override bool AllowAltF4
         {
-            get
-            {
-                return enableAltF4;
-            }
+            get { return base.AllowAltF4; }
             set
             {
-                _form.enableAltF4 = value;
-                enableAltF4 = value;
+                _form._enableAltF4 = value;
+                base.AllowAltF4 = value;
             }
         }
 
