@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework {
 
 		#endregion Events
 
-        protected bool enableAltF4 = true;
+        internal bool enableAltF4 = true;
 
         /// <summary>
         /// Gets or sets the bool that enables the Alt+F4 usage for window closing(works on all platforms except Windows8).
