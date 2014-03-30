@@ -162,7 +162,7 @@ namespace Microsoft.Xna.Framework {
         internal bool enableAltF4 = true;
 
         /// <summary>
-        /// Gets or sets the bool that enables the Alt+F4 usage for window closing(works on all platforms except Windows8).
+        /// Gets or sets the bool that enables the Alt+F4 usage for window closing(works on all platforms except WinRT). Its true by default.
         /// </summary>
         public virtual bool AllowAltF4 { get { return enableAltF4; } set { enableAltF4 = value; } }
 
