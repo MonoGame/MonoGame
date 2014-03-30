@@ -71,8 +71,8 @@ namespace Microsoft.Xna.Framework.Windows
                     // keyboard input so we can own the ALT key.
 
                     var wParam = m.WParam.ToInt32();
-                    if (!enableAltF4)
-                        if (wParam == 0xF060 && m.LParam.ToInt32() == 0)
+                    
+                        if (!enableAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0)
                         {
                             m.Result = IntPtr.Zero;
                             return;
