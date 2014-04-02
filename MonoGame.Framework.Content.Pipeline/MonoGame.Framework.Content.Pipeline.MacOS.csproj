@@ -41,22 +41,22 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Nvidia.TextureTools">
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
       <Private>False</Private>
     </Reference>
     <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\assimp\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="ManagedPVRTC">
-      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
     <Reference Include="SharpFont">
-      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\SharpFont\SharpFont.dll</HintPath>
     </Reference>
     <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NAudio\NAudio.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -247,31 +247,31 @@
   </Target>
   -->
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib">
       <Link>libnvtt.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\MacOS\libpvrtc.dylib">
+    <Content Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\libpvrtc.dylib">
       <Link>libpvrtc.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll.config">
       <Link>ManagedPVRTC.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\SharpFont\libfreetype.6.dylib">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\libfreetype.6.dylib">
       <Link>libfreetype.6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\SharpFont\libpng15.15.dylib">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\libpng15.15.dylib">
       <Link>libpng15.15.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -283,25 +283,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\assimp\AssimpNet.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\assimp\libassimp.dylib">
+    <Content Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
       <Link>libassimp.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvcore.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
       <Link>libnvcore.dylib</Link>
     </None>
-    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvimage.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib">
       <Link>libnvimage.dylib</Link>
     </None>
-    <None Include="..\ThirdParty\Libs\NVTT\MacOS\libnvmath.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib">
       <Link>libnvmath.dylib</Link>
     </None>
   </ItemGroup>

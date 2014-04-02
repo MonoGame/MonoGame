@@ -7,7 +7,7 @@ into MonoGame MGFX files.
 REQUIREMENTS:
 
 - MonoGame develop3d branch. If you're reading this, you should already have that installed.
-- ThirdParty/Libs submodule
+- ThirdParty/Dependencies submodule
 
 Open the solution in visual studio and build it. The required assemblies will be copied to MonoGame\Tools\bin\windows.
 In an elevated command prompt, switch to that folder, and run

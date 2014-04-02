@@ -41,19 +41,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NAudio\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="Nvidia.TextureTools">
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\assimp\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="ManagedPVRTC">
-      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
     <Reference Include="SharpFont">
-      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\SharpFont\SharpFont.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -241,31 +241,31 @@
   </Target>
   -->
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvcore.so">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
       <Link>libnvcore.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvimage.so">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.so">
       <Link>libnvimage.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvmath.so">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.so">
       <Link>libnvmath.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Linux\libnvtt.so">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.so">
       <Link>libnvtt.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\SharpFont\SharpFont.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\assimp\AssimpNet.dll.config">
+    <Content Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
