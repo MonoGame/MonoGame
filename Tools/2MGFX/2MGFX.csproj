@@ -52,16 +52,16 @@
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="SharpDX">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\ThirdParty\Libs\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -123,14 +123,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ThirdParty\Libs\libmojoshader_32.dll">
+    <None Include="..\..\ThirdParty\Dependencies\libmojoshader_32.dll">
       <Link>libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MGFX.tpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ThirdParty\Libs\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
+    <None Include="..\..\ThirdParty\Dependencies\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
       <Link>sharpdx_direct3d11_effects_x86.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
