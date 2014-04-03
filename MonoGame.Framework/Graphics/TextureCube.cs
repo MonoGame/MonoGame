@@ -80,58 +80,62 @@ namespace Microsoft.Xna.Framework.Graphics
 			//TODO
 #else
 			this.glTarget = TextureTarget.TextureCubeMap;
-#if IOS || ANDROID
-			GL.GenTextures(1, ref this.glTexture);
-#else
-			GL.GenTextures(1, out this.glTexture);
-#endif
-            GraphicsExtensions.CheckGLError();
-            GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
-			                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
-			                (int)TextureMagFilter.Linear);
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
-			                (int)TextureWrapMode.ClampToEdge);
-            GraphicsExtensions.CheckGLError();
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
-			                (int)TextureWrapMode.ClampToEdge);
-            GraphicsExtensions.CheckGLError();
 
-
-			format.GetGLFormat (out glInternalFormat, out glFormat, out glType);
-			
-			for (int i=0; i<6; i++) 
+            Threading.BlockOnUIThread(() =>
             {
-				TextureTarget target = GetGLCubeFace((CubeMapFace)i);
+#if IOS || ANDROID
+			    GL.GenTextures(1, ref this.glTexture);
+#else
+                GL.GenTextures(1, out this.glTexture);
+#endif
+                GraphicsExtensions.CheckGLError();
+                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter,
+                                mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter,
+                                (int)TextureMagFilter.Linear);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS,
+                                (int)TextureWrapMode.ClampToEdge);
+                GraphicsExtensions.CheckGLError();
+                GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT,
+                                (int)TextureWrapMode.ClampToEdge);
+                GraphicsExtensions.CheckGLError();
 
-				if (glFormat == (PixelFormat)All.CompressedTextureFormats) 
+
+                format.GetGLFormat(out glInternalFormat, out glFormat, out glType);
+
+                for (int i = 0; i < 6; i++)
                 {
-					throw new NotImplementedException();
-				} 
-                else 
+                    TextureTarget target = GetGLCubeFace((CubeMapFace)i);
+
+                    if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+#if IOS || ANDROID
+					    GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+#else
+                        GL.TexImage2D(target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+#endif
+                        GraphicsExtensions.CheckGLError();
+                    }
+                }
+
+                if (mipMap)
                 {
 #if IOS || ANDROID
-					GL.TexImage2D (target, 0, (int)glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+				    GL.GenerateMipmap(TextureTarget.TextureCubeMap);
 #else
-					GL.TexImage2D (target, 0, glInternalFormat, size, size, 0, glFormat, glType, IntPtr.Zero);
+                    GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
 #endif
                     GraphicsExtensions.CheckGLError();
                 }
-			}
-			
-			if (mipMap)
-			{
-#if IOS || ANDROID
-				GL.GenerateMipmap(TextureTarget.TextureCubeMap);
-#else
-				GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.GenerateMipmap, (int)All.True);
-#endif
-                GraphicsExtensions.CheckGLError();
-			}
+            });
 #endif
         }
 
@@ -203,49 +207,53 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null) 
                 throw new ArgumentNullException("data");
 
-            var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            // Use try..finally to make sure dataHandle is freed in case of an error
-            try
+#if OPENGL
+            Threading.BlockOnUIThread(() =>
             {
-                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
-
-                int xOffset, yOffset, width, height;
-                if (rect.HasValue)
+#endif
+                var elementSizeInByte = Marshal.SizeOf(typeof(T));
+                var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                // Use try..finally to make sure dataHandle is freed in case of an error
+                try
                 {
-                    xOffset = rect.Value.X;
-                    yOffset = rect.Value.Y;
-                    width = rect.Value.Width;
-                    height = rect.Value.Height;
-                }
-                else
-                {
-                    xOffset = 0;
-                    yOffset = 0;
-                    width = Math.Max(1, this.size >> level);
-                    height = Math.Max(1, this.size >> level);
+                    var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
 
-                    // For DXT textures the width and height of each level is a multiple of 4.
-                    // OpenGL only: The last two mip levels require the width and height to be 
-                    // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
-                    // a 4x4 block. 
-                    // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
-                    if (_format == SurfaceFormat.Dxt1 ||
-                        _format == SurfaceFormat.Dxt1a ||
-                        _format == SurfaceFormat.Dxt3 ||
-                        _format == SurfaceFormat.Dxt5)
+                    int xOffset, yOffset, width, height;
+                    if (rect.HasValue)
                     {
+                        xOffset = rect.Value.X;
+                        yOffset = rect.Value.Y;
+                        width = rect.Value.Width;
+                        height = rect.Value.Height;
+                    }
+                    else
+                    {
+                        xOffset = 0;
+                        yOffset = 0;
+                        width = Math.Max(1, this.size >> level);
+                        height = Math.Max(1, this.size >> level);
+
+                        // For DXT textures the width and height of each level is a multiple of 4.
+                        // OpenGL only: The last two mip levels require the width and height to be 
+                        // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy 
+                        // a 4x4 block. 
+                        // Ref: http://www.mentby.com/Group/mac-opengl/issue-with-dxt-mipmapped-textures.html 
+                        if (_format == SurfaceFormat.Dxt1 ||
+                            _format == SurfaceFormat.Dxt1a ||
+                            _format == SurfaceFormat.Dxt3 ||
+                            _format == SurfaceFormat.Dxt5)
+                        {
 #if DIRECTX
                         width = (width + 3) & ~3;
                         height = (height + 3) & ~3;
 #else
-                        if (width > 4)
-                            width = (width + 3) & ~3;
-                        if (height > 4)
-                            height = (height + 3) & ~3;
+                            if (width > 4)
+                                width = (width + 3) & ~3;
+                            if (height > 4)
+                                height = (height + 3) & ~3;
 #endif
+                        }
                     }
-                }
 
 #if DIRECTX
                 var box = new DataBox(dataPtr, GetPitch(width), 0);
@@ -268,25 +276,28 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif PSM
 			    //TODO
 #else
-                GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
-                GraphicsExtensions.CheckGLError();
-
-                TextureTarget target = GetGLCubeFace(face);
-                if (glFormat == (PixelFormat)All.CompressedTextureFormats)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
+                    GL.BindTexture(TextureTarget.TextureCubeMap, this.glTexture);
                     GraphicsExtensions.CheckGLError();
-                }
+
+                    TextureTarget target = GetGLCubeFace(face);
+                    if (glFormat == (PixelFormat)All.CompressedTextureFormats)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        GL.TexSubImage2D(target, level, xOffset, yOffset, width, height, glFormat, glType, dataPtr);
+                        GraphicsExtensions.CheckGLError();
+                    }
 #endif
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+                }
+                finally
+                {
+                    dataHandle.Free();
+                }
+#if OPENGL
+            });
+#endif
 		}
 		
 #if OPENGL
