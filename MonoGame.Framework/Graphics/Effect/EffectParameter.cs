@@ -262,12 +262,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			return new Vector2(vecInfo[0],vecInfo[1]);
 		}
 
-        /*
-		public Vector2[] GetValueVector2Array ()
+		public Vector2[] GetValueVector2Array()
 		{
-			throw new NotImplementedException();
+
+			if (Elements != null && Elements.Count > 0)
+			{
+				Vector2[] result = new Vector2[Elements.Count];
+				for (int i = 0; i < Elements.Count; i++)
+				{
+					var v = Elements[i].GetValueSingleArray();
+					result[i] = new Vector2(v[0], v[1]);
+				}
+			return result;
+			}
+			
+		return null;
 		}
-        */
 
 		public Vector3 GetValueVector3 ()
 		{
