@@ -70,6 +70,7 @@ namespace Microsoft.Xna.Framework
 		private Game _game;
 		private MacGamePlatform _platform;
         internal MouseState MouseState;
+        internal TouchPanelState TouchPanelState;
 
 		private NSTrackingArea _trackingArea;
 		private bool _needsToResetElapsedTime = false;
@@ -81,13 +82,13 @@ namespace Microsoft.Xna.Framework
 		}
 
 		#region GameWindow Methods
-		public GameWindow(Game game, RectangleF frame) : base(frame)
+		public GameWindow(Game game, RectangleF frame) : base (frame)
 		{
-
             if (game == null)
                 throw new ArgumentNullException("game");
             _game = game;
             _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
+            TouchPanelState = new TouchPanelState(this);
 
 			//LayerRetainsBacking = false; 
 			//LayerColorFormat	= EAGLColorFormat.RGBA8;
@@ -524,7 +525,7 @@ namespace Microsoft.Xna.Framework
 					OnTextInput(new TextInputEventArgs(c));
 				}
 			}
-		
+
 			Keys kk = KeyUtil.GetKeys (theEvent); 
 
 			if (!_keys.Contains (kk))
@@ -538,15 +539,30 @@ namespace Microsoft.Xna.Framework
 				handler(this, new KeysEventArgs(kk));
 			}
 		}
-		
+
+		public override void KeyUp (NSEvent theEvent)
+		{
+			Keys kk = KeyUtil.GetKeys (theEvent); 
+
+			_keys.Remove (kk);
+
+			UpdateKeyboardState ();
+
+			EventHandler<KeysEventArgs> handler = TSKeyUp;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
+		}
+
 		protected void OnTextInput(TextInputEventArgs e)
 		{
-			if (e == null)
+			if (e == null) 
 			{
-				throw new ArgumentNullException();
+				throw new ArgumentNullException("e");
 			}
 			
-			if (TextInput != null)
+			if (TextInput != null) 
 			{
 				TextInput.Invoke(this, e);
 			}
@@ -558,22 +574,6 @@ namespace Microsoft.Xna.Framework
 		/// This event also supports key repeat.
 		/// </summary>
 		public event EventHandler<TextInputEventArgs> TextInput;
-
-		public override void KeyUp (NSEvent theEvent)
-		{
-			Keys kk = KeyUtil.GetKeys (theEvent); 
-
-			_keys.Remove (kk);
-
-			UpdateKeyboardState ();
-			
-			EventHandler<KeysEventArgs> handler = TSKeyUp;
-			if (handler != null)
-			{
-				handler(this, new KeysEventArgs(kk));
-			}
-		}
-		
 		List<Keys> _flags = new List<Keys> ();
 
 		public override void FlagsChanged (NSEvent theEvent)

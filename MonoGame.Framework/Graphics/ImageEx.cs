@@ -18,39 +18,15 @@ namespace System.Drawing
 #if WINRT
 
 #else
-        internal static void RGBToBGR(ref Bitmap bmp)
+        internal static void RGBToBGR(this Bitmap bmp)
         {
-            Bitmap bmpCopy;
-            if (bmp.PixelFormat == Imaging.PixelFormat.Format8bppIndexed)
-            {
-                Bitmap bmpConvert = new Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format32bppArgb);
-                Graphics gr = Graphics.FromImage(bmpConvert);
-                gr.DrawImage(bmp, 0, 0);
-                gr.Dispose();
+            System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
+            System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
 
-                bmpCopy = bmp;
-                bmp = bmpConvert;
-            }
-            else
+            ia.SetColorMatrix(cm);
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
             {
-                bmpCopy = (Bitmap)bmp.Clone();
-            }
-
-            try
-            {
-                System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
-                System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
-
-                ia.SetColorMatrix(cm);
-                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
-                {
-                    g.Clear(Color.Transparent);
-                    g.DrawImage(bmpCopy, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
-                }
-            }
-            finally
-            {
-                bmpCopy.Dispose();
+                g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
             }
         }
 #endif

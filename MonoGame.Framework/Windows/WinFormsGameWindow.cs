@@ -159,7 +159,7 @@ namespace MonoGame.Framework
             _platform = platform;
             Game = platform.Game;
 
-            _form = new WinFormsGameForm();
+            _form = new WinFormsGameForm(this);
             
             // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
@@ -225,7 +225,7 @@ namespace MonoGame.Framework
                 touchState = TouchLocationState.Released;
 
             if (touchState.HasValue)
-                TouchPanel.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+                TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
         } 
 
         private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
