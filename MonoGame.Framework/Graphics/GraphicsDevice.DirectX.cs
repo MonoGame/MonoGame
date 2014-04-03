@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
         // Core Direct3D Objects
         internal SharpDX.Direct3D11.Device _d3dDevice;
         internal SharpDX.Direct3D11.DeviceContext _d3dContext;
-        internal FeatureLevel _featureLevel;
         internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
@@ -163,6 +162,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 // power consumption.
                 dxgiDevice2.MaximumFrameLatency = 1;
             }
+
+            // Set the correct profile based on the feature level.
+            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
         }
 
         internal void UpdateTarget(RenderTargetView renderTargetView)
@@ -287,8 +289,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Set the correct profile based on the feature level.
-            _featureLevel = _d3dDevice.FeatureLevel;
-            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
+            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -553,8 +554,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Set the correct profile based on the feature level.
-            _featureLevel = _d3dDevice.FeatureLevel;
-            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
+            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();

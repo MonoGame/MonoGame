@@ -34,13 +34,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedPVRTC">
-      <HintPath>..\ThirdParty\Libs\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
-      <HintPath>..\ThirdParty\Libs\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,16 +51,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="NAudio">
-      <HintPath>..\ThirdParty\Libs\NAudio\NAudio.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NAudio\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="AssimpNet">
-      <HintPath>..\ThirdParty\Libs\assimp\AssimpNet.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\assimp\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="Nvidia.TextureTools">
-      <HintPath>..\ThirdParty\Libs\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll</HintPath>
     </Reference>
     <Reference Include="SharpFont">
-      <HintPath>..\ThirdParty\Libs\SharpFont\SharpFont.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\SharpFont\SharpFont.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -317,35 +317,35 @@
     <Compile Include="XmlImporter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\NVTT\Windows\x86\nvtt.dll">
+    <Content Include="..\ThirdParty\Dependencies\NVTT\Windows\x86\nvtt.dll">
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll">
+    <Content Include="..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll">
       <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp32.dll">
+    <Content Include="..\ThirdParty\Dependencies\assimp\Assimp32.dll">
       <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Libs\assimp\Assimp64.dll">
+    <Content Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll">
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="..\ThirdParty\Libs\libmojoshader_64.dll">
+    <None Include="..\ThirdParty\Dependencies\libmojoshader_64.dll">
       <Link>Dependencies\x64\libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Libs\libmojoshader_32.dll">
+    <None Include="..\ThirdParty\Dependencies\libmojoshader_32.dll">
       <Link>Dependencies\x86\libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="..\ThirdParty\Libs\SharpFont\freetype6.dll">
+    <Content Include="..\ThirdParty\Dependencies\SharpFont\freetype6.dll">
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
