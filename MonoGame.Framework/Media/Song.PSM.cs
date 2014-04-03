@@ -1,35 +1,45 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.IO;
-
+using Microsoft.Xna.Framework.Audio;
 using Sce.PlayStation.Core.Audio;
 
-using Microsoft.Xna.Framework.Audio;
-﻿
 namespace Microsoft.Xna.Framework.Media
 {
-    internal class PSSuiteSong : IDisposable
+    public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        static internal PSSuiteSong _currentSong;
+        static internal Song _currentSong;
         static internal BgmPlayer _bgmPlayer;
-        
-        private Bgm _bgm;
+		
+		private Bgm _bgm;
 
-        internal PSSuiteSong(string fileName)
+        private void PlatformInitialize(string fileName)
         {
-            _bgm = new Bgm(fileName);
+			_bgm = new Bgm(fileName);
         }
-
-        public void Dispose()
+     
+        private void PlatformDispose(bool disposing)
         {
             if (_currentSong == this && _bgmPlayer != null)
             {
                 _bgmPlayer.Stop();
                 _bgmPlayer.Dispose();
             }
+			
             _bgm.Dispose();
-        }
+		}
 
-        internal void Play()
+        internal void SetEventHandler(FinishedPlayingHandler handler)
+        {
+            // TODO: Implement event handler to fire off
+            // when the song's complete.
+            return;
+        }
+		
+		internal void Play()
         {
             if (_currentSong != this) //If needed switch up the current song
             {
@@ -93,6 +103,18 @@ namespace Microsoft.Xna.Framework.Media
                 }
             }
         }
+		
+		internal TimeSpan Position
+		{
+			get 
+			{
+				if (_bgmPlayer == null)
+					return TimeSpan.Zero;
+				
+				return TimeSpan.FromSeconds(_bgmPlayer.Time);
+				
+			}
+		}
     }
 }
 
