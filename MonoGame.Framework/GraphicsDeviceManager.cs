@@ -353,6 +353,28 @@ namespace Microsoft.Xna.Framework
 
 #else
 
+#if ANDROID
+            switch (_game.Window.GraphicsMode.Stencil)
+            {
+                case 8:
+                    presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+                    break;
+
+                default:
+                    switch (_game.Window.GraphicsMode.Depth)
+                    {
+                        case 24:
+                            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+                            break;
+
+                        case 16:
+                            presentationParameters.DepthStencilFormat = DepthFormat.Depth16;
+                            break;
+                    }
+                    break;
+            }
+#endif
+
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
