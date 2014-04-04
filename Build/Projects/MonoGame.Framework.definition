@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
 
   <ProjectGuids>
@@ -1041,6 +1041,9 @@
     <Compile Include="MacOS\Audio\OpenALSupport.cs">
       <Platforms>iOS,MacOS</Platforms>
     </Compile>
+    <Compile Include="MacOS\DragDropEventArgs.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
     <Compile Include="MacOS\GamerServices\Guide.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1069,6 +1072,9 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\MacGameView.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\Media\Video.cs">
