@@ -23,6 +23,21 @@
 
   <Platform Type="MacOS">
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
+    <Binary
+      Name="NAudio"
+      Path="ThirdParty\Dependencies\NAudio\NAudio.dll" />
+    <Binary
+      Name="AssimpNet"
+      Path="ThirdParty\Dependencies\assimp\AssimpNet.dll" />
+    <Binary
+      Name="Nvidia.TextureTools"
+      Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
+    <Binary
+      Name="SharpFont"
+      Path="ThirdParty\Dependencies\SharpFont\SharpFont.dll" />
+    <Binary
+      Name="ManagedPVRTC"
+      Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
   </Platform>
 
 

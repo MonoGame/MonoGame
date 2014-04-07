@@ -3,7 +3,7 @@
 
   <ProjectGuids>
 	<Platform Name="Linux">57696462-CE5E-4BC5-80AB-1B959E2420EA</Platform>
-	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
+	<Platform Name="MacOS">A6C47073-8FF9-4997-BA3A-BA257CC88CFE</Platform>
 	<Platform Name="Windows">B950DE10-AC5D-4BD9-B817-51247C4A732D</Platform>
   </ProjectGuids>
 
@@ -27,7 +27,7 @@
 
     <CustomDefinitions>
       <Platform Name="Linux">TRACE;LINUX</Platform>
-      <Platform Name="MacOS">MONOMAC</Platform>
+      <Platform Name="MacOS">TRACE;MACOS</Platform>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
     </CustomDefinitions>
 
@@ -379,6 +379,69 @@
     <None Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
       <Platforms>Linux</Platforms>
       <Link>AssimpNet.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+
+    <!-- Mac Additional Binaries -->
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libnvcore.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libnvimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libnvmath.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libnvtt.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\libpvrtc.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libpvrtc.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\ManagedPVRTC.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>ManagedPVRTC.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\libfreetype.6.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreetype.6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\libpng15.15.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libpng15.15.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>SharpFont.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>AssimpNet.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libassimp.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
