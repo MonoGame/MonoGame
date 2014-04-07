@@ -721,8 +721,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 #endif // WINDOWS
 
-        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        public void PlatformClear(Color color)
         {
+            var options = ClearOptions.Target;
+
             if (_currentDepthStencilView != null)
             {
                 options |= ClearOptions.DepthBuffer;
@@ -730,7 +732,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
                     options |= ClearOptions.Stencil;
             }
+            
+            PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
+        }
 
+        public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+        {
             lock (_d3dContext)
             {
                 // Clear the diffuse render buffer.
