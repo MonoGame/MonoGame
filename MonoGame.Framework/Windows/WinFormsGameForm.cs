@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Windows
 
                     // Disable the system menu from being toggled by
                     // keyboard input so we can own the ALT key.
-                    if (m.WParam.ToInt32() == 0xF100) // SC_KEYMENU
+                    if (wParam == 0xF100) // SC_KEYMENU
                     {
                         m.Result = IntPtr.Zero;
                         return;
