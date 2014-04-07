@@ -2,7 +2,7 @@
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
   <ProjectGuids>
-	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
+	<Platform Name="Linux">57696462-CE5E-4BC5-80AB-1B959E2420EA</Platform>
 	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
 	<Platform Name="Windows">B950DE10-AC5D-4BD9-B817-51247C4A732D</Platform>
   </ProjectGuids>
@@ -306,6 +306,8 @@
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
 
+
+    <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x86\nvtt.dll">
       <Platforms>Windows</Platforms>
       <Link>nvtt.dll</Link>
@@ -339,6 +341,44 @@
     <None Include="..\ThirdParty\Dependencies\SharpFont\freetype6.dll">
       <Platforms>Windows</Platforms>
       <Link>freetype6.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+
+    <!-- Linux Additional Binaries -->
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvcore.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvimage.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvmath.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.so">
+      <Platforms>Linux</Platforms>
+      <Link>libnvtt.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>Nvidia.TextureTools.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>SharpFont.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
+      <Platforms>Linux</Platforms>
+      <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 
