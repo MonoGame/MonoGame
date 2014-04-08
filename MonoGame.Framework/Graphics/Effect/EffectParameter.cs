@@ -264,7 +264,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public Vector2[] GetValueVector2Array()
 		{
-
+            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
 			if (Elements != null && Elements.Count > 0)
 			{
 				Vector2[] result = new Vector2[Elements.Count];
@@ -288,12 +289,24 @@ namespace Microsoft.Xna.Framework.Graphics
 			return new Vector3(vecInfo[0],vecInfo[1],vecInfo[2]);
 		}
 
-        /*
-		public Vector3[] GetValueVector3Array ()
-		{
-			throw new NotImplementedException();
-		}
-        */
+       public Vector3[] GetValueVector3Array()
+        {
+            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
+            if (Elements != null && Elements.Count > 0)
+            {
+                Vector3[] result = new Vector3[Elements.Count];
+                for (int i = 0; i < Elements.Count; i++)
+                {
+                    var v = Elements[i].GetValueSingleArray();
+                    result[i] = new Vector3(v[0], v[1], v[2]);
+                }
+                return result;
+            }
+            return null;
+        }
+
 
 		public Vector4 GetValueVector4 ()
 		{
@@ -304,12 +317,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			return new Vector4(vecInfo[0],vecInfo[1],vecInfo[2],vecInfo[3]);
 		}
         
-        /*
-		public Vector4[] GetValueVector4Array ()
-		{
-			throw new NotImplementedException();
-		}
-        */
+          public Vector4[] GetValueVector4Array()
+        {
+            if (ParameterClass != EffectParameterClass.Vector || ParameterType != EffectParameterType.Single)
+                throw new InvalidCastException();
+
+            if (Elements != null && Elements.Count > 0)
+            {
+                Vector4[] result = new Vector4[Elements.Count];
+                for (int i = 0; i < Elements.Count; i++)
+                {
+                    var v = Elements[i].GetValueSingleArray();
+                    result[i] = new Vector4(v[0], v[1],v[2], v[3]);
+                }
+                return result;
+            }
+            return null;
+        }
 
 		public void SetValue (bool value)
 		{
