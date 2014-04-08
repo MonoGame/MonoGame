@@ -10,7 +10,6 @@
   <References>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="PipelineReferences" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -18,6 +17,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+
+	<!-- Platform specific and special references! -->
+    <Reference Include="PipelineReferences" />
+
   </References>
 
   <Properties>
