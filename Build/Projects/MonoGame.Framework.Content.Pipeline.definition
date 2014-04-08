@@ -442,7 +442,7 @@
       <Link>libpvrtc.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\MacOS\ManagedPVRTC.dll.config">
+    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll.config">
       <Platforms>MacOS</Platforms>
       <Link>ManagedPVRTC.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
