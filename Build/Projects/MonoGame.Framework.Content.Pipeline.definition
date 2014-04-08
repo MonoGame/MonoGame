@@ -417,17 +417,17 @@
       <Link>libnvcore.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvimage.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvimage.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libnvimage.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvmath.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvmath.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libnvmath.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvtt.dylib">
+    <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libnvtt.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
