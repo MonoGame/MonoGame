@@ -492,7 +492,6 @@
       <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\SpriteBatchItem.cs" />
-    <Compile Include="Graphics\SpriteBlendMode.cs" />
     <Compile Include="Graphics\SpriteEffects.cs" />
     <Compile Include="Graphics\SpriteFont.cs" />
     <Compile Include="Graphics\SpriteSortMode.cs" />

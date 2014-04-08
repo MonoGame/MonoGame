@@ -23,7 +23,7 @@
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="OpenTK"
-      Path="ThirdParty/Libs/OpenTK.dll" />
+      Path="ThirdParty/Dependencies/OpenTK.dll" />
     <Project 
       Name="Lidgren.Network.Linux"
       Guid="758CB33D-6EBD-41EA-BB0C-55B1C97A325F"
@@ -33,7 +33,6 @@
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Binary 
       Name="Tao.Sdl"
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
@@ -61,7 +60,7 @@
     <Reference Include="System.Core" />
     <Binary
       Name="Ouya.Console.Api"
-      Path="ThirdParty/Libs/OUYA/Ouya.Console.Api.dll" />
+      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
     <Project
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
@@ -87,28 +86,28 @@
     <Reference Include="System.Xml" />
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.RawInput"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.RawInput.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.RawInput.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
     <Binary
       Name="SharpDX.XInput"
-      Path="ThirdParty/Libs/SharpDX/Windows/SharpDX.XInput.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
     <Project 
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
@@ -118,25 +117,25 @@
   <Platform Type="Windows8">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.Direct2D1.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct2D1.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XAudio2.dll" />
     <Binary
       Name="SharpDX.XInput"
-      Path="ThirdParty/Libs/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />  
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />  
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -151,7 +150,7 @@
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="OpenTK"
-      Path="ThirdParty/Libs/OpenTK.dll" />
+      Path="ThirdParty/Dependencies/OpenTK.dll" />
     <Project 
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
@@ -161,19 +160,19 @@
   <Platform Type="WindowsPhone">
     <Binary
       Name="SharpDX"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.dll" />
     <Binary
       Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.Direct3D11.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.Direct3D11.dll" />
     <Binary
       Name="SharpDX.DXGI"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.DXGI.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.DXGI.dll" />
     <Binary
       Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.MediaFoundation.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.MediaFoundation.dll" />
     <Binary
       Name="SharpDX.XAudio2"
-      Path="ThirdParty/Libs/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
     <Reference  Include="Microsoft.Xna.Framework.GamerServices" 
                 Aliases="MicrosoftXnaGamerServices" />
     <Reference  Include="Microsoft.Xna.Framework" 

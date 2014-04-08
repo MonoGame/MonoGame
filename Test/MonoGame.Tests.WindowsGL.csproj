@@ -52,19 +52,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NDesk.Options">
-      <HintPath>..\ThirdParty\Libs\Tests\NDesk.Options.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\NDesk.Options.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core.interfaces">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.interfaces.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.core.interfaces.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.framework.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.util">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.util.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.util.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
