@@ -33,7 +33,6 @@
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Binary 
       Name="Tao.Sdl"
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
