@@ -118,6 +118,12 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode)
         {
 #if WINDOWS_STOREAPP
+			// If SwapChainPanel is null then we are running the non-XAML template
+			if (Game.Instance.graphicsDeviceManager.SwapChainPanel == null)
+			{
+				throw new NotImplementedException("This method works only when using the XAML template.");
+			}
+			
             Task<string> result = null;
             _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
