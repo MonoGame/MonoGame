@@ -375,6 +375,10 @@ namespace Microsoft.Xna.Framework
             }
 #endif
 
+#if IOS
+			presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+#endif
+
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
 #elif LINUX
