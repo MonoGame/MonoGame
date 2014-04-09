@@ -85,5 +85,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         RaspberryPi,
+
+        /// <summary>
+        /// Sony PlayStation4
+        /// </summary>
+        PlayStation4,
     }
 }

@@ -314,6 +314,7 @@
     <Compile Include="ContentProcessorContext.cs" />
     <Compile Include="EffectImporter.cs" />
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
     <Compile Include="IContentImporter.cs" />
