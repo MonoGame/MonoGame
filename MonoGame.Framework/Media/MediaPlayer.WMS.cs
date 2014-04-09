@@ -91,10 +91,11 @@ namespace Microsoft.Xna.Framework.Media
             // Cleanup the last song first.
             if (State != MediaState.Stopped)
             {
-                _session.Stop();
+				_session.Stop();
+				_session.Close();
                 _volumeController.Dispose();
                 _clock.Dispose();
-            }
+			}
 
             // Set the new song.
             _session.SetTopology(0, song.Topology);
@@ -138,9 +139,10 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         private static void PlatformStop()
-        {
-            _session.ClearTopologies();
-            _session.Stop();
+		{
+			_session.ClearTopologies();
+			_session.Stop();
+			_session.Close();
             _volumeController.Dispose();
             _volumeController = null;
             _clock.Dispose();
