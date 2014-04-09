@@ -73,4 +73,6 @@ MonoGame.Framework.WindowsGL.csproj
 MonoGame.Framework.WindowsGL.sln
 MonoGame.Framework.WindowsPhone.csproj
 MonoGame.Framework.WindowsPhone.sln
-
+MonoGame.Framework.Content.Pipeline.Windows.csproj
+MonoGame.Framework.Content.Pipeline.Linux.csproj
+MonoGame.Framework.Content.Pipeline.MacOS.csproj
