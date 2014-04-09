@@ -113,9 +113,11 @@ namespace Microsoft.Xna.Framework
                 case((DisplayOrientation)0):
                 case((DisplayOrientation)3):
                     return UIInterfaceOrientationMask.Landscape;
-                case((DisplayOrientation)1):
-                    return UIInterfaceOrientationMask.LandscapeLeft;
+                // NOTE: in XNA, Orientation Left is a 90 degree rotation counterclockwise, while on iOS
+		// it is a 90 degree rotation CLOCKWISE. They are BACKWARDS! 
                 case((DisplayOrientation)2):
+                    return UIInterfaceOrientationMask.LandscapeLeft;
+                case((DisplayOrientation)1):
                     return UIInterfaceOrientationMask.LandscapeRight;
                 case((DisplayOrientation)4):
                     return UIInterfaceOrientationMask.Portrait;
