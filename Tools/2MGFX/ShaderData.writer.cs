@@ -3,7 +3,7 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXShaderData
+    internal partial class ShaderData
     {
         public void Write(BinaryWriter writer, Options options)
         {
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				else
 					writer.Write(false);
 
-                if (!options.DX11Profile)
+                if (options.Profile == ShaderProfile.OpenGL)
                     writer.Write(sampler.samplerName);
 
                 writer.Write((byte)sampler.parameter);
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
             foreach (var cb in _cbuffers)
                 writer.Write((byte)cb);
 
-            if (options.DX11Profile)
+            if (options.Profile != ShaderProfile.OpenGL)
                 return;
 
             // The rest of this is for GL only!

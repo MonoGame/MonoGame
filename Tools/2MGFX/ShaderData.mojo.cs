@@ -6,14 +6,14 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal partial class DXShaderData
+	internal partial class ShaderData
 	{
 
 		private MojoShader.MOJOSHADER_symbol[] _symbols;
 
-		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
+		public static ShaderData CreateGLSL (byte[] byteCode, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
 		{
-			var dxshader = new DXShaderData ();
+			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;
 			dxshader.Bytecode = (byte[])byteCode.Clone ();
 
@@ -31,9 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				IntPtr.Zero,
 				IntPtr.Zero);
 
-			var parseData = DXHelper.Unmarshal<MojoShader.MOJOSHADER_parseData> (parseDataPtr);
+			var parseData = MarshalHelper.Unmarshal<MojoShader.MOJOSHADER_parseData> (parseDataPtr);
 			if (parseData.error_count > 0) {
-				var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error> (
+				var errors = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_error> (
 					parseData.errors,
 					parseData.error_count
 				);
@@ -57,18 +57,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			// TODO: Could this be done using DX shader reflection?
 			//
 			{
-				var attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
+				var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
 						parseData.attributes, parseData.attribute_count);
 
 				dxshader._attributes = new Attribute[attributes.Length];
 				for (var i = 0; i < attributes.Length; i++) {
 					dxshader._attributes [i].name = attributes [i].name;
 					dxshader._attributes [i].index = attributes [i].index;
-					dxshader._attributes [i].usage = DXEffectObject.ToXNAVertexElementUsage (attributes [i].usage);
+					dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
 				}
 			}
 
-			var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
+			var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
 					parseData.symbols, parseData.symbol_count);
 
 			//try to put the symbols in the order they are eventually packed into the uniform arrays
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			// Get the samplers.
-			var samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
+			var samplers = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
 					parseData.samplers, parseData.sampler_count);
 			dxshader._samplers = new Sampler[samplers.Length];
 			for (var i = 0; i < samplers.Length; i++) 
@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var cbuffer_index = new List<int> ();
 			for (var i = 0; i < symbol_types.Length; i++) {
-				var cbuffer = new DXConstantBufferData (symbol_types [i].name,
+				var cbuffer = new ConstantBufferData (symbol_types [i].name,
 													   symbol_types [i].set,
 													   symbols);
 				if (cbuffer.Size == 0)
@@ -206,13 +206,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			return dxshader;
 		}
 
-		public void SetSamplerParameters (Dictionary<string, DXEffectObject.d3dx_parameter> samplers,
-										 List<DXEffectObject.d3dx_parameter> parameters)
+		public void SetSamplerParameters (Dictionary<string, EffectObject.d3dx_parameter> samplers,
+										 List<EffectObject.d3dx_parameter> parameters)
 		{
 			for (int i=0; i<_samplers.Length; i++) {
-				DXEffectObject.d3dx_parameter param;
+				EffectObject.d3dx_parameter param;
 				if (samplers.TryGetValue (_samplers[i].parameterName, out param)) {
-					var samplerState = (DXEffectObject.d3dx_sampler)param.data;
+					var samplerState = (EffectObject.d3dx_sampler)param.data;
 					if (samplerState != null && samplerState.state_count > 0) {
 						var textureName = samplerState.states [0].parameter.name;
 						var index = parameters.FindIndex (e => e.name == textureName);

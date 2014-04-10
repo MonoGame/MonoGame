@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
-        public DXConstantBufferData (string name,
+        public ConstantBufferData (string name,
                                 MojoShader.MOJOSHADER_symbolRegisterSet set, 
                                 MojoShader.MOJOSHADER_symbol[] symbols)
 		{
@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			ParameterIndex = new List<int> ();
 			ParameterOffset = new List<int> ();
-			Parameters = new List<DXEffectObject.d3dx_parameter> ();
+			Parameters = new List<EffectObject.d3dx_parameter> ();
 
 			int minRegister = short.MaxValue;
 			int maxRegister = 0;
@@ -40,9 +40,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Size = Math.Max(maxRegister - minRegister, 0) * registerSize;
         }
 
-        private static DXEffectObject.d3dx_parameter GetParameterFromSymbol(MojoShader.MOJOSHADER_symbol symbol)
+        private static EffectObject.d3dx_parameter GetParameterFromSymbol(MojoShader.MOJOSHADER_symbol symbol)
         {
-            var param = new DXEffectObject.d3dx_parameter();
+            var param = new EffectObject.d3dx_parameter();
             param.rows = symbol.info.rows;
             param.columns = symbol.info.columns;
             param.name = symbol.name ?? string.Empty;
@@ -55,15 +55,15 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (symbol.info.parameter_class)
             {
                 case MojoShader.MOJOSHADER_symbolClass.MOJOSHADER_SYMCLASS_SCALAR:
-                    param.class_ = DXEffectObject.D3DXPARAMETER_CLASS.SCALAR;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
                     break;
 
                 case MojoShader.MOJOSHADER_symbolClass.MOJOSHADER_SYMCLASS_VECTOR:
-                    param.class_ = DXEffectObject.D3DXPARAMETER_CLASS.VECTOR;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
                     break;
 
                 case MojoShader.MOJOSHADER_symbolClass.MOJOSHADER_SYMCLASS_MATRIX_COLUMNS:
-                    param.class_ = DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
+                    param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
                     break;
 
                 default:
@@ -73,15 +73,15 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (symbol.info.parameter_type)
             {
                 case MojoShader.MOJOSHADER_symbolType.MOJOSHADER_SYMTYPE_BOOL:
-                    param.type = DXEffectObject.D3DXPARAMETER_TYPE.BOOL;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.BOOL;
                     break;
 
                 case MojoShader.MOJOSHADER_symbolType.MOJOSHADER_SYMTYPE_FLOAT:
-                    param.type = DXEffectObject.D3DXPARAMETER_TYPE.FLOAT;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
                     break;
 
                 case MojoShader.MOJOSHADER_symbolType.MOJOSHADER_SYMTYPE_INT:
-                    param.type = DXEffectObject.D3DXPARAMETER_TYPE.INT;
+                    param.type = EffectObject.D3DXPARAMETER_TYPE.INT;
                     break;
 
                 default:
@@ -96,9 +96,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (param.member_count > 0)
             {
-                param.member_handles = new DXEffectObject.d3dx_parameter[param.member_count];
+                param.member_handles = new EffectObject.d3dx_parameter[param.member_count];
 
-                var members = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+                var members = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     symbol.info.members, (int)symbol.info.member_count);
 
                 for (var i = 0; i < param.member_count; i++)
@@ -109,10 +109,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                param.member_handles = new DXEffectObject.d3dx_parameter[param.element_count];
+                param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
                 for (var i = 0; i < param.element_count; i++)
                 {
-                    var mparam = new DXEffectObject.d3dx_parameter();
+                    var mparam = new EffectObject.d3dx_parameter();
 
                     mparam.name = string.Empty;
                     mparam.semantic = string.Empty;

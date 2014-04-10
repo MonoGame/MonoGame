@@ -2,15 +2,15 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class DXExpression
+	public class ShaderExpression
 	{
         private string _indexName;
-        private DXPreshader _preshader;
+        private Preshader _preshader;
 
-        public DXExpression(string indexName, byte[] expressionCode)
+        public ShaderExpression(string indexName, byte[] expressionCode)
         {
             _indexName = indexName;
-            _preshader = DXPreshader.CreatePreshader(expressionCode);
+            _preshader = Preshader.CreatePreshader(expressionCode);
         }
 
         public void Write(BinaryWriter writer)
