@@ -20,8 +20,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
             // back to a general exception from Process.Start()
-            if (!FindInPath(command))
-                throw new Exception(string.Format("The external tool '{0}' was not found in the system path.", command));
+            var fullPath = FindCommand(command);
+            if (string.IsNullOrEmpty(fullPath))
+                throw new Exception(string.Format("Couldn't locate external tool '{0}'.", command));
 
             var processInfo = new ProcessStartInfo
             {
@@ -29,7 +30,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 ErrorDialog = false,
-                FileName = command,
+                FileName = fullPath,
+                UseShellExecute = false,
             };
 
             var process = new Process
@@ -44,26 +46,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         /// <summary>
-        /// Makes sure we can actually run the command before trying to start
-        /// any processes.
+        /// Returns the fully-qualified path for a command, searching the system path if necessary.
         /// </summary>
-        private static bool FindInPath(string fileName)
+        /// <remarks>
+        /// It's apparently necessary to use the full path when running on some systems.
+        /// </remarks>
+        private static string FindCommand(string command)
         {
-            // Get just the executable name
-            var command = Path.GetFileName(fileName);
+            // If we have a full path just pass it through.
             if (File.Exists(command))
-                return true;
+                return command;
 
-            // Search system paths
+            // We don't have a full path, so try running through the system path to find it.
+            var justTheName = Path.GetFileName(command);
             var paths = Environment.GetEnvironmentVariable("PATH");
             foreach (var path in paths.Split(Path.PathSeparator))
             {
-                var fullName = Path.Combine(path, command);
+                var fullName = Path.Combine(path, justTheName);
                 if (File.Exists(fullName))
-                    return true;
+                    return fullName;
+
+#if WINDOWS
+                var fullExeName = string.Concat(fullName, ".exe");
+                if (File.Exists(fullExeName))
+                    return fullExeName;
+#endif
             }
 
-            return false;
+            return null;
         }
     }
 }
