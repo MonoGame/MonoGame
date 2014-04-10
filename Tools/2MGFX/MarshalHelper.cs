@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
 	internal class MarshalHelper
 	{

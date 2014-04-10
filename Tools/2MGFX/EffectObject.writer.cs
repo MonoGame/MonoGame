@@ -1,7 +1,7 @@
 using System.IO;
-using TwoMGFX;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
 	internal partial class EffectObject
 	{

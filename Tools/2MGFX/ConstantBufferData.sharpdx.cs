@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
     internal partial class ConstantBufferData
     {

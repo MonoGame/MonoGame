@@ -1,10 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
 	internal partial class EffectObject
 	{
+        private EffectObject()
+        {
+        }
+
 		public enum D3DRENDERSTATETYPE
         {
 		    ZENABLE                   =   7,
@@ -562,16 +568,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			switch (class_) 
             {
-			    case EffectObject.D3DXPARAMETER_CLASS.SCALAR:
+			    case D3DXPARAMETER_CLASS.SCALAR:
 				    return EffectParameterClass.Scalar;
-			    case EffectObject.D3DXPARAMETER_CLASS.VECTOR:
+			    case D3DXPARAMETER_CLASS.VECTOR:
 				    return EffectParameterClass.Vector;
-			    case EffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS:
-			    case EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
+			    case D3DXPARAMETER_CLASS.MATRIX_ROWS:
+			    case D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
                     return EffectParameterClass.Matrix;
-			    case EffectObject.D3DXPARAMETER_CLASS.OBJECT:
+			    case D3DXPARAMETER_CLASS.OBJECT:
                     return EffectParameterClass.Object;
-			    case EffectObject.D3DXPARAMETER_CLASS.STRUCT:
+			    case D3DXPARAMETER_CLASS.STRUCT:
                     return EffectParameterClass.Struct;
 			    default:
 				    throw new NotImplementedException();
@@ -582,23 +588,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			switch (type) 
             {
-			    case EffectObject.D3DXPARAMETER_TYPE.BOOL:
+			    case D3DXPARAMETER_TYPE.BOOL:
                     return EffectParameterType.Bool;
-			    case EffectObject.D3DXPARAMETER_TYPE.INT:
+			    case D3DXPARAMETER_TYPE.INT:
 				    return EffectParameterType.Int32;
-			    case EffectObject.D3DXPARAMETER_TYPE.FLOAT:
+			    case D3DXPARAMETER_TYPE.FLOAT:
 				    return EffectParameterType.Single;
-			    case EffectObject.D3DXPARAMETER_TYPE.STRING:
+			    case D3DXPARAMETER_TYPE.STRING:
 				    return EffectParameterType.String;
-			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE:
+			    case D3DXPARAMETER_TYPE.TEXTURE:
 				    return EffectParameterType.Texture;
-			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE1D:
+			    case D3DXPARAMETER_TYPE.TEXTURE1D:
 				    return EffectParameterType.Texture1D;
-			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE2D:
+			    case D3DXPARAMETER_TYPE.TEXTURE2D:
 				    return EffectParameterType.Texture2D;
-			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE3D:
+			    case D3DXPARAMETER_TYPE.TEXTURE3D:
 				    return EffectParameterType.Texture3D;
-			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
+			    case D3DXPARAMETER_TYPE.TEXTURECUBE:
 				    return  EffectParameterType.TextureCube;
                 default:
                     throw new NotImplementedException();
@@ -641,15 +647,217 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal static int GetShaderIndex(EffectObject.STATE_CLASS type, d3dx_state[] states)
+
+        static public EffectObject FromShaderInfo(ShaderInfo shaderInfo)
+        {
+            var effect = new EffectObject();
+
+            // These are filled out as we process stuff.
+            effect.ConstantBuffers = new List<ConstantBufferData>();
+            effect.Shaders = new List<ShaderData>();
+
+            // Go thru the techniques and that will find all the 
+            // shaders and constant buffers.
+            effect.Techniques = new d3dx_technique[shaderInfo.Techniques.Count];
+            for (var t = 0; t < shaderInfo.Techniques.Count; t++)
+            {
+                var tinfo = shaderInfo.Techniques[t]; ;
+
+                var technique = new d3dx_technique();
+                technique.name = tinfo.name;
+                technique.pass_count = (uint)tinfo.Passes.Count;
+                technique.pass_handles = new d3dx_pass[tinfo.Passes.Count];
+
+                for (var p = 0; p < tinfo.Passes.Count; p++)
+                {
+                    var pinfo = tinfo.Passes[p];
+
+                    var pass = new d3dx_pass();
+                    pass.name = pinfo.name ?? string.Empty;
+
+                    pass.blendState = pinfo.blendState;
+                    pass.depthStencilState = pinfo.depthStencilState;
+                    pass.rasterizerState = pinfo.rasterizerState;
+
+                    pass.state_count = 0;
+                    var tempstate = new d3dx_state[2];
+
+                    pinfo.ValidateShaderModels(shaderInfo.Profile);
+
+                    if (!string.IsNullOrEmpty(pinfo.psFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
+                    }
+
+                    if (!string.IsNullOrEmpty(pinfo.vsFunction))
+                    {
+                        pass.state_count += 1;
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                    }
+
+                    pass.states = new d3dx_state[pass.state_count];
+                    for (var s = 0; s < pass.state_count; s++)
+                        pass.states[s] = tempstate[s];
+
+                    technique.pass_handles[p] = pass;
+                }
+
+                effect.Techniques[t] = technique;
+            }
+
+            // Make the list of parameters by combining all the
+            // constant buffers ignoring the buffer offsets.
+            var parameters = new List<d3dx_parameter>();
+            for (var c = 0; c < effect.ConstantBuffers.Count; c++)
+            {
+                var cb = effect.ConstantBuffers[c];
+
+                for (var i = 0; i < cb.Parameters.Count; i++)
+                {
+                    var param = cb.Parameters[i];
+
+                    var match = parameters.FindIndex(e => e.name == param.name);
+                    if (match == -1)
+                    {
+                        cb.ParameterIndex.Add(parameters.Count);
+                        parameters.Add(param);
+                    }
+                    else
+                    {
+                        // TODO: Make sure the type and size of 
+                        // the parameter match up!
+                        cb.ParameterIndex.Add(match);
+                    }
+                }
+            }
+
+            // Add the texture parameters from the samplers.
+            foreach (var shader in effect.Shaders)
+            {
+                for (var s = 0; s < shader._samplers.Length; s++)
+                {
+                    var sampler = shader._samplers[s];
+
+                    var match = parameters.FindIndex(e => e.name == sampler.parameterName);
+                    if (match == -1)
+                    {
+                        // Store the index for runtime lookup.
+                        shader._samplers[s].parameter = parameters.Count;
+
+                        var param = new d3dx_parameter();
+                        param.class_ = D3DXPARAMETER_CLASS.OBJECT;
+                        param.name = sampler.parameterName;
+                        param.semantic = string.Empty;
+
+                        switch (sampler.type)
+                        {
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
+                                param.type = D3DXPARAMETER_TYPE.TEXTURE1D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                                param.type = D3DXPARAMETER_TYPE.TEXTURE2D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                                param.type = D3DXPARAMETER_TYPE.TEXTURE3D;
+                                break;
+
+                            case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                                param.type = D3DXPARAMETER_TYPE.TEXTURECUBE;
+                                break;
+                        }
+
+                        parameters.Add(param);
+                    }
+                    else
+                    {
+                        // TODO: Make sure the type and size of 
+                        // the parameter match up!
+
+                        shader._samplers[s].parameter = match;
+                    }
+                }
+            }
+
+            // TODO: Annotations are part of the .FX format and
+            // not a part of shaders... we need to implement them
+            // in our mgfx parser if we want them back.
+
+            effect.Parameters = parameters.ToArray();
+
+            return effect;
+        }
+
+
+        private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader)
+        {
+            // Compile the shader.
+            byte[] bytecode;
+            if (shaderInfo.Profile == ShaderProfile.DirectX_11 || shaderInfo.Profile == ShaderProfile.OpenGL)
+            {
+                // For now GLSL is only supported via translation
+                // using MojoShader which works from HLSL bytecode.                
+                bytecode = CompileHLSL(shaderInfo, shaderFunction, shaderProfile);
+            }
+            else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
+                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile);
+            else
+                throw new NotSupportedException("Unknown shader profile!");
+
+            // First look to see if we already created this same shader.
+            ShaderData shaderData = null;
+            foreach (var shader in Shaders)
+            {
+                if (bytecode.SequenceEqual(shader.Bytecode))
+                {
+                    shaderData = shader;
+                    break;
+                }
+            }
+
+            // Create a new shader.
+            if (shaderData == null)
+            {
+                if (shaderInfo.Profile == ShaderProfile.DirectX_11)
+                    shaderData = ShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                else if (shaderInfo.Profile == ShaderProfile.OpenGL)
+                    shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
+                    shaderData = ShaderData.CreatePSSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                else
+                    throw new NotSupportedException("Unknown shader profile!");
+
+                Shaders.Add(shaderData);
+            }
+
+            var state = new d3dx_state();
+            state.index = 0;
+            state.type = STATE_TYPE.CONSTANT;
+            state.operation = isVertexShader ? (uint)146 : (uint)147;
+
+            state.parameter = new d3dx_parameter();
+            state.parameter.name = string.Empty;
+            state.parameter.semantic = string.Empty;
+            state.parameter.class_ = D3DXPARAMETER_CLASS.OBJECT;
+            state.parameter.type = isVertexShader ? D3DXPARAMETER_TYPE.VERTEXSHADER : D3DXPARAMETER_TYPE.PIXELSHADER;
+            state.parameter.rows = 0;
+            state.parameter.columns = 0;
+            state.parameter.data = shaderData.SharedIndex;
+
+            return state;
+        }
+       
+        internal static int GetShaderIndex(STATE_CLASS type, d3dx_state[] states)
         {
             foreach (var state in states)
             {
-                var operation = EffectObject.state_table[state.operation];
+                var operation = state_table[state.operation];
                 if (operation.class_ != type)
                     continue;
 
-                if (state.type != EffectObject.STATE_TYPE.CONSTANT)
+                if (state.type != STATE_TYPE.CONSTANT)
                     throw new NotSupportedException("We do not support shader expressions!");
 
                 return (int)state.parameter.data;

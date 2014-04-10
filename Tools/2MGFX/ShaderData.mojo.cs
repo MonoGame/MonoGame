@@ -2,16 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using TwoMGFX;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
 	internal partial class ShaderData
 	{
-
-		private MojoShader.MOJOSHADER_symbol[] _symbols;
-
-		public static ShaderData CreateGLSL (byte[] byteCode, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
+        public static ShaderData CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
 		{
 			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;
@@ -180,10 +176,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var glslCode = parseData.output;
 
-#if GLSLOPTIMIZER
-			//glslCode = GLSLOptimizer.Optimize(glslCode, ShaderType);
-#endif
-
 			// TODO: This sort of sucks... why does MojoShader not produce
 			// code valid for GLES out of the box?
 
@@ -204,23 +196,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			dxshader.ShaderCode = Encoding.ASCII.GetBytes (glslCode);
 
 			return dxshader;
-		}
-
-		public void SetSamplerParameters (Dictionary<string, EffectObject.d3dx_parameter> samplers,
-										 List<EffectObject.d3dx_parameter> parameters)
-		{
-			for (int i=0; i<_samplers.Length; i++) {
-				EffectObject.d3dx_parameter param;
-				if (samplers.TryGetValue (_samplers[i].parameterName, out param)) {
-					var samplerState = (EffectObject.d3dx_sampler)param.data;
-					if (samplerState != null && samplerState.state_count > 0) {
-						var textureName = samplerState.states [0].parameter.name;
-						var index = parameters.FindIndex (e => e.name == textureName);
-						if (index != -1)
-							_samplers[i].parameter = index;
-					}
-				}
-			}
 		}
 	}
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
     internal partial class ConstantBufferData
     {
