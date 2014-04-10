@@ -22,7 +22,7 @@ There are a few pre-requisites that you should be aware of for the various platf
 
 There are four quick start options available:
 * Download the current stable release from [our website](http://monogame.net/downloads).
-* Download the latest "unstable" installer from [our build server](http://teamcity.monogame.net/viewLog.html?buildTypeId=MonoGame_DevelopWin&buildId=lastSuccessful&tab=artifacts&guest=1).
+* Download the latest "unstable" installer from [our build server](http://teamcity.monogame.net/viewLog.html?buildTypeId=MonoGame_DevelopWin&buildId=lastSuccessful&tab=artifacts&buildBranch=%3Cdefault%3E&guest=1).
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop.zip).
 * Fork and clone the repo: `https://github.com/mono/MonoGame.git`.
 
