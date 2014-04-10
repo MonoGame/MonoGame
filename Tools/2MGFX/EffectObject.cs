@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal partial class DXEffectObject
+	internal partial class EffectObject
 	{
 		public enum D3DRENDERSTATETYPE
         {
@@ -562,16 +562,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			switch (class_) 
             {
-			    case DXEffectObject.D3DXPARAMETER_CLASS.SCALAR:
+			    case EffectObject.D3DXPARAMETER_CLASS.SCALAR:
 				    return EffectParameterClass.Scalar;
-			    case DXEffectObject.D3DXPARAMETER_CLASS.VECTOR:
+			    case EffectObject.D3DXPARAMETER_CLASS.VECTOR:
 				    return EffectParameterClass.Vector;
-			    case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS:
-			    case DXEffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
+			    case EffectObject.D3DXPARAMETER_CLASS.MATRIX_ROWS:
+			    case EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS:
                     return EffectParameterClass.Matrix;
-			    case DXEffectObject.D3DXPARAMETER_CLASS.OBJECT:
+			    case EffectObject.D3DXPARAMETER_CLASS.OBJECT:
                     return EffectParameterClass.Object;
-			    case DXEffectObject.D3DXPARAMETER_CLASS.STRUCT:
+			    case EffectObject.D3DXPARAMETER_CLASS.STRUCT:
                     return EffectParameterClass.Struct;
 			    default:
 				    throw new NotImplementedException();
@@ -582,23 +582,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			switch (type) 
             {
-			    case DXEffectObject.D3DXPARAMETER_TYPE.BOOL:
+			    case EffectObject.D3DXPARAMETER_TYPE.BOOL:
                     return EffectParameterType.Bool;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.INT:
+			    case EffectObject.D3DXPARAMETER_TYPE.INT:
 				    return EffectParameterType.Int32;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.FLOAT:
+			    case EffectObject.D3DXPARAMETER_TYPE.FLOAT:
 				    return EffectParameterType.Single;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.STRING:
+			    case EffectObject.D3DXPARAMETER_TYPE.STRING:
 				    return EffectParameterType.String;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE:
+			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE:
 				    return EffectParameterType.Texture;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D:
+			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE1D:
 				    return EffectParameterType.Texture1D;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D:
+			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE2D:
 				    return EffectParameterType.Texture2D;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D:
+			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURE3D:
 				    return EffectParameterType.Texture3D;
-			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
+			    case EffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
 				    return  EffectParameterType.TextureCube;
                 default:
                     throw new NotImplementedException();
@@ -641,15 +641,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal static int GetShaderIndex(DXEffectObject.STATE_CLASS type, d3dx_state[] states)
+        internal static int GetShaderIndex(EffectObject.STATE_CLASS type, d3dx_state[] states)
         {
             foreach (var state in states)
             {
-                var operation = DXEffectObject.state_table[state.operation];
+                var operation = EffectObject.state_table[state.operation];
                 if (operation.class_ != type)
                     continue;
 
-                if (state.type != DXEffectObject.STATE_TYPE.CONSTANT)
+                if (state.type != EffectObject.STATE_TYPE.CONSTANT)
                     throw new NotSupportedException("We do not support shader expressions!");
 
                 return (int)state.parameter.data;

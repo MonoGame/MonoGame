@@ -76,7 +76,7 @@
     <Compile Include="DXConstantBufferData.mojo.cs" />
     <Compile Include="DXConstantBufferData.sharpdx.cs" />
     <Compile Include="DXConstantBufferData.writer.cs" />
-    <Compile Include="DXEffectObject.cs" />
+    <Compile Include="EffectObject.cs" />
     <Compile Include="DXEffectObject.hlsl.cs" />
     <Compile Include="DXEffectObject.writer.cs" />
     <Compile Include="DXExpression.cs">

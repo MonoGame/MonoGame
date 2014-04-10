@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public List<int> ParameterOffset { get; private set; }
 
-        public List<DXEffectObject.d3dx_parameter> Parameters { get; private set; }
+        public List<EffectObject.d3dx_parameter> Parameters { get; private set; }
 
 
         public bool SameAs(DXConstantBufferData other)

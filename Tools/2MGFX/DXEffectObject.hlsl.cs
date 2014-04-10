@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    partial class DXEffectObject
+    partial class EffectObject
     {
-        private DXEffectObject()
+        private EffectObject()
         {
         }
 
-        static public DXEffectObject FromShaderInfo(TwoMGFX.ShaderInfo shaderInfo)
+        static public EffectObject FromShaderInfo(TwoMGFX.ShaderInfo shaderInfo)
         {
-            var effect = new DXEffectObject();
+            var effect = new EffectObject();
 
             // These are filled out as we process stuff.
             effect.ConstantBuffers = new List<DXConstantBufferData>();
@@ -115,19 +115,19 @@ namespace Microsoft.Xna.Framework.Graphics
                         switch (sampler.type)
                         {
                             case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D:
-                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE1D;
+                                param.type = EffectObject.D3DXPARAMETER_TYPE.TEXTURE1D;
                                 break;
 
                             case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
-                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE2D;
+                                param.type = EffectObject.D3DXPARAMETER_TYPE.TEXTURE2D;
                                 break;
 
                             case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
-                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURE3D;
+                                param.type = EffectObject.D3DXPARAMETER_TYPE.TEXTURE3D;
                                 break;
 
                             case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
-                                param.type = DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE;
+                                param.type = EffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE;
                                 break;
                         }
 

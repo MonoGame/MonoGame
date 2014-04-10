@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				for (var i = 0; i < attributes.Length; i++) {
 					dxshader._attributes [i].name = attributes [i].name;
 					dxshader._attributes [i].index = attributes [i].index;
-					dxshader._attributes [i].usage = DXEffectObject.ToXNAVertexElementUsage (attributes [i].usage);
+					dxshader._attributes [i].usage = EffectObject.ToXNAVertexElementUsage (attributes [i].usage);
 				}
 			}
 
@@ -206,13 +206,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			return dxshader;
 		}
 
-		public void SetSamplerParameters (Dictionary<string, DXEffectObject.d3dx_parameter> samplers,
-										 List<DXEffectObject.d3dx_parameter> parameters)
+		public void SetSamplerParameters (Dictionary<string, EffectObject.d3dx_parameter> samplers,
+										 List<EffectObject.d3dx_parameter> parameters)
 		{
 			for (int i=0; i<_samplers.Length; i++) {
-				DXEffectObject.d3dx_parameter param;
+				EffectObject.d3dx_parameter param;
 				if (samplers.TryGetValue (_samplers[i].parameterName, out param)) {
-					var samplerState = (DXEffectObject.d3dx_sampler)param.data;
+					var samplerState = (EffectObject.d3dx_sampler)param.data;
 					if (samplerState != null && samplerState.state_count > 0) {
 						var textureName = samplerState.states [0].parameter.name;
 						var index = parameters.FindIndex (e => e.name == textureName);
