@@ -237,13 +237,16 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if ANDROID
 
-			if (sourceId == 0)
-				return;
-
 			if (soundState == SoundState.Paused)
 				s_soundPool.Resume(sourceId);
 			else
 			{
+				if (sourceId != 0)
+				{
+					s_soundPool.Stop(sourceId);
+					sourceId = 0;
+				}
+
 				float panRatio = (_pan + 1.0f) / 2.0f;
 				float volumeTotal = SoundEffect.MasterVolume * _volume;
 				float volumeLeft = volumeTotal * (1.0f - panRatio);
