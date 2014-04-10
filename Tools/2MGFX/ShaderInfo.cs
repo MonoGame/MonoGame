@@ -36,9 +36,11 @@ namespace TwoMGFX
             minor = int.Parse(match.Groups[4].Value);
         }
 
-        public void ValidateShaderModels(bool dx11Profile)
+        public void ValidateShaderModels(ShaderProfile profile)
         {
             int major, minor;
+
+            var dx11Profile = profile != ShaderProfile.OpenGL;
 
             if (!string.IsNullOrEmpty(vsFunction))
             {
@@ -357,12 +359,21 @@ namespace TwoMGFX
 		public List<PassInfo> Passes = new List<PassInfo>();
 	}
 
+    public enum ShaderProfile
+    {
+        // NOTE: This order matters and is used as part
+        // of the file format... don't change it.
+        OpenGL = 0,
+        DirectX_11 = 1,
+        PlayStation4 = 2,
+    }
+
 	public class ShaderInfo
 	{
 		public string fileName { get; private set; }
 		public string fileContent { get; private set; }
 
-		public bool DX11Profile { get; private set; }
+        public ShaderProfile Profile { get; private set; }
 
 		public bool Debug { get; private set; }
 
@@ -383,11 +394,19 @@ namespace TwoMGFX
 			macros.Add(new SharpDX.Direct3D.ShaderMacro("MGFX", 1));
 
 			// Under the DX11 profile we pass a few more macros.
-			if (options.DX11Profile)
+			if (options.Profile == ShaderProfile.DirectX_11)
 			{
 				macros.Add(new SharpDX.Direct3D.ShaderMacro("HLSL", 1));
 				macros.Add(new SharpDX.Direct3D.ShaderMacro("SM4", 1));
 			}
+            else if (options.Profile == ShaderProfile.OpenGL)
+            {
+                macros.Add(new SharpDX.Direct3D.ShaderMacro("GLSL", 1));
+                macros.Add(new SharpDX.Direct3D.ShaderMacro("OPENGL", 1));
+            }
+            else if (options.Profile == ShaderProfile.PlayStation4)
+            {
+            }
 
 			// If we're building shaders for debug set that flag too.
 			if (options.Debug)
@@ -452,7 +471,7 @@ namespace TwoMGFX
 			}
 			*/
 
-			result.DX11Profile = options.DX11Profile;
+			result.Profile = options.Profile;
 			result.Debug = options.Debug;
 
 			return result;

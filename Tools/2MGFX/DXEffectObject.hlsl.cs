@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     pass.state_count = 0;
                     var tempstate = new d3dx_state[2];
 
-                    pinfo.ValidateShaderModels(shaderInfo.DX11Profile);
+                    pinfo.ValidateShaderModels(shaderInfo.Profile);
 
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
@@ -169,53 +169,62 @@ namespace Microsoft.Xna.Framework.Graphics
         private d3dx_state CreateShader(TwoMGFX.ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader)
         {
             // Compile the shader.
-            SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
-            try
+            byte[] bytecode;
+            if (shaderInfo.Profile == TwoMGFX.ShaderProfile.PlayStation4)
             {
-                SharpDX.D3DCompiler.ShaderFlags shaderFlags = 0;
-
-                // While we never allow preshaders, this flag is invalid for
-                // the DX11 shader compiler which doesn't allow preshaders
-                // in the first place.
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
-
-                if (shaderInfo.DX11Profile)
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
-
-                if (shaderInfo.Debug)
-                {
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipOptimization;
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
-                }
-                else
-                {
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
-                }
-
-                // Compile the shader into bytecode.                
-                var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                    shaderInfo.fileContent, 
-                    shaderFunction, 
-                    shaderProfile, 
-                    shaderFlags, 
-                    0, 
-                    null,
-                    null,
-                    shaderInfo.fileName);
-
-                if (result.HasErrors)
-                    throw new Exception(result.Message);
-
-                shaderByteCode = result.Bytecode;
-                //var source = shaderByteCode.Disassemble();
+                // TODO: Spawn PSSL tool to compile to bytecode!
+                bytecode = null;
             }
-            catch (Exception ex)
+            else
             {
-                throw ex;
-            }
+                SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
+                try
+                {
+                    SharpDX.D3DCompiler.ShaderFlags shaderFlags = 0;
 
-            // Get a copy of the shader bytecode.
-            var bytecode = shaderByteCode.Data.ToArray();
+                    // While we never allow preshaders, this flag is invalid for
+                    // the DX11 shader compiler which doesn't allow preshaders
+                    // in the first place.
+                    //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
+
+                    if (shaderInfo.Profile == TwoMGFX.ShaderProfile.DirectX_11)
+                        shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
+
+                    if (shaderInfo.Debug)
+                    {
+                        shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipOptimization;
+                        shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
+                    }
+                    else
+                    {
+                        shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
+                    }
+
+                    // Compile the shader into bytecode.                
+                    var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
+                        shaderInfo.fileContent,
+                        shaderFunction,
+                        shaderProfile,
+                        shaderFlags,
+                        0,
+                        null,
+                        null,
+                        shaderInfo.fileName);
+
+                    if (result.HasErrors)
+                        throw new Exception(result.Message);
+
+                    shaderByteCode = result.Bytecode;
+                    //var source = shaderByteCode.Disassemble();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                // Get a copy of the shader bytecode.
+                bytecode = shaderByteCode.Data.ToArray();
+            }
 
             // First look to see if we already created this same shader.
             DXShaderData dxShader = null;
@@ -231,10 +240,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // Create a new shader.
             if ( dxShader == null )
             {
-                if (shaderInfo.DX11Profile)
+                if (shaderInfo.Profile == TwoMGFX.ShaderProfile.DirectX_11)
                     dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
-                else
+                else  if (shaderInfo.Profile == TwoMGFX.ShaderProfile.OpenGL)
                     dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
+                else if (shaderInfo.Profile == TwoMGFX.ShaderProfile.PlayStation4)
+                    throw new NotSupportedException("Unknown shader profile!");
 
                 Shaders.Add(dxShader);
             }

@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         public void Write(BinaryWriter writer, Options options)
         {
-            if (!options.DX11Profile)
+            if (options.Profile == ShaderProfile.OpenGL)
                 writer.Write(Name);
 
             writer.Write((ushort)Size);
