@@ -60,6 +60,8 @@ using OpenTK.Graphics.ES20;
 
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Android.Views.InputMethods;
+using Android.Text;
 #endregion Using Statements
 
 namespace Microsoft.Xna.Framework
@@ -76,6 +78,11 @@ namespace Microsoft.Xna.Framework
         private IResumeManager _resumer;
         private bool _isResuming;
         internal TouchPanelState TouchPanelState;
+
+        private IInputConnection customInputConnection;
+        private string customInputConnectionLabel; 
+        private InputTypes customInputConnectionType;
+        private ImeFlags customInputConnectionImeOptions;
 
         public bool TouchEnabled
         {
@@ -115,6 +122,30 @@ namespace Microsoft.Xna.Framework
 			base.OnLoad (e);			
 			MakeCurrent();
 		}
+
+        public void SetInputConnection(IInputConnection connection,
+            InputTypes inputTypes, ImeFlags imeOptions, string label)
+        {
+            customInputConnection = connection;
+            customInputConnectionType = inputTypes;
+            customInputConnectionImeOptions = imeOptions;
+            customInputConnectionLabel = label;
+        }
+
+        public override IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
+        {
+            if (customInputConnection == null)
+            {
+                return base.OnCreateInputConnection(outAttrs);
+            }
+            else
+            {
+                outAttrs.ActionLabel = new Java.Lang.String(customInputConnectionLabel);
+                outAttrs.InputType = customInputConnectionType;
+                outAttrs.ImeOptions = customInputConnectionImeOptions;
+                return customInputConnection;
+            }
+        }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
