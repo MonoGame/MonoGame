@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
-        public DXConstantBufferData(SharpDX.D3DCompiler.ConstantBuffer cb)
+        public ConstantBufferData(SharpDX.D3DCompiler.ConstantBuffer cb)
         {
             Name = cb.Description.Name ?? string.Empty;            
             Size = cb.Description.Size;

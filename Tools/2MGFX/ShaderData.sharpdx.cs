@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class ShaderData
     {
-        public static ShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
+        public static ShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
         {
             var dxshader = new ShaderData();
             dxshader.IsVertexShader = isVertexShader;
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     dxshader._cbuffers = new int[refelect.Description.ConstantBuffers];
                     for (var i = 0; i < refelect.Description.ConstantBuffers; i++)
                     {
-                        var cb = new DXConstantBufferData(refelect.GetConstantBuffer(i));
+                        var cb = new ConstantBufferData(refelect.GetConstantBuffer(i));
 
                         // Look for a duplicate cbuffer in the list.
                         for (var c = 0; c < cbuffers.Count; c++)

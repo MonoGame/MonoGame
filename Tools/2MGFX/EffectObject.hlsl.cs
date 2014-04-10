@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var effect = new EffectObject();
 
             // These are filled out as we process stuff.
-            effect.ConstantBuffers = new List<DXConstantBufferData>();
+            effect.ConstantBuffers = new List<ConstantBufferData>();
             effect.Shaders = new List<ShaderData>();
 
             // Go thru the techniques and that will find all the 

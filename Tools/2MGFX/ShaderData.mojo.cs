@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private MojoShader.MOJOSHADER_symbol[] _symbols;
 
-		public static ShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
+		public static ShaderData CreateGLSL (byte[] byteCode, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
 		{
 			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;
@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			var cbuffer_index = new List<int> ();
 			for (var i = 0; i < symbol_types.Length; i++) {
-				var cbuffer = new DXConstantBufferData (symbol_types [i].name,
+				var cbuffer = new ConstantBufferData (symbol_types [i].name,
 													   symbol_types [i].set,
 													   symbols);
 				if (cbuffer.Size == 0)

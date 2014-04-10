@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
-        public DXConstantBufferData (string name,
+        public ConstantBufferData (string name,
                                 MojoShader.MOJOSHADER_symbolRegisterSet set, 
                                 MojoShader.MOJOSHADER_symbol[] symbols)
 		{

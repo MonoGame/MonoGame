@@ -2,7 +2,7 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
         public string Name { get; private set; }
 
@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public List<EffectObject.d3dx_parameter> Parameters { get; private set; }
 
 
-        public bool SameAs(DXConstantBufferData other)
+        public bool SameAs(ConstantBufferData other)
         {
             // If the names of the constant buffers don't
             // match then consider them different right off 

@@ -3,7 +3,7 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXConstantBufferData
+    internal partial class ConstantBufferData
     {
         public void Write(BinaryWriter writer, Options options)
         {

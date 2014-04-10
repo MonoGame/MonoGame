@@ -666,7 +666,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public List<ShaderData> Shaders { get; private set; }
 
-        public List<DXConstantBufferData> ConstantBuffers { get; private set; }
+        public List<ConstantBufferData> ConstantBuffers { get; private set; }
 	}
 }
 
