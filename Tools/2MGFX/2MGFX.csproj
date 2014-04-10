@@ -79,7 +79,7 @@
     <Compile Include="EffectObject.cs" />
     <Compile Include="EffectObject.hlsl.cs" />
     <Compile Include="EffectObject.writer.cs" />
-    <Compile Include="DXExpression.cs">
+    <Compile Include="ShaderExpression.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MarshalHelper.cs" />
