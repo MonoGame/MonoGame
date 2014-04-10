@@ -372,10 +372,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return SoundEffectReader.Normalize(assetName);
             }
-            else if ((typeof(T) == typeof(Video)))
-            {
-                return Video.Normalize(assetName);
-            }
 #endif
             else if ((typeof(T) == typeof(Effect)))
             {
@@ -410,10 +406,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 using (Stream s = TitleContainer.OpenStream(assetName))
                     return SoundEffect.FromStream(s);
-            }
-            else if ((typeof(T) == typeof(Video)))
-            {
-                return new Video(assetName);
             }
 #endif
             else if ((typeof(T) == typeof(Effect)))
