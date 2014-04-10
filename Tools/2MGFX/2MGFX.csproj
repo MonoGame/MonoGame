@@ -84,7 +84,7 @@
     </Compile>
     <Compile Include="DXHelper.cs" />
     <Compile Include="Preshader.cs" />
-    <Compile Include="DXPreshader.writer.cs" />
+    <Compile Include="Preshader.writer.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
     <Compile Include="ShaderData.sharpdx.cs" />
