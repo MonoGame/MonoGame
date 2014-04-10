@@ -20,13 +20,17 @@ namespace System.Drawing
 #else
         internal static void RGBToBGR(this Image bmp)
         {
-            System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
-            System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
-
-            ia.SetColorMatrix(cm);
-            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+            using (Bitmap bmpCopy = (Bitmap)bmp.Clone())
             {
-                g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
+                System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
+                System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
+
+                ia.SetColorMatrix(cm);
+                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.Transparent);
+                    g.DrawImage(bmpCopy, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
+                }
             }
         }
 #endif
