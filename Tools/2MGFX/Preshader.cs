@@ -1,6 +1,6 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal partial class DXPreshader
+	internal partial class Preshader
 	{
         private MojoShader.MOJOSHADER_symbol[] _symbols;
         private MojoShader.MOJOSHADER_preshaderInstruction[] _instructions;

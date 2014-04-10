@@ -3,12 +3,12 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal partial class DXPreshader
+	internal partial class Preshader
 	{
         private int _temp_count;
         private int _input_count;
 
-        public static DXPreshader CreatePreshader(byte[] expressionData)
+        public static Preshader CreatePreshader(byte[] expressionData)
         {
             var parseDataPtr = MojoShader.NativeMethods.MOJOSHADER_parseExpression(
                 expressionData,
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return CreatePreshader(preshader);
         }
 
-        public static DXPreshader CreatePreshader(MojoShader.MOJOSHADER_preshader preshaderData)
+        public static Preshader CreatePreshader(MojoShader.MOJOSHADER_preshader preshaderData)
         {
             var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     preshaderData.symbols, (int)preshaderData.symbol_count);
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 preshaderData.literals, (int)preshaderData.literal_count);
 
 
-            var preshader = new DXPreshader();
+            var preshader = new Preshader();
 
             preshader._temp_count = (int)preshaderData.temp_count;
             preshader._symbols = symbols;
