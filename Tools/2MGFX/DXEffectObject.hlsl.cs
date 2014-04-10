@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // These are filled out as we process stuff.
             effect.ConstantBuffers = new List<DXConstantBufferData>();
-            effect.Shaders = new List<DXShaderData>();
+            effect.Shaders = new List<ShaderData>();
 
             // Go thru the techniques and that will find all the 
             // shaders and constant buffers.
@@ -227,27 +227,27 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // First look to see if we already created this same shader.
-            DXShaderData dxShader = null;
+            ShaderData shaderData = null;
             foreach (var shader in Shaders)
             {
                 if (bytecode.SequenceEqual(shader.Bytecode))
                 {
-                    dxShader = shader;
+                    shaderData = shader;
                     break;
                 }
             }
 
             // Create a new shader.
-            if ( dxShader == null )
+            if (shaderData == null)
             {
                 if (shaderInfo.Profile == TwoMGFX.ShaderProfile.DirectX_11)
-                    dxShader = DXShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                    shaderData = ShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 else  if (shaderInfo.Profile == TwoMGFX.ShaderProfile.OpenGL)
-                    dxShader = DXShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
+                    shaderData = ShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
                 else if (shaderInfo.Profile == TwoMGFX.ShaderProfile.PlayStation4)
                     throw new NotSupportedException("Unknown shader profile!");
 
-                Shaders.Add(dxShader);
+                Shaders.Add(shaderData);
             }
             
             //var assmbly = desc.Bytecode.Disassemble();
@@ -265,7 +265,7 @@ namespace Microsoft.Xna.Framework.Graphics
             state.parameter.type = isVertexShader ? D3DXPARAMETER_TYPE.VERTEXSHADER : D3DXPARAMETER_TYPE.PIXELSHADER;
             state.parameter.rows = 0;
             state.parameter.columns = 0;
-            state.parameter.data = dxShader.SharedIndex;
+            state.parameter.data = shaderData.SharedIndex;
 
             return state;
         }

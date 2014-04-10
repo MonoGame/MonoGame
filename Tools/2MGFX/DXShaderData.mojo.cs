@@ -6,14 +6,14 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	internal partial class DXShaderData
+	internal partial class ShaderData
 	{
 
 		private MojoShader.MOJOSHADER_symbol[] _symbols;
 
-		public static DXShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
+		public static ShaderData CreateGLSL (byte[] byteCode, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
 		{
-			var dxshader = new DXShaderData ();
+			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;
 			dxshader.Bytecode = (byte[])byteCode.Clone ();
 

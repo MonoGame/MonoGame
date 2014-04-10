@@ -3,7 +3,7 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXShaderData
+    internal partial class ShaderData
     {
         public void Write(BinaryWriter writer, Options options)
         {

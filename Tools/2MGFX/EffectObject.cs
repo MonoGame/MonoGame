@@ -664,7 +664,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public d3dx_technique[] Techniques { get; private set; }
 
-        public List<DXShaderData> Shaders { get; private set; }
+        public List<ShaderData> Shaders { get; private set; }
 
         public List<DXConstantBufferData> ConstantBuffers { get; private set; }
 	}

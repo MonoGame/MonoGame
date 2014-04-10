@@ -4,11 +4,11 @@ using TwoMGFX;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    internal partial class DXShaderData
+    internal partial class ShaderData
     {
-        public static DXShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
+        public static ShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<DXConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
         {
-            var dxshader = new DXShaderData();
+            var dxshader = new ShaderData();
             dxshader.IsVertexShader = isVertexShader;
             dxshader.SharedIndex = sharedIndex;
             dxshader.Bytecode = (byte[])byteCode.Clone();
