@@ -83,6 +83,7 @@
     <Compile Include="MarshalHelper.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
+    <Compile Include="ShaderData.pssl.cs" />
     <Compile Include="ShaderData.sharpdx.cs" />
     <Compile Include="ShaderData.writer.cs" />
     <Compile Include="MojoShader.cs" />

@@ -198,6 +198,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.mojo.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderData.pssl.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderData.pssl.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderData.sharpdx.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.sharpdx.cs</Link>

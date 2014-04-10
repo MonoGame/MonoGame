@@ -123,6 +123,9 @@
     <Compile Include="..\..\Tools\2MGFX\ShaderData.mojo.cs">
       <Link>Processors\Effect\ShaderData.mojo.cs</Link>
     </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.pssl.cs">
+      <Link>Processors\Effect\ShaderData.pssl.cs</Link>
+    </Compile>
     <Compile Include="..\..\Tools\2MGFX\ShaderData.sharpdx.cs">
       <Link>Processors\Effect\ShaderData.sharpdx.cs</Link>
     </Compile>

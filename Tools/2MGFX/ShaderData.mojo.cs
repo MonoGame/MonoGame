@@ -7,7 +7,7 @@ namespace TwoMGFX
 {
 	internal partial class ShaderData
 	{
-		public static ShaderData CreateGLSL (byte[] byteCode, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates)
+        public static ShaderData CreateGLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
 		{
 			var dxshader = new ShaderData ();
 			dxshader.SharedIndex = sharedIndex;

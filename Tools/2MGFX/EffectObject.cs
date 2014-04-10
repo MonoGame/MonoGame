@@ -784,20 +784,6 @@ namespace TwoMGFX
             // TODO: Annotations are part of the .FX format and
             // not a part of shaders... we need to implement them
             // in our mgfx parser if we want them back.
-            /*
-            // Now find the things we could not in the constant
-            // buffer reflection interface...  semantics and annotations.
-            for (var i = 0; i < parameters.Count; i++)
-            {
-                var vdesc = dxeffect.GetVariableByName(parameters[i].name);
-                if (!vdesc.IsValid)
-                    continue;
-
-                parameters[i].semantic = vdesc.Description.Semantic ?? string.Empty;
-
-                // TODO: Annotations!
-            }
-            */
 
             effect.Parameters = parameters.ToArray();
 
@@ -809,14 +795,16 @@ namespace TwoMGFX
         {
             // Compile the shader.
             byte[] bytecode;
-            if (shaderInfo.Profile == ShaderProfile.PlayStation4)
-                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile);
-            else
+            if (shaderInfo.Profile == ShaderProfile.DirectX_11 || shaderInfo.Profile == ShaderProfile.OpenGL)
             {
                 // For now GLSL is only supported via translation
-                // using MojoShader which works from HLSL bytecode.
+                // using MojoShader which works from HLSL bytecode.                
                 bytecode = CompileHLSL(shaderInfo, shaderFunction, shaderProfile);
             }
+            else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
+                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile);
+            else
+                throw new NotSupportedException("Unknown shader profile!");
 
             // First look to see if we already created this same shader.
             ShaderData shaderData = null;
@@ -835,8 +823,10 @@ namespace TwoMGFX
                 if (shaderInfo.Profile == ShaderProfile.DirectX_11)
                     shaderData = ShaderData.CreateHLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 else if (shaderInfo.Profile == ShaderProfile.OpenGL)
-                    shaderData = ShaderData.CreateGLSL(bytecode, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates);
+                    shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
                 else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
+                    shaderData = ShaderData.CreatePSSL(bytecode, isVertexShader, ConstantBuffers, Shaders.Count, shaderInfo.SamplerStates, shaderInfo.Debug);
+                else
                     throw new NotSupportedException("Unknown shader profile!");
 
                 Shaders.Add(shaderData);
