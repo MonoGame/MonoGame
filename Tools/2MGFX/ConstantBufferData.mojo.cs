@@ -98,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 param.member_handles = new EffectObject.d3dx_parameter[param.member_count];
 
-                var members = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+                var members = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     symbol.info.members, (int)symbol.info.member_count);
 
                 for (var i = 0; i < param.member_count; i++)

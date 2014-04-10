@@ -31,9 +31,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				IntPtr.Zero,
 				IntPtr.Zero);
 
-			var parseData = DXHelper.Unmarshal<MojoShader.MOJOSHADER_parseData> (parseDataPtr);
+			var parseData = MarshalHelper.Unmarshal<MojoShader.MOJOSHADER_parseData> (parseDataPtr);
 			if (parseData.error_count > 0) {
-				var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error> (
+				var errors = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_error> (
 					parseData.errors,
 					parseData.error_count
 				);
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			// TODO: Could this be done using DX shader reflection?
 			//
 			{
-				var attributes = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
+				var attributes = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_attribute> (
 						parseData.attributes, parseData.attribute_count);
 
 				dxshader._attributes = new Attribute[attributes.Length];
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 
-			var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
+			var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol> (
 					parseData.symbols, parseData.symbol_count);
 
 			//try to put the symbols in the order they are eventually packed into the uniform arrays
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			// Get the samplers.
-			var samplers = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
+			var samplers = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_sampler> (
 					parseData.samplers, parseData.sampler_count);
 			dxshader._samplers = new Sampler[samplers.Length];
 			for (var i = 0; i < samplers.Length; i++) 

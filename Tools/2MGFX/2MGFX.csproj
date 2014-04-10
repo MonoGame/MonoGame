@@ -82,7 +82,7 @@
     <Compile Include="DXExpression.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DXHelper.cs" />
+    <Compile Include="MarshalHelper.cs" />
     <Compile Include="Preshader.cs" />
     <Compile Include="Preshader.writer.cs" />
     <Compile Include="ShaderData.cs" />

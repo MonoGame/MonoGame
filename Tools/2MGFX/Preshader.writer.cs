@@ -18,27 +18,27 @@ namespace Microsoft.Xna.Framework.Graphics
                 IntPtr.Zero
             );
 
-            var parseData = DXHelper.Unmarshal<MojoShader.MOJOSHADER_parseData>(parseDataPtr);
+            var parseData = MarshalHelper.Unmarshal<MojoShader.MOJOSHADER_parseData>(parseDataPtr);
             if (parseData.error_count > 0)
             {
-                var errors = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
+                var errors = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_error>(parseData.errors, parseData.error_count);
                 throw new Exception(errors[0].error);
             }
 
-            var preshader = DXHelper.Unmarshal<MojoShader.MOJOSHADER_preshader>(parseData.preshader);
+            var preshader = MarshalHelper.Unmarshal<MojoShader.MOJOSHADER_preshader>(parseData.preshader);
 
             return CreatePreshader(preshader);
         }
 
         public static Preshader CreatePreshader(MojoShader.MOJOSHADER_preshader preshaderData)
         {
-            var symbols = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
+            var symbols = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_symbol>(
                     preshaderData.symbols, (int)preshaderData.symbol_count);
 
-            var instructions = DXHelper.UnmarshalArray<MojoShader.MOJOSHADER_preshaderInstruction>(
+            var instructions = MarshalHelper.UnmarshalArray<MojoShader.MOJOSHADER_preshaderInstruction>(
                 preshaderData.instructions, (int)preshaderData.instruction_count);
 
-            var literals = DXHelper.UnmarshalArray<double>(
+            var literals = MarshalHelper.UnmarshalArray<double>(
                 preshaderData.literals, (int)preshaderData.literal_count);
 
 
