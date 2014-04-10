@@ -172,7 +172,6 @@ namespace Microsoft.Xna.Framework.Graphics
             byte[] bytecode;
             if (shaderInfo.Profile == TwoMGFX.ShaderProfile.PlayStation4)
             {
-                // TODO: Spawn PSSL tool to compile to bytecode!
                 bytecode = null;
             }
             else
