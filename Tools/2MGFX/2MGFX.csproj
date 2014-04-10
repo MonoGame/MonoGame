@@ -77,8 +77,8 @@
     <Compile Include="DXConstantBufferData.sharpdx.cs" />
     <Compile Include="DXConstantBufferData.writer.cs" />
     <Compile Include="EffectObject.cs" />
-    <Compile Include="DXEffectObject.hlsl.cs" />
-    <Compile Include="DXEffectObject.writer.cs" />
+    <Compile Include="EffectObject.hlsl.cs" />
+    <Compile Include="EffectObject.writer.cs" />
     <Compile Include="DXExpression.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -86,9 +86,9 @@
     <Compile Include="DXPreshader.cs" />
     <Compile Include="DXPreshader.writer.cs" />
     <Compile Include="ShaderData.cs" />
-    <Compile Include="DXShaderData.mojo.cs" />
-    <Compile Include="DXShaderData.sharpdx.cs" />
-    <Compile Include="DXShaderData.writer.cs" />
+    <Compile Include="ShaderData.mojo.cs" />
+    <Compile Include="ShaderData.sharpdx.cs" />
+    <Compile Include="ShaderData.writer.cs" />
     <Compile Include="GLSLOptimizer.cs" />
     <Compile Include="MojoShader.cs" />
     <Compile Include="Options.cs" />
