@@ -186,14 +186,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\MarshalHelper.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\Preshader.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Preshader.cs</Link>
-    </Compile>
-    <Compile Include="..\Tools\2MGFX\Preshader.writer.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\Preshader.writer.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.cs</Link>

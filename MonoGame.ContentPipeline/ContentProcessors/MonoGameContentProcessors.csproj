@@ -111,12 +111,6 @@
     <Compile Include="..\..\Tools\2MGFX\PassInfo.cs">
       <Link>Processors\Effect\PassInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\Preshader.cs">
-      <Link>Processors\Effect\Preshader.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Tools\2MGFX\Preshader.writer.cs">
-      <Link>Processors\Effect\Preshader.writer.cs</Link>
-    </Compile>
     <Compile Include="..\..\Tools\2MGFX\SamplerStateInfo.cs">
       <Link>Processors\Effect\SamplerStateInfo.cs</Link>
     </Compile>
