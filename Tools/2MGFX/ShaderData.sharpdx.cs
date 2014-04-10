@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using SharpDX.Direct3D;
-using TwoMGFX;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace TwoMGFX
 {
     internal partial class ShaderData
     {

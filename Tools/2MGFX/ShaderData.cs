@@ -1,4 +1,6 @@
-namespace Microsoft.Xna.Framework.Graphics
+using Microsoft.Xna.Framework.Graphics;
+
+namespace TwoMGFX
 {
 	internal partial class ShaderData
 	{
