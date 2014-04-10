@@ -78,6 +78,7 @@
     <Compile Include="ConstantBufferData.writer.cs" />
     <Compile Include="EffectObject.cs" />
     <Compile Include="EffectObject.hlsl.cs" />
+    <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />
     <Compile Include="MarshalHelper.cs" />
     <Compile Include="ShaderData.cs" />
