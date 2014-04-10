@@ -178,6 +178,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.hlsl.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\EffectObject.pssl.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\EffectObject.pssl.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\EffectObject.writer.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\EffectObject.writer.cs</Link>
