@@ -84,7 +84,6 @@
     <Compile Include="ShaderData.mojo.cs" />
     <Compile Include="ShaderData.sharpdx.cs" />
     <Compile Include="ShaderData.writer.cs" />
-    <Compile Include="GLSLOptimizer.cs" />
     <Compile Include="MojoShader.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Parser.cs" />

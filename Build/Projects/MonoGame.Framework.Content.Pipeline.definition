@@ -202,10 +202,6 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.writer.cs</Link>
     </Compile>
-    <Compile Include="..\Tools\2MGFX\GLSLOptimizer.cs">
-      <Platforms>Windows</Platforms>
-      <Link>Processors\MGFX\GLSLOptimizer.cs</Link>
-    </Compile>
     <Compile Include="..\Tools\2MGFX\MojoShader.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\MojoShader.cs</Link>
