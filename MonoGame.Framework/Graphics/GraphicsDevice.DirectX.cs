@@ -723,12 +723,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
+            // Clear options for depth/stencil buffer if not attached.
             if (_currentDepthStencilView != null)
             {
-                options |= ClearOptions.DepthBuffer;
-
-                if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
-                    options |= ClearOptions.Stencil;
+                if (_currentDepthStencilView.Description.Format != SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
+                    options &= ~ClearOptions.Stencil;
+            }
+            else
+            {
+                options &= ~ClearOptions.DepthBuffer;
+                options &= ~ClearOptions.Stencil;
             }
 
             lock (_d3dContext)
@@ -750,7 +754,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
-                if (flags != 0 && _currentDepthStencilView != null)
+                if (flags != 0)
                     _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
             }
         }
