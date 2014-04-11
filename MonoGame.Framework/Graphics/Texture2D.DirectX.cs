@@ -203,10 +203,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return toReturn;
 #endif
 #if WINDOWS
-            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            try
             {
                 // Fix up the Image to match the expected format
-                image.RGBToBGR();
+                image = (Bitmap)image.RGBToBGR();
 
                 var data = new byte[image.Width * image.Height * 4];
 
@@ -222,6 +223,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 texture.SetData(data);
 
                 return texture;
+            }
+            finally
+            {
+                image.Dispose();
             }
 #endif
         }
