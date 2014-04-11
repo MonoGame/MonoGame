@@ -14,15 +14,12 @@ using System.Xml.Linq;
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /*
-     * Backlog of stuff to support:
-     * - Dictionaries
-     * - Overridden names via ContentSerializer.CollectionItemName
-     * - Array asset types (<Asset Type="Class[]">)
-     * - Parsing optimized array element types (integer array, vector array)
-     * - Polymorphic array types
+     * Yet to be implemented:
+     * - Custom element names
      * - FlattenContent for nested classes
      * - Shared Resources
      * - External References
+     * - Errors for items that aren't allowed to be null
      */
 
     /// <summary>
@@ -32,6 +29,50 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class XmlImporter : ContentImporter<object>
     {
         private static readonly char[] _elementSeparator = new[] { ' ' };
+
+        /// <summary>
+        /// Arrays of value types can be stored in a single XML element separated by
+        /// whitespace. This table describes how many items of each type to yield from
+        /// those lists.
+        /// </summary>
+        private static readonly Dictionary<Type, int> _elementCount = new Dictionary<Type, int>
+        {
+            { typeof(Vector2),      2 },
+            { typeof(Vector3),      3 },
+            { typeof(Vector4),      4 },
+            { typeof(Quaternion),   4 },
+            { typeof(Rectangle),    4 },
+            { typeof(Color),        4 },
+        };
+
+        /// <summary>
+        /// According to the examples on Sean Hargreaves' blog, explicit types
+        /// can also specify the type aliases from C#. This maps those names
+        /// to the actual .NET framework types for parsing.
+        /// </summary>
+        private static readonly Dictionary<string, Type> _typeAliases = new Dictionary<string, Type>
+        {
+            { "bool",   typeof(bool) },
+            { "byte",   typeof(byte) },
+            { "sbyte",  typeof(sbyte) },
+            { "char",   typeof(char) },
+            { "decimal",typeof(decimal) },
+            { "double", typeof(double) },
+            { "float",  typeof(float) },
+            { "int",    typeof(int) },
+            { "uint",   typeof(uint) },
+            { "long",   typeof(long) },
+            { "ulong",  typeof(ulong) },
+            { "object", typeof(object) },
+            { "short",  typeof(short) },
+            { "ushort", typeof(ushort) },
+            { "string", typeof(string) }
+        };
+
+        /// <summary>
+        /// Maps "ShortName:" -> "My.Namespace.LongName." for type lookups.
+        /// </summary>
+        private Dictionary<string, string> _namespaceLookup;
 
         /// <summary>
         /// Initializes a new instance of XmlImporter.
@@ -59,37 +100,38 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Some XML assets have namespaces to reduce the verbosity of the file.
             // We create a map of "ShortName:" -> "My.Namespace.LongName" and replace
             // the substring as we go.
-            var nsLookup = CreateNamespaceLookup(doc);
-            var typeName = assetElement.Attribute("Type").Value;
+            _namespaceLookup = CreateNamespaceLookup(doc);
 
-            // Expand any namespaces in the asset type
-            foreach (var pair in nsLookup)
-                typeName = typeName.Replace(pair.Key, pair.Value);
-
-            // Now find the type information itself
-            var actualType =
-                (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                 from type in assembly.GetTypes()
-                 where type.FullName == typeName || type.Name == typeName
-                 select type).FirstOrDefault();
-
-            if (actualType == null)
-                throw new InvalidContentException(string.Format("There was an error deserializing intermediate XML. Cannot find type \"{0}\"", typeName));
-
-            var asset = CreateObject(actualType, assetElement);
+            var asset = ParseDispatcher(typeof(object), assetElement);
             return asset;
         }
 
         /// <summary>
-        /// Creates an object and populates its fields and properties from XML elements
+        /// Finds the type in any assembly loaded into the AppDomain.
         /// </summary>
-        private static object CreateObject(Type type, XElement rootElement)
+        private bool FindType(string typeName, out string expandedName, out Type foundType)
         {
-            var result = Activator.CreateInstance(type);
-            foreach (var element in rootElement.Elements())
-                SetValue(type, result, element);
+            // Shortcut for friendly C# names
+            if (_typeAliases.TryGetValue(typeName, out foundType))
+            {
+                expandedName = foundType.FullName;
+                return true;
+            }
 
-            return result;
+            // Expand any namespaces in the asset type
+            foreach (var pair in _namespaceLookup)
+                typeName = typeName.Replace(pair.Key, pair.Value);
+            expandedName = typeName;
+
+            foundType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                         from type in assembly.GetTypes()
+                         where type.FullName == typeName || type.Name == typeName
+                         select type).FirstOrDefault();
+
+            if (foundType == null)
+                foundType = Type.GetType(expandedName, false, true);
+
+            return foundType != null;
         }
 
         /// <summary>
@@ -109,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return nsLookup;
         }
 
-        private static void SetValue(Type type, object asset, XElement element)
+        private void SetValue(Type type, object asset, XElement element)
         {
             var memberName = element.Name.LocalName;
             var member = type.GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault();
@@ -131,7 +173,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
         }
 
-        private static void SetFieldValue(FieldInfo field, object asset, XElement element)
+        private void SetFieldValue(FieldInfo field, object asset, XElement element)
         {
             // Skip parse for null values.
             if (element.Attribute("Null") != null)
@@ -141,21 +183,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             var parseType = field.FieldType;
-            object value = null;
-
-            if (parseType.GetInterfaces().Contains(typeof(IList)))
-            {
-                value = ParseList(parseType, element);
-            }
-            else
-            {
-                value = ParseDispatcher(parseType, element.Value);
-            }
-
+            var value = ParseDispatcher(parseType, element);
             field.SetValue(asset, value);
         }
 
-        private static void SetPropertyValue(PropertyInfo property, object asset, XElement element)
+        private void SetPropertyValue(PropertyInfo property, object asset, XElement element)
         {
             // Skip parse for null values.
             if (element.Attribute("Null") != null)
@@ -165,49 +197,139 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             var parseType = property.PropertyType;
-            object value = null;
-
-            if (parseType.GetInterfaces().Contains(typeof(IList)) && parseType.IsGenericType)
-            {
-                value = ParseList(parseType, element);
-            }
-            else
-            {
-                value = ParseDispatcher(parseType, element.Value);
-            }
+            var value = ParseDispatcher(parseType, element);
             property.SetValue(asset, value, null);
         }
 
-        private static object ParseList(Type parseType, XElement element)
+        private object ParseDispatcher(Type parseType, XElement element)
         {
+            // Type override
+            var explicitType = element.Attribute("Type");
+            if (explicitType != null)
+            {
+                string fullTypeName;
+                Type replacementType;
+                if (!FindType(explicitType.Value, out fullTypeName, out replacementType))
+                    throw new InvalidContentException(string.Format("There was an error deserializing intermediate XML. Cannot find type \"{0}\"", fullTypeName));
+
+                parseType = replacementType;
+            }
+
+            if (parseType.IsValueType)
+            {
+                return ParseValueType(parseType, element.Value);
+            }
+            else
+            {
+                if (parseType.IsArray)
+                {
+                    return ParseArray(parseType, element);
+                }
+                else if (parseType.GetInterfaces().Contains(typeof(IList)))
+                {
+                    return ParseList(parseType, element);
+                }
+                else if (parseType.GetInterfaces().Contains(typeof(IDictionary)))
+                {
+                    return ParseDictionary(parseType, element);
+                }
+                else if (parseType == typeof(string))
+                {
+                    return System.Net.WebUtility.HtmlDecode(element.Value);
+                }
+                else
+                {
+                    return ParseObject(parseType, element);
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private object ParseObject(Type type, XElement rootElement)
+        {
+            object result = null;
+            try
+            {
+                result = Activator.CreateInstance(type, true);
+            }
+            catch (MissingMethodException e)
+            {
+                throw new Exception(string.Format("Couldn't create object of type {0}: {1}", type.Name, e.Message), e);
+            }
+
+            foreach (var element in rootElement.Elements())
+                SetValue(type, result, element);
+
+            return result;
+        }
+
+        private object ParseList(Type parseType, XElement element)
+        {
+            if (!parseType.IsGenericType)
+                throw new NotImplementedException("Non-generic lists are not supported.");
+
             var list = Activator.CreateInstance(parseType) as IList;
             var innerType = parseType.GetGenericArguments()[0];
-            var children = element.Elements();
-            foreach (var child in children)
-            {
-                var innerValue = CreateObject(innerType, child);
-                list.Add(innerValue);
-            }
+            foreach (var child in ParseCollection(innerType, element))
+                list.Add(child);
 
             return list;
         }
 
-        private static object ParseDispatcher(Type parseType, string value)
+        private object ParseDictionary(Type parseType, XElement element)
+        {
+            if (!parseType.IsGenericType)
+                throw new NotImplementedException("Non-generic dictionaries are not supported.");
+
+            var dict = Activator.CreateInstance(parseType) as IDictionary;
+            var keyType = parseType.GetGenericArguments()[0];
+            var valueType = parseType.GetGenericArguments()[1];
+            foreach (var item in element.Elements())
+            {
+                var key = ParseDispatcher(keyType, item.Element("Key"));
+                var value = ParseDispatcher(valueType, item.Element("Value"));
+                dict.Add(key, value);
+            }
+
+            return dict;
+        }
+
+        private object ParseArray(Type parseType, XElement element)
+        {
+            var innerType = parseType.GetElementType();
+            var values = innerType.IsValueType
+                ? ParseValueTypeArray(innerType, element).ToArray()
+                : ParseCollection(innerType, element).ToArray();
+
+            var array = Array.CreateInstance(innerType, values.Length);
+            Array.Copy(values, array, values.Length);
+
+            return array;
+        }
+
+        private static object ParseValueType(Type parseType, string value)
         {
             if (parseType == typeof(bool))
                 return XmlConvert.ToBoolean(value);
 
-            if (parseType == typeof(char))
-                return XmlConvert.ToChar(value);
-
             if (parseType == typeof(byte))
                 return XmlConvert.ToByte(value);
 
-            if (parseType == typeof(short))
-                return XmlConvert.ToInt16(value);
+            if (parseType == typeof(sbyte))
+                return XmlConvert.ToSByte(value);
 
-            if (parseType == typeof(ushort))
-                return XmlConvert.ToUInt16(value);
+            if (parseType == typeof(char))
+                return XmlConvert.ToChar(value);
+
+            if (parseType == typeof(decimal))
+                return XmlConvert.ToDecimal(value);
+
+            if (parseType == typeof(double))
+                return XmlConvert.ToDouble(value);
+
+            if (parseType == typeof(float))
+                return XmlConvert.ToSingle(value);
 
             if (parseType == typeof(int))
                 return XmlConvert.ToInt32(value);
@@ -215,14 +337,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (parseType == typeof(uint))
                 return XmlConvert.ToUInt32(value);
 
-            if (parseType == typeof(float))
-                return XmlConvert.ToSingle(value);
+            if (parseType == typeof(long))
+                return XmlConvert.ToInt64(value);
 
-            if (parseType == typeof(double))
-                return XmlConvert.ToDouble(value);
+            if (parseType == typeof(ulong))
+                return XmlConvert.ToUInt64(value);
 
-            if (parseType == typeof(string))
-                return System.Net.WebUtility.HtmlDecode(value);
+            if (parseType == typeof(short))
+                return XmlConvert.ToInt16(value);
+
+            if (parseType == typeof(ushort))
+                return XmlConvert.ToUInt16(value);
 
             if (parseType == typeof(Guid))
                 return XmlConvert.ToGuid(value);
@@ -254,6 +379,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return new Quaternion(XmlConvert.ToSingle(values[0]), XmlConvert.ToSingle(values[1]), XmlConvert.ToSingle(values[2]), XmlConvert.ToSingle(values[3]));
             }
 
+            if (parseType == typeof(Rectangle))
+            {
+                var values = value.Split(_elementSeparator, 4);
+                return new Rectangle(XmlConvert.ToInt32(values[0]), XmlConvert.ToInt32(values[1]), XmlConvert.ToInt32(values[2]), XmlConvert.ToInt32(values[3]));
+            }
+
             if (parseType.IsEnum)
                 return Enum.Parse(parseType, value);
 
@@ -266,6 +397,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             throw new NotImplementedException();
+        }
+
+        private static IEnumerable<object> ParseValueTypeArray(Type parseType, XElement element)
+        {
+            if (!_elementCount.ContainsKey(parseType))
+                throw new NotImplementedException(string.Format("Value type arrays are not implemented for type '{0}'", parseType.Name));
+
+            var values = element.Value.Split(_elementSeparator);
+
+            // See if we need to read multiples.
+            int elementCount;
+            if (!_elementCount.TryGetValue(parseType, out elementCount))
+                elementCount = 1;
+
+            var offset = 0;
+            while (offset < values.Length)
+            {
+                // This can probably be reworked to avoid lots of allocations.
+                var substring = string.Join(" ", values, offset, elementCount);
+                offset += elementCount;
+                yield return ParseValueType(parseType, substring);
+            }
+        }
+
+        private IEnumerable<object> ParseCollection(Type parseType, XElement element)
+        {
+            var children = element.Elements();
+            foreach (var child in children)
+                yield return ParseDispatcher(parseType, child);
         }
     }
 }
