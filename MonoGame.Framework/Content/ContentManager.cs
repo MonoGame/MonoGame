@@ -83,6 +83,7 @@ namespace Microsoft.Xna.Framework.Content
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
+            'P', // PlayStation4
         };
 
         private static void AddContentManager(ContentManager contentManager)
