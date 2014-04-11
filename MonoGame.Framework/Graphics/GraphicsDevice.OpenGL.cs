@@ -179,20 +179,12 @@ namespace Microsoft.Xna.Framework.Graphics
             _shaderProgram = -1;
         }
 
-        public void PlatformClear(Color color)
-        {
-            var options = ClearOptions.Target;
-
-            // TODO: We need to figure out how to detect if
-            // we have a depth stencil buffer or not!
-            options |= ClearOptions.DepthBuffer;
-            options |= ClearOptions.Stencil;
-
-            PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
-        }
-
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
+            // TODO: We need to figure out how to detect if we have a
+            // depth stencil buffer or not, and clear options relating
+            // to them if not attached.
+
             // Unlike with XNA and DirectX...  GL.Clear() obeys several
             // different render states:
             //
