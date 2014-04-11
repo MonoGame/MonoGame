@@ -33,6 +33,7 @@
     <call target="buildmac" />
     <call target="buildios" />
     <call target="buildpsm" />
+    <call target="buildweb" />
 
     <call target="buildtools"/>
     <call target="buildcontentprocessor"/>
@@ -86,6 +87,23 @@
       <exec program="mono" commandline="Protobuild.exe -generate Linux" />
       <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Linux.sln" />
       <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Linux.sln" />
+    </if>
+  </target>
+
+  <target name="buildweb" description="Build Web JSIL" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <exec program="Protobuild" commandline="-generate Web">
+        <environment>
+          <variable name="JSIL_DIRECTORY" value="C:\JSIL" />
+        </environment>
+      </exec>
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
+    </if>
+    <if test="${os == 'Unix'}">
+      <exec program="mono" commandline="Protobuild.exe -generate Web" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Web.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Web.sln" />
     </if>
   </target>
 

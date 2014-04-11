@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="FrameworkReferences">
- 
+
   <Platform Type="iOS">
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Project 
+    <Project
       Name="Lidgren.Network.iOS"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj">
@@ -15,28 +15,28 @@
         <ConfigurationMapping Old="AppStore" New="Release|Any CPU" />
     </Project>
   </Platform>
-  
+
   <Platform Type="Linux">
     <Reference Include="System.Drawing" />
     <Binary
-      Name="Tao.Sdl" 
+      Name="Tao.Sdl"
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="OpenTK"
       Path="ThirdParty/Dependencies/OpenTK.dll" />
-    <Project 
+    <Project
       Name="Lidgren.Network.Linux"
       Guid="758CB33D-6EBD-41EA-BB0C-55B1C97A325F"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Linux.csproj" />
   </Platform>
-  
+
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Binary 
+    <Binary
       Name="Tao.Sdl"
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    <Project 
+    <Project
       Name="Lidgren.Network.MacOS"
       Guid="5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.MacOS.csproj" />
@@ -52,7 +52,7 @@
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
-  
+
   <Platform Type="Ouya">
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
@@ -66,17 +66,17 @@
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
-  
+
   <Platform Type="PSMobile">
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
-    <Project 
+    <Project
       Name="Lidgren.Network.PSMobile"
       Guid="167676EE-E2D5-440A-BB2B-EFBD02BC8493"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj" />
   </Platform>
-  
+
   <Platform Type="Windows">
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -108,7 +108,7 @@
     <Binary
       Name="SharpDX.XInput"
       Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
-    <Project 
+    <Project
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
@@ -135,7 +135,7 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XAudio2.dll" />
     <Binary
       Name="SharpDX.XInput"
-      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />  
+      Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -146,12 +146,12 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Binary
-      Name="Tao.Sdl" 
+      Name="Tao.Sdl"
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="OpenTK"
       Path="ThirdParty/Dependencies/OpenTK.dll" />
-    <Project 
+    <Project
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
@@ -173,10 +173,14 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
-    <Reference  Include="Microsoft.Xna.Framework.GamerServices" 
+    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
                 Aliases="MicrosoftXnaGamerServices" />
-    <Reference  Include="Microsoft.Xna.Framework" 
+    <Reference  Include="Microsoft.Xna.Framework"
                 Aliases="MicrosoftXnaFramework" />
   </Platform>
- 
+
+  <Platform Type="Web">
+    <Reference Include="JSIL.Meta" />
+  </Platform>
+
 </ExternalProject>
