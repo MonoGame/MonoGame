@@ -12,20 +12,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <remarks>In addition to texture references, opaque data values are stored in the OpaqueData property of the base class.</remarks>
     public class MaterialContent : ContentItem
     {
-        TextureReferenceDictionary textures;
+        readonly TextureReferenceDictionary _textures;
 
         /// <summary>
         /// Gets the texture collection of the material.
         /// </summary>
         /// <value>Collection of textures used by the material.</value>
-        public TextureReferenceDictionary Textures { get { return textures; } }
+        public TextureReferenceDictionary Textures { get { return _textures; } }
 
         /// <summary>
         /// Initializes a new instance of MaterialContent.
         /// </summary>
         public MaterialContent()
         {
-            textures = new TextureReferenceDictionary();
+            _textures = new TextureReferenceDictionary();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Reference to a texture from the collection.</returns>
         protected ExternalReference<TextureContent> GetTexture(string key)
         {
-            return textures[key];
+            return _textures[key];
         }
 
         /// <summary>
@@ -93,9 +93,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         protected void SetTexture(string key, ExternalReference<TextureContent> value)
         {
             if (value != null)
-                textures[key] = value;
+                _textures[key] = value;
             else
-                textures.Remove(key);
+                _textures.Remove(key);
         }
     }
 }
