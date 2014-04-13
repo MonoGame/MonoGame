@@ -27,7 +27,7 @@ iOS / Android / Mac to follow soon</releaseNotes>
     <files>
         <file src="content\net40\Game1.cs.pp" target="content\net40\Game1.cs.pp" />
         <file src="content\net40\Program.cs.pp" target="content\net40\Program.cs.pp" />
-        <file src="content\net40\SDL.dll" target="content\net40\SDL.dll" />
+        <file src="..\ThirdParty\GamepadConfig\SDL.dll" target="content\net40\SDL.dll" />
         <file src="content\netcore\App.xaml.cs.pp" target="content\netcore\App.xaml.cs.pp" />
         <file src="content\netcore\App.xaml.pp" target="content\netcore\App.xaml.pp" />
         <file src="content\netcore\Game1.cs.pp" target="content\netcore\Game1.cs.pp" />
