@@ -4,7 +4,7 @@
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class BasicMaterialContent : MaterialContent
+    public class SkinnedMaterialContent : MaterialContent
     {
         public const string AlphaKey = "Alpha";
         public const string DiffuseColorKey = "DiffuseColor";
@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public const string SpecularColorKey = "SpecularColor";
         public const string SpecularPowerKey = "SpecularPower";
         public const string TextureKey = "Texture";
-        public const string VertexColorEnabledKey = "VertexColorEnabled";
+        public const string WeightsPerVertexKey = "WeightsPerVertex";
 
         public float? Alpha
         {
@@ -50,10 +50,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             set { SetTexture(TextureKey, value); }
         }
 
-        public bool? VertexColorEnabled
+        public int? WeightsPerVertex
         {
-            get { return GetValueTypeProperty<bool>(VertexColorEnabledKey); }
-            set { SetProperty(VertexColorEnabledKey, value); }
+            get { return GetValueTypeProperty<int>(WeightsPerVertexKey); }
+            set { SetProperty(WeightsPerVertexKey, value); }
         }
     }
 }

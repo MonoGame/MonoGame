@@ -67,6 +67,7 @@
     
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Graphics -->
+    <Compile Include="Graphics\AlphaTestMaterialContent.cs" />
     <Compile Include="Graphics\AnimationChannel.cs" />
     <Compile Include="Graphics\AnimationChannelDictionary.cs" />
     <Compile Include="Graphics\AnimationContent.cs" />
@@ -80,11 +81,14 @@
     <Compile Include="Graphics\BoneWeightCollection.cs" />
     <Compile Include="Graphics\Font\CharacterRegion.cs" />
     <Compile Include="Graphics\Font\CharacterRegionTypeConverter.cs" />
+    <Compile Include="Graphics\DualTextureMaterialContent.cs" />
     <Compile Include="Graphics\Dxt1BitmapContent.cs" />
     <Compile Include="Graphics\Dxt3BitmapContent.cs" />
     <Compile Include="Graphics\Dxt5BitmapContent.cs" />
     <Compile Include="Graphics\DxtBitmapContent.cs" />
     <Compile Include="Graphics\EffectContent.cs" />
+    <Compile Include="Graphics\EffectMaterialContent.cs" />
+    <Compile Include="Graphics\EnvironmentMapMaterialContent.cs" />
     <Compile Include="Graphics\FontDescription.cs" />
     <Compile Include="Graphics\FontDescriptionStyle.cs" />
     <Compile Include="Graphics\GeometryContent.cs" />
@@ -107,6 +111,7 @@
     <Compile Include="Graphics\PositionCollection.cs" />
     <Compile Include="Graphics\PvrtcBitmapContent.cs" />
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
+    <Compile Include="Graphics\SkinnedMaterialContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />

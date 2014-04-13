@@ -4,14 +4,12 @@
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class BasicMaterialContent : MaterialContent
+    public class DualTextureMaterialContent : MaterialContent
     {
         public const string AlphaKey = "Alpha";
         public const string DiffuseColorKey = "DiffuseColor";
-        public const string EmissiveColorKey = "EmissiveColor";
-        public const string SpecularColorKey = "SpecularColor";
-        public const string SpecularPowerKey = "SpecularPower";
         public const string TextureKey = "Texture";
+        public const string Texture2Key = "Texture2";
         public const string VertexColorEnabledKey = "VertexColorEnabled";
 
         public float? Alpha
@@ -26,28 +24,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             set { SetProperty(DiffuseColorKey, value); }
         }
 
-        public Vector3? EmissiveColor
-        {
-            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
-            set { SetProperty(EmissiveColorKey, value); }
-        }
-
-        public Vector3? SpecularColor
-        {
-            get { return GetValueTypeProperty<Vector3>(SpecularColorKey); }
-            set { SetProperty(SpecularColorKey, value); }
-        }
-
-        public float? SpecularPower
-        {
-            get { return GetValueTypeProperty<float>(SpecularPowerKey); }
-            set { SetProperty(SpecularPowerKey, value); }
-        }
-
         public ExternalReference<TextureContent> Texture
         {
             get { return GetTexture(TextureKey); }
             set { SetTexture(TextureKey, value); }
+        }
+
+        public ExternalReference<TextureContent> Texture2
+        {
+            get { return GetTexture(Texture2Key); }
+            set { SetTexture(Texture2Key, value); }
         }
 
         public bool? VertexColorEnabled

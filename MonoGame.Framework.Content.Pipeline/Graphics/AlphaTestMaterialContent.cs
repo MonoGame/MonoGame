@@ -2,15 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework.Graphics;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class BasicMaterialContent : MaterialContent
+    public class AlphaTestMaterialContent : MaterialContent
     {
         public const string AlphaKey = "Alpha";
+        public const string AlphaFunctionKey = "AlphaFunction";
         public const string DiffuseColorKey = "DiffuseColor";
-        public const string EmissiveColorKey = "EmissiveColor";
-        public const string SpecularColorKey = "SpecularColor";
-        public const string SpecularPowerKey = "SpecularPower";
+        public const string ReferenceAlphaKey = "ReferenceAlpha";
         public const string TextureKey = "Texture";
         public const string VertexColorEnabledKey = "VertexColorEnabled";
 
@@ -19,6 +20,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             get { return GetValueTypeProperty<float>(AlphaKey); }
             set { SetProperty(AlphaKey, value); }
         }
+        
+        public CompareFunction? AlphaFunction
+        {
+            get { return GetValueTypeProperty<CompareFunction>(AlphaFunctionKey); }
+            set { SetProperty(AlphaFunctionKey, value); }
+        }
 
         public Vector3? DiffuseColor
         {
@@ -26,22 +33,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             set { SetProperty(DiffuseColorKey, value); }
         }
 
-        public Vector3? EmissiveColor
+        public int? ReferenceAlpha
         {
-            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
-            set { SetProperty(EmissiveColorKey, value); }
-        }
-
-        public Vector3? SpecularColor
-        {
-            get { return GetValueTypeProperty<Vector3>(SpecularColorKey); }
-            set { SetProperty(SpecularColorKey, value); }
-        }
-
-        public float? SpecularPower
-        {
-            get { return GetValueTypeProperty<float>(SpecularPowerKey); }
-            set { SetProperty(SpecularPowerKey, value); }
+            get { return GetValueTypeProperty<int>(ReferenceAlphaKey); }
+            set { SetProperty(ReferenceAlphaKey, value); }
         }
 
         public ExternalReference<TextureContent> Texture
