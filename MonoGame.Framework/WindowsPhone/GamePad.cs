@@ -6,6 +6,11 @@ namespace Microsoft.Xna.Framework.Input
     {
         internal static bool back;
 
+        /// <summary>
+        /// Specifies the total timespan that the vibration motor will be active for.
+        /// </summary>
+        public static TimeSpan VibrationTime = TimeSpan.FromMilliseconds(500);
+
         internal static void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (!e.Cancel)
@@ -39,5 +44,12 @@ namespace Microsoft.Xna.Framework.Input
 
             return state;
         }
+
+        /* TODO Implement Vibration Functionality
+        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+        {
+            return false;
+        }
+        */
     }
 }
