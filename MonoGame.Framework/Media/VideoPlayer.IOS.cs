@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformResume()
         {
-            _currentVideo.Player.Start();
+            _currentVideo.MovieView.MoviePlayer.Play();
         }
 
         private void PlatformPlay()

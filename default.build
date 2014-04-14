@@ -99,7 +99,7 @@
 
   <target name="buildios" description="Build iOS" depends="clean">
     <if test="${os == 'MacOS'}">
-      <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets')}">
+      <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
