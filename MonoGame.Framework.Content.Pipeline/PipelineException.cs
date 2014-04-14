@@ -39,6 +39,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public PipelineException(
             string message
             )
+            : base(message)
         {
         }
 
@@ -51,6 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             string message,
             Exception innerException
             )
+            :base(message, innerException)
         {
         }
 

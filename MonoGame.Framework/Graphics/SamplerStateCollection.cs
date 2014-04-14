@@ -44,6 +44,7 @@
 using System;
 using System.Collections.Generic;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -52,6 +53,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -68,13 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal SamplerStateCollection( int maxSamplers )
         {
             _samplers = new SamplerState[maxSamplers];
-
-            for (var i = 0; i < maxSamplers; i++)
-                _samplers[i] = SamplerState.LinearWrap;
-            
-#if DIRECTX
-            _d3dDirty = int.MaxValue;
-#endif
+		    Clear();
         }
 		
 		public SamplerState this [int index] 
@@ -100,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void Clear()
         {
             for (var i = 0; i < _samplers.Length; i++)
-                _samplers[i] = null;
+                _samplers[i] = SamplerState.LinearWrap;
             
 #if DIRECTX
             _d3dDirty = int.MaxValue;
@@ -173,6 +169,35 @@ namespace Microsoft.Xna.Framework.Graphics
                     texture.glLastSamplerState = sampler;
                 }
             }
+#elif PSM
+            for (var i = 0; i < _samplers.Length; i++)
+            {
+                var sampler = _samplers[i];
+                var texture = device.Textures[i] as Texture2D;
+                if (texture == null)
+                    continue;
+                
+                var psmTexture = texture._texture2D;
+                
+                // FIXME: Handle mip attributes
+                
+                // FIXME: Separable filters
+                psmTexture.SetFilter(
+                    sampler.Filter == TextureFilter.Point
+                        ? Sce.PlayStation.Core.Graphics.TextureFilterMode.Nearest
+                        : Sce.PlayStation.Core.Graphics.TextureFilterMode.Linear
+                );
+                // FIXME: The third address mode
+                psmTexture.SetWrap(
+                    sampler.AddressU == TextureAddressMode.Clamp
+                        ? Sce.PlayStation.Core.Graphics.TextureWrapMode.ClampToEdge
+                        : Sce.PlayStation.Core.Graphics.TextureWrapMode.Repeat,
+                    sampler.AddressV == TextureAddressMode.Clamp
+                        ? Sce.PlayStation.Core.Graphics.TextureWrapMode.ClampToEdge
+                        : Sce.PlayStation.Core.Graphics.TextureWrapMode.Repeat
+                );
+            
+            }            
 #endif
         }
 	}

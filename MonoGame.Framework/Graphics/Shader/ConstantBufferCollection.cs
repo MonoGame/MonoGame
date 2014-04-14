@@ -2,7 +2,7 @@
 
 #if MONOMAC
 using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#elif (WINDOWS && !DIRECTX) || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ConstantBuffer[] _buffers;
 
         private ShaderStage _stage;
+        private ShaderStage Stage { get { return this._stage; } }
 
         private int _valid;
 

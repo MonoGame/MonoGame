@@ -9,9 +9,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Model
 	{
+		private static Matrix[] sharedDrawBoneMatrices;
+		
 		private GraphicsDevice graphicsDevice;
-		private List<ModelBone> bones;
-		private List<ModelMesh> meshes;
+        private GraphicsDevice GraphicsDevice { get { return this.graphicsDevice; } }
 
 		// Summary:
 		//     Gets a collection of ModelBone objects which describe how each mesh in the
@@ -40,8 +41,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		public Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
 		{
 			// TODO: Complete member initialization
-			this.bones = bones;
-			this.meshes = meshes;
 			this.graphicsDevice = graphicsDevice;
 
 			Bones = new ModelBoneCollection(bones);
@@ -78,10 +77,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 		
 		public void Draw(Matrix world, Matrix view, Matrix projection) 
-		{       			
-			// Look up combined bone matrices for the entire model.
-            Matrix[] boneTransforms = new Matrix[bones.Count];
-			CopyAbsoluteBoneTransformsTo(boneTransforms);
+		{       
+            int boneCount = this.Bones.Count;
+			
+			if (sharedDrawBoneMatrices == null ||
+				sharedDrawBoneMatrices.Length < boneCount)
+			{
+				sharedDrawBoneMatrices = new Matrix[boneCount];    
+			}
+			
+			// Look up combined bone matrices for the entire model.            
+			CopyAbsoluteBoneTransformsTo(sharedDrawBoneMatrices);
 
             // Draw the model.
             foreach (ModelMesh mesh in Meshes)
@@ -92,7 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					if (effectMatricies == null) {
 						throw new InvalidOperationException();
 					}
-                    effectMatricies.World = boneTransforms[mesh.ParentBone.Index] * world;
+                    effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;
                     effectMatricies.Projection = projection;
                 }
@@ -105,12 +111,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (destinationBoneTransforms == null)
 				throw new ArgumentNullException("destinationBoneTransforms");
-			if (destinationBoneTransforms.Length < this.bones.Count)
+            if (destinationBoneTransforms.Length < this.Bones.Count)
 				throw new ArgumentOutOfRangeException("destinationBoneTransforms");
-			int count = this.bones.Count;
+            int count = this.Bones.Count;
 			for (int index1 = 0; index1 < count; ++index1)
 			{
-				ModelBone modelBone = (this.bones)[index1];
+                ModelBone modelBone = (this.Bones)[index1];
 				if (modelBone.Parent == null)
 				{
 					destinationBoneTransforms[index1] = modelBone.transform;

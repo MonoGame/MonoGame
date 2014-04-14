@@ -2,16 +2,18 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#else
+using OpenTK.Graphics.ES20;
+#endif
 #elif PSM
 using Sce.PlayStation.Core.Graphics;
 #elif DIRECTX
 using System.Reflection;
-#else
-using OpenTK.Graphics.ES20;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -93,21 +95,18 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!vertexType.IsValueType)
 #endif
             {
-                var args = new object[] { vertexType };
 				throw new ArgumentException("vertexType", "Must be value type");
 			}
 
             var type = Activator.CreateInstance(vertexType) as IVertexType;
 			if (type == null)
 			{
-                var objArray3 = new object[] { vertexType };
 				throw new ArgumentException("vertexData does not inherit IVertexType");
 			}
 
             var vertexDeclaration = type.VertexDeclaration;
 			if (vertexDeclaration == null)
 			{
-                var objArray2 = new object[] { vertexType };
 				throw new Exception("VertexDeclaration cannot be null");
 			}
 

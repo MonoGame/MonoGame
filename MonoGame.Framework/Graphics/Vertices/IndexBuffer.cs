@@ -4,17 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
-using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+using PssVertexBuffer = Sce.PlayStation.Core.Graphics.VertexBuffer;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -26,7 +28,16 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _isDynamic;
 
 #if DIRECTX
-        internal SharpDX.Direct3D11.Buffer _buffer;
+        private SharpDX.Direct3D11.Buffer _buffer;
+
+        internal SharpDX.Direct3D11.Buffer Buffer
+        {
+            get
+            {
+                GenerateIfRequired();
+                return _buffer;
+            }
+        }
 #elif PSM
         internal ushort[] _buffer;
 #else
@@ -53,32 +64,12 @@ namespace Microsoft.Xna.Framework.Graphics
             this.IndexCount = indexCount;
             this.BufferUsage = usage;
 			
-			var sizeInBytes = indexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
-
             _isDynamic = dynamic;
             
 #if DIRECTX
 
-            // TODO: To use true Immutable resources we would need to delay creation of 
-            // the Buffer until SetData() and recreate them if set more than once.
+            GenerateIfRequired();
 
-            var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
-            var resUsage = SharpDX.Direct3D11.ResourceUsage.Default;
-
-            if (dynamic)
-            {
-                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
-                resUsage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
-            }
-
-            _buffer = new SharpDX.Direct3D11.Buffer(    graphicsDevice._d3dDevice,
-                                                        sizeInBytes,
-                                                        resUsage,
-                                                        SharpDX.Direct3D11.BindFlags.IndexBuffer,
-                                                        accessflags,
-                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
-                                                        0  // StructureSizeInBytes
-                                                        );
 #elif PSM
             if (indexElementSize != IndexElementSize.SixteenBits)
                 throw new NotImplementedException("PSS Currently only supports ushort (SixteenBits) index elements");
@@ -101,6 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the relevant IndexElementSize enum value for the given type.
         /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
         /// <param name="type">The type to use for the index buffer</param>
         /// <returns>The IndexElementSize enum value that matches the type</returns>
         static IndexElementSize SizeForType(GraphicsDevice graphicsDevice, Type type)
@@ -125,6 +117,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if OPENGL
             ibo = 0;
+#endif
+
+#if DIRECTX
+
+            SharpDX.Utilities.Dispose(ref _buffer);
+
 #endif
         }
 
@@ -153,6 +151,39 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
+#if DIRECTX
+        
+        void GenerateIfRequired()
+        {
+            if (_buffer != null)
+                return;
+
+            // TODO: To use true Immutable resources we would need to delay creation of 
+            // the Buffer until SetData() and recreate them if set more than once.
+
+            var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
+
+            var accessflags = SharpDX.Direct3D11.CpuAccessFlags.None;
+            var resUsage = SharpDX.Direct3D11.ResourceUsage.Default;
+
+            if (_isDynamic)
+            {
+                accessflags |= SharpDX.Direct3D11.CpuAccessFlags.Write;
+                resUsage = SharpDX.Direct3D11.ResourceUsage.Dynamic;
+            }
+
+            _buffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice._d3dDevice,
+                                                        sizeInBytes,
+                                                        resUsage,
+                                                        SharpDX.Direct3D11.BindFlags.IndexBuffer,
+                                                        accessflags,
+                                                        SharpDX.Direct3D11.ResourceOptionFlags.None,
+                                                        0  // StructureSizeInBytes
+                                                        );
+        }
+
+#endif
+
         public void GetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
 #if GLES
@@ -168,6 +199,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NotSupportedException("This IndexBuffer was created with a usage type of BufferUsage.WriteOnly. Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.");
 
 #if DIRECTX
+            GenerateIfRequired();
+
             if (_isDynamic)
             {
                 throw new NotImplementedException();
@@ -228,7 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
             IntPtr ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
             // Pointer to the start of data to read in the index buffer
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-            if (data is byte[])
+			if (typeof(T) == typeof(byte))
             {
                 byte[] buffer = data as byte[];
                 // If data is already a byte[] we can skip the temporary buffer
@@ -283,6 +316,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
 
+            GenerateIfRequired();
+
             if (_isDynamic)
             {
                 // We assume discard by default.
@@ -290,19 +325,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((options & SetDataOptions.NoOverwrite) == SetDataOptions.NoOverwrite)
                     mode = SharpDX.Direct3D11.MapMode.WriteNoOverwrite;
 
-                SharpDX.DataStream stream;
                 var d3dContext = GraphicsDevice._d3dContext;
                 lock (d3dContext)
                 {
-                    d3dContext.MapSubresource(
-                        _buffer,
-                        mode,
-                        SharpDX.Direct3D11.MapFlags.None,
-                        out stream);
-
-                    stream.Position = offsetInBytes;
-                    stream.WriteRange(data, startIndex, elementCount);
-
+                    var dataBox = d3dContext.MapSubresource(_buffer, 0, mode, SharpDX.Direct3D11.MapFlags.None);
+                    SharpDX.Utilities.Write(IntPtr.Add(dataBox.DataPointer, offsetInBytes), data, startIndex,
+                                            elementCount);
                     d3dContext.UnmapSubresource(_buffer, 0);
                 }
             }

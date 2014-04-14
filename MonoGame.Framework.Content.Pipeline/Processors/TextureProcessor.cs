@@ -8,10 +8,13 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName="Texture Processor - MonoGame")]
+    [ContentProcessor(DisplayName="Texture - MonoGame")]
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
-        public TextureProcessor() { }
+        public TextureProcessor()
+        {
+            PremultiplyAlpha = true;
+        }
 
         public virtual Color ColorKeyColor { get; set; }
 
@@ -28,23 +31,73 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-            if (PremultiplyAlpha)
-                GraphicsUtil.PremultiplyAlpha(input);
-
             if (ColorKeyEnabled)
-                throw new NotImplementedException();
+            {
+                var replaceColor = System.Drawing.Color.FromArgb(0);
+                for (var x = 0; x < input._bitmap.Width; x++)
+                {
+                    for (var y = 0; y < input._bitmap.Height; y++)
+                    {
+                        var col = input._bitmap.GetPixel(x, y);
 
-            if (GenerateMipmaps)
-                throw new NotImplementedException();
+                        if (col.ColorsEqual(ColorKeyColor))
+                        {
+                            input._bitmap.SetPixel(x, y, replaceColor);
+                        }
+                    }
+                }
+            }
 
+            var face = input.Faces[0][0];
             if (ResizeToPowerOfTwo)
-                throw new NotImplementedException();
+            {
+                if (!GraphicsUtil.IsPowerOfTwo(face.Width) || !GraphicsUtil.IsPowerOfTwo(face.Height))
+                    input.Resize(GraphicsUtil.GetNextPowerOfTwo(face.Width), GraphicsUtil.GetNextPowerOfTwo(face.Height));
+            }
+
+            if (PremultiplyAlpha)
+            {
+                for (var x = 0; x < input._bitmap.Width; x++)
+                {
+                    for (var y = 0; y < input._bitmap.Height; y++)
+                    {
+                        var oldCol = input._bitmap.GetPixel(x, y);
+                        var preMultipliedColor = Color.FromNonPremultiplied(oldCol.R, oldCol.G, oldCol.B, oldCol.A);
+                        input._bitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(preMultipliedColor.A, 
+                                                                                   preMultipliedColor.R,
+                                                                                   preMultipliedColor.G,
+                                                                                   preMultipliedColor.B));
+                    }
+                }
+            }
+
+            // Set the first layer
+            input.Faces[0][0].SetPixelData(input._bitmap.GetData());
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
-
-            if (TextureFormat != TextureProcessorOutputFormat.Color)
-                throw new NotImplementedException();
+			try 
+			{
+			if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
+                TextureFormat == TextureProcessorOutputFormat.Compressed ) {
+                	context.Logger.LogMessage("Compressing using {0}",TextureFormat);
+                	GraphicsUtil.CompressTexture(input, context, GenerateMipmaps, PremultiplyAlpha);
+					context.Logger.LogMessage("Compression {0} Suceeded", TextureFormat);
+				}
+			}
+			catch(EntryPointNotFoundException ex) {
+				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
+			catch(DllNotFoundException ex) {
+				context.Logger.LogImportantMessage ("Could not compress texture. Required shared lib is missing. {0}", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
+			catch(Exception ex)
+			{
+				context.Logger.LogImportantMessage ("Could not compress texture {0}", ex.ToString());
+				TextureFormat = TextureProcessorOutputFormat.Color;
+			}
 
             return input;
         }

@@ -27,6 +27,7 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -57,11 +58,15 @@ namespace Microsoft.Xna.Framework
         }
     }
 	
+    [DataContract]
     public struct Plane : IEquatable<Plane>
     {
         #region Public Fields
 
+        [DataMember]
         public float D;
+
+        [DataMember]
         public Vector3 Normal;
 
         #endregion Public Fields
@@ -131,7 +136,8 @@ namespace Microsoft.Xna.Framework
         {
             result = ((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z);
         }
-
+        
+        /*
         public static void Transform(ref Plane plane, ref Quaternion rotation, out Plane result)
         {
             throw new NotImplementedException();
@@ -151,6 +157,7 @@ namespace Microsoft.Xna.Framework
         {
             throw new NotImplementedException();
         }
+        */
 
         public void Normalize()
         {
@@ -210,13 +217,15 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref BoundingBox box, out PlaneIntersectionType result)
         {
-            result = Intersects(box);
+            box.Intersects (ref this, out result);
         }
 
+        /*
         public PlaneIntersectionType Intersects(BoundingFrustum frustum)
         {
             return frustum.Intersects(this);
         }
+        */
 
         public PlaneIntersectionType Intersects(BoundingSphere sphere)
         {
@@ -225,7 +234,7 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref BoundingSphere sphere, out PlaneIntersectionType result)
         {
-            result = Intersects(sphere);
+            sphere.Intersects(ref this, out result);
         }
 
         public override string ToString()

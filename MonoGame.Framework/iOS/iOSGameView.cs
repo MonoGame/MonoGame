@@ -85,6 +85,8 @@ using Microsoft.Xna.Framework.Input.Touch;
 using All = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework {
+
+    [Register("iOSGameView")]
 	partial class iOSGameView : UIView {
 		private readonly iOSGamePlatform _platform;
 		private int _colorbuffer;
@@ -154,9 +156,12 @@ namespace Microsoft.Xna.Framework {
 		{
 			AssertNotDisposed ();
 
+            // RetainedBacking controls if the content of the colorbuffer should be preserved after being displayed
+            // This is the XNA equivalent to set PreserveContent when initializing the GraphicsDevice
+            // (should be false by default for better performance)
 			Layer.DrawableProperties = NSDictionary.FromObjectsAndKeys (
 				new NSObject [] {
-					NSNumber.FromBoolean (true),
+					NSNumber.FromBoolean (false), 
 					EAGLColorFormat.RGBA8
 				},
 				new NSObject [] {
@@ -191,6 +196,12 @@ namespace Microsoft.Xna.Framework {
 			_glapi = null;
 		}
 
+        [Export("doTick")]
+        void DoTick()
+        {
+            _platform.Tick();
+        }
+
 		private void CreateFramebuffer ()
 		{
 			AssertNotDisposed ();
@@ -206,21 +217,17 @@ namespace Microsoft.Xna.Framework {
             int viewportHeight = (int)Math.Round(Layer.Bounds.Size.Height * Layer.ContentsScale);
             int viewportWidth = (int)Math.Round(Layer.Bounds.Size.Width * Layer.ContentsScale);
 
-			int previousRenderbuffer = 0;
-			_glapi.GetInteger (All.RenderbufferBinding, ref previousRenderbuffer);
-			
 			_glapi.GenFramebuffers (1, ref _framebuffer);
 			_glapi.BindFramebuffer (All.Framebuffer, _framebuffer);
 			
 			// Create our Depth buffer. Color buffer must be the last one bound
 			GL.GenRenderbuffers(1, ref _depthbuffer);
 			GL.BindRenderbuffer(All.Renderbuffer, _depthbuffer);
-			GL.RenderbufferStorage(All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
-			
+            GL.RenderbufferStorage (All.Renderbuffer, All.DepthComponent16, viewportWidth, viewportHeight);
 			GL.FramebufferRenderbuffer(All.Framebuffer, All.DepthAttachment, All.Renderbuffer, _depthbuffer);
 
-			_glapi.GenRenderbuffers (2, ref _colorbuffer);
-			_glapi.BindRenderbuffer (All.Renderbuffer, _colorbuffer);
+			_glapi.GenRenderbuffers(1, ref _colorbuffer);
+			_glapi.BindRenderbuffer(All.Renderbuffer, _colorbuffer);
 
 			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
 
@@ -230,7 +237,7 @@ namespace Microsoft.Xna.Framework {
 			//       claims to have failed.
 			ctx.EAGLContext.RenderBufferStorage ((uint) All.Renderbuffer, Layer);
 			
-			_glapi.FramebufferRenderbuffer ( All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
+			_glapi.FramebufferRenderbuffer (All.Framebuffer, All.ColorAttachment0, All.Renderbuffer, _colorbuffer);
 			
 			var status = GL.CheckFramebufferStatus (All.Framebuffer);
 			if (status != All.FramebufferComplete)
@@ -240,8 +247,8 @@ namespace Microsoft.Xna.Framework {
 			_glapi.Viewport(0, 0, viewportWidth, viewportHeight);
             _glapi.Scissor(0, 0, viewportWidth, viewportHeight);
 
-			var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService(
-				typeof (IGraphicsDeviceService));
+			var gds = _platform.Game.Services.GetService(
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
 			if (gds != null && gds.GraphicsDevice != null)
 			{
@@ -251,8 +258,8 @@ namespace Microsoft.Xna.Framework {
 
                 if (this.NextResponder is iOSGameViewController)
                 {
-                    DisplayOrientation supportedOrientations = OrientationConverter.Normalize((this.NextResponder as iOSGameViewController).SupportedOrientations);
-                    if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0 || (supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
+                    var displayOrientation = _platform.Game.Window.CurrentOrientation;
+                    if (displayOrientation == DisplayOrientation.LandscapeLeft || displayOrientation == DisplayOrientation.LandscapeRight)
                     {
                         height = Math.Min(viewportHeight, viewportWidth);
                         width = Math.Max(viewportHeight, viewportWidth);
@@ -288,15 +295,6 @@ namespace Microsoft.Xna.Framework {
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
 
-			var ctx = ((IGraphicsContextInternal)__renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			// FIXME: MonoTouch needs to allow null arguments to
-			//        RenderBufferStorage, but it doesn't right now.
-			//        So we call it manually.
-			//ctx.EAGLContext.RenderBufferStorage((uint)All.Renderbuffer, null);
-			var selector = new Selector("renderbufferStorage:fromDrawable:");
-			Messaging.bool_objc_msgSend_UInt32_IntPtr(
-				ctx.EAGLContext.Handle, selector.Handle, (uint)All.Renderbuffer, IntPtr.Zero);
-
 			_glapi.DeleteFramebuffers (1, ref _framebuffer);
 			_framebuffer = 0;
 
@@ -319,9 +317,8 @@ namespace Microsoft.Xna.Framework {
 			AssertValidContext ();
 
 			__renderbuffergraphicsContext.MakeCurrent (null);
-
-			var ctx = ((IGraphicsContextInternal) __renderbuffergraphicsContext).Implementation as iPhoneOSGraphicsContext;
-			ctx.EAGLContext.PresentRenderBuffer ((uint) All.Renderbuffer);
+            GL.BindRenderbuffer (All.Renderbuffer, this._colorbuffer);
+            __renderbuffergraphicsContext.SwapBuffers();
 		}
 
 		// FIXME: This functionality belongs iMakeCurrentn GraphicsDevice.
@@ -338,8 +335,8 @@ namespace Microsoft.Xna.Framework {
 		{
 			base.LayoutSubviews ();
 
-            var gds = (IGraphicsDeviceService) _platform.Game.Services.GetService (
-                typeof (IGraphicsDeviceService));
+            var gds = _platform.Game.Services.GetService (
+                typeof (IGraphicsDeviceService)) as IGraphicsDeviceService;
 
             if (gds == null || gds.GraphicsDevice == null)
                 return;

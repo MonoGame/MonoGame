@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Content
 		
         protected internal override T Read(ContentReader input, T existingInstance)
         {
-			return input.ReadObject<T>(elementReader);
+			return input.ReadRawObject<T>(elementReader);
 		}
     }
 }

@@ -79,7 +79,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 #endif
-
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -148,19 +148,25 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if MONOMAC || WINDOWS || LINUX
+            
             // Set the window title.
             // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
             string windowTitle = string.Empty;
+
+            // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
+            if (assembly != null)
+            {
+                //Use the Title attribute of the Assembly if possible.
+                var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
+                if (assemblyTitleAtt != null)
+                    windowTitle = assemblyTitleAtt.Title;
 
-            //Use the Title attribute of the Assembly if possible.
-            var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
-            if (assemblyTitleAtt != null)
-                windowTitle = assemblyTitleAtt.Title;
+                // Otherwise, fallback to the Name of the assembly.
+                if (string.IsNullOrEmpty(windowTitle))
+                    windowTitle = assembly.GetName().Name;
+            }
 
-            // Otherwise, fallback to the Name of the assembly.
-            if (string.IsNullOrEmpty(windowTitle))
-                windowTitle = assembly.GetName().Name;
             Window.Title = windowTitle;
 #endif
         }
@@ -199,9 +205,13 @@ namespace Microsoft.Xna.Framework
                         if (disposable != null)
                             disposable.Dispose();
                     }
+                    _components = null;
 
                     if (Content != null)
+                    {
                         Content.Dispose();
+                        Content = null;
+                    }
 
                     if (_graphicsDeviceManager != null)
                     {
@@ -209,9 +219,43 @@ namespace Microsoft.Xna.Framework
                         _graphicsDeviceManager = null;
                     }
 
-                    Platform.Dispose();
+                    if (Platform != null)
+                    {
+                        Platform.Activated -= OnActivated;
+                        Platform.Deactivated -= OnDeactivated;
+                        _services.RemoveService(typeof(GamePlatform));
+#if WINDOWS_STOREAPP
+                        Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
+#endif
+                        Platform.Dispose();
+                        Platform = null;
+                    }
+
+                    Effect.FlushCache();
+                    ContentTypeReaderManager.ClearTypeCreators();
+
+#if WINDOWS_PHONE
+                    TouchPanel.ResetState();                    
+#endif
+
+#if WINDOWS_MEDIA_SESSION
+                    Media.MediaManagerState.CheckShutdown();
+#endif
+
+#if DIRECTX
+                    SoundEffect.Shutdown();
+
+                    BlendState.ResetStates();
+                    DepthStencilState.ResetStates();
+                    RasterizerState.ResetStates();
+                    SamplerState.ResetStates();
+#endif
                 }
+#if ANDROID
+                Activity = null;
+#endif
                 _isDisposed = true;
+                _instance = null;
             }
         }
 
@@ -231,6 +275,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
+		[CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; set; }
 #endif
         private static Game _instance = null;
@@ -316,11 +361,13 @@ namespace Microsoft.Xna.Framework
         }
 
 #if ANDROID
+		[CLSCompliant(false)]
         public AndroidGameWindow Window
         {
             get { return Platform.Window; }
         }
 #else
+		[CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }
@@ -350,10 +397,12 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Exiting;
 
 #if WINDOWS_STOREAPP
+        [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
 
 #if WINRT
+        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -364,6 +413,7 @@ namespace Microsoft.Xna.Framework
         public void Exit()
         {
             Platform.Exit();
+			_suppressDraw = true;
         }
 
         public void ResetElapsedTime()
@@ -373,6 +423,7 @@ namespace Microsoft.Xna.Framework
             _gameTimer.Start();
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
+            _previousTicks = 0L;
         }
 
         public void SuppressDraw()
@@ -429,7 +480,7 @@ namespace Microsoft.Xna.Framework
 				DoExiting();
                 break;
             default:
-                throw new NotImplementedException(string.Format(
+                throw new ArgumentException(string.Format(
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }
@@ -437,6 +488,7 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
         private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private long _previousTicks = 0;
 
         public void Tick()
         {
@@ -445,12 +497,15 @@ namespace Microsoft.Xna.Framework
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
 
+            // Can only be running slow if we are fixed timestep
+            var possibleToBeRunningSlowly = IsFixedTimeStep;
+
         RetryTick:
 
             // Advance the accumulated elapsed time.
-            _accumulatedElapsedTime += _gameTimer.Elapsed;
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            var currentTicks = _gameTimer.Elapsed.Ticks;
+            _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
+            _previousTicks = currentTicks;
 
             // If we're in the fixed timestep mode and not enough time has elapsed
             // to perform an update we sleep off the the remaining time to save battery
@@ -458,6 +513,10 @@ namespace Microsoft.Xna.Framework
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
                 var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+
+                // If we have had to sleep, we shouldn't report being
+                // slow regardless of how long we actually sleep for.
+                possibleToBeRunningSlowly = false;
 
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
@@ -476,14 +535,14 @@ namespace Microsoft.Xna.Framework
 
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gametime.isrunningslowly.aspx
             // Calculate IsRunningSlowly for the fixed time step, but only when the accumulated time
-            // exceeds the target time.
+            // exceeds the target time, and we haven't slept.
+            _gameTime.IsRunningSlowly = (possibleToBeRunningSlowly &&
+                                        (_accumulatedElapsedTime > TargetElapsedTime));
 
             if (IsFixedTimeStep)
             {
                 _gameTime.ElapsedGameTime = TargetElapsedTime;
                 var stepCount = 0;
-
-                _gameTime.IsRunningSlowly = (_accumulatedElapsedTime > TargetElapsedTime);
 
                 // Perform as many full fixed length time steps as we can.
                 while (_accumulatedElapsedTime >= TargetElapsedTime)
@@ -545,15 +604,7 @@ namespace Microsoft.Xna.Framework
             // GameComponents in Components at the time Initialize() is called
             // are initialized.
             // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.game.initialize.aspx
-
-            // 1. Categorize components into IUpdateable and IDrawable lists.
-            // 2. Subscribe to Added/Removed events to keep the categorized
-            //    lists synced and to Initialize future components as they are
-            //    added.
-            // 3. Initialize all existing components
-            CategorizeComponents();
-            _components.ComponentAdded += Components_ComponentAdded;
-            _components.ComponentRemoved += Components_ComponentRemoved;
+            // Initialize all existing components
             InitializeExistingComponents();
 
             _graphicsDeviceService = (IGraphicsDeviceService)
@@ -689,18 +740,37 @@ namespace Microsoft.Xna.Framework
             AssertNotDisposed();
             Platform.BeforeInitialize();
             Initialize();
+
+            // We need to do this after virtual Initialize(...) is called.
+            // 1. Categorize components into IUpdateable and IDrawable lists.
+            // 2. Subscribe to Added/Removed events to keep the categorized
+            //    lists synced and to Initialize future components as they are
+            //    added.            
+            CategorizeComponents();
+            _components.ComponentAdded += Components_ComponentAdded;
+            _components.ComponentRemoved += Components_ComponentRemoved;
         }
 
 		internal void DoExiting()
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
+
+#if DIRECTX
+		    SoundEffect.Shutdown();
+#endif
+
+#if WINDOWS_MEDIA_SESSION
+            Media.MediaManagerState.CheckShutdown();
+#endif
 		}
 
         internal void ResizeWindow(bool changed)
         {
-#if LINUX || WINDOWS
+#if LINUX || (WINDOWS && OPENGL)
             ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
+#elif WINDOWS && DIRECTX
+            ((MonoGame.Framework.WinFormsGamePlatform)Platform).ResetWindowBounds(changed);
 #endif
         }
 

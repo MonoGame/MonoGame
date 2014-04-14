@@ -582,11 +582,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			switch (type) 
             {
-			    default:
-                    //throw new NotImplementedException();
-
-                case DXEffectObject.D3DXPARAMETER_TYPE.VOID:
-				    return EffectParameterType.Void;
 			    case DXEffectObject.D3DXPARAMETER_TYPE.BOOL:
                     return EffectParameterType.Bool;
 			    case DXEffectObject.D3DXPARAMETER_TYPE.INT:
@@ -605,6 +600,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				    return EffectParameterType.Texture3D;
 			    case DXEffectObject.D3DXPARAMETER_TYPE.TEXTURECUBE:
 				    return  EffectParameterType.TextureCube;
+                default:
+                    throw new NotImplementedException();
 			}
         }
 

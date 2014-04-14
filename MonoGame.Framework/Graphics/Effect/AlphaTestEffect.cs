@@ -11,19 +11,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-
-
-#if IOS || ANDROID
-using OpenTK.Graphics.ES20;
-using ActiveUniformType = OpenTK.Graphics.ES20.All;
-#elif MONOMAC
-using MonoMac.OpenGL;
-#elif PSM
-using Sce.PlayStation.Core;
-#elif !WINRT
-using OpenTK.Graphics.OpenGL;
-
-#endif
 #endregion
 
 namespace Microsoft.Xna.Framework.Graphics

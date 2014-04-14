@@ -48,6 +48,11 @@ namespace Microsoft.Xna.Framework
         private int _drawOrder;
         private bool _visible = true;
 
+        public Graphics.GraphicsDevice GraphicsDevice
+        {
+            get { return this.Game.GraphicsDevice; } 
+        }
+
         public int DrawOrder
         {
             get { return _drawOrder; }

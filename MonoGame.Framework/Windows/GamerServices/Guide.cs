@@ -65,7 +65,9 @@ using Windows.UI.Popups;
 using Windows.System;
 #else
 using System.Runtime.Remoting.Messaging;
+#if !(WINDOWS && DIRECTX)
 using Microsoft.Xna.Framework.Net;
+#endif
 #endif
 
 #endregion Using clause
@@ -77,9 +79,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 	public static class Guide
 	{
 		private static bool isScreenSaverEnabled;
-		private static bool isTrialMode;
+		private static bool isTrialMode = false;
 		private static bool isVisible;
-		private static bool simulateTrialMode;		
+		private static bool simulateTrialMode;
 
 #if WINDOWS_STOREAPP
 	    private static readonly CoreDispatcher _dispatcher;
@@ -89,18 +91,13 @@ namespace Microsoft.Xna.Framework.GamerServices
         {
 #if WINDOWS_STOREAPP
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-#endif
 
-#if WINRT
 
             var licenseInformation = CurrentApp.LicenseInformation;
-            licenseInformation.LicenseChanged += () => 
-                isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+            licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
             isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
-
-#endif // WINRT
-
+#endif
         }
 
 		delegate string ShowKeyboardInputDelegate(
@@ -310,7 +307,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 				return;
 			}
 
-#if !WINRT
+#if !WINRT && !(WINDOWS && DIRECTX)
             Microsoft.Xna.Framework.GamerServices.MonoGameGamerServicesHelper.ShowSigninSheet();            
 
             if (GamerServicesComponent.LocalNetworkGamer == null)
@@ -422,11 +419,13 @@ namespace Microsoft.Xna.Framework.GamerServices
 				// If simulate trial mode is enabled then 
 				// we're in the trial mode.
 #if DEBUG
-                return simulateTrialMode;
+                return simulateTrialMode || isTrialMode;
+#elif WINDOWS_PHONE
+			    return MsXna_Guide.IsTrialMode;
 #else
                 return simulateTrialMode || isTrialMode;
 #endif
-            }
+			}
 		}
 
 		public static bool IsVisible 
@@ -462,7 +461,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
-#if !WINRT
+#if !DIRECTX
             MonoGameGamerServicesHelper.Initialise(game);
 #endif
         }

@@ -4,6 +4,8 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -11,61 +13,95 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         internal T[][] _pixelData;
 
-        protected PixelBitmapContent()
-        {
-        }
+        internal SurfaceFormat _format = SurfaceFormat.Color;
 
-        public PixelBitmapContent(int width, int height) : base(width, height)
+        public PixelBitmapContent(int width, int height)
         {
+            Height = height;
+            Width = width;
+
             _pixelData = new T[height][];
 
             for (int y = 0; y < height; y++)
                 _pixelData[y] = new T[width];
         }
 
-        public T GetPixel(int x, int y)
-        {
-            checkPixelRange(y, x);
-
-            return _pixelData[y][x];
-        }
-
         public override byte[] GetPixelData()
         {
-            SurfaceFormat format;
-            if (!TryGetFormat(out format))
-                throw new Exception(string.Format("Tried to get pixel Data for PixedBitmapContent<{0}> with an invalid surfaceformat", 
-                                                    typeof(T)));
+            if (_format != SurfaceFormat.Color)
+                throw new NotImplementedException();
 
-            if (typeof(T) != typeof(Color))
-                throw new NotImplementedException("GetPixelData is not supported for Non-Color formats.");
+            var formatSize = _format.Size();
+            var dataSize = Width * Height * formatSize;
+            var outputData = new byte[dataSize];
 
-            var pixelSize = format.Size();
-            var outputData = new byte[Width * Height * pixelSize];
-
-            for (int i = 0; i < Width; i++) 
+            for (var x = 0; x < Height; x++)
             {
-                var row = GetRow(i);
-                for (int j = 0; j < row.Length; j++) 
-                {
-                    var col = (row[j] as Color?).Value;
+                var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
+                var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64());
 
-                    outputData[(i * row.Length) + j] = col.R;
-                    outputData[(i * row.Length) + j + 1] = col.G;
-                    outputData[(i * row.Length) + j + 2] = col.B;
-                    outputData[(i * row.Length) + j + 3] = col.A;
-                }
+                Marshal.Copy(dataPtr, outputData, (formatSize * x * Width), (Width * formatSize));
+
+                dataHandle.Free();
             }
 
             return outputData;
         }
 
+        public override void SetPixelData(byte[] sourceData)
+        {
+            var size = _format.Size();
+
+            for(var x = 0; x < Height; x++)
+            {
+                var dataHandle = GCHandle.Alloc(_pixelData[x], GCHandleType.Pinned);
+                var dataPtr = (IntPtr)dataHandle.AddrOfPinnedObject().ToInt64();
+
+                Marshal.Copy(sourceData, (x * Width * size), dataPtr, Width * size);
+
+                dataHandle.Free();
+            }
+        }
+
         public T[] GetRow(int y)
         {
-            if ((y < 0) || (y >= Height))
+            if (y >= Height)
                 throw new ArgumentOutOfRangeException("y");
 
             return _pixelData[y];
+        }
+
+        /// <summary>
+        /// Gets the corresponding GPU texture format for the specified bitmap type.
+        /// </summary>
+        /// <param name="format">Format being retrieved.</param>
+        /// <returns>The GPU texture format of the bitmap type.</returns>
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = _format;
+            return true;
+        }
+
+        public T GetPixel(int x, int y)
+        {
+            return _pixelData[y][x];
+        }
+
+        public void SetPixel(int x, int y, T value)
+        {
+            _pixelData[y][x] = value;
+        }
+
+        public void ReplaceColor(T originalColor, T newColor)
+        {
+            for (var y = 0; y < Height; y++ )
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    if (_pixelData[y][x].Equals(originalColor))
+                        _pixelData[y][x] = newColor;
+                }
+            }
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destRegion)
@@ -78,67 +114,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             throw new NotImplementedException();
         }
 
-        public override bool TryGetFormat(out SurfaceFormat format)
-        {
-            throw new NotImplementedException();
-        }
-
         public override string ToString()
         {
             return base.ToString();
-        }
-
-        public override void SetPixelData(byte[] sourceData)
-        {
-            if (typeof(T) != typeof(Color))
-                throw new NotImplementedException("SetPixelData is not supported for Non-Color formats.");
-
-            SurfaceFormat format;
-            if (!TryGetFormat(out format))
-                throw new Exception(string.Format("Tried to get pixel Data for PixedBitmapContent<{0}> with an invalid surfaceformat",
-                                                    typeof(T)));
-
-            sourceData.SetPixelData(this, 0, format);
-            /*var formatSize = format.Size();
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    sourceData.GetPixel((y * formatSize) + (x * formatSize), format, out _pixelData[y][x]);
-                }
-            }*/
-        }
-
-        private void SetPixelData()
-        {
-
-        }
-
-        public void SetPixel(int x, int y, T value)
-        {
-            checkPixelRange(y, x);
-
-            _pixelData[y][x] = value;
-        }
-
-        public void ReplaceColor(T originalColor, T newColor)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    if (_pixelData[y][x].Equals(originalColor))
-                    {
-                        _pixelData[y][x] = newColor;
-                    }
-                }
-            }
-        }
-
-        private void checkPixelRange(int y, int x)
-        {
-            if (x * y == 0 || x >= Height || y >= Width)
-                throw new ArgumentOutOfRangeException("x or y");
         }
     }
 }

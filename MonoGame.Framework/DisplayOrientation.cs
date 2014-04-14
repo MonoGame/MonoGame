@@ -42,24 +42,15 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
-	[Flags]
-	public enum DisplayOrientation
-	{
-		/// <summary>
-		/// In Xna, this value is Default = 0. The effect of setting
-		/// GraphicsDeviceManager.SupportedOrientations = Default is the same as setting
-		/// GraphicsDeviceManager.SupportedOrientations = LandscapeLeft | LandscapeRight.
-		/// </summary>
-		Default = 1,
-		LandscapeLeft = 2,
-		LandscapeRight = 4,
-		Portrait = 8,
-		// iPhone specific Orientations
-		FaceDown = 16,
-		FaceUp = 32,
-		// Android can also use this orientation
-		PortraitUpsideDown = 64,
-		Unknown = 128,
-	}
+    [Flags]
+    public enum DisplayOrientation
+    {
+        Default = 0,
+        LandscapeLeft = 1,
+        LandscapeRight = 2,
+        Portrait = 4,
+        PortraitDown = 8,
+        Unknown = 16
+    }
 }
 

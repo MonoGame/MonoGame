@@ -7,16 +7,20 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectPassCollection : IEnumerable<EffectPass>
     {
-		private List<EffectPass> _passes = new List<EffectPass>();
+		private readonly EffectPass[] _passes;
 
-        internal EffectPassCollection()
+        internal EffectPassCollection(EffectPass [] passes)
         {
+            _passes = passes;
         }
 
-        internal EffectPassCollection(Effect effect, EffectPassCollection cloneSource)
+        internal EffectPassCollection Clone(Effect effect)
         {
-            foreach (var pass in cloneSource)
-                Add(new EffectPass(effect, pass));
+            var passes = new EffectPass[_passes.Length];
+            for (var i = 0; i < _passes.Length; i++)
+                passes[i] = new EffectPass(effect, _passes[i]);
+
+            return new EffectPassCollection(passes);
         }
 
         public EffectPass this[int index]
@@ -40,27 +44,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public int Count
         {
-            get { return _passes.Count; }
+            get { return _passes.Length; }
         }
 
-        public List<EffectPass>.Enumerator GetEnumerator()
+        IEnumerator<EffectPass> IEnumerable<EffectPass>.GetEnumerator()
         {
-            return this._passes.GetEnumerator();
-        }
-
-        IEnumerator<EffectPass> System.Collections.Generic.IEnumerable<EffectPass>.GetEnumerator()
-        {
-            return _passes.GetEnumerator();
+            return ((IEnumerable<EffectPass>)_passes).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _passes.GetEnumerator();
-        }
-
-        internal void Add(EffectPass pass)
-        {
-            _passes.Add(pass);
         }
     }
 }

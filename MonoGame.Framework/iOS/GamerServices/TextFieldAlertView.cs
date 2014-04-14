@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 
 using MonoTouch.Foundation;
@@ -5,6 +6,7 @@ using MonoTouch.UIKit;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    [CLSCompliant(false)]
 	public class TextFieldAlertView : UIAlertView
 	{
 		private UITextField _tf = null;
@@ -15,6 +17,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 		public TextFieldAlertView() : this(false) {}
 		
+        [CLSCompliant(false)]
 		public TextFieldAlertView(bool secureTextEntry, string title, string message, UIAlertViewDelegate alertViewDelegate, string cancelBtnTitle, params string[] otherButtons)
 			: base(title, message, alertViewDelegate, cancelBtnTitle, otherButtons)
 		{

@@ -54,7 +54,46 @@ namespace Microsoft.Xna.Framework.Graphics
                         var rdesc = refelect.GetResourceBindingDescription(i);
                         if (rdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Texture)
                         {
-                            var sampler = new Sampler {index = rdesc.BindPoint, parameterName = rdesc.Name };
+                            var samplerName = rdesc.Name;
+
+                            var sampler = new Sampler
+                            {
+                                textureSlot = rdesc.BindPoint,
+                                samplerSlot = rdesc.BindPoint,
+                                parameterName = samplerName
+                            };
+                            
+                            SamplerStateInfo state;
+                            if (samplerStates.TryGetValue(samplerName, out state))
+                            {
+                                sampler.parameterName = state.TextureName ?? samplerName;
+                                sampler.state = state.State;
+                            }
+                            else
+                            {
+                                foreach (var s in samplerStates.Values)
+                                {
+                                    if (samplerName == s.TextureName)
+                                    {
+                                        sampler.state = s.State;
+                                        samplerName = s.Name;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Find sampler slot, which can be different from the texture slot.
+                            for (int j = 0; j < refelect.Description.BoundResources; j++)
+                            {
+                                var samplerrdesc = refelect.GetResourceBindingDescription(j);
+
+                                if (samplerrdesc.Type == SharpDX.D3DCompiler.ShaderInputType.Sampler && 
+                                    samplerrdesc.Name == samplerName)
+                                {
+                                    sampler.samplerSlot = samplerrdesc.BindPoint;
+                                    break;
+                                }
+                            }
 
                             switch (rdesc.Dimension)
                             {
@@ -78,13 +117,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                 case ShaderResourceViewDimension.TextureCubeArray:
                                     sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
                                     break;
-                            }
-
-                            SamplerStateInfo state;
-                            if (samplerStates.TryGetValue(rdesc.Name, out state))
-                            {
-                                sampler.parameterName = state.textureName ?? rdesc.Name;
-                                sampler.state = state.state;
                             }
 
                             samplers.Add(sampler);

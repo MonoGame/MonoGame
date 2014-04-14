@@ -178,6 +178,10 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     if (!field.IsPublic)
                         return;
+
+                    // evolutional: Added check to skip initialise only fields
+                    if (field.IsInitOnly)
+                        return;
                 }
             }
             ContentTypeReader reader = null;
@@ -205,6 +209,11 @@ namespace Microsoft.Xna.Framework.Content
                 else
                 {
                     /* Default */
+
+                    // evolutional: Fix. We can get here and still be NULL, exit gracefully
+                    if (reader == null)
+                        return;
+
                     obj2 = input.ReadObject(reader, existingChildObject);
                 }
 				

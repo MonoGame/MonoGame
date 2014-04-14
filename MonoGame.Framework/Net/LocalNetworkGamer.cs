@@ -67,12 +67,14 @@ namespace Microsoft.Xna.Framework.Net
 			receivedData = new Queue<CommandReceiveData>();
 		}
 
+        /*
 		public void EnableSendVoice (
 			NetworkGamer remoteGamer, 
 			bool enable)
 		{
 			throw new NotImplementedException ();
 		}
+        */
 
 		public int ReceiveData (
 			byte[] data, 

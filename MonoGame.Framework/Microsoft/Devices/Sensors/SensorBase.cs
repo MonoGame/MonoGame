@@ -10,6 +10,7 @@ namespace Microsoft.Devices.Sensors
 		where TSensorReading : ISensorReading
 	{
 #if IOS
+        [CLSCompliant(false)]
         protected static readonly MonoTouch.CoreMotion.CMMotionManager motionManager = new MonoTouch.CoreMotion.CMMotionManager();
 #endif
         bool disposed;

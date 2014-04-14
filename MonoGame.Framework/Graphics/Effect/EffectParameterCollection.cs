@@ -1,27 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public class EffectParameterCollection : IEnumerable<EffectParameter>
     {
-        private List<EffectParameter> _parameters = new List<EffectParameter>();
+        internal static readonly EffectParameterCollection Empty = new EffectParameterCollection(new EffectParameter[0]);
 
-        internal EffectParameterCollection()
+        private readonly EffectParameter[] _parameters;
+
+        internal EffectParameterCollection(EffectParameter[] parameters)
         {
+            _parameters = parameters;
         }
 
-        internal EffectParameterCollection(EffectParameterCollection cloneSource)
+        internal EffectParameterCollection Clone()
         {
-            foreach (var parameter in cloneSource)
-                Add(new EffectParameter(parameter));
+            if (_parameters.Length == 0)
+                return Empty;
+
+            var parameters = new EffectParameter[_parameters.Length];
+            for (var i = 0; i < _parameters.Length; i++)
+                parameters[i] = new EffectParameter(_parameters[i]);
+
+            return new EffectParameterCollection(parameters);
         }
 
         public int Count
         {
-            get { return _parameters.Count; }
+            get { return _parameters.Length; }
         }
 		
 		public EffectParameter this[int index]
@@ -36,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // TODO: Add a name to parameter lookup table.
 				foreach (var parameter in _parameters) 
                 {
-					if (parameter != null && parameter.Name == name) 
+					if (parameter.Name == name) 
 						return parameter;
 				}
 
@@ -46,17 +52,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public IEnumerator<EffectParameter> GetEnumerator()
         {
-            return _parameters.GetEnumerator();
+            return ((IEnumerable<EffectParameter>)_parameters).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return _parameters.GetEnumerator();
-        }
-
-        internal void Add(EffectParameter param)
-        {
-            _parameters.Add(param);
         }
     }
 }

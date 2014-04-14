@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Media
 	public sealed class MediaQueue
 	{
         List<Song> songs = new List<Song>();
-		private int _activeSongIndex = 0;
+		private int _activeSongIndex = -1;
 		private Random random = new Random();
 		
 		public MediaQueue()
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get
 			{
-				if (songs.Count == 0)
+				if (songs.Count == 0 || _activeSongIndex < 0)
 					return null;
 				
 				return songs[_activeSongIndex];
@@ -63,14 +63,14 @@ namespace Microsoft.Xna.Framework.Media
 			for(; songs.Count > 0; )
 			{
 				song = songs[0];
-#if !WINRT
+#if !DIRECTX
 				song.Stop();
 #endif
 				songs.Remove(song);
 			}	
 		}
 
-#if !WINRT
+#if !DIRECTX
         internal void SetVolume(float volume)
         {
             int count = songs.Count;
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Media
             songs.Add(song);
         }
 
-#if !WINRT
+#if !DIRECTX
         internal void Stop()
         {
             int count = songs.Count;

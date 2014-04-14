@@ -5,6 +5,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -14,27 +16,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// <remarks>This type directly corresponds to the runtime VertexBuffer class, and when a VertexBufferContent object is passed to the content compiler, the vertex data deserializes directly into a VertexBuffer at runtime. VertexBufferContent objects are not directly created by importers. The preferred method is to store vertex data in the more flexible VertexContent class.</remarks>
     public class VertexBufferContent : ContentItem
     {
-        byte[] vertexData;
-        VertexDeclarationContent vertexDeclarationContent;
+        readonly MemoryStream stream;
 
         /// <summary>
         /// Gets the array containing the raw bytes of the packed vertex data. Use this method to get and set the contents of the vertex buffer.
         /// </summary>
         /// <value>Raw data of the packed vertex data.</value>
-        public byte[] VertexData { get { return vertexData; } }
+        public byte[] VertexData { get { return stream.ToArray(); } }
 
         /// <summary>
-        /// Gets the associated VertexDeclarationContent object.
+        /// Gets and sets the associated VertexDeclarationContent object.
         /// </summary>
         /// <value>The associated VertexDeclarationContent object.</value>
-        public VertexDeclarationContent VertexDeclaration { get { return vertexDeclarationContent; } set { vertexDeclarationContent = value; } }
+        public VertexDeclarationContent VertexDeclaration { get; set; }
 
         /// <summary>
         /// Initializes a new instance of VertexBufferContent.
         /// </summary>
         public VertexBufferContent()
         {
-
+            stream = new MemoryStream();
+            VertexDeclaration = new VertexDeclarationContent();
         }
 
         /// <summary>
@@ -44,7 +46,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public VertexBufferContent(int size)
             : base()
         {
-
+            stream = new MemoryStream(size);
+            VertexDeclaration = new VertexDeclarationContent();
         }
 
         /// <summary>
@@ -52,11 +55,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>The size of the specified type, in bytes.</returns>
-        /// <remarks>Call this method to compute offset parameters for the Write method. If the specified data type cannot be packed into a vertex buffer—for example, if type is not a valid value type—a NotSupportedException is thrown.</remarks>
+        /// <remarks>Call this method to compute offset parameters for the Write method. If the specified 
+        /// data type cannot be packed into a vertex buffer—for example, if type is not a valid value type—a 
+        /// NotSupportedException is thrown.</remarks>
         /// <exception cref="NotSupportedException">type is not a valid value type</exception>
         public static int SizeOf(Type type)
         {
-            throw new NotSupportedException();
+            if (!type.IsValueType || type.IsAutoLayout)
+                throw new NotSupportedException("The vertex type must be a struct and have a fixed layout");
+
+            return Marshal.SizeOf(type);
         }
 
         /// <summary>
@@ -69,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <exception cref="NotSupportedException">The specified data type cannot be packed into a vertex buffer.</exception>
         public void Write<T>(int offset, int stride, IEnumerable<T> data)
         {
-            throw new NotSupportedException();
+            Write(offset, stride, typeof(T), data);
         }
 
         /// <summary>
@@ -82,7 +90,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <exception cref="NotSupportedException">The specified data type cannot be packed into a vertex buffer.</exception>
         public void Write(int offset, int stride, Type dataType, IEnumerable data)
         {
-            throw new NotSupportedException();
+            var size = SizeOf(dataType);
+            var bytes = new byte[size];
+            var ptr = Marshal.AllocHGlobal(size);
+
+            // NOTE: This is not a very fast way to serialize 
+            // an unknown struct type, but it is reliable.
+            //
+            // Still the chances vertex buffer serialization
+            // being the bottleneck of the content pipeline
+            // are almost non-existent.
+
+            stream.Seek(offset, SeekOrigin.Begin);
+            foreach (var item in data)
+            {
+                var next = stream.Position + stride;
+                Marshal.StructureToPtr(item, ptr, false);
+                Marshal.Copy(ptr, bytes, 0, size);
+                stream.Write(bytes, 0, size);
+                stream.Seek(next, SeekOrigin.Begin);
+            }
+
+            Marshal.FreeHGlobal(ptr);
         }
     }
 }

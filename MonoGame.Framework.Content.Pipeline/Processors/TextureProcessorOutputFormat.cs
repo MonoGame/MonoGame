@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary>
         /// The SurfaceFormat value, of the input TextureContent object, is converted to an appropriate DXT compression by the processor. If the input texture contains fractional alpha values, it is converted to DXT5 format (8 bits per texel); otherwise it is converted to DXT1 (4 bits per texel). This conversion reduces the resource's size on the graphics card. Typically used for 3D textures such as 3D model textures.
         /// </summary>
-        DXTCompressed,
+        DxtCompressed,
 
         /// <summary>
         /// The SurfaceFormat value, of the input TextureContent object, is not changed by the processor. Typically used for textures processed by an external tool.

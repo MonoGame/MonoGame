@@ -110,6 +110,7 @@ namespace Microsoft.Xna.Framework {
 		}
 
         #region Autorotation for iOS 5 or older
+        [Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
             DisplayOrientation supportedOrientations = OrientationConverter.Normalize (SupportedOrientations);
@@ -127,17 +128,6 @@ namespace Microsoft.Xna.Framework {
         public override bool ShouldAutorotate ()
         {
             return _platform.Game.Initialized;
-        }
-        
-        public override UIInterfaceOrientation PreferredInterfaceOrientationForPresentation ()
-        {
-            DisplayOrientation supportedOrientations = OrientationConverter.Normalize(SupportedOrientations);
-            if ((supportedOrientations & DisplayOrientation.LandscapeRight) != 0)
-                return UIInterfaceOrientation.LandscapeRight;
-            else if ((supportedOrientations & DisplayOrientation.LandscapeLeft) != 0)
-                return UIInterfaceOrientation.LandscapeLeft;
-            else
-                return UIInterfaceOrientation.Portrait;
         }
         #endregion
 

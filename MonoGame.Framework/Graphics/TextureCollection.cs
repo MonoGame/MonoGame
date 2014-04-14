@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -11,6 +12,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics.ES20;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -47,6 +49,38 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#if DIRECTX
+
+        internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
+        {
+            // NOTE: We make the assumption here that the caller has
+            // locked the d3dContext for us to use.
+            var pixelShaderStage = device._d3dContext.PixelShader;
+
+            // We assume 4 targets to avoid a loop within a loop below.
+            var target0 = targets[0].RenderTarget;
+            var target1 = targets[1].RenderTarget;
+            var target2 = targets[2].RenderTarget;
+            var target3 = targets[3].RenderTarget;
+
+            // Make one pass across all the texture slots.
+            for (var i = 0; i < _textures.Length; i++)
+            {
+                if (_textures[i] != target0 &&
+                    _textures[i] != target1 &&
+                    _textures[i] != target2 &&
+                    _textures[i] != target3)
+                    continue;
+
+                // Immediately clear the texture from the device.
+                _dirty &= ~(1 << i);
+                _textures[i] = null;
+                pixelShaderStage.SetShaderResource(i, null);
+            }
+        }
+
+#endif
+
         internal void Clear()
         {
             for (var i = 0; i < _textures.Length; i++)
@@ -70,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetTextures(GraphicsDevice device)
         {
-#if !WINRT
+#if !DIRECTX
             Threading.EnsureUIThread();
 #endif
 
@@ -110,10 +144,17 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                 }
 #elif DIRECTX
-                if (_textures[i] == null)
+                if (_textures[i] == null || _textures[i].IsDisposed)
                     pixelShaderStage.SetShaderResource(i, null);
                 else
                     pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+#elif PSM
+                // FIXME: 1d/3d textures
+                var texture2d = _textures[i] as Texture2D;
+                if (texture2d == null)
+                    device.Context.SetTexture(i, null);
+                else
+                    device.Context.SetTexture(i, texture2d._texture2D);
 #endif
 
                 _dirty &= ~mask;

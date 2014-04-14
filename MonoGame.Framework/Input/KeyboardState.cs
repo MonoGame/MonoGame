@@ -43,6 +43,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Holds the state of keystrokes by a keyboard.
+    /// </summary>
 	public struct KeyboardState
 	{
         // Used for the common situation where GetPressedKeys will return an empty array
@@ -123,6 +126,10 @@ namespace Microsoft.Xna.Framework.Input
 
         #region XNA Interface
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyboardState"/> class.
+        /// </summary>
+        /// <param name="keys">List of keys to be flagged as pressed on initialization.</param>
         internal KeyboardState(List<Keys> keys)
         {
             keys0 = 0;
@@ -139,6 +146,10 @@ namespace Microsoft.Xna.Framework.Input
                     InternalSetKey(k);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyboardState"/> class.
+        /// </summary>
+        /// <param name="keys">List of keys to be flagged as pressed on initialization.</param>
         public KeyboardState(params Keys[] keys)
         {
             keys0 = 0;
@@ -155,16 +166,31 @@ namespace Microsoft.Xna.Framework.Input
                     InternalSetKey(k);
         }
 
+        /// <summary>
+        /// Returns the state of a specified key.
+        /// </summary>
+        /// <param name="key">The key to query.</param>
+        /// <returns>The state of the key.</returns>
         public KeyState this[Keys key]
         {
             get { return InternalGetKey(key) ? KeyState.Down : KeyState.Up; }
         }
 
+        /// <summary>
+        /// Gets whether given key is currently being pressed.
+        /// </summary>
+        /// <param name="key">The key to query.</param>
+        /// <returns>true if the key is pressed; false otherwise.</returns>
         public bool IsKeyDown(Keys key)
         {
             return InternalGetKey(key);
         }
 
+        /// <summary>
+        /// Gets whether given key is currently being not pressed.
+        /// </summary>
+        /// <param name="key">The key to query.</param>
+        /// <returns>true if the key is not pressed; false otherwise.</returns>
         public bool IsKeyUp(Keys key)
         {
             return !InternalGetKey(key);
@@ -193,6 +219,10 @@ namespace Microsoft.Xna.Framework.Input
             return index;
         }
 
+        /// <summary>
+        /// Returns an array of values holding keys that are currently being pressed.
+        /// </summary>
+        /// <returns>The keys that are currently being pressed.</returns>
         public Keys[] GetPressedKeys()
         {
             uint count = CountBits(keys0) + CountBits(keys1) + CountBits(keys2) + CountBits(keys3)
@@ -219,11 +249,21 @@ namespace Microsoft.Xna.Framework.Input
 
         #region Objet and Equality
 
+        /// <summary>
+        /// Gets the hash code for <see cref="KeyboardState"/> instance.
+        /// </summary>
+        /// <returns>Hash code of the object.</returns>
         public override int GetHashCode()
         {
             return (int)(keys0 ^ keys1 ^ keys2 ^ keys3 ^ keys4 ^ keys5 ^ keys6 ^ keys7);
         }
 
+        /// <summary>
+        /// Compares whether two <see cref="KeyboardState"/> instances are equal.
+        /// </summary>
+        /// <param name="a"><see cref="KeyboardState"/> instance to the left of the equality operator.</param>
+        /// <param name="b"><see cref="KeyboardState"/> instance to the right of the equality operator.</param>
+        /// <returns>true if the instances are equal; false otherwise.</returns>
         public static bool operator ==(KeyboardState a, KeyboardState b)
         {
             return a.keys0 == b.keys0
@@ -236,11 +276,22 @@ namespace Microsoft.Xna.Framework.Input
                 && a.keys7 == b.keys7;
         }
 
+        /// <summary>
+        /// Compares whether two <see cref="KeyboardState"/> instances are not equal.
+        /// </summary>
+        /// <param name="a"><see cref="KeyboardState"/> instance to the left of the inequality operator.</param>
+        /// <param name="b"><see cref="KeyboardState"/> instance to the right of the inequality operator.</param>
+        /// <returns>true if the instances are different; false otherwise.</returns>
         public static bool operator !=(KeyboardState a, KeyboardState b)
         {
             return !(a == b);
         }
 
+        /// <summary>
+        /// Compares whether current instance is equal to specified object.
+        /// </summary>
+        /// <param name="obj">The <see cref="KeyboardState"/> to compare.</param>
+        /// <returns>true if the provided <see cref="KeyboardState"/> instance is same with current; false otherwise.</returns>
         public override bool Equals(object obj)
         {
             return obj is KeyboardState && this == (KeyboardState)obj;

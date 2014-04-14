@@ -227,8 +227,8 @@
 							}
 							else // Handle mouse 
 							{
-								Mouse.State.X = (int) location.X;
-								Mouse.State.Y = (int) location.Y;
+                                Mouse.PrimaryWindow.MouseState.X = (int)location.X;
+                                Mouse.PrimaryWindow.MouseState.Y = (int)location.Y;
 							}
 						}
 						
@@ -342,8 +342,8 @@
 								}
 								
 								// Handle the mouse
-								Mouse.State.X = (int) location.X;
-								Mouse.State.Y = (int) location.Y;
+                                Mouse.PrimaryWindow.MouseState.X = (int)location.X;
+                                Mouse.PrimaryWindow.MouseState.Y = (int)location.Y;
 							}
 						}
 					}

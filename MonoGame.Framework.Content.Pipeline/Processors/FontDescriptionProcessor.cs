@@ -7,133 +7,194 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using System.Linq;
+using SharpFont;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using MonoGame.Framework.Content.Pipeline.Builder;
+using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
-    [ContentProcessor(DisplayName = "Sprite Font Processor - MonoGame")]
-    class FontDescriptionProcessor : ContentProcessor<SpriteFontContent, SpriteFontContent>
+    [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
+    public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
-        public override SpriteFontContent Process(SpriteFontContent input,
+
+        public override SpriteFontContent Process(FontDescription input,
             ContentProcessorContext context)
         {
-            
-            var font = new Font(input.FontName, input.FontSize);
+            var output = new SpriteFontContent(input);
 
-            // Make sure that this font is installed on the system.
-            // Creating a font object with a font that's not contained will default to MS Sans Serif:
-            // http://msdn.microsoft.com/en-us/library/zet4c3fa.aspx
-            if (font.FontFamily.Name == "Microsoft Sans Serif" && input.FontName != "Microsoft Sans Serif")
-                throw new Exception(string.Format("Font {0} is not installed on this computer.", input.FontName));
+			var fontName = input.FontName;
 
-            var estimatedSurfaceArea = 0;
-            var largestHeight = 0;
-            var widthsAndHeights = new List<Point>();
-            // Calculate the bounds of each rect
-            var bmp = new Bitmap((int)(font.Size * 1.5), (int)(font.Size * 1.5));
-            using (var temp = System.Drawing.Graphics.FromImage(bmp))
-            {
-                // Calculate and save the size of each character
-                foreach (var ch in input.CharacterMap)
-                {
-                    var charSize = temp.MeasureString(ch.ToString(), font);
-                    var width = (int)charSize.Width;
-                    var height = (int)charSize.Height;
+#if WINDOWS
+			var windowsfolder = Environment.GetFolderPath (Environment.SpecialFolder.Windows);
+		        var fontDirectory = Path.Combine(windowsfolder,"Fonts");
+			fontName = FindFontFileFromFontName (fontName, fontDirectory);
+			if (string.IsNullOrWhiteSpace(fontName)) {
+				fontName = input.FontName;
+#endif
+				
+			var directory = Path.GetDirectoryName (input.Identity.SourceFilename);
+			var directories = new string[] { directory, 
+				"/Library/Fonts",
+#if WINDOWS
+				fontDirectory,
+#endif
+			};
 
-                    estimatedSurfaceArea += width;
-                    largestHeight = Math.Max(largestHeight, height);
+			foreach( var dir in directories) {
+				if (File.Exists(Path.Combine(dir,fontName+".ttf"))) {
+					fontName += ".ttf";
+					directory = dir;
+					break;
+				}
+				if (File.Exists (Path.Combine(dir,fontName+".ttc"))) {
+					fontName += ".ttc";
+					directory = dir;
+					break;
+				}
+				if (File.Exists(Path.Combine(dir,fontName+".otf"))) {
+					fontName += ".otf";
+					directory = dir;
+					break;
+				}
+			}
 
+			fontName = Path.Combine (directory, fontName);
+#if WINDOWS
+			}
+#endif
 
-                    widthsAndHeights.Add(new Point(width, height));
-                }
+			context.Logger.LogMessage ("Building Font {0}", fontName);
+			try {
+				if (!File.Exists(fontName)) {
+					throw new Exception(string.Format("Could not load {0}", fontName));
+				}
+				var lineSpacing = 0f;
+				var glyphs = ImportFont(input, out lineSpacing, context, fontName);
 
-                // TODO: Using the largest height will give us some empty space
-                // This can be optimized to pack a smaller texture if necessary
-                estimatedSurfaceArea *= largestHeight;
-            }
+				// Optimize.
+				foreach (Glyph glyph in glyphs)
+				{
+					GlyphCropper.Crop(glyph);
+				}
 
-            // calculate the best height and width for our output texture.
-            // TODO: GetMonoGamePlatform()
-            var texBounds = calculateOutputTextureBounds(estimatedSurfaceArea, context.BuildConfiguration.ToUpper().Contains("IOS"));
+				Bitmap outputBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
 
-            // Create our texture
-            var outputBitmap = new Bitmap(texBounds.X, texBounds.Y);
-            using (var g = System.Drawing.Graphics.FromImage(outputBitmap))
-            {
+				//outputBitmap.Save ("/Users/Jimmy/Desktop/Cocos2D-XNAImages/fontglyphs.png");
 
-                g.FillRectangle(Brushes.Magenta, new System.Drawing.Rectangle(0, 0, outputBitmap.Width, outputBitmap.Height));
+				// Adjust line and character spacing.
+				lineSpacing += input.Spacing;
 
-                int x = 0;
-                int y = 0;
-                // Draw each glyph into the image.
-                for (int i = 0; i < input.CharacterMap.Count; i++)
-                {
+				foreach (Glyph glyph in glyphs)
+				{
+					glyph.XAdvance += input.Spacing;
+					if (!output.CharacterMap.Contains(glyph.Character))
+						output.CharacterMap.Add(glyph.Character);
+					output.Glyphs.Add(new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
+                    output.Cropping.Add(new Rectangle(0, (int)(glyph.YOffset + glyphs.Select(x => x.YOffset).Max()), glyph.Subrect.Width, glyph.Subrect.Height));
+					ABCFloat abc = glyph.CharacterWidths;
+					output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
+				}
 
-                    input.Glyphs.Add(new Microsoft.Xna.Framework.Rectangle(x, y, input.Glyphs[x].Width, input.Glyphs[x].Height));
-                    g.DrawString(input.CharacterMap[x].ToString(), font, Brushes.White, new PointF(x, y));
+//				outputBitmap.Save("/Users/Jimmy/Desktop/Cocos2D-XNAImages/test.png");
+				output.Texture._bitmap = outputBitmap;
 
-                    x += input.Glyphs[x].Width;
+				var bitmapContent = new PixelBitmapContent<Color>(outputBitmap.Width, outputBitmap.Height);
+				bitmapContent.SetPixelData(outputBitmap.GetData());
+				output.Texture.Faces.Add(new MipmapChain(bitmapContent));
 
-                    if (x >= texBounds.X)
-                    {
-                        x = 0;
-                        y += largestHeight;
-                    }
-                }
+            	GraphicsUtil.CompressTexture(output.Texture, context, false, false);
+			}
+			catch(Exception ex) {
+				context.Logger.LogImportantMessage("{0}", ex.ToString());
+			}
 
-                using (var ms = new MemoryStream())
-                {
-                    outputBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.MemoryBmp);
-
-                    var texData = new byte[ms.Length];
-                    ms.Read(texData, 0, (int)ms.Length);
-
-                    var bitmapContent = (BitmapContent)Activator.CreateInstance(typeof(PixelBitmapContent<Microsoft.Xna.Framework.Color>), 
-                                                                                new object[] { outputBitmap.Width, outputBitmap.Height });
-                    bitmapContent.SetPixelData(texData);
-
-                    input.Texture.Faces[0].Add(bitmapContent);
-                    var tp = new TextureProcessor();
-                    tp.Process(input.Texture, context);
-                }
-            }
-
-            return input;
+            return output;
         }
 
-        private Point calculateOutputTextureBounds(int estArea, bool forceSquare)
-        {
-            // always generate textures with PoT bounds.
+		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, ContentProcessorContext context, string fontName)
+		{
+			// Which importer knows how to read this source font?
+			IFontImporter importer;
 
-            // Some texture compression requires square PoT textures
-            if (forceSquare)
-            {
-                // get a single dimention of the square
-                var dimention = (int)Math.Ceiling(Math.Sqrt(estArea));
+			var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
+			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
-                // get thenext power of two of this dimention
-                dimention = getPowerOfTwo(dimention);
+			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
+			context.Logger.LogMessage ("Building Font {0}", fontName);
 
-                // return the height and width of our new
-                return new Point(dimention, dimention);
-            }
-            else
-                throw new NotSupportedException("Non Square Textures are not yet supported");
+			//			if (BitmapFileExtensions.Contains(fileExtension))
+			//			{
+			//				importer = new BitmapImporter();
+			//			}
+			//			else
+			//			{
+			if (TrueTypeFileExtensions.Contains (fileExtension)) 
+			{
+				importer = new SharpFontImporter ();
+			}
+			else 
+			{
+				//importer = new TrueTypeImporter();
+				importer = new SharpFontImporter ();
+			}
 
-            /*// We don't require a square texture. Get the smallest PoT bounds
-            // that can contain the entire sheet.
+			// Import the source font data.
+			importer.Import(options, fontName);
 
-            return new Point();*/
-        }
+			lineSpacing = importer.LineSpacing;
 
-        private int getPowerOfTwo(int num)
-        {
-            num--;
-            num = (num >> 1) | num;
-            num = (num >> 2) | num;
-            num = (num >> 4) | num;
-            num = (num >> 8) | num;
-            num = (num >> 16) | num;
-            return ++num;
-        }
+			// Get all glyphs
+			var glyphs = new List<Glyph>(importer.Glyphs);
+
+			// Validate.
+			if (glyphs.Count == 0)
+			{
+				throw new Exception("Font does not contain any glyphs.");
+			}
+
+			// Sort the glyphs
+			glyphs.Sort((left, right) => left.Character.CompareTo(right.Character));
+
+
+			// Check that the default character is part of the glyphs
+			if (options.DefaultCharacter != null)
+			{
+				bool defaultCharacterFound = false;
+				foreach (var glyph in glyphs)
+				{
+					if (glyph.Character == options.DefaultCharacter)
+					{
+						defaultCharacterFound = true;
+						break;
+					}
+				}
+				if (!defaultCharacterFound)
+				{
+					throw new InvalidOperationException("The specified DefaultCharacter is not part of this font.");
+				}
+			}
+
+			return glyphs.ToArray();
+		}
+
+#if WINDOWS
+		string FindFontFileFromFontName (string fontName, string fontDirectory)
+		{
+			var key = Registry.LocalMachine.OpenSubKey (@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+			foreach (var font in key.GetValueNames ().OrderBy (x => x)) {
+				if (font.StartsWith (fontName, StringComparison.OrdinalIgnoreCase)) {
+					var fontPath = key.GetValue (font).ToString ();
+					return Path.IsPathRooted (fontPath) ? fontPath : Path.Combine (fontDirectory, fontPath);
+				}
+			}
+			return String.Empty;
+		}
+#endif
     }
 }

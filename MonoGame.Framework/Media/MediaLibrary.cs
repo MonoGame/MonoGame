@@ -50,7 +50,12 @@ namespace Microsoft.Xna.Framework.Media
 {
 	public class MediaLibrary : IDisposable
 	{
-        private PlaylistCollection _playLists;
+		private PlaylistCollection _playLists = null;
+		private PlaylistCollection PlayLists
+		{
+			get { return _playLists; }
+			set { _playLists = value; }
+		}
 
 		public MediaLibrary ()
 		{
@@ -64,6 +69,7 @@ namespace Microsoft.Xna.Framework.Media
 		{
 		}
 		
+        /*
 		public void SavePicture (string name, byte[] imageBuffer)
 		{
 #if IOS || ANDROID
@@ -73,7 +79,7 @@ namespace Microsoft.Xna.Framework.Media
 			throw new NotSupportedException ();
 #endif
 		}
-		
+
 		public void SavePicture (string name, Stream source)
 		{
 #if IOS || ANDROID
@@ -83,7 +89,8 @@ namespace Microsoft.Xna.Framework.Media
 			throw new NotSupportedException ();
 #endif
 		}
-		
+		*/
+
 #if IOS
 
 		public PlaylistCollection Playlists
@@ -113,8 +120,8 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 #endif
-		
-		public SongCollection Songs
+
+        public SongCollection Songs
 		{
 			get
 			{

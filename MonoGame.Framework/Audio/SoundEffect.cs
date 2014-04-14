@@ -46,18 +46,26 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if WINRT
+#if DIRECTX
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.X3DAudio;
+#elif (WINDOWS && OPENGL) || LINUX
+using OpenTK.Audio.OpenAL;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
 {
     public sealed class SoundEffect : IDisposable
     {
-#if WINRT
+        private bool isDisposed = false;
+
+        #region Internal Audio Data
+
+        private string _name;
+
+#if DIRECTX
         internal DataStream _dataStream;
         internal AudioBuffer _buffer;
         internal AudioBuffer _loopedBuffer;
@@ -69,46 +77,111 @@ namespace Microsoft.Xna.Framework.Audio
         private List<SoundEffectInstance> _availableInstances;
         private List<SoundEffectInstance> _toBeRecycledInstances;
 #else
-		private Sound _sound;
+        private string _filename = "";
+        internal byte[] _data;
+
+#if (WINDOWS && OPENGL) || LINUX
+
+        // OpenAL-specific information
+
+        internal int Size
+        {
+            get;
+            set;
+        }
+
+        internal float Rate
+        {
+            get;
+            set;
+        }
+
+        internal ALFormat Format
+        {
+            get;
+            set;
+        }
+#else
+        private Sound _sound;
         private SoundEffectInstance _instance;
 #endif
 
-        private string _name;
-#if !WINRT
-		private string _filename = "";
-        private byte[] _data;
 #endif
 
-#if WINRT
+        #endregion
+
+        #region Internal Constructors
+
+#if DIRECTX
         internal SoundEffect()
         {
         }
+
+        // Extended constructor which supports custom formats / compression.
+        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            Initialize(format, buffer, offset, count, loopStart, loopLength);
+        }
+
 #else
         internal SoundEffect(string fileName)
-		{
-			_filename = fileName;		
-			
-			if (_filename == string.Empty )
-			{
-			  throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
-			}
-			
-			_sound = new Sound(_filename, 1.0f, false);
-			_name = Path.GetFileNameWithoutExtension(fileName);
-		}
-		
-		//SoundEffect from playable audio data
-		internal SoundEffect(string name, byte[] data)
-		{
-			_data = data;
-			_name = name;
-			_sound = new Sound(_data, 1.0f, false);
-		}        
+        {
+            _filename = fileName;
+
+            if (_filename == string.Empty )
+            {
+                throw new FileNotFoundException("Supported Sound Effect formats are wav, mp3, acc, aiff");
+            }
+
+            _name = Path.GetFileNameWithoutExtension(fileName);
+
+#if (WINDOWS && OPENGL) || LINUX
+            Stream s;
+            try
+            {
+                s = File.OpenRead(fileName);
+            }
+            catch (IOException e)
+            {
+                throw new Content.ContentLoadException("Could not load audio data", e);
+            }
+
+            _data = LoadAudioStream(s, 1.0f, false);
+            s.Close();
+#else
+            _sound = new Sound(_filename, 1.0f, false);
+#endif
+        }
+
+        //SoundEffect from playable audio data
+        internal SoundEffect(string name, byte[] data)
+        {
+            _data = data;
+            _name = name;
+
+#if (WINDOWS && OPENGL) || LINUX
+            Stream s;
+            try
+            {
+                s = new MemoryStream(data);
+            }
+            catch (IOException e)
+            {
+                throw new Content.ContentLoadException("Could not load audio data", e);
+            }
+            _data = LoadAudioStream(s, 1.0f, false);
+            s.Close();
+#else
+            _sound = new Sound(_data, 1.0f, false);
+#endif
+        }        
 #endif
 
         internal SoundEffect(Stream s)
         {
-#if !WINRT
+#if (WINDOWS && OPENGL) || LINUX
+            _data = LoadAudioStream(s, 1.0f, false);
+#elif !DIRECTX
             var data = new byte[s.Length];
             s.Read(data, 0, (int)s.Length);
 
@@ -117,17 +190,32 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
         }
 
+        internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
+            : this(buffer, sampleRate, channels)
+        {
+            _name = name;
+        }
+
+        #endregion
+
+        #region Public Constructors
+
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
-		{
-#if WINRT            
+        {
+#if DIRECTX            
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, 0, buffer.Length, 0, buffer.Length);
+#elif (WINDOWS && OPENGL) || LINUX
+            _data = buffer;
+            Size = buffer.Length;
+            Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
+            Rate = sampleRate;
 #else
-			//buffer should contain 16-bit PCM wave data
-			short bitsPerSample = 16;
+            //buffer should contain 16-bit PCM wave data
+            short bitsPerSample = 16;
 
             _name = "";
 
-			using (var mStream = new MemoryStream(44+buffer.Length))
+            using (var mStream = new MemoryStream(44+buffer.Length))
             using (var writer = new BinaryWriter(mStream))
             {
                 writer.Write("RIFF".ToCharArray()); //chunk id
@@ -145,73 +233,68 @@ namespace Microsoft.Xna.Framework.Audio
                 writer.Write((short)bitsPerSample);
 
                 writer.Write("data".ToCharArray()); //chunk id
-                writer.Write((int)buffer.Length); //data size 	MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199	C#
+                writer.Write((int)buffer.Length); //data size   MonoGame.Framework.Windows8.DLL!Microsoft.Xna.Framework.Audio.Sound.Sound(byte[] audiodata, float volume, bool looping) Line 199    C#
 
                 writer.Write(buffer);
 
                 _data = mStream.ToArray();
             }
 
-			_sound = new Sound(_data, 1.0f, false);
+            _sound = new Sound(_data, 1.0f, false);
 #endif
         }
 
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
-        {            
-#if WINRT
+        {
+#if DIRECTX
             Initialize(new WaveFormat(sampleRate, (int)channels), buffer, offset, count, loopStart, loopLength);
 #else
             throw new NotImplementedException();
 #endif
-        }        
-
-#if WINRT
-
-        // Extended constructor which supports custom formats / compression.
-        internal SoundEffect(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
-        {
-            Initialize(format, buffer, offset, count, loopStart, loopLength);
         }
 
-        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        #endregion
+
+        #region Additional SoundEffect/SoundEffectInstance Creation Methods
+
+        public SoundEffectInstance CreateInstance()
         {
-            _format = format;
+#if DIRECTX
+            SourceVoice voice = null;
+            if (Device != null)
+                voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
-            _dataStream = DataStream.Create<byte>(buffer, true, false);
-
-            // Use the loopStart and loopLength also as the range
-            // when playing this SoundEffect a single time / unlooped.
-            _buffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = count,
-                Flags = BufferFlags.EndOfStream,
-                PlayBegin = loopStart,
-                PlayLength = loopLength,
-                Context = new IntPtr(42),
-            };
-
-            _loopedBuffer = new AudioBuffer()
-            {
-                Stream = _dataStream,
-                AudioBytes = count,
-                Flags = BufferFlags.EndOfStream,
-                LoopBegin = loopStart,
-                LoopLength = loopLength,
-                LoopCount = AudioBuffer.LoopInfinite,
-                Context = new IntPtr(42),
-            };            
-        }
+            var instance = new SoundEffectInstance(this, voice);
+#elif (WINDOWS && OPENGL) || LINUX
+            var instance = new SoundEffectInstance(this);
+#else
+            var instance = new SoundEffectInstance();
+            instance.Sound = _sound;
 #endif
-		
+            return instance;
+        }
+
+        public static SoundEffect FromStream(Stream stream)
+        {            
+            return new SoundEffect(stream);
+        }
+
+        #endregion
+
+        #region Play
+
         public bool Play()
-        {				
+        {
+#if (WINDOWS && OPENGL) || LINUX
+            return Play(MasterVolume, 0.0f, 0.0f);
+#else
             return Play(1.0f, 0.0f, 0.0f);
+#endif
         }
 
         public bool Play(float volume, float pitch, float pan)
         {
-#if WINRT
+#if DIRECTX
             if (MasterVolume > 0.0f)
             {
                 if (_playingInstances == null)
@@ -266,154 +349,202 @@ namespace Microsoft.Xna.Framework.Audio
             // XNA documentation says this method returns false if the sound limit
             // has been reached. However, there is no limit on PC.
             return true;
-#else
-			if ( MasterVolume > 0.0f )
-			{
-                if(_instance == null)
-				    _instance = CreateInstance();
-				_instance.Volume = volume;
-				_instance.Pitch = pitch;
-				_instance.Pan = pan;
-				_instance.Play();
-				return _instance.Sound.Playing;
-			}
-			return false;
-#endif
-        }
-		
-		public TimeSpan Duration 
-		{ 
-			get
-			{
-#if WINRT                    
-                var sampleCount = _buffer.PlayLength;
-                var avgBPS = _format.AverageBytesPerSecond;
-                
-                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
-#else
-				if ( _sound != null )
-				{
-					return new TimeSpan(0,0,(int)_sound.Duration);
-				}
-				else
-				{
-					return new TimeSpan(0);
-				}
-#endif
-			}
-		}
-
-        public string Name
-        {
-            get
+#elif (WINDOWS && OPENGL) || LINUX
+            if (MasterVolume > 0.0f)
             {
-				return _name;
+                SoundEffectInstance instance = CreateInstance();
+                instance.Volume = volume;
+                instance.Pitch = pitch;
+                instance.Pan = pan;
+                instance.Play();
             }
-			set 
+            return false;
+#else
+            if ( MasterVolume > 0.0f )
             {
-				_name = value;
-			}
-        }
-
-		public SoundEffectInstance CreateInstance()
-		{
-#if WINRT
-		    SourceVoice voice = null;
-            if (Device != null)
-                voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
-
-            var instance = new SoundEffectInstance(this, voice);
-#else
-            var instance = new SoundEffectInstance();	
-			instance.Sound = _sound;			
-#endif
-            return instance;
-		}
-		
-		#region IDisposable Members
-
-        public void Dispose()
-        {
-#if WINRT
-            _dataStream.Dispose();               
-#else
-			_sound.Dispose();
+                if(_instance == null)
+                    _instance = CreateInstance();
+                _instance.Volume = volume;
+                _instance.Pitch = pitch;
+                _instance.Pan = pan;
+                _instance.Play();
+                return _instance.Sound.Playing;
+            }
+            return false;
 #endif
         }
 
         #endregion
 
-        #region Static Members
-        static float _masterVolume = 1.0f;
-		public static float MasterVolume 
-		{ 
-			get
-			{
-				return _masterVolume;
-			}
-			set
-			{
-                if ( _masterVolume != value )
-                    _masterVolume = value;
+        #region Public Properties
 
-#if WINRT
+#if (WINDOWS && OPENGL) || LINUX
+        private TimeSpan _duration = TimeSpan.Zero;
+#endif
+
+        public TimeSpan Duration
+        {
+            get
+            {
+#if DIRECTX                    
+                var sampleCount = _buffer.PlayLength;
+                var avgBPS = _format.AverageBytesPerSecond;
+                
+                return TimeSpan.FromSeconds((float)sampleCount / (float)avgBPS);
+#elif (WINDOWS && OPENGL) || LINUX
+                return _duration;
+#else
+                if ( _sound != null )
+                {
+                    return new TimeSpan(0,0,(int)_sound.Duration);
+                }
+                else
+                {
+                    return new TimeSpan(0);
+                }
+#endif
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set 
+            {
+                _name = value;
+            }
+        }
+
+        #endregion
+
+        #region Static Members
+
+        static float _masterVolume = 1.0f;
+        public static float MasterVolume 
+        { 
+            get
+            {
+                return _masterVolume;
+            }
+            set
+            {
+                if (_masterVolume != value)
+                {
+                    _masterVolume = value;
+                }
+#if DIRECTX
                 MasterVoice.SetVolume(_masterVolume, 0);
 #endif
-			}
-		}
-
-		static float _distanceScale = 1f;
-
-		public static float DistanceScale {
-			get {
-				return _distanceScale;
-			}
-			set {
-				if (value <= 0f) {
-					throw new ArgumentOutOfRangeException ("value of DistanceScale");
-				}
-				_distanceScale = value;
-			}
-		}
-
-		static float _dopplerScale = 1f;
-
-		public static float DopplerScale {
-			get {
-				return _dopplerScale;
-			}
-			set {
-				// As per documenation it does not look like the value can be less than 0
-				//   although the documentation does not say it throws an error we will anyway
-				//   just so it is like the DistanceScale
-				if (value < 0f) {
-					throw new ArgumentOutOfRangeException ("value of DopplerScale");
-				}
-				_dopplerScale = value;
-			}
-		}
-
-		static float speedOfSound = 343.5f;
-
-		public static float SpeedOfSound {
-			get {
-				return speedOfSound;
-			}
-			set {
-				speedOfSound = value;
-			}
+            }
         }
 
-        public static SoundEffect FromStream(Stream stream)
-        {            
-#if ANDROID
-            throw new NotImplementedException();
+        static float _distanceScale = 1.0f;
+        public static float DistanceScale
+        {
+            get
+            {
+                return _distanceScale;
+            }
+            set
+            {
+                if (value <= 0f)
+                {
+                    throw new ArgumentOutOfRangeException ("value of DistanceScale");
+                }
+                _distanceScale = value;
+            }
+        }
+
+        static float _dopplerScale = 1f;
+        public static float DopplerScale
+        {
+            get
+            {
+                return _dopplerScale;
+            }
+            set
+            {
+                // As per documenation it does not look like the value can be less than 0
+                //   although the documentation does not say it throws an error we will anyway
+                //   just so it is like the DistanceScale
+                if (value < 0f)
+                {
+                    throw new ArgumentOutOfRangeException ("value of DopplerScale");
+                }
+                _dopplerScale = value;
+            }
+        }
+
+        static float speedOfSound = 343.5f;
+        public static float SpeedOfSound
+        {
+            get
+            {
+                return speedOfSound;
+            }
+            set
+            {
+                speedOfSound = value;
+            }
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public bool IsDisposed
+        {
+            get
+            {
+                return isDisposed;
+            }
+        }
+
+        public void Dispose()
+        {
+#if (WINDOWS && OPENGL) || LINUX
+            // No-op. Note that isDisposed remains false!
 #else
-            return new SoundEffect(stream);
+
+#if DIRECTX
+            _dataStream.Dispose();
+#else
+            _sound.Dispose();
+#endif
+            isDisposed = true;
+
 #endif
         }
 
-#if WINRT        
+        #endregion
+
+        #region Additional OpenTK SoundEffect Code
+
+#if (WINDOWS && OPENGL) || LINUX
+        byte[] LoadAudioStream(Stream s, float volume, bool looping)
+        {
+            ALFormat format;
+            int size;
+            int freq;
+            byte[] data;
+
+            data = AudioLoader.Load(s, out format, out size, out freq);
+
+            Format = format;
+            Size = size;
+            Rate = freq;
+            return data;
+        }
+#endif
+
+        #endregion
+
+        #region Additional DirectX SoundEffect Code
+
+#if DIRECTX
         internal static XAudio2 Device { get; private set; }
         internal static MasteringVoice MasterVoice { get; private set; }
 
@@ -421,6 +552,7 @@ namespace Microsoft.Xna.Framework.Audio
         private static Speakers _speakers = Speakers.Stereo;
 
         // XNA does not expose this, but it exists in X3DAudio.
+        [CLSCompliant(false)]
         public static Speakers Speakers
         {
             get
@@ -454,42 +586,118 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        static SoundEffect()
+        internal static void InitializeSoundEffect()
         {
-            // This cannot fail.
-            Device = new XAudio2();
-
             try
             {
-                Device.StartEngine();
+                if (Device == null)
+                {
+#if !WINRT && DEBUG
+                    try
+                    {
+                        //Fails if the XAudio2 SDK is not installed
+                        Device = new XAudio2(XAudio2Flags.DebugEngine, ProcessorSpecifier.DefaultProcessor);
+                        Device.StartEngine();
+                    }
+                    catch
+#endif
+                    {
+                        Device = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.DefaultProcessor);
+                        Device.StartEngine();
+                    }
+                }
 
-                // Let windows autodetect number of channels and sample rate.
-                MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate);            
-                MasterVoice.SetVolume(_masterVolume, 0);
+                // Just use the default device.
+#if WINRT
+                string deviceId = null;
+#else
+                const int deviceId = 0;
+#endif
+
+                if (MasterVoice == null)
+                {
+                    // Let windows autodetect number of channels and sample rate.
+                    MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
+                    MasterVoice.SetVolume(_masterVolume, 0);
+                }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
+#if WINRT
                 Speakers = (Speakers)MasterVoice.ChannelMask;
+#else
+                var deviceDetails = Device.GetDeviceDetails(deviceId);
+                Speakers = deviceDetails.OutputFormat.ChannelMask;
+#endif
             }
             catch
             {
                 // Release the device and null it as
                 // we have no audio support.
-                Device.Dispose();
-                Device = null;
+                if (Device != null)
+                {
+                    Device.Dispose();
+                    Device = null;
+                }
+
                 MasterVoice = null;
             }
+        }
 
+        private void Initialize(WaveFormat format, byte[] buffer, int offset, int count, int loopStart, int loopLength)
+        {
+            _format = format;
+
+            _dataStream = DataStream.Create<byte>(buffer, true, false);
+
+            // Use the loopStart and loopLength also as the range
+            // when playing this SoundEffect a single time / unlooped.
+            _buffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                PlayBegin = loopStart,
+                PlayLength = loopLength,
+                Context = new IntPtr(42),
+            };
+
+            _loopedBuffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = count,
+                Flags = BufferFlags.EndOfStream,
+                LoopBegin = loopStart,
+                LoopLength = loopLength,
+                LoopCount = AudioBuffer.LoopInfinite,
+                Context = new IntPtr(42),
+            };            
+        }
+
+        static SoundEffect()
+        {
+            InitializeSoundEffect();
         }
 
         // Does someone actually need to call this if it only happens when the whole
         // game closes? And if so, who would make the call?
         internal static void Shutdown()
-        {            
-            MasterVoice.DestroyVoice();
-            MasterVoice.Dispose();
+        {
+            if (MasterVoice != null)
+            {
+                MasterVoice.DestroyVoice();
+                MasterVoice.Dispose();
+                MasterVoice = null;
+            }
 
-            Device.StopEngine();
-            Device.Dispose();                     
+            if (Device != null)
+            {
+                Device.StopEngine();
+                Device.Dispose();
+                Device = null;
+            }
+
+            _device3DDirty = true;
+            _speakers = Speakers.Stereo;
         }
 #endif
         #endregion

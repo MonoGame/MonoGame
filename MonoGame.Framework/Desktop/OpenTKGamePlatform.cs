@@ -105,16 +105,25 @@ namespace Microsoft.Xna.Framework
             _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
-
-            this.IsMouseVisible = true;
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
-			soundControllerInstance = OpenALSoundController.GetInstance;
+            try
+            {
+                soundControllerInstance = OpenALSoundController.GetInstance;
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw (new NoAudioHardwareException("Failed to init OpenALSoundController", ex));
+            }
             
 #if LINUX
             // also set up SdlMixer to play background music. If one of these functions fails, we will not get any background music (but that should rarely happen)
             Tao.Sdl.Sdl.SDL_InitSubSystem(Tao.Sdl.Sdl.SDL_INIT_AUDIO);
             Tao.Sdl.SdlMixer.Mix_OpenAudio(44100, (short)Tao.Sdl.Sdl.AUDIO_S16SYS, 2, 1024);			
+
+            //even though this method is called whenever IsMouseVisible is changed it needs to be called during startup
+            //so that the cursor can be put in the correct inital state (hidden)
+            OnIsMouseVisibleChanged();
 #endif
         }
 
@@ -122,6 +131,13 @@ namespace Microsoft.Xna.Framework
         {
             get { return GameRunBehavior.Synchronous; }
         }
+
+#if WINDOWS
+        protected override void OnIsMouseVisibleChanged()
+        {
+            _view.MouseVisibleToggled();
+        }
+#endif
 
         public override void RunLoop()
         {
@@ -131,7 +147,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
         
         public override void Exit()
@@ -150,10 +166,10 @@ namespace Microsoft.Xna.Framework
         public override bool BeforeUpdate(GameTime gameTime)
         {
             IsActive = _view.Window.Focused;
-            
-            // Update our OpenAL sound buffer pools
-            soundControllerInstance.Update();
 
+            // Update our OpenAL sound buffer pools
+            if (soundControllerInstance != null)
+                soundControllerInstance.Update();
             return true;
         }
 
@@ -249,15 +265,16 @@ namespace Microsoft.Xna.Framework
         {
             
         }
-  
+#if LINUX
         protected override void OnIsMouseVisibleChanged()
         {
             MouseState oldState = Mouse.GetState();
             _view.Window.CursorVisible = IsMouseVisible;
-            // IsMouseVisible changes the location of the cursor on Linux (and Windows?) and we have to manually set it back to the correct position
+            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
             System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
             OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
         }
+#endif
         
         public override void Log(string Message)
         {

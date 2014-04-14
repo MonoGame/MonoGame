@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-			throw new NotImplementedException();
+            throw new NotSupportedException("The PSM platform does not support asynchronous run loops");
 		}
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -197,17 +197,24 @@ namespace Microsoft.Xna.Framework
         private Dictionary<int, TouchLocation> _previousTouches = new Dictionary<int, TouchLocation>();
         
         private void UpdateTouches()
-        {           
-            var pssTouches = Touch.GetData(0);
-            foreach (var touch in pssTouches)
-            {
-                Vector2 position = new Vector2((touch.X + 0.5f) * _frameBufferWidth, (touch.Y + 0.5f) * _frameBufferHeight);
-                if (touch.Status == TouchStatus.Down)
-                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Pressed, position);
-                else if (touch.Status == TouchStatus.Move)
-                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Moved, position);
-                else
-                    TouchPanel.AddEvent(touch.ID, TouchLocationState.Released, position);
+        {
+            try {
+                var pssTouches = Touch.GetData(0);
+                foreach (var touch in pssTouches)
+                {
+                    Vector2 position = new Vector2((touch.X + 0.5f) * _frameBufferWidth, (touch.Y + 0.5f) * _frameBufferHeight);
+                    if (touch.Status == TouchStatus.Down)
+                        TouchPanel.AddEvent(touch.ID, TouchLocationState.Pressed, position);
+                    else if (touch.Status == TouchStatus.Move)
+                        TouchPanel.AddEvent(touch.ID, TouchLocationState.Moved, position);
+                    else
+                        TouchPanel.AddEvent(touch.ID, TouchLocationState.Released, position);
+                }
+            } catch (Sce.PlayStation.Core.InputSystemException exc) {
+                if (exc.Message.ToLowerInvariant().Trim() == "native function returned error.")
+                    throw new InvalidOperationException("Touch must be listed in your features list in app.xml in order to use the TouchPanel API on PlayStation Mobile.", exc);
+                else                
+                    throw;
             }
         }
     }

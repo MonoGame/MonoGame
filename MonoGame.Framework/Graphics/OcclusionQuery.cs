@@ -2,10 +2,12 @@ using System;
 using System.Runtime.InteropServices;
 
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

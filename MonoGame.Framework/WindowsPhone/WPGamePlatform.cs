@@ -64,6 +64,10 @@ the implied warranties of merchantability, fitness for a particular purpose and
 non-infringement.
 */
 
+extern alias MicrosoftXnaFramework;
+using MsXna_FrameworkDispatcher = MicrosoftXnaFramework::Microsoft.Xna.Framework.FrameworkDispatcher; 
+
+using System;
 using System.Diagnostics;
 using System.Windows.Controls;
 using Microsoft.Xna.Framework;
@@ -81,7 +85,7 @@ namespace MonoGame.Framework.WindowsPhone
             : base(game)
         {
             // Setup the game window.
-            Window = new WindowsPhoneGameWindow();
+            Window = new WindowsPhoneGameWindow(game);
 
             // Setup the launch parameters.
             // - Parameters can optionally start with a forward slash.
@@ -152,7 +156,7 @@ namespace MonoGame.Framework.WindowsPhone
 
         public override void RunLoop()
         {
-            throw new System.NotImplementedException();
+            throw new NotSupportedException("The Windows Phone platform does not support synchronous run loops");
         }
 
         public override void StartRunLoop()
@@ -161,11 +165,16 @@ namespace MonoGame.Framework.WindowsPhone
         
         public override void Exit()
         {
-            throw new System.NotImplementedException();
+            // Closing event is not fired when termiate is called. We need to deactivate the game manually.
+            if (Game.Instance != null)
+                this.IsActive = false;
+
+            System.Windows.Application.Current.Terminate();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            MsXna_FrameworkDispatcher.Update(); 
             return true;
         }
 
@@ -181,13 +190,15 @@ namespace MonoGame.Framework.WindowsPhone
         public override void ExitFullScreen()
         {
         }
-        
+
         public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
+            Window.EndScreenDeviceChange(screenDeviceName, clientWidth, clientHeight);
         }
 
         public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
+            Window.BeginScreenDeviceChange(willBeFullScreen);
         }
 
         public override void Log(string message)

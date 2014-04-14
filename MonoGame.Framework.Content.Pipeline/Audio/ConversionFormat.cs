@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     public enum ConversionFormat
     {
         /// <summary>
-        /// A PCM encoding technique using 4 bits
+        /// Microsoft ADPCM encoding technique using 4 bits
         /// </summary>
         Adpcm,
 
@@ -28,5 +28,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// The Xbox compression format
         /// </summary>
         Xma,
+
+        /// <summary>
+        /// QuickTime ADPCM format
+        /// </summary>
+        ImaAdpcm,
+
+        /// <summary>
+        /// Advanced Audio Coding
+        /// </summary>
+        Aac,
+
+        /// <summary>
+        /// Vorbis open, patent-free audio encoding
+        /// </summary>
+        Vorbis,
     }
 }

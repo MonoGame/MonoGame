@@ -53,22 +53,29 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>
+    /// Implements the SoundEffectInstance, which is used to access high level features of a SoundEffect. This class uses the OpenAL
+    /// sound system to play and control the sound effects. Please refer to the OpenAL 1.x specification from Creative Labs to better
+    /// understand the features provides by SoundEffectInstance. 
+    /// </summary>
 	public class SoundEffectInstance : IDisposable
 	{
 		private bool isDisposed = false;
 		private SoundState soundState = SoundState.Stopped;
 		private OALSoundBuffer soundBuffer;
 		private OpenALSoundController controller;
-		private SoundEffect soundEffect;
 
-		float _volume = 1.0f;
-		bool _looped = false;
-		float _pan = 0;
-		float _pitch = 0f;
+        private float _volume = 1.0f;
+        private bool _looped = false;
+        private float _pan = 0f;
+        private float _pitch = 0f;
 
 		bool hasSourceId = false;
 		int sourceId;
 
+        /// <summary>
+        /// Creates an instance and initializes it.
+        /// </summary>
         public SoundEffectInstance()
         {
             InitializeSound();
@@ -79,13 +86,33 @@ namespace Microsoft.Xna.Framework.Audio
             Dispose();
         }
 
+        /* Creates a standalone SoundEffectInstance from given wavedata. */
+        internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
+        {
+            InitializeSound();
+            BindDataBuffer(
+                buffer,
+                (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16,
+                buffer.Length,
+                sampleRate
+            );
+        }
+
+        /// <summary>
+        /// Construct the instance from the given SoundEffect. The data buffer from the SoundEffect is 
+        /// preserved in this instance as a reference. This constructor will bind the buffer in OpenAL.
+        /// </summary>
+        /// <param name="parent"></param>
 		public SoundEffectInstance (SoundEffect parent)
 		{
-			this.soundEffect = parent;
 			InitializeSound ();
-            BindDataBuffer(soundEffect._data, soundEffect.Format, soundEffect.Size, (int)soundEffect.Rate);
+            BindDataBuffer(parent._data, parent.Format, parent.Size, (int)parent.Rate);
 		}
 
+        /// <summary>
+        /// Gets the OpenAL sound controller, constructs the sound buffer, and sets up the event delegates for
+        /// the reserved and recycled events.
+        /// </summary>
 		private void InitializeSound ()
 		{
 			controller = OpenALSoundController.GetInstance;
@@ -94,12 +121,27 @@ namespace Microsoft.Xna.Framework.Audio
 			soundBuffer.Recycled += HandleSoundBufferRecycled;                        
 		}
 
+        /// <summary>
+        /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
+        /// that is created in the InitializeSound method.
+        /// </summary>
+        /// <param name="data">The sound data buffer</param>
+        /// <param name="format">The sound buffer data format, e.g. Mono, Mono16 bit, Stereo, etc.</param>
+        /// <param name="size">The size of the data buffer</param>
+        /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
+        [CLSCompliant(false)]
         protected void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
             soundBuffer.BindDataBuffer(data, format, size, rate);
         }
 
-		void HandleSoundBufferRecycled (object sender, EventArgs e)
+        /// <summary>
+        /// Event handler that resets internal state of this instance. The sound state will report
+        /// SoundState.Stopped after this event handler.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+		private void HandleSoundBufferRecycled (object sender, EventArgs e)
 		{
 			sourceId = 0;
 			hasSourceId = false;
@@ -107,12 +149,22 @@ namespace Microsoft.Xna.Framework.Audio
 			//Console.WriteLine ("recycled: " + soundEffect.Name);
 		}
 
-		void HandleSoundBufferReserved (object sender, EventArgs e)
+        /// <summary>
+        /// Called after the hardware has allocated a sound buffer, this event handler will
+        /// maintain the numberical ID of the source ID.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+		private void HandleSoundBufferReserved (object sender, EventArgs e)
 		{
 			sourceId = soundBuffer.SourceId;
 			hasSourceId = true;
 		}
 
+        /// <summary>
+        /// Stops the current running sound effect, if relevant, removes its event handlers, and disposes
+        /// of the sound buffer.
+        /// </summary>
 		public void Dispose ()
         {
             if (!isDisposed)
@@ -126,11 +178,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
 		}
 		
+        /// <summary>
+        /// Wrapper for Apply3D(AudioListener[], AudioEmitter)
+        /// </summary>
+        /// <param name="listener"></param>
+        /// <param name="emitter"></param>
 		public void Apply3D (AudioListener listener, AudioEmitter emitter)
 		{
 			Apply3D ( new AudioListener[] { listener }, emitter);
 		}
 		
+        /// <summary>
+        /// Applies a 3D transform on the emitter and the listeners to account for head-up
+        /// listening orientation in a 3D surround-sound pseudo-environment. The actual 3D
+        /// sound production is handled by OpenAL. This method computes the listener positions
+        /// and orientation and hands off the calculations to OpenAL.
+        /// </summary>
+        /// <param name="listeners"></param>
+        /// <param name="emitter"></param>
 		public void Apply3D (AudioListener[] listeners, AudioEmitter emitter)
 		{
 			// get AL's listener position
@@ -157,21 +222,47 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        /// <summary>
+        /// When the sound state is playing and the source is created, this method will pause
+        /// the sound playback and set the state to SoundState.Paused. Otherwise, no change is
+        /// made to the state of this instance.
+        /// </summary>
 		public void Pause ()
 		{
-			if (hasSourceId) {
+			if (hasSourceId && soundState == SoundState.Playing)
+            {
 				controller.PauseSound (soundBuffer);
 				soundState = SoundState.Paused;
 			}
 		}
 
-        private float XnaPitchToAlPitch(float pitch)
+		/// <summary>
+		/// Converts the XNA [-1,1] pitch range to OpenAL (-1,+INF].
+        /// <param name="xnaPitch">The pitch of the sound in the Microsoft XNA range.</param>
+		/// </summary>
+        private float XnaPitchToAlPitch(float xnaPitch)
         {
-            // pitch is different in XNA and OpenAL. XNA has a pitch between -1 and 1 for one octave down/up.
-            // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default. The default value of 0 would make it completely silent.
-            return (float)Math.Exp(0.69314718 * pitch);
+            /* 
+            XNA sets pitch bounds to [-1.0f, 1.0f], each end being one octave.
+             •OpenAL's AL_PITCH boundaries are (0.0f, INF). *
+             •Consider the function f(x) = 2 ^ x
+             •The domain is (-INF, INF) and the range is (0, INF). *
+             •0.0f is the original pitch for XNA, 1.0f is the original pitch for OpenAL.
+             •Note that f(0) = 1, f(1) = 2, f(-1) = 0.5, and so on.
+             •XNA's pitch values are on the domain, OpenAL's are on the range.
+             •Remember: the XNA limit is arbitrarily between two octaves on the domain. *
+             •To convert, we just plug XNA pitch into f(x). 
+                    */
+            if (xnaPitch < -1.0f || xnaPitch > 1.0f)
+            {
+                throw new Exception("XNA PITCH MUST BE WITHIN [-1.0f, 1.0f]!");
+            }
+            return (float)Math.Pow(2, xnaPitch);
         }
 
+        /// <summary>
+        /// Sends the position, gain, looping, pitch, and distance model to the OpenAL driver.
+        /// </summary>
 		private void ApplyState ()
 		{
 			if (!hasSourceId)
@@ -189,29 +280,67 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
 		}
 
+        /// <summary>
+        /// If no source is ready, then this method does not change the current state of the instance. Otherwise,
+        /// if the controller can not reserve the source then InstancePLayLimitException is thrown. Finally, the sound
+        /// buffer is sourced to OpenAL, then ApplyState is called and then the sound is set to play. Upon success,
+        /// the sound state is set to SoundState.Playing.
+        /// </summary>
 		public virtual void Play ()
 		{
-			int bufferId = soundBuffer.OpenALDataBuffer;
-			if (hasSourceId) {
-				return;
-			}
-			bool isSourceAvailable = controller.ReserveSource (soundBuffer);
-			if (!isSourceAvailable)
-				return;
-
-			AL.Source (soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
-			ApplyState ();
-
-			controller.PlaySound (soundBuffer);            
-			//Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-			soundState = SoundState.Playing;
+            if (!TryPlay())
+                throw new InstancePlayLimitException();
 		}
 
+        /// <summary>
+        /// Internal implementation of Play that returns false on failure. See comments on Play for workings.
+        /// </summary>
+        internal bool TryPlay()
+        {
+            if (hasSourceId) {
+                return true;
+            }
+            bool isSourceAvailable = controller.ReserveSource (soundBuffer);
+            if (!isSourceAvailable)
+                return false;
+
+            int bufferId = soundBuffer.OpenALDataBuffer;
+            AL.Source(soundBuffer.SourceId, ALSourcei.Buffer, bufferId);
+            ApplyState ();
+
+            controller.PlaySound (soundBuffer);            
+            //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
+            soundState = SoundState.Playing;
+
+            return true;
+        }
+        /// <summary>
+        /// When the sound state is paused, and the source is available, then the sound
+        /// is played using the ResumeSound method from the OpenALSoundController. Otherwise,
+        /// the sound is played using the Play() method. Upon success, the sound state should
+        /// be SoundState.Playing.
+        /// </summary>
 		public void Resume ()
 		{
-			Play ();
+            if (hasSourceId)
+            {
+                if (soundState == SoundState.Paused)
+                {
+                    controller.ResumeSound(soundBuffer);
+                    soundState = SoundState.Playing;
+                }
+            }
+            else
+            {
+                Play();
+            }
 		}
 
+        /// <summary>
+        /// When the source is available, the sound buffer playback is stopped. Either way,
+        /// the state of the instance will always be SoundState.Stopped after this method is
+        /// called.
+        /// </summary>
 		public void Stop ()
 		{
 			if (hasSourceId) {
@@ -221,17 +350,28 @@ namespace Microsoft.Xna.Framework.Audio
 			soundState = SoundState.Stopped;
 		}
 
+        /// <summary>
+        /// Wrapper for Stop()
+        /// </summary>
+        /// <param name="immediate">Is not used.</param>
 		public void Stop (bool immediate)
 		{
 			Stop ();
 		}
 
+        /// <summary>
+        /// returns true if this object has been disposed.
+        /// </summary>
 		public bool IsDisposed {
 			get {
 				return isDisposed;
 			}
 		}
 
+        /// <summary>
+        /// Set/get if this sound is looped. When set, and the source is already active, then
+        /// the looping setting is applied immediately.
+        /// </summary>
 		public virtual bool IsLooped {
 			get {
 				return _looped;
@@ -246,6 +386,11 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        /// <summary>
+        /// Set/get for sound panning. Sound panning controls the location of the listener in the coordinate space
+        /// defined by your world. This method only affects the 'x' coordinate of the listener. The final position of
+        /// the listener is (pan, 0, 0.1). 
+        /// </summary>
 		public float Pan {
 			get {
 				return _pan;
@@ -261,6 +406,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        /// <summary>
+        /// Set/get the pitch (Octave adjustment) of the sound effect. This attribute assumes you are setting
+        /// the pitch using the [-1,1] Microsoft XNA pitch range. The pitch will be automatically adjusted
+        /// using the XnaPitchToAlPitch method. If the source is active, then the pitch change will
+        /// be applied immediately.
+        /// </summary>
 		public float Pitch {
 			get {
 				return _pitch;
@@ -275,24 +426,20 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-		private byte[] audioData;
-
-		internal byte[] EffectData {
-			get {
-				return audioData;
-			}
-
-			set {
-				audioData = value;
-			}
-		}
-
+        /// <summary>
+        /// Returns the current state of the SoundEffect.
+        /// </summary>
 		public SoundState State {
 			get {
 				return soundState;
 			}
 		}
 
+        /// <summary>
+        /// Get/set the relative volume of this sound effect. The volume is relative to the master
+        /// volume (SoundEffect.MasterVolume). The values in this attribute should be [0,1]. If the source
+        /// is active, then volume changes will be applied immediately.
+        /// </summary>
 		public float Volume {
 			get {
 				return _volume;

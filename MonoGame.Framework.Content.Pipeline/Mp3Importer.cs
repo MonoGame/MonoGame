@@ -28,7 +28,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override AudioContent Import(string filename, ContentImporterContext context)
         {
-            throw new NotImplementedException();
+            var content = new AudioContent(filename, AudioFileType.Mp3);
+            return content;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// Provides methods and properties for maintaining a collection of named texture references.
     /// </summary>
     /// <remarks>In addition to texture references, opaque data values are stored in the OpaqueData property of the base class.</remarks>
-    [ContentProcessor(DisplayName = "Material Processor - MonoGame")]
+    [ContentProcessor(DisplayName = "Material - MonoGame")]
     public class MaterialProcessor : ContentProcessor<MaterialContent, MaterialContent>
     {
         Color colorKeyColor;
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public virtual bool ResizeTexturesToPowerOfTwo { get; set; }
 
         /// <summary>
-        /// Specifies the texture format of output materials. Materials can either be left unchanged from the source asset, converted to a corresponding Color, or compressed using the appropriate DXTCompressed format.
+		/// Specifies the texture format of output materials. Materials can either be left unchanged from the source asset, converted to a corresponding Color, or compressed using the appropriate DxtCompressed format.
         /// </summary>
         /// <value>The texture format of the output.</value>
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Color")]

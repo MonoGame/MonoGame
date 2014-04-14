@@ -33,18 +33,27 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public class SoundBank : IDisposable
     {
-        string name;
-		string filename;
+        //string name;
+        string filename;
 		AudioEngine audioengine;
 		WaveBank[] waveBanks;
 		Dictionary<string, Cue> cues = new Dictionary<string, Cue>();
         
 		bool loaded = false;
+
+		internal AudioEngine AudioEngine { get { return audioengine; } }
 		
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
+#if WINRT
+            const char notSeparator = '/';
+            const char separator = '\\';
+#else
+            const char notSeparator = '\\';
+            var separator = Path.DirectorySeparatorChar;
+#endif
             // Check for windows-style directory separator character
-            filename = fileName.Replace('\\',Path.DirectorySeparatorChar);
+            filename = fileName.Replace(notSeparator, separator);
 			audioengine = audioEngine;
 		}
 		
@@ -52,7 +61,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private void Load ()
 		{	
 #if !ANDROID
-			using (FileStream soundbankstream = new FileStream (filename, FileMode.Open))
+			using (Stream soundbankstream = TitleContainer.OpenStream(filename))
 			{
 #else
 				using (var fileStream = Game.Activity.Assets.Open(filename))
@@ -72,27 +81,26 @@ namespace Microsoft.Xna.Framework.Audio
 						throw new Exception ("Bad soundbank format");
 					}
 					
-					uint toolVersion = soundbankreader.ReadUInt16 ();
+                    soundbankreader.ReadUInt16 (); // toolVersion
 					uint formatVersion = soundbankreader.ReadUInt16 ();
 					if (formatVersion != 46) {
 #if DEBUG
-						Console.WriteLine ("Warning: SoundBank format not supported");
+						System.Diagnostics.Debug.WriteLine ("Warning: SoundBank format not supported");
 #endif
 					}
 					
-					uint crc = soundbankreader.ReadUInt16 ();
-					//TODO: Verify crc (FCS16)
+                    soundbankreader.ReadUInt16 (); // crc, TODO: Verify crc (FCS16)
 					
-					uint lastModifiedLow = soundbankreader.ReadUInt32 ();
-					uint lastModifiedHigh = soundbankreader.ReadUInt32 ();
-					uint platform = soundbankreader.ReadByte(); //???
+                    soundbankreader.ReadUInt32 (); // lastModifiedLow
+                    soundbankreader.ReadUInt32 (); // lastModifiedHigh
+                    soundbankreader.ReadByte(); // platform ???
 					
 					uint numSimpleCues = soundbankreader.ReadUInt16 ();
 					uint numComplexCues = soundbankreader.ReadUInt16 ();
 					soundbankreader.ReadUInt16 (); //unkn
-					uint numTotalCues = soundbankreader.ReadUInt16 ();
+                    soundbankreader.ReadUInt16 (); // numTotalCues
 					uint numWaveBanks = soundbankreader.ReadByte ();
-					uint numSounds = soundbankreader.ReadUInt16 ();
+                    soundbankreader.ReadUInt16 (); // numSounds
 					uint cueNameTableLen = soundbankreader.ReadUInt16 ();
 					soundbankreader.ReadUInt16 (); //unkn
 					
@@ -100,30 +108,29 @@ namespace Microsoft.Xna.Framework.Audio
 					uint complexCuesOffset = soundbankreader.ReadUInt32 (); //unkn
 					uint cueNamesOffset = soundbankreader.ReadUInt32 ();
 					soundbankreader.ReadUInt32 (); //unkn
-					uint variationTablesOffset = soundbankreader.ReadUInt32 ();
+                    soundbankreader.ReadUInt32 (); // variationTablesOffset
 					soundbankreader.ReadUInt32 (); //unkn
 					uint waveBankNameTableOffset = soundbankreader.ReadUInt32 ();
-					uint cueNameHashTableOffset = soundbankreader.ReadUInt32 ();
-					uint cueNameHashValsOffset = soundbankreader.ReadUInt32 ();
-					uint soundsOffset = soundbankreader.ReadUInt32 ();
+                    soundbankreader.ReadUInt32 (); // cueNameHashTableOffset
+                    soundbankreader.ReadUInt32 (); // cueNameHashValsOffset
+                    soundbankreader.ReadUInt32 (); // soundsOffset
 					
-					name = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
-					
-					
+                    //name = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64),0,64).Replace("\0","");
+
 					//parse wave bank name table
 					soundbankstream.Seek (waveBankNameTableOffset, SeekOrigin.Begin);
 					waveBanks = new WaveBank[numWaveBanks];
 					for (int i=0; i<numWaveBanks; i++) {
-						string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64)).Replace("\0","");
+						string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64),0,64).Replace("\0","");
 						waveBanks[i] = audioengine.Wavebanks[bankname];
 					}
 					
 					//parse cue name table
 					soundbankstream.Seek (cueNamesOffset, SeekOrigin.Begin);
-					string[] cueNames = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes((int)cueNameTableLen)).Split('\0');
+					string[] cueNames = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes((int)cueNameTableLen), 0, (int)cueNameTableLen).Split('\0');
 					soundbankstream.Seek (simpleCuesOffset, SeekOrigin.Begin);
 					for (int i=0; i<numSimpleCues; i++) {
-						byte flags = soundbankreader.ReadByte ();
+                        soundbankreader.ReadByte (); // flags
 						uint soundOffset = soundbankreader.ReadUInt32 ();
 						XactSound sound = new XactSound(this, soundbankreader, soundOffset);
 						Cue cue = new Cue(audioengine, cueNames[i], sound);
@@ -145,7 +152,7 @@ namespace Microsoft.Xna.Framework.Audio
 							cue = new Cue(audioengine, cueNames[numSimpleCues+i], sound);
 						} else {
 							uint variationTableOffset = soundbankreader.ReadUInt32 ();
-							uint transitionTableOffset = soundbankreader.ReadUInt32 ();
+                            soundbankreader.ReadUInt32 (); // transitionTableOffset
 							
 							//parse variation table
 							long savepos = soundbankstream.Position;
@@ -167,8 +174,8 @@ namespace Microsoft.Xna.Framework.Audio
 								{
 									uint trackIndex = soundbankreader.ReadUInt16 ();
 									byte waveBankIndex = soundbankreader.ReadByte ();
-									byte weightMin = soundbankreader.ReadByte ();
-									byte weightMax = soundbankreader.ReadByte ();
+                                    soundbankreader.ReadByte (); // weightMin
+                                    soundbankreader.ReadByte (); // weightMax
 			
 									cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
 									break;
@@ -176,8 +183,8 @@ namespace Microsoft.Xna.Framework.Audio
 								case 1:
 								{
 									uint soundOffset = soundbankreader.ReadUInt32 ();
-									byte weightMin = soundbankreader.ReadByte ();
-									byte weightMax = soundbankreader.ReadByte ();
+                                    soundbankreader.ReadByte (); // weightMin
+                                    soundbankreader.ReadByte (); // weightMax
 									
 									cueSounds[j] = new XactSound(this, soundbankreader, soundOffset);
 									break;
@@ -190,7 +197,7 @@ namespace Microsoft.Xna.Framework.Audio
 									break;
 								}
 								default:
-									throw new NotImplementedException();
+									throw new NotSupportedException();
 								}
 							}
 							
@@ -230,10 +237,12 @@ namespace Microsoft.Xna.Framework.Audio
             musicCue.Play();
 		}
 		
+        /*
 		public void PlayCue (string name, AudioListener listener, AudioEmitter emitter)
 		{
 			throw new NotImplementedException();
 		}
+        */
 
 		#region IDisposable implementation
 		public void Dispose ()

@@ -13,8 +13,10 @@ namespace Microsoft.Xna.Framework.Audio
 			public abstract void Play();
 			public abstract void Stop();
 			public abstract void Pause();
+			public abstract void Resume();
 			public abstract bool Playing { get; }
 			public abstract float Volume { get; set; }
+			public abstract bool IsPaused { get; }
 		}
 		
 		class EventPlayWave : ClipEvent {
@@ -30,9 +32,22 @@ namespace Microsoft.Xna.Framework.Audio
 			public override void Pause() {
 				wave.Pause ();
 			}
+			public override void Resume()
+			{
+				wave.Volume = clip.Volume;
+				if (wave.State == SoundState.Paused)
+					wave.Resume();
+			}
 			public override bool Playing {
 				get {
-					return wave.State == SoundState.Playing;
+					return wave.State != SoundState.Stopped;
+				}
+			}
+			public override bool IsPaused
+			{
+				get
+				{
+					return wave.State == SoundState.Paused;
 				}
 			}
 			public override float Volume {
@@ -68,17 +83,21 @@ namespace Microsoft.Xna.Framework.Audio
 					uint trackIndex = clipReader.ReadUInt16 ();
 					byte waveBankIndex = clipReader.ReadByte ();
 					
-					//unkn
-					clipReader.ReadByte ();
+					
+					var loopCount = clipReader.ReadByte ();
+				    // if loopCount == 255 its an infinite loop
+					// otherwise it loops n times..
+				    // unknown
 					clipReader.ReadUInt16 ();
 					clipReader.ReadUInt16 ();
 					
 					evnt.wave = soundBank.GetWave(waveBankIndex, trackIndex);
+					evnt.wave.IsLooped = loopCount == 255;
 					
 					events[i] = evnt;
 					break;
 				default:
-					throw new NotImplementedException();
+					throw new NotSupportedException();
 				}
 				
 				events[i].clip = this;
@@ -91,6 +110,11 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Play() {
 			//TODO: run events
 			events[0].Play ();
+		}
+
+		public void Resume()
+		{
+			events[0].Resume();
 		}
 		
 		public void Stop() {
@@ -116,7 +140,13 @@ namespace Microsoft.Xna.Framework.Audio
 				events[0].Volume = value;
 			}
 		}
-		
+
+
+		public bool IsPaused { 
+			get { 
+				return events[0].IsPaused; 
+			} 
+		}
 	}
 }
 

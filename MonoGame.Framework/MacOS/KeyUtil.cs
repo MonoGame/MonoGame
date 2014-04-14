@@ -143,6 +143,7 @@ namespace Microsoft.Xna.Framework
 
 		}
 
+		[CLSCompliant(false)]
 		public static Keys GetKeys (NSEvent theEvent)
 		{
 			//Initialize ();

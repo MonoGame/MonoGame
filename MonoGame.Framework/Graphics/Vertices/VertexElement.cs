@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
 
                 default:
-                    throw new NotImplementedException("Unknown vertex element usage!");
+                    throw new NotSupportedException("Unknown vertex element usage!");
             }
 
             element.SemanticIndex = _usageIndex;
@@ -200,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     break;
                 
                 default:
-                    throw new NotImplementedException("Unknown vertex element format!");
+                    throw new NotSupportedException("Unknown vertex element format!");
             }
 
             element.Slot = 0;

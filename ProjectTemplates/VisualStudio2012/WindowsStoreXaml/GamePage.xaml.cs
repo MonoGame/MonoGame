@@ -1,6 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using MonoGame.Framework;
+using Windows.ApplicationModel.Activation;
 
 
 namespace $safeprojectname$
@@ -12,12 +13,12 @@ namespace $safeprojectname$
     {
         readonly Game1 _game;
 
-        public GamePage(string launchArguments)
+        public GamePage(LaunchActivatedEventArgs args)
         {
             this.InitializeComponent();
 
             // Create the game.
-            _game = XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, this);
+            _game = XamlGame<Game1>.Create(args, Window.Current.CoreWindow, this);
         }
     }
 }

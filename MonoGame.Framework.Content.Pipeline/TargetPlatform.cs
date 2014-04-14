@@ -79,5 +79,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// (MonoGame)
         /// </summary>
         WindowsPhone8,
+
+        /// <summary>
+        /// Raspberry Pi
+        /// (MonoGame)
+        /// </summary>
+        RaspberryPi,
     }
 }

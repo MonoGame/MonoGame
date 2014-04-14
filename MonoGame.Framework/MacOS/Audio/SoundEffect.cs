@@ -68,9 +68,9 @@ namespace Microsoft.Xna.Framework.Audio
 		private string _name = "";
 		private string _filename = "";
 		internal byte[] _data;
-		List<SoundEffectInstance> playing = null;
-		List<SoundEffectInstance> available = null;
-		List<SoundEffectInstance> toBeRecycled = null;
+		private List<SoundEffectInstance> playing = null;
+        private List<SoundEffectInstance> available = null;
+        private List<SoundEffectInstance> toBeRecycled = null;
 
 		internal float Rate { get; set; }
 
@@ -91,8 +91,13 @@ namespace Microsoft.Xna.Framework.Audio
 			double rate;
 			double duration;
 
+            try {
 			_data = OpenALSupport.LoadFromFile (_filename,
 			                                    out size, out format, out rate, out duration);
+            }
+            catch(Exception ex) {
+                throw new Content.ContentLoadException("Could not load audio data", ex);
+            }
 
 			_name = Path.GetFileNameWithoutExtension (fileName);
 
@@ -116,104 +121,73 @@ namespace Microsoft.Xna.Framework.Audio
         internal SoundEffect(Stream s)
         {
             var data = new byte[s.Length];
+            if(s.Length == 0) {
+                throw new Content.ContentLoadException("SoundEffect content stream does not contain any content.");
+            }
             s.Read(data, 0, (int)s.Length);
 
             _data = data;
             LoadAudioStream(_data);
         }
+        
+        internal SoundEffect(string name, byte[] buffer, int sampleRate, AudioChannels channels)
+            : this(buffer, sampleRate, channels)
+        {
+            _name = name;
+        }
 
 		public SoundEffect (byte[] buffer, int sampleRate, AudioChannels channels)
 		{
-			//buffer should contain 16-bit PCM wave data
-			short bitsPerSample = 16;
+            //buffer should contain 16-bit PCM wave data
+            short bitsPerSample = 16;
 
-			MemoryStream mStream = new MemoryStream (44 + buffer.Length);
-			BinaryWriter writer = new BinaryWriter (mStream);
+            Rate = (float)sampleRate;
+            Size = (int)buffer.Length;
 
-			writer.Write ("RIFF".ToCharArray ()); //chunk id
-			writer.Write ((int)(36 + buffer.Length)); //chunk size
-			writer.Write ("WAVE".ToCharArray ()); //RIFF type
+            if ((int)channels <= 1)
+                Format = bitsPerSample == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
+            else
+                Format = bitsPerSample == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
-			writer.Write ("fmt ".ToCharArray ()); //chunk id
-			writer.Write ((int)16); //format header size
-			writer.Write ((short)1); //format (PCM)
-			writer.Write ((short)channels);
-			writer.Write ((int)sampleRate);
-			short blockAlign = (short)((bitsPerSample / 8) * (int)channels);
-			writer.Write ((int)(sampleRate * blockAlign)); //byte rate
-			writer.Write ((short)blockAlign);
-			writer.Write ((short)bitsPerSample);
+            var _dblDuration = (Size / ((bitsPerSample / 8) * (((int)channels == 0) ? 1 : (int)channels))) / Rate;
+            _duration = TimeSpan.FromSeconds(_dblDuration);
 
-			writer.Write ("data".ToCharArray ()); //chunk id
-			writer.Write ((int)buffer.Length); //data size
-			writer.Write (buffer);
-
-			writer.Close ();
-			mStream.Close ();
-
-			_data = mStream.ToArray ();
-			_name = "";
-
-			LoadAudioStream (_data);
-
+            _name = "";
+            _data = buffer;
 		}        
+        /// <summary>
+        /// Loads the audio stream from the given byte array. If the AudioFileStream does not return an Ok status
+        /// then a ContentLoadException is thrown.
+        /// </summary>
+        /// <param name="audiodata">The full byte array of the audio stream.</param>
 
 		void LoadAudioStream (byte[] audiodata)
 		{
 			AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
 			//long pac = afs.DataPacketCount;
-			afs.PacketDecoded += HandlePacketDecoded;
+            afs.ParseBytes (audiodata, false); // AudioFileStreamStatus status
+            AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
+            
+            Rate = (float)asbd.SampleRate;
+            Size = (int)afs.DataByteCount;
+            
+            if (asbd.ChannelsPerFrame == 1)
+                Format = asbd.BitsPerChannel == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
+            else
+                Format = asbd.BitsPerChannel == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
 
-			afs.ParseBytes (audiodata, false);
+            byte []d = new byte[afs.DataByteCount];
+            Array.Copy (audiodata, afs.DataOffset, d, 0, afs.DataByteCount);
+
+            _data = d;
+
+            var _dblDuration = (Size / ((asbd.BitsPerChannel / 8) * ((asbd.ChannelsPerFrame == 0) ? 1 : asbd.ChannelsPerFrame))) / asbd.SampleRate;
+            _duration = TimeSpan.FromSeconds(_dblDuration);
+
 			afs.Close ();
-		}
-
-		void HandlePacketDecoded (object sender, PacketReceivedEventArgs e)
-		{
-			AudioFileStream afs = (AudioFileStream)sender;
-			byte[] audioData = new byte[e.Bytes];
-			Marshal.Copy (e.InputData, audioData, 0, e.Bytes);
-			//Console.WriteLine ("Packet decoded ");
-			AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
-
-			Rate = (float)asbd.SampleRate;
-			Size = e.Bytes;
-
-			if (asbd.ChannelsPerFrame == 1) {
-				if (asbd.BitsPerChannel == 8) {
-					Format = ALFormat.Mono8;
-				}
-				else if (asbd.BitsPerChannel == 0) // This shouldn't happen. hackking around bad data for now.
-				{
-				//TODO: Remove this when sound's been fixed on iOS and other devices.
-					Format = ALFormat.Mono16;
-					Debug.WriteLine("Warning, bad decoded audio packet in SoundEffect.HandlePacketDecoded. Squelching sound.");
-					_duration = TimeSpan.Zero;
-					_data = audioData;
-					return;
-				}
-				else 
-				{
-					Format = ALFormat.Mono16;
-				}
-			} else {
-				if (asbd.BitsPerChannel == 8) {
-					Format = ALFormat.Stereo8;
-				} else {
-					Format = ALFormat.Stereo16;
-				}
-			}
-			_data = audioData;
-
-
-			var _dblDuration = (e.Bytes / ((asbd.BitsPerChannel / 8) * asbd.ChannelsPerFrame)) / asbd.SampleRate;
-			_duration = TimeSpan.FromSeconds (_dblDuration);
-//			Console.WriteLine ("From Data: " + _name + " - " + Format + " = " + Rate + " / " + Size + " -- "  + Duration);
-//			Console.WriteLine("Duration: " + _dblDuration
-//			                  		+ " / size: " + e.Bytes
-//			                  		+ " bits: " + asbd.BitsPerChannel
-//			                  		+ " channels: " + asbd.ChannelsPerFrame
-//			                  		+ " rate: " + asbd.SampleRate);
+            //if(status != AudioFileStreamStatus.Ok) {
+            //    throw new Content.ContentLoadException("Could not load audio data. The status code was " + status);
+            //}
 		}
 
 		//double _dblDuration = 0;
@@ -221,7 +195,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public bool Play ()
 		{
-			return Play (MasterVolume, 1.0f, 0.0f);
+			return Play (MasterVolume, 0.0f, 0.0f);
 		}
 
 		public bool Play (float volume, float pitch, float pan)
@@ -267,7 +241,7 @@ namespace Microsoft.Xna.Framework.Audio
 				instance.Volume = volume;
 				instance.Pitch = pitch;
 				instance.Pan = pan;
-				instance.Play ();
+				return instance.TryPlay();
 			}
 			return false;
 		}

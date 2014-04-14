@@ -43,7 +43,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Tao.Sdl;
-using System.Xml.Serialization;
 
 namespace Microsoft.Xna.Framework.Input
 {

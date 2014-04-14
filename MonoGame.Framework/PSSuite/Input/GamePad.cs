@@ -138,18 +138,25 @@ using Microsoft.Xna.Framework.Graphics;
         {
 			//See PSS GamePadSample for details
 			
-			var gamePadData = PssGamePad.GetData(0);
-			
-			//map the buttons
-			foreach (var kvp in _buttonsMap)
-			{
-				if ((gamePadData.Buttons & kvp.Key) != 0)
-					_buttons |= (int)kvp.Value;
-			}
-			
-			//Analog sticks
-			_leftStick = new Vector2(gamePadData.AnalogLeftX, gamePadData.AnalogLeftY);
-			_rightStick = new Vector2(gamePadData.AnalogRightX, gamePadData.AnalogRightY);
+            try {
+			    var gamePadData = PssGamePad.GetData(0);
+            
+                 //map the buttons
+                 foreach (var kvp in _buttonsMap)
+                 {
+                     if ((gamePadData.Buttons & kvp.Key) != 0)
+                         _buttons |= (int)kvp.Value;
+                 }
+                 
+                 //Analog sticks
+                 _leftStick = new Vector2(gamePadData.AnalogLeftX, -gamePadData.AnalogLeftY);
+                 _rightStick = new Vector2(gamePadData.AnalogRightX, -gamePadData.AnalogRightY);
+            } catch (Sce.PlayStation.Core.InputSystemException exc) {
+                if (exc.Message.ToLowerInvariant().Trim() == "native function returned error.")
+                    throw new InvalidOperationException("GamePad must be listed in your features list in app.xml in order to use the GamePad API on PlayStation Mobile.", exc);
+                else                
+                    throw;
+            }
 		}
 
 		public static GamePadState GetState(PlayerIndex playerIndex)

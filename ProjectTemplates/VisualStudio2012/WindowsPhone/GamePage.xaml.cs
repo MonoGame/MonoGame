@@ -22,7 +22,7 @@ namespace $safeprojectname$
         {
             InitializeComponent();
 
-            _game = XamlGame<Game1>.Create("", XnaSurface);
+            _game = XamlGame<Game1>.Create("", this);
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();

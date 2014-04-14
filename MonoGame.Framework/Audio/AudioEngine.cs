@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Audio
 		AudioCategory[] categories;
 		Dictionary<string, int> categoryLookup = new Dictionary<string, int>();
 
+		internal AudioCategory[] Categories { get { return categories; } }
+
 		struct Variable {
 			public string name;
 			public float value;
@@ -110,7 +112,7 @@ namespace Microsoft.Xna.Framework.Audio
 			//Read the xact settings file
 			//Credits to alisci01 for initial format documentation
 #if !ANDROID
-			using (var stream = File.OpenRead (settingsFile))
+			using (var stream = TitleContainer.OpenStream(settingsFile))
 			{
 #else
 			using (var fileStream = Game.Activity.Assets.Open(settingsFile))
@@ -125,17 +127,17 @@ namespace Microsoft.Xna.Framework.Audio
 						throw new ArgumentException ("XGS format not recognized");
 					}
 
-					uint toolVersion = reader.ReadUInt16 ();
+                    reader.ReadUInt16 (); // toolVersion
 					uint formatVersion = reader.ReadUInt16 ();
 #if DEBUG
 					if (formatVersion != 42) {
-						Console.WriteLine ("Warning: XGS format not supported");
+						System.Diagnostics.Debug.WriteLine ("Warning: XGS format not supported");
 					}
 #endif
-					uint crc = reader.ReadUInt16 (); //??
+                    reader.ReadUInt16 (); // crc
 
-					uint lastModifiedLow = reader.ReadUInt32 ();
-					uint lastModifiedHigh = reader.ReadUInt32 ();
+                    reader.ReadUInt32 (); // lastModifiedLow
+                    reader.ReadUInt32 (); // lastModifiedHigh
 
 					reader.ReadByte (); //unkn, 0x03. Platform?
 
@@ -146,22 +148,22 @@ namespace Microsoft.Xna.Framework.Audio
 					reader.ReadUInt16 (); //unkn, 0x16
 
 					uint numRpc = reader.ReadUInt16 ();
-					uint numDspPresets = reader.ReadUInt16 ();
-					uint numDspParams = reader.ReadUInt16 ();
+                    reader.ReadUInt16 (); // numDspPresets
+                    reader.ReadUInt16 (); // numDspParams
 
 					uint catsOffset = reader.ReadUInt32 ();
 					uint varsOffset = reader.ReadUInt32 ();
 
 					reader.ReadUInt32 (); //unknown, leads to a short with value of 1?
-					uint catNameIndexOffset = reader.ReadUInt32 ();
+                    reader.ReadUInt32 (); // catNameIndexOffset
 					reader.ReadUInt32 (); //unknown, two shorts of values 2 and 3?
-					uint varNameIndexOffset = reader.ReadUInt32 ();
+                    reader.ReadUInt32 (); // varNameIndexOffset
 
 					uint catNamesOffset = reader.ReadUInt32 ();
 					uint varNamesOffset = reader.ReadUInt32 ();
 					uint rpcOffset = reader.ReadUInt32 ();
-					uint dspPresetsOffset = reader.ReadUInt32 ();
-					uint dspParamsOffset = reader.ReadUInt32 ();
+                    reader.ReadUInt32 (); // dspPresetsOffset
+                    reader.ReadUInt32 (); // dspParamsOffset
 					reader.BaseStream.Seek (catNamesOffset, SeekOrigin.Begin);
 					string[] categoryNames = readNullTerminatedStrings (numCats, reader);
 

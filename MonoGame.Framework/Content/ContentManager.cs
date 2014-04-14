@@ -68,6 +68,23 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
+	static List<char> targetPlatformIdentifiers = new List<char>()
+        {
+            'w', // Windows
+            'x', // Xbox360
+            'm', // WindowsPhone
+            'i', // iOS
+            'a', // Android
+            'l', // Linux
+            'X', // MacOSX
+            'W', // WindowsStoreApp
+            'n', // NativeClient
+            'u', // Ouya
+            'p', // PlayStationMobile
+            'M', // WindowsPhone8
+            'r', // RaspberryPi
+        };
+
         private static void AddContentManager(ContentManager contentManager)
         {
             lock (ContentManagerLock)
@@ -180,7 +197,10 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			if (!disposed)
 			{
-				Unload();
+                if (disposing)
+                {
+                    Unload();
+                }
 				disposed = true;
 			}
 		}
@@ -220,7 +240,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectoryFullPath, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
                 stream = TitleContainer.OpenStream(assetPath);
 
 #if ANDROID
@@ -304,7 +324,7 @@ namespace Microsoft.Xna.Framework.Content
             {
 				//MonoGame try to load as a non-content file
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 	
@@ -381,7 +401,7 @@ namespace Microsoft.Xna.Framework.Content
                 //result = new SpriteFont(Texture2D.FromFile(graphicsDeviceService.GraphicsDevice,assetName), null, null, null, 0, 0.0f, null, null);
                 throw new NotImplementedException();
             }
-#if !WINRT
+#if !DIRECTX
             else if ((typeof(T) == typeof(Song)))
             {
                 return new Song(assetName);
@@ -416,7 +436,7 @@ namespace Microsoft.Xna.Framework.Content
             byte platform = xnbReader.ReadByte();
 
             if (x != 'X' || n != 'N' || b != 'B' ||
-                !(platform == 'w' || platform == 'x' || platform == 'm'))
+                !(targetPlatformIdentifiers.Contains((char)platform)))
             {
                 throw new ContentLoadException("Asset does not appear to be a valid XNB file. Did you process your content for Windows?");
             }
@@ -440,7 +460,6 @@ namespace Microsoft.Xna.Framework.Content
                 //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
                 int compressedSize = xnbLength - 14;
                 int decompressedSize = xnbReader.ReadInt32();
-                int newFileSize = decompressedSize + 10;
 
                 MemoryStream decompressedStream = new MemoryStream(decompressedSize);
 
@@ -495,7 +514,7 @@ namespace Microsoft.Xna.Framework.Content
                     if (block_size == 0 || frame_size == 0)
                         break;
 
-                    int lzxRet = dec.Decompress(stream, block_size, decompressedStream, frame_size);
+                    dec.Decompress(stream, block_size, decompressedStream, frame_size);
                     pos += block_size;
                     decodedBytes += frame_size;
 
@@ -543,23 +562,13 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
-                if (asset.Value is Texture2D)
-                {
-                    ReloadAsset<Texture2D>(asset.Key, asset.Value as Texture2D);
-                }
-                else if (asset.Value is SpriteFont)
-                {
-                    ReloadAsset<SpriteFont>(asset.Key, asset.Value as SpriteFont);
-                }
-                else if (asset.Value is Model)
-                {
-                    ReloadAsset<Model>(asset.Key, asset.Value as Model);
-                }
-                // Not requried as we are recompiling them from cached source in response to DeviceReset event
-                //else if (asset.Value is Effect)
-                //{
-                //    ReloadAsset<Effect>(asset.Key, asset.Value as Effect);
-                //}
+#if WINDOWS_STOREAPP
+                var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
+#else
+                var methodInfo = typeof(ContentManager).GetMethod("ReloadAsset", BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
+                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
             }
         }
 
@@ -616,7 +625,7 @@ namespace Microsoft.Xna.Framework.Content
 				// Try to reload as a non-xnb file.
                 // Just textures supported for now.
 
-                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectoryFullPath, assetName));
+                assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
 
                 assetName = Normalize<T>(assetName);
 
@@ -664,11 +673,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             get
             {
-#if WINDOWS || LINUX || MACOS
-				return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RootDirectory);
-#else
-                return RootDirectory;
-#endif
+                return Path.Combine(TitleContainer.Location, RootDirectory);
             }
         }
 		

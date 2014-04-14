@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			uint category = soundReader.ReadUInt16 ();
 			soundReader.ReadByte (); //unkn
-			uint volume = soundReader.ReadUInt16 (); //maybe pitch?
+            soundReader.ReadUInt16 (); // volume, maybe pitch?
 			soundReader.ReadByte (); //unkn
-			uint entryLength = soundReader.ReadUInt16 ();
+            soundReader.ReadUInt16 (); // entryLength
 			
 			uint numClips = 0;
 			if (complexSound) {
@@ -36,7 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
 				uint extraDataLen = soundReader.ReadUInt16 ();
 				//TODO: Parse RPC+DSP stuff
 				
-				soundReader.BaseStream.Seek (extraDataLen, SeekOrigin.Current);
+				// extraDataLen - 2, we need to account for extraDataLen itself!
+				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
 			}
 			
 			if (complexSound) {
@@ -49,7 +50,10 @@ namespace Microsoft.Xna.Framework.Audio
 					soundClips[i] = new XactClip(soundBank, soundReader, clipOffset);
 				}
 			}
-			
+
+			var audioCategory = soundBank.AudioEngine.Categories[category];
+			audioCategory.AddSound(this);
+
 			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 		
@@ -95,7 +99,7 @@ namespace Microsoft.Xna.Framework.Audio
 		public void Resume() {
 			if (complexSound) {
 				foreach (XactClip clip in soundClips) {
-					clip.Play();
+					clip.Resume();
 				}
 			} else {
 				wave.Resume ();
@@ -129,7 +133,22 @@ namespace Microsoft.Xna.Framework.Audio
 					}
 					return false;
 				} else {
-					return wave.State == SoundState.Playing;
+					return wave.State != SoundState.Stopped;
+				}
+			}
+		}
+
+		public bool IsPaused
+		{
+			get
+			{
+				if (complexSound) {
+					foreach (XactClip clip in soundClips) {
+						if (clip.IsPaused) return true;
+					}
+					return false;
+				} else {
+					return wave.State == SoundState.Paused;
 				}
 			}
 		}

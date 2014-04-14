@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -80,9 +81,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             IEnumerable<string> pipelineAssemblies
             )
         {
-            // TODO: Implement me
-            // ...
-            return false;
+            return Update(pipelineAssemblies, null);
         }
 
         /// <summary>
@@ -96,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             IEnumerable<string> pipelineAssemblyDependencies
             )
         {
-            return Update(pipelineAssemblies, null);
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,16 +5,20 @@ namespace Microsoft.Xna.Framework
 
     static internal class SharpDXHelper
     {
-        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentationParameters present)
+        static public SharpDX.DXGI.SwapEffect ToSwapEffect(PresentInterval presentInterval)
         {
             SharpDX.DXGI.SwapEffect effect;
 
-            switch (present.PresentationInterval)
+            switch (presentInterval)
             {
                 case PresentInterval.One:
                 case PresentInterval.Two:
                 default:
+#if WINRT
                     effect = SharpDX.DXGI.SwapEffect.FlipSequential;
+#else
+                    effect = SharpDX.DXGI.SwapEffect.Discard;
+#endif
                     break;
 
                 case PresentInterval.Immediate:
@@ -23,7 +27,7 @@ namespace Microsoft.Xna.Framework
             }
 
             //if (present.RenderTargetUsage != RenderTargetUsage.PreserveContents && present.MultiSampleCount == 0)
-                //effect = SharpDX.DXGI.SwapEffect.Discard;
+            //effect = SharpDX.DXGI.SwapEffect.Discard;
 
             return effect;
         }
@@ -57,8 +61,11 @@ namespace Microsoft.Xna.Framework
                     return SharpDX.DXGI.Format.B5G6R5_UNorm;
                 case SurfaceFormat.Bgra5551:
                     return SharpDX.DXGI.Format.B5G5R5A1_UNorm;
+#if WINRT
                 case SurfaceFormat.Bgra4444:
                     return SharpDX.DXGI.Format.B4G4R4A4_UNorm;
+#endif
+
                 case SurfaceFormat.Dxt1:
                     return SharpDX.DXGI.Format.BC1_UNorm;
                 case SurfaceFormat.Dxt3:
@@ -94,6 +101,11 @@ namespace Microsoft.Xna.Framework
                     // TODO: This needs to check the graphics device and 
                     // return the best hdr blendable format for the device.
                     return SharpDX.DXGI.Format.R16G16B16A16_Float;
+
+                case SurfaceFormat.Bgr32:
+                    return SharpDX.DXGI.Format.B8G8R8X8_UNorm;
+                case SurfaceFormat.Bgra32:
+                    return SharpDX.DXGI.Format.B8G8R8A8_UNorm;
             }
         }
 

@@ -90,7 +90,7 @@ namespace Lidgren.Network
 			if (msg.m_isSent)
 				throw new NetException("This message has already been sent! Use NetPeer.SendMessage() to send to multiple recipients efficiently");
 
-			int mtu = GetMTU(recipients);
+			GetMTU(recipients); // mtu, TODO: use return value in following if statement?
 
 			msg.m_isSent = true;
 

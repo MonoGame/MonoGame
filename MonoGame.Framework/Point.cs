@@ -25,9 +25,11 @@ SOFTWARE.
 */
 #endregion License
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
+    [DataContract]
     public struct Point : IEquatable<Point>
     {
         #region Private Fields
@@ -36,14 +38,15 @@ namespace Microsoft.Xna.Framework
 
         #endregion Private Fields
 
-
         #region Public Fields
 
+        [DataMember]
         public int X;
+
+        [DataMember]
         public int Y;
 
         #endregion Public Fields
-
 
         #region Properties
 
@@ -53,7 +56,6 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion Properties
-
 
         #region Constructors
 
@@ -65,8 +67,27 @@ namespace Microsoft.Xna.Framework
 
         #endregion Constructors
 
+        #region Operators
 
-        #region Public methods
+        public static Point operator +(Point a, Point b)
+        {
+            return new Point(a.X+b.X,a.Y+b.Y);
+        }
+
+        public static Point operator -(Point a, Point b)
+        {
+            return new Point(a.X-b.X,a.Y-b.Y);
+        }
+
+        public static Point operator *(Point a, Point b)
+        {
+            return new Point(a.X*b.X,a.Y*b.Y);
+        }
+
+        public static Point operator /(Point a, Point b)
+        {
+            return new Point(a.X/b.X,a.Y/b.Y);
+        }
 
         public static bool operator ==(Point a, Point b)
         {
@@ -77,6 +98,10 @@ namespace Microsoft.Xna.Framework
         {
             return !a.Equals(b);
         }
+
+        #endregion
+
+        #region Public methods
 
         public bool Equals(Point other)
         {

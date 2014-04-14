@@ -63,6 +63,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
+	[CLSCompliant(false)]
     public class AndroidGameWindow : AndroidGameView , Android.Views.View.IOnTouchListener, ISurfaceHolderCallback
     {
 		private Rectangle clientBounds;
@@ -71,6 +72,9 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _currentOrientation;
         private AndroidTouchEventManager _touchManager = null;
         private bool _contextWasLost = false;
+        private IResumeManager _resumer;
+        private bool _isResuming;
+        internal TouchPanelState TouchPanelState;
 
         public bool TouchEnabled
         {
@@ -78,10 +82,17 @@ namespace Microsoft.Xna.Framework
             set { _touchManager.Enabled = value; }
         }
 
+        public void SetResumer(IResumeManager resumer)
+        {
+            _resumer = resumer;
+        }
+
         public AndroidGameWindow(Context context, Game game) : base(context)
         {
             _game = game;
+            TouchPanelState = new TouchPanelState(this);
             Initialize();
+
         }		
 						
         private void Initialize()
@@ -152,17 +163,43 @@ namespace Microsoft.Xna.Framework
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
 			try
             {
-                GLContextVersion = GLContextVersion.Gles2_0;
+				GLContextVersion = GLContextVersion.Gles2_0;
 				try
 				{
+					int depth = 0;
+					int stencil = 0;
+					switch (this._game.graphicsDeviceManager.PreferredDepthStencilFormat)
+					{
+						case DepthFormat.Depth16: 
+						depth = 16;
+						break;
+						case DepthFormat.Depth24:
+						depth = 24;
+						break;
+						case DepthFormat.Depth24Stencil8: 
+						depth = 24;
+						stencil = 8;
+						break;
+						case DepthFormat.None: break;
+					}
+					Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
+					GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8,8,8,8), depth,stencil, 0, 0, false);
 					base.CreateFrameBuffer();
 				}
 				catch(Exception)
 				{
-					// try again using a more basic mode which hopefully the device will support
-					GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-					base.CreateFrameBuffer();
+					Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
+					// try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
+					GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
+					try {
+						base.CreateFrameBuffer();
+					} catch (Exception) {
+						// ok we are right back to getting the default
+						GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+						base.CreateFrameBuffer();
+					}
 				}
+				Android.Util.Log.Debug("MonoGame", "Created format {0}", this.GraphicsContext.GraphicsMode);
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
             } 
@@ -173,15 +210,30 @@ namespace Microsoft.Xna.Framework
             if (_game.GraphicsDevice != null && _contextWasLost)
             {
                 _game.GraphicsDevice.Initialize();
-                Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
-                // DeviceReset events
-                _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                _game.GraphicsDevice.OnDeviceReset();
+                _isResuming = true;
+                if (_resumer != null)
+                {
+                    _resumer.LoadContent();
+                }
 
-                _contextWasLost = false;
+                // Reload textures on a different thread so the resumer can be drawn
+                System.Threading.Thread bgThread = new System.Threading.Thread(
+                    o =>
+                    {
+                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+                        // DeviceReset events
+                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                        _game.GraphicsDevice.OnDeviceReset();
+
+                        _contextWasLost = false;
+                        _isResuming = false;
+                    });
+
+                bgThread.Start();
             }
 
             MakeCurrent();
@@ -191,7 +243,8 @@ namespace Microsoft.Xna.Framework
         {
             // DeviceResetting events
             _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            _game.GraphicsDevice.OnDeviceResetting();
+			if(_game.GraphicsDevice != null) 
+				_game.GraphicsDevice.OnDeviceResetting();
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
@@ -219,9 +272,6 @@ namespace Microsoft.Xna.Framework
         {
             base.OnUpdateFrame(e);
 
-            if (_contextWasLost)
-                return;
-
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
@@ -229,13 +279,17 @@ namespace Microsoft.Xna.Framework
 
             if (_game != null)
             {
-				if ( _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+                if (!_isResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
 				{
 					_game.Tick();
 				}
 				else if (_game.GraphicsDevice != null)
-				{ 
+				{
 					_game.GraphicsDevice.Clear(Color.Black);
+                    if (_isResuming && _resumer != null)
+                    {
+                        _resumer.Draw();
+                    }
 					_game.Platform.Present();
 				}
             }
@@ -269,7 +323,7 @@ namespace Microsoft.Xna.Framework
                 }
                 else
                 {
-                    return DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown;
+                    return DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
                 }
             }
             else
@@ -294,8 +348,8 @@ namespace Microsoft.Xna.Framework
                     newOrientation = DisplayOrientation.LandscapeRight;
                 else if ((supported & DisplayOrientation.Portrait) != 0)
                     newOrientation = DisplayOrientation.Portrait;
-                else if ((supported & DisplayOrientation.PortraitUpsideDown) != 0)
-                    newOrientation = DisplayOrientation.PortraitUpsideDown;
+                else if ((supported & DisplayOrientation.PortraitDown) != 0)
+                    newOrientation = DisplayOrientation.PortraitDown;
             }
 
             DisplayOrientation oldOrientation = CurrentOrientation;
@@ -326,6 +380,13 @@ namespace Microsoft.Xna.Framework
 			{
 				throw new System.NotImplementedException ();
 			}
+
+            private set 
+            {
+                if (ScreenDeviceNameChanged != null)
+                    ScreenDeviceNameChanged (null, EventArgs.Empty);
+                throw new System.NotImplementedException ();
+            }
 		}
    
 
@@ -338,8 +399,8 @@ namespace Microsoft.Xna.Framework
             internal set
             {
                 clientBounds = value;
-                //if(ClientSizeChanged != null)
-                //    ClientSizeChanged(this, EventArgs.Empty);
+                if(ClientSizeChanged != null)
+                    ClientSizeChanged(this, EventArgs.Empty);
             }
 		}
 		
@@ -386,7 +447,7 @@ namespace Microsoft.Xna.Framework
                 {
                     DisplayOrientation supported = GetEffectiveSupportedOrientations();
                     ScreenOrientation requestedOrientation = ScreenOrientation.Unspecified;
-                    bool wasPortrait = _currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitUpsideDown;
+                    bool wasPortrait = _currentOrientation == DisplayOrientation.Portrait || _currentOrientation == DisplayOrientation.PortraitDown;
                     bool requestPortrait = false;
 
                     bool didOrientationChange = false;
@@ -413,7 +474,7 @@ namespace Microsoft.Xna.Framework
                                     requestedOrientation = (ScreenOrientation)ScreenOrientationAll.Portrait;
                                     requestPortrait = true;
                                     break;
-                                case DisplayOrientation.PortraitUpsideDown:
+                                case DisplayOrientation.PortraitDown:
                                     requestedOrientation = (ScreenOrientation)ScreenOrientationAll.ReversePortrait;
                                     requestPortrait = true;
                                     break;
@@ -432,8 +493,8 @@ namespace Microsoft.Xna.Framework
                             requestPortrait = false;
                         }
                         // Check if the requested orientation is either of the portrain orientations and any portrait orientation is supported.
-                        else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitUpsideDown) &&
-                                ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitUpsideDown)) != 0))
+                        else if ((value == DisplayOrientation.Portrait || value == DisplayOrientation.PortraitDown) &&
+                                ((supported & (DisplayOrientation.Portrait | DisplayOrientation.PortraitDown)) != 0))
                         {
                             didOrientationChange = true;
                             _currentOrientation = DisplayOrientation.Portrait;
@@ -448,7 +509,7 @@ namespace Microsoft.Xna.Framework
                         // so we need to clear them out.
                         if (wasPortrait != requestPortrait)
                         {
-                            TouchPanel.ReleaseAllTouches();
+                            TouchPanelState.ReleaseAllTouches();
                         }
 
                         Game.Activity.RequestedOrientation = requestedOrientation;
@@ -461,6 +522,7 @@ namespace Microsoft.Xna.Framework
 		}
 
         public event EventHandler<EventArgs> OrientationChanged;
+
 		public event EventHandler ClientSizeChanged;
 		public event EventHandler ScreenDeviceNameChanged;
 

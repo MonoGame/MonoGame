@@ -51,12 +51,16 @@ namespace Microsoft.Xna.Framework
                 MetroGamePlatform.LaunchParameters = protocolArgs.Uri.AbsoluteUri;
                 MetroGamePlatform.PreviousExecutionState = protocolArgs.PreviousExecutionState;
 
-                // Construct the game.
-                _game = new T();
+                // Construct the game if it does not exist
+                // Protocol can be used to reactivate a suspended game
+                if (_game == null)
+                {
+                    _game = new T();
 
-                ///Initializes it, if delegate was provided
-                if (_gameConstructorCustomizationDelegate != null)
-                    _gameConstructorCustomizationDelegate(_game, args);
+                    ///Initializes it, if delegate was provided
+                    if (_gameConstructorCustomizationDelegate != null)
+                        _gameConstructorCustomizationDelegate(_game, args);
+                }
             }
         }
 

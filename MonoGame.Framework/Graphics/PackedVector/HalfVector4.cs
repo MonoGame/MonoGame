@@ -75,6 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// Directly gets or sets the packed representation of the value.
         /// </summary>
         /// <value>The packed representation of the value.</value>
+        [CLSCompliant(false)]
         public ulong PackedValue
         {
             get
@@ -118,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <summary>
         /// Returns a value that indicates whether the current instance is equal to a specified object.
         /// </summary>
-        /// <param name="obj">The object with which to make the comparison.</param>
+        /// <param name="other">The object with which to make the comparison.</param>
         /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
         public bool Equals(HalfVector4 other)
         {

@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
 
-        private List<Shader> _shaderList = new List<Shader>();
+        private Shader[] _shaders;
 
 	    private readonly bool _isClone;
 
@@ -142,8 +142,8 @@ namespace Microsoft.Xna.Framework.Graphics
             Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
 
             // Copy the mutable members of the effect.
-            Parameters = new EffectParameterCollection(cloneSource.Parameters);
-            Techniques = new EffectTechniqueCollection(this, cloneSource.Techniques);
+            Parameters = cloneSource.Parameters.Clone();
+            Techniques = cloneSource.Techniques.Clone(this);
 
             // Make a copy of the immutable constant buffers.
             ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Take a reference to the original shader list.
-            _shaderList = cloneSource._shaderList;
+            _shaders = cloneSource._shaders;
         }
 
         /// <summary>
@@ -178,10 +178,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
-		public void End()
-		{
-		}
-
         protected internal virtual bool OnApply()
         {
             return false;
@@ -191,11 +187,24 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                if (!_isClone)
+                if (disposing)
                 {
-                    // Only the clone source can dispose the shaders.
-                    foreach (var shader in _shaderList)
-                        shader.Dispose();
+                    if (!_isClone)
+                    {
+                        // Only the clone source can dispose the shaders.
+                        if (_shaders != null)
+                        {
+                            foreach (var shader in _shaders)
+                                shader.Dispose();
+                        }
+                    }
+
+                    if (ConstantBuffers != null)
+                    {
+                        foreach (var buffer in ConstantBuffers)
+                            buffer.Dispose();
+                        ConstantBuffers = null;
+                    }
                 }
             }
 
@@ -235,10 +244,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// used to detect old packaged content.
         /// </summary>
         /// <remarks>
-        /// We should avoid supporting old versions for very long as
-        /// users should be rebuilding content when packaging their game.
+        /// We should avoid supporting old versions for very long if at all 
+        /// as users should be rebuilding content when packaging their game.
         /// </remarks>
-        private const int MGFXVersion = 3;
+        private const int MGFXVersion = 5;
 
 #if !PSM
 
@@ -266,7 +275,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			// Read in all the constant buffers.
 			var buffers = (int)reader.ReadByte ();
 			ConstantBuffers = new ConstantBuffer[buffers];
-			for (var c = 0; c < buffers; c++) {
+			for (var c = 0; c < buffers; c++) 
+            {
 				
 #if OPENGL
 				string name = reader.ReadString ();               
@@ -278,9 +288,10 @@ namespace Microsoft.Xna.Framework.Graphics
 				var sizeInBytes = (int)reader.ReadInt16 ();
 
 				// Read the parameter index values.
-				int[] parameters = new int[reader.ReadByte ()];
-				int[] offsets = new int[parameters.Length];
-				for (var i = 0; i < parameters.Length; i++) {
+				var parameters = new int[reader.ReadByte ()];
+				var offsets = new int[parameters.Length];
+				for (var i = 0; i < parameters.Length; i++) 
+                {
 					parameters [i] = (int)reader.ReadByte ();
 					offsets [i] = (int)reader.ReadUInt16 ();
 				}
@@ -294,77 +305,66 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Read in all the shader objects.
-            _shaderList = new List<Shader>();
             var shaders = (int)reader.ReadByte();
+            _shaders = new Shader[shaders];
             for (var s = 0; s < shaders; s++)
-            {
-                var shader = new Shader(GraphicsDevice, reader);
-                _shaderList.Add(shader);
-            }
+                _shaders[s] = new Shader(GraphicsDevice, reader);
 
             // Read in the parameters.
             Parameters = ReadParameters(reader);
 
             // Read the techniques.
-            Techniques = new EffectTechniqueCollection();
-            var techniques = (int)reader.ReadByte();
-            for (var t = 0; t < techniques; t++)
+            var techniqueCount = (int)reader.ReadByte();
+            var techniques = new EffectTechnique[techniqueCount];
+            for (var t = 0; t < techniqueCount; t++)
             {
                 var name = reader.ReadString();
 
                 var annotations = ReadAnnotations(reader);
 
-                var passes = ReadPasses(reader, this, _shaderList);
+                var passes = ReadPasses(reader, this, _shaders);
 
-                var technique = new EffectTechnique(this, name, passes, annotations);
-                Techniques.Add(technique);
-            }            
+                techniques[t] = new EffectTechnique(this, name, passes, annotations);
+            }
 
+            Techniques = new EffectTechniqueCollection(techniques);
             CurrentTechnique = Techniques[0];
         }
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
-            var collection = new EffectAnnotationCollection();
-
             var count = (int)reader.ReadByte();
             if (count == 0)
-                return collection;
+                return EffectAnnotationCollection.Empty;
+
+            var annotations = new EffectAnnotation[count];
 
             // TODO: Annotations are not implemented!
 
-            return collection;
+            return new EffectAnnotationCollection(annotations);
         }
 
-        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, List<Shader> shaders)
+        private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, Shader[] shaders)
         {
-            Shader vertexShader = null;
-            Shader pixelShader = null;
-
-            var collection = new EffectPassCollection();
-
             var count = (int)reader.ReadByte();
+            var passes = new EffectPass[count];
 
             for (var i = 0; i < count; i++)
             {
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
-                
-                // Assign these to the default shaders at this point? or do that in the effect pass.
                 // Get the vertex shader.
+                Shader vertexShader = null;
                 var shaderIndex = (int)reader.ReadByte();
                 if (shaderIndex != 255)
-                {
                     vertexShader = shaders[shaderIndex];
-                }
 
                 // Get the pixel shader.
+                Shader pixelShader = null;
                 shaderIndex = (int)reader.ReadByte();
                 if (shaderIndex != 255)
-                {
                     pixelShader = shaders[shaderIndex];
-                }
 
 				BlendState blend = null;
 				DepthStencilState depth = null;
@@ -421,20 +421,24 @@ namespace Microsoft.Xna.Framework.Graphics
 						SlopeScaleDepthBias = reader.ReadSingle(),
 					};
 				}
-				var pass = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
-				collection.Add(pass);         
+
+                passes[i] = new EffectPass(effect, name, vertexShader, pixelShader, blend, depth, raster, annotations);
 			}
 
-			return collection;
+            return new EffectPassCollection(passes);
 		}
 
 		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
-			var collection = new EffectParameterCollection();
-			var count = (int)reader.ReadByte();			if (count == 0)				return collection;
+			var count = (int)reader.ReadByte();			
+            if (count == 0)
+                return EffectParameterCollection.Empty;
+
+            var parameters = new EffectParameter[count];
 			for (var i = 0; i < count; i++)
 			{
-				var class_ = (EffectParameterClass)reader.ReadByte();				var type = (EffectParameterType)reader.ReadByte();
+				var class_ = (EffectParameterClass)reader.ReadByte();				
+                var type = (EffectParameterType)reader.ReadByte();
 				var name = reader.ReadString();
 				var semantic = reader.ReadString();
 				var annotations = ReadAnnotations(reader);
@@ -448,60 +452,91 @@ namespace Microsoft.Xna.Framework.Graphics
 				if (elements.Count == 0 && structMembers.Count == 0)
 				{
 					switch (type)
-					{						case EffectParameterType.Bool:						case EffectParameterType.Int32:							{								var buffer = new int[rowCount * columnCount];								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadInt32();								data = buffer;								break;							}
+					{						
+                        case EffectParameterType.Bool:
+                        case EffectParameterType.Int32:
+#if DIRECTX
+                            // Under DirectX we properly store integers and booleans
+                            // in an integer type.
+                            //
+                            // MojoShader on the otherhand stores everything in float
+                            // types which is why this code is disabled under OpenGL.
+					        {
+					            var buffer = new int[rowCount * columnCount];								
+                                for (var j = 0; j < buffer.Length; j++)
+                                    buffer[j] = reader.ReadInt32();
+                                data = buffer;
+                                break;
+					        }
+#endif
+
 						case EffectParameterType.Single:
 							{
 								var buffer = new float[rowCount * columnCount];
-								for (var j = 0; j < buffer.Length; j++)									buffer[j] = reader.ReadSingle();								data = buffer;								break;							}
-						case EffectParameterType.String:
-							throw new NotImplementedException();
-					};				}
-				var param = new EffectParameter(
+								for (var j = 0; j < buffer.Length; j++)
+                                    buffer[j] = reader.ReadSingle();
+                                data = buffer;
+                                break;							
+                            }
+
+                        case EffectParameterType.String:
+                            // TODO: We have not investigated what a string
+                            // type should do in the parameter list.  Till then
+                            // throw to let the user know.
+							throw new NotSupportedException();
+
+                        default:
+                            // NOTE: We skip over all other types as they 
+                            // don't get added to the constant buffer.
+					        break;
+					}
+                }
+
+				parameters[i] = new EffectParameter(
 					class_, type, name, rowCount, columnCount, semantic, 
 					annotations, elements, structMembers, data);
-
-				collection.Add(param);
 			}
 
-			return collection;
+			return new EffectParameterCollection(parameters);
 		}
 #else //PSM
 		internal void ReadEffect(BinaryReader reader)
 		{
-			var effectPass = new EffectPass(this, "Pass", null, null, BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone, new EffectAnnotationCollection());
+			var effectPass = new EffectPass(this, "Pass", null, null, null, DepthStencilState.Default, RasterizerState.CullNone, EffectAnnotationCollection.Empty);
 			effectPass._shaderProgram = new ShaderProgram(reader.ReadBytes((int)reader.BaseStream.Length));
 			var shaderProgram = effectPass._shaderProgram;
-			Parameters = new EffectParameterCollection();
+            
+            EffectParameter[] parametersArray = new EffectParameter[shaderProgram.UniformCount+4];
 			for (int i = 0; i < shaderProgram.UniformCount; i++)
 			{	
-			    Parameters.Add(EffectParameterForUniform(shaderProgram, i));
+                parametersArray[i]= EffectParameterForUniform(shaderProgram, i);
 			}
 			
 			#warning Hacks for BasicEffect as we don't have these parameters yet
-            Parameters.Add (new EffectParameter(
+            parametersArray[shaderProgram.UniformCount] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "SpecularColor",
-                3, 1, "float3",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[3]));
-            Parameters.Add (new EffectParameter(
+                3, 1, "float3",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[3]);
+            parametersArray[shaderProgram.UniformCount+1] = new EffectParameter(
                 EffectParameterClass.Scalar, EffectParameterType.Single, "SpecularPower",
-                1, 1, "float",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), 0.0f));
-            Parameters.Add (new EffectParameter(
+                1, 1, "float",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, 0.0f);
+            parametersArray[shaderProgram.UniformCount+2] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "FogVector",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
-            Parameters.Add (new EffectParameter(
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+            parametersArray[shaderProgram.UniformCount+3] = new EffectParameter(
                 EffectParameterClass.Vector, EffectParameterType.Single, "DiffuseColor",
-                4, 1, "float4",
-                new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]));
+                4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
+
+            Parameters = new EffectParameterCollection(parametersArray);
+                       
+            EffectPass []effectsPassArray = new EffectPass[1];
+            effectsPassArray[0] = effectPass;
+            var effectPassCollection = new EffectPassCollection(effectsPassArray);            
             
-            Techniques = new EffectTechniqueCollection();
-            var effectPassCollection = new EffectPassCollection();
-            effectPassCollection.Add(effectPass);
-            Techniques.Add(new EffectTechnique(this, "Name", effectPassCollection, new EffectAnnotationCollection()));
-       
-            ConstantBuffers = new ConstantBuffer[0];
+            EffectTechnique []effectTechniqueArray = new EffectTechnique[1]; 
+            effectTechniqueArray[0] = new EffectTechnique(this, "Name", effectPassCollection, EffectAnnotationCollection.Empty);
+            Techniques = new EffectTechniqueCollection(effectTechniqueArray);
             
+            ConstantBuffers = new ConstantBuffer[0];            
             CurrentTechnique = Techniques[0];
         }
         
@@ -521,18 +556,15 @@ namespace Microsoft.Xna.Framework.Graphics
             case ShaderUniformType.Float4x4:
                 return new EffectParameter(
                     EffectParameterClass.Matrix, EffectParameterType.Single, name,
-                    4, 4, "float4x4",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4 * 4]);
+                    4, 4, "float4x4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4 * 4]);
             case ShaderUniformType.Float4:
                 return new EffectParameter(
                     EffectParameterClass.Vector, EffectParameterType.Single, name,
-                    4, 1, "float4",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), new float[4]);
+                    4, 1, "float4",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, new float[4]);
             case ShaderUniformType.Sampler2D:
                 return new EffectParameter(
                     EffectParameterClass.Object, EffectParameterType.Texture2D, name,
-                    1, 1, "texture2d",
-                    new EffectAnnotationCollection(), new EffectParameterCollection(), new EffectParameterCollection(), null);
+                    1, 1, "texture2d",EffectAnnotationCollection.Empty, EffectParameterCollection.Empty, EffectParameterCollection.Empty, null);
             default:
                 throw new Exception("Uniform Type " + type + " Not yet implemented (" + name + ")");
             }

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<Template>
+	<TemplateConfiguration>
+		<_Name>MonoGame Content Extension</_Name>
+		<_Category>C#/MonoGame</_Category>
+		<LanguageName>C#</LanguageName>
+		<Icon>monogame-icon</Icon>
+		<_Description>Creates a MonoGame Content Extension Project</_Description>
+	</TemplateConfiguration>
+	
+	<Combine name = "${ProjectName}" directory = ".">
+		<Options>
+			<StartupProject>${ProjectName}</StartupProject>
+		</Options>
+		
+		<Project name = "${ProjectName}" directory = "." type = "DotNet">
+		    <Options Target = "Library" PauseConsoleOutput = "False" />
+			<References>
+				<Reference type="Gac" refto="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+				<Reference type="Gac" refto="MonoGame.Framework.Content.Pipeline" SpecificVersion="false" CopyLocal="false"/>
+				<Reference type="Gac" refto="MonoGame.Framework" SpecificVersion="false" CopyLocal="false"/>
+			</References>
+			<Files>
+			  <File name="ContentProcessor1.cs">
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+
+// TODO: replace these with the processor input and output types.
+using TInput = System.String;
+using TOutput = System.String;
+
+namespace ${Namespace} {
+	/// <summary>
+	/// This class will be instantiated by the XNA Framework Content Pipeline
+	/// to apply custom processing to content data, converting an object of
+	/// type TInput to TOutput. The input and output types may be the same if
+	/// the processor wishes to alter data without changing its type.
+	///
+	/// This should be part of a Content Pipeline Extension Library project.
+	///
+	/// TODO: change the ContentProcessor attribute to specify the correct
+	/// display name for this processor.
+	/// </summary>
+	[ContentProcessor(DisplayName = "${Namespace}.ContentProcessor1")]
+	public class ContentProcessor1 : ContentProcessor<TInput, TOutput> {
+		public override TOutput Process(TInput input, ContentProcessorContext context)
+		{
+			// TODO: process the input object, and return the modified data.
+			throw new NotImplementedException();
+		}
+	}
+}
+]]>		  
+			  </File>			
+			</Files>
+		</Project>
+	</Combine>
+</Template>

@@ -12,19 +12,31 @@ namespace Microsoft.Xna.Framework.Audio
     {
 		private PssSound _sound;
         private SoundPlayer _soundPlayer;
-		
+        bool disposed;
+        
         ~Sound()
         {
-            Dispose();
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            _soundPlayer.Stop();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                _soundPlayer.Stop();
             
-            // gives Error when Soundplayer is reused
-//			_soundPlayer.Dispose();
-            _sound.Dispose();
+                // gives Error when Soundplayer is reused
+                // _soundPlayer.Dispose();
+                _sound.Dispose();
+
+                disposed = true;
+            }
         }
 
         public void Resume()

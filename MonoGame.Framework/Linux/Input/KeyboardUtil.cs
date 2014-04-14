@@ -350,6 +350,12 @@ namespace Microsoft.Xna.Framework.Input
 				case OpenTK.Input.Key.Right:
 					return Keys.Right;
 	                    
+				case OpenTK.Input.Key.RShift:
+					return Keys.RightShift;
+	                    
+				case OpenTK.Input.Key.RWin:
+					return Keys.RightWindows;
+	                    
 				case OpenTK.Input.Key.S:
 					return Keys.S;
 	                    
@@ -360,7 +366,7 @@ namespace Microsoft.Xna.Framework.Input
 					return Keys.OemSemicolon;
 	                    
 				case OpenTK.Input.Key.Slash:
-					return Keys.None;
+					return Keys.OemQuestion;
 	                    
 				case OpenTK.Input.Key.Sleep:
 					return Keys.Sleep;

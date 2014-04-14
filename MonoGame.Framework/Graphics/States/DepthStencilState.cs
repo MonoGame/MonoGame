@@ -1,14 +1,14 @@
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
+#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 using GLStencilFunction = OpenTK.Graphics.OpenGL.StencilFunction;
-#elif PSM
-using Sce.PlayStation.Core.Graphics;
 #elif GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -16,6 +16,11 @@ using GLStencilFunction = OpenTK.Graphics.ES20.All;
 using StencilOp = OpenTK.Graphics.ES20.All;
 using DepthFunction = OpenTK.Graphics.ES20.All;
 #endif
+#elif PSM
+using Sce.PlayStation.Core.Graphics;
+#endif
+
+
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -64,30 +69,37 @@ namespace Microsoft.Xna.Framework.Graphics
 			StencilWriteMask = Int32.MaxValue;
 			ReferenceStencil = 0;
 		}
-		
-		public static readonly DepthStencilState Default;
-		public static readonly DepthStencilState DepthRead;
-		public static readonly DepthStencilState None;
+
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _default;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _depthRead;
+        private static readonly Utilities.ObjectFactoryWithReset<DepthStencilState> _none;
+
+        public static DepthStencilState Default { get { return _default.Value; } }
+        public static DepthStencilState DepthRead { get { return _depthRead.Value; } }
+        public static DepthStencilState None { get { return _none.Value; } }
 		
 		static DepthStencilState ()
 		{
-			Default = new DepthStencilState () 
+			_default = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
+                Name = "DepthStencilState.Default",
 				DepthBufferEnable = true,
 				DepthBufferWriteEnable = true
-			};
+			});
 			
-			DepthRead = new DepthStencilState () 
+			_depthRead = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = true,
+                Name = "DepthStencilState.DepthRead",
+                DepthBufferEnable = true,
 				DepthBufferWriteEnable = false
-			};
+			});
 			
-			None = new DepthStencilState () 
+			_none = new Utilities.ObjectFactoryWithReset<DepthStencilState>(() => new DepthStencilState
             {
-				DepthBufferEnable = false,
+                Name = "DepthStencilState.None",
+                DepthBufferEnable = false,
 				DepthBufferWriteEnable = false
-			};
+			});
 		}
 
 #if OPENGL
@@ -153,46 +165,72 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.Enable(EnableCap.StencilTest);
                 GraphicsExtensions.CheckGLError();
 
-                // Set color mask - not needed
-                //GL.ColorMask(false, false, false, false); //Disable drawing colors to the screen
                 // set function
-                GLStencilFunction func;
-                switch (StencilFunction)
+                if (this.TwoSidedStencilMode)
                 {
-                    default:
-                    case CompareFunction.Always:
-                        func = GLStencilFunction.Always;
-                        break;
-                    case CompareFunction.Equal:
-                        func = GLStencilFunction.Equal;
-                        break;
-                    case CompareFunction.Greater:
-                        func = GLStencilFunction.Greater;
-                        break;
-                    case CompareFunction.GreaterEqual:
-                        func = GLStencilFunction.Gequal;
-                        break;
-                    case CompareFunction.Less:
-                        func = GLStencilFunction.Less;
-                        break;
-                    case CompareFunction.LessEqual:
-                        func = GLStencilFunction.Lequal;
-                        break;
-                    case CompareFunction.Never:
-                        func = GLStencilFunction.Never;
-                        break;
-                    case CompareFunction.NotEqual:
-                        func = GLStencilFunction.Notequal;
-                        break;
+#if GLES
+                    var cullFaceModeFront = (All)CullFaceMode.Front;
+                    var cullFaceModeBack = (All)CullFaceMode.Back;
+                    var stencilFaceFront = (All)CullFaceMode.Front;
+                    var stencilFaceBack = (All)CullFaceMode.Back;
+#else
+                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
+                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
+                    var stencilFaceFront = StencilFace.Front;
+                    var stencilFaceBack = StencilFace.Back;
+#endif
+
+                    GL.StencilFuncSeparate(cullFaceModeFront, GetStencilFunc(this.StencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilFuncSeparate(cullFaceModeBack, GetStencilFunc(this.CounterClockwiseStencilFunction), 
+                                           this.ReferenceStencil, this.StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate(stencilFaceFront, GetStencilOp(this.StencilFail), 
+                                         GetStencilOp(this.StencilDepthBufferFail), 
+                                         GetStencilOp(this.StencilPass));
+                    GraphicsExtensions.CheckGLError();
+                    GL.StencilOpSeparate(stencilFaceBack, GetStencilOp(this.CounterClockwiseStencilFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilDepthBufferFail), 
+                                         GetStencilOp(this.CounterClockwiseStencilPass));
+                    GraphicsExtensions.CheckGLError();
+                }
+                else
+                {
+                    GL.StencilFunc(GetStencilFunc(this.StencilFunction), ReferenceStencil, StencilMask);
+                    GraphicsExtensions.CheckGLError();
+                    
+                    GL.StencilOp(GetStencilOp(StencilFail),
+                                 GetStencilOp(StencilDepthBufferFail),
+                                 GetStencilOp(StencilPass));
+                    GraphicsExtensions.CheckGLError();
                 }
 
-                GL.StencilFunc(func, ReferenceStencil, StencilMask);
-                GraphicsExtensions.CheckGLError();
+            }
+        }
 
-                GL.StencilOp(GetStencilOp(StencilFail),
-                                GetStencilOp(StencilDepthBufferFail),
-                                GetStencilOp(StencilPass));
-                GraphicsExtensions.CheckGLError();
+        private static GLStencilFunction GetStencilFunc(CompareFunction function)
+        {
+            switch (function)
+            {
+            case CompareFunction.Always:
+                return GLStencilFunction.Always;
+            case CompareFunction.Equal:
+                return GLStencilFunction.Equal;
+            case CompareFunction.Greater:
+                return GLStencilFunction.Greater;
+            case CompareFunction.GreaterEqual:
+                return GLStencilFunction.Gequal;
+            case CompareFunction.Less:
+                return GLStencilFunction.Less;
+            case CompareFunction.LessEqual:
+                return GLStencilFunction.Lequal;
+            case CompareFunction.Never:
+                return GLStencilFunction.Never;
+            case CompareFunction.NotEqual:
+                return GLStencilFunction.Notequal;
+            default:
+                return GLStencilFunction.Always;
             }
         }
 
@@ -222,6 +260,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #elif DIRECTX
+
+        protected internal override void GraphicsDeviceResetting()
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.GraphicsDeviceResetting();
+        }
 
         internal void ApplyState(GraphicsDevice device)
         {
@@ -276,8 +320,14 @@ namespace Microsoft.Xna.Framework.Graphics
             // locked the d3dContext for us to use.
 
             // Apply the state!
-            device._d3dContext.OutputMerger.DepthStencilReference = ReferenceStencil;
-            device._d3dContext.OutputMerger.DepthStencilState = _state;
+            device._d3dContext.OutputMerger.SetDepthStencilState(_state, ReferenceStencil);
+        }
+
+        internal static void ResetStates()
+        {
+            _default.Reset();
+            _depthRead.Reset();
+            _none.Reset();
         }
 
         static private SharpDX.Direct3D11.Comparison GetComparison( CompareFunction compare)
@@ -309,7 +359,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.Comparison.NotEqual;
 
                 default:
-                    throw new NotImplementedException("Invalid comparison!");
+                    throw new ArgumentException("Invalid comparison!");
             }
         }
 
@@ -342,15 +392,53 @@ namespace Microsoft.Xna.Framework.Graphics
                     return SharpDX.Direct3D11.StencilOperation.Zero;
 
                 default:
-                    throw new NotImplementedException("Invalid stencil operation!");
+                    throw new ArgumentException("Invalid stencil operation!");
             }
         }
 
 #endif // DIRECTX
 #if PSM
+        static readonly Dictionary<CompareFunction, DepthFuncMode> MapDepthCompareFunction = new Dictionary<CompareFunction, DepthFuncMode> {
+            { CompareFunction.Always,        DepthFuncMode.Always    },
+            { CompareFunction.Equal,         DepthFuncMode.Equal     },
+            { CompareFunction.GreaterEqual,  DepthFuncMode.GEqual    },
+            { CompareFunction.Greater,       DepthFuncMode.Greater   },
+            { CompareFunction.LessEqual,     DepthFuncMode.LEqual    },
+            { CompareFunction.Less,          DepthFuncMode.Less      },
+            { CompareFunction.NotEqual,      DepthFuncMode.NotEqual },
+            { CompareFunction.Never,         DepthFuncMode.Never     },
+        };
+        
+        static readonly Dictionary<CompareFunction, StencilFuncMode> MapStencilCompareFunction = new Dictionary<CompareFunction, StencilFuncMode> {
+            { CompareFunction.Always,        StencilFuncMode.Always    },
+            { CompareFunction.Equal,         StencilFuncMode.Equal     },
+            { CompareFunction.GreaterEqual,  StencilFuncMode.GEqual    },
+            { CompareFunction.Greater,       StencilFuncMode.Greater   },
+            { CompareFunction.LessEqual,     StencilFuncMode.LEqual    },
+            { CompareFunction.Less,          StencilFuncMode.Less      },
+            { CompareFunction.NotEqual,      StencilFuncMode.NotEqual },
+            { CompareFunction.Never,         StencilFuncMode.Never     },
+        };
+        
         internal void ApplyState(GraphicsDevice device)
         {
-            #warning Unimplemented
+            var g = device.Context;
+            
+            // FIXME: More advanced stencil attributes
+            
+            g.SetDepthFunc(
+                MapDepthCompareFunction[DepthBufferFunction],
+                DepthBufferWriteEnable
+            );
+            
+            g.Enable(EnableMode.DepthTest, DepthBufferEnable);
+            
+            g.SetStencilFunc(
+                MapStencilCompareFunction[StencilFunction],
+                ReferenceStencil, StencilMask, StencilWriteMask
+            );
+            
+            g.Enable(EnableMode.StencilTest, StencilEnable);
         }
 #endif
 	}

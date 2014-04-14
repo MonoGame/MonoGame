@@ -29,17 +29,11 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-    #if WINRT
     [DataContract]
-    #else
-    [Serializable]
-    #endif
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
@@ -60,17 +54,14 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-#if WINRT
+        
         [DataMember]
-#endif
         public float X;
-#if WINRT
+      
         [DataMember]
-#endif
         public float Y;
-#if WINRT
+      
         [DataMember]
-#endif
         public float Z;
 
         #endregion Public Fields
@@ -314,12 +305,20 @@ namespace Microsoft.Xna.Framework
 
         public override bool Equals(object obj)
         {
-            return (obj is Vector3) ? this == (Vector3)obj : false;
+            if (!(obj is Vector3))
+                return false;
+
+            var other = (Vector3)obj;
+            return  X == other.X &&
+                    Y == other.Y &&
+                    Z == other.Z;
         }
 
         public bool Equals(Vector3 other)
         {
-            return this == other;
+            return  X == other.X && 
+                    Y == other.Y &&
+                    Z == other.Z;
         }
 
         public override int GetHashCode()
@@ -568,6 +567,26 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public static void Transform(Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
+        {
+            Debug.Assert(sourceArray.Length - sourceIndex >= length, 
+                "The source array is too small for the given sourceIndex and length.");
+            Debug.Assert(destinationArray.Length - destinationIndex >= length,
+                "The destination array is too small for the given destinationIndex and length.");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < length; i++)
+            {
+                var position = sourceArray[sourceIndex + i];
+                destinationArray[destinationIndex + i] =
+                    new Vector3(
+                        (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
+                        (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
+                        (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
+            }
+        }
+
 	/// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
@@ -581,12 +600,12 @@ namespace Microsoft.Xna.Framework
             return result;
         }
 
-        /// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
-        /// <param name="result">The result of the operation.</param>
+        ///// <summary>
+        ///// Transforms a vector by a quaternion rotation.
+        ///// </summary>
+        ///// <param name="vec">The vector to transform.</param>
+        ///// <param name="quat">The quaternion to rotate the vector by.</param>
+        ///// <param name="result">The result of the operation.</param>
 //        public static void Transform(ref Vector3 vec, ref Quaternion quat, out Vector3 result)
 //        {
 //		// Taken from the OpentTK implementation of Vector3
@@ -604,8 +623,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
-        /// <param name="vec">The vector to transform.</param>
-        /// <param name="quat">The quaternion to rotate the vector by.</param>
+        /// <param name="value">The vector to transform.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector3 result)
         {
@@ -617,6 +636,69 @@ namespace Microsoft.Xna.Framework
             result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
             result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
         }
+
+        /// <summary>
+        /// Transforms an array of vectors by a quaternion rotation.
+        /// </summary>
+        /// <param name="sourceArray">The vectors to transform</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
+        /// <param name="destinationArray">The result of the operation.</param>
+        public static void Transform(Vector3[] sourceArray, ref Quaternion rotation, Vector3[] destinationArray)
+        {
+            Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var position = sourceArray[i];
+
+                float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
+                float y = 2 * (rotation.Z * position.X - rotation.X * position.Z);
+                float z = 2 * (rotation.X * position.Y - rotation.Y * position.X);
+
+                destinationArray[i] =
+                    new Vector3(
+                        position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+                        position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+                        position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+            }
+        }
+
+        /// <summary>
+        /// Transforms an array of vectors within a given range by a quaternion rotation.
+        /// </summary>
+        /// <param name="sourceArray">The vectors to transform.</param>
+        /// <param name="sourceIndex">The starting index in the source array.</param>
+        /// <param name="rotation">The quaternion to rotate the vector by.</param>
+        /// <param name="destinationArray">The array to store the result of the operation.</param>
+        /// <param name="destinationIndex">The starting index in the destination array.</param>
+        /// <param name="length">The number of vectors to transform.</param>
+        public static void Transform(Vector3[] sourceArray, int sourceIndex, ref Quaternion rotation, Vector3[] destinationArray, int destinationIndex, int length)
+        {
+            Debug.Assert(sourceArray.Length - sourceIndex >= length,
+                "The source array is too small for the given sourceIndex and length.");
+            Debug.Assert(destinationArray.Length - destinationIndex >= length,
+                "The destination array is too small for the given destinationIndex and length.");
+
+            // TODO: Are there options on some platforms to implement a vectorized version of this?
+
+            for (var i = 0; i < length; i++) 
+            {
+                var position = sourceArray[sourceIndex + i];
+
+                float x = 2 * (rotation.Y * position.Z - rotation.Z * position.Y);
+                float y = 2 * (rotation.Z * position.X - rotation.X * position.Z);
+                float z = 2 * (rotation.X * position.Y - rotation.Y * position.X);
+
+                destinationArray[destinationIndex + i] =
+                    new Vector3(
+                        position.X + x * rotation.W + (rotation.Y * z - rotation.Z * y),
+                        position.Y + y * rotation.W + (rotation.Z * x - rotation.X * z),
+                        position.Z + z * rotation.W + (rotation.X * y - rotation.Y * x));
+            }
+        }
+
 
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {

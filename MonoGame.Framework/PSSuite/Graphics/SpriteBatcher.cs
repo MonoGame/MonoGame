@@ -52,8 +52,8 @@ namespace Microsoft.Xna.Framework.Graphics
 	internal class SpriteBatcher
 	{
 #warning Magic numbers? How i set this on my game?        
-		private const int InitialBatchSize = 10000;
-		private const int InitialVertexArraySize = 10000;
+		private const int InitialBatchSize = 2000;
+		private const int InitialVertexArraySize = 2000;
         
 		List<SpriteBatchItem> _batchItemList;
 		Queue<SpriteBatchItem> _freeBatchItemQueue;
@@ -223,10 +223,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var vertexCount = end - start;
-
-#warning this should be applied somewhere else
-            _device._graphics.Enable(EnableMode.Blend);  
-            _device._graphics.SetBlendFunc(BlendFuncMode.Add, BlendFuncFactor.One, BlendFuncFactor.OneMinusSrcAlpha);
             _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
 		}
 	}

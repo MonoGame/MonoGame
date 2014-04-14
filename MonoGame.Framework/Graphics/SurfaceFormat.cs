@@ -64,6 +64,10 @@ namespace Microsoft.Xna.Framework.Graphics
         HalfVector2 = 17,
         HalfVector4 = 18,
         HdrBlendable = 19,
+
+        // BGRA formats are required for compatibility with WPF D3DImage.
+        Bgr32 = 20,     // B8G8R8X8
+        Bgra32 = 21,    // B8G8R8A8
         
 		// Good explanation of compressed formats for mobile devices (aimed at Android, but describes PVRTC)
 		// http://developer.motorola.com/docstools/library/understanding-texture-compression/
@@ -76,6 +80,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		// Ericcson Texture Compression (Android)
 		RgbEtc1 = 60,
+
+        // DXT1 also has a 1-bit alpha form
+        Dxt1a = 70,
     }
     
     public enum SurfaceFormat_Legacy

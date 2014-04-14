@@ -73,22 +73,24 @@ namespace Microsoft.Xna.Framework
 {
     public static class OrientationConverter
     {
+        [CLSCompliant(false)]
         public static DisplayOrientation UIDeviceOrientationToDisplayOrientation(UIDeviceOrientation orientation)
         {
             switch (orientation)
             {
-            case UIDeviceOrientation.FaceDown: return DisplayOrientation.FaceDown;
-            case UIDeviceOrientation.FaceUp: return DisplayOrientation.FaceUp;
+            case UIDeviceOrientation.FaceDown: return DisplayOrientation.Unknown;
+            case UIDeviceOrientation.FaceUp: return DisplayOrientation.Unknown;
             default:
 			// NOTE: in XNA, Orientation Left is a 90 degree rotation counterclockwise, while on iOS
 			// it is a 90 degree rotation CLOCKWISE. They are BACKWARDS! 
             case UIDeviceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeRight;
             case UIDeviceOrientation.LandscapeRight: return DisplayOrientation.LandscapeLeft;
             case UIDeviceOrientation.Portrait: return DisplayOrientation.Portrait;
-            case UIDeviceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitUpsideDown;
+            case UIDeviceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitDown;
             }
         }
 
+        [CLSCompliant(false)]
         public static DisplayOrientation ToDisplayOrientation(UIInterfaceOrientation orientation)
         {
             switch (orientation)
@@ -99,26 +101,27 @@ namespace Microsoft.Xna.Framework
             case UIInterfaceOrientation.LandscapeLeft: return DisplayOrientation.LandscapeRight;
             case UIInterfaceOrientation.LandscapeRight: return DisplayOrientation.LandscapeLeft;
             case UIInterfaceOrientation.Portrait: return DisplayOrientation.Portrait;
-            case UIInterfaceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitUpsideDown;
+            case UIInterfaceOrientation.PortraitUpsideDown: return DisplayOrientation.PortraitDown;
             }
         }
 
+        [CLSCompliant(false)]
         public static UIInterfaceOrientationMask ToUIInterfaceOrientationMask (DisplayOrientation orientation)
         {
             switch (Normalize(orientation))
             {
-                case((DisplayOrientation)1):
-                case((DisplayOrientation)6):
+                case((DisplayOrientation)0):
+                case((DisplayOrientation)3):
                     return UIInterfaceOrientationMask.Landscape;
-                case((DisplayOrientation)2):
+                case((DisplayOrientation)1):
                     return UIInterfaceOrientationMask.LandscapeLeft;
-                case((DisplayOrientation)4):
+                case((DisplayOrientation)2):
                     return UIInterfaceOrientationMask.LandscapeRight;
-                case((DisplayOrientation)16):
+                case((DisplayOrientation)4):
                     return UIInterfaceOrientationMask.Portrait;
-                case((DisplayOrientation)32):
+                case((DisplayOrientation)8):
                     return UIInterfaceOrientationMask.PortraitUpsideDown;
-                case((DisplayOrientation)14):
+                case((DisplayOrientation)7):
                     return UIInterfaceOrientationMask.AllButUpsideDown;
                 default:
                     return UIInterfaceOrientationMask.All;
@@ -130,7 +133,7 @@ namespace Microsoft.Xna.Framework
             var normalized = orientation;
 			
 			// Xna's "default" displayorientation is Landscape Left/Right.
-            if ((normalized & DisplayOrientation.Default) != 0)
+            if (normalized == DisplayOrientation.Default)
             {
                 normalized |= DisplayOrientation.LandscapeLeft;
 				normalized |= DisplayOrientation.LandscapeRight;

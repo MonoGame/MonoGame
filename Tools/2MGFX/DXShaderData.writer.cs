@@ -9,14 +9,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             writer.Write(IsVertexShader);
 
-            writer.Write((ushort)ShaderCode.Length);
+            writer.Write(ShaderCode.Length);
             writer.Write(ShaderCode);
 
             writer.Write((byte)_samplers.Length);
             foreach (var sampler in _samplers)
             {
                 writer.Write((byte)sampler.type);
-                writer.Write((byte)sampler.index);
+                writer.Write((byte)sampler.textureSlot);
+                writer.Write((byte)sampler.samplerSlot);
 
 				if (sampler.state != null)
 				{

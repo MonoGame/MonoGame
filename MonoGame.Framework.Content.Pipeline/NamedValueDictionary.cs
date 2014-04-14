@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
-    public class NamedValueDictionary<T> : IDictionary<string, T>, ICollection<KeyValuePair<string, T>>, IEnumerable<KeyValuePair<string, T>>, IEnumerable
+    public class NamedValueDictionary<T> : IDictionary<string, T>
     {
-        Dictionary<string, T> dict = new Dictionary<string,T>();
+        readonly Dictionary<string, T> dict = new Dictionary<string,T>();
 
         /// <summary>
         /// Initializes an instance of NamedValueDictionary.
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>true if the value is present; false otherwise.</returns>
         public bool TryGetValue(string key, out T value)
         {
-            return TryGetValue(key, out value);
+            return dict.TryGetValue(key, out value);
         }
 
         /// <summary>

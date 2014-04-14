@@ -32,11 +32,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
 	// TODO [TypeConverter(ExpandableObjectConverter)]
-#if WINRT
     [DataContract]
-#else
-    [Serializable]
-#endif
     public class Curve
     {
         #region Private Fields
@@ -50,22 +46,26 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
+        [DataMember]
         public bool IsConstant
         {
             get { return this.keys.Count <= 1; }
         }
 
+        [DataMember]
         public CurveKeyCollection Keys
         {
             get { return this.keys; }
         }
 
+        [DataMember]
         public CurveLoopType PostLoop
         {
             get { return this.postLoop; }
             set { this.postLoop = value; }
         }
 
+        [DataMember]
         public CurveLoopType PreLoop
         {
             get { return this.preLoop; }

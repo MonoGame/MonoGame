@@ -66,12 +66,14 @@ namespace Microsoft.Xna.Framework.Media
             _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
         }
 
+        /*
         public Texture2D GetTexture()
         {
 			// Coming Soon
 			throw new NotImplementedException();
 			// TODO when Xamarin implement the relevant functions return currentFrame;
         }
+        */
 
         public void Pause()
         {

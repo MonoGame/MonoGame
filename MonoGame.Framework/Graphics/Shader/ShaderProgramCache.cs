@@ -82,8 +82,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void Link(Shader vertexShader, Shader pixelShader)
         {
-            // TODO: Shouldn't we be calling GL.DeleteProgram() somewhere?
-
             // NOTE: No need to worry about background threads here
             // as this is only called at draw time when we're in the
             // main drawing thread.
@@ -121,6 +119,13 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !GLES
                 var log = GL.GetProgramInfoLog(program);
                 Console.WriteLine(log);
+#endif
+                GL.DetachShader(program, vertexShader.GetShaderHandle());
+                GL.DetachShader(program, pixelShader.GetShaderHandle());
+#if MONOMAC
+                GL.DeleteProgram(1, ref program);
+#else
+                GL.DeleteProgram(program);
 #endif
                 throw new InvalidOperationException("Unable to link effect program");
             }

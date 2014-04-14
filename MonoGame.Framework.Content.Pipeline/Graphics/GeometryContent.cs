@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public GeometryContent()
         {
             indices = new IndexCollection();
-            vertices = new VertexContent();
+            vertices = new VertexContent(this);
         }
     }
 }

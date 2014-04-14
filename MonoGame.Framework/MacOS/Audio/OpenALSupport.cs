@@ -88,21 +88,16 @@ namespace Microsoft.Xna.Framework.Audio
 		public static bool GetDataFromExtAudioFile (ExtAudioFile ext, AudioStreamBasicDescription outputFormat, int maxBufferSize,
 		                                       byte[] dataBuffer, out int dataBufferSize, out ALFormat format, out double sampleRate)
 		{
-			int errorStatus = 0;
-			int bufferSizeInFrames = 0;
+			uint errorStatus = 0;
+			uint bufferSizeInFrames = 0;
 			dataBufferSize = 0;
 			format = ALFormat.Mono16;
 			sampleRate = 0;
 			/* Compute how many frames will fit into our max buffer size */
-			bufferSizeInFrames = maxBufferSize / outputFormat.BytesPerFrame;
+			bufferSizeInFrames = (uint)(maxBufferSize / outputFormat.BytesPerFrame);
 
 			if (dataBuffer != null) {
-				MutableAudioBufferList audioBufferList = new MutableAudioBufferList (1, maxBufferSize);
-
-				audioBufferList.Buffers [0].DataByteSize = maxBufferSize;
-				audioBufferList.Buffers [0].NumberChannels = outputFormat.ChannelsPerFrame;
-
-
+				var audioBufferList = new AudioBuffers(maxBufferSize);
 
 				// This a hack so if there is a problem speak to kjpou1 -Kenneth
 				// the cleanest way is to copy the buffer to the pointer already allocated
@@ -111,17 +106,13 @@ namespace Microsoft.Xna.Framework.Audio
 				GCHandle meBePinned = GCHandle.Alloc (dataBuffer, GCHandleType.Pinned);
 				IntPtr meBePointer = meBePinned.AddrOfPinnedObject ();
 
-				// Let's not use copy for right now while we test this.  For very large files this
-				//  might show some stutter in the sound loading
-				//Marshal.Copy(dataBuffer, 0, audioBufferList.Buffers[0].Data, maxBufferSize);
-				IntPtr savedDataPtr = audioBufferList.Buffers [0].Data;
-				audioBufferList.Buffers [0].Data = meBePointer;
-
+				audioBufferList.SetData (0, meBePointer);
 
 				try {
 					// Read the data into an AudioBufferList
 					// errorStatus here returns back the amount of information read
-					errorStatus = ext.Read (bufferSizeInFrames, audioBufferList);
+					ExtAudioFileError extAudioFileError = ExtAudioFileError.OK;
+					errorStatus = ext.Read (bufferSizeInFrames, audioBufferList, out extAudioFileError);
 					if (errorStatus >= 0) {
 						/* Success */
 						/* Note: 0 == bufferSizeInFrames is a legitimate value meaning we are EOF. */
@@ -129,7 +120,7 @@ namespace Microsoft.Xna.Framework.Audio
 						/* ExtAudioFile.Read returns the number of frames actually read.
 						 * Need to convert back to bytes.
 						 */
-						dataBufferSize = bufferSizeInFrames * outputFormat.BytesPerFrame;
+						dataBufferSize = (int)bufferSizeInFrames * outputFormat.BytesPerFrame;
 
 						// Now we set our format
 						format = outputFormat.ChannelsPerFrame > 1 ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -150,7 +141,7 @@ namespace Microsoft.Xna.Framework.Audio
 					// Don't forget to free our dataBuffer memory pointer that was pinned above
 					meBePinned.Free ();
 					// and restore what was allocated to beginwith
-					audioBufferList.Buffers[0].Data = savedDataPtr;
+					audioBufferList.SetData (0, IntPtr.Zero);
 				}
 
 

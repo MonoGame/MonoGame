@@ -58,10 +58,12 @@ namespace Microsoft.Xna.Framework.Media
 			_game = Game.Instance;
         }
 
+        /*
         public Texture2D GetTexture()
         {
 			throw new NotImplementedException();
         }
+        */
 
         public void Pause()
         {

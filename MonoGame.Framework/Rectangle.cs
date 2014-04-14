@@ -28,10 +28,11 @@ SOFTWARE.
 using System;
 using System.Globalization;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
-
+    [DataContract]
     public struct Rectangle : IEquatable<Rectangle>
     {
         #region Private Fields
@@ -40,16 +41,21 @@ namespace Microsoft.Xna.Framework
 
         #endregion Private Fields
 
-
         #region Public Fields
 
+        [DataMember]
         public int X;
+
+        [DataMember]
         public int Y;
+
+        [DataMember]
         public int Width;
+
+        [DataMember]
         public int Height;
 
         #endregion Public Fields
-
 
         #region Public Properties
 
@@ -80,7 +86,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Public Properties
 
-
         #region Constructors
 
         public Rectangle(int x, int y, int width, int height)
@@ -93,7 +98,6 @@ namespace Microsoft.Xna.Framework
 
         #endregion Constructors
 
-
         #region Public Methods
 
         public static bool operator ==(Rectangle a, Rectangle b)
@@ -105,8 +109,18 @@ namespace Microsoft.Xna.Framework
         {
             return ((((this.X <= x) && (x < (this.X + this.Width))) && (this.Y <= y)) && (y < (this.Y + this.Height)));
         }
+
+        public bool Contains(float x, float y)
+        {
+            return ((((this.X <= x) && (x < (this.X + this.Width))) && (this.Y <= y)) && (y < (this.Y + this.Height)));
+        }
 		
         public bool Contains(Point value)
+        {
+            return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
+        }
+
+        public bool Contains(Vector2 value)
         {
             return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
         }
@@ -150,16 +164,10 @@ namespace Microsoft.Xna.Framework
 		{
 			get 
 			{
-				// This is incorrect
-				//return new Point( (this.X + this.Width) / 2,(this.Y + this.Height) / 2 );
-				// What we want is the Center of the rectangle from the X and Y Origins
 				return new Point(this.X + (this.Width / 2), this.Y + (this.Height / 2));
 			}
 		}
-
-
-
-
+           
         public void Inflate(int horizontalValue, int verticalValue)
         {
             X -= horizontalValue;

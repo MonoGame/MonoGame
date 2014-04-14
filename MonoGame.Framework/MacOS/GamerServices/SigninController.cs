@@ -10,6 +10,7 @@ using MonoMac.ObjCRuntime;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+	[CLSCompliant(false)]
 	public partial class SigninController : MonoMac.AppKit.NSWindowController
 	{
 		
@@ -89,7 +90,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			tableView = new NSTableView(new RectangleF(0,0,420, 123));
 			tableView.UsesAlternatingRowBackgroundColors = true;
 			
-			NSTableColumn colGamerTag = new NSTableColumn(new NSString("Gamer"));
+			NSTableColumn colGamerTag = new NSTableColumn("Gamer");
 			tableView.AddColumn(colGamerTag);
 			
 			colGamerTag.Width = 420;
@@ -178,7 +179,8 @@ namespace Microsoft.Xna.Framework.GamerServices
 			
 		}		
 	}
-	
+
+	[CLSCompliant(false)]
 	public class GamersDataSource : NSTableViewDataSource
 	{
 		
@@ -210,6 +212,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		
 	}
 	
+	[CLSCompliant(false)]
 	public class GamersTableDelegate : NSTableViewDelegate
 	{
 		SigninController controller;

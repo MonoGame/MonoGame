@@ -6,6 +6,17 @@ using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
+    /// <summary>
+    /// Identifies the components of a type writer. Custom content writers must apply this attribute to their class as well as extend the ContentTypeWriter class.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class ContentTypeWriterAttribute : Attribute { }
+    public sealed class ContentTypeWriterAttribute : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the ContentTypeWriterAttribute class.
+        /// </summary>
+        public ContentTypeWriterAttribute()
+        {
+        }
+    }
 }

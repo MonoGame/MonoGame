@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content
 					surfaceFormat = SurfaceFormat.Color;
 					break;
 				default:
-					throw new NotImplementedException();
+					throw new NotSupportedException("Unsupported legacy surface format.");
 				}
 			}
             else
@@ -84,6 +84,17 @@ namespace Microsoft.Xna.Framework.Content
 			int width = (reader.ReadInt32 ());
 			int height = (reader.ReadInt32 ());
 			int levelCount = (reader.ReadInt32 ());
+            int levelCountOutput = levelCount;
+
+            // If the system does not fully support Power of Two textures,
+            // skip any mip maps supplied with any non PoT textures.
+			if (levelCount > 1 && !GraphicsCapabilities.SupportsNonPowerOfTwo &&
+                (!MathHelper.IsPowerOfTwo(width) || !MathHelper.IsPowerOfTwo(height)))
+            {
+                levelCountOutput = 1;
+                System.Diagnostics.Debug.WriteLine(
+                    "Device does not support non Power of Two textures. Skipping mipmaps.");
+            }
 
 			SurfaceFormat convertedFormat = surfaceFormat;
 			switch (surfaceFormat)
@@ -99,11 +110,16 @@ namespace Microsoft.Xna.Framework.Content
 				case SurfaceFormat.Dxt5:
 					convertedFormat = SurfaceFormat.RgbaPvrtc4Bpp;
 					break;
-#elif ANDROID || PSM
+#else
 				case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1a:
+                    if (!GraphicsCapabilities.SupportsDxt1)
+                        convertedFormat = SurfaceFormat.Color;
+                    break;
 				case SurfaceFormat.Dxt3:
 				case SurfaceFormat.Dxt5:
-					convertedFormat = SurfaceFormat.Color;
+                    if (!GraphicsCapabilities.SupportsS3tc)
+					    convertedFormat = SurfaceFormat.Color;
 					break;
 #endif
 				case SurfaceFormat.NormalizedByte4:
@@ -112,7 +128,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
             if (existingInstance == null)
-			    texture = new Texture2D(reader.GraphicsDevice, width, height, levelCount > 1, convertedFormat);
+                texture = new Texture2D(reader.GraphicsDevice, width, height, levelCountOutput > 1, convertedFormat);
             else
                 texture = existingInstance;
 			
@@ -122,19 +138,28 @@ namespace Microsoft.Xna.Framework.Content
 				byte[] levelData = reader.ReadBytes (levelDataSizeInBytes);
                 int levelWidth = width >> level;
                 int levelHeight = height >> level;
+
+                if (level >= levelCountOutput)
+                {
+                    continue;
+                }
+
 				//Convert the image data if required
 				switch (surfaceFormat)
 				{
-#if ANDROID || PSM
-					//no Dxt in OpenGL ES
+#if !IOS
 					case SurfaceFormat.Dxt1:
-						levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
+                    case SurfaceFormat.Dxt1a:
+                        if (!GraphicsCapabilities.SupportsDxt1)
+						    levelData = DxtUtil.DecompressDxt1(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt3:
-						levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
+                        if (!GraphicsCapabilities.SupportsS3tc)
+						    levelData = DxtUtil.DecompressDxt3(levelData, levelWidth, levelHeight);
 						break;
 					case SurfaceFormat.Dxt5:
-						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
+                        if (!GraphicsCapabilities.SupportsS3tc)
+    						levelData = DxtUtil.DecompressDxt5(levelData, levelWidth, levelHeight);
 						break;
 #endif
 					case SurfaceFormat.Bgr565:

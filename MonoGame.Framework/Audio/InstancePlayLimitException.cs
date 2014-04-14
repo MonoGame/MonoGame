@@ -44,11 +44,10 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-#if WINRT
     [DataContract]
+#if WINRT
     public sealed class InstancePlayLimitException : Exception
 #else
-    [Serializable]
     public sealed class InstancePlayLimitException : ExternalException
 #endif
 	{

@@ -35,8 +35,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class DisplayModeCollection : IEnumerable<DisplayMode>, IEnumerable
     {
-        private List<DisplayMode> modes;
-        
+        private readonly List<DisplayMode> modes;
+
         public IEnumerable<DisplayMode> this[SurfaceFormat format]
         {
             get {
@@ -58,14 +58,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return modes.GetEnumerator();
         }
 
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return modes.GetEnumerator();
         }
         
         public DisplayModeCollection(List<DisplayMode> setmodes) {
