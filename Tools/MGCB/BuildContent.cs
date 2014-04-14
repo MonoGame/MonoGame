@@ -118,7 +118,7 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
-            sourceFile = NormalizePath(sourceFile);
+            sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
             var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
@@ -151,7 +151,7 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
-            sourceFile = NormalizePath(sourceFile);
+            sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
             var previous = _copyItems.FindIndex(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
@@ -182,9 +182,9 @@ namespace MGCB
 
         public void Build(out int successCount, out int errorCount)
         {
-            var projectDirectory = NormalizePath(Directory.GetCurrentDirectory());
-            var outputPath = NormalizePath(Path.GetFullPath(Path.Combine(projectDirectory, OutputDir)));
-            var intermediatePath = NormalizePath(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+            var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
+            var outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, OutputDir)));
+            var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
 
@@ -307,15 +307,6 @@ namespace MGCB
                     ++errorCount;
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns a path with a standardized (forward slash) directory separator char.
-        /// </summary>
-        private string NormalizePath(string path)
-        {
-            return path.Replace(Path.DirectorySeparatorChar, '/')
-                       .Replace(Path.DirectorySeparatorChar, '/');
         }
     }
 }
