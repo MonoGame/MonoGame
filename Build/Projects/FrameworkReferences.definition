@@ -201,6 +201,9 @@
   </Platform>
 
   <Platform Type="Web">
+    <Binary
+      Name="ProtoBuf"
+      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
     <Reference Include="JSIL.Meta" />
   </Platform>
 
