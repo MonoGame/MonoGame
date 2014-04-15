@@ -521,7 +521,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if LINUX
+#if LINUX || (WINDOWS && OPENGL)
                 return _game.Platform.VSyncEnabled;
 #else
                 return _synchronizedWithVerticalRetrace;
@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework
             }
             set
             {
-#if LINUX
+#if LINUX || (WINDOWS && OPENGL)
                 // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
                 _game.Platform.VSyncEnabled = value;
 #else
