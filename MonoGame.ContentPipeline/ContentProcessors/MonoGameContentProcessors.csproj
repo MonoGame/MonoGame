@@ -84,53 +84,53 @@
     <Compile Include="..\..\Tools\2MGFX\CompilerInclude.cs">
       <Link>Processors\Effect\CompilerInclude.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.cs">
-      <Link>Processors\Effect\DXConstantBufferData.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBufferData.cs">
+      <Link>Processors\Effect\ConstantBufferData.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.mojo.cs">
-      <Link>Processors\Effect\DXConstantBufferData.mojo.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBufferData.mojo.cs">
+      <Link>Processors\Effect\ConstantBufferData.mojo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.sharpdx.cs">
-      <Link>Processors\Effect\DXConstantBufferData.sharpdx.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBufferData.sharpdx.cs">
+      <Link>Processors\Effect\ConstantBufferData.sharpdx.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXConstantBufferData.writer.cs">
-      <Link>Processors\Effect\DXConstantBufferData.writer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ConstantBufferData.writer.cs">
+      <Link>Processors\Effect\ConstantBufferData.writer.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.cs">
-      <Link>Processors\Effect\DXEffectObject.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\EffectObject.cs">
+      <Link>Processors\Effect\EffectObject.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.hlsl.cs">
-      <Link>Processors\Effect\DXEffectObject.hlsl.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\EffectObject.hlsl.cs">
+      <Link>Processors\Effect\EffectObject.hlsl.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXEffectObject.writer.cs">
-      <Link>Processors\Effect\DXEffectObject.writer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\EffectObject.pssl.cs">
+      <Link>Processors\Effect\EffectObject.pssl.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXExpression.cs">
-      <Link>Processors\Effect\DXExpression.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\EffectObject.writer.cs">
+      <Link>Processors\Effect\EffectObject.writer.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXHelper.cs">
-      <Link>Processors\Effect\DXHelper.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\MarshalHelper.cs">
+      <Link>Processors\Effect\MarshalHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXPreshader.cs">
-      <Link>Processors\Effect\DXPreshader.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\PassInfo.cs">
+      <Link>Processors\Effect\PassInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXPreshader.writer.cs">
-      <Link>Processors\Effect\DXPreshader.writer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\SamplerStateInfo.cs">
+      <Link>Processors\Effect\SamplerStateInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXShaderData.cs">
-      <Link>Processors\Effect\DXShaderData.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.cs">
+      <Link>Processors\Effect\ShaderData.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXShaderData.mojo.cs">
-      <Link>Processors\Effect\DXShaderData.mojo.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.mojo.cs">
+      <Link>Processors\Effect\ShaderData.mojo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXShaderData.sharpdx.cs">
-      <Link>Processors\Effect\DXShaderData.sharpdx.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.pssl.cs">
+      <Link>Processors\Effect\ShaderData.pssl.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\DXShaderData.writer.cs">
-      <Link>Processors\Effect\DXShaderData.writer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.sharpdx.cs">
+      <Link>Processors\Effect\ShaderData.sharpdx.cs</Link>
     </Compile>
-    <Compile Include="..\..\Tools\2MGFX\GLSLOptimizer.cs">
-      <Link>Processors\Effect\GLSLOptimizer.cs</Link>
+    <Compile Include="..\..\Tools\2MGFX\ShaderData.writer.cs">
+      <Link>Processors\Effect\ShaderData.writer.cs</Link>
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\MojoShader.cs">
       <Link>Processors\Effect\MojoShader.cs</Link>
@@ -152,6 +152,15 @@
     </Compile>
     <Compile Include="..\..\Tools\2MGFX\ShaderInfo.cs">
       <Link>Processors\Effect\ShaderInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ShaderProfile.cs">
+      <Link>Processors\Effect\ShaderProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\TechniqueInfo.cs">
+      <Link>Processors\Effect\TechniqueInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tools\2MGFX\TextureFilterType.cs">
+      <Link>Processors\Effect\TextureFilterType.cs</Link>
     </Compile>
     <Compile Include="AudioConverter.cs" />
     <Compile Include="ContentHelper.cs" />

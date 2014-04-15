@@ -1,4 +1,4 @@
-# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://build.monogame.net/job/develop-win/badge/icon)](http://build.monogame.net/job/develop-win/)
+# [MonoGame](http://monogame.net/) <a href='http://monogame.net/' target='_blank'><img src='https://github.com/mono/MonoGame/blob/develop/Graphics/Logos/MonogameLogo32x32.png?raw=true' width='16' height='16'></a> [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/project.html?projectId=MonoGame&guest=1)
 
 [MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework. 
 
@@ -22,7 +22,7 @@ There are a few pre-requisites that you should be aware of for the various platf
 
 There are four quick start options available:
 * Download the current stable release from [our website](http://monogame.net/downloads).
-* Download the latest "unstable" installer from [our build server](http://build.monogame.net/job/develop-win/lastSuccessfulBuild/artifact/Installers/Windows/).
+* Download the latest "unstable" installer from [our build server](http://teamcity.monogame.net/viewLog.html?buildTypeId=MonoGame_DevelopWin&buildId=lastSuccessful&tab=artifacts&buildBranch=%3Cdefault%3E&guest=1).
 * Download the latest [source code](https://github.com/mono/MonoGame/archive/develop.zip).
 * Fork and clone the repo: `https://github.com/mono/MonoGame.git`.
 

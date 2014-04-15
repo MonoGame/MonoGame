@@ -147,8 +147,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 	public static class Guide
 	{
-		private static int _showKeyboardInputRequestCount;
-
 		private static GKLeaderboardViewController leaderboardController;
 		private static GKAchievementViewController achievementController;
 		private static GKPeerPickerController peerPickerController;
@@ -219,6 +217,40 @@ namespace Microsoft.Xna.Framework.GamerServices
 					"Gamer services functionality has not been initialized.");
 		}
 
+        delegate string ShowKeyboardInputDelegate(
+            string title, string description, string defaultText, Object state, bool usePasswordMode);
+
+        private static string ShowKeyboardInput(
+            string title, string description, string defaultText, Object state, bool usePasswordMode)
+        {
+            string result = null;
+
+            IsVisible = true;
+            EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+
+            keyboardViewController = new KeyboardInputViewController(
+                title, description, defaultText, usePasswordMode, _gameViewController);
+
+            UIApplication.SharedApplication.InvokeOnMainThread (delegate {
+                _gameViewController.PresentViewController (keyboardViewController, true, null);
+
+                keyboardViewController.View.InputAccepted += (sender, e) => {
+                    _gameViewController.DismissViewController (true, null);
+                    result = keyboardViewController.View.Text;
+                    waitHandle.Set ();
+                };
+
+                keyboardViewController.View.InputCanceled += (sender, e) => {
+                    _gameViewController.DismissViewController (true, null);
+                    waitHandle.Set ();
+                };
+            });
+            waitHandle.WaitOne ();
+
+            IsVisible = false;
+            return result;
+        }
+
 		public static IAsyncResult BeginShowKeyboardInput (
 			PlayerIndex player, string title, string description, string defaultText,
 			AsyncCallback callback, Object state)
@@ -233,46 +265,18 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{
 			AssertInitialised ();
 
-            if (keyboardViewController != null)
-                return null;
+            if (IsVisible)
+                throw new GuideAlreadyVisibleException("The function cannot be completed at this time: the Guide UI is already active. Wait until Guide.IsVisible is false before issuing this call.");
 
-			int requestCount = Interlocked.Increment (ref _showKeyboardInputRequestCount);
-			if (requestCount != 1) {
-				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
-				// FIXME: Return the in-progress IAsyncResult?
-				return null;
-			}
+            ShowKeyboardInputDelegate ski = ShowKeyboardInput;
 
-			IsVisible = true;
-
-			keyboardViewController = new KeyboardInputViewController(
-				title, description, defaultText, usePasswordMode, _gameViewController);
-
-			_gameViewController.PresentModalViewController (keyboardViewController, true);
-
-			keyboardViewController.View.InputAccepted += (sender, e) => {
-                _gameViewController.DismissModalViewControllerAnimated(true);
-				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
-			};
-
-			keyboardViewController.View.InputCanceled += (sender, e) => {
-                _gameViewController.DismissModalViewControllerAnimated(true);
-				Interlocked.Decrement (ref _showKeyboardInputRequestCount);
-			};
-
-			return new KeyboardInputAsyncResult (keyboardViewController, callback, state);
+            return ski.BeginInvoke(title, description, defaultText, state, usePasswordMode, callback, ski);
 		}
 
 		public static string EndShowKeyboardInput (IAsyncResult result)
 		{
-			AssertInitialised ();
-
             keyboardViewController = null;
-
-			if (!(result is KeyboardInputAsyncResult))
-				throw new ArgumentException ("result");
-
-			return (result as KeyboardInputAsyncResult).GetResult();
+            return (result.AsyncState as ShowKeyboardInputDelegate).EndInvoke (result);
 		}
 
 		delegate Nullable<int> ShowMessageBoxDelegate(
@@ -318,7 +322,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 			ShowMessageBoxDelegate smb = ShowMessageBox; 
 
-			return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
+            return smb.BeginInvoke(title, text, buttons, focusButton, icon, callback, smb);			
 		}
 
 		public static IAsyncResult BeginShowMessageBox (

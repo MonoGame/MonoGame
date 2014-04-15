@@ -265,7 +265,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(Color color)
         {
-            PlatformClear(color);
+            var options = ClearOptions.Target;
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
+            PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
         }
 
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
