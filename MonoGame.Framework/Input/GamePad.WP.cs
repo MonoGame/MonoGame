@@ -1,8 +1,12 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public static class GamePad
+    static partial class GamePad
     {
         internal static bool back;
 
@@ -15,20 +19,20 @@ namespace Microsoft.Xna.Framework.Input
             }
         }
 
-        public static Microsoft.Xna.Framework.Input.GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
             GamePadCapabilities capabilities = new GamePadCapabilities();
 
-            capabilities.IsConnected = (playerIndex == PlayerIndex.One);
+            capabilities.IsConnected = (index == 0);
             capabilities.HasBackButton = true;
 
             return capabilities;
         }
 
-        public static Microsoft.Xna.Framework.Input.GamePadState GetState(PlayerIndex playerIndex)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             GamePadState state;
-            if (playerIndex == PlayerIndex.One && back)
+            if (index == 0 && back)
             {
                 // Consume state
                 back = false;
@@ -38,6 +42,11 @@ namespace Microsoft.Xna.Framework.Input
                 state = new GamePadState();
 
             return state;
+        }
+
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        {
+            return false;
         }
     }
 }
