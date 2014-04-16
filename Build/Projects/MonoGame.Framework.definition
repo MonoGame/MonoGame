@@ -704,6 +704,7 @@
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Android.cs">
       <Platforms>Android</Platforms>
     </Compile>
