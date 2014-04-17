@@ -16,7 +16,7 @@
 			private float _thumbStickRadius = 20*20;
             internal bool _visible;
             internal List<ButtonDefinition> _buttonsDefinitions;
-            internal ThumbStickDefinition _leftThumbDefinition, _rightThumbDefinition;
+            private ThumbStickDefinition _leftThumbDefinition, _rightThumbDefinition;
 			private Color _alphaColor = Color.Gray;
             internal int _buttons;
             internal Vector2 _leftStick, _rightStick;
@@ -81,8 +81,8 @@
 
 					// Check where is the touch
 					bool hitInButton = false;
-					
-					if (Visible) 
+
+                    if (_visible) 
 					{
 						foreach(ButtonDefinition button in _buttonsDefinitions)
 						{
@@ -93,7 +93,7 @@
 					if (!hitInButton)
 					{
 						// check the left thumbstick
-						if (Visible &&  (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition,location)))
+                        if (_visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location)))
 						{
 							_leftThumbDefinition.InitialHit = location;	
 							UpdateTouch(touch,_leftThumbDefinition);
@@ -101,7 +101,7 @@
 						else 
 						{
 							// check the right thumbstick
-							if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition,location)))
+                            if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location)))
 							{
 								_rightThumbDefinition.InitialHit = location;
 								UpdateTouch(touch,_rightThumbDefinition);
@@ -134,7 +134,7 @@
 					var oldItem = GetTouchesObject(touch);
 					// Check if touch any button
 					bool hitInButton = false;
-					if (Visible)
+                    if (_visible)
 					{
 						if(oldItem != null && oldItem is ButtonDefinition)
 						{
@@ -155,8 +155,8 @@
 					if (!hitInButton) 
 					{
 						if(oldItem != null && oldItem == _leftThumbDefinition)
-						{						
-							Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+						{
+                            Vector2 movement = location - _leftThumbDefinition.InitialHit;
 							if(movement.X > 20)
 								movement.X = 20;
 							else if(movement.X < -20)
@@ -168,13 +168,13 @@
 								movement.Y = -20;
 							_leftThumbDefinition.Offset = movement;
 							_leftStick = new Vector2(movement.X / 20,movement.Y / -20);
-						}										
-						else if (Visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition,location)))
+						}
+                        else if (_visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location)))
 						{
-							Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+                            Vector2 movement = location - _leftThumbDefinition.InitialHit;
 								
 							UpdateTouch(touch,_leftThumbDefinition);
-							LeftThumbStickDefinition.InitialHit = location;
+                            _leftThumbDefinition.InitialHit = location;
 							
 							// Keep the stick in the "hole" 
 							float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
@@ -200,8 +200,8 @@
 								Vector2 movement = location - _rightThumbDefinition.InitialHit;
 								_rightThumbDefinition.Offset = movement;
 								_rightStick = new Vector2(movement.X / 20,movement.Y / -20);
-							}										
-							else if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition,location)))
+							}
+                            else if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location)))
 							{
 								Vector2 movement = location - _rightThumbDefinition.InitialHit;
 								
@@ -241,7 +241,7 @@
 					location = view.GetOffsetPosition(location, true);
 
 					// Check where is the touch
-					if (Visible)
+                    if (_visible)
 					{
 						var oldItem = GetTouchesObject(touch);
 						if(oldItem == null)
@@ -256,7 +256,7 @@
 						}
 						else if(oldItem  == _leftThumbDefinition)
 						{
-							LeftThumbStickDefinition.Offset = Vector2.Zero;
+                            _leftThumbDefinition.Offset = Vector2.Zero;
 							_leftStick = Vector2.Zero;
 						}
 						else if(oldItem == _rightThumbDefinition)
@@ -406,30 +406,6 @@
             {
                 SystemSound.Vibrate.PlaySystemSound();
                 return true;
-            }
-
-            public static ThumbStickDefinition LeftThumbStickDefinition
-            {
-                get
-                {
-                    return Instance._leftThumbDefinition;
-                }
-                set
-                {
-                    Instance._leftThumbDefinition = value;
-                }
-            }
-
-            public static ThumbStickDefinition RightThumbStickDefinition
-            {
-                get
-                {
-                    return Instance._rightThumbDefinition;
-                }
-                set
-                {
-                    Instance._rightThumbDefinition = value;
-                }
             }
 
             #region render virtual gamepad
