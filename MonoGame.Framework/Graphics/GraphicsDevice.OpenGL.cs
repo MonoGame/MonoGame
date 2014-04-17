@@ -146,7 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 Framebuffer = new FramebufferObject();
                 Renderbuffer = new RenderbufferObject();
             }
-#if !GLES
+#if !(GLES || MONOMAC)
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 Framebuffer = new FramebufferObjectEXT();

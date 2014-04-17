@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-#if !GLES
+#if !(GLES || MONOMAC)
         // EXT_framebuffer_object implementation
         internal sealed class FramebufferObjectEXT : FramebufferObject
         {
