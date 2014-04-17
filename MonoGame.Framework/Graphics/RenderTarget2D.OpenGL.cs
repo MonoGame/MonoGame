@@ -31,8 +31,8 @@ namespace Microsoft.Xna.Framework.Graphics
     const RenderbufferStorage GLStencilIndex8 = RenderbufferStorage.StencilIndex8;
 #endif
 
-    internal uint glDepthBuffer;
-    internal uint glStencilBuffer;
+    internal int glDepthBuffer;
+    internal int glStencilBuffer;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
