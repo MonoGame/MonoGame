@@ -51,7 +51,6 @@ using System.Collections.Generic;
 {
     internal class AndroidGamePad
     {
-		private static GamePad _instance;
 		private float _thumbStickRadius = 20*20;	
 		private bool _visible;
 		private List<ButtonDefinition> _buttonsDefinitions;
@@ -59,7 +58,7 @@ using System.Collections.Generic;
 		private Color _alphaColor = Color.DarkGray;		
 		private int _buttons;
 
-        internal AndroidGamePad()
+        public AndroidGamePad()
 		{
 			_visible = true;
 			_buttonsDefinitions = new List<ButtonDefinition>();
@@ -85,12 +84,12 @@ using System.Collections.Generic;
 			}
 		}
 
-        internal void SetBack()
+        public void SetBack()
         {
             _buttons |= (int)Buttons.Back;
         }
 
-        internal void Update(MotionEvent e)
+        public void Update(MotionEvent e)
         {
             Vector2 location = new Vector2(e.GetX(), e.GetY());
             // Check where is the touch
@@ -204,8 +203,8 @@ using System.Collections.Generic;
         }
 
 		#region render virtual gamepad
-		
-		internal void Render(GameTime gameTime, SpriteBatch batch)
+
+        public void Render(GameTime gameTime, SpriteBatch batch)
 		{
 			// render buttons
 			foreach (ButtonDefinition button in _buttonsDefinitions)
