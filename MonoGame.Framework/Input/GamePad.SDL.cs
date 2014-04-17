@@ -295,7 +295,7 @@ namespace Microsoft.Xna.Framework.Input
             var device = devices[index];
             var c = Settings[index];
             if (device == IntPtr.Zero || c == null)
-                return GamePadState.InitializedState;
+                return GamePadState.Default;
 
             var leftStick = c.LeftStick.ReadAxisPair(device);
             var rightStick = c.RightStick.ReadAxisPair(device);

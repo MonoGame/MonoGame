@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Input
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             var gamePad = GamePads[index];
-            GamePadState state = GamePadState.InitializedState;
+            GamePadState state = GamePadState.Default;
             if (gamePad != null && gamePad._isConnected)
             {
                 // Check if the device was disconnected
