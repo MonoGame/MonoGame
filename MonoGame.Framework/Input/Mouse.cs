@@ -65,11 +65,11 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly MouseState _defaultState = new MouseState();
 
-#if (WINDOWS && OPENGL) || LINUX
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
 	private static OpenTK.Input.MouseDevice _mouse = null;			
 #endif
 
-#if (WINDOWS && OPENGL)
+#if (WINDOWS && OPENGL) || ANGLE
 
         static OpenTK.GameWindow Window;
 
