@@ -1247,9 +1247,6 @@
     </Page>
 
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs">
-      <Platforms>Windows8,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Windows\GamerServices\Guide.cs">
       <Platforms>Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
