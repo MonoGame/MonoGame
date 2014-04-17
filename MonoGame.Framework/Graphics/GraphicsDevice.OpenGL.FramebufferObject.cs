@@ -11,9 +11,13 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 
-#if GLES
+#if IOS
 using OpenTK.Graphics.ES20;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
+using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
+using FramebufferTarget = OpenTK.Graphics.ES20.All;
+using RenderbufferTarget = OpenTK.Graphics.ES20.All;
+using TextureTarget = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -40,8 +44,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public virtual int Generate()
             {
-                int id;
+                int id = 0;
+#if IOS
+                GL.GenFramebuffers(1, ref id);
+#else
                 GL.GenFramebuffers(1, out id);
+#endif
                 return id;
             }
 
