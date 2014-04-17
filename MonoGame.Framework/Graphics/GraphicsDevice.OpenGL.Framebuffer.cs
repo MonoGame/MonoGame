@@ -7,8 +7,13 @@ using System.Text;
 using MonoMac.OpenGL;
 #endif
 
-#if WINDOWS || LINUX
+#if (WINDOWS || LINUX) && !GLES
 using OpenTK.Graphics.OpenGL;
+#endif
+
+#if GLES
+using OpenTK.Graphics.ES20;
+using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -43,11 +48,6 @@ namespace Microsoft.Xna.Framework.Graphics
             public virtual void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer)
             {
                 GL.FramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer);
-            }
-
-            public void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, uint renderbuffer)
-            {
-                Renderbuffer(target, attachment, renderbufferTarget, (int)renderbuffer);
             }
 
             public virtual void Texture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textureTarget, int texture, int level)
