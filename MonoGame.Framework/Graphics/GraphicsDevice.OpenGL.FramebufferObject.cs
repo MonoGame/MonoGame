@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public virtual void Bind(FramebufferTarget target, int id)
             {
                 GL.BindFramebuffer(target, id);
+                GraphicsExtensions.CheckGLError();
             }
 
             public virtual FramebufferErrorCode CheckStatus(FramebufferTarget target)
@@ -40,6 +41,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public virtual void Delete(int id)
             {
                 GL.DeleteFramebuffers(1, ref id);
+                GraphicsExtensions.CheckGLError();
             }
 
             public virtual int Generate()
@@ -50,17 +52,20 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
                 GL.GenFramebuffers(1, out id);
 #endif
+                GraphicsExtensions.CheckGLError();
                 return id;
             }
 
             public virtual void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer)
             {
                 GL.FramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer);
+                GraphicsExtensions.CheckGLError();
             }
 
             public virtual void Texture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textureTarget, int texture, int level)
             {
                 GL.FramebufferTexture2D(target, attachment, textureTarget, texture, level);
+                GraphicsExtensions.CheckGLError();
             }
         }
 
@@ -71,6 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public override void Bind(FramebufferTarget target, int id)
             {
                 GL.Ext.BindFramebuffer(target, id);
+                GraphicsExtensions.CheckGLError();
             }
 
             public override FramebufferErrorCode CheckStatus(FramebufferTarget target)
@@ -81,23 +87,27 @@ namespace Microsoft.Xna.Framework.Graphics
             public override void Delete(int id)
             {
                 GL.Ext.DeleteFramebuffers(1, ref id);
+                GraphicsExtensions.CheckGLError();
             }
 
             public override int Generate()
             {
                 int id;
                 GL.Ext.GenFramebuffers(1, out id);
+                GraphicsExtensions.CheckGLError();
                 return id;
             }
 
             public override void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer)
             {
                 GL.Ext.FramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer);
+                GraphicsExtensions.CheckGLError();
             }
 
             public override void Texture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textureTarget, int texture, int level)
             {
                 GL.Ext.FramebufferTexture2D(target, attachment, textureTarget, texture, level);
+                GraphicsExtensions.CheckGLError();
             }
         }
 #endif
