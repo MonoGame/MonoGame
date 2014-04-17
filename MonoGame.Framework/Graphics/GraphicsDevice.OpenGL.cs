@@ -140,44 +140,22 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
             _extensions = GetGLExtensions();
 
-#if !GLES
-            // Check for required extensions
-            bool is_arb_framebuffer_supported = false;
-            bool is_ext_framebuffer_supported = false;
-
-            foreach (string ext in _extensions)
-            {
-                switch (ext)
-                {
-                    case "GL_ARB_framebuffer_object":
-                        is_arb_framebuffer_supported = true;
-                        break;
-
-                    case "GL_EXT_framebuffer_object":
-                        is_ext_framebuffer_supported = true;
-                        break;
-                }
-            }
-
-            if (is_arb_framebuffer_supported)
+            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
             {
                 fbo = new Framebuffer();
             }
-            else if (is_ext_framebuffer_supported)
+#if !GLES
+            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 fbo = new FramebufferEXT();
             }
+#endif
             else
             {
                 throw new PlatformNotSupportedException(
                     "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
                     "Try updating your graphics drivers.");
             }
-#endif
-
-#if GLES
-            fbo = new Framebuffer();
-#endif
         }
 
         List<string> GetGLExtensions()
