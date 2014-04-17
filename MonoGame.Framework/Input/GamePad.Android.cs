@@ -52,11 +52,11 @@ using System.Collections.Generic;
     internal class AndroidGamePad
     {
 		private float _thumbStickRadius = 20*20;	
-		private bool _visible;
+		internal bool _visible;
 		private List<ButtonDefinition> _buttonsDefinitions;
 		private ThumbStickDefinition _leftThumbDefinition,_rightThumbDefinition;
-		private Color _alphaColor = Color.DarkGray;		
-		private int _buttons;
+		private Color _alphaColor = Color.DarkGray;
+        internal int _buttons;
 
         public AndroidGamePad()
 		{
@@ -126,7 +126,7 @@ using System.Collections.Generic;
                 if (!hitInButton) {
                     if (Visible && (_leftThumbDefinition != null) &&
                         (CheckThumbStickHit(_leftThumbDefinition, location))) {
-                        Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+                        Vector2 movement = location - _leftThumbDefinition.InitialHit;
 
                         // Keep the stick in the "hole" 
                         float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
@@ -169,7 +169,7 @@ using System.Collections.Generic;
                         }
                     }
                     if ((_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location))) {
-                        LeftThumbStickDefinition.Offset = Vector2.Zero;
+                        _leftThumbDefinition.Offset = Vector2.Zero;
                     }
                     if ((_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
                         _rightThumbDefinition.Offset = Vector2.Zero;
@@ -311,41 +311,9 @@ using System.Collections.Generic;
 				return false;
 			}
         }
-		
-		public static ThumbStickDefinition LeftThumbStickDefinition
-		{
-			get 
-			{
-				return Instance._leftThumbDefinition;
-			}
-			set
-			{
-				Instance._leftThumbDefinition = value;
-			}
-		}
-		
-		public static ThumbStickDefinition RightThumbStickDefinition
-		{
-			get 
-			{
-				return Instance._rightThumbDefinition;
-			}
-			set
-			{
-				Instance._rightThumbDefinition = value;
-			}
-		}	
-		 
+			 
 		#region render virtual gamepad
-		
-		public static List<ButtonDefinition> ButtonsDefinitions
-		{
-			get 
-			{
-				return Instance._buttonsDefinitions;
-			}
-		}
-		
+			
 		public static void Draw(GameTime gameTime, SpriteBatch batch )
 		{		
 			Instance.Render(gameTime,batch);		
