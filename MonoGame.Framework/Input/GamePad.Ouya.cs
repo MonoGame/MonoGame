@@ -174,13 +174,13 @@ namespace Microsoft.Xna.Framework.Input
                 var dvc = InputDevice.GetDevice(gamePad._deviceId);
                 if (dvc == null)
                 {
-                    Debug.WriteLine("Detected controller disconnect [" + (int)playerIndex + "] ");
+                    Debug.WriteLine("Detected controller disconnect [" + index + "] ");
                     gamePad._isConnected = false;
                     return state;
                 }
 
                 GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
-                thumbSticks.ApplyDeadZone(deadZone, 0.3f);
+                thumbSticks.ApplyDeadZone(deadZoneMode, 0.3f);
 
                 if (gamePad._startButtonPressed)
                 {
