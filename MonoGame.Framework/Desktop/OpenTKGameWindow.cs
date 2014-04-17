@@ -323,7 +323,12 @@ namespace Microsoft.Xna.Framework
         {
             GraphicsContext.ShareContexts = true;
 
+#if ANGLE
+            window = new OpenTK.GameWindow(640, 480, GraphicsMode.Default, "MonoGame GameWindow",
+                GameWindowFlags.Default, DisplayDevice.Default, 2, 0, GraphicsContextFlags.Embedded);
+#else
             window = new OpenTK.GameWindow();
+#endif
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);

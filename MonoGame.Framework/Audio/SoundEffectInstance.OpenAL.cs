@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
             InitializeSound();
             BindDataBuffer(
                 buffer,
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
             // No-op on Android
         }
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
         /// <summary>
         /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
