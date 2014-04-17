@@ -79,7 +79,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
 
-        Framebuffer fbo;
+        internal static FramebufferObject Framebuffer { get; private set; }
+        internal static RenderbufferObject Renderbuffer { get; private set; }
 
         internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
@@ -142,12 +143,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (GraphicsCapabilities.SupportsFramebufferObjectARB)
             {
-                fbo = new Framebuffer();
+                Framebuffer = new FramebufferObject();
+                Renderbuffer = new RenderbufferObject();
             }
 #if !GLES
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
-                fbo = new FramebufferEXT();
+                Framebuffer = new FramebufferObjectEXT();
+                Renderbuffer = new RenderbufferObjectEXT();
             }
 #endif
             else
@@ -270,7 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                             {
                 if (this.glRenderTargetFrameBuffer > 0)
                 {
-                    fbo.Delete(this.glRenderTargetFrameBuffer);
+                    Framebuffer.Delete(this.glRenderTargetFrameBuffer);
                     GraphicsExtensions.CheckGLError();
                 }
             });
@@ -337,7 +340,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            fbo.Bind(GLFramebuffer, glFramebuffer);
+            Framebuffer.Bind(GLFramebuffer, glFramebuffer);
             GraphicsExtensions.CheckGLError();
 
             // Reset the raster state because we flip vertices
@@ -356,25 +359,25 @@ namespace Microsoft.Xna.Framework.Graphics
             var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 			if (this.glRenderTargetFrameBuffer == 0)
 			{
-                glRenderTargetFrameBuffer = fbo.Generate();
+                glRenderTargetFrameBuffer = Framebuffer.Generate();
                 GraphicsExtensions.CheckGLError();
             }
 
-            fbo.Bind(GLFramebuffer, glRenderTargetFrameBuffer);
+            Framebuffer.Bind(GLFramebuffer, glRenderTargetFrameBuffer);
             GraphicsExtensions.CheckGLError();
-            fbo.Texture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
+            Framebuffer.Texture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
             GraphicsExtensions.CheckGLError();
 
 			// Reverted this change, as per @prollin's suggestion
-            fbo.Renderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
-            fbo.Renderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
+            Framebuffer.Renderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+            Framebuffer.Renderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
 			for (var i = 0; i < _currentRenderTargetCount; i++)
 			{
 				GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 				GraphicsExtensions.CheckGLError();
-                fbo.Texture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
+                Framebuffer.Texture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 				GraphicsExtensions.CheckGLError();
 			}
 
@@ -383,7 +386,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Test that the FBOs are attached and correct.
-			var status = fbo.CheckStatus(GLFramebuffer);
+			var status = Framebuffer.CheckStatus(GLFramebuffer);
 			if (status != GLFramebufferComplete)
 			{
 				string message = "Framebuffer Incomplete.";

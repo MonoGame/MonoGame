@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
     // ARB_framebuffer_object implementation
     partial class GraphicsDevice
     {
-        class Framebuffer
+        internal class FramebufferObject
         {
             public virtual void Bind(FramebufferTarget target, int id)
             {
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !GLES
         // EXT_framebuffer_object implementation
-        sealed class FramebufferEXT : Framebuffer
+        internal sealed class FramebufferObjectEXT : FramebufferObject
         {
             public override void Bind(FramebufferTarget target, int id)
             {
