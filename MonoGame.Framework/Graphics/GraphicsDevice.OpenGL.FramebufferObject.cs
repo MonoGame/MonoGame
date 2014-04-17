@@ -11,7 +11,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 
-#if IOS
+#if IOS || ANDROID
 using OpenTK.Graphics.ES20;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             public virtual int Generate()
             {
                 int id = 0;
-#if IOS
+#if IOS || ANDROID
                 GL.GenFramebuffers(1, ref id);
 #else
                 GL.GenFramebuffers(1, out id);
