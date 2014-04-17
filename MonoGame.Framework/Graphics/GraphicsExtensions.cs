@@ -547,7 +547,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
-#if !IOS && !ANDROID
+#if !IOS && !ANDROID && !ANGLE
 			case SurfaceFormat.Dxt1:
 				glInternalFormat = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -790,7 +790,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static int GetBoundTexture2D()
         {
             var prevTexture = 0;
-#if GLES
+#if GLES && !ANGLE
             GL.GetInteger(GetPName.TextureBinding2D, ref prevTexture);
 #else
             GL.GetInteger(GetPName.TextureBinding2D, out prevTexture);
@@ -803,7 +803,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		[DebuggerHidden]
         public static void CheckGLError()
         {
-#if GLES
+#if GLES && !ANGLE
             All error = GL.GetError();
             if (error != All.False)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());
