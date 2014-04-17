@@ -107,6 +107,8 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
+            GraphicsProfile = GraphicsDevice.GetHighestSupportedGraphicsProfile(null);
+
             if (_game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
                 throw new ArgumentException("Graphics Device Manager Already Present");
 
@@ -222,6 +224,7 @@ namespace Microsoft.Xna.Framework
                 return;
 
 #if WINDOWS_PHONE
+            _graphicsDevice.GraphicsProfile = GraphicsProfile;
             // Display orientation is always portrait on WP8
             _graphicsDevice.PresentationParameters.DisplayOrientation = DisplayOrientation.Portrait;
 #elif WINDOWS_STOREAPP

@@ -670,5 +670,10 @@ namespace Microsoft.Xna.Framework.Graphics
             ibHandle.Free();
             vbHandle.Free();
         }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+           return GraphicsProfile.HiDef;
+        }
     }
 }

@@ -162,9 +162,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 // power consumption.
                 dxgiDevice2.MaximumFrameLatency = 1;
             }
-
-            // Set the correct profile based on the feature level.
-            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
         }
 
         internal void UpdateTarget(RenderTargetView renderTargetView)
@@ -287,9 +284,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             }
 #endif
-
-            // Set the correct profile based on the feature level.
-            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -552,9 +546,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
             }
 #endif
-
-            // Set the correct profile based on the feature level.
-            GraphicsProfile = _d3dDevice.FeatureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
@@ -1209,5 +1200,29 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _d3dContext.Flush();
         }
+        
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            FeatureLevel featureLevel;
+
+            if (graphicsDevice == null || graphicsDevice._d3dDevice == null)
+                featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+            else
+                featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
+
+            GraphicsProfile graphicsProfile;
+
+            //if (featureLevel >= FeatureLevel.Level_10_1)
+            //    graphicsProfile = GraphicsProfile.Profile_10_1;
+            if (featureLevel >= FeatureLevel.Level_10_0)
+                graphicsProfile = GraphicsProfile.HiDef;
+            //else if (featureLevel >= FeatureLevel.Level_9_3)
+            //    graphicsProfile = GraphicsProfile.Profile_9_3;
+            else 
+                graphicsProfile = GraphicsProfile.Reach;
+
+            return graphicsProfile;
+        }
+
     }
 }
