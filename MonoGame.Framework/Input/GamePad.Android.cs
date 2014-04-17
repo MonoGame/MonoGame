@@ -99,7 +99,7 @@ using System.Collections.Generic;
 
                 Reset();
 
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         hitInButton |= UpdateButton(button, location);
                     }
@@ -109,7 +109,7 @@ using System.Collections.Generic;
                         if (_leftThumbDefinition != null && (CheckThumbStickHit(_leftThumbDefinition, location))) {
                             _leftThumbDefinition.InitialHit = location;
                         }
-                        else if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
+                        else if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
                             _rightThumbDefinition.InitialHit = location;
                         }
                     }
@@ -117,14 +117,14 @@ using System.Collections.Generic;
             } 
             else if (e.Action == MotionEventActions.Move) {
 
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         hitInButton |= UpdateButton(button, location);
                     }
                 }
 
                 if (!hitInButton) {
-                    if (Visible && (_leftThumbDefinition != null) &&
+                    if (_visible && (_leftThumbDefinition != null) &&
                         (CheckThumbStickHit(_leftThumbDefinition, location))) {
                         Vector2 movement = location - _leftThumbDefinition.InitialHit;
 
@@ -141,7 +141,7 @@ using System.Collections.Generic;
                             _leftThumbDefinition.Offset = Vector2.Zero;
                         }
 
-                        if (Visible && (_rightThumbDefinition != null) &&
+                        if (_visible && (_rightThumbDefinition != null) &&
                             (CheckThumbStickHit(_rightThumbDefinition, location))) {
                             Vector2 movement = location - _rightThumbDefinition.InitialHit;
 
@@ -162,7 +162,7 @@ using System.Collections.Generic;
                 }
             }
             else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel) {
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         if (CheckButtonHit(button, location)) {
                             _buttons &= ~(int) button.Type;
