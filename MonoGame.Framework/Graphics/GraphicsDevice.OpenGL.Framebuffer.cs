@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+#if MONOMAC
+using MonoMac.OpenGL;
+#endif
+
+#if WINDOWS || LINUX
+using OpenTK.Graphics.OpenGL;
+#endif
+
+namespace Microsoft.Xna.Framework.Graphics
+{
+    // ARB_framebuffer_object implementation
+    partial class GraphicsDevice
+    {
+        class Framebuffer
+        {
+            public virtual void Bind(FramebufferTarget target, int id)
+            {
+                GL.BindFramebuffer(target, id);
+            }
+
+            public virtual FramebufferErrorCode CheckStatus(FramebufferTarget target)
+            {
+                return GL.CheckFramebufferStatus(target);
+            }
+
+            public virtual void Delete(int id)
+            {
+                GL.DeleteFramebuffers(1, ref id);
+            }
+
+            public virtual int Generate()
+            {
+                int id;
+                GL.GenFramebuffers(1, out id);
+                return id;
+            }
+
+            public virtual void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer)
+            {
+                GL.FramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer);
+            }
+
+            public void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, uint renderbuffer)
+            {
+                Renderbuffer(target, attachment, renderbufferTarget, (int)renderbuffer);
+            }
+
+            public virtual void Texture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textureTarget, int texture, int level)
+            {
+                GL.FramebufferTexture2D(target, attachment, textureTarget, texture, level);
+            }
+        }
+
+#if !GLES
+        // EXT_framebuffer_object implementation
+        sealed class FramebufferEXT : Framebuffer
+        {
+            public override void Bind(FramebufferTarget target, int id)
+            {
+                GL.Ext.BindFramebuffer(target, id);
+            }
+
+            public override FramebufferErrorCode CheckStatus(FramebufferTarget target)
+            {
+                return GL.Ext.CheckFramebufferStatus(target);
+            }
+
+            public override void Delete(int id)
+            {
+                GL.Ext.DeleteFramebuffers(1, ref id);
+            }
+
+            public override int Generate()
+            {
+                int id;
+                GL.Ext.GenFramebuffers(1, out id);
+                return id;
+            }
+
+            public override void Renderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer)
+            {
+                GL.Ext.FramebufferRenderbuffer(target, attachment, renderbufferTarget, renderbuffer);
+            }
+
+            public override void Texture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textureTarget, int texture, int level)
+            {
+                GL.Ext.FramebufferTexture2D(target, attachment, textureTarget, texture, level);
+            }
+        }
+#endif
+    }
+}

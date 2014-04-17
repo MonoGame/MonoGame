@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice
     {
 #if !GLES
-		private DrawBuffersEnum[] _drawBuffers;
+        private DrawBuffersEnum[] _drawBuffers;
 #endif
 
         static List<Action> disposeActions = new List<Action>();
@@ -78,6 +78,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
+
+        Framebuffer fbo;
 
         internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
@@ -137,6 +139,45 @@ namespace Microsoft.Xna.Framework.Graphics
                 _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
             _extensions = GetGLExtensions();
+
+#if !GLES
+            // Check for required extensions
+            bool is_arb_framebuffer_supported = false;
+            bool is_ext_framebuffer_supported = false;
+
+            foreach (string ext in _extensions)
+            {
+                switch (ext)
+                {
+                    case "GL_ARB_framebuffer_object":
+                        is_arb_framebuffer_supported = true;
+                        break;
+
+                    case "GL_EXT_framebuffer_object":
+                        is_ext_framebuffer_supported = true;
+                        break;
+                }
+            }
+
+            if (is_arb_framebuffer_supported)
+            {
+                fbo = new Framebuffer();
+            }
+            else if (is_ext_framebuffer_supported)
+            {
+                fbo = new FramebufferEXT();
+            }
+            else
+            {
+                throw new PlatformNotSupportedException(
+                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
+                    "Try updating your graphics drivers.");
+            }
+#endif
+
+#if GLES
+            fbo = new Framebuffer();
+#endif
         }
 
         List<string> GetGLExtensions()
@@ -251,7 +292,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                             {
                 if (this.glRenderTargetFrameBuffer > 0)
                 {
-                    GL.DeleteFramebuffers(1, ref this.glRenderTargetFrameBuffer);
+                    fbo.Delete(this.glRenderTargetFrameBuffer);
                     GraphicsExtensions.CheckGLError();
                 }
             });
@@ -318,7 +359,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-			GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
+            fbo.Bind(GLFramebuffer, glFramebuffer);
             GraphicsExtensions.CheckGLError();
 
             // Reset the raster state because we flip vertices
@@ -337,29 +378,25 @@ namespace Microsoft.Xna.Framework.Graphics
             var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 			if (this.glRenderTargetFrameBuffer == 0)
 			{
-#if GLES
-                GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-#else
-                GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
-#endif
+                glRenderTargetFrameBuffer = fbo.Generate();
                 GraphicsExtensions.CheckGLError();
             }
 
-            GL.BindFramebuffer(GLFramebuffer, this.glRenderTargetFrameBuffer);
+            fbo.Bind(GLFramebuffer, glRenderTargetFrameBuffer);
             GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
+            fbo.Texture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
             GraphicsExtensions.CheckGLError();
 
 			// Reverted this change, as per @prollin's suggestion
-			GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
-			GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
+            fbo.Renderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+            fbo.Renderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
 			for (var i = 0; i < _currentRenderTargetCount; i++)
 			{
 				GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 				GraphicsExtensions.CheckGLError();
-				GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
+                fbo.Texture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 				GraphicsExtensions.CheckGLError();
 			}
 
@@ -368,7 +405,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Test that the FBOs are attached and correct.
-			var status = GL.CheckFramebufferStatus(GLFramebuffer);
+			var status = fbo.CheckStatus(GLFramebuffer);
 			if (status != GLFramebufferComplete)
 			{
 				string message = "Framebuffer Incomplete.";
