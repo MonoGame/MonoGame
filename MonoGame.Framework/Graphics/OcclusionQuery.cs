@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public bool IsComplete {
 			get {
-				int resultReady;
+				int resultReady = 0;
 #if MONOMAC               
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResultAvailable,
@@ -84,15 +84,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out resultReady);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX
-                resultReady = 0;
+#elif DIRECTX               
 #endif
 				return resultReady != 0;
 			}
 		}
 		public int PixelCount {
 			get {
-				int result;
+				int result = 0;
 #if MONOMAC
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResult,
@@ -100,8 +99,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out result);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX
-                result = 0;
+#elif DIRECTX               
 #endif
                 return result;
 			}
