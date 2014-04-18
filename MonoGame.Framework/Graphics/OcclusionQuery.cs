@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		[System.Security.SuppressUnmanagedCodeSecurity()]
 		[DllImport(OpenGLLibrary, EntryPoint = "glGetQueryObjectiv", ExactSpelling = true)]
-		extern static unsafe void GetQueryObjectiv(int id, int pname, [OutAttribute] Int32[] @params);
+		extern static unsafe void GetQueryObjectiv(int id, int pname, out int @params);
 #endif
     }
 }
