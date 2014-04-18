@@ -84,7 +84,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out resultReady);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX                
+#elif DIRECTX
+                resultReady = 0;
 #endif
 				return resultReady != 0;
 			}
@@ -99,7 +100,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out result);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX             
+#elif DIRECTX
+                result = 0;
 #endif
                 return result;
 			}
