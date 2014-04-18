@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             MaxTextureSlots = 16;
 
-#if GLES
+#if ANDROID || IOS
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -117,8 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetInteger(All.MaxTextureSize, ref _maxTextureSize);
             GraphicsExtensions.CheckGLError();
-#endif
-#if !GLES
+#else
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -128,13 +127,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
-            // Initialize draw buffer attachment array
-            int maxDrawBuffers;
-            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-            GraphicsExtensions.CheckGLError();
-            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-            for (int i = 0; i < maxDrawBuffers; i++)
-                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+#if !GLES
+			// Initialize draw buffer attachment array
+			int maxDrawBuffers;
+			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+			for (int i = 0; i < maxDrawBuffers; i++)
+				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+#endif
 #endif
             _extensions = GetGLExtensions();
         }
@@ -229,12 +229,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES
+#if GLES && !ANGLE
 			GL.Clear((uint)bufferMask);
-            GraphicsExtensions.CheckGLError();
 #else
 			GL.Clear(bufferMask);
 #endif
+            GraphicsExtensions.CheckGLError();
            		
             // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;
@@ -336,8 +336,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 			if (this.glRenderTargetFrameBuffer == 0)
-			{
-#if GLES
+            {
+#if GLES && !ANGLE
                 GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
 #else
                 GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
@@ -368,7 +368,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Test that the FBOs are attached and correct.
-			var status = GL.CheckFramebufferStatus(GLFramebuffer);
+			var status = (FramebufferErrorCode)GL.CheckFramebufferStatus(GLFramebuffer);
 			if (status != GLFramebufferComplete)
 			{
 				string message = "Framebuffer Incomplete.";

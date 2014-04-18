@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private bool _looped = false;
 		int sourceId;
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
             InitializeSound();
             BindDataBuffer(
                 buffer,
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
             // No-op on Android
         }
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
         /// <summary>
         /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Appears to be a no-op on Android?
 #endif
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             // get AL's listener position
             float x, y, z;
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformPause()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             if (!hasSourceId || soundState != SoundState.Playing)
                 return;
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             if (hasSourceId)
                 return;
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Audio
             controller.PlaySound (soundBuffer);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 
-#endif // WINDOWS || LINUX || MONOMAC || IOS
+#endif // WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
 #if ANDROID
 
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformResume()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             if (!hasSourceId)
             {
@@ -292,7 +292,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformStop(bool immediate)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             if (hasSourceId)
             {
@@ -316,8 +316,8 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetIsLooped(bool value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
-            
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
+
             _looped = value;
             
             if (hasSourceId)
@@ -334,8 +334,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool PlatformGetIsLooped()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
-            
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
+
             return _looped;
 #endif
 
@@ -351,7 +351,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetPan(float value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             _pan = value;
 			if (!hasSourceId)
@@ -372,7 +372,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPitch(float value)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
             _pitch = value;
 
 			if (hasSourceId)
@@ -393,7 +393,7 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState PlatformGetState()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             if (!hasSourceId)
                 return SoundState.Stopped;
@@ -438,7 +438,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetVolume(float value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             _volume = value;
 			if (hasSourceId)
@@ -455,7 +455,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             this.Stop(true);
             soundBuffer.Reserved -= HandleSoundBufferReserved;

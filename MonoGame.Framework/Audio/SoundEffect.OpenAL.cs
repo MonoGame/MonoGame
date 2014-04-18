@@ -10,7 +10,7 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
 using OpenTK.Audio.OpenAL;
 #elif ANDROID
 using Android.Content;
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal int Size { get; set; }
 
-#if WINDOWS || LINUX || IOS || MONOMAC
+#if WINDOWS || LINUX || IOS || MONOMAC || ANGLE
 
         internal ALFormat Format { get; set; }
 #endif
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
             
             ALFormat format;
             int size;
@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
 			Rate = (float)sampleRate;
             Size = (int)buffer.Length;
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
             inst.InitializeSound();
             inst.BindDataBuffer(_data, Format, Size, (int)Rate);

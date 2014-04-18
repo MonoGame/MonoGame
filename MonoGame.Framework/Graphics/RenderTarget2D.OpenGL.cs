@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Threading.BlockOnUIThread(() =>
             {
 
-#if GLES
+#if GLES && !ANGLE
 			GL.GenRenderbuffers(1, ref glDepthBuffer);
 #else
 			GL.GenRenderbuffers(1, out glDepthBuffer);
@@ -94,10 +94,10 @@ namespace Microsoft.Xna.Framework.Graphics
 					GraphicsExtensions.CheckGLError();
 					GL.RenderbufferStorage(GLRenderbuffer, glDepthFormat, this.width, this.height);
 					GraphicsExtensions.CheckGLError();
-#if GLES
+#if GLES && !ANGLE
 					GL.GenRenderbuffers(1, ref glStencilBuffer);
 #else
-					GL.GenRenderbuffers(1, out glStencilBuffer);
+                    GL.GenRenderbuffers(1, out glStencilBuffer);
 #endif
 					GraphicsExtensions.CheckGLError();
 					GL.BindRenderbuffer(GLRenderbuffer, this.glStencilBuffer);
