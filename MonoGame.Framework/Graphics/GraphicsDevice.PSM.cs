@@ -233,5 +233,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 vertexBuffer.SetIndices(_indexBuffer._buffer);
             _graphics.SetVertexBuffer(0, vertexBuffer);
         }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+           return GraphicsProfile.HiDef;
+        }
     }
 }
