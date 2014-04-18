@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // disposed yet.
         GraphicsDevice graphicsDevice;
 
-        private readonly WeakReference _selfReference;
+        private WeakReference _selfReference;
 
         internal GraphicsResource()
         {
@@ -157,6 +157,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     resources.Remove(_selfReference);
                 }
 
+                _selfReference = null;
                 graphicsDevice = null;
                 disposed = true;
             }
