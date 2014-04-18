@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
             
             ALFormat format;
             int size;
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Audio
 			Rate = (float)sampleRate;
             Size = (int)buffer.Length;
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
