@@ -77,14 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public bool IsComplete {
 			get {
 				int resultReady;
-#if MONOMAC               
-				GetQueryObjectiv(glQueryId,
-				                 (int)GetQueryObjectParam.QueryResultAvailable,
-				                 out resultReady);
-#elif OPENGL
+#if OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out resultReady);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX                
+#elif DIRECTX
+                resultReady = 0;
 #endif
 				return resultReady != 0;
 			}
@@ -92,14 +89,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int PixelCount {
 			get {
 				int result;
-#if MONOMAC
-				GetQueryObjectiv(glQueryId,
-				                 (int)GetQueryObjectParam.QueryResult,
-				                 out result);
-#elif OPENGL
+#if OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out result);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX             
+#elif DIRECTX
+                result = 0;
 #endif
                 return result;
 			}
@@ -111,7 +105,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		[System.Security.SuppressUnmanagedCodeSecurity()]
 		[DllImport(OpenGLLibrary, EntryPoint = "glGetQueryObjectiv", ExactSpelling = true)]
-		extern static unsafe void GetQueryObjectiv(int id, int pname, out int @params);
+		extern static unsafe void GetQueryObjectiv(int id, GetQueryObjectParam pname, out int @params);
 #endif
     }
 }
