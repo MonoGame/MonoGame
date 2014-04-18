@@ -43,19 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public enum GraphicsProfile
 	{
-        Reach = 0x9100, // 	Use a limited set of graphic features and capabilities, allowing the game to support the widest variety of devices, including all Windows-based computers and Windows Phone.
-        HiDef = 0x93FF, // 	Use the largest available set of graphic features and capabilities to target devices, such as an Xbox 360 console and a Windows-based computer, that have more enhanced graphic capabilities.        
-        
-        // Reach requires 9.1 hardware. It is equal to FeatureLevel 9.1 
-        // HiDef requires 10.0 hardware but has limitations enforced by DirectX9.3 API.
-        // This is why we have to define a seperate Profile_10_0 and set HiDef as 0x93FF.
-
-        //Profile_9_2  = 0x9200,
-        //Profile_9_3  = 0x9300,
-        //Profile_10_0 = 0xa000,
-        //Profile_10_1 = 0xa100,
-        //Profile_11_0 = 0xb000,
-        //Profile_11_1 = 0xb100,
-        //Profile_11_2 = 0xb200
+        Reach =  1, // 	Use a limited set of graphic features and capabilities, allowing the game to support the widest variety of devices, including all Windows-based computers and Windows Phone.
+        HiDef =  2, // 	Use the largest available set of graphic features and capabilities to target devices, such as an Xbox 360 console and a Windows-based computer, that have more enhanced graphic capabilities.        
 	}
 }

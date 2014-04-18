@@ -1212,12 +1212,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsProfile graphicsProfile;
 
-            //if (featureLevel >= FeatureLevel.Level_10_1)
-            //    graphicsProfile = GraphicsProfile.Profile_10_1;
             if (featureLevel >= FeatureLevel.Level_10_0)
                 graphicsProfile = GraphicsProfile.HiDef;
-            //else if (featureLevel >= FeatureLevel.Level_9_3)
-            //    graphicsProfile = GraphicsProfile.Profile_9_3;
             else 
                 graphicsProfile = GraphicsProfile.Reach;
 
