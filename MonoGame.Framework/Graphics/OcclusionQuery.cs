@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-#elif GLES
+#elif ANGLE // Review for iOS and Android, and change to GLES
 using OpenTK.Graphics.ES30;
 #endif
 #endif
