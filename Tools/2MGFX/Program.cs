@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -41,10 +40,10 @@ namespace TwoMGFX
             }
 
             // Create the effect object.
-            DXEffectObject effect;
+            EffectObject effect;
             try
             {
-                effect = DXEffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.FromShaderInfo(shaderInfo);
             }
             catch (Exception ex)
             {

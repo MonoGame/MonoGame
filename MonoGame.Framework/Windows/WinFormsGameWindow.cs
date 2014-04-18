@@ -111,6 +111,16 @@ namespace MonoGame.Framework
             }
         }
 
+        public override bool AllowAltF4
+        {
+             get { return base.AllowAltF4; }
+             set
+             {
+                 _form.AllowAltF4 = value;
+                 base.AllowAltF4 = value;
+             }
+        }
+
         public override DisplayOrientation CurrentOrientation
         {
             get { return DisplayOrientation.Default; }

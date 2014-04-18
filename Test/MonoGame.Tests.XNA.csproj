@@ -57,19 +57,19 @@
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="NDesk.Options">
-      <HintPath>..\ThirdParty\Libs\Tests\NDesk.Options.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\NDesk.Options.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core.interfaces">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.core.interfaces.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.core.interfaces.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.framework.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.util">
-      <HintPath>..\ThirdParty\Libs\Tests\nunit.util.dll</HintPath>
+      <HintPath>..\ThirdParty\Dependencies\Tests\nunit.util.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

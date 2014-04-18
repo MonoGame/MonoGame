@@ -82,7 +82,7 @@
     <Content Include="Nvidia.TextureTools.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\ThirdParty\Libs\NVTT\MacOS\libnvtt.dylib">
+    <Content Include="..\..\ThirdParty\Dependencies\NVTT\MacOS\libnvtt.dylib">
       <Link>libnvtt.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

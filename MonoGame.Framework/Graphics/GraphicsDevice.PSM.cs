@@ -44,10 +44,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            // TODO: We need to figure out how to detect if
-            // we have a depth stencil buffer or not!
-            options |= ClearOptions.DepthBuffer;
-            options |= ClearOptions.Stencil;
+            // TODO: We need to figure out how to detect if we have a
+            // depth stencil buffer or not, and clear options relating
+            // to them if not attached.
 
             _graphics.SetClearColor(color.ToPssVector4());
             _graphics.Clear();
@@ -93,22 +92,25 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
+            // TODO: This was on both the OpenGL and PSM path previously - is it necessary?
+            Threading.EnsureUIThread();
+
             if ( _scissorRectangleDirty )
 	            _scissorRectangleDirty = false;
 
             if (_blendStateDirty)
             {
-                _blendState.ApplyState(this);
+                _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 	        if ( _depthStencilStateDirty )
             {
-                _depthStencilState.ApplyState(this);
+                _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
 	        if ( _rasterizerStateDirty )
             {
-                _rasterizerState.ApplyState(this);
+                _rasterizerState.PlatformApplyState(this);
 	            _rasterizerStateDirty = false;
             }
 
@@ -125,7 +127,7 @@ namespace Microsoft.Xna.Framework.Graphics
             //}
 
             Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
@@ -230,6 +232,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (requiredIndexLength > 0)
                 vertexBuffer.SetIndices(_indexBuffer._buffer);
             _graphics.SetVertexBuffer(0, vertexBuffer);
+        }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+           return GraphicsProfile.HiDef;
         }
     }
 }

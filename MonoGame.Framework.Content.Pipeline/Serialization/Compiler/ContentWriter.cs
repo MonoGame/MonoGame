@@ -52,6 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
+            'P', // PlayStation4
         };
 
         /// <summary>
@@ -85,7 +86,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             this.targetProfile = targetProfile;
             this.compressContent = compressContent;
             this.rootDirectory = rootDirectory;
-            this.referenceRelocationPath = referenceRelocationPath;
+
+            // Normalize the directory format so PathHelper.GetRelativePath will compute external references correctly.
+            this.referenceRelocationPath = PathHelper.NormalizeDirectory(referenceRelocationPath);
 
             outputStream = this.OutStream;
             headerStream = new MemoryStream();

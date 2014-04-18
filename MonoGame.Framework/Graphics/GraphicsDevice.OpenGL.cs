@@ -128,12 +128,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
-			// Initialize draw buffer attachment array
-			int maxDrawBuffers;
-			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-			for (int i = 0; i < maxDrawBuffers; i++)
-				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+            // Initialize draw buffer attachment array
+            int maxDrawBuffers;
+            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GraphicsExtensions.CheckGLError();
+            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+            for (int i = 0; i < maxDrawBuffers; i++)
+                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
             _extensions = GetGLExtensions();
         }
@@ -181,10 +182,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            // TODO: We need to figure out how to detect if
-            // we have a depth stencil buffer or not!
-            options |= ClearOptions.DepthBuffer;
-            options |= ClearOptions.Stencil;
+            // TODO: We need to figure out how to detect if we have a
+            // depth stencil buffer or not, and clear options relating
+            // to them if not attached.
 
             // Unlike with XNA and DirectX...  GL.Clear() obeys several
             // different render states:
@@ -474,6 +474,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void PlatformApplyState(bool applyShaders)
         {
+            Threading.EnsureUIThread();
+
             if ( _scissorRectangleDirty )
 	        {
                 var scissorRect = _scissorRectangle;
@@ -486,17 +488,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                _blendState.ApplyState(this);
+                _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 	        if ( _depthStencilStateDirty )
             {
-	            _depthStencilState.ApplyState(this);
+	            _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
 	        if ( _rasterizerStateDirty )
             {
-	            _rasterizerState.ApplyState(this);
+	            _rasterizerState.PlatformApplyState(this);
 	            _rasterizerStateDirty = false;
             }
 
@@ -538,7 +540,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelConstantBuffers.SetConstantBuffers(this, _shaderProgram);
 
             Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
@@ -667,6 +669,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+        }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+           return GraphicsProfile.HiDef;
         }
     }
 }

@@ -8,7 +8,9 @@ namespace Microsoft.Xna.Framework.Input
     //     Represents specific information about the state of an Xbox 360 Controller,
     //     including the current state of buttons and sticks. Reference page contains
     //     links to related code samples.
-    public struct GamePadState
+    //     This is implemented as a partial struct to allow for individual platforms
+    //     to offer additional data without separate state queries to GamePad.
+    public partial struct GamePadState
     {
         //
         // Summary:
@@ -100,6 +102,8 @@ namespace Microsoft.Xna.Framework.Input
             Buttons = buttons;
             DPad = dPad;
 			IsConnected = true;
+
+            PlatformConstruct();
         }
         //
         // Summary:
@@ -125,6 +129,12 @@ namespace Microsoft.Xna.Framework.Input
             : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad())
         {
         }
+
+        /// <summary>
+        /// Define this method in platform partial classes to initialize default
+        /// values for platform-specific fields.
+        /// </summary>
+        partial void PlatformConstruct();
   
         /// <summary>
         /// Gets the button mask along with 'virtual buttons' like LeftThumbstickLeft.

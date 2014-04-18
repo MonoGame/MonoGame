@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         private Matrix4x4 _globalInverseXform = Matrix4x4.Identity;
         private Node _skeletonRoot;
-        private List<string> _animatedNodes = new List<string>();
+        private List<string> _boneNames = new List<string>();
         private List<string> _skeletonNodes = new List<string>();
         private Dictionary<string, Matrix4x4> _objectToBone = new Dictionary<string, Matrix4x4>();
 
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureDiffuse.FilePath, identity);
                     texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureDiffuse.UVIndex));
-                    material.Textures.Add("Texture", texture);
+                    material.Texture = texture;
                 }
 
                 if (sceneMaterial.HasTextureOpacity)
@@ -189,6 +189,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // Extract bind pose.
                 foreach (var bone in aiMesh.Bones)
                 {
+                    if (!_boneNames.Contains(bone.Name))
+                        _boneNames.Add(bone.Name);
+
                     var boneName = bone.Name;
                     _objectToBone[boneName] = Matrix4x4.Identity;
                     //_objectToBone[boneName].Inverse();
@@ -209,8 +212,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         private BoneContent CreateSkeleton()
         {
-            _animatedNodes.AddRange(_scene.Animations.SelectMany(a => a.NodeAnimationChannels).Distinct().Select(n => n.NodeName));
-            _skeletonRoot = FindSkeletonRoot(_animatedNodes, _scene.RootNode);
+            _skeletonRoot = FindSkeletonRoot(_boneNames, _scene.RootNode);
             if (_skeletonRoot == null)
                 return null;
 

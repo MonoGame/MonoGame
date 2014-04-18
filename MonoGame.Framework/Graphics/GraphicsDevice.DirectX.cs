@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
         // Core Direct3D Objects
         internal SharpDX.Direct3D11.Device _d3dDevice;
         internal SharpDX.Direct3D11.DeviceContext _d3dContext;
-        internal FeatureLevel _featureLevel;
         internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
         internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
 
@@ -285,10 +284,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             }
 #endif
-
-            // Set the correct profile based on the feature level.
-            _featureLevel = _d3dDevice.FeatureLevel;
-            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
 
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -552,10 +547,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 
-            // Set the correct profile based on the feature level.
-            _featureLevel = _d3dDevice.FeatureLevel;
-            GraphicsProfile = _featureLevel <= FeatureLevel.Level_9_3 ? GraphicsProfile.Reach : GraphicsProfile.HiDef;
-
             // Get Direct3D 11.1 context
             _d3dContext = _d3dDevice.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext>();
         }
@@ -723,12 +714,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
+            // Clear options for depth/stencil buffer if not attached.
             if (_currentDepthStencilView != null)
             {
-                options |= ClearOptions.DepthBuffer;
-
-                if (_currentDepthStencilView.Description.Format == SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
-                    options |= ClearOptions.Stencil;
+                if (_currentDepthStencilView.Description.Format != SharpDX.DXGI.Format.D24_UNorm_S8_UInt)
+                    options &= ~ClearOptions.Stencil;
+            }
+            else
+            {
+                options &= ~ClearOptions.DepthBuffer;
+                options &= ~ClearOptions.Stencil;
             }
 
             lock (_d3dContext)
@@ -750,7 +745,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if ((options & ClearOptions.Stencil) == ClearOptions.Stencil)
                     flags |= SharpDX.Direct3D11.DepthStencilClearFlags.Stencil;
 
-                if (flags != 0 && _currentDepthStencilView != null)
+                if (flags != 0)
                     _d3dContext.ClearDepthStencilView(_currentDepthStencilView, flags, depth, (byte)stencil);
             }
         }
@@ -982,17 +977,17 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_blendStateDirty)
             {
-                _blendState.ApplyState(this);
+                _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
 	        if ( _depthStencilStateDirty )
             {
-	            _depthStencilState.ApplyState(this);
+	            _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
 	        if ( _rasterizerStateDirty )
             {
-	            _rasterizerState.ApplyState(this);
+	            _rasterizerState.PlatformApplyState(this);
 	            _rasterizerStateDirty = false;
             }
 
@@ -1045,7 +1040,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _pixelConstantBuffers.SetConstantBuffers(this);
 
             Textures.SetTextures(this);
-            SamplerStates.SetSamplers(this);
+            SamplerStates.PlatformSetSamplers(this);
         }
 
         private SharpDX.Direct3D11.InputLayout GetInputLayout(Shader shader, VertexDeclaration decl)
@@ -1209,5 +1204,25 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _d3dContext.Flush();
         }
+        
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            FeatureLevel featureLevel;
+
+            if (graphicsDevice == null || graphicsDevice._d3dDevice == null)
+                featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+            else
+                featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
+
+            GraphicsProfile graphicsProfile;
+
+            if (featureLevel >= FeatureLevel.Level_10_0)
+                graphicsProfile = GraphicsProfile.HiDef;
+            else 
+                graphicsProfile = GraphicsProfile.Reach;
+
+            return graphicsProfile;
+        }
+
     }
 }
