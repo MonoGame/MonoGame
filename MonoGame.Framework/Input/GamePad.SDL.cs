@@ -38,20 +38,11 @@ purpose and non-infringement.
 */
 #endregion License
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using Tao.Sdl;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    //
-    // Summary:
-    //     Allows retrieval of user interaction with an Xbox 360 Controller and setting
-    //     of controller vibration motors. Reference page contains links to related
-    //     code samples.
-    public static class GamePad
+    static partial class GamePad
     {
 		static bool running;		
         static bool sdl;
@@ -231,16 +222,6 @@ namespace Microsoft.Xna.Framework.Input
             running = false;
         }
 
-        static IntPtr GetDevice(PlayerIndex index)
-        {
-            return devices[(int)index];
-        }
-
-        static PadConfig GetConfig(PlayerIndex index)
-        {
-            return Settings[(int)index];
-        }
-
         static Buttons ReadButtons(IntPtr device, PadConfig c, float deadZoneSize)
         {
             short DeadZone = (short)(deadZoneSize * short.MaxValue);
@@ -308,13 +289,13 @@ namespace Microsoft.Xna.Framework.Input
 			return b;
 		}
 		
-        static GamePadState ReadState(PlayerIndex index, GamePadDeadZone deadZone)
+        static GamePadState ReadState(int index, GamePadDeadZone deadZone)
         {
             const float DeadZoneSize = 0.27f;
-            IntPtr device = GetDevice(index);
-            PadConfig c = GetConfig(index);
+            var device = devices[index];
+            var c = Settings[index];
             if (device == IntPtr.Zero || c == null)
-                return GamePadState.InitializedState;
+                return GamePadState.Default;
 
             var leftStick = c.LeftStick.ReadAxisPair(device);
             var rightStick = c.RightStick.ReadAxisPair(device);
@@ -333,17 +314,10 @@ namespace Microsoft.Xna.Framework.Input
             return g;
         }
 
-        //
-        // Summary:
-        //     Retrieves the capabilities of an Xbox 360 Controller.
-        //
-        // Parameters:
-        //   playerIndex:
-        //     Index of the controller to query.
-        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            IntPtr d = GetDevice(playerIndex);
-            PadConfig c = GetConfig(playerIndex);
+            var d = devices[index];
+            var c = Settings[index];
 
             if (c == null || ((c.JoystickName == null || c.JoystickName == string.Empty) && d == IntPtr.Zero))
                 return new GamePadCapabilities();
@@ -378,54 +352,16 @@ namespace Microsoft.Xna.Framework.Input
                 HasBigButton = false
             };
         }
-        //
-        // Summary:
-        //     Gets the current state of a game pad controller. Reference page contains
-        //     links to related code samples.
-        //
-        // Parameters:
-        //   playerIndex:
-        //     Player index for the controller you want to query.
-        public static GamePadState GetState(PlayerIndex playerIndex)
-        {
-            return GetState(playerIndex, GamePadDeadZone.IndependentAxes);
-        }
-        //
-        // Summary:
-        //     Gets the current state of a game pad controller, using a specified dead zone
-        //     on analog stick positions. Reference page contains links to related code
-        //     samples.
-        //
-        // Parameters:
-        //   playerIndex:
-        //     Player index for the controller you want to query.
-        //
-        //   deadZoneMode:
-        //     Enumerated value that specifies what dead zone type to use.
-        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
+
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             PrepSettings();
             if (sdl)
 				Sdl.SDL_JoystickUpdate();
-            return ReadState(playerIndex, deadZoneMode);
+            return ReadState(index, deadZoneMode);
         }
-        //
-        // Summary:
-        //     Sets the vibration motor speeds on an Xbox 360 Controller. Reference page
-        //     contains links to related code samples.
-        //
-        // Parameters:
-        //   playerIndex:
-        //     Player index that identifies the controller to set.
-        //
-        //   leftMotor:
-        //     The speed of the left motor, between 0.0 and 1.0. This motor is a low-frequency
-        //     motor.
-        //
-        //   rightMotor:
-        //     The speed of the right motor, between 0.0 and 1.0. This motor is a high-frequency
-        //     motor.
-        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
             return false;
         }

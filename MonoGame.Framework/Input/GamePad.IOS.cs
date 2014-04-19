@@ -1,42 +1,6 @@
-	#region License
-	/*
-	Microsoft Public License (Ms-PL)
-	MonoGame - Copyright © 2009 The MonoGame Team
-	
-	All rights reserved.
-	
-	This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-	accept the license, do not use the software.
-	
-	1. Definitions
-	The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-	U.S. copyright law.
-	
-	A "contribution" is the original software, or any additions or changes to the software.
-	A "contributor" is any person that distributes its contribution under this license.
-	"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-	
-	2. Grant of Rights
-	(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-	each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-	(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-	each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-	
-	3. Conditions and Limitations
-	(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-	(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-	your patent license from such contributor to the software ends automatically.
-	(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-	notices that are present in the software.
-	(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-	a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-	code form, you may only do so under a license that complies with this license.
-	(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-	or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-	permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-	purpose and non-infringement.
-	*/
-	#endregion License
+    // MonoGame - Copyright (C) The MonoGame Team
+    // This file is subject to the terms and conditions defined in
+    // file 'LICENSE.txt', which is part of this source code package.
 	
 	using Microsoft.Xna.Framework;
 	using System;
@@ -47,19 +11,18 @@
 	
 	﻿namespace Microsoft.Xna.Framework.Input
 	{
-	    public class GamePad
+	    internal class IOSGamePad
 	    {
-			private static GamePad _instance;
-			private float _thumbStickRadius = 20*20;	
-			private bool _visible;
-			private List<ButtonDefinition> _buttonsDefinitions;
-			private ThumbStickDefinition _leftThumbDefinition,_rightThumbDefinition;
-			private Color _alphaColor = Color.Gray;		
-			private int _buttons;
-			private Vector2 _leftStick, _rightStick;
-			internal Dictionary<IntPtr,object> touchState = new Dictionary<IntPtr, object>();
-			
-			protected GamePad()
+			private float _thumbStickRadius = 20*20;
+            internal bool _visible;
+            internal List<ButtonDefinition> _buttonsDefinitions;
+            private ThumbStickDefinition _leftThumbDefinition, _rightThumbDefinition;
+			private Color _alphaColor = Color.Gray;
+            internal int _buttons;
+            internal Vector2 _leftStick, _rightStick;
+            public Dictionary<IntPtr, object> touchState = new Dictionary<IntPtr, object>();
+
+            public IOSGamePad()
 			{
 				_visible = true;
 				_buttonsDefinitions = new List<ButtonDefinition>();
@@ -69,19 +32,7 @@
 		
 				Reset();
 			}
-			
-			internal static GamePad Instance 
-			{
-				get 
-				{
-					if (_instance == null) 
-					{
-						_instance = new GamePad();
-					}
-					return _instance;
-				}
-			}
-			
+						
 			public void Reset()
 			{
 				if(touchState.Count == 0)
@@ -100,77 +51,7 @@
 						_rightThumbDefinition.Offset = Vector2.Zero;
 					}
 				}
-			}
-			
-			public static bool Visible 
-			{
-				get 
-				{
-					return GamePad.Instance._visible;
-				}
-				set 
-				{
-					GamePad.Instance.Reset();
-					GamePad.Instance._visible = value;
-				}
-			}
-			
-	        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
-	        {
-	            GamePadCapabilities capabilities = new GamePadCapabilities();
-				capabilities.IsConnected = (playerIndex == PlayerIndex.One);
-				capabilities.HasAButton = true;
-				capabilities.HasBButton = true;
-				capabilities.HasXButton = true;
-				capabilities.HasYButton = true;
-				capabilities.HasBackButton = true;
-				capabilities.HasLeftXThumbStick = true;
-				capabilities.HasLeftYThumbStick = true;
-				capabilities.HasRightXThumbStick = true;
-				capabilities.HasRightYThumbStick = true;
-				
-				return capabilities;
-	        }
-	
-	        public static GamePadState GetState(PlayerIndex playerIndex)
-	        {		
-			return new GamePadState(
-					new GamePadThumbSticks(Instance._leftStick, Instance._rightStick), 
-		                        new GamePadTriggers(0f, 0f), 
-					new GamePadButtons((Buttons)Instance._buttons), 
-					new GamePadDPad(0,0,0,0)
-				);
-	        }
-	
-	        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
-	        {					
-				SystemSound.Vibrate.PlaySystemSound();
-	            return true;
-	        }
-			
-			public static ThumbStickDefinition LeftThumbStickDefinition
-			{
-				get 
-				{
-					return Instance._leftThumbDefinition;
-				}
-				set
-				{
-					Instance._leftThumbDefinition = value;
-				}
-			}
-			
-			public static ThumbStickDefinition RightThumbStickDefinition
-			{
-				get 
-				{
-					return Instance._rightThumbDefinition;
-				}
-				set
-				{
-					Instance._rightThumbDefinition = value;
-				}
-			}
+			}			
 			
 			private bool CheckButtonHit(ButtonDefinition theButton, Vector2 location)
 			{
@@ -184,8 +65,8 @@
 				Rectangle thumbRect = new Rectangle((int) stickPosition.X,(int)stickPosition.Y,theStick.TextureRect.Width, theStick.TextureRect.Height);
 				return  thumbRect.Contains((int)location.X, (int)location.Y); 
 			}
-			
-			internal void TouchesBegan( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+
+            public void TouchesBegan(MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{
 				// Reset State		
 				//Reset();
@@ -200,8 +81,8 @@
 
 					// Check where is the touch
 					bool hitInButton = false;
-					
-					if (Visible) 
+
+                    if (_visible) 
 					{
 						foreach(ButtonDefinition button in _buttonsDefinitions)
 						{
@@ -212,7 +93,7 @@
 					if (!hitInButton)
 					{
 						// check the left thumbstick
-						if (Visible &&  (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition,location)))
+                        if (_visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location)))
 						{
 							_leftThumbDefinition.InitialHit = location;	
 							UpdateTouch(touch,_leftThumbDefinition);
@@ -220,7 +101,7 @@
 						else 
 						{
 							// check the right thumbstick
-							if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition,location)))
+                            if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location)))
 							{
 								_rightThumbDefinition.InitialHit = location;
 								UpdateTouch(touch,_rightThumbDefinition);
@@ -235,13 +116,13 @@
 					}
 				}
 			}
-			
-			internal void TouchesCancelled( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e)
+
+            public void TouchesCancelled(MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e)
 			{
 				// do nothing
 			}
-			
-			internal void TouchesMoved( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+
+            public void TouchesMoved(MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
@@ -253,7 +134,7 @@
 					var oldItem = GetTouchesObject(touch);
 					// Check if touch any button
 					bool hitInButton = false;
-					if (Visible)
+                    if (_visible)
 					{
 						if(oldItem != null && oldItem is ButtonDefinition)
 						{
@@ -274,8 +155,8 @@
 					if (!hitInButton) 
 					{
 						if(oldItem != null && oldItem == _leftThumbDefinition)
-						{						
-							Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+						{
+                            Vector2 movement = location - _leftThumbDefinition.InitialHit;
 							if(movement.X > 20)
 								movement.X = 20;
 							else if(movement.X < -20)
@@ -287,13 +168,13 @@
 								movement.Y = -20;
 							_leftThumbDefinition.Offset = movement;
 							_leftStick = new Vector2(movement.X / 20,movement.Y / -20);
-						}										
-						else if (Visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition,location)))
+						}
+                        else if (_visible && (_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location)))
 						{
-							Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+                            Vector2 movement = location - _leftThumbDefinition.InitialHit;
 								
 							UpdateTouch(touch,_leftThumbDefinition);
-							LeftThumbStickDefinition.InitialHit = location;
+                            _leftThumbDefinition.InitialHit = location;
 							
 							// Keep the stick in the "hole" 
 							float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
@@ -319,8 +200,8 @@
 								Vector2 movement = location - _rightThumbDefinition.InitialHit;
 								_rightThumbDefinition.Offset = movement;
 								_rightStick = new Vector2(movement.X / 20,movement.Y / -20);
-							}										
-							else if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition,location)))
+							}
+                            else if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location)))
 							{
 								Vector2 movement = location - _rightThumbDefinition.InitialHit;
 								
@@ -349,8 +230,8 @@
 					}
 				}	
 			}
-			
-			internal void TouchesEnded( MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
+
+            public void TouchesEnded(MonoTouch.Foundation.NSSet touches, MonoTouch.UIKit.UIEvent e, iOSGameView view)
 			{						
 				UITouch []touchesArray = touches.ToArray<UITouch>();
 				foreach(UITouch touch in touchesArray)
@@ -360,7 +241,7 @@
 					location = view.GetOffsetPosition(location, true);
 
 					// Check where is the touch
-					if (Visible)
+                    if (_visible)
 					{
 						var oldItem = GetTouchesObject(touch);
 						if(oldItem == null)
@@ -375,7 +256,7 @@
 						}
 						else if(oldItem  == _leftThumbDefinition)
 						{
-							LeftThumbStickDefinition.Offset = Vector2.Zero;
+                            _leftThumbDefinition.Offset = Vector2.Zero;
 							_leftStick = Vector2.Zero;
 						}
 						else if(oldItem == _rightThumbDefinition)
@@ -388,22 +269,24 @@
 				}	
 				Reset();
 				
-			}	
-			
-			internal object GetTouchesObject(UITouch touch)
+			}
+
+            public object GetTouchesObject(UITouch touch)
 			{
 				if(touchState.ContainsKey(touch.Handle))
 					return touchState[touch.Handle];			
 				return null;	
 			}
-			internal void UpdateTouch(UITouch touch, object theObject)
+
+            public void UpdateTouch(UITouch touch, object theObject)
 			{
 				if(touchState.ContainsKey(touch.Handle))
 					touchState[touch.Handle] = theObject;
 				else
 					touchState.Add(touch.Handle,theObject);
 			}
-			internal void RemoveTouch(UITouch touch)
+
+			public void RemoveTouch(UITouch touch)
 			{
 				if(touchState.ContainsKey(touch.Handle))
 					touchState.Remove(touch.Handle);
@@ -421,21 +304,8 @@
 			}
 			 
 			#region render virtual gamepad
-			
-			public static List<ButtonDefinition> ButtonsDefinitions
-			{
-				get 
-				{
-					return Instance._buttonsDefinitions;
-				}
-			}
-			
-			public static void Draw(GameTime gameTime, SpriteBatch batch )
-			{		
-				Instance.Render(gameTime,batch);		
-			}
-			
-			internal void Render(GameTime gameTime, SpriteBatch batch)
+								
+			public void Render(GameTime gameTime, SpriteBatch batch)
 			{
 				// render buttons
 				foreach (ButtonDefinition button in _buttonsDefinitions)
@@ -474,5 +344,85 @@
 			
 			#endregion
 		}
-		
+
+
+        static partial class GamePad
+        {
+            private static IOSGamePad _instance;
+
+            internal static IOSGamePad Instance
+            {
+                get
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new IOSGamePad();
+                    }
+                    return _instance;
+                }
+            }
+
+            public static bool Visible
+            {
+                get
+                {
+                    return Instance._visible;
+                }
+                set
+                {
+                    Instance.Reset();
+                    Instance._visible = value;
+                }
+            }
+
+            private static GamePadCapabilities PlatformGetCapabilities(int index)
+            {
+                GamePadCapabilities capabilities = new GamePadCapabilities();
+                capabilities.IsConnected = (index == 0);
+                capabilities.HasAButton = true;
+                capabilities.HasBButton = true;
+                capabilities.HasXButton = true;
+                capabilities.HasYButton = true;
+                capabilities.HasBackButton = true;
+                capabilities.HasLeftXThumbStick = true;
+                capabilities.HasLeftYThumbStick = true;
+                capabilities.HasRightXThumbStick = true;
+                capabilities.HasRightYThumbStick = true;
+
+                return capabilities;
+            }
+
+            private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+            {
+                return new GamePadState(
+                        new GamePadThumbSticks(Instance._leftStick, Instance._rightStick),
+                                    new GamePadTriggers(0f, 0f),
+                        new GamePadButtons((Buttons)Instance._buttons),
+                        new GamePadDPad(0, 0, 0, 0)
+                    );
+            }
+
+            private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+            {
+                SystemSound.Vibrate.PlaySystemSound();
+                return true;
+            }
+
+            #region render virtual gamepad
+
+            public static List<ButtonDefinition> ButtonsDefinitions
+            {
+                get
+                {
+                    return Instance._buttonsDefinitions;
+                }
+            }
+
+            public static void Draw(GameTime gameTime, SpriteBatch batch)
+            {
+                Instance.Render(gameTime, batch);
+            }
+
+            #endregion
+        }
 	}

@@ -49,17 +49,16 @@ using System.Collections.Generic;
 
 ﻿namespace Microsoft.Xna.Framework.Input
 {
-    public class GamePad
+    internal class AndroidGamePad
     {
-		private static GamePad _instance;
 		private float _thumbStickRadius = 20*20;	
-		private bool _visible;
+		internal bool _visible;
 		private List<ButtonDefinition> _buttonsDefinitions;
 		private ThumbStickDefinition _leftThumbDefinition,_rightThumbDefinition;
-		private Color _alphaColor = Color.DarkGray;		
-		private int _buttons;
-		
-		protected GamePad()
+		private Color _alphaColor = Color.DarkGray;
+        internal int _buttons;
+
+        public AndroidGamePad()
 		{
 			_visible = true;
 			_buttonsDefinitions = new List<ButtonDefinition>();
@@ -68,18 +67,6 @@ using System.Collections.Generic;
 			_alphaColor.A = 100;
 	
 			Reset();
-		}
-		
-		internal static GamePad Instance 
-		{
-			get 
-			{
-				if (_instance == null) 
-				{
-					_instance = new GamePad();
-				}
-				return _instance;
-			}
 		}
 		
 		public void Reset()
@@ -96,43 +83,13 @@ using System.Collections.Generic;
 				_rightThumbDefinition.Offset = Vector2.Zero;
 			}
 		}
-		
-		public static bool Visible 
-		{
-			get 
-			{
-				return GamePad.Instance._visible;
-			}
-			set 
-			{
-				GamePad.Instance.Reset();
-				GamePad.Instance._visible = value;
-			}
-		}
-		
-        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
-        {
-            GamePadCapabilities capabilities = new GamePadCapabilities();
-			capabilities.IsConnected = (playerIndex == PlayerIndex.One);
-			capabilities.HasAButton = true;
-			capabilities.HasBButton = true;
-			capabilities.HasXButton = true;
-			capabilities.HasYButton = true;
-			capabilities.HasBackButton = true;
-			capabilities.HasLeftXThumbStick = true;
-			capabilities.HasLeftYThumbStick = true;
-			capabilities.HasRightXThumbStick = true;
-			capabilities.HasRightYThumbStick = true;
-			
-			return capabilities;
-        }
 
-        internal void SetBack()
+        public void SetBack()
         {
             _buttons |= (int)Buttons.Back;
         }
 
-        internal void Update(MotionEvent e)
+        public void Update(MotionEvent e)
         {
             Vector2 location = new Vector2(e.GetX(), e.GetY());
             // Check where is the touch
@@ -142,7 +99,7 @@ using System.Collections.Generic;
 
                 Reset();
 
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         hitInButton |= UpdateButton(button, location);
                     }
@@ -152,7 +109,7 @@ using System.Collections.Generic;
                         if (_leftThumbDefinition != null && (CheckThumbStickHit(_leftThumbDefinition, location))) {
                             _leftThumbDefinition.InitialHit = location;
                         }
-                        else if (Visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
+                        else if (_visible && (_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
                             _rightThumbDefinition.InitialHit = location;
                         }
                     }
@@ -160,16 +117,16 @@ using System.Collections.Generic;
             } 
             else if (e.Action == MotionEventActions.Move) {
 
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         hitInButton |= UpdateButton(button, location);
                     }
                 }
 
                 if (!hitInButton) {
-                    if (Visible && (_leftThumbDefinition != null) &&
+                    if (_visible && (_leftThumbDefinition != null) &&
                         (CheckThumbStickHit(_leftThumbDefinition, location))) {
-                        Vector2 movement = location - LeftThumbStickDefinition.InitialHit;
+                        Vector2 movement = location - _leftThumbDefinition.InitialHit;
 
                         // Keep the stick in the "hole" 
                         float radius = (movement.X*movement.X) + (movement.Y*movement.Y);
@@ -184,7 +141,7 @@ using System.Collections.Generic;
                             _leftThumbDefinition.Offset = Vector2.Zero;
                         }
 
-                        if (Visible && (_rightThumbDefinition != null) &&
+                        if (_visible && (_rightThumbDefinition != null) &&
                             (CheckThumbStickHit(_rightThumbDefinition, location))) {
                             Vector2 movement = location - _rightThumbDefinition.InitialHit;
 
@@ -205,14 +162,14 @@ using System.Collections.Generic;
                 }
             }
             else if (e.Action == MotionEventActions.Up || e.Action == MotionEventActions.Cancel) {
-                if (Visible) {
+                if (_visible) {
                     foreach (ButtonDefinition button in _buttonsDefinitions) {
                         if (CheckButtonHit(button, location)) {
                             _buttons &= ~(int) button.Type;
                         }
                     }
                     if ((_leftThumbDefinition != null) && (CheckThumbStickHit(_leftThumbDefinition, location))) {
-                        LeftThumbStickDefinition.Offset = Vector2.Zero;
+                        _leftThumbDefinition.Offset = Vector2.Zero;
                     }
                     if ((_rightThumbDefinition != null) && (CheckThumbStickHit(_rightThumbDefinition, location))) {
                         _rightThumbDefinition.Offset = Vector2.Zero;
@@ -245,69 +202,9 @@ using System.Collections.Generic;
             return hitInButton;
         }
 
-        public static GamePadState GetState(PlayerIndex playerIndex)
-        {
-            var instance = GamePad.Instance;
-            var state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
-            instance.Reset();
-            return state;
-        }
-
-        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
-        {	
-			try
-			{
-	            Vibrator vibrator = (Vibrator)Game.Activity.GetSystemService(Context.VibratorService);
-				vibrator.Vibrate(500);
-	            return true;
-			}
-			catch
-			{
-				return false;
-			}
-        }
-		
-		public static ThumbStickDefinition LeftThumbStickDefinition
-		{
-			get 
-			{
-				return Instance._leftThumbDefinition;
-			}
-			set
-			{
-				Instance._leftThumbDefinition = value;
-			}
-		}
-		
-		public static ThumbStickDefinition RightThumbStickDefinition
-		{
-			get 
-			{
-				return Instance._rightThumbDefinition;
-			}
-			set
-			{
-				Instance._rightThumbDefinition = value;
-			}
-		}
-	
-		 
 		#region render virtual gamepad
-		
-		public static List<ButtonDefinition> ButtonsDefinitions
-		{
-			get 
-			{
-				return Instance._buttonsDefinitions;
-			}
-		}
-		
-		public static void Draw(GameTime gameTime, SpriteBatch batch )
-		{		
-			Instance.Render(gameTime,batch);		
-		}
-		
-		internal void Render(GameTime gameTime, SpriteBatch batch)
+
+        public void Render(GameTime gameTime, SpriteBatch batch)
 		{
 			// render buttons
 			foreach (ButtonDefinition button in _buttonsDefinitions)
@@ -344,6 +241,84 @@ using System.Collections.Generic;
 			batch.Draw(theStick.Texture,theStick.Position + theStick.Offset,theStick.TextureRect,_alphaColor);
 		}
 		
+		#endregion
+	}
+
+    static partial class GamePad
+    {
+		private static AndroidGamePad _instance;
+			
+		internal static AndroidGamePad Instance 
+		{
+			get 
+			{
+				if (_instance == null) 
+				{
+					_instance = new AndroidGamePad();
+				}
+				return _instance;
+			}
+		}
+		
+		public static bool Visible 
+		{
+			get 
+			{
+				return Instance._visible;
+			}
+			set 
+			{
+				Instance.Reset();
+				Instance._visible = value;
+			}
+		}
+
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
+        {
+            GamePadCapabilities capabilities = new GamePadCapabilities();
+            capabilities.IsConnected = (index == 0);
+			capabilities.HasAButton = true;
+			capabilities.HasBButton = true;
+			capabilities.HasXButton = true;
+			capabilities.HasYButton = true;
+			capabilities.HasBackButton = true;
+			capabilities.HasLeftXThumbStick = true;
+			capabilities.HasLeftYThumbStick = true;
+			capabilities.HasRightXThumbStick = true;
+			capabilities.HasRightYThumbStick = true;
+			
+			return capabilities;
+        }
+
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
+        {
+            var instance = GamePad.Instance;
+            var state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons((Buttons)instance._buttons), new GamePadDPad());
+            instance.Reset();
+            return state;
+        }
+
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        {	
+			try
+			{
+	            Vibrator vibrator = (Vibrator)Game.Activity.GetSystemService(Context.VibratorService);
+				vibrator.Vibrate(500);
+	            return true;
+			}
+			catch
+			{
+				return false;
+			}
+        }
+			 
+		#region render virtual gamepad
+			
+		public static void Draw(GameTime gameTime, SpriteBatch batch )
+		{		
+			Instance.Render(gameTime,batch);		
+		}
+			
 		#endregion
 	}
 	

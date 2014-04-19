@@ -698,6 +698,31 @@
     <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
+    <Compile Include="Input\GamePad.cs" />
+    <Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Ouya.cs">
+      <Platforms>Ouya</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.PSM.cs">
+      <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.SDL.cs">
+      <Platforms>Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.Web.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Input\GamePad.XInput.cs">
+      <Platforms>Windows8,Windows</Platforms>
+    </Compile>
     <Compile Include="Input\GamePadButtons.cs" />
     <Compile Include="Input\GamePadCapabilities.cs" />
     <Compile Include="Input\GamePadDeadZone.cs" />
@@ -967,9 +992,6 @@
     <Compile Include="Android\GamerServices\SignedInGamer.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
-    <Compile Include="Android\Input\GamePad.cs">
-      <Platforms>Android</Platforms>
-    </Compile>
     <Compile Include="Android\Input\Keyboard.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -981,9 +1003,6 @@
     </Compile>
     <Compile Include="Android\OrientationListener.cs">
       <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Android\Ouya\Input\GamePad.cs">
-      <Platforms>Ouya</Platforms>
     </Compile>
     <Compile Include="Android\ResumeManager.cs">
       <Platforms>Android,Ouya</Platforms>
@@ -1010,9 +1029,6 @@
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Input\DPad.cs">
-      <Platforms>Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Input\GamePad.cs">
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\Input\Input.cs">
@@ -1061,9 +1077,6 @@
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="iOS\GamerServices\TextFieldAlertView.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\Input\GamePad.cs">
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="iOS\iOSGamePlatform.cs">
@@ -1174,9 +1187,6 @@
     <Compile Include="PSSuite\Input\AccelerometerState.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
-    <Compile Include="PSSuite\Input\GamePad.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="PSSuite\Input\Keyboard.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
@@ -1200,9 +1210,6 @@
     <!-- Windows 8 Platform -->
     <Compile Include="Windows8\GameFrameworkViewSource.cs">
       <Platforms>Windows8</Platforms>
-    </Compile>
-    <Compile Include="Windows8\GamePad.cs">
-      <Platforms>Windows8,Windows</Platforms>
     </Compile>
     <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
       <Platforms>Windows8</Platforms>
@@ -1274,9 +1281,6 @@
     <Compile Include="WindowsPhone\DrawingSurfaceUpdateHandler.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="WindowsPhone\GamePad.cs">
-      <Platforms>WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="WindowsPhone\SurfaceUpdateHandler.cs">
       <Platforms>WindowsPhone</Platforms>
     </Compile>
@@ -1290,19 +1294,15 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
 
-  <!-- Web Platform -->
+    <!-- Web Platform -->
     <Compile Include="Web\WebGamePlatform.cs">
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Web\WebGameWindow.cs">
       <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Web\GamePad.cs">
-      <Platforms>Web</Platforms>
-    </Compile>
-
 	
-	<!-- OpenGL Stock Effects -->
+    <!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </EmbeddedResource>
