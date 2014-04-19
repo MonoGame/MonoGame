@@ -1,14 +1,5 @@
-This is a test of the main page of the `MonoGame` reference documentation using SharpDoc!
+## Welcome
+This is the documentation home for the MonoGame game library.
 
-Pages can easily be written using `Markdown` or directly `html` pages.
-
-> This page is under-construction
-
-## Features
-
- - This is
- - A bullet point
- - Listing of
- - Features
-
-TODO Continue documentation
+### WORK IN PROGRESS
+Note that the MonoGame documentation project is currently a work in progress.  You can also reference our [GitHub wiki](http://github.com/mono/MonoGame/wiki) and the original [Codeplex documentation](http://monogame.codeplex.com/documentation) while we're getting this all sorted out.
