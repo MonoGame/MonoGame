@@ -670,6 +670,11 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
 
+        public void GetBackBufferData<T>(T[] data) where T : struct
+        {
+            PlatformGetBackBufferData(data);
+        }
+
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             //TODO: Overview the calculation

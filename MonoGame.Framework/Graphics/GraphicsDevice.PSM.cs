@@ -158,6 +158,11 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException("Not implemented");
         }
 
+        private void PlatformGetBackBufferData<T>(T[] data) where T : struct
+        {
+            throw new NotImplementedException();
+        }
+
         internal PssVertexBuffer GetVertexBuffer(VertexFormat[] vertexFormat, int requiredVertexLength, int requiredIndexLength)
         {
             int bestMatchIndex = -1;

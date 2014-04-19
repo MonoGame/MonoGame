@@ -1197,6 +1197,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void PlatformGetBackBufferData<T>(T[] data) where T : struct
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Sends queued-up commands in the command buffer to the graphics processing unit (GPU).
         /// </summary>
