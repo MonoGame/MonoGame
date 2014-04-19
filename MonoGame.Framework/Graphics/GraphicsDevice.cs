@@ -1295,6 +1295,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        public void GetBackBufferData<T>(T[] data) where T : struct
+        {
+            PlatformGetBackBufferData(data);
+        }
+
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             switch (primitiveType)
