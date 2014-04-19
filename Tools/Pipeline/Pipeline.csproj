@@ -49,6 +49,8 @@
       <Link>CommandLineParser.cs</Link>
     </Compile>
     <Compile Include="ContentItem.cs" />
+    <Compile Include="ContentItem.Processor.cs" />
+    <Compile Include="ContentItem.Importer.cs" />
     <Compile Include="IController.cs" />
     <Compile Include="IProjectItem.cs" />
     <Compile Include="IProjectObserver.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="MainView.Designer.cs">
       <DependentUpon>MainView.cs</DependentUpon>
     </Compile>
+    <Compile Include="CustomPropertyDescriptors.cs" />
     <Compile Include="PipelineController.cs" />
     <Compile Include="PipelineProject.cs" />
     <Compile Include="Program.cs" />

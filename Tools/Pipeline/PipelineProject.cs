@@ -115,8 +115,8 @@ namespace MonoGame.Tools.Pipeline
             var item = new ContentItem
             {
                 SourceFile = sourceFile,
-                Importer = Importer,
-                Processor = Processor,
+                ImporterName = Importer,
+                ProcessorName = Processor,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _content.Add(item);
