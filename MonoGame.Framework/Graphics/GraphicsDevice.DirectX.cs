@@ -1484,7 +1484,38 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetBackBufferData<T>(T[] data) where T : struct
         {
-            throw new NotImplementedException();
+            var dataBytes = data as byte[];
+
+            if (dataBytes == null)
+                throw new Exception("GetBackBufferData only supports byte[]");
+
+            lock (_d3dContext)
+            {
+                //You can't Map the BackBuffer surface, so we copy to another texture
+                using (var dxgiBackBuffer = _swapChain.GetBackBuffer<Surface>(0))
+                using (var backBufferTexture = dxgiBackBuffer.QueryInterface<SharpDX.Direct3D11.Texture2D>())
+                {
+                    var desc = backBufferTexture.Description;
+                    desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+                    desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
+                    desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+
+                    using (var texture = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
+                    {
+                        _d3dContext.CopyResource(backBufferTexture, texture);
+
+                        DataStream dataStream;
+                        var dataBox = _d3dContext.MapSubresource(texture, 0, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out dataStream);
+
+                        //Copy each line one at a time as there may be overhang from Pitch
+                        for (var y = 0; y < _viewport.Height; y++)
+                        {
+                            dataStream.Seek(y * dataBox.RowPitch, System.IO.SeekOrigin.Begin);
+                            dataStream.Read(dataBytes, y * _viewport.Width * 4, _viewport.Width * 4);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
