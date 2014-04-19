@@ -131,6 +131,9 @@
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioListener.cs" />
+    <Compile Include="Audio\AudioLoader.cs">
+      <Platforms>Linux,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Audio\AudioUtil.cs">
       <Platforms>Android,Ouya,PSMobile</Platforms>
@@ -141,6 +144,15 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\OALSoundBuffer.cs">
+      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenALSoundController.cs">
+      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Audio\OpenALSupport.cs">
+      <Platforms>iOS,MacOS</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
@@ -1013,15 +1025,6 @@
 
 
     <!-- Common Desktop Platform -->
-    <Compile Include="Desktop\Audio\AudioLoader.cs">
-      <Platforms>Linux,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Audio\OALSoundBuffer.cs">
-      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Desktop\Audio\OpenALSoundController.cs">
-      <Platforms>iOS,Linux,MacOS,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Desktop\Input\Axis.cs">
       <Platforms>Linux,MacOS,WindowsGL</Platforms>
     </Compile>
@@ -1127,9 +1130,6 @@
 
 
     <!-- MacOS Platform -->
-    <Compile Include="MacOS\Audio\OpenALSupport.cs">
-      <Platforms>iOS,MacOS</Platforms>
-    </Compile>
     <Compile Include="MacOS\GamerServices\Guide.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1248,9 +1248,6 @@
     </Page>
 
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\Content\ContentReaders\SoundEffectReader.cs">
-      <Platforms>Windows8,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Windows\GamerServices\Guide.cs">
       <Platforms>Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
