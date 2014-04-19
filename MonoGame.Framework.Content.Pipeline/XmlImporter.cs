@@ -392,7 +392,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 // Swizzle ARGB -> ABGR
                 var argb = uint.Parse(value, NumberStyles.HexNumber);
-                var abgr = ((argb & 0xFF00FF00) | ((argb & 0x00FF0000) >> 16) | ((argb & 0x000000FF) << 16));
+                var abgr = ((argb & 0xFF000000) | ((argb & 0x00FF0000) >> 16) | ((argb & 0x000000FF) << 16));
                 return new Color { PackedValue = abgr };
             }
 
