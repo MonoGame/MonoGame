@@ -45,28 +45,26 @@ using Ouya.Console.Api;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public class GamePad
+    internal class OuyaGamePad
     {
-        internal InputDevice _device;
-        internal int _deviceId;
-        internal string _descriptor;
-        internal bool _isConnected;
+        public InputDevice _device;
+        public int _deviceId;
+        public string _descriptor;
+        public bool _isConnected;
 
-        private Buttons _buttons;
-        private float _leftTrigger, _rightTrigger;
-        private Vector2 _leftStick, _rightStick;
+        public Buttons _buttons;
+        public float _leftTrigger, _rightTrigger;
+        public Vector2 _leftStick, _rightStick;
 
         // Workaround for the OnKeyUp and OnKeyDown events for KeyCode.Menu 
         // both being sent in a single frame. This can be removed if the
         // OUYA firmware is updated to send these events in different frames. 
-        private bool _startButtonPressed;
+        public bool _startButtonPressed;
 
-        private readonly GamePadCapabilities _capabilities;
-
-        private static readonly GamePad[] GamePads = new GamePad[OuyaController.MaxControllers];
+        public readonly GamePadCapabilities _capabilities;
 
 		[CLSCompliant(false)]
-        protected GamePad(InputDevice device)
+        public OuyaGamePad(InputDevice device)
         {
             _device = device;
             _deviceId = device.Id;
@@ -76,9 +74,78 @@ namespace Microsoft.Xna.Framework.Input
             _capabilities = CapabilitiesOfDevice(device);
         }
 
-        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static GamePadCapabilities CapabilitiesOfDevice(InputDevice device)
         {
-            var gamePad = GamePads[(int) playerIndex];
+            //TODO: There is probably a better way to do this. Maybe device.GetMotionRange and device.GetKeyCharacterMap?
+            //Or not http://stackoverflow.com/questions/11686703/android-enumerating-the-buttons-on-a-gamepad
+
+            var capabilities = new GamePadCapabilities();
+            capabilities.IsConnected = true;
+            capabilities.GamePadType = GamePadType.GamePad;
+            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
+
+            switch (device.Name)
+            {
+                case "OUYA Game Controller":
+
+                    capabilities.HasAButton = true;
+                    capabilities.HasBButton = true;
+                    capabilities.HasXButton = true;
+                    capabilities.HasYButton = true;
+
+                    capabilities.HasLeftXThumbStick = true;
+                    capabilities.HasLeftYThumbStick = true;
+                    capabilities.HasRightXThumbStick = true;
+                    capabilities.HasRightYThumbStick = true;
+
+                    capabilities.HasLeftShoulderButton = true;
+                    capabilities.HasRightShoulderButton = true;
+                    capabilities.HasLeftTrigger = true;
+                    capabilities.HasRightTrigger = true;
+
+                    capabilities.HasDPadDownButton = true;
+                    capabilities.HasDPadLeftButton = true;
+                    capabilities.HasDPadRightButton = true;
+                    capabilities.HasDPadUpButton = true;
+                    break;
+
+                case "Microsoft X-Box 360 pad":
+                    capabilities.HasAButton = true;
+                    capabilities.HasBButton = true;
+                    capabilities.HasXButton = true;
+                    capabilities.HasYButton = true;
+
+                    capabilities.HasLeftXThumbStick = true;
+                    capabilities.HasLeftYThumbStick = true;
+                    capabilities.HasRightXThumbStick = true;
+                    capabilities.HasRightYThumbStick = true;
+
+                    capabilities.HasLeftShoulderButton = true;
+                    capabilities.HasRightShoulderButton = true;
+                    capabilities.HasLeftTrigger = true;
+                    capabilities.HasRightTrigger = true;
+
+                    capabilities.HasDPadDownButton = true;
+                    capabilities.HasDPadLeftButton = true;
+                    capabilities.HasDPadRightButton = true;
+                    capabilities.HasDPadUpButton = true;
+
+                    capabilities.HasStartButton = true;
+                    capabilities.HasBackButton = true;
+                    break;
+            }
+            return capabilities;
+        }
+    }
+
+
+    static partial class GamePad
+    {
+        private static readonly OuyaGamePad[] GamePads = new OuyaGamePad[OuyaController.MaxControllers];
+
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
+        {
+            var gamePad = GamePads[index];
             if (gamePad != null)
                 return gamePad._capabilities;
 
@@ -96,29 +163,24 @@ namespace Microsoft.Xna.Framework.Input
 
             return capabilities;
         }
-        
-        public static GamePadState GetState(PlayerIndex playerIndex)
-        {
-            return GetState(playerIndex, GamePadDeadZone.IndependentAxes);
-        }
 
-        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZone)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            var gamePad = GamePads[(int) playerIndex];
-            GamePadState state = GamePadState.InitializedState;
+            var gamePad = GamePads[index];
+            GamePadState state = GamePadState.Default;
             if (gamePad != null && gamePad._isConnected)
             {
                 // Check if the device was disconnected
                 var dvc = InputDevice.GetDevice(gamePad._deviceId);
                 if (dvc == null)
                 {
-                    Debug.WriteLine("Detected controller disconnect [" + (int)playerIndex + "] ");
+                    Debug.WriteLine("Detected controller disconnect [" + index + "] ");
                     gamePad._isConnected = false;
                     return state;
                 }
 
                 GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
-                thumbSticks.ApplyDeadZone(deadZone, 0.3f);
+                thumbSticks.ApplyDeadZone(deadZoneMode, 0.3f);
 
                 if (gamePad._startButtonPressed)
                 {
@@ -131,18 +193,18 @@ namespace Microsoft.Xna.Framework.Input
                 }
 
                 state = new GamePadState(
-                    thumbSticks, 
-                    new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger), 
-                    new GamePadButtons(gamePad._buttons), 
+                    thumbSticks,
+                    new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
+                    new GamePadButtons(gamePad._buttons),
                     new GamePadDPad(gamePad._buttons));
             }
 
             return state;
         }
 
-        public static bool SetVibration(PlayerIndex playerIndex, float leftMotor, float rightMotor)
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
         {
-            var gamePad = GamePads[(int)playerIndex];
+            var gamePad = GamePads[index];
             if (gamePad == null)
                 return false;
 
@@ -153,7 +215,7 @@ namespace Microsoft.Xna.Framework.Input
             return true;
         }
 
-        internal static GamePad GetGamePad(InputDevice device)
+        internal static OuyaGamePad GetGamePad(InputDevice device)
         {
             if (device == null || (device.Sources & InputSourceType.Gamepad) != InputSourceType.Gamepad)
                 return null;
@@ -182,7 +244,7 @@ namespace Microsoft.Xna.Framework.Input
                 else if (pad == null)
                 {
                     Debug.WriteLine("Found new controller [" + i + "] " + device.Name);
-                    pad = new GamePad(device);
+                    pad = new OuyaGamePad(device);
                     GamePads[i] = pad;
                     return pad;
                 }
@@ -197,7 +259,7 @@ namespace Microsoft.Xna.Framework.Input
             if (firstDisconnectedPadId >= 0)
             {
                 Debug.WriteLine("Found new controller in place of disconnected controller [" + firstDisconnectedPadId + "] " + device.Name);
-                var pad = new GamePad(device);
+                var pad = new OuyaGamePad(device);
                 GamePads[firstDisconnectedPadId] = pad;
                 return pad;
             }
@@ -299,71 +361,6 @@ namespace Microsoft.Xna.Framework.Input
 
             return 0;
         }
-
-
-        private static GamePadCapabilities CapabilitiesOfDevice(InputDevice device)
-        {
-            //TODO: There is probably a better way to do this. Maybe device.GetMotionRange and device.GetKeyCharacterMap?
-            //Or not http://stackoverflow.com/questions/11686703/android-enumerating-the-buttons-on-a-gamepad
-
-            var capabilities = new GamePadCapabilities();
-            capabilities.IsConnected = true;
-            capabilities.GamePadType = GamePadType.GamePad;
-            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
-
-            switch (device.Name)
-            {
-                case "OUYA Game Controller":
-
-                    capabilities.HasAButton = true;
-                    capabilities.HasBButton = true;
-                    capabilities.HasXButton = true;
-                    capabilities.HasYButton = true;
-
-                    capabilities.HasLeftXThumbStick = true;
-                    capabilities.HasLeftYThumbStick = true;
-                    capabilities.HasRightXThumbStick = true;
-                    capabilities.HasRightYThumbStick = true;
-
-                    capabilities.HasLeftShoulderButton = true;
-                    capabilities.HasRightShoulderButton = true;
-                    capabilities.HasLeftTrigger = true;
-                    capabilities.HasRightTrigger = true;
-
-                    capabilities.HasDPadDownButton = true;
-                    capabilities.HasDPadLeftButton = true;
-                    capabilities.HasDPadRightButton = true;
-                    capabilities.HasDPadUpButton = true;
-                    break;
-
-                case "Microsoft X-Box 360 pad":
-                    capabilities.HasAButton = true;
-                    capabilities.HasBButton = true;
-                    capabilities.HasXButton = true;
-                    capabilities.HasYButton = true;
-
-                    capabilities.HasLeftXThumbStick = true;
-                    capabilities.HasLeftYThumbStick = true;
-                    capabilities.HasRightXThumbStick = true;
-                    capabilities.HasRightYThumbStick = true;
-
-                    capabilities.HasLeftShoulderButton = true;
-                    capabilities.HasRightShoulderButton = true;
-                    capabilities.HasLeftTrigger = true;
-                    capabilities.HasRightTrigger = true;
-
-                    capabilities.HasDPadDownButton = true;
-                    capabilities.HasDPadLeftButton = true;
-                    capabilities.HasDPadRightButton = true;
-                    capabilities.HasDPadUpButton = true;
-
-                    capabilities.HasStartButton = true;
-                    capabilities.HasBackButton = true;
-                    break;
-            }
-            return capabilities;
-        }
-
 
         internal static void Initialize()
         {

@@ -1,10 +1,14 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Diagnostics;
 using GBF = SharpDX.XInput.GamepadButtonFlags;
 
 namespace Microsoft.Xna.Framework.Input
 {
-    public static class GamePad
+    static partial class GamePad
     {
         private static readonly SharpDX.XInput.Controller[] _controllers = new[]
         {
@@ -18,13 +22,8 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly long[] _timeout = new long[4];
         private static readonly long TimeoutTicks = TimeSpan.FromSeconds(1).Ticks;
 
-        public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
+        private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
@@ -137,18 +136,8 @@ namespace Microsoft.Xna.Framework.Input
             return ret;
         }
 
-        public static GamePadState GetState(PlayerIndex playerIndex)
+        private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            return GetState(playerIndex, GamePadDeadZone.IndependentAxes);
-        }
-
-        public static GamePadState GetState(PlayerIndex playerIndex, GamePadDeadZone deadZoneMode)
-        {
-            // Make sure the player index is in range.
-            var index = (int)playerIndex;
-            if (index < (int)PlayerIndex.One || index > (int)PlayerIndex.Four)
-                throw new InvalidOperationException();
-
             // If the device was disconneced then wait for 
             // the timeout to elapsed before we test it again.
             if (!_connected[index] && _timeout[index] > DateTime.UtcNow.Ticks)
@@ -311,6 +300,25 @@ namespace Microsoft.Xna.Framework.Input
                 ret |= Buttons.RightTrigger;
 
             return new GamePadButtons(ret);
+        }
+
+        private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor)
+        {
+#if DIRECTX11_1
+            if (!_connected[index])
+                return false;
+
+            var controller = _controllers[index];
+            var result = controller.SetVibration(new SharpDX.XInput.Vibration
+            {
+                LeftMotorSpeed = (ushort)(leftMotor * ushort.MaxValue),
+                RightMotorSpeed = (ushort)(rightMotor * ushort.MaxValue),
+            });
+
+            return result == SharpDX.Result.Ok;
+#else
+            return false;
+#endif            
         }
     }
 }
