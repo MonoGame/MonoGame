@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+	MonoGame - Copyright (C) The MonoGame Team
+	This file is subject to the terms and conditions defined in
+	file 'LICENSE.txt', which is part of this source code package.
+-->
+<config xmlns="SharpDoc">
+
+  <!-- Title of the generated documentation -->
+  <title>MonoGame Documentation</title>
+
+  <!-- Defines the styles used. Apply first Paradox and after Standard style -->
+  <style>Standard</style>
+  <!-- <style-dir>Style</style-dir> -->
+
+  <!-- Generate default and docpak -->
+  <output-dir>.\Output</output-dir>
+  
+  <!-- Topics -->
+  <topic id="welcome.md" page-id="main" name="MonoGame Documentation" filename="welcome.md">
+
+    <topic id="getting_started.md" name="Getting Started" filename="getting_started.md"/>
+    <topic id="tutorials.md" name="Tutorials" filename="tutorials.md"/>
+    <topic id="links.md" name="External Links" filename="links.md"/>
+
+    <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->
+    <topic id="X:ClassLibraryReference" page-id="api" name="Class Library Reference" index="100" on-url="true"/>
+
+  </topic>
+  
+  <!-- List the assemblies to include for the class library-->
+  
+  <!-- Windows Desktop -->
+  <source	api="default|Windows Desktop" 
+			xml="..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <source	api="default|Windows Desktop" 
+			xml="..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
+			>..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+
+  <!-- Linux Desktop -->
+  <source	api="linux|Linux Desktop" 
+			xml="..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <source	api="linux|Linux Desktop" 
+			xml="..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
+			>..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+
+ </config>
