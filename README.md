@@ -34,7 +34,7 @@ For more information and advanced usage, please refer to the [Protobuild wiki](h
 
 ### Samples
 
-Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame-Samples](https://github.com/CartBlanche/MonoGame-Samples) to help get you started on your first project.
+Once you have MonoGame, grab the [MonoGame StarterKits](https://github.com/kungfubanana/MonoGame-StarterKits) or [MonoGame Samples](https://github.com/Mono-Game/MonoGame.Samples) to help get you started on your first project.
 
 ## Bug Tracker
 
