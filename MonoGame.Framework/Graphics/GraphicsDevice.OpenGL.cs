@@ -13,7 +13,6 @@ using OpenTK.Graphics;
 using MonoGame.OpenGL;
 #endif
 
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
@@ -1215,7 +1214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new Exception("GetBackBufferData only supports byte[]");
 
             Debug.Assert(data.Length == (_viewport.Width * _viewport.Height * 4));
-            GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+            GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, dataBytes);
 
             //In GL this is upside down (top row is the bottom row), so loop through fixing it up
             var rowSize = _viewport.Width * 4;
