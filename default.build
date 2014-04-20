@@ -188,7 +188,7 @@
 
   <target name="builddocs" description="Build Documentation" depends="clean">
     <if test="${os == 'Win32NT'}">
-      <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml">
+      <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml" />
     </if>
   </target>
 
