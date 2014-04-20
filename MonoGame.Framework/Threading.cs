@@ -65,8 +65,6 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
-        public const int kMaxWaitForUIThread = 12000; // In milliseconds
-
         static int mainThreadId;
         //static int currentThreadId;
 #if ANDROID
@@ -81,10 +79,6 @@ namespace Microsoft.Xna.Framework
         static Threading()
         {
 #if WINDOWS_PHONE
-            if (Thread.CurrentThread.IsBackground)
-            {
-                mainThreadId = Thread.CurrentThread.ManagedThreadId;
-            }
 #else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 #endif
@@ -142,7 +136,7 @@ namespace Microsoft.Xna.Framework
                     action();
                     wait.Set();
                 });
-                wait.WaitOne(kMaxWaitForUIThread);
+                wait.WaitOne();
             }
         }
 #endif
@@ -157,25 +151,15 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if (DIRECTX && !WINDOWS_PHONE) || PSM
+#if WINDOWS_PHONE
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+#elif DIRECTX || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
             if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-                try
-                {
-                    action();
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    // Need to be on a different thread
-#if WINDOWS_PHONE
-                    BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-#else
-                    throw (ex);
-#endif
-                }
+                action();
                 return;
             }
 
@@ -204,8 +188,6 @@ namespace Microsoft.Xna.Framework
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
-#elif WINDOWS_PHONE
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
@@ -224,6 +206,7 @@ namespace Microsoft.Xna.Framework
             resetEvent.Wait();
 #endif
 #endif
+
         }
 
 #if ANDROID

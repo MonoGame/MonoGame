@@ -166,6 +166,18 @@ namespace Microsoft.Xna.Framework.Graphics
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
 #if WINDOWS_PHONE
+            WriteableBitmap writableBitmap = null;
+            Threading.BlockOnUIThread(() =>
+            {
+                // Note that contrary to the method name this works for both JPEG and PNGs.
+                writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
+            });
+            // Convert from ARGB to ABGR 
+            ConvertToABGR(writableBitmap.PixelHeight, writableBitmap.PixelWidth, writableBitmap.Pixels);
+            Texture2D texture = new Texture2D(graphicsDevice, writableBitmap.PixelWidth, writableBitmap.PixelHeight, false, SurfaceFormat.Color);
+            texture.SetData<int>(writableBitmap.Pixels);
+            return texture;
+#elif WINDOWS_PHONE_FROM_NEZZ
             WriteableBitmap bitmap = null;
             var waitEvent = new ManualResetEventSlim(false);
 				    Deployment.Current.Dispatcher.BeginInvoke(() =>
@@ -245,15 +257,13 @@ namespace Microsoft.Xna.Framework.Graphics
             ConvertToRGBA(height, width, pixelData);
 
             var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.BlockOnUIThread(() =>
             {
                 var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
-                waitEvent.Set();
             });
 
-            waitEvent.Wait();
 #endif
 #if MONOMAC
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
