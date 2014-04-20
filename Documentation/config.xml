@@ -79,14 +79,18 @@
   -->
 
   <!-- Android -->
+  <!--
   <source	api="android|Android" 
 			xml="..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.xml"
 			>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
+  -->
 
   <!-- Ouya -->
+  <!--
   <source	api="ouya|OUYA" 
 			xml="..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.xml"
 			>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
+  -->
 
   <!-- PSMobile -->
   <source	api="psm|PlayStation Mobile" 
