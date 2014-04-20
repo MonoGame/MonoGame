@@ -6,14 +6,9 @@
 -->
 <config xmlns="SharpDoc">
 
-  <!-- Title of the generated documentation -->
   <title>MonoGame Documentation</title>
+  <style>MonoGame</style>
 
-  <!-- Defines the styles used. Apply first Paradox and after Standard style -->
-  <style>Standard</style>
-  <!-- <style-dir>Style</style-dir> -->
-
-  <!-- Generate default and docpak -->
   <output-dir>.\Output</output-dir>
   
   <!-- Topics -->
@@ -31,10 +26,10 @@
   <!-- List the assemblies to include for the class library-->
   
   <!-- Windows Desktop -->
-  <source	api="default|Windows Desktop" 
+  <source	api="default|Windows DirectX Desktop" 
 			xml="..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.xml"
 			>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll</source>
-  <source	api="default|Windows Desktop" 
+  <source	api="default|Windows DirectX Desktop" 
 			xml="..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
 			>..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
 
@@ -57,7 +52,7 @@
   -->
 
   <!-- WindowsGL Desktop -->
-  <source	api="windowsgl|WindowsGL Desktop" 
+  <source	api="wingl|Windows OpenGL Desktop" 
 			xml="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.xml"
 			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
 
