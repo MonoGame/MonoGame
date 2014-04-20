@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureDiffuse.FilePath, identity);
                     texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureDiffuse.UVIndex));
-                    material.Textures.Add("Texture", texture);
+                    material.Texture = texture;
                 }
 
                 if (sceneMaterial.HasTextureOpacity)

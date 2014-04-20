@@ -166,7 +166,23 @@ namespace Microsoft.Xna.Framework.Graphics
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
 #if WINDOWS_PHONE
-            throw new NotImplementedException();
+            WriteableBitmap bitmap = null;
+            var waitEvent = new ManualResetEventSlim(false);
+				    Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+		            BitmapImage bitmapImage = new BitmapImage();
+		            bitmapImage.SetSource(stream);
+		            bitmap = new WriteableBitmap(bitmapImage);
+		            waitEvent.Set();
+            });
+				    waitEvent.Wait();
+
+            // Convert from ARGB to ABGR 
+            ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+            Texture2D texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
+            texture.SetData<int>(bitmap.Pixels);
+            return texture;
 #endif
 #if !WINDOWS_PHONE
 
@@ -187,10 +203,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return toReturn;
 #endif
 #if WINDOWS
-            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            try
             {
                 // Fix up the Image to match the expected format
-                image.RGBToBGR();
+                image = (Bitmap)image.RGBToBGR();
 
                 var data = new byte[image.Width * image.Height * 4];
 
@@ -206,6 +223,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 texture.SetData(data);
 
                 return texture;
+            }
+            finally
+            {
+                image.Dispose();
             }
 #endif
         }

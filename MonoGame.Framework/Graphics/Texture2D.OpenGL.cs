@@ -469,11 +469,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.Recycle();
 
                 // Convert from ARGB to ABGR
-                for (int i = 0; i < width * height; ++i)
-                {
-                    uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
-                }
+                ConvertToABGR(height, width, pixels);
 
                 Texture2D texture = null;
                 Threading.BlockOnUIThread(() =>
@@ -486,10 +482,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 #if WINDOWS || LINUX
-            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
+            Bitmap image = (Bitmap)Bitmap.FromStream(stream);
+            try
             {
                 // Fix up the Image to match the expected format
-                image.RGBToBGR();
+                image = (Bitmap)image.RGBToBGR();
 
                 var data = new byte[image.Width * image.Height * 4];
 
@@ -505,6 +502,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 texture.SetData(data);
 
                 return texture;
+            }
+            finally
+            {
+                image.Dispose();
             }
 #endif
         }
@@ -528,11 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 image.GetPixels(pixels, 0, width, 0, 0, width, height);
 
                 // Convert from ARGB to ABGR
-                for (int i = 0; i < width * height; ++i)
-                {
-                    uint pixel = (uint)pixels[i];
-                    pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
-                }
+                ConvertToABGR(height, width, pixels);
 
                 this.SetData<int>(pixels);
                 image.Recycle();

@@ -26,7 +26,7 @@ namespace MonoGameContentProcessors.Processors
 
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.DX11Profile = platform == MonoGamePlatform.Windows8 ? true : false;
+            options.Profile = platform == MonoGamePlatform.Windows8 ? ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
@@ -45,10 +45,10 @@ namespace MonoGameContentProcessors.Processors
             }
 
             // Create the effect object.
-            DXEffectObject effect = null;
+            EffectObject effect = null;
             try
             {
-                effect = DXEffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.FromShaderInfo(shaderInfo);
             }
             catch (Exception ex)
             {
