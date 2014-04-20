@@ -5,13 +5,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
-using System.Drawing;
-
-#if WINDOWS
-using System.Drawing.Imaging;
-#endif
 
 #if WINRT
 #if WINDOWS_PHONE
@@ -20,10 +13,9 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 #else
 using Windows.Graphics.Imaging;
-using Windows.UI.Xaml.Media.Imaging;
-#endif
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
