@@ -680,7 +680,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetBackBufferData<T>(T[] data) where T : struct
         {
+#if MONOMAC
+            var tByteSize = Marshal.SizeOf(typeof(T));
+#endif
+#if !MONOMAC
             var tByteSize = OpenTK.BlittableValueType.StrideOf(data);
+#endif
+
             Debug.Assert((data.Length * tByteSize) >= (_viewport.Width * _viewport.Height * 4));
 
             GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
