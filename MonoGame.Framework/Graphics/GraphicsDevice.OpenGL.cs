@@ -1206,27 +1206,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetBackBufferData<T>(T[] data) where T : struct
         {
-            //TODO: We could probably support other types
+            var tByteSize = Marshal.SizeOf(typeof(T));
+            Debug.Assert((data.Length * tByteSize) >= (_viewport.Width * _viewport.Height * 4));
 
-            var dataBytes = data as byte[];
-
-            if (dataBytes == null)
-                throw new Exception("GetBackBufferData only supports byte[]");
-
-            Debug.Assert(data.Length == (_viewport.Width * _viewport.Height * 4));
-            GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, dataBytes);
+            GL.ReadPixels(0, 0, _viewport.Width, _viewport.Height, PixelFormat.Rgba, PixelType.UnsignedByte, data);
 
             //In GL this is upside down (top row is the bottom row), so loop through fixing it up
-            var rowSize = _viewport.Width * 4;
-            var row = new byte[rowSize];
+            var rowSize = _viewport.Width * 4 / tByteSize;
+            var row = new T[rowSize];
             for (var y = 0; y < _viewport.Height / 2; y++)
             {
                 //Copy the top row out
-                Array.Copy(dataBytes, y * rowSize, row, 0, rowSize);
+                Array.Copy(data, y * rowSize, row, 0, rowSize);
                 //Copy the bottom row over the top row
-                Array.Copy(dataBytes, (_viewport.Height - y - 1) * rowSize, dataBytes, y * rowSize, rowSize);
+                Array.Copy(data, (_viewport.Height - y - 1) * rowSize, data, y * rowSize, rowSize);
                 //Copy the backup over the bottom row
-                Array.Copy(row, 0, dataBytes, (_viewport.Height - y - 1) * rowSize, rowSize);
+                Array.Copy(row, 0, data, (_viewport.Height - y - 1) * rowSize, rowSize);
             }
         }
 
