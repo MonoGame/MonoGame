@@ -45,5 +45,35 @@
   <source	api="linux|Linux Desktop" 
 			xml="..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
 			>..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  
+  <!-- MacOS Desktop -->
+  <!--
+  <source	api="macos|MacOS Desktop" 
+			xml="..\MonoGame.Framework\bin\MacOS\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\MacOS\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <source	api="macos|MacOS Desktop" 
+			xml="..\MonoGame.Framework.Content.Pipeline\bin\MacOS\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
+			>..\MonoGame.Framework.Content.Pipeline\bin\MacOS\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  -->
+
+  <!-- WindowsGL Desktop -->
+  <source	api="windowsgl|WindowsGL Desktop" 
+			xml="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+
+  <!-- Windows 8 Store -->
+  <source	api="win8metro|Windows 8 Store" 
+			xml="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+
+  <!-- Windows Phone 8 -->
+  <source	api="wp8|Windows Phone 8" 
+			xml="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
+
+  <!-- Web -->
+  <source	api="web|Web" 
+			xml="..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
 
  </config>
