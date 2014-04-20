@@ -71,4 +71,26 @@
 			xml="..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.xml"
 			>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
 
+  <!-- iOS -->
+  <!--
+  <source	api="ios|iOS" 
+			xml="..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.dll</source>
+  -->
+
+  <!-- Android -->
+  <source	api="android|Android" 
+			xml="..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
+
+  <!-- Ouya -->
+  <source	api="ouya|OUYA" 
+			xml="..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
+
+  <!-- PSMobile -->
+  <source	api="psm|PlayStation Mobile" 
+			xml="..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.dll</source>
+
  </config>
