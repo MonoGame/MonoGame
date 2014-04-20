@@ -110,14 +110,14 @@ namespace Microsoft.Xna.Framework.Media
         public static float Volume
         {
             get { return _volume; }
-			set 
-			{       
-				_volume = value;
+            set
+            {
+                _volume = MathHelper.Clamp(value, 0, 1);
 
                 PlatformSetVolume();
-			}
+            }
         }
-		
+
 		#endregion
 		
         public static void Pause()
