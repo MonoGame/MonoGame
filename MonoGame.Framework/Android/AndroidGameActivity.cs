@@ -56,6 +56,8 @@ namespace Microsoft.Xna.Framework
 		    RegisterReceiver(screenReceiver, filter);
 
             RequestWindowFeature(WindowFeatures.NoTitle);
+
+			Game.Activity = this;
 		}
 
         public static event EventHandler Paused;

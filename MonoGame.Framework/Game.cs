@@ -275,9 +275,8 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
-		[Obsolete("This is ugly and would be nice to get rid of")]
-		[CLSCompliant(false)]
-        public static AndroidGameActivity Activity { get; set; }
+        [CLSCompliant(false)]
+        public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
         internal static Game Instance { get { return Game._instance; } }
