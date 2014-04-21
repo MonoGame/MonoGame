@@ -360,19 +360,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if ANDROID
-		[CLSCompliant(false)]
-        public AndroidGameWindow Window
-        {
-            get { return Platform.Window; }
-        }
-#else
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }
         }
-#endif
 
         #endregion Properties
 

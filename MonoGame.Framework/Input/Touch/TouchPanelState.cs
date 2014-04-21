@@ -70,25 +70,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
-#if ANDROID
-
-        // TODO: Fix AndroidGameWindow and this
-        // gross hack can be removed.
-
-        internal readonly AndroidGameWindow Window;
-
-        internal TouchPanelState(AndroidGameWindow window)
-        {
-            Window = window;
-        }
-#else
         internal readonly GameWindow Window;
 
         internal TouchPanelState(GameWindow window)
         {
             Window = window;
         }
-#endif
 
         /// <summary>
         /// The window handle of the touch panel. Purely for Xna compatibility.
