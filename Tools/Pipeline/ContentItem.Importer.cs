@@ -22,9 +22,9 @@ namespace MonoGame.Tools.Pipeline
         // JCF: Temporary hard coded values for testing purposes.
         //      This should be populated with real importers from loaded assemblies.
         private static readonly Importer[] _importerTypes = new Importer[]
-            {                
-                new Importer() { Name = "Sound Importer" },
-                new Importer() { Name = "Texture Importer" },
+            {
+                new Importer() {Name = "Sound Importer"},
+                new Importer() {Name = "Texture Importer"},
             };
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
@@ -50,9 +50,9 @@ namespace MonoGame.Tools.Pipeline
         // conversion. Typically, this interface is used at design time to 
         // provide information about the design-time container.
         public override bool CanConvertFrom(ITypeDescriptorContext context,
-           Type sourceType)
+                                            Type sourceType)
         {
-            if (sourceType == typeof(string))
+            if (sourceType == typeof (string))
             {
                 return true;
             }
@@ -62,7 +62,8 @@ namespace MonoGame.Tools.Pipeline
 
 
         public override object ConvertFrom(ITypeDescriptorContext context,
-           CultureInfo culture, object value)
+                                           CultureInfo culture,
+                                           object value)
         {
             if (value is string)
             {
@@ -80,9 +81,11 @@ namespace MonoGame.Tools.Pipeline
 
 
         public override object ConvertTo(ITypeDescriptorContext context,
-           CultureInfo culture, object value, Type destinationType)
+                                         CultureInfo culture,
+                                         object value,
+                                         Type destinationType)
         {
-            if (destinationType == typeof(string))
+            if (destinationType == typeof (string))
             {
                 return ((Importer)value).Name;
             }
@@ -92,7 +95,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
         {
-            return TypeDescriptor.GetProperties(value, attributes, true);            
+            return TypeDescriptor.GetProperties(value, attributes, true);
         }
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)

@@ -11,6 +11,8 @@
     <RootNamespace>MGCB</RootNamespace>
     <AssemblyName>MGCB</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,14 +38,16 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\Windows\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-    <PlatformTarget>anycpu</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <OutputPath>..\bin\Windows\</OutputPath>
     <DefineConstants>WINDOWS</DefineConstants>
-    <PlatformTarget>anycpu</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -70,6 +74,9 @@
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
       <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

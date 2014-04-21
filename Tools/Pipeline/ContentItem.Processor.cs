@@ -23,9 +23,9 @@ namespace MonoGame.Tools.Pipeline
         // JCF: Temporary hard coded values for testing purposes.
         //      This should be populated with real processors from loaded assemblies.
         private static readonly Processor[] _processorTypes = new Processor[]
-            {                
-                new Processor() { Name = "Sound Processor" },
-                new Processor() { Name = "Texture Processor" },
+            {
+                new Processor() {Name = "Sound Processor"},
+                new Processor() {Name = "Texture Processor"},
             };
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
@@ -51,9 +51,9 @@ namespace MonoGame.Tools.Pipeline
         // conversion. Typically, this interface is used at design time to 
         // provide information about the design-time container.
         public override bool CanConvertFrom(ITypeDescriptorContext context,
-           Type sourceType)
+                                            Type sourceType)
         {
-            if (sourceType == typeof(string))
+            if (sourceType == typeof (string))
             {
                 return true;
             }
@@ -63,7 +63,8 @@ namespace MonoGame.Tools.Pipeline
 
 
         public override object ConvertFrom(ITypeDescriptorContext context,
-           CultureInfo culture, object value)
+                                           CultureInfo culture,
+                                           object value)
         {
             if (value is string)
             {
@@ -81,9 +82,11 @@ namespace MonoGame.Tools.Pipeline
 
 
         public override object ConvertTo(ITypeDescriptorContext context,
-           CultureInfo culture, object value, Type destinationType)
+                                         CultureInfo culture,
+                                         object value,
+                                         Type destinationType)
         {
-            if (destinationType == typeof(string))
+            if (destinationType == typeof (string))
             {
                 return ((Processor)value).Name;
             }
@@ -106,7 +109,7 @@ namespace MonoGame.Tools.Pipeline
             var processor = value as Processor;
             foreach (var item in processor.Data)
             {
-                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, typeof(string), typeof(Processor), processor.Data);
+                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, typeof (string), typeof (Processor), processor.Data);
                 props.Add(desc);
             }
 

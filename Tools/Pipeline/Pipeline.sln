@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGCB", "..\MGCB\MGCB.csproj", "{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DE47032-A904-4C29-BD22-2D235E8D91BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -94,12 +94,16 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj">
-      <Project>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</Project>
+      <Project>{b950de10-ac5d-4bd9-b817-51247c4a732d}</Project>
       <Name>MonoGame.Framework.Content.Pipeline.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
       <Name>MonoGame.Framework.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MGCB\MGCB.csproj">
+      <Project>{dcc0b1ad-8dc5-41c1-b6ec-404534cdeb32}</Project>
+      <Name>MGCB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
