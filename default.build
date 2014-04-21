@@ -19,9 +19,9 @@
   </target>
 
   <target name="clean">
-    <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" verbose="true" />
-    <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" verbose="true" />
-    <delete dir="${project::get-base-directory()}\Documentation\Output" verbose="true" />
+    <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" />
+    <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" />
+    <delete dir="${project::get-base-directory()}\Documentation\Output" />
   </target>
 
   <target name="build" description="Build MonoGame Release" depends="checkos">
