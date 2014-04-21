@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework
             : base(game)
         {
             System.Diagnostics.Debug.Assert(Game.Activity != null, "Must set Game.Activity before creating the Game instance");
-            AndroidGameActivity.Game = game;
+            Game.Activity.Game = Game;
             AndroidGameActivity.Paused += Activity_Paused;
             AndroidGameActivity.Resumed += Activity_Resumed;
 

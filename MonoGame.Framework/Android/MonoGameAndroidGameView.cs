@@ -18,13 +18,15 @@ namespace Microsoft.Xna.Framework
     internal class MonoGameAndroidGameView : AndroidGameView, View.IOnTouchListener, ISurfaceHolderCallback
     {
         private readonly AndroidGameWindow _gameWindow;
-        private readonly AndroidTouchEventManager _touchManager;
+	    private readonly Game _game;
+	    private readonly AndroidTouchEventManager _touchManager;
 
-        public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow)
+        public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow, Game game)
             : base(context)
         {
             _gameWindow = androidGameWindow;
-            _touchManager = new AndroidTouchEventManager(androidGameWindow);
+	        _game = game;
+	        _touchManager = new AndroidTouchEventManager(androidGameWindow);
 
             Initialize();
         }
@@ -60,8 +62,8 @@ namespace Microsoft.Xna.Framework
             SurfaceChanged(holder, format, width, height);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
 
-            if (_gameWindow.Game.GraphicsDevice != null)
-                _gameWindow.Game.graphicsDeviceManager.ResetClientBounds();
+            if (_game.GraphicsDevice != null)
+                _game.graphicsDeviceManager.ResetClientBounds();
         }
 
         void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)

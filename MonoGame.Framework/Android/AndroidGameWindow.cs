@@ -26,7 +26,8 @@ namespace Microsoft.Xna.Framework
     {
         internal MonoGameAndroidGameView GameView { get; private set; }
         private Rectangle clientBounds;
-        internal readonly Game Game;
+        private readonly Game _game;
+        private readonly OrientationListener _orientationListener;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
         private bool _contextWasLost = false;
@@ -41,11 +42,12 @@ namespace Microsoft.Xna.Framework
             _resumer = resumer;
         }
 
-        public AndroidGameWindow(Context context, Game game)
+        public AndroidGameWindow(AndroidGameActivity activity, Game game)
         {
-            Game = game;
+            _game = game;
             TouchPanelState = new TouchPanelState(this);
-            Initialize(context);
+            _orientationListener = new OrientationListener(Game.Activity, this);
+            Initialize(activity);
 
             game.Services.AddService(typeof(View), GameView);
         }
@@ -54,7 +56,10 @@ namespace Microsoft.Xna.Framework
         {
             clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
 
-            GameView = new MonoGameAndroidGameView(context, this);
+            if (_orientationListener.CanDetectOrientation())
+                _orientationListener.Enable();
+
+            GameView = new MonoGameAndroidGameView(context, this, _game);
             GameView.RenderFrame += OnRenderFrame;
             GameView.UpdateFrame += OnUpdateFrame;
 
@@ -76,7 +81,7 @@ namespace Microsoft.Xna.Framework
                 {
                     int depth = 0;
                     int stencil = 0;
-                    switch (this.Game.graphicsDeviceManager.PreferredDepthStencilFormat)
+                    switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
                     {
                         case DepthFormat.Depth16: 
                         depth = 16;
@@ -115,9 +120,9 @@ namespace Microsoft.Xna.Framework
             {
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
             }
-            if (Game.GraphicsDevice != null && _contextWasLost)
+            if (_game.GraphicsDevice != null && _contextWasLost)
             {
-                Game.GraphicsDevice.Initialize();
+                _game.GraphicsDevice.Initialize();
 
                 _isResuming = true;
                 if (_resumer != null)
@@ -134,8 +139,8 @@ namespace Microsoft.Xna.Framework
                         Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                         // DeviceReset events
-                        Game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        Game.GraphicsDevice.OnDeviceReset();
+                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                        _game.GraphicsDevice.OnDeviceReset();
 
                         _contextWasLost = false;
                         _isResuming = false;
@@ -150,9 +155,9 @@ namespace Microsoft.Xna.Framework
         internal void DestroyFrameBuffer()
         {
             // DeviceResetting events
-            Game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if(Game.GraphicsDevice != null) 
-                Game.GraphicsDevice.OnDeviceResetting();
+            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            if(_game.GraphicsDevice != null) 
+                _game.GraphicsDevice.OnDeviceResetting();
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
@@ -181,20 +186,20 @@ namespace Microsoft.Xna.Framework
 
             Threading.Run();
 
-            if (Game != null)
+            if (_game != null)
             {
-                if (!_isResuming && Game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+                if (!_isResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
                 {
-                    Game.Tick();
+                    _game.Tick();
                 }
-                else if (Game.GraphicsDevice != null)
+                else if (_game.GraphicsDevice != null)
                 {
-                    Game.GraphicsDevice.Clear(Color.Black);
+                    _game.GraphicsDevice.Clear(Color.Black);
                     if (_isResuming && _resumer != null)
                     {
                         _resumer.Draw();
                     }
-                    Game.Platform.Present();
+                    _game.Platform.Present();
                 }
             }
         }
@@ -217,7 +222,7 @@ namespace Microsoft.Xna.Framework
         {
             if (supportedOrientations == DisplayOrientation.Default)
             {
-                var deviceManager = (Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
+                var deviceManager = (_game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
                 if (deviceManager == null)
                     return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
@@ -261,8 +266,8 @@ namespace Microsoft.Xna.Framework
             SetDisplayOrientation(newOrientation);
             TouchPanel.DisplayOrientation = newOrientation;
 
-            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && Game.graphicsDeviceManager != null)
-                Game.graphicsDeviceManager.ApplyChanges();
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
+                _game.graphicsDeviceManager.ApplyChanges();
         }
 
         public override string ScreenDeviceName 
