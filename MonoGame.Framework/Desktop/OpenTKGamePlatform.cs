@@ -181,6 +181,12 @@ namespace Microsoft.Xna.Framework
             OpenTK.DisplayDevice.Default.RestoreResolution();
         }
 
+        public override void BeforeInitialize()
+        {
+            _view.Window.Visible = true;
+            base.BeforeInitialize();
+        }
+
         public override bool BeforeUpdate(GameTime gameTime)
         {
             IsActive = _view.Window.Focused;
