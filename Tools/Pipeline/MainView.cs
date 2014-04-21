@@ -52,7 +52,8 @@ namespace MonoGame.Tools.Pipeline
                 FileName = Path.GetFileName(filePath),
                 AddExtension = true,
                 CheckPathExists = true,
-                Filter = "Pipeline Project (*.pipline)|*.pipeline"
+                Filter = "All Files (*.*)|*.*|Pipeline Projects (*.mgcb, *.pipeline)|*.mgcb;*.pipeline",
+                FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
             filePath = dialog.FileName;
@@ -67,7 +68,8 @@ namespace MonoGame.Tools.Pipeline
                 AddExtension = true,
                 CheckPathExists = true,
                 CheckFileExists = true,
-                Filter = "Pipeline Project (*.pipline)|*.pipeline"
+                Filter = "All Files (*.*)|*.*|Pipeline Projects (*.mgcb, *.pipeline)|*.mgcb;*.pipeline",
+                FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
             projectFilePath = dialog.FileName;

@@ -71,11 +71,21 @@ namespace MonoGame.Tools.Pipeline
             Description = "Defines the class name of the content importer for reading source content.")]
         public string Importer;
 
+        private string _processor;
+
         [CommandLineParameter(
             Name = "processor",
             ValueName = "className",
             Description = "Defines the class name of the content processor for processing imported content.")]
-        public string Processor;
+        public string Processor
+        {
+            get { return _processor; }
+            set
+            {
+                _processor = value;
+                _processorParams.Clear();
+            }
+        }
 
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
 
