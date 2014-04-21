@@ -15,6 +15,7 @@ using MonoMac.OpenGL;
 #endif
 
 #if WINDOWS || LINUX
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -39,6 +40,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
+#if WINDOWS || LINUX
+        internal IGraphicsContext Context { get; private set; }
+#endif
+
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
 #endif
@@ -109,6 +114,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
+#if WINDOWS || LINUX
+            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+            if (Context == null || Context.IsDisposed)
+            {
+                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
+                var depth =
+                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
+                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
+                    24;
+                var stencil =
+                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
+                    0;
+                var samples = PresentationParameters.MultiSampleCount;
+
+                var mode = new GraphicsMode(color, depth, stencil, samples);
+
+                Context = new GraphicsContext(mode, wnd);
+            }
+            Context.MakeCurrent(wnd);
+            (Context as IGraphicsContextInternal).LoadAll();
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+#endif
+
             MaxTextureSlots = 16;
 
 #if GLES
@@ -275,6 +303,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     Framebuffer.Delete(this.glRenderTargetFrameBuffer);
                 }
+
+#if WINDOWS || LINUX
+                Context.Dispose();
+                Context = null;
+#endif
             });
         }
 
@@ -302,7 +335,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-			GL.Flush();
+#if WINDOWS || LINUX
+            Context.SwapBuffers();
+#else
+            GL.Flush();
+#endif
             GraphicsExtensions.CheckGLError();
 
             // Dispose of any GL resources that were disposed in another thread
