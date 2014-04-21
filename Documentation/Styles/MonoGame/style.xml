@@ -8,7 +8,9 @@
 
   <name>MonoGame</name>
   <description>MonoGame style for web publishing</description>
-  <param name="FileExt">.htm</param>
   <inherit>Standard</inherit>
+
+  <param name="FileExt">.html</param>
+  <param name="ExternalLinkTarget">_top</param>
 
 </style>
