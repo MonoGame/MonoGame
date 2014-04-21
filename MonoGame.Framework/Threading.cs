@@ -65,6 +65,8 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
+        public const int kMaxWaitForUIThread = 12000; // In milliseconds
+
         static int mainThreadId;
         //static int currentThreadId;
 #if ANDROID
@@ -79,6 +81,12 @@ namespace Microsoft.Xna.Framework
         static Threading()
         {
 #if WINDOWS_PHONE
+            if (Thread.CurrentThread.IsBackground)
+            {
+                mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
+#elif WINDOWS_STOREAPP
+            mainThreadId = Environment.CurrentManagedThreadId;
 #else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 #endif
@@ -92,6 +100,8 @@ namespace Microsoft.Xna.Framework
         {
 #if WINDOWS_PHONE
             return Deployment.Current.Dispatcher.CheckAccess();
+#elif WINDOWS_STOREAPP
+            return (mainThreadId == Environment.CurrentManagedThreadId);
 #else
             return mainThreadId == Thread.CurrentThread.ManagedThreadId;
 #endif
@@ -105,10 +115,12 @@ namespace Microsoft.Xna.Framework
         {
 #if WINDOWS_PHONE
             if (!Deployment.Current.Dispatcher.CheckAccess())
+#elif WINDOWS_STOREAPP
+            if (mainThreadId != Environment.CurrentManagedThreadId)
 #else
             if (mainThreadId != Thread.CurrentThread.ManagedThreadId)
 #endif
-                throw new InvalidOperationException(String.Format("Operation not called on UI thread. UI thread ID = {0}. This thread ID = {1}.", mainThreadId, Thread.CurrentThread.ManagedThreadId));
+                throw new InvalidOperationException("Operation not called on UI thread.");
         }
 
 #if WINDOWS_PHONE
@@ -136,7 +148,7 @@ namespace Microsoft.Xna.Framework
                     action();
                     wait.Set();
                 });
-                wait.WaitOne();
+                wait.WaitOne(kMaxWaitForUIThread);
             }
         }
 #endif
@@ -151,15 +163,25 @@ namespace Microsoft.Xna.Framework
             if (action == null)
                 throw new ArgumentNullException("action");
 
-#if WINDOWS_PHONE
-            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-#elif DIRECTX || PSM
+#if (DIRECTX && !WINDOWS_PHONE) || PSM
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
             if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-                action();
+                try
+                {
+                    action();
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // Need to be on a different thread
+#if WINDOWS_PHONE
+                    BlockOnContainerThread(Deployment.Current.Dispatcher, action);
+#else
+                    throw (ex);
+#endif
+                }
                 return;
             }
 
@@ -188,6 +210,8 @@ namespace Microsoft.Xna.Framework
                 // Must make the context not current on this thread or the next thread will get error 170 from the MakeCurrent call
                 BackgroundContext.MakeCurrent(null);
             }
+#elif WINDOWS_PHONE
+            BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
 #if MONOMAC
@@ -206,7 +230,6 @@ namespace Microsoft.Xna.Framework
             resetEvent.Wait();
 #endif
 #endif
-
         }
 
 #if ANDROID
