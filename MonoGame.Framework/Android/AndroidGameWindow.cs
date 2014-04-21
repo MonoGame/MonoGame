@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
     [CLSCompliant(false)]
     public class AndroidGameWindow : GameWindow , View.IOnTouchListener, ISurfaceHolderCallback, View.IOnKeyListener, IDisposable
     {
-        private MonoGameAndroidGameView _gameView;
+	    internal MonoGameAndroidGameView GameView { get; private set; }
         private Rectangle clientBounds;
         private Game _game;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
@@ -96,20 +96,22 @@ namespace Microsoft.Xna.Framework
             TouchPanelState = new TouchPanelState(this);
             Initialize(context);
 
+            game.Services.AddService(typeof(View), GameView);
         }
 
         private void Initialize(Context context)
         {
-			_gameView = new MonoGameAndroidGameView(context, this);
-            _gameView.Load += OnLoad;
-            _gameView.SetOnKeyListener(this);
-            _gameView.SetOnTouchListener(this);
-            _gameView.RenderFrame += OnRenderFrame;
-            _gameView.UpdateFrame += OnUpdateFrame;
-			clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
+            clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
 
-            _gameView.RequestFocus();
-            _gameView.FocusableInTouchMode = true;
+            GameView = new MonoGameAndroidGameView(context, this);
+            GameView.Load += OnLoad;
+            GameView.SetOnKeyListener(this);
+            GameView.SetOnTouchListener(this);
+            GameView.RenderFrame += OnRenderFrame;
+            GameView.UpdateFrame += OnUpdateFrame;
+
+            GameView.RequestFocus();
+            GameView.FocusableInTouchMode = true;
 
             _touchManager = new AndroidTouchEventManager(_game);
 
@@ -120,7 +122,7 @@ namespace Microsoft.Xna.Framework
         
         private void OnLoad (object sender, EventArgs eventArgs)
         {
-            _gameView.MakeCurrent();
+            GameView.MakeCurrent();
         }
 
         #region IOnKeyListener
@@ -196,7 +198,7 @@ namespace Microsoft.Xna.Framework
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
             try
             {
-                _gameView.GLContextVersion = GLContextVersion.Gles2_0;
+                GameView.GLContextVersion = GLContextVersion.Gles2_0;
                 try
                 {
                     int depth = 0;
@@ -216,23 +218,23 @@ namespace Microsoft.Xna.Framework
                         case DepthFormat.None: break;
                     }
                     Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
-                    _gameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false);
-                    _gameView.BaseCreateFrameBuffer();
+                    GameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false);
+                    GameView.BaseCreateFrameBuffer();
                 }
                 catch(Exception)
                 {
                     Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
                     // try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
-                    _gameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
+                    GameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
                     try {
-                        _gameView.BaseCreateFrameBuffer();
+                        GameView.BaseCreateFrameBuffer();
                     } catch (Exception) {
                         // ok we are right back to getting the default
-                        _gameView.GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-                        _gameView.BaseCreateFrameBuffer();
+                        GameView.GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+                        GameView.BaseCreateFrameBuffer();
                     }
                 }
-                Android.Util.Log.Debug("MonoGame", "Created format {0}", _gameView.GraphicsContext.GraphicsMode);
+                Android.Util.Log.Debug("MonoGame", "Created format {0}", GameView.GraphicsContext.GraphicsMode);
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
             } 
@@ -269,7 +271,7 @@ namespace Microsoft.Xna.Framework
                 bgThread.Start();
             }
 
-            _gameView.MakeCurrent();
+            GameView.MakeCurrent();
         }
 
         internal void DestroyFrameBuffer()
@@ -281,28 +283,28 @@ namespace Microsoft.Xna.Framework
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
-            _gameView.BaseDestroyFrameBuffer();
+            GameView.BaseDestroyFrameBuffer();
 
-            _contextWasLost = _gameView.GraphicsContext == null || _gameView.GraphicsContext.IsDisposed;
+            _contextWasLost = GameView.GraphicsContext == null || GameView.GraphicsContext.IsDisposed;
         }
 
         #region AndroidGameView Methods
 
         private void OnRenderFrame(object sender, FrameEventArgs frameEventArgs)
         {
-            if (_gameView.GraphicsContext == null || _gameView.GraphicsContext.IsDisposed)
+            if (GameView.GraphicsContext == null || GameView.GraphicsContext.IsDisposed)
                 return;
 
-            if (!_gameView.GraphicsContext.IsCurrent)
-                _gameView.MakeCurrent();
+            if (!GameView.GraphicsContext.IsCurrent)
+                GameView.MakeCurrent();
 
             Threading.Run();
         }
 
         private void OnUpdateFrame(object sender, FrameEventArgs frameEventArgs)
         {
-            if (!_gameView.GraphicsContext.IsCurrent)
-                _gameView.MakeCurrent();
+            if (!GameView.GraphicsContext.IsCurrent)
+                GameView.MakeCurrent();
 
             Threading.Run();
 
@@ -543,7 +545,7 @@ namespace Microsoft.Xna.Framework
 
         void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
         {
-            _gameView.SurfaceChanged(holder, format, width, height);
+            GameView.SurfaceChanged(holder, format, width, height);
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
 
             if (_game.GraphicsDevice != null)
@@ -552,13 +554,13 @@ namespace Microsoft.Xna.Framework
 
         void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)
         {
-            _gameView.SurfaceDestroyed(holder);
+            GameView.SurfaceDestroyed(holder);
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceDestroyed");
         }
 
         void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
         {
-            _gameView.SurfaceCreated(holder);
+            GameView.SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
         }
 
@@ -566,10 +568,10 @@ namespace Microsoft.Xna.Framework
 
 	    public void Dispose()
 	    {
-		    if (_gameView != null)
+		    if (GameView != null)
 		    {
-			    _gameView.Dispose();
-			    _gameView = null;
+			    GameView.Dispose();
+			    GameView = null;
 		    }
 	    }
 

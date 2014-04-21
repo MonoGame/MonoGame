@@ -96,12 +96,14 @@ namespace Microsoft.Xna.Framework
             AndroidGameActivity.Paused += Activity_Paused;
             AndroidGameActivity.Resumed += Activity_Resumed;
 
-            Window = new AndroidGameWindow(Game.Activity, game);
+            _view = new AndroidGameWindow(Game.Activity, game);
+            Window = _view;
         }
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
-		private bool _exiting = false;
+        private bool _exiting = false;
+        private AndroidGameWindow _view;
 
         public override void Exit()
         {
@@ -116,7 +118,7 @@ namespace Microsoft.Xna.Framework
 					Game.DoExiting();
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
-				    Window.Close();
+				    _view.GameView.Close();
 				}
             }
             catch
@@ -131,7 +133,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            Window.Resume();
+			_view.GameView.Resume();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -156,16 +158,16 @@ namespace Microsoft.Xna.Framework
             // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
             //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
 
-            switch (Window.Context.Resources.Configuration.Orientation)
+			switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait, false);				
+					_view.SetOrientation(DisplayOrientation.Portrait, false);
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_view.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_view.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
             }			
             base.BeforeInitialize();
@@ -173,8 +175,9 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeRun()
         {
+
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
-            Window.Run();
+			_view.GameView.Run();
 
             return false;
         }
@@ -203,25 +206,25 @@ namespace Microsoft.Xna.Framework
             if (!IsActive)
             {
                 IsActive = true;
-                Window.Resume();
+				_view.GameView.Resume();
 				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
-				if(!Window.IsFocused)
-		           Window.RequestFocus();
+				if (!_view.GameView.IsFocused)
+					_view.GameView.RequestFocus();
             }
         }
 
 		MediaState _MediaPlayer_PrevState = MediaState.Stopped;
-        // EnterBackground
+	    // EnterBackground
         void Activity_Paused(object sender, EventArgs e)
         {
             if (IsActive)
             {
                 IsActive = false;
 				_MediaPlayer_PrevState = MediaPlayer.State;
-                Window.Pause();
-				Window.ClearFocus();
+				_view.GameView.Pause();
+				_view.GameView.ClearFocus();
 				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
@@ -249,8 +252,8 @@ namespace Microsoft.Xna.Framework
                 var device = Game.GraphicsDevice;
                 if (device != null)
                     device.Present();
-                    
-                Window.SwapBuffers();
+
+				_view.GameView.SwapBuffers();
             }
             catch (Exception ex)
             {

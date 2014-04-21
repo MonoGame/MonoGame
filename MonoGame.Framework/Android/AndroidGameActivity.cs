@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework
 	[CLSCompliant(false)]
     public class AndroidGameActivity : Activity
     {
+		[Obsolete("This is really ugly, would be nice to get rid of")]
         public static Game Game { get; set; }
 		
 		private OrientationListener o;		
@@ -43,8 +44,8 @@ namespace Microsoft.Xna.Framework
 			o = new OrientationListener(this);	
 			if (o.CanDetectOrientation())
 			{
-				o.Enable();				
-			}					
+				o.Enable();
+			}
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -84,7 +85,7 @@ namespace Microsoft.Xna.Framework
             if (deviceManager == null)
                 return;
             (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
-            Game.Window.RequestFocus();
+            ((AndroidGameWindow)Game.Window).GameView.RequestFocus();
         }
 
 		protected override void OnDestroy ()
