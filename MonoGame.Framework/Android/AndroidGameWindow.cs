@@ -76,7 +76,6 @@ namespace Microsoft.Xna.Framework
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
-        internal TouchPanelState TouchPanelState;
 
 		public override IntPtr Handle { get { return IntPtr.Zero; } }
 
