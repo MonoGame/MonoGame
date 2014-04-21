@@ -24,12 +24,7 @@ namespace Microsoft.Xna.Framework
 		private OrientationListener o;		
 		private ScreenReceiver screenReceiver;
 
-		private bool _AutoPauseAndResumeMediaPlayer = true;
-		public bool AutoPauseAndResumeMediaPlayer
-		{
-			get{return _AutoPauseAndResumeMediaPlayer;}
-			set{_AutoPauseAndResumeMediaPlayer = value;}
-		}
+		public bool AutoPauseAndResumeMediaPlayer = true;
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
