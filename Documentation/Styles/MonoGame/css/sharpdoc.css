@@ -67,7 +67,7 @@
 
 .sdoc-subheading
 {
-	color:#3F529C;
+	color:#D32600;
 	font-size:1em;
 	font-weight:bold;
 }
@@ -545,7 +545,7 @@
 
 .sharpdoc .content .section span.title
 {
-	color:#3f529c;
+	color:#D32600;
 	font-size:1.53em;
 	font-weight:bold;
 	padding-left:6px;
@@ -556,7 +556,7 @@
 
 .sharpdoc .content  .sub_section.title
 {
-	color:#3f529c;
+	color:#D32600;
 	font-size:1.05em;
 	font-weight:bold;
 	padding-left:6px;
@@ -567,7 +567,7 @@
 
 .sharpdoc .content  .code_section.title 
 {
-	color: #3f529c;
+	color: #D32600;
 	font-size: 0.995em;
 	font-weight: bold;
 	padding-left: 6px;
@@ -657,7 +657,7 @@
 }
 
 .sharpdoc h1.top-title, .sharpdoc h1.content-title {
-	color:#3f529c;
+	color:#D32600;
 	font-size:1.77em;
 	font-weight:bold;   
 }
@@ -766,7 +766,7 @@
 	border-bottom:none;
 	border-top-left-radius:4px;
 	border-top-right-radius:4px;
-	color:#1364C4;
+	color:#e73c00;
 	height:18px;
 	padding:2px 0 0;
 	width:32px;
@@ -783,7 +783,7 @@
 
 a:link
 {
-	color:#1364C4;
+	color:#e73c00;
 	text-decoration:none;
 }
 
@@ -893,7 +893,7 @@ h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
 =============================================================================*/
 
 a {
-  color: #4183C4;
+  color: #E73C00;
   text-decoration: none;
 }
 
