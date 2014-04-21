@@ -275,9 +275,6 @@ namespace Microsoft.Xna.Framework
             {
                 var graphicsDeviceManager = Game.Services.GetService(typeof(IGraphicsDeviceManager)) as IGraphicsDeviceManager;			   
                 graphicsDeviceManager.CreateDevice();
-#if ANDROID
-                ((AndroidGameWindow)Window).TouchEnabled = true;
-#endif
             }
         }
 

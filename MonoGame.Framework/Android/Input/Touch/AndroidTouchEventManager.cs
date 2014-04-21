@@ -53,13 +53,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     class AndroidTouchEventManager
     {
-        Game _game;
+        readonly AndroidGameWindow _gameWindow;
 
         public bool Enabled { get; set; }
 
-        public AndroidTouchEventManager(Game game)
+        public AndroidTouchEventManager(AndroidGameWindow androidGameWindow)
         {
-            _game = game;
+            _gameWindow = androidGameWindow;
         }
 
         public void OnTouchEvent(MotionEvent e)
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         void UpdateTouchPosition(ref Vector2 position)
         {
-            Rectangle clientBounds = _game.Window.ClientBounds;
+            Rectangle clientBounds = _gameWindow.ClientBounds;
 
             //Fix for ClientBounds
             position.X -= clientBounds.X;

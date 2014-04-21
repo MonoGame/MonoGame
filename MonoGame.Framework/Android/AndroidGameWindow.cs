@@ -38,52 +38,39 @@ purpose and non-infringement.
 */
 #endregion License
 
-#region Using Statements
 using System;
-using System.Drawing;
-using System.Collections.Generic;
-using System.ComponentModel;
 using Android.Content;
 using Android.Content.PM;
-using Android.Content.Res;
-using Android.Media;
-using Android.Util;
 using Android.Views;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using OpenTK.Platform.Android;
 
+#if OUYA
+using Microsoft.Xna.Framework.Input;
+#endif
+
 using OpenTK;
-using OpenTK.Platform;
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
 
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#endregion Using Statements
 
 namespace Microsoft.Xna.Framework
 {
     [CLSCompliant(false)]
-    public class AndroidGameWindow : GameWindow , View.IOnTouchListener, ISurfaceHolderCallback, View.IOnKeyListener, IDisposable
+    public class AndroidGameWindow : GameWindow, IDisposable
     {
-	    internal MonoGameAndroidGameView GameView { get; private set; }
+        internal MonoGameAndroidGameView GameView { get; private set; }
         private Rectangle clientBounds;
-        private Game _game;
+        internal readonly Game Game;
         private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
-        private AndroidTouchEventManager _touchManager = null;
         private bool _contextWasLost = false;
         private IResumeManager _resumer;
         private bool _isResuming;
 
-		public override IntPtr Handle { get { return IntPtr.Zero; } }
+        public override IntPtr Handle { get { return IntPtr.Zero; } }
 
-        public bool TouchEnabled
-        {
-            get { return _touchManager.Enabled; }
-            set { _touchManager.Enabled = value; }
-        }
 
         public void SetResumer(IResumeManager resumer)
         {
@@ -92,7 +79,7 @@ namespace Microsoft.Xna.Framework
 
         public AndroidGameWindow(Context context, Game game)
         {
-            _game = game;
+            Game = game;
             TouchPanelState = new TouchPanelState(this);
             Initialize(context);
 
@@ -104,94 +91,16 @@ namespace Microsoft.Xna.Framework
             clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
 
             GameView = new MonoGameAndroidGameView(context, this);
-            GameView.Load += OnLoad;
-            GameView.SetOnKeyListener(this);
-            GameView.SetOnTouchListener(this);
             GameView.RenderFrame += OnRenderFrame;
             GameView.UpdateFrame += OnUpdateFrame;
 
             GameView.RequestFocus();
             GameView.FocusableInTouchMode = true;
 
-            _touchManager = new AndroidTouchEventManager(_game);
-
 #if OUYA
             GamePad.Initialize();
 #endif
         }
-        
-        private void OnLoad (object sender, EventArgs eventArgs)
-        {
-            GameView.MakeCurrent();
-        }
-
-        #region IOnKeyListener
-
-        bool View.IOnKeyListener.OnKey(View view, Keycode keycode, KeyEvent keyEvent)
-        {
-            switch (keyEvent.Action)
-            {
-                case KeyEventActions.Down:
-                    return OnKeyDown(keycode, keyEvent);
-                case KeyEventActions.Up:
-                    return OnKeyUp(keycode, keyEvent);
-                //TODO case KeyEventActions.Multiple:
-                    //I don't know
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        private bool OnKeyDown(Keycode keyCode, KeyEvent e)
-        {
-#if OUYA
-            if (GamePad.OnKeyDown(keyCode, e))
-                return true;
-#endif
-
-            Keyboard.KeyDown(keyCode);
-            // we need to handle the Back key here because it doesnt work any other way
-#if !OUYA
-            if (keyCode == Keycode.Back)
-                GamePad.Instance.SetBack();
-#endif
-
-            if (keyCode == Keycode.VolumeUp)
-            {
-                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
-                audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
-            }
-
-            if (keyCode == Keycode.VolumeDown)
-            {
-                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
-                audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
-            }
-
-            return true;
-        }
-
-        private bool OnKeyUp(Keycode keyCode, KeyEvent e)
-        {
-#if OUYA
-            if (GamePad.OnKeyUp(keyCode, e))
-                return true;
-#endif
-            Keyboard.KeyUp(keyCode);
-            return true;
-        }
-
-#if OUYA
-        public override bool OnGenericMotionEvent(MotionEvent e)
-        {
-            if (GamePad.OnGenericMotionEvent(e))
-                return true;
-
-            return base.OnGenericMotionEvent(e);
-        }
-#endif
 
         internal void CreateFrameBuffer()
         {
@@ -203,7 +112,7 @@ namespace Microsoft.Xna.Framework
                 {
                     int depth = 0;
                     int stencil = 0;
-                    switch (this._game.graphicsDeviceManager.PreferredDepthStencilFormat)
+                    switch (this.Game.graphicsDeviceManager.PreferredDepthStencilFormat)
                     {
                         case DepthFormat.Depth16: 
                         depth = 16;
@@ -242,9 +151,9 @@ namespace Microsoft.Xna.Framework
             {
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
             }
-            if (_game.GraphicsDevice != null && _contextWasLost)
+            if (Game.GraphicsDevice != null && _contextWasLost)
             {
-                _game.GraphicsDevice.Initialize();
+                Game.GraphicsDevice.Initialize();
 
                 _isResuming = true;
                 if (_resumer != null)
@@ -261,8 +170,8 @@ namespace Microsoft.Xna.Framework
                         Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                         // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
+                        Game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                        Game.GraphicsDevice.OnDeviceReset();
 
                         _contextWasLost = false;
                         _isResuming = false;
@@ -277,9 +186,9 @@ namespace Microsoft.Xna.Framework
         internal void DestroyFrameBuffer()
         {
             // DeviceResetting events
-            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if(_game.GraphicsDevice != null) 
-                _game.GraphicsDevice.OnDeviceResetting();
+            Game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            if(Game.GraphicsDevice != null) 
+                Game.GraphicsDevice.OnDeviceResetting();
 
             Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
 
@@ -308,20 +217,20 @@ namespace Microsoft.Xna.Framework
 
             Threading.Run();
 
-            if (_game != null)
+            if (Game != null)
             {
-                if (!_isResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+                if (!_isResuming && Game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
                 {
-                    _game.Tick();
+                    Game.Tick();
                 }
-                else if (_game.GraphicsDevice != null)
+                else if (Game.GraphicsDevice != null)
                 {
-                    _game.GraphicsDevice.Clear(Color.Black);
+                    Game.GraphicsDevice.Clear(Color.Black);
                     if (_isResuming && _resumer != null)
                     {
                         _resumer.Draw();
                     }
-                    _game.Platform.Present();
+                    Game.Platform.Present();
                 }
             }
         }
@@ -344,7 +253,7 @@ namespace Microsoft.Xna.Framework
         {
             if (supportedOrientations == DisplayOrientation.Default)
             {
-                var deviceManager = (_game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
+                var deviceManager = (Game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
                 if (deviceManager == null)
                     return DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
@@ -388,23 +297,15 @@ namespace Microsoft.Xna.Framework
             SetDisplayOrientation(newOrientation);
             TouchPanel.DisplayOrientation = newOrientation;
 
-            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && _game.graphicsDeviceManager != null)
-                _game.graphicsDeviceManager.ApplyChanges();
+            if (applyGraphicsChanges && oldOrientation != CurrentOrientation && Game.graphicsDeviceManager != null)
+                Game.graphicsDeviceManager.ApplyChanges();
         }
-
-        #region IOnTouchListener implementation
-        bool View.IOnTouchListener.OnTouch (View v, MotionEvent e)
-        {
-            _touchManager.OnTouchEvent(e);
-            return true;
-        }
-        #endregion
 
         public override string ScreenDeviceName 
         {
             get 
             {
-                throw new System.NotImplementedException ();
+                throw new NotImplementedException ();
             }
         }
    
@@ -541,81 +442,26 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        #region ISurfaceHolderCallback
 
-        void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
+        public void Dispose()
         {
-            GameView.SurfaceChanged(holder, format, width, height);
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
-
-            if (_game.GraphicsDevice != null)
-                _game.graphicsDeviceManager.ResetClientBounds();
+            if (GameView != null)
+            {
+                GameView.Dispose();
+                GameView = null;
+            }
         }
 
-        void ISurfaceHolderCallback.SurfaceDestroyed(ISurfaceHolder holder)
+        public override void BeginScreenDeviceChange(bool willBeFullScreen)
         {
-            GameView.SurfaceDestroyed(holder);
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceDestroyed");
         }
 
-        void ISurfaceHolderCallback.SurfaceCreated(ISurfaceHolder holder)
+        public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
         {
-            GameView.SurfaceCreated(holder);
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
         }
 
-        #endregion
-
-	    public void Dispose()
-	    {
-		    if (GameView != null)
-		    {
-			    GameView.Dispose();
-			    GameView = null;
-		    }
-	    }
-
-		public override void BeginScreenDeviceChange(bool willBeFullScreen)
-		{
-		}
-
-		public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
-		{
-		}
-
-	    protected override void SetTitle(string title)
-	    {
-	    }
-    }
-
-    internal class MonoGameAndroidGameView : AndroidGameView
-    {
-        private readonly AndroidGameWindow _gameWindow;
-
-        public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow)
-            : base(context)
+        protected override void SetTitle(string title)
         {
-            _gameWindow = androidGameWindow;
-        }
-
-        protected override void CreateFrameBuffer()
-        {
-            _gameWindow.CreateFrameBuffer();
-        }
-
-        protected override void DestroyFrameBuffer()
-        {
-            _gameWindow.DestroyFrameBuffer();
-        }
-
-        public void BaseCreateFrameBuffer()
-        {
-            base.CreateFrameBuffer();
-        }
-
-        public void BaseDestroyFrameBuffer()
-        {
-            base.DestroyFrameBuffer();
         }
     }
 }

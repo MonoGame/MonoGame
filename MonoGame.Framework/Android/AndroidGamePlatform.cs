@@ -96,14 +96,14 @@ namespace Microsoft.Xna.Framework
             AndroidGameActivity.Paused += Activity_Paused;
             AndroidGameActivity.Resumed += Activity_Resumed;
 
-            _view = new AndroidGameWindow(Game.Activity, game);
-            Window = _view;
+            _gameWindow = new AndroidGameWindow(Game.Activity, game);
+            Window = _gameWindow;
         }
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
         private bool _exiting = false;
-        private AndroidGameWindow _view;
+        private AndroidGameWindow _gameWindow;
 
         public override void Exit()
         {
@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework
 					Game.DoExiting();
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
-				    _view.GameView.Close();
+				    _gameWindow.GameView.Close();
 				}
             }
             catch
@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-			_view.GameView.Resume();
+			_gameWindow.GameView.Resume();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -161,23 +161,24 @@ namespace Microsoft.Xna.Framework
 			switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-					_view.SetOrientation(DisplayOrientation.Portrait, false);
+					_gameWindow.SetOrientation(DisplayOrientation.Portrait, false);
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-					_view.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-					_view.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
-            }			
+            }
             base.BeforeInitialize();
+            _gameWindow.GameView.TouchEnabled = true;
         }
 
         public override bool BeforeRun()
         {
 
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
-			_view.GameView.Run();
+			_gameWindow.GameView.Run();
 
             return false;
         }
@@ -206,12 +207,12 @@ namespace Microsoft.Xna.Framework
             if (!IsActive)
             {
                 IsActive = true;
-				_view.GameView.Resume();
+				_gameWindow.GameView.Resume();
 				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
-				if (!_view.GameView.IsFocused)
-					_view.GameView.RequestFocus();
+				if (!_gameWindow.GameView.IsFocused)
+					_gameWindow.GameView.RequestFocus();
             }
         }
 
@@ -223,8 +224,8 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = false;
 				_MediaPlayer_PrevState = MediaPlayer.State;
-				_view.GameView.Pause();
-				_view.GameView.ClearFocus();
+				_gameWindow.GameView.Pause();
+				_gameWindow.GameView.ClearFocus();
 				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
@@ -253,7 +254,7 @@ namespace Microsoft.Xna.Framework
                 if (device != null)
                     device.Present();
 
-				_view.GameView.SwapBuffers();
+				_gameWindow.GameView.SwapBuffers();
             }
             catch (Exception ex)
             {
