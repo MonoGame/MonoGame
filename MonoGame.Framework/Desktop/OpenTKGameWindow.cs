@@ -191,6 +191,10 @@ namespace Microsoft.Xna.Framework
 
         private void OnResize(object sender, EventArgs e)
         {
+            // Ignore resize events until intialization is complete
+            if (Game == null)
+                return;
+
             var winWidth = window.ClientRectangle.Width;
             var winHeight = window.ClientRectangle.Height;
             var winRect = new Rectangle(0, 0, winWidth, winHeight);
