@@ -1,5 +1,3 @@
-## External Links
-
 Links to several useful reference sites related to MonoGame.
 
  - [Microsoft XNA Documentation](http://msdn.microsoft.com/en-us/library/bb203940.aspx)

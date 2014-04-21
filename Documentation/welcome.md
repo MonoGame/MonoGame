@@ -1,4 +1,3 @@
-## Welcome
 This is the documentation home for the MonoGame game library.
 
 ### WORK IN PROGRESS

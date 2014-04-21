@@ -1,5 +1,3 @@
-## Tutorials
-
 Links to various tutorials and articles to help you get started with MonoGame.
 
 ### Pluralsight

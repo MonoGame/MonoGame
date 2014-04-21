@@ -1,5 +1,3 @@
-## Getting Started
-
 This is where we could write a getting started overview documentation.
 
 We could also add simple tutorials, link video tutorials, etc.
