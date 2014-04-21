@@ -341,9 +341,6 @@ namespace Microsoft.Xna.Framework
                 }
             }
 #endif
-            // Provide the graphics context for background loading
-            Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, window.WindowInfo);
-            Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
 
@@ -414,14 +411,6 @@ namespace Microsoft.Xna.Framework
                 {
                     // Dispose/release managed objects
                     window.Dispose();
-                }
-
-                // Release native resources
-                if (Threading.BackgroundContext != null)
-                {
-                    Threading.BackgroundContext.Dispose();
-                    Threading.BackgroundContext = null;
-                    Threading.WindowInfo = null;
                 }
 
                 disposed = true;

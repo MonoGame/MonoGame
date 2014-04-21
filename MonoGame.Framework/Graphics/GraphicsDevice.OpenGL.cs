@@ -135,6 +135,13 @@ namespace Microsoft.Xna.Framework.Graphics
             Context.MakeCurrent(wnd);
             (Context as IGraphicsContextInternal).LoadAll();
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+
+            // Provide the graphics context for background loading
+            if (Threading.BackgroundContext == null)
+            {
+                Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, wnd);
+                Threading.WindowInfo = wnd;
+            }
 #endif
 
             MaxTextureSlots = 16;
@@ -308,6 +315,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 Context.Dispose();
                 Context = null;
 #endif
+
+                // Release native resources
+                if (Threading.BackgroundContext != null)
+                {
+                    Threading.BackgroundContext.Dispose();
+                    Threading.BackgroundContext = null;
+                    Threading.WindowInfo = null;
+                }
             });
         }
 
