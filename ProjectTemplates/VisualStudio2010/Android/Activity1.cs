@@ -18,7 +18,7 @@ namespace $safeprojectname$
         {
             base.OnCreate(bundle);
             var g = new Game1();
-            SetContentView(g.Window);
+            SetContentView((View)g.Services.GetService(typeof(View)));
             g.Run();
         }
     }
