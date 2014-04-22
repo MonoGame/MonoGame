@@ -44,9 +44,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public bool TryGetValue(string meshName, out ModelMesh value)
         {
             if (string.IsNullOrEmpty(meshName))
-            {
                 throw new ArgumentNullException("meshName");
-            }
 
             foreach (var mesh in this)
             {
