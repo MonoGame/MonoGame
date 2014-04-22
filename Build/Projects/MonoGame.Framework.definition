@@ -578,7 +578,6 @@
     <Compile Include="Graphics\States\SamplerState.Web.cs">
         <Platforms>Web</Platforms>
     </Compile>
-    <Compile Include="Graphics\States\SaveStateMode.cs" />
     <Compile Include="Graphics\States\StencilOperation.cs" />
     <Compile Include="Graphics\States\TargetBlendState.cs" />
     <Compile Include="Graphics\States\TextureAddressMode.cs" />
