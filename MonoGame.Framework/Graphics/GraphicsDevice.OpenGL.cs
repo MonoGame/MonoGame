@@ -128,7 +128,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 var stencil =
                     PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
                     0;
-                var samples = PresentationParameters.MultiSampleCount;
+
+                var samples = 0;
+                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
+                {
+                    // Use a default of 4x samples if PreferMultiSampling is enabled
+                    // without explicitly setting the desired MultiSampleCount.
+                    if (PresentationParameters.MultiSampleCount == 0)
+                    {
+                        PresentationParameters.MultiSampleCount = 4;
+                    }
+
+                    samples = PresentationParameters.MultiSampleCount;
+                }
 
                 mode = new GraphicsMode(color, depth, stencil, samples);
                 Context = new GraphicsContext(mode, wnd);
