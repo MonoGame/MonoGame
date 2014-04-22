@@ -249,7 +249,7 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
@@ -730,7 +730,7 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -741,8 +741,11 @@
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android,Ouya</Platforms>
     </Compile>
+    <Compile Include="Media\Video.WMS.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -755,6 +758,9 @@
     </Compile>
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.WMS.cs">
+        <Platforms>Windows</Platforms>
     </Compile>
 
     <!-- Microsoft.Devices.Sensors -->
@@ -1210,6 +1216,9 @@
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Windows\WinFormsGameWindow.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoSampleGrabber.cs">
       <Platforms>Windows</Platforms>
     </Compile>
 	
