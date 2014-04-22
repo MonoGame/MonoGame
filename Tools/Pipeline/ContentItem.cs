@@ -30,8 +30,12 @@ namespace MonoGame.Tools.Pipeline
                     ProcessorParams[p.Name] = p.DefaultValue;
                 }
                 else
-                {
-                    ProcessorParams[p.Name] = TypeDescriptor.GetConverter(p.TypeName).ConvertFrom(ProcessorParams[p.Name]);
+                {                    
+                    var src = ProcessorParams[p.Name];                    
+                    var srcType = src.GetType();
+                    var converter = TypeDescriptor.GetConverter(p.Type);
+                    var dst = converter.ConvertFrom(src);
+                    ProcessorParams[p.Name] = dst;
                 }
             }
         }

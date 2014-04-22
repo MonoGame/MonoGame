@@ -96,7 +96,7 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var item in contentItem.ProcessorParams)
             {
-                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, typeof(string), typeof(ProcessorTypeDescription), contentItem.ProcessorParams);
+                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, item.Value.GetType(), typeof(ProcessorTypeDescription), contentItem.ProcessorParams);
                 props.Add(desc);
             }
 

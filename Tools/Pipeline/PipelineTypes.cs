@@ -33,7 +33,7 @@ namespace MonoGame.Tools.Pipeline
         public struct Property
         {
             public string Name;
-            public string TypeName;
+            public Type Type;
             public object DefaultValue;
         }
 
@@ -155,7 +155,7 @@ namespace MonoGame.Tools.Pipeline
                     var p = new ProcessorTypeDescription.Property()
                         {
                             Name = i.Name,
-                            TypeName = i.PropertyType.Name,
+                            Type = i.PropertyType,
                             DefaultValue = i.GetValue(obj),
                         };
                     properties.Add(p);
@@ -167,6 +167,9 @@ namespace MonoGame.Tools.Pipeline
                     DisplayName = item.Attribute.DisplayName,
                     Properties = properties.ToArray(),                    
                 };
+                if (string.IsNullOrEmpty(desc.DisplayName))
+                    desc.DisplayName = desc.TypeName;
+
                 processorDescriptions[cur] = desc;
                 cur++;
             }
