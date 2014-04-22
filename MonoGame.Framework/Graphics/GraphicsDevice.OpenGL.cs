@@ -115,7 +115,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetup()
         {
 #if WINDOWS || LINUX
+            GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+
             if (Context == null || Context.IsDisposed)
             {
                 var color = PresentationParameters.BackBufferFormat.GetColorFormat();
@@ -128,8 +130,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     0;
                 var samples = PresentationParameters.MultiSampleCount;
 
-                var mode = new GraphicsMode(color, depth, stencil, samples);
-
+                mode = new GraphicsMode(color, depth, stencil, samples);
                 Context = new GraphicsContext(mode, wnd);
             }
             Context.MakeCurrent(wnd);
@@ -139,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Provide the graphics context for background loading
             if (Threading.BackgroundContext == null)
             {
-                Threading.BackgroundContext = new GraphicsContext(GraphicsMode.Default, wnd);
+                Threading.BackgroundContext = new GraphicsContext(mode, wnd);
                 Threading.WindowInfo = wnd;
             }
 #endif
