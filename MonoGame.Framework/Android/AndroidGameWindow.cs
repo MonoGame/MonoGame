@@ -21,9 +21,9 @@ namespace Microsoft.Xna.Framework
         internal MonoGameAndroidGameView GameView { get; private set; }
         internal IResumeManager Resumer;
 
-        private Rectangle _clientBounds;
         private readonly Game _game;
         private readonly OrientationListener _orientationListener;
+        private Rectangle _clientBounds;
         private DisplayOrientation _supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
 
