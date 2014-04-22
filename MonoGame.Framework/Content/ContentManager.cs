@@ -241,7 +241,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+                string assetPath = Path.ChangeExtension(assetName, "xnb");
                 stream = TitleContainer.OpenStream(assetPath);
 
 #if ANDROID
