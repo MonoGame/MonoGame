@@ -314,15 +314,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS || LINUX
                 Context.Dispose();
                 Context = null;
-#endif
 
-                // Release native resources
                 if (Threading.BackgroundContext != null)
                 {
                     Threading.BackgroundContext.Dispose();
                     Threading.BackgroundContext = null;
                     Threading.WindowInfo = null;
                 }
+#endif
             });
         }
 
