@@ -149,9 +149,9 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        public OpenTKGameWindow()
+        public OpenTKGameWindow(Game game)
         {
-            Initialize();
+            Initialize(game);
         }
 
         ~OpenTKGameWindow()
@@ -305,8 +305,10 @@ namespace Microsoft.Xna.Framework
         
         #endregion
 
-        private void Initialize()
+        private void Initialize(Game game)
         {
+            Game = game;
+
             GraphicsContext.ShareContexts = true;
 
             window = new NativeWindow();
