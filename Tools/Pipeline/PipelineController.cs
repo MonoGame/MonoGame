@@ -49,18 +49,28 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
+#if SHIPPING
             try
+#endif
             {
                 _project.OpenProject(projectFilePath);
                 PipelineTypes.Load(_project);
+
+                foreach (var i in _project.ContentItems)
+                {
+                    i.ResolveTypes();
+                    i.View = _view;
+                }
             }
-            catch (Exception)
+#if SHIPPING
+            catch (Exception e)
             {
                 _view.ShowError("Open Project", "Failed to open project!");
                 return;
             }
+#endif
 
-            UpdateTree();
+                UpdateTree();
         }
 
         public void CloseProject()
@@ -83,6 +93,7 @@ namespace MonoGame.Tools.Pipeline
 
             // Do the save.
             _project.IsDirty = false;
+            _project.SaveProject();
 
             return true;
         }

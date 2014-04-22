@@ -185,6 +185,83 @@ namespace MonoGame.Tools.Pipeline
             IsDirty = false;
         }
 
+        public void SaveProject()
+        {
+            const string lineFormat = "/{0}:{1}";
+            const string processorParamFormat = "{0}={1}";
+            const string commentFormat = "\n#---------------------- {0} ----------------------#\n";
+            string line;
+            var parameterLines = new List<string>();
+
+            using (var io = File.CreateText(FilePath))
+            {
+                line = string.Format(commentFormat, "Global Properties");
+                io.WriteLine(line);
+
+                line = string.Format(lineFormat, "outputDir", OutputDir);
+                io.WriteLine(line);
+
+                line = string.Format(lineFormat, "intermediateDir", IntermediateDir);
+                io.WriteLine(line);
+
+                line = string.Format(lineFormat, "platform", Platform);
+                io.WriteLine(line);
+
+                line = string.Format(lineFormat, "config", Config);
+                io.WriteLine(line);
+
+                line = string.Format(commentFormat, "References");
+                io.WriteLine(line);
+
+                foreach (var i in References)
+                {
+                    line = string.Format(lineFormat, "reference", i);
+                    io.WriteLine(line);
+                }
+
+                line = string.Format(commentFormat, "Content");
+                io.WriteLine(line);
+
+                foreach (var i in ContentItems)
+                {
+                    if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
+                    {
+                        line = string.Format(lineFormat, "importer", i.ImporterName);
+                        io.WriteLine(line);   
+                    }
+
+                    // Collect lines for each non-default-value processor parameter
+                    // but do not write them yet.
+                    parameterLines.Clear();
+                    foreach (var j in i.ProcessorParams)
+                    {
+                        var defaultValue = i.Processor.Properties[j.Key].DefaultValue;
+                        if (j.Value == null || j.Value == defaultValue)
+                            continue;
+
+                        line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                        parameterLines.Add(line);
+                    }
+
+                    // If there were any non-default-value processor parameters
+                    // or, if the processor itself is not the default processor for this content's importer
+                    // then we write out the processor command line and any (non default value) processor parameters.
+                    if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor))
+                    {
+                        line = string.Format(lineFormat, "processor", i.ProcessorName);
+                        io.WriteLine(line);
+
+                        foreach (var ln in parameterLines)
+                            io.WriteLine(ln);
+                    }
+
+                    line = string.Format(lineFormat, "build", i.SourceFile);
+                    io.WriteLine(line);
+                    io.WriteLine();
+                }
+            }
+        }
+
         public void CloseProject()
         {
             _content.Clear();
@@ -192,7 +269,7 @@ namespace MonoGame.Tools.Pipeline
 
 #region IPipelineItem
 
-        public string Label 
+        public string Name 
         { 
             get
             {
@@ -200,12 +277,13 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public string Path
+        public string Location
         {
             get { return string.Empty; }
         }
 
-        public string Icon { get; private set; }
+        public string Icon { get; set; }
+
 #endregion
     }
 }

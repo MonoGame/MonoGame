@@ -1,9 +1,13 @@
-﻿namespace MonoGame.Tools.Pipeline
+﻿using System.ComponentModel;
+
+namespace MonoGame.Tools.Pipeline
 {
     interface IProjectItem
     {
-        string Label { get; }
-        string Path { get; }
-        string Icon { get; }
+        string Name { get; }
+        string Location { get; }
+
+        [Browsable(false)]
+        string Icon { get; set; }
     }
 }

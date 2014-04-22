@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
     internal class ContentItem : IProjectItem
-    {
+    {        
+        public string Icon { get; set; }        
         public string SourceFile;
         public string ImporterName;
         public string ProcessorName;
@@ -16,56 +19,10 @@ namespace MonoGame.Tools.Pipeline
 
         private ImporterTypeDescription _importer;
         private ProcessorTypeDescription _processor;
-        private List<ProcessorTypeDescription.Property> _processorProperties;
 
-        public void ResolveTypes()
-        {
-            Importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
-            Processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+        public IView View;
 
-            foreach (var p in Processor.Properties)
-            {
-                if (!ProcessorParams.ContainsKey(p.Name))
-                {
-                    ProcessorParams[p.Name] = p.DefaultValue;
-                }
-                else
-                {                    
-                    var src = ProcessorParams[p.Name];                    
-                    var srcType = src.GetType();
-                    var converter = TypeDescriptor.GetConverter(p.Type);
-                    var dst = converter.ConvertFrom(src);
-                    ProcessorParams[p.Name] = dst;
-                }
-            }
-        }
-
-        [TypeConverter(typeof (ImporterConverter))]
-        public ImporterTypeDescription Importer
-        {
-            get { return _importer; }
-
-            set
-            {
-                _importer = value;
-                ImporterName = _importer.TypeName;
-            }
-        }
-
-        [TypeConverter(typeof (ProcessorConverter))]
-        public ProcessorTypeDescription Processor
-        {
-            get { return _processor; }
-
-            set
-            {
-                _processor = value;
-                ProcessorName = _importer.TypeName;
-            }
-        }
-
-
-        public string Label 
+        public string Name 
         { 
             get
             {
@@ -73,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public string Path
+        public string Location
         {
             get
             {
@@ -81,7 +38,90 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public string Icon { get; private set; }
+        [TypeConverter(typeof(ImporterConverter))]
+        public ImporterTypeDescription Importer
+        {
+            get { return _importer; }
+
+            set
+            {
+                if (_importer == value)
+                    return;
+
+                _importer = value;
+                ImporterName = _importer.TypeName;
+
+                View.UpdateProperties(this);
+
+                // Validate that our processor can accept input content of the type
+                // output by the new importer.                
+                if (_processor.InputType != _importer.OutputType)
+                {
+                    // If it cannot, set the default processor.
+                    Processor = PipelineTypes.FindProcessor(_importer.DefaultProcessor, _importer);
+                }
+            }
+        }
+
+        [TypeConverter(typeof(ProcessorConverter))]
+        public ProcessorTypeDescription Processor
+        {
+            get { return _processor; }
+
+            set
+            {
+                if (_processor == value)
+                    return;
+                
+                _processor = value;
+                ProcessorName = _processor.TypeName;
+                
+                // When the processor changes reset our parameters
+                // to the default for the processor type.
+                ProcessorParams.Clear();
+                foreach (var p in _processor.Properties)
+                {
+                    ProcessorParams.Add(p.Name, p.DefaultValue);
+                }
+                
+                View.UpdateProperties(this);
+
+                // Note:
+                // There is no need to validate that the new processor can accept input
+                // of the type output by our importer, because that should be handled by
+                // only showing valid processors in the drop-down (eg, within ProcessConverter).
+            }
+        }
+
+        public void ResolveTypes()
+        {
+            _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));            
+            _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+
+            // ProcessorParams get deserialized as strings
+            // this code converts them to object(s) of their actual type
+            // so that the correct editor appears within the property grid.
+            foreach (var p in Processor.Properties)
+            {
+                if (!ProcessorParams.ContainsKey(p.Name))
+                {
+                    ProcessorParams[p.Name] = p.DefaultValue;
+                }
+                else
+                {
+                    var src = ProcessorParams[p.Name];
+                    var srcType = src.GetType();
+                    var converter = TypeDescriptor.GetConverter(p.Type);
+                    var dst = converter.ConvertFrom(src);
+                    ProcessorParams[p.Name] = dst;
+                }
+            }
+        }        
+
+        public override string ToString()
+        {
+            return System.IO.Path.GetFileName(SourceFile);
+        }
     }
 
     //internal class EditerContentItem

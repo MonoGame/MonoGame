@@ -14,22 +14,24 @@ namespace MonoGame.Tools.Pipeline
     /// Custom converter for the Processor property of a ContentItem.
     /// </summary>
     internal class ImporterConverter : TypeConverter
-    {        
+    {                
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            //true means show a combobox
-            return true;
+            // True means show a combobox.
+            if (GetStandardValues(context).Count > 0)
+                return true;
+
+            return false;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
         {
-            //true will limit to list. false will show the list, 
-            //but allow free-form entry
-            return false;
+            // True means that values returned by GetStandardValues is exclusive (contains all possible valid values).
+            return true;
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {
+        {            
             return new StandardValuesCollection(PipelineTypes.Importers);
         }
 
@@ -68,12 +70,6 @@ namespace MonoGame.Tools.Pipeline
                                          object value,
                                          Type destinationType)
         {
-            if (value.GetType() == destinationType)
-                return value;
-
-            if (value == null)
-                return null;
-
             if (destinationType == typeof (string))
             {                
                 return ((ImporterTypeDescription)value).DisplayName;
@@ -82,14 +78,14 @@ namespace MonoGame.Tools.Pipeline
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
-        {
-            return TypeDescriptor.GetProperties(value, attributes, true);
-        }
+        //public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
+        //{
+        //    return TypeDescriptor.GetProperties(value, attributes, true);
+        //}
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
-        {
-            return true;
+        {            
+            return false;
         }
     }
 }

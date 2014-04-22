@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -18,28 +19,109 @@ using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace MonoGame.Tools.Pipeline
 {
-    [DebuggerDisplay("{TypeName}")]
     public class ImporterTypeDescription
-    {
+    {        
         public string TypeName;
         public string DisplayName;
         public string DefaultProcessor;        
         public IEnumerable<string> FileExtensions;
+        public Type OutputType;
+
+        public override string ToString()
+        {
+            return TypeName;
+        }
     };
 
-    [DebuggerDisplay("{TypeName}")]
     public class ProcessorTypeDescription
-    {                
+    {
+        #region Supporting Types 
+
         public struct Property
         {
             public string Name;
             public Type Type;
             public object DefaultValue;
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
 
+        public class ProcessorPropertyCollection : IEnumerable<Property>
+        {
+            private readonly Property[] _properties;
+
+            public ProcessorPropertyCollection(IEnumerable<Property> properties)
+            {
+                _properties = properties.ToArray();
+            }
+ 
+            public Property this[int index]
+            {
+                get
+                {
+                    return _properties[index];
+                }
+                set
+                {
+                    _properties[index] = value;
+                }
+            }
+
+            public Property this[string name]
+            {
+                get
+                {
+                    foreach (var p in _properties)
+                    {
+                        if (p.Name.Equals(name))
+                            return p;
+                    }
+
+                    throw new IndexOutOfRangeException();
+                }    
+            
+                set
+                {
+                    for (var i = 0; i < _properties.Length; i++)
+                    {
+                        var p = _properties[i];
+                        if (p.Name.Equals(name))
+                        {
+                            _properties[i] = value;
+                            return;
+                        }
+
+                    }
+
+                    throw new IndexOutOfRangeException();
+                }
+            }
+
+            public IEnumerator<Property> GetEnumerator()
+            {
+                return _properties.AsEnumerable().GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _properties.GetEnumerator();
+            }
+        }
+
+        #endregion
+        
         public string TypeName;
         public string DisplayName;
-        public Property[] Properties;
+        public ProcessorPropertyCollection Properties;
+        public Type InputType;
+
+        public override string ToString()
+        {
+            return TypeName;
+        }
     };
 
     internal class PipelineTypes
@@ -126,12 +208,14 @@ namespace MonoGame.Tools.Pipeline
             var cur = 0;
             foreach (var item in _importers)
             {
+                var outputType = item.Type.BaseType.GenericTypeArguments[0];
                 var desc = new ImporterTypeDescription()
                     {
                         TypeName = item.Type.Name,
                         DisplayName = item.Attribute.DisplayName,
                         DefaultProcessor = item.Attribute.DefaultProcessor,                        
-                        FileExtensions = item.Attribute.FileExtensions,                        
+                        FileExtensions = item.Attribute.FileExtensions,   
+                        OutputType = outputType,
                     };
                 importerDescriptions[cur] = desc;
                 cur++;
@@ -160,12 +244,14 @@ namespace MonoGame.Tools.Pipeline
                         };
                     properties.Add(p);
                 }
-                
+
+                var inputType = (obj as IContentProcessor).InputType;
                 var desc = new ProcessorTypeDescription()
                 {
                     TypeName = item.Type.Name,
                     DisplayName = item.Attribute.DisplayName,
-                    Properties = properties.ToArray(),                    
+                    Properties = new ProcessorTypeDescription.ProcessorPropertyCollection(properties),
+                    InputType = inputType,
                 };
                 if (string.IsNullOrEmpty(desc.DisplayName))
                     desc.DisplayName = desc.TypeName;
@@ -175,11 +261,6 @@ namespace MonoGame.Tools.Pipeline
             }
 
             Processors = processorDescriptions;
-
-            foreach (var i in project.ContentItems)
-            {
-                i.ResolveTypes();
-            }
         }
 
         public void Unload()
@@ -203,6 +284,7 @@ namespace MonoGame.Tools.Pipeline
                         return i;
                 }
 
+                Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
                 return null;
             }
 
@@ -212,6 +294,7 @@ namespace MonoGame.Tools.Pipeline
                     return i;
             }
 
+            Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
             return null;
         }
 
@@ -225,6 +308,7 @@ namespace MonoGame.Tools.Pipeline
                         return i;
                 }
 
+                Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
                 return null;
             }
 
@@ -234,6 +318,7 @@ namespace MonoGame.Tools.Pipeline
                     return i;
             }
 
+            Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
             return null;
         }
 
@@ -246,26 +331,33 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
+#if SHIPPING
                 try
+#endif
                 {
                     var types = asm.GetTypes();
                     ProcessTypes(types);
                 }
+#if SHIPPING
                 catch (Exception e)
                 {
                     // ??
                 }
+#endif
             }
 
             foreach (var assemblyPath in Assemblies)
             {
                 Type[] types;
+#if SHIPPING
                 try
+#endif
                 {
                     var a = Assembly.LoadFrom(assemblyPath);
                     types = a.GetExportedTypes();
                     ProcessTypes(types);
                 }
+#if SHIPPING
                 catch (Exception e)
                 {
                     Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
@@ -273,6 +365,7 @@ namespace MonoGame.Tools.Pipeline
                     // we can do but ignore it.
                     continue;
                 }                
+#endif
             }
         }
 

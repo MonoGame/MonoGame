@@ -84,13 +84,13 @@ namespace MonoGame.Tools.Pipeline
         public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();
-            var root = _treeView.Nodes.Add(string.Empty, item.Label, -1);
+            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
             root.Tag = item;
         }
 
         public void AddTreeItem(IProjectItem item)
         {
-            var path = item.Path;
+            var path = item.Location;
             var folders = path.Split(new [] {'/'}, StringSplitOptions.RemoveEmptyEntries);
 
             var root = _treeView.Nodes[0];
@@ -104,7 +104,7 @@ namespace MonoGame.Tools.Pipeline
                     parent = found[0].Nodes;
             }
 
-            parent.Add(string.Empty, item.Label, -1).Tag = item;
+            parent.Add(string.Empty, item.Name, -1).Tag = item;
 
             root.Expand();
         }
@@ -112,6 +112,12 @@ namespace MonoGame.Tools.Pipeline
         public void ShowProperties(IProjectItem item)
         {
             _propertyGrid.SelectedObject = item;
+        }
+
+        public void UpdateProperties(IProjectItem item)
+        {
+            if (_propertyGrid.SelectedObject == item)
+                _propertyGrid.Refresh();
         }
 
         public void OutputAppend(string text)

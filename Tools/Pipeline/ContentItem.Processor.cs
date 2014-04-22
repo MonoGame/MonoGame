@@ -16,20 +16,31 @@ namespace MonoGame.Tools.Pipeline
     {
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            //true means show a combobox            
-            return true;
+            // True means show a combobox.
+            if (GetStandardValues(context).Count > 0)
+                return true;
+                        
+            return false;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
         {
-            //true will limit to list. false will show the list, 
-            //but allow free-form entry
+            // True means that values returned by GetStandardValues is exclusive (contains all possible valid values).
             return true;
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection(PipelineTypes.Processors);
+            var importer = ((ContentItem)context.Instance).Importer;
+            var processors = new List<ProcessorTypeDescription>();
+            foreach (var p in PipelineTypes.Processors)
+            {
+                if (p.InputType == importer.OutputType)
+                {
+                    processors.Add(p);
+                }
+            }
+            return new StandardValuesCollection(processors);
         }
 
         // Overrides the CanConvertFrom method of TypeConverter.
@@ -105,7 +116,11 @@ namespace MonoGame.Tools.Pipeline
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
-            return true;
+            var contentItem = context.Instance as ContentItem;
+            if (contentItem.Processor.Properties.Count() > 0)
+                return true;
+            
+            return false;
         }
     }
 }

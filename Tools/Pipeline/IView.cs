@@ -33,6 +33,8 @@ namespace MonoGame.Tools.Pipeline
 
         void ShowProperties(IProjectItem item);
 
+        void UpdateProperties(IProjectItem item);
+
         void OutputAppend(string text);
 
         void OutputClear();
