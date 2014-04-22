@@ -66,6 +66,7 @@
     <Compile Include="PipelineProject.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PipelineTypes.cs" />
     <EmbeddedResource Include="MainView.resx">
       <DependentUpon>MainView.cs</DependentUpon>
     </EmbeddedResource>
@@ -96,6 +97,7 @@
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj">
       <Project>{b950de10-ac5d-4bd9-b817-51247c4a732d}</Project>
       <Name>MonoGame.Framework.Content.Pipeline.Windows</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj">
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>

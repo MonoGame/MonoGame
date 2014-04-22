@@ -9,28 +9,14 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class Processor
-    {
-        public string Name;
-        public OpaqueDataDictionary Data;
-    }
-
     /// <summary>
     /// Custom converter for the Processor property of a ContentItem.
     /// </summary>
-    internal class ProcessorConverter : ExpandableObjectConverter
+    internal class ProcessorConverter : TypeConverter
     {
-        // JCF: Temporary hard coded values for testing purposes.
-        //      This should be populated with real processors from loaded assemblies.
-        private static readonly Processor[] _processorTypes = new Processor[]
-            {
-                new Processor() {Name = "Sound Processor"},
-                new Processor() {Name = "Texture Processor"},
-            };
-
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            //true means show a combobox
+            //true means show a combobox            
             return true;
         }
 
@@ -38,12 +24,12 @@ namespace MonoGame.Tools.Pipeline
         {
             //true will limit to list. false will show the list, 
             //but allow free-form entry
-            return false;
+            return true;
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection(_processorTypes);
+            return new StandardValuesCollection(PipelineTypes.Processors);
         }
 
         // Overrides the CanConvertFrom method of TypeConverter.
@@ -68,9 +54,9 @@ namespace MonoGame.Tools.Pipeline
         {
             if (value is string)
             {
-                foreach (var i in _processorTypes)
+                foreach (var i in PipelineTypes.Processors)
                 {
-                    if (i.Name.Equals(value))
+                    if (i.DisplayName.Equals(value))
                     {
                         return i;
                     }
@@ -88,7 +74,7 @@ namespace MonoGame.Tools.Pipeline
         {
             if (destinationType == typeof (string))
             {
-                return ((Processor)value).Name;
+                return ((ProcessorTypeDescription)value).DisplayName;
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
@@ -104,12 +90,13 @@ namespace MonoGame.Tools.Pipeline
             {
                 props.Add(prop);
             }
+            
+            var processor = value as ProcessorTypeDescription;
+            var contentItem = context.Instance as ContentItem;
 
-            // Emit items in the OpaqueDataDictionary.
-            var processor = value as Processor;
-            foreach (var item in processor.Data)
+            foreach (var item in contentItem.ProcessorParams)
             {
-                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, typeof (string), typeof (Processor), processor.Data);
+                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(item.Key, typeof(string), typeof(ProcessorTypeDescription), contentItem.ProcessorParams);
                 props.Add(desc);
             }
 

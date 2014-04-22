@@ -2,31 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
-{
-    internal class Importer
-    {
-        public string Name;
-    }
-
+{    
     /// <summary>
     /// Custom converter for the Processor property of a ContentItem.
     /// </summary>
-    internal class ImporterConverter : ExpandableObjectConverter
-    {
-        // JCF: Temporary hard coded values for testing purposes.
-        //      This should be populated with real importers from loaded assemblies.
-        private static readonly Importer[] _importerTypes = new Importer[]
-            {
-                new Importer() {Name = "Sound Importer"},
-                new Importer() {Name = "Texture Importer"},
-            };
-
+    internal class ImporterConverter : TypeConverter
+    {        
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
             //true means show a combobox
@@ -42,7 +30,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection(_importerTypes);
+            return new StandardValuesCollection(PipelineTypes.Importers);
         }
 
         // Overrides the CanConvertFrom method of TypeConverter.
@@ -67,13 +55,8 @@ namespace MonoGame.Tools.Pipeline
         {
             if (value is string)
             {
-                foreach (var i in _importerTypes)
-                {
-                    if (i.Name.Equals(value))
-                    {
-                        return i;
-                    }
-                }
+                var contentItem = (context.Instance as ContentItem);
+                return PipelineTypes.FindImporter(value as string, Path.GetExtension(contentItem.SourceFile));                
             }
 
             return base.ConvertFrom(context, culture, value);
@@ -85,9 +68,15 @@ namespace MonoGame.Tools.Pipeline
                                          object value,
                                          Type destinationType)
         {
+            if (value.GetType() == destinationType)
+                return value;
+
+            if (value == null)
+                return null;
+
             if (destinationType == typeof (string))
-            {
-                return ((Importer)value).Name;
+            {                
+                return ((ImporterTypeDescription)value).DisplayName;
             }
 
             return base.ConvertTo(context, culture, value, destinationType);

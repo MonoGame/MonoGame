@@ -21,7 +21,7 @@ namespace MonoGame.Tools.Pipeline
             _view = view;
             _view.Attach(this);
             _project = project;
-            _project.Attach(_view as IProjectObserver);
+            _project.Attach(_view as IProjectObserver);            
         }
 
         public void NewProject()
@@ -52,6 +52,7 @@ namespace MonoGame.Tools.Pipeline
             try
             {
                 _project.OpenProject(projectFilePath);
+                PipelineTypes.Load(_project);
             }
             catch (Exception)
             {

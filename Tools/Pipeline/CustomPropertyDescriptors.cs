@@ -25,6 +25,9 @@ namespace MonoGame.Tools.Pipeline
 
         public override object GetValue(object component)
         {
+            if (!_data.ContainsKey(_propertyName))
+                return string.Empty;
+
             return _data[_propertyName];
         }
 
