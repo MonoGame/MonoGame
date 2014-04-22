@@ -156,7 +156,10 @@ namespace Microsoft.Xna.Framework
             var separator = Path.DirectorySeparatorChar;
 #endif
 
-            return new Uri("file:///" + name).LocalPath.Substring(1).Replace(notSeparator, separator);
+            var path = new Uri("file:///" + name).LocalPath;
+            path = path.Substring(Path.GetPathRoot(path).Length);
+            path = path.Replace(notSeparator, separator);
+            return path;
         }
     }
 }
