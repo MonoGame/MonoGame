@@ -6,18 +6,12 @@ using System;
 using Android.Content;
 using Android.Content.PM;
 using Android.Views;
-using Microsoft.Xna.Framework.Graphics;
-using OpenTK.Platform.Android;
+using Microsoft.Xna.Framework.Input.Touch;
+using OpenTK;
 
 #if OUYA
 using Microsoft.Xna.Framework.Input;
 #endif
-
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.ES20;
-
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
@@ -25,21 +19,20 @@ namespace Microsoft.Xna.Framework
     public class AndroidGameWindow : GameWindow, IDisposable
     {
         internal MonoGameAndroidGameView GameView { get; private set; }
-        private Rectangle clientBounds;
+        internal IResumeManager Resumer;
+
+        private Rectangle _clientBounds;
         private readonly Game _game;
         private readonly OrientationListener _orientationListener;
-        private DisplayOrientation supportedOrientations = DisplayOrientation.Default;
+        private DisplayOrientation _supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
-        private bool _contextWasLost = false;
-        private IResumeManager _resumer;
-        private bool _isResuming;
 
         public override IntPtr Handle { get { return IntPtr.Zero; } }
 
 
         public void SetResumer(IResumeManager resumer)
         {
-            _resumer = resumer;
+            Resumer = resumer;
         }
 
         public AndroidGameWindow(AndroidGameActivity activity, Game game)
@@ -54,7 +47,7 @@ namespace Microsoft.Xna.Framework
 
         private void Initialize(Context context)
         {
-            clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
+            _clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
 
             if (_orientationListener.CanDetectOrientation())
                 _orientationListener.Enable();
@@ -69,101 +62,6 @@ namespace Microsoft.Xna.Framework
 #if OUYA
             GamePad.Initialize();
 #endif
-        }
-
-        internal void CreateFrameBuffer()
-        {
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.CreateFrameBuffer");
-            try
-            {
-                GameView.GLContextVersion = GLContextVersion.Gles2_0;
-                try
-                {
-                    int depth = 0;
-                    int stencil = 0;
-                    switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
-                    {
-                        case DepthFormat.Depth16: 
-                        depth = 16;
-                        break;
-                        case DepthFormat.Depth24:
-                        depth = 24;
-                        break;
-                        case DepthFormat.Depth24Stencil8: 
-                        depth = 24;
-                        stencil = 8;
-                        break;
-                        case DepthFormat.None: break;
-                    }
-                    Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
-                    GameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false);
-                    GameView.BaseCreateFrameBuffer();
-                }
-                catch(Exception)
-                {
-                    Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
-                    // try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
-                    GameView.GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
-                    try {
-                        GameView.BaseCreateFrameBuffer();
-                    } catch (Exception) {
-                        // ok we are right back to getting the default
-                        GameView.GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-                        GameView.BaseCreateFrameBuffer();
-                    }
-                }
-                Android.Util.Log.Debug("MonoGame", "Created format {0}", GameView.GraphicsContext.GraphicsMode);
-                All status = GL.CheckFramebufferStatus(All.Framebuffer);
-                Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
-            } 
-            catch (Exception) 
-            {
-                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
-            }
-            if (_game.GraphicsDevice != null && _contextWasLost)
-            {
-                _game.GraphicsDevice.Initialize();
-
-                _isResuming = true;
-                if (_resumer != null)
-                {
-                    _resumer.LoadContent();
-                }
-
-                // Reload textures on a different thread so the resumer can be drawn
-                System.Threading.Thread bgThread = new System.Threading.Thread(
-                    o =>
-                    {
-                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
-
-                        // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
-
-                        _contextWasLost = false;
-                        _isResuming = false;
-                    });
-
-                bgThread.Start();
-            }
-
-            GameView.MakeCurrent();
-        }
-
-        internal void DestroyFrameBuffer()
-        {
-            // DeviceResetting events
-            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if(_game.GraphicsDevice != null) 
-                _game.GraphicsDevice.OnDeviceResetting();
-
-            Android.Util.Log.Debug("MonoGame", "AndroidGameWindow.DestroyFrameBuffer");
-
-            GameView.BaseDestroyFrameBuffer();
-
-            _contextWasLost = GameView.GraphicsContext == null || GameView.GraphicsContext.IsDisposed;
         }
 
         #region AndroidGameView Methods
@@ -188,16 +86,16 @@ namespace Microsoft.Xna.Framework
 
             if (_game != null)
             {
-                if (!_isResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
+                if (!GameView.IsResuming && _game.Platform.IsActive && !ScreenReceiver.ScreenLocked) //Only call draw if an update has occured
                 {
                     _game.Tick();
                 }
                 else if (_game.GraphicsDevice != null)
                 {
                     _game.GraphicsDevice.Clear(Color.Black);
-                    if (_isResuming && _resumer != null)
+                    if (GameView.IsResuming && Resumer != null)
                     {
-                        _resumer.Draw();
+                        Resumer.Draw();
                     }
                     _game.Platform.Present();
                 }
@@ -209,7 +107,7 @@ namespace Microsoft.Xna.Framework
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
         {
-            supportedOrientations = orientations;
+            _supportedOrientations = orientations;
         }
 
         /// <summary>
@@ -220,7 +118,7 @@ namespace Microsoft.Xna.Framework
         /// <returns></returns>
         internal DisplayOrientation GetEffectiveSupportedOrientations()
         {
-            if (supportedOrientations == DisplayOrientation.Default)
+            if (_supportedOrientations == DisplayOrientation.Default)
             {
                 var deviceManager = (_game.Services.GetService(typeof(IGraphicsDeviceManager)) as GraphicsDeviceManager);
                 if (deviceManager == null)
@@ -237,7 +135,7 @@ namespace Microsoft.Xna.Framework
             }
             else
             {
-                return supportedOrientations;
+                return _supportedOrientations;
             }
         }
 
@@ -283,13 +181,13 @@ namespace Microsoft.Xna.Framework
         {
             get 
             {
-                return clientBounds;
+                return _clientBounds;
             }
         }
         
         internal void ChangeClientBounds(Rectangle bounds)
         {
-            clientBounds = bounds;
+            _clientBounds = bounds;
             OnClientSizeChanged();
         }
 
