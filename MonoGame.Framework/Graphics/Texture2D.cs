@@ -146,6 +146,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformReload(textureStream);
         }
+
+        //Converts Pixel Data from ARGB to ABGR
+        private static void ConvertToABGR(int pixelHeight, int pixelWidth, int[] pixels)
+        {
+            int pixelCount = pixelWidth * pixelHeight;
+            for (int i = 0; i < pixelCount; ++i)
+            {
+                uint pixel = (uint)pixels[i];
+                pixels[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+        }
 	}
 }
 

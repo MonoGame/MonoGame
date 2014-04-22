@@ -36,7 +36,6 @@
 
     <call target="buildtools"/>
     <call target="buildcontentprocessor"/>
-    <call target="buildcontentpipeline"/>
 
     <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
@@ -164,23 +163,6 @@
     <if test="${os == 'Win32NT'}">
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Build /p:Configuration=Release" />
-    </if>
-  </target>
-
-  <target name="buildcontentpipeline" description="Build Content Pipeline" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="MonoGame.Framework.Content.Pipeline.Windows.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Content.Pipeline.Windows.sln /t:Build /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Content.Pipeline.Linux.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="MonoGame.Framework.Content.Pipeline.Linux.sln /t:Build /p:Configuration=Release" />
-    </if>
-    <if test="${os == 'Unix'}">
-      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Content.Pipeline.Linux.sln" />
-      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Content.Pipeline.Linux.sln" />
-    </if>
-    <if test="${os == 'MacOS'}">
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.Content.Pipeline.MacOS.sln" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.Content.Pipeline.MacOS.sln" />
     </if>
   </target>
 
