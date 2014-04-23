@@ -38,14 +38,15 @@ namespace Utilities
             // Reflect to find what commandline options are available.
             foreach (var field in optionsObject.GetType().GetFields())
             {
-                var fieldName = GetOptionName(field);
+                String description;
+                var fieldName = GetOptionNameAndDescription(field, out description);
 
                 if (GetAttribute<RequiredAttribute>(field) != null)
                 {
                     // Record a required option.
                     _requiredOptions.Enqueue(field);
 
-                    _requiredUsageHelp.Add(string.Format("<{0}>", fieldName));
+                    _requiredUsageHelp.Add(string.Format("<{0}> {1}", fieldName, description));
                 }
                 else
                 {
@@ -53,9 +54,9 @@ namespace Utilities
                     _optionalOptions.Add(fieldName.ToLowerInvariant(), field);
 
                     if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0}", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0} {1}", fieldName, description));
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value", fieldName));
+                        _optionalUsageHelp.Add(string.Format("/{0}:value {1}", fieldName, description));
                 }
             }
         }
@@ -185,11 +186,26 @@ namespace Utilities
         static string GetOptionName(FieldInfo field)
         {
             var nameAttribute = GetAttribute<NameAttribute>(field);
-
             if (nameAttribute != null)
                 return nameAttribute.Name;
             else
                 return field.Name;
+        }
+
+        static string GetOptionNameAndDescription(FieldInfo field, out String description)
+        {
+            var nameAttribute = GetAttribute<NameAttribute>(field);
+
+            if (nameAttribute != null)
+            {
+                description = nameAttribute.Description;
+                return nameAttribute.Name;
+            }
+            else
+            {
+                description = null;
+                return field.Name;
+            }
         }
 
         public string Title { get; set; }
@@ -237,9 +253,17 @@ namespace Utilities
             public NameAttribute(string name)
             {
                 Name = name;
+                Description = null;
+            }
+
+            public NameAttribute(string name, string description)
+            {
+                Name = name;
+                Description = description;
             }
 
             public string Name { get; private set; }
+            public string Description { get; private set; }
         }
     }
 }

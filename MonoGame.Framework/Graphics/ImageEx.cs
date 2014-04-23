@@ -18,16 +18,38 @@ namespace System.Drawing
 #if WINRT
 
 #else
-        internal static void RGBToBGR(this Image bmp)
+        internal static Image RGBToBGR(this Image bmp)
         {
-            System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
-            System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
-
-            ia.SetColorMatrix(cm);
-            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
+            Image newBmp;
+            if ((bmp.PixelFormat & Imaging.PixelFormat.Indexed) != 0)
             {
-                g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
+                newBmp = new Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format32bppArgb);
             }
+            else
+            {
+                newBmp = bmp;
+            }
+        
+            try
+            {
+                System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
+                System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix(rgbtobgr);
+
+                ia.SetColorMatrix(cm);
+                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBmp))
+                {
+                    g.DrawImage(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, bmp.Width, bmp.Height, System.Drawing.GraphicsUnit.Pixel, ia);
+                }
+            }
+            finally
+            {
+                if (newBmp != bmp)
+                {
+                    bmp.Dispose();
+                }
+            }
+            
+            return newBmp;
         }
 #endif
 

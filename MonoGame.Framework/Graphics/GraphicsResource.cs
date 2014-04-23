@@ -42,10 +42,10 @@ using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
-{	
-	public abstract class GraphicsResource : IDisposable
-	{
-		bool disposed;
+{
+    public abstract class GraphicsResource : IDisposable
+    {
+        bool disposed;
         
         // Resources may be added to and removed from the list from many threads.
         static object resourcesLock = new object();
@@ -58,13 +58,16 @@ namespace Microsoft.Xna.Framework.Graphics
         // The GraphicsDevice property should only be accessed in Dispose(bool) if the disposing
         // parameter is true. If disposing is false, the GraphicsDevice may or may not be
         // disposed yet.
-		GraphicsDevice graphicsDevice;
+        GraphicsDevice graphicsDevice;
 
-		internal GraphicsResource()
+        private WeakReference _selfReference;
+
+        internal GraphicsResource()
         {
             lock (resourcesLock)
             {
-                resources.Add(new WeakReference(this));
+                _selfReference = new WeakReference(this);
+                resources.Add(_selfReference);
             }
         }
 
@@ -108,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (resourcesLock)
             {
-                foreach (var resource in resources)
+                foreach (var resource in resources.ToArray())
                 {
                     var target = resource.Target;
                     if (target != null)
@@ -118,14 +121,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		public void Dispose()
+        public void Dispose()
         {
             // Dispose of managed objects as well
             Dispose(true);
             // Since we have been manually disposed, do not call the finalizer on this object
             GC.SuppressFinalize(this);
         }
-		
+
         /// <summary>
         /// The method that derived classes should override to implement disposing of managed and native resources.
         /// </summary>
@@ -151,9 +154,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Remove from the global list of graphics resources
                 lock (resourcesLock)
                 {
-                    resources.Remove(new WeakReference(this));
+                    resources.Remove(_selfReference);
                 }
 
+                _selfReference = null;
                 graphicsDevice = null;
                 disposed = true;
             }

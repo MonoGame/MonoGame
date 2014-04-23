@@ -2,6 +2,7 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Content;
+using Android.Views;
 using Ouya.Console.Api;
 
 namespace $safeprojectname$
@@ -21,9 +22,8 @@ namespace $safeprojectname$
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            Game1.Activity = this;
             var g = new Game1();
-            SetContentView(g.Window);
+            SetContentView((View)g.Services.GetService(typeof(View)));
             g.Run();
         }
     }

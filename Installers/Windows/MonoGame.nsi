@@ -82,15 +82,15 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
-  File '..\..\ThirdParty\Libs\NAudio\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.*'
-  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.xml'
-  File /nonfatal '..\..\ThirdParty\Libs\NAudio\*.txt'
+  File '..\..\ThirdParty\Dependencies\NAudio\*.dll'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
+  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
+  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt'
   File '..\..\Tools\2MGFX\bin\Release\*.exe'
   
-  File '..\..\ThirdParty\Libs\ManagedPVRTC\x86\pvrtc.dll'
-  File /oname=libmojoshader.dll  '..\..\ThirdParty\Libs\libmojoshader_32.dll'
-  File '..\..\ThirdParty\Libs\lame_enc.dll'
+  File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
+  File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\libmojoshader_32.dll'
+  File '..\..\ThirdParty\Dependencies\lame_enc.dll'
 
   ; Install the MonoGame Content Builder to a subfolder both
   ; to avoid conflicting assemblies and to make it easy for end
@@ -106,29 +106,29 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
   File /nonfatal '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'  
-  File /nonfatal '..\..\ThirdParty\Libs\OUYA\*.dll'
+  File /nonfatal '..\..\ThirdParty\Dependencies\OUYA\*.dll'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Libs\OpenTK.dll'
-  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
-  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
+  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows'
   File /nonfatal '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows\*.xml'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.dll'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.xml'
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Libs\OpenTK.dll'
-  File '..\..\ThirdParty\Libs\OpenTK.dll.config'
-  File '..\..\ThirdParty\Libs\OpenTK_svnversion.txt'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll'
+  File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
+  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
@@ -138,8 +138,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll'
   File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.xml'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Libs\SharpDX\Windows 8 Metro\*.xml'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.dll'
+  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
@@ -155,8 +155,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
 
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.dll'
-  File /r '..\..\ThirdParty\Libs\SharpDX\Windows Phone\*.xml'  
+  File /r '..\..\ThirdParty\Dependencies\SharpDX\Windows Phone\*.dll'
+  File /r '..\..\ThirdParty\Dependencies\SharpDX\Windows Phone\*.xml'  
 
   ; Intall iOS Assemblies
 
@@ -213,7 +213,7 @@ SectionEnd
 
 Section "OpenAL" OpenAL
   ; SetOutPath $INSTDIR
-  File '..\..\ThirdParty\Libs\oalinst.exe'
+  File '..\..\ThirdParty\Dependencies\oalinst.exe'
   ExecWait '"$INSTDIR\oalinst.exe /S"'
 SectionEnd
 

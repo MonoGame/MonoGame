@@ -118,6 +118,8 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
+            sourceFile = PathHelper.Normalize(sourceFile);
+
             // Remove duplicates... keep this new one.
             var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
@@ -140,6 +142,25 @@ namespace MGCB
                 item.ProcessorParams.Add(pair.Key, pair.Value);
         }
 
+        [CommandLineParameter(
+            Name = "copy",
+            ValueName = "sourceFile",
+            Description = "Copy the content source file verbatim to the output directory.")]
+        public void OnCopy(string sourceFile)
+        {
+            if (!Path.IsPathRooted(sourceFile))
+                sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
+
+            sourceFile = PathHelper.Normalize(sourceFile);
+
+            // Remove duplicates... keep this new one.
+            var previous = _copyItems.FindIndex(e => string.Equals(e, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            if (previous != -1)
+                _copyItems.RemoveAt(previous);
+
+            _copyItems.Add(sourceFile);
+        }
+
         public class ContentItem
         {
             public string SourceFile;
@@ -150,18 +171,20 @@ namespace MGCB
 
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
+        private readonly List<string> _copyItems = new List<string>();
+
         private PipelineManager _manager;
 
         public bool HasWork
         {
-            get { return _content.Count > 0 || Clean; }    
+            get { return _content.Count > 0 || _copyItems.Count > 0 || Clean; }    
         }
 
         public void Build(out int successCount, out int errorCount)
         {
-            var projectDirectory = Directory.GetCurrentDirectory();
-            var outputPath = Path.GetFullPath(Path.Combine(projectDirectory, OutputDir));
-            var intermediatePath = Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir));
+            var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
+            var outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, OutputDir)));
+            var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
 
@@ -237,6 +260,53 @@ namespace MGCB
             FileHelper.DeleteIfExists(contentFile);
             if (newContent.SourceFiles.Count > 0)
                 newContent.Write(contentFile);
+
+            // Process copy items (files that bypass the content pipeline)
+            foreach (var c in _copyItems)
+            {
+                try
+                {
+                    // Figure out an asset name relative to the project directory,
+                    // retaining the file extension.
+                    // Note that replacing a sub-path like this requires consistent
+                    // directory separator characters.
+                    var relativeName = c.Replace(projectDirectory, string.Empty)
+                                            .TrimStart(Path.DirectorySeparatorChar)
+                                            .TrimStart(Path.AltDirectorySeparatorChar);
+                    var dest = Path.Combine(outputPath, relativeName);
+
+                    // Only copy if the source file is newer than the destination.
+                    // We may want to provide an option for overriding this, but for
+                    // nearly all cases this is the desired behavior.
+                    if (File.Exists(dest))
+                    {
+                        var srcTime = File.GetLastWriteTimeUtc(c);
+                        var dstTime = File.GetLastWriteTimeUtc(dest);
+                        if (srcTime <= dstTime)
+                        {
+                            Console.WriteLine("Skipping {0}", c);
+                            continue;
+                        }
+                    }
+
+                    // Create the destination directory if it doesn't already exist.
+                    var destPath = Path.GetDirectoryName(dest);
+                    if (!Directory.Exists(destPath))
+                        Directory.CreateDirectory(destPath);
+
+                    File.Copy(c, dest, true);
+
+                    ++successCount;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("{0}: error: {1}", c, ex.Message);
+                    if (ex.InnerException != null)
+                        Console.Error.Write(ex.InnerException.ToString());
+
+                    ++errorCount;
+                }
+            }
         }
     }
 }

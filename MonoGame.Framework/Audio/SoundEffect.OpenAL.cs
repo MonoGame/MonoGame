@@ -10,22 +10,22 @@ using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-#if WINDOWS || LINUX
+#if MONOMAC
+using MonoMac.AudioToolbox;
+using MonoMac.AudioUnit;
+using MonoMac.OpenAL;
+#elif OPENAL
 using OpenTK.Audio.OpenAL;
+#if IOS
+using MonoTouch.AudioToolbox;
+using MonoTouch.AudioUnit;
+#endif
 #elif ANDROID
 using Android.Content;
 using Android.Content.Res;
 using Android.Media;
 using Android.Util;
 using Stream = System.IO.Stream;
-#elif IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AudioUnit;
-using OpenTK.Audio.OpenAL;
-#elif MONOMAC
-using MonoMac.AudioToolbox;
-using MonoMac.AudioUnit;
-using MonoMac.OpenAL;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal int Size { get; set; }
 
-#if WINDOWS || LINUX || IOS || MONOMAC
+#if OPENAL
 
         internal ALFormat Format { get; set; }
 #endif
@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             inst.InitializeSound();
             inst.BindDataBuffer(_data, Format, Size, (int)Rate);

@@ -36,6 +36,8 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
+        public bool AllowAltF4 = true;
+
         public WinFormsGameForm(GameWindow window)
         {
             _window = window;
@@ -66,9 +68,18 @@ namespace Microsoft.Xna.Framework.Windows
                     }
 
                 case WM_SYSCOMMAND:
+
+                    var wParam = m.WParam.ToInt32();
+
+                    if (!AllowAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0)
+                    {
+                        m.Result = IntPtr.Zero;
+                        return;
+                    }
+
                     // Disable the system menu from being toggled by
                     // keyboard input so we can own the ALT key.
-                    if (m.WParam.ToInt32() == 0xF100) // SC_KEYMENU
+                    if (wParam == 0xF100) // SC_KEYMENU
                     {
                         m.Result = IntPtr.Zero;
                         return;

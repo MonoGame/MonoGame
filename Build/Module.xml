@@ -3,7 +3,7 @@
   <Name>MonoGame.Framework</Name>
   <ModuleAssemblies />
   <DefaultAction>Generate</DefaultAction>
-  <SupportedPlatforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,iOS,MacOS</SupportedPlatforms> 
+  <SupportedPlatforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,iOS,MacOS,Web</SupportedPlatforms>
   <DefaultWindowsPlatforms>Android,Linux,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,iOS</DefaultWindowsPlatforms>
   <DefaultMacOSPlatforms>MacOS,iOS,WindowsGL,Android</DefaultMacOSPlatforms>
   <DefaultLinuxPlatforms>Linux,WindowsGL</DefaultLinuxPlatforms>

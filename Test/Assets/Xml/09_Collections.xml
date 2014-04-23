@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="Collections">
+    <StringArray>
+      <Item>Hello</Item>
+      <Item>World</Item>
+    </StringArray>
+    <StringList>
+      <Item>This</Item>
+      <Item>is</Item>
+      <Item>a</Item>
+      <Item>test</Item>
+    </StringList>
+    <IntArray>1 2 3 23 42</IntArray>
+  </Asset>
+</XnaContent>

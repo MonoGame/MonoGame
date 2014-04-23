@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="FlattenContent">
+    <Name>Shawn</Name>
+    <IsEnglish>true</IsEnglish>
+    <Boo>Hello</Boo>
+    <Boo>World</Boo>
+  </Asset>
+</XnaContent>

@@ -89,6 +89,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
+				output.VerticalLineSpacing = (int)lineSpacing;
 
 				foreach (Glyph glyph in glyphs)
 				{

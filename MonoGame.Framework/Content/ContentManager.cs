@@ -83,6 +83,7 @@ namespace Microsoft.Xna.Framework.Content
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
+            'P', // PlayStation4
         };
 
         private static void AddContentManager(ContentManager contentManager)
@@ -372,10 +373,6 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return SoundEffectReader.Normalize(assetName);
             }
-            else if ((typeof(T) == typeof(Video)))
-            {
-                return Video.Normalize(assetName);
-            }
 #endif
             else if ((typeof(T) == typeof(Effect)))
             {
@@ -408,12 +405,12 @@ namespace Microsoft.Xna.Framework.Content
             }
             else if ((typeof(T) == typeof(SoundEffect)))
             {
+#if ANDROID
+                return new SoundEffect(assetName);
+#else
                 using (Stream s = TitleContainer.OpenStream(assetName))
                     return SoundEffect.FromStream(s);
-            }
-            else if ((typeof(T) == typeof(Video)))
-            {
-                return new Video(assetName);
+#endif
             }
 #endif
             else if ((typeof(T) == typeof(Effect)))
@@ -563,6 +560,11 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
+                // This never executes as asset.Key is never null.  This just forces the 
+                // linker to include the ReloadAsset function when AOT compiled.
+                if (asset.Key == null)
+                    ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
+
 #if WINDOWS_STOREAPP
                 var methodInfo = typeof(ContentManager).GetType().GetTypeInfo().GetDeclaredMethod("ReloadAsset");
 #else

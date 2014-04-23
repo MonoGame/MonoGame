@@ -69,7 +69,7 @@ non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-#if !PSM
+#if !PSM && !WEB
 using System.Drawing;
 #endif
 using System.IO;
@@ -275,8 +275,8 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
-		[CLSCompliant(false)]
-        public static AndroidGameActivity Activity { get; set; }
+        [CLSCompliant(false)]
+        public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
         internal static Game Instance { get { return Game._instance; } }
@@ -360,19 +360,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if ANDROID
-		[CLSCompliant(false)]
-        public AndroidGameWindow Window
-        {
-            get { return Platform.Window; }
-        }
-#else
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }
         }
-#endif
 
         #endregion Properties
 

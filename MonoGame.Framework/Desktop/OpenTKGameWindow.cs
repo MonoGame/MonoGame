@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework
 
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
-            if (e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
+            if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
             {
                 window.Close();
                 return;
