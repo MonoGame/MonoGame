@@ -112,7 +112,12 @@ namespace Microsoft.Xna.Framework.Content
 				var hExternalReferenceReader = new ExternalReferenceReader();
                 var hSoundEffectReader = new SoundEffectReader();
                 var hSongReader = new SongReader();
+
+                // At the moment the Video class doesn't exist
+                // on all platforms... Allow it to compile anyway.
+#if ANDROID || IOS || MONOMAC || (WINDOWS && !OPENGL) || WINRT        
                 var hVideoReader = new VideoReader();
+#endif
             }
 #pragma warning restore 0219, 0649
 
