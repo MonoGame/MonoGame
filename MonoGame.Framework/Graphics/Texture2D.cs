@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
+        internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
             : this(graphicsDevice, width, height, mipmap, format, type, false)
         {
         }

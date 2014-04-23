@@ -12,11 +12,6 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     public sealed partial class Video : IDisposable
 	{
-		private TimeSpan _duration;
-		private float _framesPerSecond = 0.0f;
-		private int _height = 0;
-		private int _width = 0;
-		private VideoSoundtrackType _soundtrackType = VideoSoundtrackType.Dialog;
 		private bool _disposed;
 
 		#region Public API
@@ -29,42 +24,27 @@ namespace Microsoft.Xna.Framework.Media
 		/// <summary>
 		/// Gets the duration of the Video.
         /// </summary>
-        public TimeSpan Duration
-        {
-            get { return _duration; }
-        }
+        public TimeSpan Duration { get; internal set; }
 
         /// <summary>
         /// Gets the frame rate of this video.
         /// </summary>
-        public float FramesPerSecond
-        {
-            get { return _framesPerSecond; }
-        }
+        public float FramesPerSecond { get; internal set; }
 
         /// <summary>
         /// Gets the height of this video, in pixels.
         /// </summary>
-        public int Height
-        {
-            get { return _height; }
-        }
+        public int Height { get; internal set; }
 
         /// <summary>
         /// Gets the VideoSoundtrackType for this video.
         /// </summary>
-        public VideoSoundtrackType VideoSoundtrackType
-        {
-            get { return _soundtrackType; }
-        }
+        public VideoSoundtrackType VideoSoundtrackType { get; internal set; }
 
         /// <summary>
         /// Gets the width of this video, in pixels.
         /// </summary>
-        public int Width
-        {
-            get { return _width; }
-        }
+        public int Width { get; internal set; }
 
         #endregion
 
@@ -73,14 +53,16 @@ namespace Microsoft.Xna.Framework.Media
         internal Video(string fileName, float durationMS) :
             this(fileName)
         {
-            _duration = TimeSpan.FromMilliseconds(durationMS);
+            Duration = TimeSpan.FromMilliseconds(durationMS);
         }
 
         internal Video(string fileName)
         {
             FileName = fileName;
 
+#if !WINRT
             PlatformInitialize();
+#endif
         }
 
         ~Video()
@@ -102,7 +84,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (!_disposed)
             {
-                PlatformDispose(disposing);
+                //PlatformDispose(disposing);
                 _disposed = true;
             }
         }
