@@ -18,17 +18,11 @@ namespace Microsoft.Xna.Framework
 	[CLSCompliant(false)]
     public class AndroidGameActivity : Activity
     {
-        public static Game Game { get; set; }
-		
-		private OrientationListener o;		
-		private ScreenReceiver screenReceiver;
+        internal Game Game { private get; set; }
 
-		private bool _AutoPauseAndResumeMediaPlayer = true;
-		public bool AutoPauseAndResumeMediaPlayer
-		{
-			get{return _AutoPauseAndResumeMediaPlayer;}
-			set{_AutoPauseAndResumeMediaPlayer = value;}
-		}
+        private ScreenReceiver screenReceiver;
+
+        public bool AutoPauseAndResumeMediaPlayer = true;
 
 		/// <summary>
 		/// OnCreate called when the activity is launched from cold or after the app
@@ -40,11 +34,6 @@ namespace Microsoft.Xna.Framework
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
 			base.OnCreate (savedInstanceState);
-			o = new OrientationListener(this);	
-			if (o.CanDetectOrientation())
-			{
-				o.Enable();				
-			}					
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -55,13 +44,15 @@ namespace Microsoft.Xna.Framework
 		    RegisterReceiver(screenReceiver, filter);
 
             RequestWindowFeature(WindowFeatures.NoTitle);
+
+			Game.Activity = this;
 		}
 
         public static event EventHandler Paused;
 
 		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
 		{
-			// we need to refresh the viewport here.			
+			// we need to refresh the viewport here.
 			base.OnConfigurationChanged (newConfig);
 		}
 
@@ -80,11 +71,14 @@ namespace Microsoft.Xna.Framework
             if (Resumed != null)
                 Resumed(this, EventArgs.Empty);
 
-            var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-            if (deviceManager == null)
-                return;
-            (deviceManager as GraphicsDeviceManager).ForceSetFullScreen();
-            Game.Window.RequestFocus();
+            if (Game != null)
+            {
+                var deviceManager = (IGraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
+                if (deviceManager == null)
+                    return;
+                ((GraphicsDeviceManager)deviceManager).ForceSetFullScreen();
+                ((AndroidGameWindow)Game.Window).GameView.RequestFocus();
+            }
         }
 
 		protected override void OnDestroy ()
