@@ -72,6 +72,8 @@ namespace MonoGame.Framework
 
         private bool _isMouseInBounds;
 
+        private MouseButtons _mouseDownButtonsState;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -109,6 +111,16 @@ namespace MonoGame.Framework
                     return;
                 _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
+        }
+
+        public override bool AllowAltF4
+        {
+             get { return base.AllowAltF4; }
+             set
+             {
+                 _form.AllowAltF4 = value;
+                 base.AllowAltF4 = value;
+             }
         }
 
         public override DisplayOrientation CurrentOrientation
@@ -167,9 +179,9 @@ namespace MonoGame.Framework
             _form.StartPosition = FormStartPosition.CenterScreen;           
 
             // Capture mouse events.
-            _form.MouseDown += OnMouseState;
+            _form.MouseDown += OnMouseDown;
             _form.MouseMove += OnMouseState;
-            _form.MouseUp += OnMouseState;
+            _form.MouseUp += OnMouseUp;
             _form.MouseWheel += OnMouseState;
             _form.MouseEnter += OnMouseEnter;
             _form.MouseLeave += OnMouseLeave;            
@@ -198,15 +210,27 @@ namespace MonoGame.Framework
                 KeyState.Clear();
         }
 
+        private void OnMouseDown(object sender, MouseEventArgs mouseEventArgs)
+        {
+            _mouseDownButtonsState |= mouseEventArgs.Button;
+            OnMouseState(sender, mouseEventArgs);
+        }
+
+        private void OnMouseUp(object sender, MouseEventArgs mouseEventArgs)
+        {
+            _mouseDownButtonsState &= ~mouseEventArgs.Button;
+            OnMouseState(sender, mouseEventArgs);
+        }
+
         private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
         {
             var previousState = MouseState.LeftButton;
 
             MouseState.X = mouseEventArgs.X;
             MouseState.Y = mouseEventArgs.Y;
-            MouseState.LeftButton = (mouseEventArgs.Button & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.MiddleButton = (mouseEventArgs.Button & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.RightButton = (mouseEventArgs.Button & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.LeftButton = (_mouseDownButtonsState & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.MiddleButton = (_mouseDownButtonsState & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.RightButton = (_mouseDownButtonsState & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
             MouseState.ScrollWheelValue += mouseEventArgs.Delta;
             
             TouchLocationState? touchState = null;

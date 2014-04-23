@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice : IDisposable
     {
         private Viewport _viewport;
+        private GraphicsProfile _graphicsProfile;
 
         private bool _isDisposed;
 
@@ -265,7 +266,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Clear(Color color)
         {
-			var options = ClearOptions.Target;
+            var options = ClearOptions.Target;
+            options |= ClearOptions.DepthBuffer;
+            options |= ClearOptions.Stencil;
             PlatformClear(options, color.ToVector4(), _viewport.MaxDepth, 0);
         }
 
@@ -387,7 +390,20 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public GraphicsProfile GraphicsProfile { get; set; }
+        public GraphicsProfile GraphicsProfile
+        { 
+            get 
+            {
+                return _graphicsProfile;
+            }
+            internal set
+            {
+                //check Profile
+                if(value > GraphicsDevice.GetHighestSupportedGraphicsProfile(this))
+                    throw new System.NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
+                _graphicsProfile = value;
+            }
+        }
 
         public Rectangle ScissorRectangle
         {
@@ -671,5 +687,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
+
+        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
+        }
+
     }
 }

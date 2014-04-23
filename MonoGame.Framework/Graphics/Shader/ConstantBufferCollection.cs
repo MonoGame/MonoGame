@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
         internal void SetConstantBuffers(GraphicsDevice device)
-#elif OPENGL || PSM
+#elif OPENGL || PSM || WEB
         internal void SetConstantBuffers(GraphicsDevice device, int shaderProgram)
 #endif
         {
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
 #if DIRECTX
                     buffer.PlatformApply(device, _stage, i);
-#elif OPENGL || PSM
+#elif OPENGL || PSM || WEB
                     buffer.PlatformApply(device, shaderProgram);
 #endif
                 }

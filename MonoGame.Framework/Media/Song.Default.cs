@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformInitialize(string fileName)
         {
 
-#if MONOMAC || (WINDOWS && OPENGL)
+#if MONOMAC || (WINDOWS && OPENGL) || WEB
 
             using (var s = File.OpenRead(_name))
             {

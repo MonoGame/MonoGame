@@ -310,7 +310,7 @@ namespace MonoGame.Tests {
 
 			do {
 				int result = GetMessage (out msg, IntPtr.Zero, 0, 0);
-				if (result == -1)
+				if (result == -1 || result == 0)
 					return;
 			} while (msg.msg != WM_QUIT);
 		}

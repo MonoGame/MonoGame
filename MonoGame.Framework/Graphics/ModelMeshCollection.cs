@@ -1,127 +1,126 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// Summary:
-	//     Represents a collection of ModelMesh objects.
-	public sealed class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
-	{
-		internal ModelMeshCollection(IList<ModelMesh> list)
-			: base(list)
-		{
+    /// <summary>
+    /// Represents a collection of ModelMesh objects.
+    /// </summary>
+    public sealed class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
+    {
+        internal ModelMeshCollection(IList<ModelMesh> list)
+            : base(list)
+        {
 
-		}
-		
-	    // Summary:
-	    //     Retrieves a ModelMesh from the collection, given the name of the mesh.
-	    //
-	    // Parameters:
-	    //   meshName:
-	    //     The name of the mesh to retrieve.
-		public ModelMesh this[string meshName] {
-			get {
-				ModelMesh ret;
-				if (!this.TryGetValue(meshName, out ret)) {
-					throw new KeyNotFoundException();
-				}
-				return ret;
-			}
-		}
-		
-	    // Summary:
-	    //     Finds a mesh with a given name if it exists in the collection.
-	    //
-	    // Parameters:
-	    //   meshName:
-	    //     The name of the mesh to find.
-	    //
-	    //   value:
-	    //     [OutAttribute] The mesh named meshName, if found.
-	    public bool TryGetValue (string meshName, out ModelMesh value)
-		{
-			if (string.IsNullOrEmpty (meshName)) {
-				throw new ArgumentNullException ("meshName");
-			}
-			
-			foreach (var mesh in this) {
-				if (string.Compare(mesh.Name, meshName, StringComparison.Ordinal) == 0) {
-					value = mesh;
-					return true;
-				}
-			}
-			
-			value = null;
-			return false;
-		}
+        }
 
-	}
+        /// <summary>
+        /// Retrieves a ModelMesh from the collection, given the name of the mesh.
+        /// </summary>
+        /// <param name="meshName">The name of the mesh to retrieve.</param>
+        public ModelMesh this[string meshName]
+        {
+            get
+            {
+                ModelMesh ret;
+                if (!TryGetValue(meshName, out ret))
+                    throw new KeyNotFoundException();
+                return ret;
+            }
+        }
 
-	//// Summary:
-	////     Represents a collection of ModelMesh objects.
-	//public sealed class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
-	//{
-	//    internal ModelMeshCollection()
-	//        : base(new List<ModelMesh>())
-	//    {
-	//    }
+        /// <summary>
+        /// Finds a mesh with a given name if it exists in the collection.
+        /// </summary>
+        /// <param name="meshName">The name of the mesh to find.</param>
+        /// <param name="value">The mesh named meshName, if found.</param>
+        /// <returns>true if a mesh was found</returns>
+        public bool TryGetValue(string meshName, out ModelMesh value)
+        {
+            if (string.IsNullOrEmpty(meshName))
+                throw new ArgumentNullException("meshName");
 
-	//    // Summary:
-	//    //     Retrieves a ModelMesh from the collection, given the name of the mesh.
-	//    //
-	//    // Parameters:
-	//    //   meshName:
-	//    //     The name of the mesh to retrieve.
-	//    public ModelMesh this[string meshName] { get { throw new NotImplementedException(); } }
+            foreach (var mesh in this)
+            {
+                if (string.Compare(mesh.Name, meshName, StringComparison.Ordinal) == 0)
+                {
+                    value = mesh;
+                    return true;
+                }
+            }
 
-	//    // Summary:
-	//    //     Returns a ModelMeshCollection.Enumerator that can iterate through a ModelMeshCollection.
-	//    public ModelMeshCollection.Enumerator GetEnumerator() { throw new NotImplementedException(); }
-	//    //
-	//    // Summary:
-	//    //     Finds a mesh with a given name if it exists in the collection.
-	//    //
-	//    // Parameters:
-	//    //   meshName:
-	//    //     The name of the mesh to find.
-	//    //
-	//    //   value:
-	//    //     [OutAttribute] The mesh named meshName, if found.
-	//    public bool TryGetValue(string meshName, out ModelMesh value) { throw new NotImplementedException(); }
+            value = null;
+            return false;
+        }
 
-	//    // Summary:
-	//    //     Provides the ability to iterate through the bones in an ModelMeshCollection.
-	//    public struct Enumerator : IEnumerator<ModelMesh>, IDisposable, IEnumerator
-	//    {
+        /// <summary>
+        /// Returns a ModelMeshCollection.Enumerator that can iterate through a ModelMeshCollection.
+        /// </summary>
+        /// <returns></returns>
+        public new Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
 
-	//        // Summary:
-	//        //     Gets the current element in the ModelMeshCollection.
-	//        public ModelMesh Current { get { throw new NotImplementedException(); } }
+        /// <summary>
+        /// Provides the ability to iterate through the bones in an ModelMeshCollection.
+        /// </summary>
+        public struct Enumerator : IEnumerator<ModelMesh>
+        {
+            private readonly ModelMeshCollection _collection;
+            private int _position;
 
-	//        // Summary:
-	//        //     Immediately releases the unmanaged resources used by this object.
-	//        public void Dispose() { throw new NotImplementedException(); }
-	//        //
-	//        // Summary:
-	//        //     Advances the enumerator to the next element of the ModelMeshCollection.
-	//        public bool MoveNext() { throw new NotImplementedException(); }
+            internal Enumerator(ModelMeshCollection collection)
+            {
+                _collection = collection;
+                _position = -1;
+            }
 
-	//        #region IEnumerator Members
 
-	//        object IEnumerator.Current
-	//        {
-	//            get { throw new NotImplementedException(); }
-	//        }
+            /// <summary>
+            /// Gets the current element in the ModelMeshCollection.
+            /// </summary>
+            public ModelMesh Current { get { return _collection[_position]; } }
 
-	//        public void Reset()
-	//        {
-	//            throw new NotImplementedException();
-	//        }
+            /// <summary>
+            /// Advances the enumerator to the next element of the ModelMeshCollection.
+            /// </summary>
+            public bool MoveNext()
+            {
+                _position++;
+                return (_position < _collection.Count);
+            }
 
-	//        #endregion
-	//    }
-	//}
+            #region IDisposable
+
+            /// <summary>
+            /// Immediately releases the unmanaged resources used by this object.
+            /// </summary>
+            public void Dispose()
+            {
+            }
+
+            #endregion
+
+            #region IEnumerator Members
+
+            object IEnumerator.Current
+            {
+                get { return _collection[_position]; }
+            }
+
+            public void Reset()
+            {
+                _position = -1;
+            }
+
+            #endregion
+        }
+    }
 }

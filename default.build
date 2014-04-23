@@ -33,6 +33,7 @@
     <call target="buildmac" />
     <call target="buildios" />
     <call target="buildpsm" />
+    <call target="buildweb" />
 
     <call target="buildtools"/>
     <call target="buildcontentprocessor"/>
@@ -89,6 +90,23 @@
     </if>
   </target>
 
+  <target name="buildweb" description="Build Web JSIL" depends="clean">
+    <if test="${os == 'Win32NT'}">
+      <exec program="Protobuild" commandline="-generate Web">
+        <environment>
+          <variable name="JSIL_DIRECTORY" value="C:\JSIL" />
+        </environment>
+      </exec>
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="MonoGame.Framework.Web.sln /t:Build /p:Configuration=Release" />
+    </if>
+    <if test="${os == 'Unix'}">
+      <exec program="mono" commandline="Protobuild.exe -generate Web" />
+      <exec program="xbuild" commandline="/t:Clean /p:Configuration=Release MonoGame.Framework.Web.sln" />
+      <exec program="xbuild" commandline="/t:Build /p:Configuration=Release MonoGame.Framework.Web.sln" />
+    </if>
+  </target>
+
   <target name="buildmac" description="Build MacOS" depends="clean">
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
@@ -99,7 +117,7 @@
 
   <target name="buildios" description="Build iOS" depends="clean">
     <if test="${os == 'MacOS'}">
-      <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets')}">
+      <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />

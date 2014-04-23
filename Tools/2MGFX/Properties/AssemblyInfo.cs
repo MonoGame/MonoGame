@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("2MGFX")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("The MonoGame Team")]
 [assembly: AssemblyProduct("2MGFX")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
+[assembly: AssemblyCopyright("Copyright (C) The MonoGame Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

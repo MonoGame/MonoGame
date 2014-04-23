@@ -5,13 +5,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
-using System.Drawing;
-
-#if WINDOWS
-using System.Drawing.Imaging;
-#endif
 
 #if WINRT
 #if WINDOWS_PHONE
@@ -20,10 +13,9 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 #else
 using Windows.Graphics.Imaging;
-using Windows.UI.Xaml.Media.Imaging;
-#endif
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
+#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -168,14 +160,14 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS_PHONE
             WriteableBitmap bitmap = null;
             var waitEvent = new ManualResetEventSlim(false);
-				    Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-		            BitmapImage bitmapImage = new BitmapImage();
-		            bitmapImage.SetSource(stream);
-		            bitmap = new WriteableBitmap(bitmapImage);
-		            waitEvent.Set();
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(stream);
+                    bitmap = new WriteableBitmap(bitmapImage);
+                    waitEvent.Set();
             });
-				    waitEvent.Wait();
+            waitEvent.Wait();
 
             // Convert from ARGB to ABGR 
             ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
@@ -201,28 +193,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 toReturn._texture = sharpDxTexture;
             }
             return toReturn;
-#endif
-#if WINDOWS
-            using (Bitmap image = (Bitmap)Bitmap.FromStream(stream))
-            {
-                // Fix up the Image to match the expected format
-                image.RGBToBGR();
-
-                var data = new byte[image.Width * image.Height * 4];
-
-                BitmapData bitmapData = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
-                    ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                if (bitmapData.Stride != image.Width * 4) 
-                    throw new NotImplementedException();
-                Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
-                image.UnlockBits(bitmapData);
-
-                Texture2D texture = null;
-                texture = new Texture2D(graphicsDevice, image.Width, image.Height);
-                texture.SetData(data);
-
-                return texture;
-            }
 #endif
         }
 
@@ -250,9 +220,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             waitEvent.Wait();
 #endif
-#if MONOMAC
-			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
-#else
+#if !WINDOWS_STOREAPP && !WINDOWS_PHONE
             throw new NotImplementedException();
 #endif
         }
@@ -281,8 +249,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_STOREAPP
             SaveAsImage(BitmapEncoder.PngEncoderId, stream, width, height);
-#elif MONOMAC
-			SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             // TODO: We need to find a simple stand alone
             // PNG encoder if we want to support this.
@@ -318,7 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 #if !WINDOWS_PHONE
-		
+
         [CLSCompliant(false)]
         public static SharpDX.Direct3D11.Texture2D CreateTex2DFromBitmap(SharpDX.WIC.BitmapSource bsource, GraphicsDevice device)
         {
@@ -336,18 +302,14 @@ namespace Microsoft.Xna.Framework.Graphics
             desc.SampleDescription.Count = 1;
             desc.SampleDescription.Quality = 0;
 
-			SharpDX.Direct3D11.Texture2D dx11Texture;
-			
             using(SharpDX.DataStream s = new SharpDX.DataStream(bsource.Size.Height * bsource.Size.Width * 4, true, true))
-			{
-				bsource.CopyPixels(bsource.Size.Width * 4, s);
+            {
+                bsource.CopyPixels(bsource.Size.Width * 4, s);
 
-				SharpDX.DataRectangle rect = new SharpDX.DataRectangle(s.DataPointer, bsource.Size.Width * 4);
+                SharpDX.DataRectangle rect = new SharpDX.DataRectangle(s.DataPointer, bsource.Size.Width * 4);
 
-				dx11Texture = new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
-			}
-            
-			return dx11Texture;
+                return new SharpDX.Direct3D11.Texture2D(device._d3dDevice, desc, rect);
+            }
         }
 
         static SharpDX.WIC.ImagingFactory imgfactory = null;
@@ -357,27 +319,24 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 imgfactory = new SharpDX.WIC.ImagingFactory();
             }
-			
-			SharpDX.WIC.FormatConverter fconv = null;
-			
+
             decoder = new SharpDX.WIC.BitmapDecoder(
                 imgfactory,
                 stream,
                 SharpDX.WIC.DecodeOptions.CacheOnDemand
                 );
 
-			fconv = new SharpDX.WIC.FormatConverter(imgfactory);
+            var fconv = new SharpDX.WIC.FormatConverter(imgfactory);
 
-			fconv.Initialize(
-				decoder.GetFrame(0),
-				SharpDX.WIC.PixelFormat.Format32bppPRGBA,
-				SharpDX.WIC.BitmapDitherType.None, null,
-				0.0, SharpDX.WIC.BitmapPaletteType.Custom);
+            fconv.Initialize(
+                decoder.GetFrame(0),
+                SharpDX.WIC.PixelFormat.Format32bppPRGBA,
+                SharpDX.WIC.BitmapDitherType.None, null,
+                0.0, SharpDX.WIC.BitmapPaletteType.Custom);
 
-			return fconv;
+            return fconv;
         }
-		
-		
+
 #endif
 
         internal override SharpDX.Direct3D11.Resource CreateTexture()

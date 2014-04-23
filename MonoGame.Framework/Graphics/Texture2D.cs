@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 
-#if !PSM
+#if !PSM && !WEB
 using System.Drawing;
 #endif
 

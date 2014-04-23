@@ -52,10 +52,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #if WINDOWS
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.DX11Profile =   context.TargetPlatform == TargetPlatform.Windows ||
-                                    context.TargetPlatform == TargetPlatform.WindowsPhone8 ||
-                                    context.TargetPlatform == TargetPlatform.WindowsStoreApp ||
-                                    context.TargetPlatform == TargetPlatform.Xbox360;
+            options.Profile =   context.TargetPlatform == TargetPlatform.Windows ||
+                                context.TargetPlatform == TargetPlatform.WindowsPhone8 ||
+                                context.TargetPlatform == TargetPlatform.WindowsStoreApp ||
+                                context.TargetPlatform == TargetPlatform.Xbox360 ? 
+                                ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
@@ -74,10 +75,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Create the effect object.
-            DXEffectObject effect = null;
+            EffectObject effect = null;
             try
             {
-                effect = DXEffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.FromShaderInfo(shaderInfo);
             }
             catch (Exception ex)
             {

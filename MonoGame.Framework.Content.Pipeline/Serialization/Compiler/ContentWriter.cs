@@ -52,6 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'p', // PlayStationMobile
             'M', // WindowsPhone8
             'r', // RaspberryPi
+            'P', // PlayStation4
         };
 
         /// <summary>
