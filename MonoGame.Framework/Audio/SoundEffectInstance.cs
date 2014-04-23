@@ -60,6 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new ArgumentOutOfRangeException();
 
                 PlatformSetVolume(value);
+                _volume = value;
             }
         }
 

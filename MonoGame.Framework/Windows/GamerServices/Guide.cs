@@ -92,14 +92,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         static Guide()
         {
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP 
             _dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-
 
             var licenseInformation = CurrentApp.LicenseInformation;
             licenseInformation.LicenseChanged += () => isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
 
             isTrialMode = !licenseInformation.IsActive || licenseInformation.IsTrial;
+#elif WINDOWS_PHONE
+            Microsoft.Phone.Marketplace.LicenseInformation licenseInformation = new Microsoft.Phone.Marketplace.LicenseInformation();
+            isTrialMode = licenseInformation == null ? false : licenseInformation.IsTrial();
 #endif
         }
 
@@ -436,7 +438,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 #if DEBUG
                 return simulateTrialMode || isTrialMode;
 #elif WINDOWS_PHONE
-			    return MsXna_Guide.IsTrialMode;
+			    return isTrialMode;
 #else
                 return simulateTrialMode || isTrialMode;
 #endif
