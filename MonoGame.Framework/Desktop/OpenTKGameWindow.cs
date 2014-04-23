@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
         private bool _isMouseInBounds;
 #endif
 		//private DisplayOrientation _currentOrientation;
-        private IntPtr _windowHandle = IntPtr.Zero;
+        private IntPtr _windowHandle;
         private INativeWindow window;
 
         protected Game game;
@@ -337,16 +337,7 @@ namespace Microsoft.Xna.Framework
                                          window.ClientRectangle.Width, window.ClientRectangle.Height);
             windowState = window.WindowState;            
 
-#if WINDOWS
-            {
-                var windowInfoType = window.WindowInfo.GetType();
-                var propertyInfo = windowInfoType.GetProperty("WindowHandle");
-                if (propertyInfo != null)
-                {
-                    _windowHandle = (IntPtr)propertyInfo.GetValue(window.WindowInfo, null);
-                }
-            }
-#endif
+            _windowHandle = window.WindowInfo.Handle;
 
             keys = new List<Keys>();
 
@@ -418,6 +409,8 @@ namespace Microsoft.Xna.Framework
                     // Dispose/release managed objects
                     window.Dispose();
                 }
+                // The window handle no longer exists
+                _windowHandle = IntPtr.Zero;
 
                 disposed = true;
             }
