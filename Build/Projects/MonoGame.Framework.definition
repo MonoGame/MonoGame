@@ -268,7 +268,7 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
