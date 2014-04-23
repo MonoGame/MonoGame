@@ -41,7 +41,7 @@
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\$(Platform)\$(Configuration)</IntermediateOutputPath>
     
     <ContentResponseFile>$(IntermediateOutputPath)\mgcontent.txt</ContentResponseFile>	
-    <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\MGCB.exe</MonoGameContentBuilderExe>
+    <MonoGameContentBuilderExe>$(MSBuildProgramFiles32)\MonoGame\v3.0\MGCB.exe</MonoGameContentBuilderExe>
     <MonoGamePlatform Condition="'$(MonoGamePlatform)' == ''">Windows</MonoGamePlatform>
 
     <AssemblySearchPaths>
