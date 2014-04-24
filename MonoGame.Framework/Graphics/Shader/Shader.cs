@@ -94,16 +94,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             PlatformGraphicsDeviceResetting();
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose();
-            }
-
-            base.Dispose(disposing);
-        }
 	}
 }
 

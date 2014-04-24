@@ -161,20 +161,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDevice.AddDisposeAction(() =>
+            if (!IsDisposed)
             {
-                if (_shaderHandle != -1)
+                GraphicsDevice.AddDisposeAction(() =>
                 {
-                    if (GL.IsShader(_shaderHandle))
+                    if (_shaderHandle != -1)
                     {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
+                        if (GL.IsShader(_shaderHandle))
+                        {
+                            GL.DeleteShader(_shaderHandle);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        _shaderHandle = -1;
                     }
-                    _shaderHandle = -1;
-                }
-            });
+                });
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

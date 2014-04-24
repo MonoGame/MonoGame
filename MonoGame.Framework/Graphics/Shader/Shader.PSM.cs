@@ -23,10 +23,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGraphicsDeviceResetting()
         {
         }
-
-        private void PlatformDispose()
-        {
-        }
 	}
 }
 

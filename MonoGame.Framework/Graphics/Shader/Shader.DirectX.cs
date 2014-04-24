@@ -63,9 +63,11 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _pixelShader);
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDeviceResetting();
+            SharpDX.Utilities.Dispose(ref _vertexShader);
+            SharpDX.Utilities.Dispose(ref _pixelShader);
+            base.Dispose(disposing);
         }
 
         private void CreatePixelShader()
