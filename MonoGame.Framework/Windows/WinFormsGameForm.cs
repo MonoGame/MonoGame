@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Windows
 
                     var wParam = m.WParam.ToInt32();
 
-                    if (!AllowAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0)
+                    if (!AllowAltF4 && wParam == 0xF060 && m.LParam.ToInt32() == 0 && Focused)
                     {
                         m.Result = IntPtr.Zero;
                         return;
