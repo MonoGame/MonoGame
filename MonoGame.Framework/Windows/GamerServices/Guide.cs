@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		 bool usePasswordMode)
         {
 #if WINDOWS_STOREAPP
-			// If SwapChainBackgroundPanel is null then we are running the non-XAML template
+			// If SwapChainPanel is null then we are running the non-XAML template
 			if (Game.Instance.graphicsDeviceManager.SwapChainBackgroundPanel == null)
 			{
 				throw new NotImplementedException("This method works only when using the XAML template.");
