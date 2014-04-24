@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds(true);
             _view.Window.Run(0);
         }
 
@@ -180,19 +180,21 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
-        internal void ResetWindowBounds(bool toggleFullScreen)
+        internal void ResetWindowBounds(bool resetPosition=false)
         {
             Rectangle bounds;
 
             bounds = Window.ClientBounds;
+
+            var displayDevice = OpenTK.DisplayDevice.Default;
 
             //Changing window style forces a redraw. Some games
             //have fail-logic and toggle fullscreen in their draw function,
@@ -208,23 +210,29 @@ namespace Microsoft.Xna.Framework
             {
                 bounds = new Rectangle(0, 0,graphicsDeviceManager.PreferredBackBufferWidth,graphicsDeviceManager.PreferredBackBufferHeight);
 
-                if (OpenTK.DisplayDevice.Default.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
-                    OpenTK.DisplayDevice.Default.Height != graphicsDeviceManager.PreferredBackBufferHeight)
+                if (displayDevice.Width != graphicsDeviceManager.PreferredBackBufferWidth ||
+                    displayDevice.Height != graphicsDeviceManager.PreferredBackBufferHeight)
                 {
-                    OpenTK.DisplayDevice.Default.ChangeResolution(graphicsDeviceManager.PreferredBackBufferWidth,
+                    displayDevice.ChangeResolution(graphicsDeviceManager.PreferredBackBufferWidth,
                             graphicsDeviceManager.PreferredBackBufferHeight,
-                            OpenTK.DisplayDevice.Default.BitsPerPixel,
-                            OpenTK.DisplayDevice.Default.RefreshRate);
+                            displayDevice.BitsPerPixel,
+                            displayDevice.RefreshRate);
                 }
             }
             else
             {
                 
                 // switch back to the normal screen resolution
-                OpenTK.DisplayDevice.Default.RestoreResolution();
+                displayDevice.RestoreResolution();
                 // now update the bounds 
                 bounds.Width = graphicsDeviceManager.PreferredBackBufferWidth;
                 bounds.Height = graphicsDeviceManager.PreferredBackBufferHeight;
+
+                if( resetPosition )
+                {
+                    bounds.X = displayDevice.Bounds.Left + (displayDevice.Bounds.Width - bounds.Width) / 2;
+                    bounds.Y = displayDevice.Bounds.Top + (displayDevice.Bounds.Height - bounds.Height) / 2;
+                }
             }
             
 
