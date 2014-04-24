@@ -13,11 +13,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             throw new NotImplementedException();
         }
-
-        private void PlatformDispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

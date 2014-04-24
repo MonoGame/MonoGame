@@ -59,10 +59,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 (this.ColorWriteChannels & ColorWriteChannels.Alpha) != 0);
             GraphicsExtensions.CheckGLError();
         }
-
-        private void PlatformDispose()
-        {
-        }
     }
 }
 
