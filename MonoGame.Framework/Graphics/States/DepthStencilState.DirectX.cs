@@ -139,6 +139,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new ArgumentException("Invalid stencil operation!");
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
+        }
     }
 }
 

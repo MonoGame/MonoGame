@@ -107,6 +107,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new ArgumentException("Invalid texture address mode!");
             }
         }
-  }
+
+        protected override void Dispose(bool disposing)
+        {
+            SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
+        }
+    }
 }
 
