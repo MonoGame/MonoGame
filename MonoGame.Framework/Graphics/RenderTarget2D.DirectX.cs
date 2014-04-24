@@ -72,13 +72,12 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _depthStencilView);
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                SharpDX.Utilities.Dispose(ref _renderTargetView);
-                SharpDX.Utilities.Dispose(ref _depthStencilView);
-            }
+            SharpDX.Utilities.Dispose(ref _renderTargetView);
+            SharpDX.Utilities.Dispose(ref _depthStencilView);
+
+            base.Dispose(disposing);
         }
 
         RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
