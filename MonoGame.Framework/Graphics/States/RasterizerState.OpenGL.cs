@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void PlatformApplyState(GraphicsDevice device)
         {
             // When rendering offscreen the faces change order.
-            var offscreen = device.GetRenderTargets().Length > 0;
+            var offscreen = device.IsRenderTargetBound;
 
             if (CullMode == CullMode.None)
             {

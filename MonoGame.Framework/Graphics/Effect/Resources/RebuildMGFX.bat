@@ -7,7 +7,7 @@ SET TWOMGFX="..\..\..\..\Tools\bin\Windows\2mgfx.exe"
 
   call %TWOMGFX% %%~nf.fx %%~nf.ogl.mgfxo
 
-  call %TWOMGFX% %%~nf.fx %%~nf.dx11.mgfxo /DX11
+  call %TWOMGFX% %%~nf.fx %%~nf.dx11.mgfxo /Profile:DirectX_11
 
 )
 

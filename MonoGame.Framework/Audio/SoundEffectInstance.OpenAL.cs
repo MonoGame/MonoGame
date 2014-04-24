@@ -15,7 +15,7 @@ using Android.Util;
 
 #if MONOMAC
 using MonoMac.OpenAL;
-#else
+#elif OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
 #endregion Statements
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Audio
 		private bool _looped = false;
 		int sourceId;
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
@@ -158,7 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
 			// Appears to be a no-op on Android?
 #endif
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             // get AL's listener position
             float x, y, z;
@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformPause()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             if (!hasSourceId || soundState != SoundState.Playing)
                 return;
@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformPlay()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             if (hasSourceId)
                 return;
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Audio
             controller.PlaySound (soundBuffer);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
 
-#endif // WINDOWS || LINUX || MONOMAC || IOS
+#endif
 
 #if ANDROID
 
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformResume()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             if (!hasSourceId)
             {
@@ -292,7 +292,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformStop(bool immediate)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             if (hasSourceId)
             {
@@ -316,7 +316,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetIsLooped(bool value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
             
             _looped = value;
             
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private bool PlatformGetIsLooped()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
             
             return _looped;
 #endif
@@ -351,7 +351,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetPan(float value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             _pan = value;
 			if (!hasSourceId)
@@ -372,7 +372,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPitch(float value)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
             _pitch = value;
 
 			if (hasSourceId)
@@ -393,7 +393,7 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundState PlatformGetState()
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             if (!hasSourceId)
                 return SoundState.Stopped;
@@ -438,7 +438,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetVolume(float value)
         {
 
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             _volume = value;
 			if (hasSourceId)
@@ -455,7 +455,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformDispose()
         {
-#if WINDOWS || LINUX || MONOMAC || IOS
+#if OPENAL
 
             this.Stop(true);
             soundBuffer.Reserved -= HandleSoundBufferReserved;

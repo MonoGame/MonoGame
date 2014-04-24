@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             lock (resourcesLock)
             {
-                foreach (var resource in resources)
+                foreach (var resource in resources.ToArray())
                 {
                     var target = resource.Target;
                     if (target != null)
