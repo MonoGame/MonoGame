@@ -52,8 +52,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _resourceView);
-            SharpDX.Utilities.Dispose(ref _texture);
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _resourceView);
+                SharpDX.Utilities.Dispose(ref _texture);
+            }
 
             base.Dispose(disposing);
         }

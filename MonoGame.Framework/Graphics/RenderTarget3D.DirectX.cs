@@ -49,8 +49,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _renderTargetView);
-            SharpDX.Utilities.Dispose(ref _depthStencilView);
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _renderTargetView);
+                SharpDX.Utilities.Dispose(ref _depthStencilView);
+            }
 
             base.Dispose(disposing);
         }

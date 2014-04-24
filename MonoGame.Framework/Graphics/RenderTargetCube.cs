@@ -173,16 +173,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-#if DIRECTX
-            if (_renderTargetViews != null)
+            if (disposing)
             {
-                for (var i = 0; i < _renderTargetViews.Length; i++)
-                    _renderTargetViews[i].Dispose();
+#if DIRECTX
+                if (_renderTargetViews != null)
+                {
+                    for (var i = 0; i < _renderTargetViews.Length; i++)
+                        _renderTargetViews[i].Dispose();
 
-                _renderTargetViews = null;
-                SharpDX.Utilities.Dispose(ref _depthStencilView);
-            }
+                    _renderTargetViews = null;
+                    SharpDX.Utilities.Dispose(ref _depthStencilView);
+                }
 #endif
+            }
 
             base.Dispose(disposing);
         }

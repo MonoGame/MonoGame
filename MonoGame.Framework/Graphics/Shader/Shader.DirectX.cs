@@ -65,8 +65,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _vertexShader);
-            SharpDX.Utilities.Dispose(ref _pixelShader);
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _vertexShader);
+                SharpDX.Utilities.Dispose(ref _pixelShader);
+            }
+
             base.Dispose(disposing);
         }
 

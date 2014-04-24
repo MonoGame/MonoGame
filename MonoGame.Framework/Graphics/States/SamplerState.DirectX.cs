@@ -110,7 +110,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _state);
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
             base.Dispose(disposing);
         }
     }
