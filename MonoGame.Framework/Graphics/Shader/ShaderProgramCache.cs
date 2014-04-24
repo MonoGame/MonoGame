@@ -26,15 +26,12 @@ namespace Microsoft.Xna.Framework.Graphics
     internal class ShaderProgram
     {
         public readonly int Program;
-        public readonly int PosFixupLoc;
 
         private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
 
         public ShaderProgram(int program)
         {
             Program = program;
-            PosFixupLoc = GL.GetUniformLocation(program, "posFixup");
-            GraphicsExtensions.CheckGLError();
         }
 
         public int GetUniformLocation(string name)
