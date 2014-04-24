@@ -273,6 +273,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Create the Direct3D device.
                 using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+
+                // Necessary to enable video playback
+                var multithread = _d3dDevice.QueryInterface<SharpDX.Direct3D.DeviceMultithread>();
+                multithread.SetMultithreadProtected(true);
 #if DEBUG
             }
             catch(SharpDXException)

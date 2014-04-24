@@ -1,88 +1,11 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using Android.Hardware;
 
 namespace Microsoft.Xna.Framework
 {
@@ -92,16 +15,18 @@ namespace Microsoft.Xna.Framework
             : base(game)
         {
             System.Diagnostics.Debug.Assert(Game.Activity != null, "Must set Game.Activity before creating the Game instance");
-            AndroidGameActivity.Game = game;
+            Game.Activity.Game = Game;
             AndroidGameActivity.Paused += Activity_Paused;
             AndroidGameActivity.Resumed += Activity_Resumed;
 
-            Window = new AndroidGameWindow(Game.Activity, game);
+            _gameWindow = new AndroidGameWindow(Game.Activity, game);
+            Window = _gameWindow;
         }
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
-		private bool _exiting = false;
+        private bool _exiting = false;
+        private AndroidGameWindow _gameWindow;
 
         public override void Exit()
         {
@@ -116,7 +41,7 @@ namespace Microsoft.Xna.Framework
 					Game.DoExiting();
                     Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
-				    Window.Close();
+				    _gameWindow.GameView.Close();
 				}
             }
             catch
@@ -131,7 +56,7 @@ namespace Microsoft.Xna.Framework
 
         public override void StartRunLoop()
         {
-            Window.Resume();
+			_gameWindow.GameView.Resume();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -139,7 +64,7 @@ namespace Microsoft.Xna.Framework
             if (!_initialized)
             {
                 Game.DoInitialize();
-                _initialized = true;				
+                _initialized = true;
             }
 
             return true;
@@ -156,25 +81,27 @@ namespace Microsoft.Xna.Framework
             // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
             //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
 
-            switch (Window.Context.Resources.Configuration.Orientation)
+			switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-                    Window.SetOrientation(DisplayOrientation.Portrait, false);				
+					_gameWindow.SetOrientation(DisplayOrientation.Portrait, false);
                     break;
                 case Android.Content.Res.Orientation.Landscape:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
                 default:
-                    Window.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
                     break;
-            }			
+            }
             base.BeforeInitialize();
+            _gameWindow.GameView.TouchEnabled = true;
         }
 
         public override bool BeforeRun()
         {
+
             // Run it as fast as we can to allow for more response on threaded GPU resource creation
-            Window.Run();
+			_gameWindow.GameView.Run();
 
             return false;
         }
@@ -203,25 +130,25 @@ namespace Microsoft.Xna.Framework
             if (!IsActive)
             {
                 IsActive = true;
-                Window.Resume();
+				_gameWindow.GameView.Resume();
 				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
-				if(!Window.IsFocused)
-		           Window.RequestFocus();
+				if (!_gameWindow.GameView.IsFocused)
+					_gameWindow.GameView.RequestFocus();
             }
         }
 
 		MediaState _MediaPlayer_PrevState = MediaState.Stopped;
-        // EnterBackground
+	    // EnterBackground
         void Activity_Paused(object sender, EventArgs e)
         {
             if (IsActive)
             {
                 IsActive = false;
 				_MediaPlayer_PrevState = MediaPlayer.State;
-                Window.Pause();
-				Window.ClearFocus();
+				_gameWindow.GameView.Pause();
+				_gameWindow.GameView.ClearFocus();
 				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
@@ -249,8 +176,8 @@ namespace Microsoft.Xna.Framework
                 var device = Game.GraphicsDevice;
                 if (device != null)
                     device.Present();
-                    
-                Window.SwapBuffers();
+
+				_gameWindow.GameView.SwapBuffers();
             }
             catch (Exception ex)
             {

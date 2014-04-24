@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="MathTypes">
+    <Vector>1 2 3</Vector>
+    <Rectangle>1 2 3 4</Rectangle>
+    <Quaternion>1 2 3 4</Quaternion>
+    <Color>FF6495ED</Color>
+    <VectorArray>0 0 1 1</VectorArray>
+  </Asset>
+</XnaContent>

@@ -222,7 +222,7 @@ namespace Microsoft.Xna.Framework
             {
 #if ANDROID
                 //if (!Game.Instance.Window.GraphicsContext.IsCurrent)
-                Game.Instance.Window.MakeCurrent();
+                ((AndroidGameWindow)Game.Instance.Window).GameView.MakeCurrent();
 #endif
                 action();
                 resetEvent.Set();
