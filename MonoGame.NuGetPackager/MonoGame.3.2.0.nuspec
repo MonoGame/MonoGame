@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>MonoGame</id>
+        <version>3.2.0</version>
+        <title>MonoGame</title>
+        <authors>Simon-darkside-Jackson,Michael Cummings</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>http://www.monogame.net/wp-content/themes/monogame/images/monogame.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes>New 3.2 release 
+Aligned with the official MonoGame 3.2 release install found at 
+http://MonoGame.Net
+**Note, Project templates only for WinGL, Win8, WP8 as yet
+iOS / Android / Mac to follow soon</releaseNotes>
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+        <dependencies>
+            <dependency id="MonoGame.Binaries"/>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="content\net40\Game1.cs.pp" target="content\net40\Game1.cs.pp" />
+        <file src="content\net40\Program.cs.pp" target="content\net40\Program.cs.pp" />
+        <file src="..\ThirdParty\GamepadConfig\SDL.dll" target="content\net40\SDL.dll" />
+        <file src="content\netcore\App.xaml.cs.pp" target="content\netcore\App.xaml.cs.pp" />
+        <file src="content\netcore\App.xaml.pp" target="content\netcore\App.xaml.pp" />
+        <file src="content\netcore\Game1.cs.pp" target="content\netcore\Game1.cs.pp" />
+        <file src="content\netcore\GamePage.xaml.cs.pp" target="content\netcore\GamePage.xaml.cs.pp" />
+        <file src="content\netcore\GamePage.xaml.pp" target="content\netcore\GamePage.xaml.pp" />
+        <file src="content\wp8\Game1.cs.pp" target="content\wp8\Game1.cs.pp" />
+        <file src="content\wp8\GamePage.xaml.cs.pp" target="content\wp8\GamePage.xaml.cs.pp" />
+        <file src="content\wp8\GamePage.xaml.pp" target="content\wp8\GamePage.xaml.pp" />
+		<file src="readme\MonoGame\readme.txt" target="" />
+    </files>
+</package>
