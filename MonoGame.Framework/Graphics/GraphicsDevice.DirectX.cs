@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // The swap chain resources.
         SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         SharpDX.DXGI.SwapChain1 _swapChain;
-        SwapChainBackgroundPanel _swapChainPanel;
+        SwapChainBackgroundPanel _swapChainBackgroundPanel;
 
         float _dpi; 
 #endif
@@ -341,9 +341,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Did we change swap panels?
-            if (PresentationParameters.SwapChainBackgroundPanel != _swapChainPanel)
+            if (PresentationParameters.SwapChainBackgroundPanel != _swapChainBackgroundPanel)
             {
-                _swapChainPanel = null;
+                _swapChainBackgroundPanel = null;
                 if (_swapChain != null)
                 {
                     _swapChain.Dispose();
@@ -411,7 +411,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        _swapChainPanel = PresentationParameters.SwapChainBackgroundPanel;
+                        _swapChainBackgroundPanel = PresentationParameters.SwapChainBackgroundPanel;
 
                         using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
                         {
