@@ -55,5 +55,11 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            SharpDX.Utilities.Dispose(ref _cbuffer);
+            base.Dispose(disposing);
+        }
     }
 }
