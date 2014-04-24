@@ -31,16 +31,21 @@ namespace Microsoft.Xna.Framework.Graphics
             this.glLastSamplerState = null;
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDevice.AddDisposeAction(() =>
+            if (!IsDisposed)
             {
-                GL.DeleteTextures(1, ref glTexture);
-                GraphicsExtensions.CheckGLError();
-                glTexture = -1;
-            });
+                GraphicsDevice.AddDisposeAction(() =>
+                {
+                    GL.DeleteTextures(1, ref glTexture);
+                    GraphicsExtensions.CheckGLError();
+                    glTexture = -1;
+                });
 
-            glLastSamplerState = null;
+                glLastSamplerState = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
