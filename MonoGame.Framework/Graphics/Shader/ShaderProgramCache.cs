@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (GL.IsProgram(pair.Value.Program))
                 {
 #if MONOMAC
-                    GL.DeleteProgram(pair.Value.program, null);
+                    GL.DeleteProgram(pair.Value.Program, null);
 #else
                     GL.DeleteProgram(pair.Value.Program);
 #endif
