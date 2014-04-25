@@ -19,11 +19,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glTexture = -1;
         internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
-        internal SamplerState glLastSamplerState = null;
+        internal SamplerState glLastSamplerState;
+
         private void PlatformGraphicsDeviceResetting()
         {
-            this.glTexture = -1;
-            this.glLastSamplerState = null;
+            glTexture = -1;
+            glLastSamplerState = null;
         }
 
         private void PlatformDispose(bool disposing)
