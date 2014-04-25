@@ -15,10 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics
             SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage, bool shared)
         {
             GenerateIfRequired();
-
-            // If we don't need a depth buffer then we're done.
-            if (preferredDepthFormat == DepthFormat.None)
-                return;
         }
 
         private void GenerateIfRequired()
