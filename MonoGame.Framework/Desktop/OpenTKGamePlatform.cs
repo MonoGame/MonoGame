@@ -76,6 +76,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
 
+using OpenTK;
+
 namespace Microsoft.Xna.Framework
 {
     class OpenTKGamePlatform : GamePlatform
@@ -84,7 +86,7 @@ namespace Microsoft.Xna.Framework
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
-        
+        private Toolkit toolkit;
         
         public override bool VSyncEnabled
         {
@@ -102,6 +104,10 @@ namespace Microsoft.Xna.Framework
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
+            toolkit = Toolkit.Init(new ToolkitOptions
+            {
+                Backend = PlatformBackend.PreferNative
+            });
             _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
@@ -298,6 +304,12 @@ namespace Microsoft.Xna.Framework
         {
             if (!IsDisposed)
             {
+                if (toolkit != null)
+                {
+                    toolkit.Dispose();
+                    toolkit = null;
+                }
+
                 if (_view != null)
                 {
                     _view.Dispose();
