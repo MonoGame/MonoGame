@@ -84,6 +84,11 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
+        private void PlatformGetBackBufferData<T>(T[] data) where T : struct
+        {
+            throw new NotImplementedException();
+        }
+
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             return GraphicsProfile.HiDef;

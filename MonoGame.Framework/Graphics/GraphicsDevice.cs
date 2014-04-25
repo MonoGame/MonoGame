@@ -665,6 +665,16 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
 
+        /// <summary>
+        /// Gets the Pixel data of what is currently drawn on screen.
+        /// On XNA/OpenGL this is in BGRA format. On DirectX/iOS/Android it is RGBA format.
+        /// </summary>
+        /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
+        public void GetBackBufferData<T>(T[] data) where T : struct
+        {
+            PlatformGetBackBufferData(data);
+        }
+
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             //TODO: Overview the calculation
