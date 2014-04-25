@@ -2,12 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#region Using Statements
 using System;
-#if !DIRECTX
-using System.IO;
-#endif
-#endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {

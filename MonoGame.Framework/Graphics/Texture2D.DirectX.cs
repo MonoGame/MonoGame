@@ -6,16 +6,16 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if WINRT
 #if WINDOWS_PHONE
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
-#else
+#endif
+
+#if WINDOWS_STOREAPP
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

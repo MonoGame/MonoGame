@@ -1,13 +1,9 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif (WINDOWS && !DIRECTX) || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif PSM
+#if PSM
 using Sce.PlayStation.Core.Graphics;
-#elif GLES
-using OpenTK.Graphics.ES20;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

@@ -3,13 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Audio;
-using System.Linq;
 
 #if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
 using MonoTouch.MediaPlayer;
 #endif
 

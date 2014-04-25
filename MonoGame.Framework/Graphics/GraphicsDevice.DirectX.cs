@@ -5,9 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
 using System.Diagnostics;
 
 using SharpDX;
@@ -15,7 +12,6 @@ using SharpDX.Direct3D;
 
 #if WINDOWS_PHONE
 using SharpDX.Direct3D11;
-using Windows.Foundation;
 using MonoGame.Framework.WindowsPhone;
 #endif
 

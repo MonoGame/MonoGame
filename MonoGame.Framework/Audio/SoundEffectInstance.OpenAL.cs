@@ -2,15 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#region Using Statements
 using System;
-using System.IO;
 
 #if ANDROID
-using Android.Content;
-using Android.Content.Res;
 using Android.Media;
-using Android.Util;
 #endif
 
 #if MONOMAC
@@ -18,7 +13,6 @@ using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
-#endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {

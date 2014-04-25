@@ -4,9 +4,6 @@
 //
 // Author: Kenneth James Pouncey
 
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed partial class SamplerStateCollection
