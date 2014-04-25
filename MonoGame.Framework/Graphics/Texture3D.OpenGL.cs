@@ -45,17 +45,23 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-        private void PlatformSetData(int level,
+        private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
-                                     IntPtr dataPtr, int width, int height, int depth)
+                                     T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
 #if GLES
             throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
 #else
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
             GL.BindTexture(glTarget, glTexture);
             GraphicsExtensions.CheckGLError();
             GL.TexSubImage3D(glTarget, level, left, top, front, width, height, depth, glFormat, glType, dataPtr);
             GraphicsExtensions.CheckGLError();
+
+            dataHandle.Free();
 #endif
         }
 

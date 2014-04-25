@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformSetData(
+        private void PlatformSetData<T>(
             int level,
             int left, 
             int top, 
@@ -28,7 +28,9 @@ namespace Microsoft.Xna.Framework.Graphics
             int bottom, 
             int front, 
             int back,
-            IntPtr dataPtr,
+            T[] data,
+            int startIndex,
+            int elementCount,
             int width, 
             int height, 
             int depth)
