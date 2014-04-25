@@ -140,25 +140,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
             _extensions = GetGLExtensions();
-
-            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
-            {
-                Framebuffer = new FramebufferObject();
-                Renderbuffer = new RenderbufferObject();
-            }
-#if !(GLES || MONOMAC)
-            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
-            {
-                Framebuffer = new FramebufferObjectEXT();
-                Renderbuffer = new RenderbufferObjectEXT();
-            }
-#endif
-            else
-            {
-                throw new PlatformNotSupportedException(
-                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
-                    "Try updating your graphics drivers.");
-            }
         }
 
         List<string> GetGLExtensions()
@@ -200,6 +181,25 @@ namespace Microsoft.Xna.Framework.Graphics
             // Free all the cached shader programs. 
             _programCache.Clear();
             _shaderProgram = null;
+
+            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
+            {
+                Framebuffer = new FramebufferObject();
+                Renderbuffer = new RenderbufferObject();
+            }
+            #if !(GLES || MONOMAC)
+            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
+            {
+                Framebuffer = new FramebufferObjectEXT();
+                Renderbuffer = new RenderbufferObjectEXT();
+            }
+            #endif
+            else
+            {
+                throw new PlatformNotSupportedException(
+                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
+                    "Try updating your graphics drivers.");
+            }
         }
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -274,7 +274,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (this.glRenderTargetFrameBuffer > 0)
                 {
                     Framebuffer.Delete(this.glRenderTargetFrameBuffer);
-                    GraphicsExtensions.CheckGLError();
                 }
             });
         }
@@ -341,7 +340,6 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformApplyDefaultRenderTarget()
         {
             Framebuffer.Bind(GLFramebuffer, glFramebuffer);
-            GraphicsExtensions.CheckGLError();
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
@@ -360,13 +358,10 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (this.glRenderTargetFrameBuffer == 0)
 			{
                 glRenderTargetFrameBuffer = Framebuffer.Generate();
-                GraphicsExtensions.CheckGLError();
             }
 
             Framebuffer.Bind(GLFramebuffer, glRenderTargetFrameBuffer);
-            GraphicsExtensions.CheckGLError();
             Framebuffer.Texture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
-            GraphicsExtensions.CheckGLError();
 
 			// Reverted this change, as per @prollin's suggestion
             Framebuffer.Renderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
@@ -378,7 +373,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 				GraphicsExtensions.CheckGLError();
                 Framebuffer.Texture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
-				GraphicsExtensions.CheckGLError();
 			}
 
 			GL.DrawBuffers(_currentRenderTargetCount, _drawBuffers);
