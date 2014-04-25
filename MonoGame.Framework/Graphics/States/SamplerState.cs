@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
   public partial class SamplerState : GraphicsResource
   {
-    static SamplerState () 
+        static SamplerState () 
         {
 #if OPENGL
 #if GLES

@@ -64,10 +64,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformSetVolume()
         {
-            _mediaEngineEx.Volume = _volume;       
+            _mediaEngineEx.Volume = _volume;
         }
-		
-		#endregion
+
+        #endregion
 
         private static void PlatformPause()
         {
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformPlaySong(Song song)
         {
-            _mediaEngineEx.Source = song.FilePath;            
+            _mediaEngineEx.Source = song.FilePath;
             _mediaEngineEx.Load();
             _mediaEngineEx.Play();
         }
