@@ -762,15 +762,6 @@ namespace Microsoft.Xna.Framework
 #endif
 		}
 
-        internal void ResizeWindow(bool changed)
-        {
-#if LINUX || (WINDOWS && OPENGL)
-            ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
-#elif WINDOWS && DIRECTX
-            ((MonoGame.Framework.WinFormsGamePlatform)Platform).ResetWindowBounds(changed);
-#endif
-        }
-
         #endregion Internal Methods
 
         internal GraphicsDeviceManager graphicsDeviceManager

@@ -149,7 +149,7 @@ namespace MonoGame.Framework
         {
         }
 
-        public void ResetWindowBounds(bool toggleFullScreen)
+        public void ResetWindowBounds()
         {
             _window.ChangeClientSize(new Size(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight));
         }
