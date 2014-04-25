@@ -104,10 +104,7 @@ namespace Microsoft.Xna.Framework
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
-            toolkit = Toolkit.Init(new ToolkitOptions
-            {
-                Backend = PlatformBackend.PreferNative
-            });
+            toolkit = Toolkit.Init();
             _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
