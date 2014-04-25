@@ -852,8 +852,8 @@ namespace Microsoft.Xna.Framework
         class SortingFilteringCollection<T> : ICollection<T>
         {
             private readonly List<T> _items;
-            private readonly List<AddJournalEntry> _addJournal;
-            private readonly Comparison<AddJournalEntry> _addJournalSortComparison;
+            private readonly List<AddJournalEntry<T>> _addJournal;
+            private readonly Comparison<AddJournalEntry<T>> _addJournalSortComparison;
             private readonly List<int> _removeJournal;
             private readonly List<T> _cachedFilteredItems;
             private bool _shouldRebuildCache;
@@ -874,7 +874,7 @@ namespace Microsoft.Xna.Framework
                 Action<T, EventHandler<EventArgs>> sortChangedUnsubscriber)
             {
                 _items = new List<T>();
-                _addJournal = new List<AddJournalEntry>();
+                _addJournal = new List<AddJournalEntry<T>>();
                 _removeJournal = new List<int>();
                 _cachedFilteredItems = new List<T>();
                 _shouldRebuildCache = true;
@@ -889,9 +889,9 @@ namespace Microsoft.Xna.Framework
                 _addJournalSortComparison = CompareAddJournalEntry;
             }
 
-            private int CompareAddJournalEntry(AddJournalEntry x, AddJournalEntry y)
+            private int CompareAddJournalEntry(AddJournalEntry<T> x, AddJournalEntry<T> y)
             {
-                int result = _sort((T)x.Item, (T)y.Item);
+                int result = _sort(x.Item, y.Item);
                 if (result != 0)
                     return result;
                 return x.Order - y.Order;
@@ -927,13 +927,13 @@ namespace Microsoft.Xna.Framework
             {
                 // NOTE: We subscribe to item events after items in _addJournal
                 //       have been merged.
-                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
+                _addJournal.Add(new AddJournalEntry<T>(_addJournal.Count, item));
                 InvalidateCache();
             }
 
             public bool Remove(T item)
             {
-                if (_addJournal.Remove(AddJournalEntry.CreateKey(item)))
+                if (_addJournal.Remove(AddJournalEntry<T>.CreateKey(item)))
                     return true;
 
                 var index = _items.IndexOf(item);
@@ -1022,7 +1022,7 @@ namespace Microsoft.Xna.Framework
 
                 while (iItems < _items.Count && iAddJournal < _addJournal.Count)
                 {
-                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
+                    var addJournalItem = _addJournal[iAddJournal].Item;
                     // If addJournalItem is less than (belongs before)
                     // _items[iItems], insert it.
                     if (_sort(addJournalItem, _items[iItems]) < 0)
@@ -1040,7 +1040,7 @@ namespace Microsoft.Xna.Framework
                 // If _addJournal had any "tail" items, append them all now.
                 for (; iAddJournal < _addJournal.Count; ++iAddJournal)
                 {
-                    var addJournalItem = (T)_addJournal[iAddJournal].Item;
+                    var addJournalItem = _addJournal[iAddJournal].Item;
                     SubscribeToItemEvents(addJournalItem);
                     _items.Add(addJournalItem);
                 }
@@ -1075,7 +1075,7 @@ namespace Microsoft.Xna.Framework
                 var item = (T)sender;
                 var index = _items.IndexOf(item);
 
-                _addJournal.Add(new AddJournalEntry(_addJournal.Count, item));
+                _addJournal.Add(new AddJournalEntry<T>(_addJournal.Count, item));
                 _removeJournal.Add(index);
 
                 // Until the item is back in place, we don't care about its
@@ -1085,23 +1085,20 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        // For iOS, the AOT compiler can't seem to handle a
-        // List<AddJournalEntry<T>>, so unfortunately we'll use object
-        // for storage.
-        private struct AddJournalEntry
+        private struct AddJournalEntry<T>
         {
             public readonly int Order;
-            public readonly object Item;
+            public readonly T Item;
 
-            public AddJournalEntry(int order, object item)
+            public AddJournalEntry(int order, T item)
             {
                 Order = order;
                 Item = item;
             }
 
-            public static AddJournalEntry CreateKey(object item)
+            public static AddJournalEntry<T> CreateKey(T item)
             {
-                return new AddJournalEntry(-1, item);
+                return new AddJournalEntry<T>(-1, item);
             }
 
             public override int GetHashCode()
@@ -1111,10 +1108,10 @@ namespace Microsoft.Xna.Framework
 
             public override bool Equals(object obj)
             {
-                if (!(obj is AddJournalEntry))
+                if (!(obj is AddJournalEntry<T>))
                     return false;
 
-                return object.Equals(Item, ((AddJournalEntry)obj).Item);
+                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
             }
         }
     }
