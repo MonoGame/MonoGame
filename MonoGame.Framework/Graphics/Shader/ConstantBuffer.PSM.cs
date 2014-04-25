@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformClear()
         {
         }
-        public unsafe void PlatformApply(GraphicsDevice device, int program)
+        public unsafe void PlatformApply(GraphicsDevice device, ShaderProgram program)
         {
 #warning Unimplemented
         }

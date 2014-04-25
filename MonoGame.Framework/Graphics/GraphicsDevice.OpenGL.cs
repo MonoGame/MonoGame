@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
 
-        private int _shaderProgram = -1;
+        private ShaderProgram _shaderProgram = null;
 
         static readonly float[] _posFixup = new float[4];
 
@@ -177,7 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Free all the cached shader programs. 
             _programCache.Clear();
-            _shaderProgram = -1;
+            _shaderProgram = null;
         }
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -415,18 +415,19 @@ namespace Microsoft.Xna.Framework.Graphics
         private void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var info = _programCache.GetProgramInfo(VertexShader, PixelShader);
-            if (info.program == -1)
+            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
+            if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
-            if (_shaderProgram != info.program)
+            if (_shaderProgram != shaderProgram)
             {
-                GL.UseProgram(info.program);
+                GL.UseProgram(shaderProgram.Program);
                 GraphicsExtensions.CheckGLError();
-                _shaderProgram = info.program;
+                _shaderProgram = shaderProgram;
             }
 
-            if (info.posFixupLoc == -1)
+            var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
+            if (posFixupLoc == -1)
                 return;
 
             // Apply vertex shader fix:
@@ -468,7 +469,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            GL.Uniform4(info.posFixupLoc, 1, _posFixup);
+            GL.Uniform4(posFixupLoc, 1, _posFixup);
             GraphicsExtensions.CheckGLError();
         }
 
