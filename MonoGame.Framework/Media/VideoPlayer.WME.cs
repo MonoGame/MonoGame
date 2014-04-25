@@ -5,11 +5,7 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 
-using SharpDX;
 using SharpDX.MediaFoundation;
-using SharpDX.Multimedia;
-using SharpDX.Win32;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -63,7 +59,7 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-        private Microsoft.Xna.Framework.Graphics.Texture2D PlatformGetTexture()
+        private Texture2D PlatformGetTexture()
         {
             // This will return a null texture if
             // the video hasn't started playing yet
