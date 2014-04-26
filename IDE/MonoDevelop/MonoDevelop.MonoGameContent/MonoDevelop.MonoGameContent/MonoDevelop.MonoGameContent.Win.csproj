@@ -183,6 +183,14 @@
     <Content Include="icons\monogame-font.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\AssimpNet.dll">
+      <Link>AssimpNet.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
