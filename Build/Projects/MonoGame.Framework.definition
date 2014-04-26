@@ -986,6 +986,9 @@
 
     
     <!-- Utility Classes -->
+    <Compile Include="Utilities\AssemblyHelper.cs">
+      <Platforms>Linux,MacOS,Windows,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
 

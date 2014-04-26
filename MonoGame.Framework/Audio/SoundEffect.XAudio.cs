@@ -187,9 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
             isDisposed = true;
         }
 
-        // Does someone actually need to call this if it only happens when the whole
-        // game closes? And if so, who would make the call?
-        internal static void Shutdown()
+        internal static void PlatformShutdown()
         {
             if (MasterVoice != null)
             {

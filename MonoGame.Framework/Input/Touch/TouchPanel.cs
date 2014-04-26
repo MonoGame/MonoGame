@@ -166,12 +166,5 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get { return PrimaryWindow.TouchPanelState.IsGestureAvailable; }
         }
-
-#if WINDOWS_PHONE
-        internal static void ResetState()
-        {
-            PrimaryWindow.TouchPanelState.ResetState();
-        }
-#endif
     }
 }

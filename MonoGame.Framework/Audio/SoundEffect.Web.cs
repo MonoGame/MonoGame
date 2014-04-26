@@ -37,6 +37,10 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformDispose()
         {
         }
+
+        internal static void PlatformShutdown()
+        {
+        }
     }
 }
 
