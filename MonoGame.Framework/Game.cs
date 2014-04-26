@@ -211,10 +211,6 @@ namespace Microsoft.Xna.Framework
                     Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
-#if WINDOWS_MEDIA_SESSION
-                    Media.MediaManagerState.CheckShutdown();
-#endif
-
                     SoundEffect.PlatformShutdown();
 
                     BlendState.ResetStates();
