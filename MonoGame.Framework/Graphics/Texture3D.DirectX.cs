@@ -32,9 +32,9 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var description = new Texture3DDescription
             {
-                Width = width,
-                Height = height,
-                Depth = depth,
+                Width = _width,
+                Height = _height,
+                Depth = _depth,
                 MipLevels = _levelCount,
                 Format = SharpDXHelper.ToFormat(_format),
                 BindFlags = BindFlags.ShaderResource,
@@ -58,10 +58,14 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture3D(GraphicsDevice._d3dDevice, description);
         }
 
-        private void PlatformSetData(int level,
+        private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
-                                     IntPtr dataPtr, int width, int height, int depth)
+                                     T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
+            var elementSizeInByte = Marshal.SizeOf(typeof(T));
+            var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+
             int rowPitch = GetPitch(width);
             int slicePitch = rowPitch * height; // For 3D texture: Size of 2D image.
             var box = new DataBox(dataPtr, rowPitch, slicePitch);
@@ -73,6 +77,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var d3dContext = GraphicsDevice._d3dContext;
             lock (d3dContext)
                 d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+
+            dataHandle.Free();
         }
 
         private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
@@ -86,9 +92,9 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             var desc = new Texture3DDescription
             {
-                Width = width,
-                Height = height,
-                Depth = depth,
+                Width = _width,
+                Height = _height,
+                Depth = _depth,
                 MipLevels = 1,
                 Format = SharpDXHelper.ToFormat(_format),
                 BindFlags = BindFlags.None,

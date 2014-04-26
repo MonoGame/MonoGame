@@ -3,11 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -21,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     internal partial class ConstantBuffer
     {
-        private int _program = -1;
+        private ShaderProgram _shaderProgram = null;
         private int _location;
 
         static ConstantBuffer _lastConstantBufferApplied = null;
@@ -45,24 +40,23 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformClear()
         {
             // Force the uniform location to be looked up again
-            _program = -1;
+            _shaderProgram = null;
         }
 
-        public unsafe void PlatformApply(GraphicsDevice device, int program)
+        public unsafe void PlatformApply(GraphicsDevice device, ShaderProgram program)
         {
             // NOTE: We assume here the program has 
             // already been set on the device.
 
             // If the program changed then lookup the
             // uniform again and apply the state.
-            if (_program != program)
+            if (_shaderProgram != program)
             {
-                var location = GL.GetUniformLocation(program, _name);
-                GraphicsExtensions.CheckGLError();
+                var location = program.GetUniformLocation(_name);
                 if (location == -1)
                     return;
 
-                _program = program;
+                _shaderProgram = program;
                 _location = location;
                 _dirty = true;
             }

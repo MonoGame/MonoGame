@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 #if MONOMAC
@@ -12,6 +11,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #else
 using OpenTK.Graphics.ES20;
+using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -76,11 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 public int Offset;
                 public int AttributeLocation;
                 public int NumberOfElements;
-#if GLES
-                public All VertexAttribPointerType;
-#elif OPENGL
                 public VertexAttribPointerType VertexAttribPointerType;
-#endif
                 public bool Normalized;
             }
 

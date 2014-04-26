@@ -2,12 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sce.PlayStation.Core.Graphics;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -21,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformClear()
         {
         }
-        public unsafe void PlatformApply(GraphicsDevice device, int program)
+        public unsafe void PlatformApply(GraphicsDevice device, ShaderProgram program)
         {
 #warning Unimplemented
         }
