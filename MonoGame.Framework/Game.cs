@@ -723,14 +723,6 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
-
-#if DIRECTX
-		    SoundEffect.Shutdown();
-#endif
-
-#if WINDOWS_MEDIA_SESSION
-            Media.MediaManagerState.CheckShutdown();
-#endif
 		}
 
         #endregion Internal Methods
