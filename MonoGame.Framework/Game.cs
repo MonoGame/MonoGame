@@ -215,14 +215,12 @@ namespace Microsoft.Xna.Framework
                     Media.MediaManagerState.CheckShutdown();
 #endif
 
-#if DIRECTX
-                    SoundEffect.Shutdown();
+                    SoundEffect.PlatformShutdown();
 
                     BlendState.ResetStates();
                     DepthStencilState.ResetStates();
                     RasterizerState.ResetStates();
                     SamplerState.ResetStates();
-#endif
                 }
 #if ANDROID
                 Activity = null;

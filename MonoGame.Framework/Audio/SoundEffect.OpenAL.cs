@@ -205,6 +205,11 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #endregion
+
+        internal static void PlatformShutdown()
+        {
+            OpenALSoundController.DestroyInstance();
+        }
     }
 }
 
