@@ -159,15 +159,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if WINDOWS_PHONE
             WriteableBitmap bitmap = null;
-            var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.BlockOnUIThread(() =>
             {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
                     bitmap = new WriteableBitmap(bitmapImage);
-                    waitEvent.Set();
             });
-            waitEvent.Wait();
 
             // Convert from ARGB to ABGR 
             ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
