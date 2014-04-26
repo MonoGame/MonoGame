@@ -50,9 +50,11 @@ namespace Microsoft.Xna.Framework.Graphics
             device._d3dContext.OutputMerger.SetBlendState(_state, blendFactor);
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _state);
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
         }
     }
 }

@@ -47,21 +47,15 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (_renderTargetView != null)
-                {
-                    _renderTargetView.Dispose();
-                    _renderTargetView = null;
-                }
-                if (_depthStencilView != null)
-                {
-                    _depthStencilView.Dispose();
-                    _depthStencilView = null;
-                }
+                SharpDX.Utilities.Dispose(ref _renderTargetView);
+                SharpDX.Utilities.Dispose(ref _depthStencilView);
             }
+
+            base.Dispose(disposing);
         }
 
 	    RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
