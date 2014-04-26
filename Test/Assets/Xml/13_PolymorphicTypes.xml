@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="PolymorphicTypes">
+    <Hello Type="string">World</Hello>
+    <Elf Type="int">23</Elf>
+    <PolymorphicArray>
+      <Item>
+        <Value>true</Value>
+      </Item>
+      <Item Type="PolymorphicB">
+        <Value>true</Value>
+      </Item>
+      <Item Type="PolymorphicC">
+        <Value>true</Value>
+      </Item>
+    </PolymorphicArray>
+  </Asset>
+</XnaContent>

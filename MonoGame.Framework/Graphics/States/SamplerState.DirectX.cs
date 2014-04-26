@@ -7,8 +7,8 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-  public partial class SamplerState
-  {
+    public partial class SamplerState
+    {
         private SharpDX.Direct3D11.SamplerState _state;
 
         protected internal override void GraphicsDeviceResetting()

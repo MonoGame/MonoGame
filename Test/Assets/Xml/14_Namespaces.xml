@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Test="MonoGame.Tests.ContentPipeline"
+            xmlns:Framework="Microsoft.Xna.Framework"
+            xmlns:Graphics="Microsoft.Xna.Framework.Graphics">
+  <Asset Type="Test:NamespaceClass">
+    <A Type="Test:NamespaceHelper">
+      <Value>true</Value>
+    </A>
+    <B Type="Framework:Vector2">0 0</B>
+    <C Type="Graphics:SpriteSortMode">Immediate</C>
+  </Asset>
+</XnaContent>

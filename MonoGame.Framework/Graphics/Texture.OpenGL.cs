@@ -2,10 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Diagnostics;
-
-#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
@@ -15,7 +11,6 @@ using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 #endif
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -24,11 +19,12 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glTexture = -1;
         internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
-        internal SamplerState glLastSamplerState = null;
+        internal SamplerState glLastSamplerState;
+
         private void PlatformGraphicsDeviceResetting()
         {
-            this.glTexture = -1;
-            this.glLastSamplerState = null;
+            glTexture = -1;
+            glLastSamplerState = null;
         }
 
         protected override void Dispose(bool disposing)

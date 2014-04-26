@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {

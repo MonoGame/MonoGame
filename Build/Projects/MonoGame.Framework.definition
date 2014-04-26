@@ -117,7 +117,7 @@
       <Platforms>Linux,MacOS,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Threading.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="TitleContainer.cs" />
     <Compile Include="Vector2.cs" />
@@ -268,7 +268,7 @@
       <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
@@ -401,6 +401,12 @@
       <Platforms>Windows8,Windows,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferObject.cs">
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.RenderbufferObject.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">
@@ -815,7 +821,7 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -826,17 +832,26 @@
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android,Ouya</Platforms>
     </Compile>
+    <Compile Include="Media\Video.WMS.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Linux,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.WME.cs">
+        <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoPlayer.WMS.cs">
+        <Platforms>Windows</Platforms>
     </Compile>
 
     <!-- Microsoft.Devices.Sensors -->
@@ -986,6 +1001,9 @@
       <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Android\AndroidGameWindow.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Android\MonoGameAndroidGameView.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Android\Devices\Sensors\Accelerometer.cs">
@@ -1266,6 +1284,9 @@
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Windows\WinFormsGameWindow.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\VideoSampleGrabber.cs">
       <Platforms>Windows</Platforms>
     </Compile>
 	

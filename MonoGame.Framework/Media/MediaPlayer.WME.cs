@@ -3,12 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Audio;
-using System.Linq;
-using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Multimedia;
-using SharpDX.Win32;
 using Windows.UI.Core;
 
 
@@ -68,10 +64,10 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformSetVolume()
         {
-            _mediaEngineEx.Volume = _volume;       
+            _mediaEngineEx.Volume = _volume;
         }
-		
-		#endregion
+
+        #endregion
 
         private static void PlatformPause()
         {
@@ -80,7 +76,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private static void PlatformPlaySong(Song song)
         {
-            _mediaEngineEx.Source = song.FilePath;            
+            _mediaEngineEx.Source = song.FilePath;
             _mediaEngineEx.Load();
             _mediaEngineEx.Play();
         }
