@@ -24,6 +24,8 @@
   </References>
 
   <Properties>
+    
+    <NoWarn>1591,0436</NoWarn>
 
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 	<RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
