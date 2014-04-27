@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
             _view.Run();
         }
 
