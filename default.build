@@ -21,7 +21,6 @@
   <target name="clean">
     <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" />
     <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" />
-    <delete dir="${project::get-base-directory()}\Documentation\Output" />
   </target>
 
   <target name="build" description="Build MonoGame Release" depends="checkos">
@@ -187,8 +186,9 @@
     </if>
   </target>
 
-  <target name="builddocs" description="Build Documentation" depends="clean">
+  <target name="builddocs" description="Build Documentation">
     <if test="${os == 'Win32NT'}">
+      <delete dir="${project::get-base-directory()}\Documentation\Output" />
       <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml" />
     </if>
   </target>
