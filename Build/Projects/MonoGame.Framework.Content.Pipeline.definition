@@ -358,19 +358,14 @@
 
 
     <!-- Windows Additional Binaries -->
-    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x86\nvtt.dll">
+    <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
       <Platforms>Windows</Platforms>
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll">
+    <None Include="..\ThirdParty\Dependencies\ManagedPVRTC\x64\pvrtc.dll">
       <Platforms>Windows</Platforms>
       <Link>pvrtc.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\assimp\Assimp32.dll">
-      <Platforms>Windows</Platforms>
-      <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\ThirdParty\Dependencies\assimp\Assimp64.dll">
@@ -380,15 +375,10 @@
     </None>
     <None Include="..\ThirdParty\Dependencies\libmojoshader_64.dll">
       <Platforms>Windows</Platforms>
-      <Link>Dependencies\x64\libmojoshader_64.dll</Link>
+      <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\libmojoshader_32.dll">
-      <Platforms>Windows</Platforms>
-      <Link>Dependencies\x86\libmojoshader_32.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\freetype6.dll">
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\freetype6.dll">
       <Platforms>Windows</Platforms>
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -421,7 +411,7 @@
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
       <Platforms>Linux</Platforms>
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -469,17 +459,17 @@
       <Link>ManagedPVRTC.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\libfreetype.6.dylib">
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libfreetype.6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\libpng15.15.dylib">
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libpng15.15.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+    <None Include="..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
       <Platforms>MacOS</Platforms>
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

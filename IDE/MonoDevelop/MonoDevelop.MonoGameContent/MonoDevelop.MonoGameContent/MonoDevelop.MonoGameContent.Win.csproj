@@ -105,23 +105,23 @@
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\NVTT\Windows\x86\nvtt.dll">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\ManagedPVRTC\x64\pvrtc.dll">
       <Link>pvrtc.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\freetype6.dll">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\freetype6.dll">
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libfreetype.6.so">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so">
       <Link>libfreetype.6.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -165,15 +165,15 @@
       <Link>libnvmath.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libfreetype.6.dylib">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
       <Link>libfreetype.6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libpng15.15.dylib">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib">
       <Link>libpng15.15.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libpng12.so">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libpng12.so">
       <Link>libpng12.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -181,6 +181,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="icons\monogame-font.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\AssimpNet.dll">
+      <Link>AssimpNet.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\AssimpNet.dll.config">

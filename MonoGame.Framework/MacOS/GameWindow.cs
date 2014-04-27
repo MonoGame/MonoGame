@@ -101,6 +101,7 @@ namespace Microsoft.Xna.Framework
 			//MultipleTouchEnabled = true;
 			
 			Mouse.Window = this;
+            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 		}
 
 		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
@@ -122,6 +123,7 @@ namespace Microsoft.Xna.Framework
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
 
+            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 		}
 
 		~GameWindow ()

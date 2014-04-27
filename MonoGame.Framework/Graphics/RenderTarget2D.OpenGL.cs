@@ -103,19 +103,24 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-				GraphicsDevice.AddDisposeAction(() =>
-				{
-					if (this.glStencilBuffer != 0 && this.glStencilBuffer != this.glDepthBuffer)
-					{
-						GraphicsDevice.Renderbuffer.Delete(this.glStencilBuffer);
-					}
-					if (this.glDepthBuffer != 0)
-					{
-						GraphicsDevice.Renderbuffer.Delete(this.glDepthBuffer);
-					}
-				});
+            if (!IsDisposed)
+            {
+                GraphicsDevice.AddDisposeAction(() =>
+                {
+                    if (this.glStencilBuffer != 0 && this.glStencilBuffer != this.glDepthBuffer)
+                    {
+                        GraphicsDevice.Renderbuffer.Delete(this.glStencilBuffer);
+                    }
+                    if (this.glDepthBuffer != 0)
+                    {
+                        GraphicsDevice.Renderbuffer.Delete(this.glDepthBuffer);
+                    }
+                });
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -68,12 +68,6 @@ non-infringement.
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-#if !PSM && !WEB
-using System.Drawing;
-#endif
-using System.IO;
-using System.Reflection;
 using System.Diagnostics;
 #if WINRT
 using System.Threading.Tasks;
@@ -82,10 +76,6 @@ using Windows.ApplicationModel.Activation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.GamerServices;
 
 
 namespace Microsoft.Xna.Framework
@@ -145,29 +135,6 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_STOREAPP
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
-#endif
-
-#if MONOMAC || WINDOWS || LINUX
-            
-            // Set the window title.
-            // TODO: Get the title from the WindowsPhoneManifest.xml for WP7 projects.
-            string windowTitle = string.Empty;
-
-            // When running unit tests this can return null.
-            var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-            {
-                //Use the Title attribute of the Assembly if possible.
-                var assemblyTitleAtt = ((AssemblyTitleAttribute)AssemblyTitleAttribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute)));
-                if (assemblyTitleAtt != null)
-                    windowTitle = assemblyTitleAtt.Title;
-
-                // Otherwise, fallback to the Name of the assembly.
-                if (string.IsNullOrEmpty(windowTitle))
-                    windowTitle = assembly.GetName().Name;
-            }
-
-            Window.Title = windowTitle;
 #endif
         }
 
@@ -234,22 +201,12 @@ namespace Microsoft.Xna.Framework
                     Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
-#if WINDOWS_PHONE
-                    TouchPanel.ResetState();                    
-#endif
-
-#if WINDOWS_MEDIA_SESSION
-                    Media.MediaManagerState.CheckShutdown();
-#endif
-
-#if DIRECTX
-                    SoundEffect.Shutdown();
+                    SoundEffect.PlatformShutdown();
 
                     BlendState.ResetStates();
                     DepthStencilState.ResetStates();
                     RasterizerState.ResetStates();
                     SamplerState.ResetStates();
-#endif
                 }
 #if ANDROID
                 Activity = null;
@@ -752,24 +709,7 @@ namespace Microsoft.Xna.Framework
 		{
 			OnExiting(this, EventArgs.Empty);
 			UnloadContent();
-
-#if DIRECTX
-		    SoundEffect.Shutdown();
-#endif
-
-#if WINDOWS_MEDIA_SESSION
-            Media.MediaManagerState.CheckShutdown();
-#endif
 		}
-
-        internal void ResizeWindow(bool changed)
-        {
-#if LINUX || (WINDOWS && OPENGL)
-            ((OpenTKGamePlatform)Platform).ResetWindowBounds(changed);
-#elif WINDOWS && DIRECTX
-            ((MonoGame.Framework.WinFormsGamePlatform)Platform).ResetWindowBounds(changed);
-#endif
-        }
 
         #endregion Internal Methods
 
