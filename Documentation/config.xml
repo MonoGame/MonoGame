@@ -9,7 +9,7 @@
   <title>MonoGame Documentation</title>
   <style>MonoGame</style>
 
-  <output-dir>.\Output</output-dir>
+  <output-dir>Output</output-dir>
   
   <!-- Topics -->
   <topic id="welcome.md" page-id="main" name="MonoGame Documentation" filename="welcome.md">
