@@ -54,8 +54,12 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
-    
     <!-- Microsoft.Xna.Framework -->
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
