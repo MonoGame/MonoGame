@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                     }
                 }
-                PlatformSetData(face, level, dataPtr, xOffset, yOffset, width, height);
+                PlatformSetData<T>(face, level, dataPtr, xOffset, yOffset, width, height);
             }
             finally
             {

@@ -5,9 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
 using System.Diagnostics;
 
 using SharpDX;
@@ -15,7 +12,6 @@ using SharpDX.Direct3D;
 
 #if WINDOWS_PHONE
 using SharpDX.Direct3D11;
-using Windows.Foundation;
 using MonoGame.Framework.WindowsPhone;
 #endif
 
@@ -54,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // The swap chain resources.
         SharpDX.Direct2D1.Bitmap1 _bitmapTarget;
         SharpDX.DXGI.SwapChain1 _swapChain;
-        SwapChainBackgroundPanel _swapChainPanel;
+        SwapChainBackgroundPanel _swapChainBackgroundPanel;
 
         float _dpi; 
 #endif
@@ -333,7 +329,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // We need presentation parameters to continue here.
             if (    PresentationParameters == null ||
-                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainPanel == null))
+                    (PresentationParameters.DeviceWindowHandle == IntPtr.Zero && PresentationParameters.SwapChainBackgroundPanel == null))
             {
                 if (_swapChain != null)
                 {
@@ -345,9 +341,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Did we change swap panels?
-            if (PresentationParameters.SwapChainPanel != _swapChainPanel)
+            if (PresentationParameters.SwapChainBackgroundPanel != _swapChainBackgroundPanel)
             {
-                _swapChainPanel = null;
+                _swapChainBackgroundPanel = null;
                 if (_swapChain != null)
                 {
                     _swapChain.Dispose();
@@ -415,9 +411,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     else
                     {
-                        _swapChainPanel = PresentationParameters.SwapChainPanel;
+                        _swapChainBackgroundPanel = PresentationParameters.SwapChainBackgroundPanel;
 
-                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainPanel))
+                        using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
                         {
                             _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
                             nativePanel.SwapChain = _swapChain;

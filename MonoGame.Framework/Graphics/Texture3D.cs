@@ -10,23 +10,23 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class Texture3D : Texture
 	{
-        private int width;
-        private int height;
-        private int depth;
+        private int _width;
+        private int _height;
+        private int _depth;
 
         public int Width
         {
-            get { return width; }
+            get { return _width; }
         }
 
         public int Height
         {
-            get { return height; }
+            get { return _height; }
         }
 
         public int Depth
         {
-            get { return depth; }
+            get { return _depth; }
         }
 
 		public Texture3D(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format)
@@ -40,9 +40,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("graphicsDevice");
 
 			this.GraphicsDevice = graphicsDevice;
-            this.width = width;
-            this.height = height;
-            this.depth = depth;
+            this._width = width;
+            this._height = height;
+            this._depth = depth;
             this._levelCount = 1;
 		    this._format = format;
 
@@ -66,15 +66,11 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (data == null) 
 				throw new ArgumentNullException("data");
 
-			var elementSizeInByte = Marshal.SizeOf(typeof(T));
-			var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-			var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
             int width = right - left;
             int height = bottom - top;
             int depth = back - front;
 
-            PlatformSetData(level, left, top, right, bottom, front, back, dataPtr, width, height, depth);
-            dataHandle.Free ();
+            PlatformSetData<T>(level, left, top, right, bottom, front, back, data, startIndex, elementCount, width, height, depth);
 		}
 
         /// <summary>
@@ -116,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of elements to get.</param>
         public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            GetData(0, 0, 0, width, height, 0, depth, data, startIndex, elementCount);
+            GetData(0, 0, 0, _width, _height, 0, _depth, data, startIndex, elementCount);
         }
 
         /// <summary>

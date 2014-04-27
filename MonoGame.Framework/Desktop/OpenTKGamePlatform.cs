@@ -76,6 +76,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
 
+using OpenTK;
+
 namespace Microsoft.Xna.Framework
 {
     class OpenTKGamePlatform : GamePlatform
@@ -84,7 +86,7 @@ namespace Microsoft.Xna.Framework
 		private OpenALSoundController soundControllerInstance = null;
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
-        
+        private Toolkit toolkit;
         
         public override bool VSyncEnabled
         {
@@ -102,6 +104,7 @@ namespace Microsoft.Xna.Framework
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
+            toolkit = Toolkit.Init();
             _view = new OpenTKGameWindow();
             _view.Game = game;
             this.Window = _view;
@@ -136,6 +139,17 @@ namespace Microsoft.Xna.Framework
         protected override void OnIsMouseVisibleChanged()
         {
             _view.MouseVisibleToggled();
+        }
+#endif
+
+#if LINUX
+        protected override void OnIsMouseVisibleChanged()
+        {
+            MouseState oldState = Mouse.GetState();
+            _view.Window.CursorVisible = IsMouseVisible;
+            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
+            System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
+            OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
         }
 #endif
 
@@ -265,16 +279,6 @@ namespace Microsoft.Xna.Framework
         {
             
         }
-#if LINUX
-        protected override void OnIsMouseVisibleChanged()
-        {
-            MouseState oldState = Mouse.GetState();
-            _view.Window.CursorVisible = IsMouseVisible;
-            // IsMouseVisible changes the location of the cursor on Linux and we have to manually set it back to the correct position
-            System.Drawing.Point mousePos = _view.Window.PointToScreen(new System.Drawing.Point(oldState.X, oldState.Y));
-            OpenTK.Input.Mouse.SetPosition(mousePos.X, mousePos.Y);
-        }
-#endif
         
         public override void Log(string Message)
         {
@@ -297,6 +301,12 @@ namespace Microsoft.Xna.Framework
         {
             if (!IsDisposed)
             {
+                if (toolkit != null)
+                {
+                    toolkit.Dispose();
+                    toolkit = null;
+                }
+
                 if (_view != null)
                 {
                     _view.Dispose();

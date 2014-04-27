@@ -19,22 +19,22 @@ namespace MonoGame.Framework
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
-        /// <param name="swapPanel">The XAML swapchain panel to which we render the scene and recieve input events.</param>
+        /// <param name="SwapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
         /// <returns></returns>
-        static public T Create(string launchParameters, CoreWindow window, SwapChainBackgroundPanel swapPanel)
+        static public T Create(string launchParameters, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
             if (launchParameters == null)
                 throw new NullReferenceException("The launch parameters cannot be null!");
             if (window == null)
                 throw new NullReferenceException("The window cannot be null!");
-            if (swapPanel == null)
+            if (swapChainBackgroundPanel == null)
                 throw new NullReferenceException("The swap chain panel cannot be null!");
 
             // Save any launch parameters to be parsed by the platform.
             MetroGamePlatform.LaunchParameters = launchParameters;
 
             // Setup the window class.
-            MetroGameWindow.Instance.Initialize(window, swapPanel);
+            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel);
 
             // Construct the game.
             var game = new T();
@@ -42,7 +42,7 @@ namespace MonoGame.Framework
             // Set the swap chain panel on the graphics mananger.
             if (game.graphicsDeviceManager == null)
                 throw new NullReferenceException("You must create the GraphicsDeviceManager in the Game constructor!");
-            game.graphicsDeviceManager.SwapChainPanel = swapPanel;
+            game.graphicsDeviceManager.SwapChainBackgroundPanel = swapChainBackgroundPanel;
 
             // Start running the game.
             game.Run(GameRunBehavior.Asynchronous);
@@ -56,20 +56,20 @@ namespace MonoGame.Framework
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
-        /// <param name="swapPanel">The XAML swapchain panel to which we render the scene and recieve input events.</param>
+        /// <param name="swapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
         /// <returns></returns>
-        static public T Create(LaunchActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapPanel)
+        static public T Create(LaunchActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
             MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
 
-            return Create(args.Arguments, window, swapPanel);
+            return Create(args.Arguments, window, swapChainBackgroundPanel);
         }
 
-        static public T Create(ProtocolActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapPanel)
+        static public T Create(ProtocolActivatedEventArgs args, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
             MetroGamePlatform.PreviousExecutionState = args.PreviousExecutionState;
 
-            return Create(args.Uri.AbsoluteUri, window, swapPanel);
+            return Create(args.Uri.AbsoluteUri, window, swapChainBackgroundPanel);
         }
     }
 }

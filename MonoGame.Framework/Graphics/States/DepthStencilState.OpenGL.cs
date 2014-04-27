@@ -2,10 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-
 #if MONOMAC
 using MonoMac.OpenGL;
 using GLStencilFunction = MonoMac.OpenGL.StencilFunction;

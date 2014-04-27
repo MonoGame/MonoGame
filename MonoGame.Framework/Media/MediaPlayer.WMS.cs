@@ -3,12 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Audio;
-using System.Linq;
 
 using SharpDX;
 using SharpDX.MediaFoundation;
-using SharpDX.Multimedia;
 using SharpDX.Win32;
 
 
