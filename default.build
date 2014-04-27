@@ -56,7 +56,7 @@
       <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
         <exec program="Protobuild" commandline="-generate PSMobile" />
         <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.PSMobile.sln" />
-        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release -p:nowarn=1591 MonoGame.Framework.PSMobile.sln" />
+        <exec program="mdtool.exe" basedir="${psmtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.PSMobile.sln" />
       </if>
     </if>
   </target>
@@ -114,7 +114,7 @@
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.MacOS.sln" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release -p:nowarn=1591 MonoGame.Framework.MacOS.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.MacOS.sln" />
     </if>
   </target>
 
@@ -122,8 +122,8 @@
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator  MonoGame.Framework.iOS.sln" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator -p:nowarn=1591 MonoGame.Framework.iOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release\|iPhoneSimulator MonoGame.Framework.iOS.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release\|iPhoneSimulator MonoGame.Framework.iOS.sln" />
       </if>
     </if>
   </target>
@@ -143,10 +143,10 @@
       <if test="${file::exists('/Developer/MonoAndroid/usr/bin/mandroid')}">
         <exec program="mono" commandline="Protobuild.exe -generate Android" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.Android.sln" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release -p:nowarn=1591 MonoGame.Framework.Android.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.Android.sln" />
         <exec program="mono" commandline="Protobuild.exe -generate Ouya" />
         <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.Ouya.sln" />
-        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release -p:nowarn=1591 MonoGame.Framework.Ouya.sln" />
+        <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release MonoGame.Framework.Ouya.sln" />
       </if>
     </if>
   </target>
