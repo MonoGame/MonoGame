@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using MGCB;
@@ -25,45 +26,48 @@ namespace MonoGame.Tools.Pipeline
     {
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
+        [Browsable(false)]
         public ReadOnlyCollection<ContentItem> ContentItems { get; private set; }
 
+        [Browsable(false)]
         public string FilePath { get; set; }
 
         [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
-        public string OutputDir = string.Empty;
+        public string OutputDir { get; set; }
 
         [CommandLineParameter(
             Name = "intermediateDir",
             ValueName = "directoryPath",
             Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir = string.Empty;
+        public string IntermediateDir { get; set; }
 
+        //[TypeConverter(typeof(AssemblyReferenceListConverter))]        
         [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public readonly List<string> References = new List<string>();
+        public BindingList<string> References { get; private set; }
 
         [CommandLineParameter(
             Name = "platform",
             ValueName = "targetPlatform",
             Description = "Set the target platform for this build.  Defaults to Windows.")]
-        public TargetPlatform Platform;
+        public TargetPlatform Platform { get; set; }
 
         [CommandLineParameter(
             Name = "profile",
             ValueName = "graphicsProfile",
             Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
-        public GraphicsProfile Profile;
+        public GraphicsProfile Profile { get; set; }
 
         [CommandLineParameter(
             Name = "config",
             ValueName = "string",
             Description = "The optional build config string from the build system.")]
-        public string Config = string.Empty;
+        public string Config { get; set; }
 
         [CommandLineParameter(
             Name = "importer",
@@ -73,6 +77,7 @@ namespace MonoGame.Tools.Pipeline
 
         private string _processor;
 
+        [Browsable(false)]
         [CommandLineParameter(
             Name = "processor",
             ValueName = "className",
@@ -143,11 +148,13 @@ namespace MonoGame.Tools.Pipeline
             _content.Remove(item);
         }
 
+        [Browsable(false)]
         public bool IsDirty { get; set; }
 
         public PipelineProject()
         {
             ContentItems = new ReadOnlyCollection<ContentItem>(_content);
+            References = new BindingList<string>();
         }
 
         public void Attach(IProjectObserver observer)
@@ -166,7 +173,7 @@ namespace MonoGame.Tools.Pipeline
             Profile = GraphicsProfile.HiDef;
             Processor = null;
             FilePath = null;
-            IsDirty = false;
+            IsDirty = false;            
         }
 
         public void OpenProject(string projectFilePath)
@@ -303,6 +310,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        [Browsable(false)]
         public string Icon { get; set; }
 
 #endregion

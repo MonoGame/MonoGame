@@ -238,9 +238,15 @@ namespace MGCB
         }
 
 
-        IList GetList(MemberInfo field)
+        IList GetList(MemberInfo member)
         {
-            return (IList)(field as FieldInfo).GetValue(_optionsObject);
+            if (member is PropertyInfo)
+                return (IList)(member as PropertyInfo).GetValue(_optionsObject);
+
+            if (member is FieldInfo)
+                return (IList)(member as FieldInfo).GetValue(_optionsObject);
+
+            throw new Exception();
         }
 
 
