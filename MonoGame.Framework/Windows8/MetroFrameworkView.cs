@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework
                 // Construct the game.                
                 _game = new T();
 
-                ///Initializes it, if delegate was provided
+                //Initializes it, if delegate was provided
                 if (_gameConstructorCustomizationDelegate != null)
                     _gameConstructorCustomizationDelegate(_game, args);
 
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework
                 {
                     _game = new T();
 
-                    ///Initializes it, if delegate was provided
+                    //Initializes it, if delegate was provided
                     if (_gameConstructorCustomizationDelegate != null)
                         _gameConstructorCustomizationDelegate(_game, args);
                 }
