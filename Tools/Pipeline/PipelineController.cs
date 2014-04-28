@@ -16,6 +16,11 @@ namespace MonoGame.Tools.Pipeline
 
         private Task _buildProcess;
 
+        public PipelineProject Project
+        {
+            get { return _project; }
+        }
+
         public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
@@ -58,8 +63,8 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach (var i in _project.ContentItems)
                 {
-                    i.ResolveTypes();
                     i.View = _view;
+                    i.ResolveTypes();                    
                 }
             }
 #if SHIPPING

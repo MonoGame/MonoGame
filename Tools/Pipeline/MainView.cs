@@ -5,17 +5,134 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
     partial class MainView : Form, IView, IProjectObserver
     {
-        IController _controller;
+        private IController _controller;
+        private ImageList _treeIcons;
+        private ContextMenuStrip _contextMenu;
+
+        private const int ContentItemIcon = 0;
+        private const int FolderOpenIcon = 1;
+        private const int FolderClosedIcon = 2;
+        private const int ProjectIcon = 3;
+        private const string ContextMenuInclude = "Add";
+        private const string ContextMenuExclude = "Remove";
+        private const string ContextMenuDelete = "Delete";
 
         public MainView()
-        {
+        {            
             InitializeComponent();
+
+            _treeIcons = new ImageList();
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            
+            _treeView.ImageList = _treeIcons;
+            _treeView.BeforeExpand += TreeViewOnBeforeExpand;
+            _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
+            _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
+
+            _contextMenu = new ContextMenuStrip();
+            _contextMenu.ItemClicked += OnContextMenuItemClicked;
+        }
+
+        private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Text)
+            {
+                case ContextMenuInclude:
+                    {
+                        var projectRoot = _controller.Project.FilePath;
+                        projectRoot = projectRoot.Remove(projectRoot.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, projectRoot.Length-1));
+
+                        var path = projectRoot + "\\" + (e.ClickedItem.Tag as IProjectItem).Location;
+                        var dlg = new OpenFileDialog()
+                            {
+                                RestoreDirectory = true,
+                                AddExtension = true,
+                                CheckPathExists = true,
+                                CheckFileExists = true,
+                                Filter = "All Files (*.*)|*.*",
+                                InitialDirectory = path,
+                                Multiselect = false,
+                            };
+                        var result = dlg.ShowDialog(this);
+                        if (result != DialogResult.OK)
+                            return;
+
+                        _controller.Project.OnBuild(dlg.FileName);
+                        var item = _controller.Project.ContentItems.Last();
+                        item.View = this;
+                        item.ResolveTypes();                                                
+                        AddTreeItem(item);
+                        SelectTreeItem(item);
+                    } break;
+                case ContextMenuExclude:
+                    {
+                        var item = (e.ClickedItem.Tag as ContentItem);
+                        _controller.Project.RemoveItem(item);
+                        var node = _treeView.AllNodes().Find(f => f.Tag == item);
+                        _treeView.Nodes.Remove(node);
+                    } break;
+                case ContextMenuDelete:
+                    {
+                        var item = (e.ClickedItem.Tag as ContentItem);
+                        _controller.Project.RemoveItem(item);
+                        var node = _treeView.AllNodes().Find(f => f.Tag == item);
+                        _treeView.Nodes.Remove(node);
+                        var fullPath = Path.GetDirectoryName(_controller.Project.FilePath);
+                        fullPath += "\\" + item.SourceFile;
+                        File.Delete(fullPath);
+                    } break;
+                default:
+                    throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
+            }
+        }
+
+        private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            // Show menu only if the right mouse button is clicked.
+            if (e.Button == MouseButtons.Right)
+            {
+                // Point where the mouse is clicked.
+                var p = new Point(e.X, e.Y);
+
+                // Get the node that the user has clicked.
+                var node = _treeView.GetNodeAt(p);
+                if (node != null)
+                {
+                    // Select the node the user has clicked.
+                    _treeView.SelectedNode = node;
+
+                    if (node.Tag is ContentItem)
+                    {
+                        _contextMenu.Items.Clear();
+
+                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
+                        item.Tag = node.Tag;
+                        item = _contextMenu.Items.Add(ContextMenuDelete);
+                        item.Tag = node.Tag;
+
+                        _contextMenu.Show(_treeView, p);
+                    }
+                    else
+                    {
+                        _contextMenu.Items.Clear();
+
+                        var item = _contextMenu.Items.Add(ContextMenuInclude);
+                        item.Tag = node.Tag;
+
+                        _contextMenu.Show(_treeView, p); 
+                    }                   
+                }
+            }
         }
 
         public event SelectionChanged OnSelectionChanged;
@@ -84,14 +201,17 @@ namespace MonoGame.Tools.Pipeline
         public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();
-            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);            
             root.Tag = item;
+            root.SelectedImageIndex = ProjectIcon;
+            root.ImageIndex = ProjectIcon;
         }
 
         public void AddTreeItem(IProjectItem item)
         {
+            
             var path = item.Location;
-            var folders = path.Split(new [] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
 
             var root = _treeView.Nodes[0];
             var parent = root.Nodes;
@@ -99,14 +219,33 @@ namespace MonoGame.Tools.Pipeline
             {
                 var found = parent.Find(folder, false);
                 if (found.Length == 0)
-                    parent = parent.Add(folder, folder, -1).Nodes;
+                {
+                    var folderNode = parent.Add(folder, folder, -1);
+                    folderNode.ImageIndex = FolderOpenIcon;
+                    folderNode.SelectedImageIndex = FolderOpenIcon;
+
+                    var idx = path.IndexOf(folder);
+                    var curPath = path.Substring(0, idx + folder.Length);
+                    folderNode.Tag = new FolderItem(curPath);
+                    
+                    parent = folderNode.Nodes;
+                }
                 else
                     parent = found[0].Nodes;
             }
 
-            parent.Add(string.Empty, item.Name, -1).Tag = item;
+            var node = parent.Add(string.Empty, item.Name, -1);
+            node.Tag = item;
+            node.ImageIndex = ContentItemIcon;
+            node.SelectedImageIndex = ContentItemIcon;
 
             root.Expand();
+        }
+
+        public void SelectTreeItem(IProjectItem item)
+        {
+            var node = _treeView.AllNodes().Find(e => e.Tag == item);
+            _treeView.SelectedNode = node;
         }
 
         public void ShowProperties(IProjectItem item)
@@ -213,6 +352,24 @@ namespace MonoGame.Tools.Pipeline
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
             _controller.Clean();
+        }
+
+        private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node.ImageIndex == FolderOpenIcon)
+            {
+                e.Node.ImageIndex = FolderClosedIcon;
+                e.Node.SelectedImageIndex = FolderClosedIcon;
+            }
+        }
+
+        private void TreeViewOnBeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node.ImageIndex == FolderClosedIcon)
+            {
+                e.Node.ImageIndex = FolderOpenIcon;
+                e.Node.SelectedImageIndex = FolderOpenIcon;
+            }
         }
     }
 }

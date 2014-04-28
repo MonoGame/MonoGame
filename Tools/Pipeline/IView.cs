@@ -25,11 +25,13 @@ namespace MonoGame.Tools.Pipeline
 
         bool AskOpenProject(out string projectFilePath);
 
-        void ShowError(string title, string message);
+        void ShowError(string title, string message);        
 
         void SetTreeRoot(IProjectItem item);
 
         void AddTreeItem(IProjectItem item);
+
+        void SelectTreeItem(IProjectItem item);
 
         void ShowProperties(IProjectItem item);
 

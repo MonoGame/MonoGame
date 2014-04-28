@@ -6,6 +6,8 @@ namespace MonoGame.Tools.Pipeline
 {
     interface IController
     {
+        PipelineProject Project { get; }
+
         void NewProject();
 
         void OpenProject();

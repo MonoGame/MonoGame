@@ -10,8 +10,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 namespace MonoGame.Tools.Pipeline
 {
     internal class ContentItem : IProjectItem
-    {        
-        public string Icon { get; set; }        
+    {       
         public string SourceFile;
         public string ImporterName;
         public string ProcessorName;
@@ -21,6 +20,8 @@ namespace MonoGame.Tools.Pipeline
         private ProcessorTypeDescription _processor;
 
         public IView View;
+
+        #region IProjectItem
 
         public string Name 
         { 
@@ -37,6 +38,11 @@ namespace MonoGame.Tools.Pipeline
                 return System.IO.Path.GetDirectoryName(SourceFile);
             }
         }
+
+        [Browsable(false)]
+        public string Icon { get; set; }
+
+        #endregion
 
         [TypeConverter(typeof(ImporterConverter))]
         public ImporterTypeDescription Importer
@@ -55,7 +61,7 @@ namespace MonoGame.Tools.Pipeline
 
                 // Validate that our processor can accept input content of the type
                 // output by the new importer.                
-                if (_processor.InputType != _importer.OutputType)
+                if (_processor == null || _processor.InputType != _importer.OutputType)
                 {
                     // If it cannot, set the default processor.
                     Processor = PipelineTypes.FindProcessor(_importer.DefaultProcessor, _importer);
@@ -95,8 +101,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void ResolveTypes()
         {
-            _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));            
-            _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+            Importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));            
+            //Processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
 
             // ProcessorParams get deserialized as strings
             // this code converts them to object(s) of their actual type
@@ -110,10 +116,21 @@ namespace MonoGame.Tools.Pipeline
                 else
                 {
                     var src = ProcessorParams[p.Name];
-                    var srcType = src.GetType();
-                    var converter = TypeDescriptor.GetConverter(p.Type);
-                    var dst = converter.ConvertFrom(src);
-                    ProcessorParams[p.Name] = dst;
+                    if (src != null)
+                    {
+                        var srcType = src.GetType();
+
+                        var converter = TypeDescriptor.GetConverter(p.Type);
+
+                        // Should we throw an exception here?
+                        // This property will actually not be editable in the property grid
+                        // since we do not have a type converter for it.
+                        if (converter.CanConvertFrom(srcType))
+                        {
+                            var dst = converter.ConvertFrom(src);
+                            ProcessorParams[p.Name] = dst;
+                        }
+                    }
                 }
             }
         }        

@@ -113,13 +113,13 @@ namespace MonoGame.Tools.Pipeline
         public void OnBuild(string sourceFile)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = System.IO.Path.GetDirectoryName(FilePath);
+            var projectDir = System.IO.Path.GetDirectoryName(FilePath) + "\\";
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
             var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
-                _content.RemoveAt(previous);
+                _content.RemoveAt(previous);          
 
             // Create the item for processing later.
             var item = new ContentItem
@@ -136,6 +136,11 @@ namespace MonoGame.Tools.Pipeline
             // the build process later.
             foreach (var pair in _processorParams)
                 item.ProcessorParams.Add(pair.Key, pair.Value);
+        }
+
+        public void RemoveItem(ContentItem item)
+        {
+            _content.Remove(item);
         }
 
         public bool IsDirty { get; set; }
@@ -183,6 +188,11 @@ namespace MonoGame.Tools.Pipeline
 
             // We're not dirty as we just loaded.
             IsDirty = false;
+
+            // Clear variables which store temporary data concerning the last item.
+            Importer = null;
+            Processor = null;
+            _processorParams.Clear();
         }
 
         public void SaveProject()
@@ -222,9 +232,11 @@ namespace MonoGame.Tools.Pipeline
                 line = string.Format(commentFormat, "Content");
                 io.WriteLine(line);
 
+                //string prevProcessor = null;
                 foreach (var i in ContentItems)
                 {
-                    if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
+                    // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
+                    //if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
                     {
                         line = string.Format(lineFormat, "importer", i.ImporterName);
                         io.WriteLine(line);   
@@ -245,11 +257,16 @@ namespace MonoGame.Tools.Pipeline
 
                     // If there were any non-default-value processor parameters
                     // or, if the processor itself is not the default processor for this content's importer
+                    // or, the processor for this item is different than the previous item's
                     // then we write out the processor command line and any (non default value) processor parameters.
-                    if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor))
+                    // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
+                    //if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor) || (prevProcessor != null && prevProcessor != i.Processor.TypeName)
                     {
                         line = string.Format(lineFormat, "processor", i.ProcessorName);
                         io.WriteLine(line);
+
+                        // Store the last processor we emitted, so we can test if it does not match subsequent items.
+                        //prevProcessor = i.Processor.TypeName;
 
                         foreach (var ln in parameterLines)
                             io.WriteLine(ln);
@@ -279,7 +296,11 @@ namespace MonoGame.Tools.Pipeline
 
         public string Location
         {
-            get { return string.Empty; }
+            get
+            {
+                var idx = FilePath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, FilePath.Length - 1);
+                return FilePath.Remove(idx);                
+            }
         }
 
         public string Icon { get; set; }
