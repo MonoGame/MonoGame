@@ -39,6 +39,13 @@ namespace MonoGame.Tools.Pipeline
 
             // Clear the existing model data.
             _project.NewProject();
+            PipelineTypes.Load(_project);
+
+            string projectFilePath = Environment.CurrentDirectory;
+            if (!_view.AskSaveName(ref projectFilePath ))
+                return;
+
+            _project.FilePath = projectFilePath;            
 
             // Setup a default project.
             UpdateTree();
@@ -204,9 +211,8 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {
-            var projectRoot = _project.FilePath;
-            projectRoot = projectRoot.Remove(projectRoot.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, projectRoot.Length - 1));
+        {            
+            var projectRoot = _project.Location;
             var path = projectRoot + "\\" + initialDirectory;
 
             string file;

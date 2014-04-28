@@ -118,7 +118,7 @@ namespace MonoGame.Tools.Pipeline
         public void OnBuild(string sourceFile)
         {
             // Make sure the source file is relative to the project.
-            var projectDir = System.IO.Path.GetDirectoryName(FilePath) + "\\";
+            var projectDir = Location + "\\";
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
@@ -297,6 +297,9 @@ namespace MonoGame.Tools.Pipeline
         { 
             get
             {
+                if (string.IsNullOrEmpty(FilePath))
+                    return "";
+
                 return System.IO.Path.GetFileNameWithoutExtension(FilePath);
             }
         }
@@ -305,6 +308,9 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
+                if (string.IsNullOrEmpty(FilePath))
+                    return "";
+
                 var idx = FilePath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, FilePath.Length - 1);
                 return FilePath.Remove(idx);                
             }
