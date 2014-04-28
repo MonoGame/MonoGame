@@ -75,7 +75,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="format">The sound buffer data format, e.g. Mono, Mono16 bit, Stereo, etc.</param>
         /// <param name="size">The size of the data buffer</param>
         /// <param name="rate">The sampling rate of the sound effect, e.g. 44 khz, 22 khz.</param>
-        [CLSCompliant(false)]
         internal void BindDataBuffer(byte[] data, ALFormat format, int size, int rate)
         {
             soundBuffer.BindDataBuffer(data, format, size, rate);
