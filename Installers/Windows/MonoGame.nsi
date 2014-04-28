@@ -96,8 +96,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; to avoid conflicting assemblies and to make it easy for end
   ; users to copy all the necessary files for distribution.
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\MGCB
-  File /r '..\..\Tools\MGCB\bin\Release\*.exe'
-  File /r '..\..\Tools\MGCB\bin\Release\*.dll'
+  File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
+  File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
 
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
   File /nonfatal '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'

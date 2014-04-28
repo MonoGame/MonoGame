@@ -3,12 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-
-using Microsoft.Xna;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 
 using SharpDX;
 using SharpDX.XAudio2;
@@ -192,9 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
             isDisposed = true;
         }
 
-        // Does someone actually need to call this if it only happens when the whole
-        // game closes? And if so, who would make the call?
-        internal static void Shutdown()
+        internal static void PlatformShutdown()
         {
             if (MasterVoice != null)
             {

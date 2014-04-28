@@ -24,6 +24,8 @@
   </References>
 
   <Properties>
+    
+    <NoWarn>1591,0436</NoWarn>
 
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
 	<RemoveXnaAssembliesOnWP8>false</RemoveXnaAssembliesOnWP8>
@@ -54,8 +56,12 @@
       <Link>Tao.Sdl.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\OpenTK.dll.config">
+      <Platforms>Linux,MacOS</Platforms>
+      <Link>OpenTK.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
-    
     <!-- Microsoft.Xna.Framework -->
     <Compile Include="BoundingBox.cs" />
     <Compile Include="BoundingFrustum.cs" />
@@ -401,6 +407,12 @@
       <Platforms>Windows8,Windows,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferObject.cs">
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.RenderbufferObject.cs">
       <Platforms>Android,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">
@@ -980,6 +992,9 @@
 
     
     <!-- Utility Classes -->
+    <Compile Include="Utilities\AssemblyHelper.cs">
+      <Platforms>Linux,MacOS,Windows,WindowsGL</Platforms>
+    </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
 

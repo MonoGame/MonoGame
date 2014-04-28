@@ -3,11 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -122,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 switch (param.ParameterType)
                 {
                     case EffectParameterType.Single:
-					case EffectParameterType.Int32:
+                    case EffectParameterType.Int32:
                     case EffectParameterType.Bool:
                         // HLSL assumes matrices are column-major, whereas in-memory we use row-major.
                         // TODO: HLSL can be told to use row-major. We should handle that too.

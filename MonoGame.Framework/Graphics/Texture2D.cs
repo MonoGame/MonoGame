@@ -4,17 +4,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
-
-#if !PSM && !WEB
-using System.Drawing;
-#endif
-
-#if WINDOWS || LINUX || MONOMAC
-using System.Drawing.Imaging;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {

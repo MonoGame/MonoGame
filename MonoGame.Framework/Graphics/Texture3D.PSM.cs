@@ -3,8 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -15,9 +13,9 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformSetData(int level,
+        private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
-                                     IntPtr dataPtr, int width, int height, int depth)
+                                     T[] data, int startIndex, int elementCount, int width, int height, int depth)
         {
             throw new NotImplementedException();
         }

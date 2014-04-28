@@ -2,14 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Runtime.InteropServices;
 using System.IO;
 
-using SharpDX;
-using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -63,9 +58,15 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _pixelShader);
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDeviceResetting();
+            if (disposing)
+            {
+                SharpDX.Utilities.Dispose(ref _vertexShader);
+                SharpDX.Utilities.Dispose(ref _pixelShader);
+            }
+
+            base.Dispose(disposing);
         }
 
         private void CreatePixelShader()

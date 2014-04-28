@@ -14,7 +14,7 @@
       Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
     <Binary
       Name="SharpFont"
-      Path="ThirdParty\Dependencies\SharpFont\SharpFont.dll" />
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
@@ -34,7 +34,7 @@
       Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
     <Binary
       Name="SharpFont"
-      Path="ThirdParty\Dependencies\SharpFont\SharpFont.dll" />
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
@@ -59,7 +59,7 @@
       Path="ThirdParty\Dependencies\NVTT\Windows\Nvidia.TextureTools.dll" />
     <Binary
       Name="SharpFont"
-      Path="ThirdParty\Dependencies\SharpFont\SharpFont.dll" />
+      Path="ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll" />
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />

@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -16,11 +15,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformGraphicsDeviceResetting()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void PlatformDispose()
         {
             throw new NotImplementedException();
         }

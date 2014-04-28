@@ -245,15 +245,15 @@ namespace Microsoft.Xna.Framework
 
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
-            if (SwapChainPanel != null)
+            if (this.SwapChainBackgroundPanel != null)
             {
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = SwapChainPanel;
+                _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
             }
             else
             {
                 _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                _graphicsDevice.PresentationParameters.SwapChainPanel = null;
+                _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = null;
             }
 
             // Update the back buffer.
@@ -280,10 +280,10 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-            _game.ResizeWindow(false);
+            ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
 #elif WINDOWS || LINUX
-            _game.ResizeWindow(false);
+            ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
@@ -339,15 +339,15 @@ namespace Microsoft.Xna.Framework
 #elif WINRT
 			// The graphics device can use a XAML panel or a window
 			// to created the default swapchain target.
-            if (SwapChainPanel != null)
+            if (this.SwapChainBackgroundPanel != null)
             {
                 presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                presentationParameters.SwapChainPanel = SwapChainPanel;
+                presentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
             }
             else
             {
                 presentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                presentationParameters.SwapChainPanel = null;
+                presentationParameters.SwapChainBackgroundPanel = null;
             }
 #else
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
@@ -404,7 +404,7 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS_STOREAPP
         [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
         public GraphicsProfile GraphicsProfile { get; set; }

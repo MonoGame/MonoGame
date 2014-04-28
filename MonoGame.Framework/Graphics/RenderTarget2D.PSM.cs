@@ -28,9 +28,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-                _frameBuffer.Dispose();
+            _frameBuffer.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -38,7 +38,6 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(AndroidGameActivity activity, Game game)
         {
             _game = game;
-            TouchPanelState = new TouchPanelState(this);
             _orientationListener = new OrientationListener(Game.Activity, this);
             Initialize(activity);
 

@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -50,13 +49,15 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 SharpDX.Utilities.Dispose(ref _resourceView);
                 SharpDX.Utilities.Dispose(ref _texture);
             }
+
+            base.Dispose(disposing);
         }
     }
 }

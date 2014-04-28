@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Runtime.InteropServices;
 using System.IO;
 
 enum ShaderType //FIXME: Major Hack
@@ -21,10 +19,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         private void PlatformGraphicsDeviceResetting()
-        {
-        }
-
-        private void PlatformDispose()
         {
         }
 	}

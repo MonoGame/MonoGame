@@ -113,8 +113,17 @@ namespace Microsoft.Xna.Framework.Audio
 					_instance = new OpenALSoundController ();
 				return _instance;
 			}
-
 		}
+
+        public static void DestroyInstance()
+        {
+            if (_instance != null)
+            {
+                _instance.Dispose();
+                _instance = null;
+            }
+        }
+
 
         /// <summary>
         /// Checks the error state of the OpenAL driver. If a value that is not AlcError.NoError

@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\MacOS\Debug\</OutputPath>
-	<IntermediateOutputPath>obj\MacOS\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\MacOS\Debug\</IntermediateOutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\MacOS\Release\</OutputPath>
-	<IntermediateOutputPath>obj\MacOS\Release\</IntermediateOutputPath>
+    <IntermediateOutputPath>obj\MacOS\Release\</IntermediateOutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -79,11 +79,6 @@
     <Compile Include="Runner\PixelArgb.cs" />
     <Compile Include="Runner\Constants.cs" />
     <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
-    <Compile Include="Components\UpdateGuard.cs" />
-    <Compile Include="Components\VisualTestDrawableGameComponent.cs" />
-    <Compile Include="Components\VisualTestGameComponent.cs" />
-    <Compile Include="Components\Colored3DCubeComponent.cs" />
-    <Compile Include="Components\TexturedQuadComponent.cs" />
     <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
     <Compile Include="Runner\FramePixelData.cs" />
     <Compile Include="Framework\Bounding.cs" />
@@ -103,6 +98,11 @@
     <Compile Include="Framework\Visual\ViewportTest.cs" />
     <Compile Include="Runner\Extensions.cs" />
     <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
+    <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
+    <Compile Include="Framework\Components\UpdateGuard.cs" />
+    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">

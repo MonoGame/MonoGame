@@ -173,6 +173,7 @@ namespace MonoGame.Framework
             var assembly = Assembly.GetEntryAssembly();
             if (assembly != null)
                 _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;

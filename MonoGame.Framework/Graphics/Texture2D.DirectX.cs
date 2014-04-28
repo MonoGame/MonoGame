@@ -6,16 +6,16 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if WINRT
 #if WINDOWS_PHONE
 using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
-#else
+#endif
+
+#if WINDOWS_STOREAPP
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -171,15 +171,12 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 #elif WINDOWS_PHONE_FROM_NEZZ
             WriteableBitmap bitmap = null;
-            var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.BlockOnUIThread(() =>
             {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
                     bitmap = new WriteableBitmap(bitmapImage);
-                    waitEvent.Set();
             });
-            waitEvent.Wait();
 
             // Convert from ARGB to ABGR 
             ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);

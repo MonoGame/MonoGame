@@ -2,12 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -54,6 +48,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.VertexShader.SetConstantBuffer(slot, _cbuffer);
             else
                 d3dContext.PixelShader.SetConstantBuffer(slot, _cbuffer);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _cbuffer);
+            base.Dispose(disposing);
         }
     }
 }

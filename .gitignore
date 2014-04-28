@@ -50,6 +50,9 @@ monodroid*.msi
 #Unix temporary files
 *~
 
+# Output docs
+Documentation/Output/
+
 # Generated Project files
 # These should be changed to just *.csproj and *.sln when
 # all projects have been converted over.
