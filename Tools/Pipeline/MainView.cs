@@ -22,7 +22,6 @@ namespace MonoGame.Tools.Pipeline
         private const int ProjectIcon = 3;
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
-        private const string ContextMenuDelete = "Delete";
 
         public MainView()
         {            
@@ -49,48 +48,12 @@ namespace MonoGame.Tools.Pipeline
             {
                 case ContextMenuInclude:
                     {
-                        var projectRoot = _controller.Project.FilePath;
-                        projectRoot = projectRoot.Remove(projectRoot.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, projectRoot.Length-1));
-
-                        var path = projectRoot + "\\" + (e.ClickedItem.Tag as IProjectItem).Location;
-                        var dlg = new OpenFileDialog()
-                            {
-                                RestoreDirectory = true,
-                                AddExtension = true,
-                                CheckPathExists = true,
-                                CheckFileExists = true,
-                                Filter = "All Files (*.*)|*.*",
-                                InitialDirectory = path,
-                                Multiselect = false,
-                            };
-                        var result = dlg.ShowDialog(this);
-                        if (result != DialogResult.OK)
-                            return;
-
-                        _controller.Project.OnBuild(dlg.FileName);
-                        var item = _controller.Project.ContentItems.Last();
-                        item.View = this;
-                        item.ResolveTypes();                                                
-                        AddTreeItem(item);
-                        SelectTreeItem(item);
+                        _controller.Include((e.ClickedItem.Tag as IProjectItem).Location);                        
                     } break;
                 case ContextMenuExclude:
                     {
-                        var item = (e.ClickedItem.Tag as ContentItem);
-                        _controller.Project.RemoveItem(item);
-                        var node = _treeView.AllNodes().Find(f => f.Tag == item);
-                        _treeView.Nodes.Remove(node);
-                    } break;
-                case ContextMenuDelete:
-                    {
-                        var item = (e.ClickedItem.Tag as ContentItem);
-                        _controller.Project.RemoveItem(item);
-                        var node = _treeView.AllNodes().Find(f => f.Tag == item);
-                        _treeView.Nodes.Remove(node);
-                        var fullPath = Path.GetDirectoryName(_controller.Project.FilePath);
-                        fullPath += "\\" + item.SourceFile;
-                        File.Delete(fullPath);
-                    } break;
+                        _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
+                    } break;                
                 default:
                     throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
             }
@@ -116,8 +79,6 @@ namespace MonoGame.Tools.Pipeline
                         _contextMenu.Items.Clear();
 
                         var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
-                        item = _contextMenu.Items.Add(ContextMenuDelete);
                         item.Tag = node.Tag;
 
                         _contextMenu.Show(_treeView, p);
@@ -208,8 +169,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void AddTreeItem(IProjectItem item)
-        {
-            
+        {            
             var path = item.Location;
             var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -242,6 +202,12 @@ namespace MonoGame.Tools.Pipeline
             root.Expand();
         }
 
+        public void RemoveTreeItem(ContentItem item)
+        {
+            var node = _treeView.AllNodes().Find(f => f.Tag == item);
+            _treeView.Nodes.Remove(node);
+        }
+
         public void SelectTreeItem(IProjectItem item)
         {
             var node = _treeView.AllNodes().Find(e => e.Tag == item);
@@ -272,6 +238,28 @@ namespace MonoGame.Tools.Pipeline
                 _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
             else
                 _outputWindow.AppendText(line);
+        }
+
+        public bool ChooseContentFile(string initialDirectory, out string file)
+        {
+            var dlg = new OpenFileDialog()
+            {
+                RestoreDirectory = true,
+                AddExtension = true,
+                CheckPathExists = true,
+                CheckFileExists = true,
+                Filter = "All Files (*.*)|*.*",
+                InitialDirectory = initialDirectory,
+                Multiselect = false,
+            };
+            var result = dlg.ShowDialog(this);
+            
+            file = dlg.FileName;
+
+            if (result != DialogResult.OK)
+                return false;
+
+            return true;
         }
 
         public void OutputClear()

@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MonoGame.Tools.Pipeline
@@ -200,6 +201,30 @@ namespace MonoGame.Tools.Pipeline
             // Make sure we give the user a chance to
             // save the project if they need too.
             return AskSaveProject();
+        }
+
+        public void Include(string initialDirectory)
+        {
+            var projectRoot = _project.FilePath;
+            projectRoot = projectRoot.Remove(projectRoot.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, projectRoot.Length - 1));
+            var path = projectRoot + "\\" + initialDirectory;
+
+            string file;
+            if (_view.ChooseContentFile(initialDirectory, out file))
+            {
+                _project.OnBuild(file);
+                var item = _project.ContentItems.Last();
+                item.View = _view;
+                item.ResolveTypes();
+                _view.AddTreeItem(item);
+                _view.SelectTreeItem(item);
+            }                      
+        }
+
+        public void Exclude(ContentItem item)
+        {
+            _project.RemoveItem(item);
+            _view.RemoveTreeItem(item);
         }
     }
 }
