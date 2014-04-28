@@ -347,6 +347,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     UpdateGestures(stateChanged);
                 }
 
+                // We must run this even if _gestureEvents is empty,
+                // as some gestures occur as a result of the passage of time,
+                // even without new gesture events.
+                UpdateGestures(false);
+
                 return GestureList.Count > 0;
             }
         }
