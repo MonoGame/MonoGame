@@ -359,9 +359,9 @@ namespace Microsoft.Xna.Framework
                     throw new ArgumentOutOfRangeException();
             }
 
-            var graphichMode = new GraphicsMode(colorSize, depthSize, stencilSize, 0, ColorFormat.Empty, 2, false);
+            var graphicMode = new GraphicsMode(colorSize, depthSize, stencilSize, 0, ColorFormat.Empty, 2, false);
 
-            window = new OpenTK.GameWindow(pp.BackBufferWidth, pp.BackBufferHeight, graphichMode);
+            window = new OpenTK.GameWindow(pp.BackBufferWidth, pp.BackBufferHeight, graphicMode);
             window.RenderFrame += OnRenderFrame;
             window.UpdateFrame += OnUpdateFrame;
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
@@ -399,7 +399,7 @@ namespace Microsoft.Xna.Framework
             }
 #endif
             // Provide the graphics context for background loading
-            Threading.BackgroundContext = new GraphicsContext(graphichMode, window.WindowInfo);
+            Threading.BackgroundContext = new GraphicsContext(graphicMode, window.WindowInfo);
             Threading.WindowInfo = window.WindowInfo;
 
             keys = new List<Keys>();
