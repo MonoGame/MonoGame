@@ -169,7 +169,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if GLES
             if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
             {
-                GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, ref anisotropy);
+                GL.GetInteger(All.MaxTextureMaxAnisotropyExt, ref anisotropy);
             }
 #else
             GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
