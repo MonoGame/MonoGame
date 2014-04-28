@@ -88,6 +88,11 @@ namespace MonoGame.Tools.Pipeline
 
         public void CloseProject()
         {
+            // Make sure we give the user a chance to
+            // save the project if they need too.
+            if (!AskSaveProject())
+                return;
+
             _project.CloseProject();
             UpdateTree();
         }
@@ -224,6 +229,8 @@ namespace MonoGame.Tools.Pipeline
                 item.ResolveTypes();
                 _view.AddTreeItem(item);
                 _view.SelectTreeItem(item);
+
+                _project.IsDirty = true;
             }                      
         }
 
@@ -231,6 +238,13 @@ namespace MonoGame.Tools.Pipeline
         {
             _project.RemoveItem(item);
             _view.RemoveTreeItem(item);
+
+            _project.IsDirty = true;
+        }
+
+        public void ProjectModified()
+        {
+            _project.IsDirty = true;
         }
     }
 }
