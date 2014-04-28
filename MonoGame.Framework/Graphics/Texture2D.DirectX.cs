@@ -161,31 +161,16 @@ namespace Microsoft.Xna.Framework.Graphics
             WriteableBitmap writableBitmap = null;
             Threading.BlockOnUIThread(() =>
             {
-                // Note that contrary to the method name this works for both JPEG and PNGs.
-                writableBitmap = Microsoft.Phone.PictureDecoder.DecodeJpeg(stream);
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(stream);
+                    writableBitmap = new WriteableBitmap(bitmapImage);
             });
             // Convert from ARGB to ABGR 
             ConvertToABGR(writableBitmap.PixelHeight, writableBitmap.PixelWidth, writableBitmap.Pixels);
             Texture2D texture = new Texture2D(graphicsDevice, writableBitmap.PixelWidth, writableBitmap.PixelHeight, false, SurfaceFormat.Color);
             texture.SetData<int>(writableBitmap.Pixels);
             return texture;
-#elif WINDOWS_PHONE_FROM_NEZZ
-            WriteableBitmap bitmap = null;
-            Threading.BlockOnUIThread(() =>
-            {
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.SetSource(stream);
-                    bitmap = new WriteableBitmap(bitmapImage);
-            });
-
-            // Convert from ARGB to ABGR 
-            ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
-
-            Texture2D texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
-            texture.SetData<int>(bitmap.Pixels);
-            return texture;
-#endif
-#if !WINDOWS_PHONE
+#else
 
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
