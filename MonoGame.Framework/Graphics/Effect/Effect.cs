@@ -140,21 +140,19 @@ namespace Microsoft.Xna.Framework.Graphics
         private void Clone(Effect cloneSource)
         {
             Debug.Assert(_isClone, "Cannot clone into non-cloned effect!");
-
+			Debug.Assert(cloneSource.Parameters != null, "Invalid cloned Effect. The Effect must have a non-null Parameters member.");
+			Debug.Assert (cloneSource.Techniques != null, "Invalid cloned Effect. The Effect must have a non-null Techniques member.");
+			Debug.Assert (cloneSource.ConstantBuffers != null, "Invalid cloned Effect. The Effect must have a non-null ConstantBuffers member.");
+			
             // Copy the mutable members of the effect.
-            if(cloneSource.Parameters != null)
-                Parameters = cloneSource.Parameters.Clone();
-            if(cloneSource.Techniques != null)
-                Techniques = cloneSource.Techniques.Clone(this);
+            Parameters = cloneSource.Parameters.Clone();
+            Techniques = cloneSource.Techniques.Clone(this);
 
             // Make a copy of the immutable constant buffers.
-            if(cloneSource.ConstantBuffers != null) {
-                ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
-                for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
-                    ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
-            }
-            if(Techniques != null)
-                CurrentTechnique = Techniques[0];
+            ConstantBuffers = new ConstantBuffer[cloneSource.ConstantBuffers.Length];
+            for (var i = 0; i < cloneSource.ConstantBuffers.Length; i++)
+                ConstantBuffers[i] = new ConstantBuffer(cloneSource.ConstantBuffers[i]);
+            CurrentTechnique = Techniques[0];
             
             // Take a reference to the original shader list.
             _shaders = cloneSource._shaders;
