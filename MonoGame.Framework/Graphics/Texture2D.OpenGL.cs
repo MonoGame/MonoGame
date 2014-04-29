@@ -287,12 +287,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataRowColOffset = 0;
                 var sz = 0;
                 var pixelOffset = 0;
+                var outputElement = 0; // Write image into the output image
                 for (int y = r.Top; y < rHeight; y++)
                 {
                     for (int x = r.Left; x < rWidth; x++)
                     {
                         var result = new Color(0, 0, 0, 0);
-                        dataRowColOffset = ((y * r.Width) + x);
+                        dataRowColOffset = ((y * width) + x); // Read index from the source image
                         switch (Format)
                         {
                             case SurfaceFormat.Color: //kTexture2DPixelFormat_RGBA8888
@@ -353,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
                             default:
                                 throw new NotSupportedException("Texture format");
                         }
-                        data[dataRowColOffset] = (T)(object)result;
+                        data[outputElement++] = (T)(object)result;
                     }                    
                 }
             }

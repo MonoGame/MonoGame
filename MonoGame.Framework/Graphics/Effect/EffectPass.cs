@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if PSM
             _effect.GraphicsDevice._graphics.SetShaderProgram(_shaderProgram);
 
-            #warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
+	#warning We are only setting one hardcoded parameter here. Need to do this properly by iterating _effect.Parameters (Happens in Shader)
 
             float[] data;
             if (_effect.Parameters["WorldViewProj"] != null) 
@@ -162,7 +162,14 @@ namespace Microsoft.Xna.Framework.Graphics
             
             if (_effect.Parameters["Texture0"].Data != null && _effect.Parameters["Texture0"].Data != null)
                 _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
-#endif
+
+/* Kevin G's PR1604
+	   foreach (var parameter in _effect.Parameters) {
+                if (parameter.InternalSet != null)
+                    parameter.InternalSet(parameter, _shaderProgram);                
+            }
+*/
+	#endif
         }
 		
     }

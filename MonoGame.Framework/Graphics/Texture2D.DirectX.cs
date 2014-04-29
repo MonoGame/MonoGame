@@ -158,22 +158,19 @@ namespace Microsoft.Xna.Framework.Graphics
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
 #if WINDOWS_PHONE
-            WriteableBitmap bitmap = null;
+            WriteableBitmap writableBitmap = null;
             Threading.BlockOnUIThread(() =>
             {
                     BitmapImage bitmapImage = new BitmapImage();
                     bitmapImage.SetSource(stream);
-                    bitmap = new WriteableBitmap(bitmapImage);
+                    writableBitmap = new WriteableBitmap(bitmapImage);
             });
-
             // Convert from ARGB to ABGR 
-            ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
-
-            Texture2D texture = new Texture2D(graphicsDevice, bitmap.PixelWidth, bitmap.PixelHeight);
-            texture.SetData<int>(bitmap.Pixels);
+            ConvertToABGR(writableBitmap.PixelHeight, writableBitmap.PixelWidth, writableBitmap.Pixels);
+            Texture2D texture = new Texture2D(graphicsDevice, writableBitmap.PixelWidth, writableBitmap.PixelHeight, false, SurfaceFormat.Color);
+            texture.SetData<int>(writableBitmap.Pixels);
             return texture;
-#endif
-#if !WINDOWS_PHONE
+#else
 
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
@@ -207,15 +204,13 @@ namespace Microsoft.Xna.Framework.Graphics
             ConvertToRGBA(height, width, pixelData);
 
             var waitEvent = new ManualResetEventSlim(false);
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            Threading.BlockOnUIThread(() =>
             {
                 var bitmap = new WriteableBitmap(width, height);
                 System.Buffer.BlockCopy(pixelData, 0, bitmap.Pixels, 0, pixelData.Length);
                 bitmap.SaveJpeg(stream, width, height, 0, 100);
-                waitEvent.Set();
             });
 
-            waitEvent.Wait();
 #endif
 #if !WINDOWS_STOREAPP && !WINDOWS_PHONE
             throw new NotImplementedException();

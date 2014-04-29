@@ -123,19 +123,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsDevice(GraphicsDeviceInformation gdi)
         {
-            SetupGL();
             if (gdi.PresentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = gdi.PresentationParameters;
             GraphicsProfile = gdi.GraphicsProfile;
+            SetupGL();
             Initialize();
         }
 
         internal GraphicsDevice ()
 		{
-            SetupGL();
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            SetupGL();
             Initialize();
         }
 
@@ -153,14 +153,18 @@ namespace Microsoft.Xna.Framework.Graphics
             Adapter = adapter;
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-            SetupGL();
             PresentationParameters = presentationParameters;
             GraphicsProfile = graphicsProfile;
+            SetupGL();
             Initialize();
         }
 
         private void SetupGL() 
         {
+#if WINDOWS && OPENGL
+            ((OpenTKGameWindow)Game.Instance.Window).Initialize(PresentationParameters);
+#endif
+
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,
 			                         DisplayMode.Width, DisplayMode.Height);
@@ -279,6 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Dispose()
         {
+            Disposing(null,null);
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -644,7 +649,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+        public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
             Debug.Assert(indexData != null && indexData.Length > 0, "The indexData must not be null or zero length!");
@@ -664,7 +669,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
         }
-
+            
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             //TODO: Overview the calculation

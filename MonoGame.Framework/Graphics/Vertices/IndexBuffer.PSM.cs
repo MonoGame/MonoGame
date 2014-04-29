@@ -57,5 +57,24 @@ namespace Microsoft.Xna.Framework.Graphics
             _buffer = null;
             base.Dispose(disposing);
         }
+
+        /// <summary>
+        /// Gets the relevant IndexElementSize enum value for the given type.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="type">The type to use for the index buffer</param>
+        /// <returns>The IndexElementSize enum value that matches the type</returns>
+        static IndexElementSize PlatformSizeForType(GraphicsDevice graphicsDevice, Type type)
+        {
+            if(type == typeof(int) || type == typeof(uint)) {
+                return(IndexElementSize.ThirtyTwoBits);
+            }
+            else if(type == typeof(short) || type == typeof(ushort)) {
+                return(IndexElementSize.SixteenBits);
+            }
+            else {
+                throw(new NotSupportedException("Type " + type + " is not supported for IndexElementSize."));
+            }
+		}
 	}
 }
