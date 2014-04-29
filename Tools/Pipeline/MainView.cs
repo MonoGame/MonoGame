@@ -23,6 +23,8 @@ namespace MonoGame.Tools.Pipeline
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
 
+        private const string ProjectFileFilter = "Pipeline Projects (*.mgcb)|*.mgcb";
+
         public MainView()
         {            
             InitializeComponent();
@@ -137,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
                 FileName = Path.GetFileName(filePath),
                 AddExtension = true,
                 CheckPathExists = true,
-                Filter = "All Files (*.*)|*.*|Pipeline Projects (*.mgcb, *.pipeline)|*.mgcb;*.pipeline",
+                Filter = ProjectFileFilter,
                 FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
@@ -153,7 +155,7 @@ namespace MonoGame.Tools.Pipeline
                 AddExtension = true,
                 CheckPathExists = true,
                 CheckFileExists = true,
-                Filter = "All Files (*.*)|*.*|Pipeline Projects (*.mgcb, *.pipeline)|*.mgcb;*.pipeline",
+                Filter = ProjectFileFilter,
                 FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
