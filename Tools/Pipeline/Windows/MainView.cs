@@ -23,7 +23,8 @@ namespace MonoGame.Tools.Pipeline
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
 
-        private const string ProjectFileFilter = "Pipeline Projects (*.mgcb)|*.mgcb";
+        private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
+        private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
         public MainView()
         {            
@@ -48,7 +49,10 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            _controller.ProjectModified();
+            if (e.ChangedItem.PropertyDescriptor is ReferenceListElementPropertyDescriptor)            
+                _controller.OnReferencesModified();
+            else
+                _controller.OnProjectModified();
         }
 
         private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -139,8 +143,8 @@ namespace MonoGame.Tools.Pipeline
                 FileName = Path.GetFileName(filePath),
                 AddExtension = true,
                 CheckPathExists = true,
-                Filter = ProjectFileFilter,
-                FilterIndex = 2,
+                Filter = MonoGameContentProjectFileFilter,
+                FilterIndex = 2,                
             };
             var result = dialog.ShowDialog(this);
             filePath = dialog.FileName;
@@ -155,7 +159,23 @@ namespace MonoGame.Tools.Pipeline
                 AddExtension = true,
                 CheckPathExists = true,
                 CheckFileExists = true,
-                Filter = ProjectFileFilter,
+                Filter = MonoGameContentProjectFileFilter,
+                FilterIndex = 2,
+            };
+            var result = dialog.ShowDialog(this);
+            projectFilePath = dialog.FileName;
+            return result != DialogResult.Cancel;
+        }
+
+        public bool AskImportProject(out string projectFilePath)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                RestoreDirectory = true,
+                AddExtension = true,
+                CheckPathExists = true,
+                CheckFileExists = true,
+                Filter = XnaContentProjectFileFilter,
                 FilterIndex = 2,
             };
             var result = dialog.ShowDialog(this);
@@ -196,8 +216,8 @@ namespace MonoGame.Tools.Pipeline
                 if (found.Length == 0)
                 {
                     var folderNode = parent.Add(folder, folder, -1);
-                    folderNode.ImageIndex = FolderOpenIcon;
-                    folderNode.SelectedImageIndex = FolderOpenIcon;
+                    folderNode.ImageIndex = FolderClosedIcon;
+                    folderNode.SelectedImageIndex = FolderClosedIcon;
 
                     var idx = path.IndexOf(folder);
                     var curPath = path.Substring(0, idx + folder.Length);
@@ -266,6 +286,7 @@ namespace MonoGame.Tools.Pipeline
                 Filter = "All Files (*.*)|*.*",
                 InitialDirectory = initialDirectory,
                 Multiselect = false,
+                
             };
             var result = dlg.ShowDialog(this);
             
@@ -362,6 +383,11 @@ namespace MonoGame.Tools.Pipeline
             _controller.Clean();
         }
 
+        private void ImportMenuItem_Click(object sender, EventArgs e)
+        {
+            _controller.ImportProject();
+        }
+
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
             if (e.Node.ImageIndex == FolderOpenIcon)
@@ -378,6 +404,28 @@ namespace MonoGame.Tools.Pipeline
                 e.Node.ImageIndex = FolderOpenIcon;
                 e.Node.SelectedImageIndex = FolderOpenIcon;
             }
+        }
+
+        private void FileMenu_Click(object sender, EventArgs e)
+        {
+            // Update the enabled state for menu items.
+
+            _newMenuItem.Enabled = true;
+            _openMenuItem.Enabled = true;
+            _importMenuItem.Enabled = true;
+
+            _saveMenuItem.Enabled = _controller.ProjectOpen && _controller.ProjectDiry;
+            _saveAsMenuItem.Enabled = _controller.ProjectOpen;
+            _closeMenuItem.Enabled = _controller.ProjectOpen;
+        }
+
+        private void BuildMenu_Click(object sender, EventArgs e)
+        {
+            // Update the enabled state for menu items.
+
+            _buildMenuItem.Enabled = _controller.ProjectOpen;
+            _cleanMenuItem.Enabled = _controller.ProjectOpen;
+            _rebuilMenuItem.Enabled = _controller.ProjectOpen;
         }
     }
 }

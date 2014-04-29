@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,7 +24,9 @@ namespace MonoGame.Tools.Pipeline
     /// controller or view... it is only the data "model".
     /// </remarks>
     class PipelineProject : IProjectItem
-    {
+    {        
+        #region CommandLineParameters
+
         private readonly List<ContentItem> _content = new List<ContentItem>();
 
         [Browsable(false)]
@@ -44,12 +47,12 @@ namespace MonoGame.Tools.Pipeline
             Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir { get; set; }
 
-        //[TypeConverter(typeof(AssemblyReferenceListConverter))]        
+        [TypeConverter(typeof(AssemblyReferenceListConverter))]
         [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public BindingList<string> References { get; private set; }
+        public List<string> References { get; private set; }
 
         [CommandLineParameter(
             Name = "platform",
@@ -143,18 +146,42 @@ namespace MonoGame.Tools.Pipeline
                 item.ProcessorParams.Add(pair.Key, pair.Value);
         }
 
-        public void RemoveItem(ContentItem item)
+        #endregion
+
+        #region IPipelineItem
+
+        public string Name
         {
-            _content.Remove(item);
+            get
+            {
+                if (string.IsNullOrEmpty(FilePath))
+                    return "";
+
+                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
+            }
+        }
+
+        public string Location
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(FilePath))
+                    return "";
+
+                var idx = FilePath.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, FilePath.Length - 1);
+                return FilePath.Remove(idx);
+            }
         }
 
         [Browsable(false)]
-        public bool IsDirty { get; set; }
+        public string Icon { get; set; }
+
+        #endregion
 
         public PipelineProject()
         {
             ContentItems = new ReadOnlyCollection<ContentItem>(_content);
-            References = new BindingList<string>();
+            References = new List<string>();
         }
 
         public void Attach(IProjectObserver observer)
@@ -163,17 +190,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewProject()
         {
-            _content.Clear();
-            References.Clear();
-            OutputDir = null;
-            IntermediateDir = null;
-            Config = null;
-            Importer = null;
-            Platform = TargetPlatform.Windows;
-            Profile = GraphicsProfile.HiDef;
-            Processor = null;
-            FilePath = null;
-            IsDirty = false;            
+            Clear();            
         }
 
         public void OpenProject(string projectFilePath)
@@ -191,12 +208,9 @@ namespace MonoGame.Tools.Pipeline
                             Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
                             ToArray();
 
-            parser.ParseCommandLine(commands);
+            parser.ParseCommandLine(commands);           
 
-            // We're not dirty as we just loaded.
-            IsDirty = false;
-
-            // Clear variables which store temporary data concerning the last item.
+            // Clear variables which store temporary data for the last content item.
             Importer = null;
             Processor = null;
             _processorParams.Clear();
@@ -288,41 +302,148 @@ namespace MonoGame.Tools.Pipeline
 
         public void CloseProject()
         {
+            Clear();
+        }
+
+        public void ImportProject(string projectFilePath)
+        {
+            Clear();
+
+            FilePath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
+
+            using (var io = XmlReader.Create(File.OpenText(projectFilePath)))
+            {
+                string element = null;
+
+                while (io.Read())
+                {
+                    if (io.NodeType == XmlNodeType.Element)
+                    {
+                        if (io.LocalName.Equals("Reference"))
+                        {
+                            string include, hintPath;
+                            ReadReference(io, out include, out hintPath);
+
+                            if (!string.IsNullOrEmpty(hintPath))
+                                References.Add(hintPath);
+                        }
+                        else if (io.LocalName.Equals("Compile"))
+                        {
+                            string include, name, importer, processor;
+                            string[] processorParams;
+                            ReadCompile(io, out include, out name, out importer, out processor, out processorParams);
+                            
+                            Importer = importer;
+                            Processor = processor;
+
+                            if (processorParams != null)
+                            {
+                                foreach (var i in processorParams)
+                                    AddProcessorParam(i);
+                            }
+
+                            var sourceFilePath = Path.GetDirectoryName(projectFilePath);
+                            sourceFilePath += "\\" + include;
+
+                            OnBuild(sourceFilePath);
+                        }
+                    }                   
+                }
+            }           
+        }
+
+        public void RemoveItem(ContentItem item)
+        {
+            _content.Remove(item);
+        }         
+
+        private void Clear()
+        {
             _content.Clear();
-            FilePath = null;
+            References.Clear();
             OutputDir = null;
             IntermediateDir = null;
             Config = null;
+            Importer = null;
+            Platform = TargetPlatform.Windows;
+            Profile = GraphicsProfile.HiDef;
+            Processor = null;
+            FilePath = null;            
         }
 
-#region IPipelineItem
-
-        public string Name 
-        { 
-            get
-            {
-                if (string.IsNullOrEmpty(FilePath))
-                    return "";
-
-                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
-            }
-        }
-
-        public string Location
+        private void ReadReference(XmlReader io, out string include, out string hintPath)
         {
-            get
-            {
-                if (string.IsNullOrEmpty(FilePath))
-                    return "";
+            include = io.GetAttribute("Include");
+            hintPath = null;
 
-                var idx = FilePath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, FilePath.Length - 1);
-                return FilePath.Remove(idx);                
+            if (!io.IsEmptyElement)
+            {
+                var depth = io.Depth;
+                for (io.Read(); io.Depth != depth; io.Read())
+                {
+                    // process sub nodes
+                    if (io.IsStartElement("HintPath"))
+                    {
+                        io.Read();
+                        hintPath = io.Value;                        
+                    }
+                }
             }
         }
 
-        [Browsable(false)]
-        public string Icon { get; set; }
+        private void ReadCompile(XmlReader io,
+                                 out string include,
+                                 out string name,
+                                 out string importer,
+                                 out string processor,
+                                 out string[] processorParams)
+        {
+            name = null;
+            importer = null;
+            processor = null;
 
-#endregion
+            include = io.GetAttribute("Include");
+            var parameters = new List<string>();
+
+            if (!io.IsEmptyElement)
+            {
+                var depth = io.Depth;
+                for (io.Read(); io.Depth != depth; io.Read())
+                {
+                    // process sub nodes here.
+
+                    if (io.IsStartElement())
+                    {
+                        switch (io.LocalName)
+                        {
+                            case "Name":                        
+                                io.Read();
+                                name = io.Value;
+                                break;                        
+                            case "Importer":
+                                io.Read();
+                                importer = io.Value;
+                                break;
+                            case "Processor":
+                                io.Read();
+                                processor = io.Value;
+                                break;      
+                            default:
+                                if (io.LocalName.Contains("ProcessorParameters_"))
+                                {
+                                    var line = io.LocalName.Replace("ProcessorParameters_", "");
+                                    line += "=";
+                                    io.Read();
+                                    line += io.Value;
+                                    parameters.Add(line);
+                                }
+                                break;
+                        }
+                    }
+                }            
+            }
+
+            processorParams = parameters.ToArray();
+        }
     }
 }

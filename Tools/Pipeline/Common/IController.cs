@@ -6,9 +6,29 @@ namespace MonoGame.Tools.Pipeline
 {
     interface IController
     {
-        PipelineProject Project { get; }
+        /// <summary>
+        /// True if there is a project.
+        /// </summary>
+        bool ProjectOpen { get; }
+
+        /// <summary>
+        /// True if the project has unsaved changes.
+        /// </summary>
+        bool ProjectDiry { get; }
+
+        /// <summary>
+        /// Notify controller that a property of Project or its contents has been modified.
+        /// </summary>
+        void OnProjectModified();
+
+        /// <summary>
+        /// Notify controller that Project.References has been modified.
+        /// </summary>
+        void OnReferencesModified();
 
         void NewProject();
+
+        void ImportProject();
 
         void OpenProject();
 
@@ -26,8 +46,6 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);
-
-        void ProjectModified();
+        void Exclude(ContentItem item);    
     }
 }

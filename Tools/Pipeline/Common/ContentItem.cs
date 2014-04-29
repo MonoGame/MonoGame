@@ -60,8 +60,8 @@ namespace MonoGame.Tools.Pipeline
                 View.UpdateProperties(this);
 
                 // Validate that our processor can accept input content of the type
-                // output by the new importer.                
-                if (_processor == null || _processor.InputType != _importer.OutputType)
+                // output by the new importer.
+                if ((_processor == null || _processor.InputType != _importer.OutputType) && _processor != PipelineTypes.InvalidProcessor)
                 {
                     // If it cannot, set the default processor.
                     Processor = PipelineTypes.FindProcessor(_importer.DefaultProcessor, _importer);
@@ -101,13 +101,21 @@ namespace MonoGame.Tools.Pipeline
 
         public void ResolveTypes()
         {
-            Importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));            
-            //Processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+            _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
+            if (string.IsNullOrEmpty(ImporterName) && _importer != null)
+                ImporterName = _importer.TypeName;
+            
+            _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+            if (string.IsNullOrEmpty(ProcessorName) && _processor != null)
+                ProcessorName = _processor.TypeName;
+
+            if (_processor == null)
+                _processor = PipelineTypes.InvalidProcessor;
 
             // ProcessorParams get deserialized as strings
             // this code converts them to object(s) of their actual type
             // so that the correct editor appears within the property grid.
-            foreach (var p in Processor.Properties)
+            foreach (var p in _processor.Properties)
             {
                 if (!ProcessorParams.ContainsKey(p.Name))
                 {
