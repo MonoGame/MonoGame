@@ -140,87 +140,53 @@ namespace Microsoft.Xna.Framework
 
         public static Vector4 Add(Vector4 value1, Vector4 value2)
         {
-            value1.W += value2.W;
             value1.X += value2.X;
             value1.Y += value2.Y;
             value1.Z += value2.Z;
+            value1.W += value2.W;
             return value1;
         }
 
         public static void Add(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result.W = value1.W + value2.W;
             result.X = value1.X + value2.X;
             result.Y = value1.Y + value2.Y;
             result.Z = value1.Z + value2.Z;
+            result.W = value1.W + value2.W;
         }
 
         public static Vector4 Barycentric(Vector4 value1, Vector4 value2, Vector4 value3, float amount1, float amount2)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#else
             return new Vector4(
                 MathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
                 MathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
                 MathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
                 MathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#endif
         }
 
         public static void Barycentric(ref Vector4 value1, ref Vector4 value2, ref Vector4 value3, float amount1, float amount2, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
-                SilverSpriteMathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#else
-            result = new Vector4(
-                MathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2),
-                MathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2),
-                MathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2),
-                MathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2));
-#endif
+            result.X = MathHelper.Barycentric(value1.X, value2.X, value3.X, amount1, amount2);
+            result.Y = MathHelper.Barycentric(value1.Y, value2.Y, value3.Y, amount1, amount2);
+            result.Z = MathHelper.Barycentric(value1.Z, value2.Z, value3.Z, amount1, amount2);
+            result.W = MathHelper.Barycentric(value1.W, value2.W, value3.W, amount1, amount2);
         }
 
         public static Vector4 CatmullRom(Vector4 value1, Vector4 value2, Vector4 value3, Vector4 value4, float amount)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#else
             return new Vector4(
                 MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
                 MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
                 MathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
                 MathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#endif
         }
 
         public static void CatmullRom(ref Vector4 value1, ref Vector4 value2, ref Vector4 value3, ref Vector4 value4, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
-                SilverSpriteMathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#else
-            result = new Vector4(
-                MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount),
-                MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount),
-                MathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount),
-                MathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount));
-#endif
+            result.X = MathHelper.CatmullRom(value1.X, value2.X, value3.X, value4.X, amount);
+            result.Y = MathHelper.CatmullRom(value1.Y, value2.Y, value3.Y, value4.Y, amount);
+            result.Z = MathHelper.CatmullRom(value1.Z, value2.Z, value3.Z, value4.Z, amount);
+            result.W = MathHelper.CatmullRom(value1.W, value2.W, value3.W, value4.W, amount);
         }
 
         public static Vector4 Clamp(Vector4 value1, Vector4 min, Vector4 max)
@@ -234,11 +200,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Clamp(ref Vector4 value1, ref Vector4 min, ref Vector4 max, out Vector4 result)
         {
-            result = new Vector4(
-                MathHelper.Clamp(value1.X, min.X, max.X),
-                MathHelper.Clamp(value1.Y, min.Y, max.Y),
-                MathHelper.Clamp(value1.Z, min.Z, max.Z),
-                MathHelper.Clamp(value1.W, min.W, max.W));
+            result.X = MathHelper.Clamp(value1.X, min.X, max.X);
+            result.Y = MathHelper.Clamp(value1.Y, min.Y, max.Y);
+            result.Z = MathHelper.Clamp(value1.Z, min.Z, max.Z);
+            result.W = MathHelper.Clamp(value1.W, min.W, max.W);
         }
 
         public static float Distance(Vector4 value1, Vector4 value2)
@@ -339,17 +304,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Hermite(ref Vector4 value1, ref Vector4 tangent1, ref Vector4 value2, ref Vector4 tangent2, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result.W = SilverSpriteMathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount);
-            result.X = SilverSpriteMathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount);
-            result.Y = SilverSpriteMathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount);
-            result.Z = SilverSpriteMathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount);
-#else
             result.W = MathHelper.Hermite(value1.W, tangent1.W, value2.W, tangent2.W, amount);
             result.X = MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount);
             result.Y = MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount);
             result.Z = MathHelper.Hermite(value1.Z, tangent1.Z, value2.Z, tangent2.Z, amount);
-#endif
         }
 
         public float Length()
@@ -377,11 +335,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Lerp(ref Vector4 value1, ref Vector4 value2, float amount, out Vector4 result)
         {
-            result = new Vector4(
-                MathHelper.Lerp(value1.X, value2.X, amount),
-                MathHelper.Lerp(value1.Y, value2.Y, amount),
-                MathHelper.Lerp(value1.Z, value2.Z, amount),
-                MathHelper.Lerp(value1.W, value2.W, amount));
+            result.X = MathHelper.Lerp(value1.X, value2.X, amount);
+            result.Y = MathHelper.Lerp(value1.Y, value2.Y, amount);
+            result.Z = MathHelper.Lerp(value1.Z, value2.Z, amount);
+            result.W = MathHelper.Lerp(value1.W, value2.W, amount);
         }
 
         public static Vector4 Max(Vector4 value1, Vector4 value2)
@@ -395,11 +352,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Max(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result = new Vector4(
-               MathHelper.Max(value1.X, value2.X),
-               MathHelper.Max(value1.Y, value2.Y),
-               MathHelper.Max(value1.Z, value2.Z),
-               MathHelper.Max(value1.W, value2.W));
+            result.X = MathHelper.Max(value1.X, value2.X);
+            result.Y = MathHelper.Max(value1.Y, value2.Y);
+            result.Z = MathHelper.Max(value1.Z, value2.Z);
+            result.W = MathHelper.Max(value1.W, value2.W);
         }
 
         public static Vector4 Min(Vector4 value1, Vector4 value2)
@@ -413,11 +369,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Min(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
-            result = new Vector4(
-               MathHelper.Min(value1.X, value2.X),
-               MathHelper.Min(value1.Y, value2.Y),
-               MathHelper.Min(value1.Z, value2.Z),
-               MathHelper.Min(value1.W, value2.W));
+            result.X = MathHelper.Min(value1.X, value2.X);
+            result.Y = MathHelper.Min(value1.Y, value2.Y);
+            result.Z = MathHelper.Min(value1.Z, value2.Z);
+            result.W = MathHelper.Min(value1.W, value2.W);
         }
 
         public static Vector4 Multiply(Vector4 value1, Vector4 value2)
@@ -462,7 +417,10 @@ namespace Microsoft.Xna.Framework
 
         public static void Negate(ref Vector4 value, out Vector4 result)
         {
-            result = new Vector4(-value.X, -value.Y, -value.Z,-value.W);
+            result.X = -value.X;
+            result.Y = -value.Y;
+            result.Z = -value.Z;
+            result.W = -value.W;
         }
 
         public void Normalize()
@@ -490,36 +448,19 @@ namespace Microsoft.Xna.Framework
 
         public static Vector4 SmoothStep(Vector4 value1, Vector4 value2, float amount)
         {
-#if(USE_FARSEER)
-            return new Vector4(
-                SilverSpriteMathHelper.SmoothStep(value1.X, value2.X, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Y, value2.Y, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Z, value2.Z, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.W, value2.W, amount));
-#else
             return new Vector4(
                 MathHelper.SmoothStep(value1.X, value2.X, amount),
                 MathHelper.SmoothStep(value1.Y, value2.Y, amount),
                 MathHelper.SmoothStep(value1.Z, value2.Z, amount),
                 MathHelper.SmoothStep(value1.W, value2.W, amount));
-#endif
         }
 
         public static void SmoothStep(ref Vector4 value1, ref Vector4 value2, float amount, out Vector4 result)
         {
-#if(USE_FARSEER)
-            result = new Vector4(
-                SilverSpriteMathHelper.SmoothStep(value1.X, value2.X, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Y, value2.Y, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.Z, value2.Z, amount),
-                SilverSpriteMathHelper.SmoothStep(value1.W, value2.W, amount));
-#else
-            result = new Vector4(
-                MathHelper.SmoothStep(value1.X, value2.X, amount),
-                MathHelper.SmoothStep(value1.Y, value2.Y, amount),
-                MathHelper.SmoothStep(value1.Z, value2.Z, amount),
-                MathHelper.SmoothStep(value1.W, value2.W, amount));
-#endif
+            result.X = MathHelper.SmoothStep(value1.X, value2.X, amount);
+            result.Y = MathHelper.SmoothStep(value1.Y, value2.Y, amount);
+            result.Z = MathHelper.SmoothStep(value1.Z, value2.Z, amount);
+            result.W = MathHelper.SmoothStep(value1.W, value2.W, amount);
         }
 
         public static Vector4 Subtract(Vector4 value1, Vector4 value2)
@@ -561,26 +502,30 @@ namespace Microsoft.Xna.Framework
 
         public static void Transform(ref Vector2 position, ref Matrix matrix, out Vector4 result)
         {
-            result = new Vector4((position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41,
-                                 (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42,
-                                 (position.X * matrix.M13) + (position.Y * matrix.M23) + matrix.M43,
-                                 (position.X * matrix.M14) + (position.Y * matrix.M24) + matrix.M44);
+            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
+            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
+            result.Z = (position.X * matrix.M13) + (position.Y * matrix.M23) + matrix.M43;
+            result.W = (position.X * matrix.M14) + (position.Y * matrix.M24) + matrix.M44;
         }
 
         public static void Transform(ref Vector3 position, ref Matrix matrix, out Vector4 result)
         {
-            result = new Vector4((position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
-                                 (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
-                                 (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43,
-                                 (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44);
+            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41;
+            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42;
+            result.Z = (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43;
+            result.W = (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44;
         }
 
         public static void Transform(ref Vector4 vector, ref Matrix matrix, out Vector4 result)
         {
-            result = new Vector4((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + (vector.W * matrix.M41),
-                                 (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + (vector.W * matrix.M42),
-                                 (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + (vector.W * matrix.M43),
-                                 (vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + (vector.W * matrix.M44));
+            var x = (vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + (vector.W * matrix.M41);
+            var y = (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + (vector.W * matrix.M42);
+            var z = (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + (vector.W * matrix.M43);
+            var w = (vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + (vector.W * matrix.M44);
+            result.X = x;
+            result.Y = y;
+            result.Z = z;
+            result.W = w;
         }
 
         public override string ToString()

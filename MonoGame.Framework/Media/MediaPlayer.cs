@@ -3,19 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Audio;
-using System.Linq;
-
-#if IOS
-using MonoTouch.AudioToolbox;
-using MonoTouch.AVFoundation;
-using MonoTouch.Foundation;
-using MonoTouch.MediaPlayer;
-#endif
-
-#if WINRT
-using Windows.UI.Core;
-#endif
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -110,14 +97,14 @@ namespace Microsoft.Xna.Framework.Media
         public static float Volume
         {
             get { return _volume; }
-			set 
-			{       
-				_volume = value;
+            set
+            {
+                _volume = MathHelper.Clamp(value, 0, 1);
 
                 PlatformSetVolume();
-			}
+            }
         }
-		
+
 		#endregion
 		
         public static void Pause()

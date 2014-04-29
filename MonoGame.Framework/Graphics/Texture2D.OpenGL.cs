@@ -5,8 +5,6 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
 using System.Drawing;
 
 #if MONOMAC

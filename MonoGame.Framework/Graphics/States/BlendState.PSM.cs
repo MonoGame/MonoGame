@@ -20,10 +20,6 @@ namespace Microsoft.Xna.Framework.Graphics
                                           PSSHelper.ToBlendFuncFactor(device.BlendState.ColorSourceBlend),
                                           PSSHelper.ToBlendFuncFactor(device.BlendState.ColorDestinationBlend));
         }
-
-        private void PlatformDispose()
-        {
-        }
 	}
 }
 

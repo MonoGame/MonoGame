@@ -124,14 +124,5 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, options);
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose(disposing);
-            }
-            base.Dispose(disposing);
-		}
 	}
 }

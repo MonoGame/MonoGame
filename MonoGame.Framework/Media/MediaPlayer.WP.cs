@@ -6,13 +6,10 @@ extern alias MicrosoftXnaFramework;
 using MsXna_MediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaPlayer;
 
 using System;
-using Microsoft.Xna.Framework.Audio;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Phone.Shell;
 using System.Threading;
-using Windows.UI.Core;
 
 namespace Microsoft.Xna.Framework.Media
 {

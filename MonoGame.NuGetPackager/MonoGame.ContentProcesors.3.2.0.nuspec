@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.ContentProcessors</id>
+        <version>3.2</version>
+        <title>MonoGame.ContentProcessors</title>
+        <authors>Simon-Darkside</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>http://monogame.net/themes/_bartik/css/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Content Processors reference package for MonoGame Content Projects
+		MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes>Updated dev release - 07 January 2014</releaseNotes>
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+        <references>
+            <reference file="MonoGameContentProcessors.dll" />
+        </references>
+    </metadata>
+    <files>
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\lame_enc.dll" target="lib\lame_enc.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\libmojoshader_32.dll" target="lib\libmojoshader.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\ManagedPVRTC.dll" target="lib\ManagedPVRTC.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\MonoGameContentProcessors.dll" target="lib\MonoGameContentProcessors.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\NAudio.dll" target="lib\net\NAudio.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\NAudio.WindowsMediaFormat.dll" target="lib\NAudio.WindowsMediaFormat.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\pvrtc.dll" target="lib\pvrtc.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\SharpDX.D3DCompiler.dll" target="lib\SharpDX.D3DCompiler.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\SharpDX.dll" target="lib\SharpDX.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\yeti.mmedia.dll" target="lib\yeti.mmedia.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\yeti.mp3.dll" target="lib\yeti.mp3.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\yeti.wmfsdk.dll" target="lib\yeti.wmfsdk.dll" />
+		<file src="readme\MonoGame.ContentProcessors\readme.txt" target="" />
+    </files>
+</package>

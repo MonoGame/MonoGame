@@ -150,13 +150,18 @@ namespace Microsoft.Xna.Framework.Graphics
             dataHandle.Free();
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDevice.AddDisposeAction(() =>
+            if (!IsDisposed)
+            {
+                GraphicsDevice.AddDisposeAction(() =>
                 {
                     GL.DeleteBuffers(1, ref ibo);
                     GraphicsExtensions.CheckGLError();
                 });
+            }
+
+            base.Dispose(disposing);
         }
 	}
 }

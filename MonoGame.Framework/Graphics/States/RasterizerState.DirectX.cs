@@ -2,9 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -75,6 +73,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Apply the state!
             device._d3dContext.Rasterizer.State = _state;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
         }
     }
 }

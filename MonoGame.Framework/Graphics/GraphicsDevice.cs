@@ -3,11 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
 using System.Diagnostics;
 
 
@@ -16,6 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice : IDisposable
     {
         private Viewport _viewport;
+        private GraphicsProfile _graphicsProfile;
 
         private bool _isDisposed;
 
@@ -389,7 +385,20 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public GraphicsProfile GraphicsProfile { get; set; }
+        public GraphicsProfile GraphicsProfile
+        { 
+            get 
+            {
+                return _graphicsProfile;
+            }
+            internal set
+            {
+                //check Profile
+                if(value > GraphicsDevice.GetHighestSupportedGraphicsProfile(this))
+                    throw new System.NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
+                _graphicsProfile = value;
+            }
+        }
 
         public Rectangle ScissorRectangle
         {
@@ -673,5 +682,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             throw new NotSupportedException();
         }
+
+        internal static GraphicsProfile GetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+            return PlatformGetHighestSupportedGraphicsProfile(graphicsDevice);
+        }
+
     }
 }

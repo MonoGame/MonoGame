@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_currentVideo == null)
+                if (_currentVideo == null || _state == MediaState.Stopped)
                     return TimeSpan.Zero;
 
                 return PlatformGetPlayPosition();
@@ -125,6 +125,22 @@ namespace Microsoft.Xna.Framework.Media
             if (video == null)
                 throw new ArgumentNullException("video is null.");
 
+            if (_currentVideo == video)
+            {
+                // No work to do if we're already
+                // playing this video.
+                if (_state == MediaState.Playing)
+                    return;
+
+                // If we try to Play the same video
+                // from a paused state, just resume it instead.
+                if (_state == MediaState.Paused)
+                {
+                    PlatformResume();
+                    return;
+                }
+            }
+            
             _currentVideo = video;
 
             PlatformPlay();
@@ -139,6 +155,16 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (_currentVideo == null)
                 return;
+
+            // No work to do if we're already playing
+            if (_state == MediaState.Playing)
+                return;
+
+            if (_state == MediaState.Stopped)
+            {
+                PlatformPlay();
+                return;
+            }
 
             PlatformResume();
 

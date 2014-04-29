@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice
     {
 #if !GLES
-		private DrawBuffersEnum[] _drawBuffers;
+        private DrawBuffersEnum[] _drawBuffers;
 #endif
 
         static List<Action> disposeActions = new List<Action>();
@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly ShaderProgramCache _programCache = new ShaderProgramCache();
 
-        private int _shaderProgram = -1;
+        private ShaderProgram _shaderProgram = null;
 
         static readonly float[] _posFixup = new float[4];
 
@@ -78,6 +78,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		const RenderbufferStorage GLDepth24Stencil8 = RenderbufferStorage.Depth24Stencil8;
 		const FramebufferErrorCode GLFramebufferComplete = FramebufferErrorCode.FramebufferComplete;
 #endif
+
+        internal static FramebufferObject Framebuffer { get; private set; }
+        internal static RenderbufferObject Renderbuffer { get; private set; }
 
         internal int glFramebuffer = 0;
         internal int glRenderTargetFrameBuffer;
@@ -128,12 +131,13 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
-			// Initialize draw buffer attachment array
-			int maxDrawBuffers;
-			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-			for (int i = 0; i < maxDrawBuffers; i++)
-				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+            // Initialize draw buffer attachment array
+            int maxDrawBuffers;
+            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+            GraphicsExtensions.CheckGLError();
+            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+            for (int i = 0; i < maxDrawBuffers; i++)
+                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
             _extensions = GetGLExtensions();
         }
@@ -176,7 +180,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Free all the cached shader programs. 
             _programCache.Clear();
-            _shaderProgram = -1;
+            _shaderProgram = null;
+
+            if (GraphicsCapabilities.SupportsFramebufferObjectARB)
+            {
+                Framebuffer = new FramebufferObject();
+                Renderbuffer = new RenderbufferObject();
+            }
+            #if !(GLES || MONOMAC)
+            else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
+            {
+                Framebuffer = new FramebufferObjectEXT();
+                Renderbuffer = new RenderbufferObjectEXT();
+            }
+            #endif
+            else
+            {
+                throw new PlatformNotSupportedException(
+                    "MonoGame requires either ARB_framebuffer_object or EXT_framebuffer_object." +
+                    "Try updating your graphics drivers.");
+            }
         }
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -250,8 +273,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                             {
                 if (this.glRenderTargetFrameBuffer > 0)
                 {
-                    GL.DeleteFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-                    GraphicsExtensions.CheckGLError();
+                    Framebuffer.Delete(this.glRenderTargetFrameBuffer);
                 }
             });
         }
@@ -317,8 +339,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-			GL.BindFramebuffer(GLFramebuffer, this.glFramebuffer);
-            GraphicsExtensions.CheckGLError();
+            Framebuffer.Bind(GLFramebuffer, glFramebuffer);
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
@@ -336,30 +357,22 @@ namespace Microsoft.Xna.Framework.Graphics
             var renderTarget = _currentRenderTargetBindings[0].RenderTarget as RenderTarget2D;
 			if (this.glRenderTargetFrameBuffer == 0)
 			{
-#if GLES
-                GL.GenFramebuffers(1, ref this.glRenderTargetFrameBuffer);
-#else
-                GL.GenFramebuffers(1, out this.glRenderTargetFrameBuffer);
-#endif
-                GraphicsExtensions.CheckGLError();
+                glRenderTargetFrameBuffer = Framebuffer.Generate();
             }
 
-            GL.BindFramebuffer(GLFramebuffer, this.glRenderTargetFrameBuffer);
-            GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
-            GraphicsExtensions.CheckGLError();
+            Framebuffer.Bind(GLFramebuffer, glRenderTargetFrameBuffer);
+            Framebuffer.Texture2D(GLFramebuffer, GLColorAttachment0, TextureTarget.Texture2D, renderTarget.glTexture, 0);
 
 			// Reverted this change, as per @prollin's suggestion
-			GL.FramebufferRenderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
-			GL.FramebufferRenderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
+            Framebuffer.Renderbuffer(GLFramebuffer, GLDepthAttachment, GLRenderbuffer, renderTarget.glDepthBuffer);
+            Framebuffer.Renderbuffer(GLFramebuffer, GLStencilAttachment, GLRenderbuffer, renderTarget.glStencilBuffer);
 
 #if !GLES
 			for (var i = 0; i < _currentRenderTargetCount; i++)
 			{
 				GL.BindTexture(TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture);
 				GraphicsExtensions.CheckGLError();
-				GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
-				GraphicsExtensions.CheckGLError();
+                Framebuffer.Texture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext + i, TextureTarget.Texture2D, _currentRenderTargetBindings[i].RenderTarget.glTexture, 0);
 			}
 
 			GL.DrawBuffers(_currentRenderTargetCount, _drawBuffers);
@@ -367,7 +380,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
             // Test that the FBOs are attached and correct.
-			var status = GL.CheckFramebufferStatus(GLFramebuffer);
+			var status = Framebuffer.CheckStatus(GLFramebuffer);
 			if (status != GLFramebufferComplete)
 			{
 				string message = "Framebuffer Incomplete.";
@@ -414,18 +427,19 @@ namespace Microsoft.Xna.Framework.Graphics
         private void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var info = _programCache.GetProgramInfo(VertexShader, PixelShader);
-            if (info.program == -1)
+            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
+            if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
-            if (_shaderProgram != info.program)
+            if (_shaderProgram != shaderProgram)
             {
-                GL.UseProgram(info.program);
+                GL.UseProgram(shaderProgram.Program);
                 GraphicsExtensions.CheckGLError();
-                _shaderProgram = info.program;
+                _shaderProgram = shaderProgram;
             }
 
-            if (info.posFixupLoc == -1)
+            var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
+            if (posFixupLoc == -1)
                 return;
 
             // Apply vertex shader fix:
@@ -467,7 +481,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _posFixup[3] *= -1.0f;
             }
 
-            GL.Uniform4(info.posFixupLoc, 1, _posFixup);
+            GL.Uniform4(posFixupLoc, 1, _posFixup);
             GraphicsExtensions.CheckGLError();
         }
 
@@ -668,6 +682,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // Release the handles.
             ibHandle.Free();
             vbHandle.Free();
+        }
+
+        private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
+        {
+           return GraphicsProfile.HiDef;
         }
     }
 }
