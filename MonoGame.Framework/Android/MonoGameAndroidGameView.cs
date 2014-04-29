@@ -24,8 +24,6 @@ namespace Microsoft.Xna.Framework
         private readonly Game _game;
         private readonly AndroidTouchEventManager _touchManager;
 
-        private bool _contextWasLost;
-
         public bool IsResuming { get; private set; }
 
         public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow, Game game)
@@ -83,6 +81,34 @@ namespace Microsoft.Xna.Framework
         {
             SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+
+            if (_game.GraphicsDevice != null)
+            {
+                _game.GraphicsDevice.Initialize();
+
+                IsResuming = true;
+                if (_gameWindow.Resumer != null)
+                {
+                    _gameWindow.Resumer.LoadContent();
+                }
+
+                // Reload textures on a different thread so the resumer can be drawn
+                System.Threading.Thread bgThread = new System.Threading.Thread(
+                    o =>
+                    {
+                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+                        // DeviceReset events
+                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                        _game.GraphicsDevice.OnDeviceReset();
+
+                        IsResuming = false;
+                    });
+
+                bgThread.Start();
+            }
         }
 
         #endregion
@@ -146,34 +172,6 @@ namespace Microsoft.Xna.Framework
             {
                 throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
             }
-            if (_game.GraphicsDevice != null && _contextWasLost)
-            {
-                _game.GraphicsDevice.Initialize();
-
-                IsResuming = true;
-                if (_gameWindow.Resumer != null)
-                {
-                    _gameWindow.Resumer.LoadContent();
-                }
-
-                // Reload textures on a different thread so the resumer can be drawn
-                System.Threading.Thread bgThread = new System.Threading.Thread(
-                    o =>
-                    {
-                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
-
-                        // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
-
-                        _contextWasLost = false;
-                        IsResuming = false;
-                    });
-
-                bgThread.Start();
-            }
 
             MakeCurrent();
         }
@@ -188,8 +186,6 @@ namespace Microsoft.Xna.Framework
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.DestroyFrameBuffer");
 
             base.DestroyFrameBuffer();
-
-            _contextWasLost = GraphicsContext == null || GraphicsContext.IsDisposed;
         }
 
         #endregion
