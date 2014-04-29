@@ -749,7 +749,7 @@
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\Keyboard.cs">
-		<ExcludePlatforms>PSMobile,Android</ExcludePlatforms>
+		<ExcludePlatforms>PSMobile,Android,Ouya</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
