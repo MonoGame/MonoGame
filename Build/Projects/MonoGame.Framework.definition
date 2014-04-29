@@ -214,13 +214,13 @@
     <Compile Include="Content\ContentReaders\DictionaryReader.cs" />
     <Compile Include="Content\ContentReaders\DoubleReader.cs" />
     <Compile Include="Content\ContentReaders\DualTextureEffectReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\EffectMaterialReader.cs" />
     <Compile Include="Content\ContentReaders\EffectReader.cs" />
     <Compile Include="Content\ContentReaders\EnumReader.cs" />
     <Compile Include="Content\ContentReaders\EnvironmentMapEffectReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\ExternalReferenceReader.cs" />
     <Compile Include="Content\ContentReaders\IndexBufferReader.cs" />
@@ -229,24 +229,18 @@
     <Compile Include="Content\ContentReaders\Int64Reader.cs" />
     <Compile Include="Content\ContentReaders\ListReader.cs" />
     <Compile Include="Content\ContentReaders\MatrixReader.cs" />
-    <Compile Include="Content\ContentReaders\ModelReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Content\ContentReaders\ModelReader.cs" />
     <Compile Include="Content\ContentReaders\NullableReader.cs" />
-    <Compile Include="Content\ContentReaders\PlaneReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Content\ContentReaders\PlaneReader.cs" />
     <Compile Include="Content\ContentReaders\PointReader.cs" />
-    <Compile Include="Content\ContentReaders\QuaternionReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Content\ContentReaders\QuaternionReader.cs" />
     <Compile Include="Content\ContentReaders\RayReader.cs" />
     <Compile Include="Content\ContentReaders\RectangleReader.cs" />
     <Compile Include="Content\ContentReaders\ReflectiveReader.cs" />
     <Compile Include="Content\ContentReaders\SByteReader.cs" />
     <Compile Include="Content\ContentReaders\SingleReader.cs" />
     <Compile Include="Content\ContentReaders\SkinnedEffectReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentReaders\SongReader.cs" />
     <Compile Include="Content\ContentReaders\SoundEffectReader.cs" />
@@ -375,7 +369,7 @@
     <Compile Include="Graphics\Effect\AlphaTestEffect.cs" />
     <Compile Include="Graphics\Effect\BasicEffect.cs" />
     <Compile Include="Graphics\Effect\DualTextureEffect.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\EffectAnnotationCollection.cs" />
     <Compile Include="Graphics\Effect\EffectAnnotation.cs" />
@@ -391,13 +385,13 @@
     <Compile Include="Graphics\Effect\EffectTechniqueCollection.cs" />
     <Compile Include="Graphics\Effect\EffectTechnique.cs" />
     <Compile Include="Graphics\Effect\EnvironmentMapEffect.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\IEffectFog.cs" />
     <Compile Include="Graphics\Effect\IEffectLights.cs" />
     <Compile Include="Graphics\Effect\IEffectMatrices.cs" />
     <Compile Include="Graphics\Effect\SkinnedEffect.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+		<ExcludePlatforms>PSMobile,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Graphics\Effect\SpriteEffect.cs" />
     <Compile Include="Graphics\GraphicsAdapter.cs" />
@@ -755,7 +749,7 @@
     <Compile Include="Input\GamePadTriggers.cs" />
     <Compile Include="Input\GamePadType.cs" />
     <Compile Include="Input\Keyboard.cs">
-      <Platforms>iOS,Linux,MacOS,Windows8,Windows,WindowsGL,WindowsPhone,Web</Platforms>
+		<ExcludePlatforms>PSMobile,Android</ExcludePlatforms>
     </Compile>
     <Compile Include="Input\KeyboardState.cs" />
     <Compile Include="Input\Keys.cs" />
