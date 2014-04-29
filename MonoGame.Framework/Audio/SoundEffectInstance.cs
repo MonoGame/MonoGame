@@ -2,12 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#region Using Statements
 using System;
-#if !DIRECTX
-using System.IO;
-#endif
-#endregion Statements
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -17,9 +12,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal bool _IsPooled = true;
 
-        private float _pan = 0.0f;
-        private float _volume = 1.0f;
-        private float _pitch = 0.0f;
+        private float _pan;
+        private float _volume;
+        private float _pitch;
 
         public bool IsLooped
         { 
@@ -36,6 +31,7 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new ArgumentOutOfRangeException();
 
                 PlatformSetPan(value);
+                _pan = value;
             }
         }
 
@@ -48,6 +44,7 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new ArgumentOutOfRangeException();
 
                 PlatformSetPitch(value);
+                _pitch = value;
             }
         }
 
@@ -60,6 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new ArgumentOutOfRangeException();
 
                 PlatformSetVolume(value);
+                _volume = value;
             }
         }
 
@@ -67,12 +65,18 @@ namespace Microsoft.Xna.Framework.Audio
 
         public bool IsDisposed { get { return isDisposed; } }
 
-        internal SoundEffectInstance(){}
+        internal SoundEffectInstance()
+        {
+            _pan = 0.0f;
+            _volume = 1.0f;
+            _pitch = 0.0f;            
+        }
         
         /// <summary>
         /// Creates a standalone SoundEffectInstance from given wavedata.
         /// </summary>
         internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
+            : base()
         {
             PlatformInitialize(buffer, sampleRate, channels);
         }

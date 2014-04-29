@@ -61,11 +61,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
     /// </summary>
     public static class TouchPanel
     {
-#if ANDROID
-        internal static AndroidGameWindow PrimaryWindow;
-#else
         internal static GameWindow PrimaryWindow;
-#endif
 
         /// <summary>
         /// Gets the current state of the touch panel.
@@ -170,12 +166,5 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get { return PrimaryWindow.TouchPanelState.IsGestureAvailable; }
         }
-
-#if WINDOWS_PHONE
-        internal static void ResetState()
-        {
-            PrimaryWindow.TouchPanelState.ResetState();
-        }
-#endif
     }
 }

@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -51,9 +50,11 @@ namespace Microsoft.Xna.Framework.Graphics
             device._d3dContext.OutputMerger.SetBlendState(_state, blendFactor);
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            SharpDX.Utilities.Dispose(ref _state);
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
         }
     }
 }

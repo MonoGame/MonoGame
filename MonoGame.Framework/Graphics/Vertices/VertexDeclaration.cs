@@ -3,8 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
 
 #if WINRT
 using System.Reflection;

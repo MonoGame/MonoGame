@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
 
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -55,7 +54,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
-        private void PlatformSetData(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
+        private void PlatformSetData<T>(CubeMapFace face, int level, IntPtr dataPtr, int xOffset, int yOffset, int width, int height)
         {
                 var box = new DataBox(dataPtr, GetPitch(width), 0);
 

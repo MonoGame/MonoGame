@@ -4,5 +4,11 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MSBuildThisFileDirectory)\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="Tao.Sdl">
+      <HintPath>$(MSBuildThisFileDirectory)\Tao.Sdl.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>$(MSBuildThisFileDirectory)\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

@@ -344,6 +344,7 @@ namespace Microsoft.Xna.Framework
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
                 window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,

@@ -70,25 +70,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
 
-#if ANDROID
-
-        // TODO: Fix AndroidGameWindow and this
-        // gross hack can be removed.
-
-        internal readonly AndroidGameWindow Window;
-
-        internal TouchPanelState(AndroidGameWindow window)
-        {
-            Window = window;
-        }
-#else
         internal readonly GameWindow Window;
 
         internal TouchPanelState(GameWindow window)
         {
             Window = window;
         }
-#endif
 
         /// <summary>
         /// The window handle of the touch panel. Purely for Xna compatibility.
@@ -772,32 +759,5 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         #endregion
-
-#if WINDOWS_PHONE
-        internal void ResetState()
-        {
-            _touchState.Clear();
-            _touchEvents.Clear();
-            _gestureState.Clear();
-            _gestureEvents.Clear();
-
-            _touchScale = Vector2.One;
-            _displaySize = Point.Zero;
-
-            _nextTouchId = 2;
-
-            _touchIds.Clear();
-
-            GestureList.Clear();
-
- 		    _pinchGestureStarted = false;
-            _tapDisabled = false;
-
-            _holdDisabled = false;
-
-            _dragGestureStarted = GestureType.None;
-            _lastTap = new TouchLocation();
-      }
-#endif
     }
 }

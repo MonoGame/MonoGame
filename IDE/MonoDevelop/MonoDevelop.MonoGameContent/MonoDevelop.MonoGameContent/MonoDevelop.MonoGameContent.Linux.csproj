@@ -110,7 +110,7 @@
       <Link>Nvidia.TextureTools.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\SharpFont.dll.config">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\SharpFont.dll.config">
       <Link>SharpFont.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -134,7 +134,7 @@
       <Link>nvtt.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\freetype6.dll">
+    <Content Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\freetype6.dll">
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -144,10 +144,6 @@
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Dependencies\OpenTK.dll.config">
       <Link>OpenTK.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\Assimp32.dll">
-      <Link>Assimp32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\ThirdParty\Dependencies\assimp\Assimp64.dll">
@@ -177,7 +173,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libfreetype.6.so">
+    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.so">
       <Link>libfreetype.6.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -217,15 +213,15 @@
       <Link>libpvrtc.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libfreetype.6.dylib">
+    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libfreetype.6.dylib">
       <Link>libfreetype.6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libpng15.15.dylib">
+    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libpng15.15.dylib">
       <Link>libpng15.15.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\libpng12.so">
+    <None Include="..\..\..\..\ThirdParty\Dependencies\SharpFont\x64\libpng12.so">
       <Link>libpng12.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

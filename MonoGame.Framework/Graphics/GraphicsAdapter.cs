@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
 #elif ANDROID
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter(Game.Instance.Window) });
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter(((AndroidGameWindow)Game.Instance.Window).GameView) });
 #else
                     adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter()});

@@ -110,14 +110,5 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInBytes = Marshal.SizeOf(typeof(T));
             PlatformSetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose(disposing);
-            }
-            base.Dispose(disposing);
-		}
     }
 }

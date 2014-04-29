@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-// TODO: Exclude this file from non-(WINDOWS && DIRECTX) platforms.
-#if WINDOWS_MEDIA_SESSION
 using SharpDX.MediaFoundation;
-using System;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -42,4 +39,3 @@ namespace Microsoft.Xna.Framework.Media
         }
     }
 }
-#endif

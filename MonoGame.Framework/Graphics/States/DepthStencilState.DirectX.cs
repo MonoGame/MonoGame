@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -138,6 +137,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 default:
                     throw new ArgumentException("Invalid stencil operation!");
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
         }
     }
 }

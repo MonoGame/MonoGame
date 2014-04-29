@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using Microsoft.Xna.Framework;
 using System;
 
 namespace Microsoft.Xna.Framework.Input
@@ -12,6 +16,11 @@ namespace Microsoft.Xna.Framework.Input
     //     to offer additional data without separate state queries to GamePad.
     public partial struct GamePadState
     {
+        /// <summary>
+        /// The default initialized gamepad state.
+        /// </summary>
+        public static readonly GamePadState Default = new GamePadState();
+
         //
         // Summary:
         //     Indicates whether the Xbox 360 Controller is connected. Reference page contains
@@ -67,15 +76,6 @@ namespace Microsoft.Xna.Framework.Input
             get;
             internal set;
         }
-
-	private static GamePadState initializedGamePadState = new GamePadState();
-
-	internal static GamePadState InitializedState
-	{
-		get {
-				return initializedGamePadState;
-		}
-	}
 
         //
         // Summary:

@@ -62,7 +62,10 @@ namespace Microsoft.Xna.Framework.Audio
             _audioBuffer.Dispose();
             
             isDisposed = true;
+        }
 
+        internal static void PlatformShutdown()
+        {
         }
     }
 }

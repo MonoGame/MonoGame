@@ -4,17 +4,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
-
-#if !PSM && !WEB
-using System.Drawing;
-#endif
-
-#if WINDOWS || LINUX || MONOMAC
-using System.Drawing.Imaging;
-#endif
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -48,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
-        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
+        internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
             : this(graphicsDevice, width, height, mipmap, format, type, false)
         {
         }

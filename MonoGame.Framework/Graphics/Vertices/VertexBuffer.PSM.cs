@@ -35,10 +35,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Array.Copy(data, offsetInBytes / vertexStride, _vertexArray, startIndex, elementCount);
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-                //Do nothing
-                _vertexArray = null;
+            //Do nothing
+            _vertexArray = null;
+            base.Dispose(disposing);
         }
     }
 }

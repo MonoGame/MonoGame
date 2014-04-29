@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if WINDOWS_STOREAPP
         [CLSCompliant(false)]
-        public SwapChainBackgroundPanel SwapChainPanel { get; set; }
+        public SwapChainBackgroundPanel SwapChainBackgroundPanel { get; set; }
 #endif
 
         public DepthFormat DepthStencilFormat

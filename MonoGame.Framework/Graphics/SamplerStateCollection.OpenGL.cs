@@ -4,9 +4,6 @@
 //
 // Author: Kenneth James Pouncey
 
-using System;
-using System.Collections.Generic;
-
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX

@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Runtime.InteropServices;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -93,16 +91,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal protected override void GraphicsDeviceResetting()
         {
             PlatformGraphicsDeviceResetting();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                PlatformDispose();
-            }
-
-            base.Dispose(disposing);
         }
 	}
 }
