@@ -149,7 +149,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Compile, regex);
             Tokens.Add(TokenType.Compile);
 
-            regex = new Regex(@"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            regex = new Regex(@"[A-Za-z_][A-Za-z0-9_]*", RegexOptions.Compiled);
             Patterns.Add(TokenType.ShaderModel, regex);
             Tokens.Add(TokenType.ShaderModel);
 
@@ -162,6 +162,11 @@ namespace TwoMGFX
             Tokens.Add(TokenType.EndOfFile);
 
 
+        }
+
+        public void Init(string input)
+        {
+            Init(input, "");
         }
 
         public void Init(string input, string fileName)
@@ -255,9 +260,12 @@ namespace TwoMGFX
                     tok.Text = Input.Substring(tok.StartPos, len);
                     tok.Type = index;
                 }
-                else if (tok.StartPos < tok.EndPos - 1)
+                else if (tok.StartPos == tok.EndPos)
                 {
-                    tok.Text = Input.Substring(tok.StartPos, 1);
+                    if (tok.StartPos < Input.Length)
+                        tok.Text = Input.Substring(tok.StartPos, 1);
+                    else
+                        tok.Text = "EOF";
                 }
 
                 // Update the line and column count for error reporting.
