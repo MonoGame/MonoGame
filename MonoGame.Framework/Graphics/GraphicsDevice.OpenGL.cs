@@ -5,18 +5,16 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
-using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
 #endif
 
 #if WINDOWS || LINUX
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 #endif
 
 #if GLES
@@ -33,6 +31,7 @@ using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+using GLPrimitiveType = OpenTK.Graphics.ES20.All;
 #endif
 
 
@@ -468,18 +467,18 @@ namespace Microsoft.Xna.Framework.Graphics
             return renderTarget;
         }
 
-        private static BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
+        private static GLPrimitiveType PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
-                    return BeginMode.Lines;
+                    return GLPrimitiveType.Lines;
                 case PrimitiveType.LineStrip:
-                    return BeginMode.LineStrip;
+                    return GLPrimitiveType.LineStrip;
                 case PrimitiveType.TriangleList:
-                    return BeginMode.Triangles;
+                    return GLPrimitiveType.Triangles;
                 case PrimitiveType.TriangleStrip:
-                    return BeginMode.TriangleStrip;
+                    return GLPrimitiveType.TriangleStrip;
             }
 
             throw new ArgumentException();

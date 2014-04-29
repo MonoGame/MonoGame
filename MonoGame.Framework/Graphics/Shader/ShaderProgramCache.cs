@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
 #elif WINRT
@@ -14,7 +15,7 @@ using OpenTK.Graphics.ES20;
 #if IOS || ANDROID
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
-using ProgramParameter = OpenTK.Graphics.ES20.All;
+using GetProgramParameterName = OpenTK.Graphics.ES20.All;
 #endif
 #endif
 
@@ -124,9 +125,9 @@ namespace Microsoft.Xna.Framework.Graphics
             var linked = 0;
 
 #if GLES
-			GL.GetProgram(program, ProgramParameter.LinkStatus, ref linked);
+            GL.GetProgram(program, GetProgramParameterName.LinkStatus, ref linked);
 #else
-            GL.GetProgram(program, ProgramParameter.LinkStatus, out linked);
+            GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);
 #endif
             GraphicsExtensions.LogGLError("VertexShaderCache.Link(), GL.GetProgram");
             if (linked == 0)

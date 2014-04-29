@@ -19,7 +19,7 @@ namespace MonoGame.Framework
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
-        /// <param name="SwapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
+        /// <param name="swapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
         /// <returns></returns>
         static public T Create(string launchParameters, CoreWindow window, SwapChainBackgroundPanel swapChainBackgroundPanel)
         {
@@ -54,7 +54,7 @@ namespace MonoGame.Framework
         /// <summary>
         /// Preserves the previous execution state in MetroGamePlatform and returns the constructed game object initialized with the given window.
         /// </summary>
-        /// <param name="launchParameters">The command line arguments from launch.</param>
+        /// <param name="args">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>
         /// <param name="swapChainBackgroundPanel">The XAML SwapChainBackgroundPanel to which we render the scene and recieve input events.</param>
         /// <returns></returns>
