@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
 
-#if ANDROID || OPENAL
+#if ANDROID || OPENAL || PSM
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
         event FinishedPlayingHandler DonePlaying;
 #endif
