@@ -131,7 +131,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Inserts the range of values from the enumerable into the channel.
         /// </summary>
-        /// <typeparam name="T">The type of the channel.</typeparam>
         /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
         /// <param name="data">The data to insert into the channel.</param>
         internal override void InsertRange(int index, IEnumerable data)
