@@ -121,6 +121,18 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
+            #if GLES
+            // Create an OpenGL ES 2.0 context
+            var flags = GraphicsContextFlags.Embedded;
+            int major = 2;
+            int minor = 0;
+            #else
+            // Create an OpenGL compatibility context
+            var flags = GraphicsContextFlags.Default;
+            int major = 1;
+            int minor = 0;
+            #endif
+
             if (Context == null || Context.IsDisposed)
             {
                 var color = PresentationParameters.BackBufferFormat.GetColorFormat();
@@ -146,16 +158,31 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 mode = new GraphicsMode(color, depth, stencil, samples);
-                Context = new GraphicsContext(mode, wnd);
+                try
+                {
+                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                }
+                catch (Exception e)
+                {
+                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
+                        e.ToString());
+                    major = 1;
+                    minor = 0;
+                    flags = GraphicsContextFlags.Default;
+                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                }
             }
             Context.MakeCurrent(wnd);
             (Context as IGraphicsContextInternal).LoadAll();
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
             // Provide the graphics context for background loading
+            // Note: this context should use the same GraphicsMode,
+            // major, minor version and flags parameters as the main
+            // context. Otherwise, context sharing will very likely fail.
             if (Threading.BackgroundContext == null)
             {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd);
+                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
                 Threading.WindowInfo = wnd;
             }
 #endif
