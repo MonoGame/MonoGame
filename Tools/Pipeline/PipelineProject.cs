@@ -289,6 +289,10 @@ namespace MonoGame.Tools.Pipeline
         public void CloseProject()
         {
             _content.Clear();
+            FilePath = null;
+            OutputDir = null;
+            IntermediateDir = null;
+            Config = null;
         }
 
 #region IPipelineItem

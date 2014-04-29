@@ -203,9 +203,15 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateTree()
         {
-            _view.SetTreeRoot(_project);
-            foreach (var item in _project.ContentItems)
-                _view.AddTreeItem(item);
+            if (string.IsNullOrEmpty(_project.FilePath))
+                _view.SetTreeRoot(null);
+            else
+            {
+                _view.SetTreeRoot(_project);
+
+                foreach (var item in _project.ContentItems)
+                    _view.AddTreeItem(item);
+            }
         }
 
         public bool Exit()

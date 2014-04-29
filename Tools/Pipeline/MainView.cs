@@ -169,10 +169,16 @@ namespace MonoGame.Tools.Pipeline
         public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();
-            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);            
-            root.Tag = item;
-            root.SelectedImageIndex = ProjectIcon;
-            root.ImageIndex = ProjectIcon;
+
+            if (item != null)
+            {
+                var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+                root.Tag = item;
+                root.SelectedImageIndex = ProjectIcon;
+                root.ImageIndex = ProjectIcon;
+            }
+
+            _propertyGrid.SelectedObject = item;
         }
 
         public void AddTreeItem(IProjectItem item)
@@ -283,6 +289,11 @@ namespace MonoGame.Tools.Pipeline
         {
             if (_controller.Exit())
                 Application.Exit();
+        }
+
+        private void CloseMenuItem_Click(object sender, EventArgs e)
+        {
+            _controller.CloseProject();
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)
