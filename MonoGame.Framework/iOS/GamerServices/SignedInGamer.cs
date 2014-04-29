@@ -93,17 +93,18 @@ namespace Microsoft.Xna.Framework.GamerServices
                     {
                         lp = GKLocalPlayer.LocalPlayer;
                         
-    			        if (lp != null)
-    					{
-    						lp.Authenticate( delegate(NSError error) 
-    						                	{  	
+                        if (lp != null)
+                        {
+                            lp.AuthenticateHandler = delegate(UIViewController controller, NSError error)
+                            {
 #if DEBUG
-    												if ( error != null )								
-    													Console.WriteLine(error);
+                                if (error != null)
+                                    Console.WriteLine(error);
 #endif
-    											}
-    						                );
-    					}
+                                if (controller != null)
+                                    ((UIViewController)Game.Instance.Services.GetService(typeof(UIViewController))).PresentViewController(controller, true, null);
+                            };
+                        }
                     } );
 				}
 			}
@@ -302,13 +303,12 @@ namespace Microsoft.Xna.Framework.GamerServices
             {
                 GKAchievement a = new GKAchievement(achievementId);
                 a.PercentComplete = percentageComplete;
-                a.ReportAchievement(delegate(NSError error)
+                GKAchievement.ReportAchievements(new[] { a }, delegate(NSError error)
                 {
                     if (error != null)
                     {
                         // Retain the achievement object and try again later (not shown).
                     }
-
                 });
             });
 		}
@@ -329,13 +329,13 @@ namespace Microsoft.Xna.Framework.GamerServices
                 {
                     GKScore score = new GKScore(aCategory);
                     score.Value = aScore;
-                    score.ReportScore(delegate(NSError error)
+                    GKScore.ReportScores(new [] { score }, delegate(NSError error)
+                    {
+                        if (error != null)
                         {
-                            if (error != null)
-                            {
-                                // Oh oh something went wrong.
-                            }
-                        });
+                            // Oh oh something went wrong.
+                        }
+                    });
                 });
 			}
 		}
