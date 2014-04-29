@@ -35,7 +35,7 @@ CloseSquareBracket -> @"\]";
 LessThan -> @"<";
 GreaterThan -> @">";
 [IgnoreCase] Compile -> @"compile";
-[IgnoreCase] ShaderModel -> @"(vs_|ps_)(2_0|3_0|4_0|5_0)((_level_)(9_1|9_2|9_3))?";
+ShaderModel -> @"[A-Za-z_][A-Za-z0-9_]*";
 Code -> @"[\S]+";
 EndOfFile -> @"^$";
 
