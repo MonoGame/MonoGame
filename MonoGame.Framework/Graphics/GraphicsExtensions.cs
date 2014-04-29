@@ -8,6 +8,9 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #elif GLES
+#if ANGLE
+using OpenTK.Graphics;
+#endif
 using OpenTK.Graphics.ES20;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
@@ -444,7 +447,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
         /// <summary>
         /// Convert a <see cref="SurfaceFormat"/> to an OpenTK.Graphics.ColorFormat.
         /// This is used for setting up the backbuffer format of the OpenGL context.

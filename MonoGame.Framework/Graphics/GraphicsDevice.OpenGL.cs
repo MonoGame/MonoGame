@@ -17,6 +17,10 @@ using OpenTK.Graphics.OpenGL;
 using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 #endif
 
+#if ANGLE
+using OpenTK.Graphics;
+#endif
+
 #if GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;

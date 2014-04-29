@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Anisotropic filtering
 #if OPENGL
             int anisotropy = 0;
-#if GLES
+#if GLES && !ANGLE
             if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
             {
                 GL.GetInteger(All.MaxTextureMaxAnisotropyExt, ref anisotropy);

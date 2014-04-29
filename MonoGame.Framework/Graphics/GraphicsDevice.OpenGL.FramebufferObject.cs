@@ -15,7 +15,7 @@ using MonoMac.OpenGL;
 using OpenTK.Graphics.OpenGL;
 #endif
 
-#if IOS || ANDROID
+#if GLES
 using OpenTK.Graphics.ES20;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using FramebufferErrorCode = OpenTK.Graphics.ES20.All;
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public virtual FramebufferErrorCode CheckStatus(FramebufferTarget target)
             {
-                return GL.CheckFramebufferStatus(target);
+                return (FramebufferErrorCode)GL.CheckFramebufferStatus(target);
             }
 
             public virtual void Delete(int id)
