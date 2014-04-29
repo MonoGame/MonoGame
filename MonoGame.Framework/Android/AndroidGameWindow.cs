@@ -9,7 +9,6 @@ using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
 using Microsoft.Xna.Framework.Input.Touch;
-
 using OpenTK;
 
 #if OUYA
@@ -31,17 +30,6 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _currentOrientation;
 
         public override IntPtr Handle { get { return IntPtr.Zero; } }
-        
-		private IInputConnection customInputConnection;
-        private string customInputConnectionLabel; 
-        private InputTypes customInputConnectionType;
-        private ImeFlags customInputConnectionImeOptions;
-
-        public bool TouchEnabled
-        {
-            get { return _touchManager.Enabled; }
-            set { _touchManager.Enabled = value; }
-        }
 
 
         public void SetResumer(IResumeManager resumer)
@@ -61,25 +49,7 @@ namespace Microsoft.Xna.Framework
         public void SetInputConnection(IInputConnection connection,
             InputTypes inputTypes, ImeFlags imeOptions, string label)
         {
-            customInputConnection = connection;
-            customInputConnectionType = inputTypes;
-            customInputConnectionImeOptions = imeOptions;
-            customInputConnectionLabel = label;
-        }
-
-        public override IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
-        {
-            if (customInputConnection == null)
-            {
-                return base.OnCreateInputConnection(outAttrs);
-            }
-            else
-            {
-                outAttrs.ActionLabel = new Java.Lang.String(customInputConnectionLabel);
-                outAttrs.InputType = customInputConnectionType;
-                outAttrs.ImeOptions = customInputConnectionImeOptions;
-                return customInputConnection;
-            }
+            GameView.SetInputConnection(connection, inputTypes, imeOptions, label);
         }
 
         private void Initialize(Context context)

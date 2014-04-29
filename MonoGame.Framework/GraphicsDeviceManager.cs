@@ -357,14 +357,14 @@ namespace Microsoft.Xna.Framework
 #else
 
 #if ANDROID
-            switch (_game.Window.GraphicsMode.Stencil)
+            switch (((AndroidGameWindow)_game.Window).GameView.GraphicsMode.Stencil)
             {
                 case 8:
                     presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
                     break;
 
                 default:
-                    switch (_game.Window.GraphicsMode.Depth)
+                    switch (((AndroidGameWindow)_game.Window).GameView.GraphicsMode.Depth)
                     {
                         case 24:
                             presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
