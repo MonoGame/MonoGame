@@ -85,21 +85,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (this.TwoSidedStencilMode)
                 {
 #if GLES
-                    var cullFaceModeFront = (All)CullFaceMode.Front;
-                    var cullFaceModeBack = (All)CullFaceMode.Back;
                     var stencilFaceFront = (All)CullFaceMode.Front;
                     var stencilFaceBack = (All)CullFaceMode.Back;
 #else
-                    var cullFaceModeFront = (Version20)CullFaceMode.Front;
-                    var cullFaceModeBack = (Version20)CullFaceMode.Back;
                     var stencilFaceFront = StencilFace.Front;
                     var stencilFaceBack = StencilFace.Back;
 #endif
 
-                    GL.StencilFuncSeparate(cullFaceModeFront, GetStencilFunc(this.StencilFunction), 
+                    GL.StencilFuncSeparate(stencilFaceFront, GetStencilFunc(this.StencilFunction), 
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
-                    GL.StencilFuncSeparate(cullFaceModeBack, GetStencilFunc(this.CounterClockwiseStencilFunction), 
+                    GL.StencilFuncSeparate(stencilFaceBack, GetStencilFunc(this.CounterClockwiseStencilFunction), 
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
                     GL.StencilOpSeparate(stencilFaceFront, GetStencilOp(this.StencilFail), 
