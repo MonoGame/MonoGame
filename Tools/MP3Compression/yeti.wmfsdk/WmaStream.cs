@@ -591,7 +591,7 @@ namespace Yeti.WMFSdk
     #endregion
 
     #region IDisposable Members
-    private void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
       if (disposing)
       {
@@ -599,7 +599,7 @@ namespace Yeti.WMFSdk
       }
     }
 
-    public void Dispose()
+    public new void Dispose()
     {
       Dispose(true);
       GC.SuppressFinalize(this);
