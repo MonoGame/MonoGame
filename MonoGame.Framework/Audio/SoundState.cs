@@ -42,10 +42,14 @@ using System;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>Current state (playing, paused, or stopped) of a SoundEffectInstance.</summary>
     public enum SoundState
     {
+        /// <summary>The SoundEffectInstance is playing.</summary>
         Playing,
+        /// <summary>The SoundEffectInstance is paused.</summary>
         Paused,
+        /// <summary>The SoundEffectInstance is stopped.</summary>
         Stopped
     }
 }

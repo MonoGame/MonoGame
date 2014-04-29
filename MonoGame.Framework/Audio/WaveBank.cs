@@ -32,6 +32,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>Represents a wave bank, which is a collection of wave files.</summary>
     public class WaveBank : IDisposable
     {
         internal SoundEffectInstance[] sounds;
@@ -79,7 +80,11 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MiniFormatTag_XMA = 0x1;
         private const int MiniFormatTag_ADPCM = 0x2;
         private const int MiniForamtTag_WMA = 0x3;
-        
+
+        /// <summary>Initializes a new, in-memory instance of this class using a specified AudioEngine and path to a wave bank file.</summary>
+        /// <param name="audioEngine">Instance of an AudioEngine to associate this wave bank with.</param>
+        /// <param name="nonStreamingWaveBankFilename">Path to the wave bank file to load.</param>
+        /// <remarks>This constructor generates an in-memory version of a wave bank. The entire wave bank contents are held in memory.</remarks>
         public WaveBank(AudioEngine audioEngine, string nonStreamingWaveBankFilename)
         {
             //XWB PARSING
@@ -436,6 +441,18 @@ namespace Microsoft.Xna.Framework.Audio
 			audioEngine.Wavebanks[BankName] = this;
         }
 		
+        /// <summary>
+        /// Initializes a new, streaming instance of this class, using a provided AudioEngine and streaming wave bank parameters.
+        /// </summary>
+        /// <param name="audioEngine">Instance of an AudioEngine to associate this wave bank with.</param>
+        /// <param name="streamingWaveBankFilename">Path to the wave bank file to stream from.</param>
+        /// <param name="offset">Offset within the wave bank data file. This offset must be DVD sector aligned.</param>
+        /// <param name="packetsize">Stream packet size, in sectors, to use for each stream. The minimum value is 2.</param>
+        /// <remarks>
+        /// <para>This constructor constructs a streaming wave bank whose contents are streamed from storage as needed.</para>
+        /// <para>When setting packetsize, note that the size of a DVD sector is 2,048 bytes. Therefore, setting this value to 2 would result in a packet size of 4,096 bytes. Setting it to 3 would specify packets of 6,144 bytes, setting it to 4 would specify packets of 8,192 bytes, and so on. The optimal DVD size is a multiple of 16 (1 DVD block = 16 DVD sectors).</para>
+        /// <para>After creating a streaming wave bank, you must call Update at least once from the AudioEngine that was used to create the streaming wave bank before attempting to play a wave from the wave bank. This properly prepares the wave bank for use. Attempts to play waves out of any wave bank before the wave bank is prepared will result in an error.</para>
+        /// </remarks>
 		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
 			: this(audioEngine, streamingWaveBankFilename)
 		{

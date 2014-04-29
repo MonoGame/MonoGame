@@ -1,51 +1,20 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-// 
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>
+    /// Represents a 3D audio emitter. This object, used in combination with an AudioListener,
+    /// can simulate 3D audio effects for a given Cue or SoundEffectInstance.
+    /// </summary>
 	public class AudioEmitter
 	{
+        /// <summary>Initializes a new instance of this class.</summary>
 		public AudioEmitter ()
 		{
             _dopplerScale = 1.0f;
@@ -56,7 +25,13 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         private float _dopplerScale;
-		
+
+        /// <summary>Gets or sets a scalar applied to the level of Doppler effect calculated between this and any AudioListener.</summary>
+        /// <remarks>
+        /// <para>By default, this value is 1.0.</para>
+        /// <para>This value determines how much to modify the calculated Doppler effect between this object and a AudioListener. Values below 1.0 scale down the Doppler effect to make it less apparent. Values above 1.0 exaggerate the Doppler effect. A value of 1.0 leaves the effect unmodified.</para>
+        /// <para>Note that this value modifies only the calculated Doppler between this object and a AudioListener. The calculated Doppler is a product of the relationship between AudioEmitter.Velocity and AudioListener.Velocity. If the calculation yields a result of no Doppler effect, this value has no effect.</para>
+        /// </remarks>
 		public float DopplerScale 
         {
             get
@@ -73,21 +48,40 @@ namespace Microsoft.Xna.Framework.Audio
             }
 		}
 
+        /// <summary>Gets or sets the forward orientation vector for this emitter.</summary>
+        /// <remarks><para>By default, this value is Vector3.Forward. In most cases, it is not necessary to modify this value.</para>
+        /// <para>Doppler values between an AudioEmitter and an AudioListener are calculated by the relationship between AudioListener.Velocity and AudioEmitter.Velocity with respect to the axes defined by the Forward and Up vectors of each.</para>
+        /// <para>The values of the Forward and Up vectors must be orthonormal (at right angles to one another). Behavior is undefined if these vectors are not orthonormal.</para></remarks>
 		public Vector3 Forward {
 			get;
 			set;
 		}
 
-		public Vector3 Position {
+        /// <summary>Gets or sets the position of this emitter.</summary>
+        /// <remarks>
+        /// <para>By default, the value of this property is Vector3.Zero.</para>
+        /// <para>The relative positions of an AudioEmitter and an AudioListener are used to determine speaker positioning of a sound.</para>
+        /// </remarks>
+        public Vector3 Position {
 			get;
 			set;
 		}
 
+        /// <summary>Gets or sets the upward orientation vector for this emitter.</summary>
+        /// <remarks>
+        /// <para>By default, this value is Vector3.Up. In most cases, it is not necessary to modify this value.</para>
+        /// <para>Doppler values between an AudioEmitter and an AudioListener are calculated by the relationship between AudioListener.Velocity and AudioEmitter.Velocity with respect to the axes defined by the Forward and Up vectors of each.</para>
+        /// <para>The values of the Forward and Up vectors must be orthonormal (at right angles to one another). Behavior is undefined if these vectors are not orthonormal.</para>
+        /// </remarks>
 		public Vector3 Up {
 			get;
 			set;
 		}
 
+        /// <summary>Gets or sets the velocity vector of this emitter.</summary>
+        /// <remarks><para>By default, the value of this property is Vector3.Zero.</para>
+        /// <para>The Doppler effect value applied to a Cue is based on the relative Velocity values of the AudioEmitter and AudioListener, scaled by the DopplerScale value.</para>
+        /// <para>The Velocity property is used only to calculate Doppler values. It is not applied to the Position vector or otherwise used to set game state. You must set Velocity and Position each frame to maintain accurate 3D audio values in your game.</para></remarks>
 		public Vector3 Velocity {
 			get;
 			set;

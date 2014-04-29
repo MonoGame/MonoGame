@@ -1,48 +1,19 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>Defines methods for managing the playback of sounds.</summary>
+    /// <remarks>
+    /// <para>Cues are what programmers use to play sounds. Cues are typically played when certain game events occur, such as footsteps or gunshots. A cue is composed of one or more sounds, so when the cue is triggered, the set of associated sounds is heard.</para>
+    /// <para>A sound specifies how one or more waves should be played. A sound also has specific properties such as volume and pitch. The sound designer can adjust these properties.</para>
+    /// <para>The advantage to using the Audio API to reference cues rather than specific sounds is that an audio designer can reassign sounds to a cue in the sound bank without programmer intervention. For example, a sound designer can try various gunshot waves associated with a particular game event without requiring the programmer to change code or rename sounds.</para>
+    /// <para>Cues and sounds are referenced through SoundBank objects. The waves that compose a sound are referenced through WaveBank objects.</para>
+    /// </remarks>
 	public class Cue : IDisposable
 	{
 		AudioEngine engine;
@@ -53,7 +24,9 @@ namespace Microsoft.Xna.Framework.Audio
 		Random variationRand;
 		
 		float volume = 1.0f;
-		
+
+        /// <summary>Returns whether the cue is currently paused.</summary>
+        /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
 		public bool IsPaused
 		{
 			get {
@@ -62,7 +35,9 @@ namespace Microsoft.Xna.Framework.Audio
 				return true;
 			}
 		}
-		
+
+        /// <summary>Returns whether the cue is playing.</summary>
+        /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
 		public bool IsPlaying
 		{
 			get {
@@ -72,7 +47,8 @@ namespace Microsoft.Xna.Framework.Audio
 				return false;
 			}
 		}
-		
+
+        /// <summary>Returns whether the cue is currently stopped.</summary>
 		public bool IsStopped
 		{
 			get {
@@ -82,7 +58,9 @@ namespace Microsoft.Xna.Framework.Audio
 				return true;
 			}
 		}
-		
+
+        /// <summary>Returns the friendly name of the cue.</summary>
+        /// <remarks>The friendly name is a text string that the designer can associate with the cue when it is built.</remarks>
 		public string Name
 		{
 			get { return name; }
@@ -109,14 +87,17 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			variationRand = new Random();
 		}
-		
+
+        /// <summary>Pauses playback.</summary>
 		public void Pause()
 		{
 			if (curSound != null) {
 				curSound.Pause();
 			}
 		}
-		
+
+        /// <summary>Requests playback of a prepared or preparing Cue.</summary>
+        /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
 		public void Play()
 		{
 			//TODO: Probabilities
@@ -125,14 +106,17 @@ namespace Microsoft.Xna.Framework.Audio
 			curSound.Volume = volume;
 			curSound.Play ();
 		}
-		
+
+        /// <summary>Resumes playback of a paused Cue.</summary>
 		public void Resume()
 		{
 			if (curSound != null) {
 				curSound.Resume ();
 			}
 		}
-		
+
+        /// <summary>Stops playback of a Cue.</summary>
+        /// <param name="options">Enumerated value specifying how the sound should stop. If set to None, the sound will play any release phase or transition specified in the audio designer. If set to Immediate, the sound will stop immediately, ignoring any release phases or transitions.</param>
 		public void Stop(AudioStopOptions options)
 		{
 			if (curSound != null) {
@@ -140,6 +124,12 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 		
+        /// <summary>
+        /// Sets the value of a cue-instance variable based on its friendly name.
+        /// </summary>
+        /// <param name="name">Friendly name of the variable to set.</param>
+        /// <param name="value">Value to assign to the variable.</param>
+        /// <remarks>The friendly name is a text string that the designer can associate with the cue when it is built.</remarks>
 		public void SetVariable (string name, float value)
 		{
 			if (name == "Volume") {
@@ -151,7 +141,14 @@ namespace Microsoft.Xna.Framework.Audio
 				engine.SetGlobalVariable (name, value);
 			}
 		}
-		
+
+        /// <summary>Gets a cue-instance variable value based on its friendly name.</summary>
+        /// <param name="name">Friendly name of the variable.</param>
+        /// <returns>Value of the variable.</returns>
+        /// <remarks>
+        /// <para>Cue-instance variables are useful when multiple instantiations of a single cue (and its associated sounds) are required (for example, a "car" cue where there may be more than one car at any given time). While a global variable allows multiple audio elements to be controlled in unison, a cue instance variable grants discrete control of each instance of a cue, even for each copy of the same cue.</para>
+        /// <para>The friendly name is a text string that the designer can associate with the cue when it is built.</para>
+        /// </remarks>
 		public float GetVariable (string name, float value)
 		{
 			if (name == "Volume") {
@@ -160,16 +157,26 @@ namespace Microsoft.Xna.Framework.Audio
 				return engine.GetGlobalVariable (name);
 			}
 		}
-		
+
+        /// <summary>Calculates the 3D audio values between an AudioEmitter and an AudioListener object, and applies the resulting values to this Cue.</summary>
+        /// <param name="listener">The listener to calculate.</param>
+        /// <param name="emitter">The emitter to calculate.</param>
+        /// <remarks>
+        /// <para>If you want to apply 3D effects to a Cue, you must call this method before you call the Play method. Not doing so will throw an exception the next time Apply3D is called.</para>
+        /// <para>Calling this method automatically sets the speaker mix for any sound played by this cue to a value calculated by the difference in Position values between listener and emitter. In preparation for the mix, the sound is converted to monoaural. Any stereo information in the sound is discarded.</para>
+        /// <para>Calling this method sets the cue-instance variables Distance, DopplerPitchScalar, and OrientationAngle to the resulting values of the 3D calculation between listener and emitter. These values do not modify sound attenuation over distance, or pitch shifting using Doppler values, on their own. You must set up a Runtime Parameter Curve (RPC) that defines how to map the cue-instance variable values to pitch and volume shifts, and associate sounds to these curves in the Microsoft Cross-Platform Audio Creation Tool (XACT). For information on doing so, see Applying 3D Audio Effects (XACT).</para>
+        /// </remarks>
 		public void Apply3D(AudioListener listener, AudioEmitter emitter) {
 			
 		}
-		
+
+        /// <summary>Gets a value indicating whether the object has been disposed.</summary>
 		public bool IsDisposed { get { return false; } }
 		
 		
 		
 		#region IDisposable implementation
+        /// <summary>Immediately releases the unmanaged resources used by this object.</summary>
 		public void Dispose ()
 		{
 			//_sound.Dispose();
