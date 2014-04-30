@@ -715,7 +715,7 @@ namespace Microsoft.Xna.Framework
 		private void UpdateMousePosition (PointF location)
 		{
 			MouseState.X = (int)location.X;
-			MouseState.Y = (int)(ClientBounds.Height - location.Y);			
+			MouseState.Y = (int)(Bounds.Height - location.Y);			
 		}
 
 		internal void SetSupportedOrientations(DisplayOrientation orientations)
