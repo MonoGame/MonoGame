@@ -161,7 +161,7 @@ namespace MonoGame.Tools.Pipeline
             process.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
             process.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
 
-            string stdError = null;
+            //string stdError = null;
             try
             {
                 process.Start();
@@ -169,7 +169,7 @@ namespace MonoGame.Tools.Pipeline
                 process.BeginErrorReadLine();
                 process.WaitForExit();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // TODO: What if we fail here?
             }

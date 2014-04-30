@@ -5,15 +5,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
-using System.Globalization;
-using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 using System.Diagnostics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -143,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
 
-        private List<Type> _writers;
+        //private List<Type> _writers;
 
         public string ProjectDirectory { get; private set; }
         public string OutputDirectory { get; private set; }
