@@ -105,10 +105,6 @@
       <Project>{7DE47032-A904-4C29-BD22-2D235E8D91BA}</Project>
       <Name>MonoGame.Framework.Windows</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MGCB\MGCB.csproj">
-      <Project>{dcc0b1ad-8dc5-41c1-b6ec-404534cdeb32}</Project>
-      <Name>MGCB</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icons\blueprint.png" />
