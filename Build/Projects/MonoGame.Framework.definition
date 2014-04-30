@@ -1084,9 +1084,6 @@
     <Compile Include="iOS\Devices\Sensors\Compass.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Extender.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\GamerServices\Guide.cs">
       <Platforms>iOS</Platforms>
     </Compile>
