@@ -4,115 +4,104 @@
         <name>protobuf-net</name>
     </assembly>
     <members>
-        <member name="T:ProtoBuf.Serializer">
+        <member name="T:ProtoBuf.BclHelpers">
             <summary>
-            Provides protocol-buffer serialization capability for concrete, attributed types. This
-            is a *default* model, but custom serializer models are also supported.
-            </summary>
-            <remarks>
-            Protocol-buffer serialization is a compact binary format, designed to take
-            advantage of sparse data and knowledge of specific data types; it is also
-            extensible, allowing a type to be deserialized / merged even if some data is
-            not recognised.
-            </remarks>
-        </member>
-        <member name="F:ProtoBuf.Serializer.ListItemTag">
-            <summary>
-            The field number that is used as a default when serializing/deserializing a list of objects.
-            The data is treated as repeated message with field number 1.
+            Provides support for common .NET types that do not have a direct representation
+            in protobuf, using the definitions from bcl.proto
             </summary>
         </member>
-        <member name="M:ProtoBuf.Serializer.FlushPool">
+        <member name="M:ProtoBuf.BclHelpers.GetUninitializedObject(System.Type)">
             <summary>
-            Releases any internal buffers that have been reserved for efficiency; this does not affect any serialization
-            operations; simply: it can be used (optionally) to release the buffers for garbage collection (at the expense
-            of having to re-allocate a new buffer for the next operation, rather than re-use prior buffers).
+            Creates a new instance of the specified type, bypassing the constructor.
+            </summary>
+            <param name="type">The type to create</param>
+            <returns>The new instance</returns>
+            <exception cref="T:System.NotSupportedException">If the platform does not support constructor-skipping</exception>
+        </member>
+        <member name="M:ProtoBuf.BclHelpers.WriteTimeSpan(System.TimeSpan,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a TimeSpan to a protobuf stream
             </summary>
         </member>
-        <member name="T:ProtoBuf.Serializer.TypeResolver">
+        <member name="M:ProtoBuf.BclHelpers.ReadTimeSpan(ProtoBuf.ProtoReader)">
             <summary>
-            Maps a field-number to a type
+            Parses a TimeSpan from a protobuf stream
+            </summary>        
+        </member>
+        <member name="M:ProtoBuf.BclHelpers.ReadDateTime(ProtoBuf.ProtoReader)">
+            <summary>
+            Parses a DateTime from a protobuf stream
             </summary>
         </member>
-        <member name="T:ProtoBuf.ProtoContractAttribute">
+        <member name="M:ProtoBuf.BclHelpers.WriteDateTime(System.DateTime,ProtoBuf.ProtoWriter)">
             <summary>
-            Indicates that a type is defined for protocol-buffer serialization.
+            Writes a DateTime to a protobuf stream
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.Name">
+        <member name="M:ProtoBuf.BclHelpers.ReadDecimal(ProtoBuf.ProtoReader)">
             <summary>
-            Gets or sets the defined name of the type.
+            Parses a decimal from a protobuf stream
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.ImplicitFirstTag">
+        <member name="M:ProtoBuf.BclHelpers.WriteDecimal(System.Decimal,ProtoBuf.ProtoWriter)">
             <summary>
-            Gets or sets the fist offset to use with implicit field tags;
-            only uesd if ImplicitFields is set.
+            Writes a decimal to a protobuf stream
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.UseProtoMembersOnly">
+        <member name="M:ProtoBuf.BclHelpers.WriteGuid(System.Guid,ProtoBuf.ProtoWriter)">
             <summary>
-            If specified, alternative contract markers (such as markers for XmlSerailizer or DataContractSerializer) are ignored.
+            Writes a Guid to a protobuf stream
+            </summary>        
+        </member>
+        <member name="M:ProtoBuf.BclHelpers.ReadGuid(ProtoBuf.ProtoReader)">
+            <summary>
+            Parses a Guid from a protobuf stream
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.IgnoreListHandling">
+        <member name="M:ProtoBuf.BclHelpers.ReadNetObject(System.Object,ProtoBuf.ProtoReader,System.Int32,System.Type,ProtoBuf.BclHelpers.NetObjectOptions)">
             <summary>
-            If specified, do NOT treat this type as a list, even if it looks like one.
+            Reads an *implementation specific* bundled .NET object, including (as options) type-metadata, identity/re-use, etc.
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.ImplicitFields">
+        <member name="M:ProtoBuf.BclHelpers.WriteNetObject(System.Object,ProtoBuf.ProtoWriter,System.Int32,ProtoBuf.BclHelpers.NetObjectOptions)">
             <summary>
-            Gets or sets the mechanism used to automatically infer field tags
-            for members. This option should be used in advanced scenarios only.
-            Please review the important notes against the ImplicitFields enumeration.
+            Writes an *implementation specific* bundled .NET object, including (as options) type-metadata, identity/re-use, etc.
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.InferTagFromName">
+        <member name="T:ProtoBuf.BclHelpers.NetObjectOptions">
             <summary>
-            Enables/disables automatic tag generation based on the existing name / order
-            of the defined members. This option is not used for members marked
-            with ProtoMemberAttribute, as intended to provide compatibility with
-            WCF serialization. WARNING: when adding new fields you must take
-            care to increase the Order for new elements, otherwise data corruption
-            may occur.
-            </summary>
-            <remarks>If not explicitly specified, the default is assumed from Serializer.GlobalOptions.InferTagFromName.</remarks>
-        </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.InferTagFromNameHasValue">
-            <summary>
-            Has a InferTagFromName value been explicitly set? if not, the default from the type-model is assumed.
+            Optional behaviours that introduce .NET-specific functionality
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.DataMemberOffset">
+        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.None">
             <summary>
-            Specifies an offset to apply to [DataMember(Order=...)] markers;
-            this is useful when working with mex-generated classes that have
-            a different origin (usually 1 vs 0) than the original data-contract.
-            
-            This value is added to the Order of each member.
+            No special behaviour
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.SkipConstructor">
+        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.AsReference">
             <summary>
-            If true, the constructor for the type is bypassed during deserialization, meaning any field initializers
+            Enables full object-tracking/full-graph support.
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.DynamicType">
+            <summary>
+            Embeds the type information into the stream, allowing usage with types not known in advance.
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.UseConstructor">
+            <summary>
+            If false, the constructor for the type is bypassed during deserialization, meaning any field initializers
             or other initialization code is skipped.
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.AsReferenceDefault">
+        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.LateSet">
             <summary>
-            Should this type be treated as a reference by default? Please also see the implications of this,
-            as recorded on ProtoMemberAttribute.AsReference
+            Should the object index be reserved, rather than creating an object promptly
             </summary>
         </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.EnumPassthru">
+        <member name="T:ProtoBuf.BufferExtension">
             <summary>
-            Applies only to enums (not to DTO classes themselves); gets or sets a value indicating that an enum should be treated directly as an int/short/etc, rather
-            than enforcing .proto enum rules. This is useful *in particul* for [Flags] enums.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoContractAttribute.EnumPassthruHasValue">
-            <summary>
-            Has a EnumPassthru value been explicitly set?
+            Provides a simple buffer-based implementation of an <see cref="T:ProtoBuf.IExtension">extension</see> object.
             </summary>
         </member>
         <member name="T:ProtoBuf.IExtension">
@@ -157,20 +146,67 @@
             </summary>
             <returns>The length of the binary stream representing unexpected data.</returns>
         </member>
-        <member name="T:ProtoBuf.ExtensibleUtil">
+        <member name="T:ProtoBuf.ProtoBeforeSerializationAttribute">
+            <summary>Specifies a method on the root-contract in an hierarchy to be invoked before serialization.</summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoAfterSerializationAttribute">
+            <summary>Specifies a method on the root-contract in an hierarchy to be invoked after serialization.</summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoBeforeDeserializationAttribute">
+            <summary>Specifies a method on the root-contract in an hierarchy to be invoked before deserialization.</summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoAfterDeserializationAttribute">
+            <summary>Specifies a method on the root-contract in an hierarchy to be invoked after deserialization.</summary>
+        </member>
+        <member name="T:ProtoBuf.DataFormat">
             <summary>
-            This class acts as an internal wrapper allowing us to do a dynamic
-            methodinfo invoke; an't put into Serializer as don't want on public
-            API; can't put into Serializer&lt;T&gt; since we need to invoke
-            accross classes, which isn't allowed in Silverlight)
+            Sub-format to use when serializing/deserializing data
             </summary>
         </member>
-        <member name="M:ProtoBuf.ExtensibleUtil.GetExtendedValues(ProtoBuf.Meta.TypeModel,System.Type,ProtoBuf.IExtensible,System.Int32,ProtoBuf.DataFormat,System.Boolean,System.Boolean)">
+        <member name="F:ProtoBuf.DataFormat.Default">
             <summary>
-            All this does is call GetExtendedValuesTyped with the correct type for "instance";
-            this ensures that we don't get issues with subclasses declaring conflicting types -
-            the caller must respect the fields defined for the type they pass in.
+            Uses the default encoding for the data-type.
             </summary>
+        </member>
+        <member name="F:ProtoBuf.DataFormat.ZigZag">
+            <summary>
+            When applied to signed integer-based data (including Decimal), this
+            indicates that zigzag variant encoding will be used. This means that values
+            with small magnitude (regardless of sign) take a small amount
+            of space to encode.
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.DataFormat.TwosComplement">
+            <summary>
+            When applied to signed integer-based data (including Decimal), this
+            indicates that two's-complement variant encoding will be used.
+            This means that any -ve number will take 10 bytes (even for 32-bit),
+            so should only be used for compatibility.
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.DataFormat.FixedSize">
+            <summary>
+            When applied to signed integer-based data (including Decimal), this
+            indicates that a fixed amount of space will be used.
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.DataFormat.Group">
+            <summary>
+            When applied to a sub-message, indicates that the value should be treated
+            as group-delimited.
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.Extensible">
+            <summary>
+            Simple base class for supporting unexpected fields allowing
+            for loss-less round-tips/merge, even if the data is not understod.
+            The additional fields are (by default) stored in-memory in a buffer.
+            </summary>
+            <remarks>As an example of an alternative implementation, you might
+            choose to use the file system (temporary files) as the back-end, tracking
+            only the paths [such an object would ideally be IDisposable and use
+            a finalizer to ensure that the files are removed].</remarks>
+            <seealso cref="T:ProtoBuf.IExtensible"/>
         </member>
         <member name="T:ProtoBuf.IExtensible">
             <summary>
@@ -190,66 +226,6 @@
             if the extension object does not exist or is not available.</returns>
             <remarks>The <c>createIfMissing</c> argument is false during serialization,
             and true during deserialization upon encountering unexpected fields.</remarks>
-        </member>
-        <member name="T:ProtoBuf.ProtoEnumAttribute">
-            <summary>
-            Used to define protocol-buffer specific behavior for
-            enumerated values.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoEnumAttribute.HasValue">
-            <summary>
-            Indicates whether this instance has a customised value mapping
-            </summary>
-            <returns>true if a specific value is set</returns>
-        </member>
-        <member name="P:ProtoBuf.ProtoEnumAttribute.Value">
-            <summary>
-            Gets or sets the specific value to use for this enum during serialization.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoEnumAttribute.Name">
-            <summary>
-            Gets or sets the defined name of the enum, as used in .proto
-            (this name is not used during serialization).
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.PrefixStyle">
-            <summary>
-            Specifies the type of prefix that should be applied to messages.
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.PrefixStyle.None">
-            <summary>
-            No length prefix is applied to the data; the data is terminated only be the end of the stream.
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.PrefixStyle.Base128">
-            <summary>
-            A base-128 length prefix is applied to the data (efficient for short messages).
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.PrefixStyle.Fixed32">
-            <summary>
-            A fixed-length (little-endian) length prefix is applied to the data (useful for compatibility).
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.PrefixStyle.Fixed32BigEndian">
-            <summary>
-            A fixed-length (big-endian) length prefix is applied to the data (useful for compatibility).
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.Extensible">
-            <summary>
-            Simple base class for supporting unexpected fields allowing
-            for loss-less round-tips/merge, even if the data is not understod.
-            The additional fields are (by default) stored in-memory in a buffer.
-            </summary>
-            <remarks>As an example of an alternative implementation, you might
-            choose to use the file system (temporary files) as the back-end, tracking
-            only the paths [such an object would ideally be IDisposable and use
-            a finalizer to ensure that the files are removed].</remarks>
-            <seealso cref="T:ProtoBuf.IExtensible"/>
         </member>
         <member name="M:ProtoBuf.Extensible.GetExtensionObject(System.Boolean)">
             <summary>
@@ -321,44 +297,19 @@
             <param name="tag">The field identifier; the tag should not be defined as a known data-field for the instance.</param>
             <param name="value">The value to append.</param>
         </member>
-        <member name="T:ProtoBuf.ProtoException">
+        <member name="T:ProtoBuf.ExtensibleUtil">
             <summary>
-            Indicates an error during serialization/deserialization of a proto stream.
+            This class acts as an internal wrapper allowing us to do a dynamic
+            methodinfo invoke; an't put into Serializer as don't want on public
+            API; can't put into Serializer&lt;T&gt; since we need to invoke
+            accross classes, which isn't allowed in Silverlight)
             </summary>
         </member>
-        <member name="M:ProtoBuf.ProtoException.#ctor">
-            <summary>Creates a new ProtoException instance.</summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoException.#ctor(System.String)">
-            <summary>Creates a new ProtoException instance.</summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoException.#ctor(System.String,System.Exception)">
-            <summary>Creates a new ProtoException instance.</summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoIgnoreAttribute">
+        <member name="M:ProtoBuf.ExtensibleUtil.GetExtendedValues(ProtoBuf.Meta.TypeModel,System.Type,ProtoBuf.IExtensible,System.Int32,ProtoBuf.DataFormat,System.Boolean,System.Boolean)">
             <summary>
-            Indicates that a member should be excluded from serialization; this
-            is only normally used when using implict fields.
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoPartialIgnoreAttribute">
-            <summary>
-            Indicates that a member should be excluded from serialization; this
-            is only normally used when using implict fields. This allows
-            ProtoIgnoreAttribute usage
-            even for partial classes where the individual members are not
-            under direct control.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoPartialIgnoreAttribute.#ctor(System.String)">
-            <summary>
-            Creates a new ProtoPartialIgnoreAttribute instance.
-            </summary>
-            <param name="memberName">Specifies the member to be ignored.</param>
-        </member>
-        <member name="P:ProtoBuf.ProtoPartialIgnoreAttribute.MemberName">
-            <summary>
-            The name of the member to be ignored.
+            All this does is call GetExtendedValuesTyped with the correct type for "instance";
+            this ensures that we don't get issues with subclasses declaring conflicting types -
+            the caller must respect the fields defined for the type they pass in.
             </summary>
         </member>
         <member name="T:ProtoBuf.Helpers">
@@ -405,549 +356,25 @@
             this acts as a state/implementation serializer. Ordering beings from ImplicitFirstTag.
             </summary>
         </member>
-        <member name="T:ProtoBuf.SubItemToken">
+        <member name="T:ProtoBuf.Meta.TypeFormatEventArgs">
             <summary>
-            Used to hold particulars relating to nested objects. This is opaque to the caller - simply
-            give back the token you are given at the end of an object.
+            Event arguments needed to perform type-formatting functions; this could be resolving a Type to a string suitable for serialization, or could
+            be requesting a Type from a string. If no changes are made, a default implementation will be used (from the assembly-qualified names).
             </summary>
         </member>
-        <member name="T:ProtoBuf.DataFormat">
+        <member name="P:ProtoBuf.Meta.TypeFormatEventArgs.Type">
             <summary>
-            Sub-format to use when serializing/deserializing data
+            The type involved in this map; if this is initially null, a Type is expected to be provided for the string in FormattedName.
             </summary>
         </member>
-        <member name="F:ProtoBuf.DataFormat.Default">
+        <member name="P:ProtoBuf.Meta.TypeFormatEventArgs.FormattedName">
             <summary>
-            Uses the default encoding for the data-type.
+            The formatted-name involved in this map; if this is initially null, a formatted-name is expected from the type in Type.
             </summary>
         </member>
-        <member name="F:ProtoBuf.DataFormat.ZigZag">
+        <member name="T:ProtoBuf.Meta.TypeFormatEventHandler">
             <summary>
-            When applied to signed integer-based data (including Decimal), this
-            indicates that zigzag variant encoding will be used. This means that values
-            with small magnitude (regardless of sign) take a small amount
-            of space to encode.
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.DataFormat.TwosComplement">
-            <summary>
-            When applied to signed integer-based data (including Decimal), this
-            indicates that two's-complement variant encoding will be used.
-            This means that any -ve number will take 10 bytes (even for 32-bit),
-            so should only be used for compatibility.
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.DataFormat.FixedSize">
-            <summary>
-            When applied to signed integer-based data (including Decimal), this
-            indicates that a fixed amount of space will be used.
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.DataFormat.Group">
-            <summary>
-            When applied to a sub-message, indicates that the value should be treated
-            as group-delimited.
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.BufferExtension">
-            <summary>
-            Provides a simple buffer-based implementation of an <see cref="T:ProtoBuf.IExtension">extension</see> object.
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoBeforeSerializationAttribute">
-            <summary>Specifies a method on the root-contract in an hierarchy to be invoked before serialization.</summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoAfterSerializationAttribute">
-            <summary>Specifies a method on the root-contract in an hierarchy to be invoked after serialization.</summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoBeforeDeserializationAttribute">
-            <summary>Specifies a method on the root-contract in an hierarchy to be invoked before deserialization.</summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoAfterDeserializationAttribute">
-            <summary>Specifies a method on the root-contract in an hierarchy to be invoked after deserialization.</summary>
-        </member>
-        <member name="T:ProtoBuf.WireType">
-            <summary>
-            Indicates the encoding used to represent an individual value in a protobuf stream
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.None">
-            <summary>
-            Represents an error condition
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.Variant">
-            <summary>
-            Base-128 variant-length encoding
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.Fixed64">
-            <summary>
-            Fixed-length 8-byte encoding
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.String">
-            <summary>
-            Length-variant-prefixed encoding
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.StartGroup">
-            <summary>
-            Indicates the start of a group
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.EndGroup">
-            <summary>
-            Indicates the end of a group
-            </summary>
-        </member>
-        <member name="F:ProtoBuf.WireType.Fixed32">
-            <summary>
-            Fixed-length 4-byte encoding
-            </summary>10
-        </member>
-        <member name="F:ProtoBuf.WireType.SignedVariant">
-            <summary>
-            This is not a formal wire-type in the "protocol buffers" spec, but
-            denotes a variant integer that should be interpreted using
-            zig-zag semantics (so -ve numbers aren't a significant overhead)
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoWriter">
-            <summary>
-            Represents an output stream for writing protobuf data.
-            
-            Why is the API backwards (static methods with writer arguments)?
-            See: http://marcgravell.blogspot.com/2010/03/last-will-be-first-and-first-will-be.html
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type).
-            </summary>
-            <param name="value">The object to write.</param>
-            <param name="key">The key that uniquely identifies the type within the model.</param>
-            <param name="writer">The destination.</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteRecursionSafeObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type) - but the
-            caller is asserting that this relationship is non-recursive; no recursion check will be
-            performed.
-            </summary>
-            <param name="value">The object to write.</param>
-            <param name="key">The key that uniquely identifies the type within the model.</param>
-            <param name="writer">The destination.</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteFieldHeader(System.Int32,ProtoBuf.WireType,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a field-header, indicating the format of the next data we plan to write.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteBytes(System.Byte[],ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a byte-array to the stream; supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteBytes(System.Byte[],System.Int32,System.Int32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a byte-array to the stream; supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.StartSubItem(System.Object,ProtoBuf.ProtoWriter)">
-            <summary>
-            Indicates the start of a nested record.
-            </summary>
-            <param name="instance">The instance to write.</param>
-            <param name="writer">The destination.</param>
-            <returns>A token representing the state of the stream; this token is given to EndSubItem.</returns>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.EndSubItem(ProtoBuf.SubItemToken,ProtoBuf.ProtoWriter)">
-            <summary>
-            Indicates the end of a nested record.
-            </summary>
-            <param name="token">The token obtained from StartubItem.</param>
-            <param name="writer">The destination.</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext)">
-            <summary>
-            Creates a new writer against a stream
-            </summary>
-            <param name="dest">The destination stream</param>
-            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to serialize sub-objects</param>
-            <param name="context">Additional context about this serialization operation</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.Close">
-            <summary>
-            Flushes data to the underlying stream, and releases any resources. The underlying stream is *not* disposed
-            by this operation.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.Flush(ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes any buffered data (if possible) to the underlying stream.
-            </summary>
-            <param name="writer">The writer to flush</param>
-            <remarks>It is not always possible to fully flush, since some sequences
-            may require values to be back-filled into the byte-stream.</remarks>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteUInt32Variant(System.UInt32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes an unsigned 32-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteString(System.String,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a string to the stream; supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteUInt64(System.UInt64,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes an unsigned 64-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteInt64(System.Int64,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a signed 64-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteUInt32(System.UInt32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes an unsigned 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteInt16(System.Int16,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a signed 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteUInt16(System.UInt16,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes an unsigned 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteByte(System.Byte,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes an unsigned 8-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteSByte(System.SByte,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a signed 8-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteInt32(System.Int32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a signed 32-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteDouble(System.Double,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a double-precision number to the stream; supported wire-types: Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteSingle(System.Single,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a single-precision number to the stream; supported wire-types: Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.ThrowEnumException(ProtoBuf.ProtoWriter,System.Object)">
-            <summary>
-            Throws an exception indicating that the given enum cannot be mapped to a serialized value.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteBoolean(System.Boolean,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a boolean to the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.AppendExtensionData(ProtoBuf.IExtensible,ProtoBuf.ProtoWriter)">
-            <summary>
-            Copies any extension data stored for the instance to the underlying stream
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.SetPackedField(System.Int32,ProtoBuf.ProtoWriter)">
-            <summary>
-            Used for packed encoding; indicates that the next field should be skipped rather than
-            a field header written. Note that the field number must match, else an exception is thrown
-            when the attempt is made to write the (incorrect) field. The wire-type is taken from the
-            subsequent call to WriteFieldHeader. Only primitive types can be packed.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.SetRootObject(System.Object)">
-            <summary>
-            Specifies a known root object to use during reference-tracked serialization
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoWriter.WriteType(System.Type,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a Type to the stream, using the model's DynamicTypeFormatting if appropriate; supported wire-types: String
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoWriter.Context">
-            <summary>
-            Addition information about this serialization operation.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoWriter.Model">
-            <summary>
-            Get the TypeModel associated with this writer
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.ProtoReader">
-            <summary>
-            A stateful reader, used to read a protobuf stream. Typical usage would be (sequentially) to call
-            ReadFieldHeader and (after matching the field) an appropriate Read* method.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext)">
-            <summary>
-            Creates a new reader against a stream
-            </summary>
-            <param name="source">The source stream</param>
-            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to deserialize sub-objects</param>
-            <param name="context">Additional context about this serialization operation</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext,System.Int32)">
-            <summary>
-            Creates a new reader against a stream
-            </summary>
-            <param name="source">The source stream</param>
-            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to deserialize sub-objects</param>
-            <param name="context">Additional context about this serialization operation</param>
-            <param name="length">The number of bytes to read, or -1 to read until the end of the stream</param>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.Dispose">
-            <summary>
-            Releases resources used by the reader, but importantly <b>does not</b> Dispose the 
-            underlying stream; in many typical use-cases the stream is used for different
-            processes, so it is assumed that the consumer will Dispose their stream separately.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadUInt32">
-            <summary>
-            Reads an unsigned 32-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadInt16">
-            <summary>
-            Reads a signed 16-bit integer from the stream: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadUInt16">
-            <summary>
-            Reads an unsigned 16-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadByte">
-            <summary>
-            Reads an unsigned 8-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadSByte">
-            <summary>
-            Reads a signed 8-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadInt32">
-            <summary>
-            Reads a signed 32-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadInt64">
-            <summary>
-            Reads a signed 64-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadString">
-            <summary>
-            Reads a string from the stream (using UTF8); supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ThrowEnumException(System.Type,System.Int32)">
-            <summary>
-            Throws an exception indication that the given value cannot be mapped to an enum.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadDouble">
-            <summary>
-            Reads a double-precision number from the stream; supported wire-types: Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadObject(System.Object,System.Int32,ProtoBuf.ProtoReader)">
-            <summary>
-            Reads (merges) a sub-message from the stream, internally calling StartSubItem and EndSubItem, and (in between)
-            parsing the message in accordance with the model associated with the reader
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.EndSubItem(ProtoBuf.SubItemToken,ProtoBuf.ProtoReader)">
-            <summary>
-            Makes the end of consuming a nested message in the stream; the stream must be either at the correct EndGroup
-            marker, or all fields of the sub-message must have been consumed (in either case, this means ReadFieldHeader
-            should return zero)
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.StartSubItem(ProtoBuf.ProtoReader)">
-            <summary>
-            Begins consuming a nested message in the stream; supported wire-types: StartGroup, String
-            </summary>
-            <remarks>The token returned must be help and used when callining EndSubItem</remarks>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadFieldHeader">
-            <summary>
-            Reads a field header from the stream, setting the wire-type and retuning the field number. If no
-            more fields are available, then 0 is returned. This methods respects sub-messages.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.TryReadFieldHeader(System.Int32)">
-            <summary>
-            Looks ahead to see whether the next field in the stream is what we expect
-            (typically; what we've just finished reading - for example ot read successive list items)
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.Hint(ProtoBuf.WireType)">
-            <summary>
-            Compares the streams current wire-type to the hinted wire-type, updating the reader if necessary; for example,
-            a Variant may be updated to SignedVariant. If the hinted wire-type is unrelated then no change is made.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.Assert(ProtoBuf.WireType)">
-            <summary>
-            Verifies that the stream's current wire-type is as expected, or a specialized sub-type (for example,
-            SignedVariant) - in which case the current wire-type is updated. Otherwise an exception is thrown.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.SkipField">
-            <summary>
-            Discards the data for the current field.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadUInt64">
-            <summary>
-            Reads an unsigned 64-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadSingle">
-            <summary>
-            Reads a single-precision number from the stream; supported wire-types: Fixed32, Fixed64
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadBoolean">
-            <summary>
-            Reads a boolean value from the stream; supported wire-types: Variant, Fixed32, Fixed64
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.AppendBytes(System.Byte[],ProtoBuf.ProtoReader)">
-            <summary>
-            Reads a byte-sequence from the stream, appending them to an existing byte-sequence (which can be null); supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadLengthPrefix(System.IO.Stream,System.Boolean,ProtoBuf.PrefixStyle,System.Int32@)">
-            <summary>
-            Reads the length-prefix of a message from a stream without buffering additional data, allowing a fixed-length
-            reader to be created.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadLittleEndianInt32(System.IO.Stream)">
-            <summary>
-            Reads a little-endian encoded integer. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadBigEndianInt32(System.IO.Stream)">
-            <summary>
-            Reads a big-endian encoded integer. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadVarintInt32(System.IO.Stream)">
-            <summary>
-            Reads a varint encoded integer. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Byte[],System.Int32,System.Int32)">
-            <summary>
-            Reads a string (of a given lenth, in bytes) directly from the source into a pre-existing buffer. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Int32)">
-            <summary>
-            Reads a given number of bytes directly from the source. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.DirectReadString(System.IO.Stream,System.Int32)">
-            <summary>
-            Reads a string (of a given lenth, in bytes) directly from the source. An exception is thrown if the data is not all available.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadLengthPrefix(System.IO.Stream,System.Boolean,ProtoBuf.PrefixStyle,System.Int32@,System.Int32@)">
-            <summary>
-            Reads the length-prefix of a message from a stream without buffering additional data, allowing a fixed-length
-            reader to be created.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.TryReadUInt32Variant(System.IO.Stream,System.UInt32@)">
-            <returns>The number of bytes consumed; 0 if no data available</returns>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.AppendExtensionData(ProtoBuf.IExtensible)">
-            <summary>
-            Copies the current field into the instance as extension data
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.HasSubValue(ProtoBuf.WireType,ProtoBuf.ProtoReader)">
-            <summary>
-            Indicates whether the reader still has data remaining in the current sub-item,
-            additionally setting the wire-type for the next field if there is more data.
-            This is used when decoding packed data.
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.NoteObject(System.Object,ProtoBuf.ProtoReader)">
-            <summary>
-            Utility method, not intended for public use; this helps maintain the root object is complex scenarios
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.ReadType">
-            <summary>
-            Reads a Type from the stream, using the model's DynamicTypeFormatting if appropriate; supported wire-types: String
-            </summary>
-        </member>
-        <member name="M:ProtoBuf.ProtoReader.Merge(ProtoBuf.ProtoReader,System.Object,System.Object)">
-            <summary>
-            Merge two objects using the details from the current reader; this is used to change the type
-            of objects when an inheritance relationship is discovered later than usual during deserilazation.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.FieldNumber">
-            <summary>
-            Gets the number of the field being processed.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.WireType">
-            <summary>
-            Indicates the underlying proto serialization format on the wire.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.InternStrings">
-            <summary>
-            Gets / sets a flag indicating whether strings should be checked for repetition; if
-            true, any repeated UTF-8 byte sequence will result in the same String instance, rather
-            than a second instance of the same string. Enabled by default. Note that this uses
-            a <i>custom</i> interner - the system-wide string interner is not used.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.Context">
-            <summary>
-            Addition information about this deserialization operation.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.Position">
-            <summary>
-            Returns the position of the current reader (note that this is not necessarily the same as the position
-            in the underlying stream, if multiple readers are used on the same stream)
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.ProtoReader.Model">
-            <summary>
-            Get the TypeModel associated with this reader
+            Delegate type used to perform type-formatting functions; the sender originates as the type-model.
             </summary>
         </member>
         <member name="T:ProtoBuf.Meta.TypeModel">
@@ -1338,99 +765,173 @@
             Invoked after an object is deserialized
             </summary>
         </member>
-        <member name="T:ProtoBuf.BclHelpers">
+        <member name="T:ProtoBuf.PrefixStyle">
             <summary>
-            Provides support for common .NET types that do not have a direct representation
-            in protobuf, using the definitions from bcl.proto
+            Specifies the type of prefix that should be applied to messages.
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.GetUninitializedObject(System.Type)">
+        <member name="F:ProtoBuf.PrefixStyle.None">
             <summary>
-            Creates a new instance of the specified type, bypassing the constructor.
-            </summary>
-            <param name="type">The type to create</param>
-            <returns>The new instance</returns>
-            <exception cref="T:System.NotSupportedException">If the platform does not support constructor-skipping</exception>
-        </member>
-        <member name="M:ProtoBuf.BclHelpers.WriteTimeSpan(System.TimeSpan,ProtoBuf.ProtoWriter)">
-            <summary>
-            Writes a TimeSpan to a protobuf stream
+            No length prefix is applied to the data; the data is terminated only be the end of the stream.
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.ReadTimeSpan(ProtoBuf.ProtoReader)">
+        <member name="F:ProtoBuf.PrefixStyle.Base128">
             <summary>
-            Parses a TimeSpan from a protobuf stream
-            </summary>        
-        </member>
-        <member name="M:ProtoBuf.BclHelpers.ReadDateTime(ProtoBuf.ProtoReader)">
-            <summary>
-            Parses a DateTime from a protobuf stream
+            A base-128 length prefix is applied to the data (efficient for short messages).
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.WriteDateTime(System.DateTime,ProtoBuf.ProtoWriter)">
+        <member name="F:ProtoBuf.PrefixStyle.Fixed32">
             <summary>
-            Writes a DateTime to a protobuf stream
+            A fixed-length (little-endian) length prefix is applied to the data (useful for compatibility).
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.ReadDecimal(ProtoBuf.ProtoReader)">
+        <member name="F:ProtoBuf.PrefixStyle.Fixed32BigEndian">
             <summary>
-            Parses a decimal from a protobuf stream
+            A fixed-length (big-endian) length prefix is applied to the data (useful for compatibility).
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.WriteDecimal(System.Decimal,ProtoBuf.ProtoWriter)">
+        <member name="T:ProtoBuf.ProtoContractAttribute">
             <summary>
-            Writes a decimal to a protobuf stream
+            Indicates that a type is defined for protocol-buffer serialization.
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.WriteGuid(System.Guid,ProtoBuf.ProtoWriter)">
+        <member name="P:ProtoBuf.ProtoContractAttribute.Name">
             <summary>
-            Writes a Guid to a protobuf stream
-            </summary>        
-        </member>
-        <member name="M:ProtoBuf.BclHelpers.ReadGuid(ProtoBuf.ProtoReader)">
-            <summary>
-            Parses a Guid from a protobuf stream
+            Gets or sets the defined name of the type.
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.ReadNetObject(System.Object,ProtoBuf.ProtoReader,System.Int32,System.Type,ProtoBuf.BclHelpers.NetObjectOptions)">
+        <member name="P:ProtoBuf.ProtoContractAttribute.ImplicitFirstTag">
             <summary>
-            Reads an *implementation specific* bundled .NET object, including (as options) type-metadata, identity/re-use, etc.
+            Gets or sets the fist offset to use with implicit field tags;
+            only uesd if ImplicitFields is set.
             </summary>
         </member>
-        <member name="M:ProtoBuf.BclHelpers.WriteNetObject(System.Object,ProtoBuf.ProtoWriter,System.Int32,ProtoBuf.BclHelpers.NetObjectOptions)">
+        <member name="P:ProtoBuf.ProtoContractAttribute.UseProtoMembersOnly">
             <summary>
-            Writes an *implementation specific* bundled .NET object, including (as options) type-metadata, identity/re-use, etc.
+            If specified, alternative contract markers (such as markers for XmlSerailizer or DataContractSerializer) are ignored.
             </summary>
         </member>
-        <member name="T:ProtoBuf.BclHelpers.NetObjectOptions">
+        <member name="P:ProtoBuf.ProtoContractAttribute.IgnoreListHandling">
             <summary>
-            Optional behaviours that introduce .NET-specific functionality
+            If specified, do NOT treat this type as a list, even if it looks like one.
             </summary>
         </member>
-        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.None">
+        <member name="P:ProtoBuf.ProtoContractAttribute.ImplicitFields">
             <summary>
-            No special behaviour
+            Gets or sets the mechanism used to automatically infer field tags
+            for members. This option should be used in advanced scenarios only.
+            Please review the important notes against the ImplicitFields enumeration.
             </summary>
         </member>
-        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.AsReference">
+        <member name="P:ProtoBuf.ProtoContractAttribute.InferTagFromName">
             <summary>
-            Enables full object-tracking/full-graph support.
+            Enables/disables automatic tag generation based on the existing name / order
+            of the defined members. This option is not used for members marked
+            with ProtoMemberAttribute, as intended to provide compatibility with
+            WCF serialization. WARNING: when adding new fields you must take
+            care to increase the Order for new elements, otherwise data corruption
+            may occur.
+            </summary>
+            <remarks>If not explicitly specified, the default is assumed from Serializer.GlobalOptions.InferTagFromName.</remarks>
+        </member>
+        <member name="P:ProtoBuf.ProtoContractAttribute.InferTagFromNameHasValue">
+            <summary>
+            Has a InferTagFromName value been explicitly set? if not, the default from the type-model is assumed.
             </summary>
         </member>
-        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.DynamicType">
+        <member name="P:ProtoBuf.ProtoContractAttribute.DataMemberOffset">
             <summary>
-            Embeds the type information into the stream, allowing usage with types not known in advance.
+            Specifies an offset to apply to [DataMember(Order=...)] markers;
+            this is useful when working with mex-generated classes that have
+            a different origin (usually 1 vs 0) than the original data-contract.
+            
+            This value is added to the Order of each member.
             </summary>
         </member>
-        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.UseConstructor">
+        <member name="P:ProtoBuf.ProtoContractAttribute.SkipConstructor">
             <summary>
-            If false, the constructor for the type is bypassed during deserialization, meaning any field initializers
+            If true, the constructor for the type is bypassed during deserialization, meaning any field initializers
             or other initialization code is skipped.
             </summary>
         </member>
-        <member name="F:ProtoBuf.BclHelpers.NetObjectOptions.LateSet">
+        <member name="P:ProtoBuf.ProtoContractAttribute.AsReferenceDefault">
             <summary>
-            Should the object index be reserved, rather than creating an object promptly
+            Should this type be treated as a reference by default? Please also see the implications of this,
+            as recorded on ProtoMemberAttribute.AsReference
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoContractAttribute.EnumPassthru">
+            <summary>
+            Applies only to enums (not to DTO classes themselves); gets or sets a value indicating that an enum should be treated directly as an int/short/etc, rather
+            than enforcing .proto enum rules. This is useful *in particul* for [Flags] enums.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoContractAttribute.EnumPassthruHasValue">
+            <summary>
+            Has a EnumPassthru value been explicitly set?
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoEnumAttribute">
+            <summary>
+            Used to define protocol-buffer specific behavior for
+            enumerated values.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoEnumAttribute.HasValue">
+            <summary>
+            Indicates whether this instance has a customised value mapping
+            </summary>
+            <returns>true if a specific value is set</returns>
+        </member>
+        <member name="P:ProtoBuf.ProtoEnumAttribute.Value">
+            <summary>
+            Gets or sets the specific value to use for this enum during serialization.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoEnumAttribute.Name">
+            <summary>
+            Gets or sets the defined name of the enum, as used in .proto
+            (this name is not used during serialization).
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoException">
+            <summary>
+            Indicates an error during serialization/deserialization of a proto stream.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoException.#ctor">
+            <summary>Creates a new ProtoException instance.</summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoException.#ctor(System.String)">
+            <summary>Creates a new ProtoException instance.</summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoException.#ctor(System.String,System.Exception)">
+            <summary>Creates a new ProtoException instance.</summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoIgnoreAttribute">
+            <summary>
+            Indicates that a member should be excluded from serialization; this
+            is only normally used when using implict fields.
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoPartialIgnoreAttribute">
+            <summary>
+            Indicates that a member should be excluded from serialization; this
+            is only normally used when using implict fields. This allows
+            ProtoIgnoreAttribute usage
+            even for partial classes where the individual members are not
+            under direct control.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoPartialIgnoreAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new ProtoPartialIgnoreAttribute instance.
+            </summary>
+            <param name="memberName">Specifies the member to be ignored.</param>
+        </member>
+        <member name="P:ProtoBuf.ProtoPartialIgnoreAttribute.MemberName">
+            <summary>
+            The name of the member to be ignored.
             </summary>
         </member>
         <member name="T:ProtoBuf.ProtoIncludeAttribute">
@@ -1474,21 +975,6 @@
             <summary>
             Specifies whether the inherited sype's sub-message should be
             written with a length-prefix (default), or with group markers.
-            </summary>
-        </member>
-        <member name="T:ProtoBuf.SerializationContext">
-            <summary>
-            Additional information about a serialization operation
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.SerializationContext.Context">
-            <summary>
-            Gets or sets a user-defined object containing additional information about this serialization/deserialization operation.
-            </summary>
-        </member>
-        <member name="P:ProtoBuf.SerializationContext.Default">
-            <summary>
-            A default SerializationContext, with minimal information.
             </summary>
         </member>
         <member name="T:ProtoBuf.ProtoMemberAttribute">
@@ -1627,25 +1113,539 @@
             The name of the member to be serialized.
             </summary>
         </member>
-        <member name="T:ProtoBuf.Meta.TypeFormatEventArgs">
+        <member name="T:ProtoBuf.ProtoReader">
             <summary>
-            Event arguments needed to perform type-formatting functions; this could be resolving a Type to a string suitable for serialization, or could
-            be requesting a Type from a string. If no changes are made, a default implementation will be used (from the assembly-qualified names).
+            A stateful reader, used to read a protobuf stream. Typical usage would be (sequentially) to call
+            ReadFieldHeader and (after matching the field) an appropriate Read* method.
             </summary>
         </member>
-        <member name="P:ProtoBuf.Meta.TypeFormatEventArgs.Type">
+        <member name="M:ProtoBuf.ProtoReader.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext)">
             <summary>
-            The type involved in this map; if this is initially null, a Type is expected to be provided for the string in FormattedName.
+            Creates a new reader against a stream
+            </summary>
+            <param name="source">The source stream</param>
+            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to deserialize sub-objects</param>
+            <param name="context">Additional context about this serialization operation</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext,System.Int32)">
+            <summary>
+            Creates a new reader against a stream
+            </summary>
+            <param name="source">The source stream</param>
+            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to deserialize sub-objects</param>
+            <param name="context">Additional context about this serialization operation</param>
+            <param name="length">The number of bytes to read, or -1 to read until the end of the stream</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.Dispose">
+            <summary>
+            Releases resources used by the reader, but importantly <b>does not</b> Dispose the 
+            underlying stream; in many typical use-cases the stream is used for different
+            processes, so it is assumed that the consumer will Dispose their stream separately.
             </summary>
         </member>
-        <member name="P:ProtoBuf.Meta.TypeFormatEventArgs.FormattedName">
+        <member name="M:ProtoBuf.ProtoReader.ReadUInt32">
             <summary>
-            The formatted-name involved in this map; if this is initially null, a formatted-name is expected from the type in Type.
+            Reads an unsigned 32-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
             </summary>
         </member>
-        <member name="T:ProtoBuf.Meta.TypeFormatEventHandler">
+        <member name="M:ProtoBuf.ProtoReader.ReadInt16">
             <summary>
-            Delegate type used to perform type-formatting functions; the sender originates as the type-model.
+            Reads a signed 16-bit integer from the stream: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadUInt16">
+            <summary>
+            Reads an unsigned 16-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadByte">
+            <summary>
+            Reads an unsigned 8-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadSByte">
+            <summary>
+            Reads a signed 8-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadInt32">
+            <summary>
+            Reads a signed 32-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadInt64">
+            <summary>
+            Reads a signed 64-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadString">
+            <summary>
+            Reads a string from the stream (using UTF8); supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ThrowEnumException(System.Type,System.Int32)">
+            <summary>
+            Throws an exception indication that the given value cannot be mapped to an enum.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadDouble">
+            <summary>
+            Reads a double-precision number from the stream; supported wire-types: Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadObject(System.Object,System.Int32,ProtoBuf.ProtoReader)">
+            <summary>
+            Reads (merges) a sub-message from the stream, internally calling StartSubItem and EndSubItem, and (in between)
+            parsing the message in accordance with the model associated with the reader
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.EndSubItem(ProtoBuf.SubItemToken,ProtoBuf.ProtoReader)">
+            <summary>
+            Makes the end of consuming a nested message in the stream; the stream must be either at the correct EndGroup
+            marker, or all fields of the sub-message must have been consumed (in either case, this means ReadFieldHeader
+            should return zero)
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.StartSubItem(ProtoBuf.ProtoReader)">
+            <summary>
+            Begins consuming a nested message in the stream; supported wire-types: StartGroup, String
+            </summary>
+            <remarks>The token returned must be help and used when callining EndSubItem</remarks>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadFieldHeader">
+            <summary>
+            Reads a field header from the stream, setting the wire-type and retuning the field number. If no
+            more fields are available, then 0 is returned. This methods respects sub-messages.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.TryReadFieldHeader(System.Int32)">
+            <summary>
+            Looks ahead to see whether the next field in the stream is what we expect
+            (typically; what we've just finished reading - for example ot read successive list items)
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.Hint(ProtoBuf.WireType)">
+            <summary>
+            Compares the streams current wire-type to the hinted wire-type, updating the reader if necessary; for example,
+            a Variant may be updated to SignedVariant. If the hinted wire-type is unrelated then no change is made.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.Assert(ProtoBuf.WireType)">
+            <summary>
+            Verifies that the stream's current wire-type is as expected, or a specialized sub-type (for example,
+            SignedVariant) - in which case the current wire-type is updated. Otherwise an exception is thrown.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.SkipField">
+            <summary>
+            Discards the data for the current field.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadUInt64">
+            <summary>
+            Reads an unsigned 64-bit integer from the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadSingle">
+            <summary>
+            Reads a single-precision number from the stream; supported wire-types: Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadBoolean">
+            <summary>
+            Reads a boolean value from the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.AppendBytes(System.Byte[],ProtoBuf.ProtoReader)">
+            <summary>
+            Reads a byte-sequence from the stream, appending them to an existing byte-sequence (which can be null); supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadLengthPrefix(System.IO.Stream,System.Boolean,ProtoBuf.PrefixStyle,System.Int32@)">
+            <summary>
+            Reads the length-prefix of a message from a stream without buffering additional data, allowing a fixed-length
+            reader to be created.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadLittleEndianInt32(System.IO.Stream)">
+            <summary>
+            Reads a little-endian encoded integer. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadBigEndianInt32(System.IO.Stream)">
+            <summary>
+            Reads a big-endian encoded integer. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadVarintInt32(System.IO.Stream)">
+            <summary>
+            Reads a varint encoded integer. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads a string (of a given lenth, in bytes) directly from the source into a pre-existing buffer. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Int32)">
+            <summary>
+            Reads a given number of bytes directly from the source. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.DirectReadString(System.IO.Stream,System.Int32)">
+            <summary>
+            Reads a string (of a given lenth, in bytes) directly from the source. An exception is thrown if the data is not all available.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadLengthPrefix(System.IO.Stream,System.Boolean,ProtoBuf.PrefixStyle,System.Int32@,System.Int32@)">
+            <summary>
+            Reads the length-prefix of a message from a stream without buffering additional data, allowing a fixed-length
+            reader to be created.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.TryReadUInt32Variant(System.IO.Stream,System.UInt32@)">
+            <returns>The number of bytes consumed; 0 if no data available</returns>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.AppendExtensionData(ProtoBuf.IExtensible)">
+            <summary>
+            Copies the current field into the instance as extension data
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.HasSubValue(ProtoBuf.WireType,ProtoBuf.ProtoReader)">
+            <summary>
+            Indicates whether the reader still has data remaining in the current sub-item,
+            additionally setting the wire-type for the next field if there is more data.
+            This is used when decoding packed data.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.NoteObject(System.Object,ProtoBuf.ProtoReader)">
+            <summary>
+            Utility method, not intended for public use; this helps maintain the root object is complex scenarios
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.ReadType">
+            <summary>
+            Reads a Type from the stream, using the model's DynamicTypeFormatting if appropriate; supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoReader.Merge(ProtoBuf.ProtoReader,System.Object,System.Object)">
+            <summary>
+            Merge two objects using the details from the current reader; this is used to change the type
+            of objects when an inheritance relationship is discovered later than usual during deserilazation.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.FieldNumber">
+            <summary>
+            Gets the number of the field being processed.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.WireType">
+            <summary>
+            Indicates the underlying proto serialization format on the wire.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.InternStrings">
+            <summary>
+            Gets / sets a flag indicating whether strings should be checked for repetition; if
+            true, any repeated UTF-8 byte sequence will result in the same String instance, rather
+            than a second instance of the same string. Enabled by default. Note that this uses
+            a <i>custom</i> interner - the system-wide string interner is not used.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.Context">
+            <summary>
+            Addition information about this deserialization operation.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.Position">
+            <summary>
+            Returns the position of the current reader (note that this is not necessarily the same as the position
+            in the underlying stream, if multiple readers are used on the same stream)
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoReader.Model">
+            <summary>
+            Get the TypeModel associated with this reader
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.ProtoWriter">
+            <summary>
+            Represents an output stream for writing protobuf data.
+            
+            Why is the API backwards (static methods with writer arguments)?
+            See: http://marcgravell.blogspot.com/2010/03/last-will-be-first-and-first-will-be.html
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type).
+            </summary>
+            <param name="value">The object to write.</param>
+            <param name="key">The key that uniquely identifies the type within the model.</param>
+            <param name="writer">The destination.</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteRecursionSafeObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type) - but the
+            caller is asserting that this relationship is non-recursive; no recursion check will be
+            performed.
+            </summary>
+            <param name="value">The object to write.</param>
+            <param name="key">The key that uniquely identifies the type within the model.</param>
+            <param name="writer">The destination.</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteFieldHeader(System.Int32,ProtoBuf.WireType,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a field-header, indicating the format of the next data we plan to write.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteBytes(System.Byte[],ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a byte-array to the stream; supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteBytes(System.Byte[],System.Int32,System.Int32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a byte-array to the stream; supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.StartSubItem(System.Object,ProtoBuf.ProtoWriter)">
+            <summary>
+            Indicates the start of a nested record.
+            </summary>
+            <param name="instance">The instance to write.</param>
+            <param name="writer">The destination.</param>
+            <returns>A token representing the state of the stream; this token is given to EndSubItem.</returns>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.EndSubItem(ProtoBuf.SubItemToken,ProtoBuf.ProtoWriter)">
+            <summary>
+            Indicates the end of a nested record.
+            </summary>
+            <param name="token">The token obtained from StartubItem.</param>
+            <param name="writer">The destination.</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.#ctor(System.IO.Stream,ProtoBuf.Meta.TypeModel,ProtoBuf.SerializationContext)">
+            <summary>
+            Creates a new writer against a stream
+            </summary>
+            <param name="dest">The destination stream</param>
+            <param name="model">The model to use for serialization; this can be null, but this will impair the ability to serialize sub-objects</param>
+            <param name="context">Additional context about this serialization operation</param>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.Close">
+            <summary>
+            Flushes data to the underlying stream, and releases any resources. The underlying stream is *not* disposed
+            by this operation.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.Flush(ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes any buffered data (if possible) to the underlying stream.
+            </summary>
+            <param name="writer">The writer to flush</param>
+            <remarks>It is not always possible to fully flush, since some sequences
+            may require values to be back-filled into the byte-stream.</remarks>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteUInt32Variant(System.UInt32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes an unsigned 32-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteString(System.String,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a string to the stream; supported wire-types: String
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteUInt64(System.UInt64,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes an unsigned 64-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteInt64(System.Int64,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a signed 64-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteUInt32(System.UInt32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes an unsigned 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteInt16(System.Int16,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a signed 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteUInt16(System.UInt16,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes an unsigned 16-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteByte(System.Byte,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes an unsigned 8-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteSByte(System.SByte,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a signed 8-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteInt32(System.Int32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a signed 32-bit integer to the stream; supported wire-types: Variant, Fixed32, Fixed64, SignedVariant
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteDouble(System.Double,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a double-precision number to the stream; supported wire-types: Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteSingle(System.Single,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a single-precision number to the stream; supported wire-types: Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.ThrowEnumException(ProtoBuf.ProtoWriter,System.Object)">
+            <summary>
+            Throws an exception indicating that the given enum cannot be mapped to a serialized value.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteBoolean(System.Boolean,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a boolean to the stream; supported wire-types: Variant, Fixed32, Fixed64
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.AppendExtensionData(ProtoBuf.IExtensible,ProtoBuf.ProtoWriter)">
+            <summary>
+            Copies any extension data stored for the instance to the underlying stream
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.SetPackedField(System.Int32,ProtoBuf.ProtoWriter)">
+            <summary>
+            Used for packed encoding; indicates that the next field should be skipped rather than
+            a field header written. Note that the field number must match, else an exception is thrown
+            when the attempt is made to write the (incorrect) field. The wire-type is taken from the
+            subsequent call to WriteFieldHeader. Only primitive types can be packed.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.SetRootObject(System.Object)">
+            <summary>
+            Specifies a known root object to use during reference-tracked serialization
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.ProtoWriter.WriteType(System.Type,ProtoBuf.ProtoWriter)">
+            <summary>
+            Writes a Type to the stream, using the model's DynamicTypeFormatting if appropriate; supported wire-types: String
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoWriter.Context">
+            <summary>
+            Addition information about this serialization operation.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.ProtoWriter.Model">
+            <summary>
+            Get the TypeModel associated with this writer
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.SerializationContext">
+            <summary>
+            Additional information about a serialization operation
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.SerializationContext.Context">
+            <summary>
+            Gets or sets a user-defined object containing additional information about this serialization/deserialization operation.
+            </summary>
+        </member>
+        <member name="P:ProtoBuf.SerializationContext.Default">
+            <summary>
+            A default SerializationContext, with minimal information.
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.Serializer">
+            <summary>
+            Provides protocol-buffer serialization capability for concrete, attributed types. This
+            is a *default* model, but custom serializer models are also supported.
+            </summary>
+            <remarks>
+            Protocol-buffer serialization is a compact binary format, designed to take
+            advantage of sparse data and knowledge of specific data types; it is also
+            extensible, allowing a type to be deserialized / merged even if some data is
+            not recognised.
+            </remarks>
+        </member>
+        <member name="F:ProtoBuf.Serializer.ListItemTag">
+            <summary>
+            The field number that is used as a default when serializing/deserializing a list of objects.
+            The data is treated as repeated message with field number 1.
+            </summary>
+        </member>
+        <member name="M:ProtoBuf.Serializer.FlushPool">
+            <summary>
+            Releases any internal buffers that have been reserved for efficiency; this does not affect any serialization
+            operations; simply: it can be used (optionally) to release the buffers for garbage collection (at the expense
+            of having to re-allocate a new buffer for the next operation, rather than re-use prior buffers).
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.Serializer.TypeResolver">
+            <summary>
+            Maps a field-number to a type
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.SubItemToken">
+            <summary>
+            Used to hold particulars relating to nested objects. This is opaque to the caller - simply
+            give back the token you are given at the end of an object.
+            </summary>
+        </member>
+        <member name="T:ProtoBuf.WireType">
+            <summary>
+            Indicates the encoding used to represent an individual value in a protobuf stream
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.None">
+            <summary>
+            Represents an error condition
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.Variant">
+            <summary>
+            Base-128 variant-length encoding
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.Fixed64">
+            <summary>
+            Fixed-length 8-byte encoding
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.String">
+            <summary>
+            Length-variant-prefixed encoding
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.StartGroup">
+            <summary>
+            Indicates the start of a group
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.EndGroup">
+            <summary>
+            Indicates the end of a group
+            </summary>
+        </member>
+        <member name="F:ProtoBuf.WireType.Fixed32">
+            <summary>
+            Fixed-length 4-byte encoding
+            </summary>10
+        </member>
+        <member name="F:ProtoBuf.WireType.SignedVariant">
+            <summary>
+            This is not a formal wire-type in the "protocol buffers" spec, but
+            denotes a variant integer that should be interpreted using
+            zig-zag semantics (so -ve numbers aren't a significant overhead)
             </summary>
         </member>
     </members>

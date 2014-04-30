@@ -7,7 +7,7 @@
     <Reference Include="OpenTK" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/CoreOnly/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/iOS/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.iOS"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
