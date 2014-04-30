@@ -63,7 +63,6 @@ namespace Microsoft.Xna.Framework.Input
 
         public readonly GamePadCapabilities _capabilities;
 
-		[CLSCompliant(false)]
         public OuyaGamePad(InputDevice device)
         {
             _device = device;
