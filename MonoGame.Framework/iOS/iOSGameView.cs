@@ -493,7 +493,7 @@ namespace Microsoft.Xna.Framework {
         }
 
 
-        [Export ("insertDictationResult")]
+		[Export ("insertDictationResult:")]
         void insertDictationResult(NSArray a)
         {
             NSNotificationCenter.DefaultCenter.PostNotificationName ("DictationRecognitionSucceededNotification", this);
