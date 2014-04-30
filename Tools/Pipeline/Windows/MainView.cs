@@ -105,7 +105,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public event SelectionChanged OnSelectionChanged;
+        //public event SelectionChanged OnSelectionChanged;
 
         public void Attach(IController controller)
         {

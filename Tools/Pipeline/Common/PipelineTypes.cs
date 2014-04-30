@@ -143,7 +143,7 @@ namespace MonoGame.Tools.Pipeline
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
 
-        private List<Type> _writers;
+        //private List<Type> _writers;
 
         public string ProjectDirectory { get; private set; }
         public string OutputDirectory { get; private set; }
