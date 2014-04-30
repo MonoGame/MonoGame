@@ -305,7 +305,7 @@
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerPresence.cs">
-      <Platforms>Android,Angle,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerPresenceMode.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
