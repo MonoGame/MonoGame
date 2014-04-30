@@ -176,6 +176,8 @@
       <exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Build /p:Configuration=Release" />
       <exec program="msbuild " commandline="Tools\MGCB\MGCB.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="Tools\MGCB\MGCB.sln /t:Build /p:Configuration=Release" />
+      <exec program="msbuild " commandline="Tools\Pipeline\Pipeline.sln /t:Clean /p:Configuration=Release" />
+      <exec program="msbuild " commandline="Tools\Pipeline\Pipeline.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 

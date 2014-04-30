@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Media
 
             _currentVideo.MovieView.MoviePlayer.RepeatMode = IsLooped ? MPMovieRepeatMode.One : MPMovieRepeatMode.None;
 
-            _platform.ViewController.PresentModalViewController(_currentVideo.MovieView, animated: false);
+            _platform.ViewController.PresentViewController(_currentVideo.MovieView, false, null);
             _currentVideo.MovieView.MoviePlayer.Play();
         }
 
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Media
 
             _currentVideo.MovieView.MoviePlayer.Stop();
             _platform.IsPlayingVideo = false;
-            _platform.ViewController.DismissModalViewControllerAnimated(false);
+            _platform.ViewController.DismissViewController(false, null);
         }
 
         private void OnStop(NSNotification e)

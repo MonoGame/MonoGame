@@ -33,7 +33,9 @@ namespace MGCB
         {
             _optionsObject = optionsObject;
 
-            // Reflect to find what commandline options are available.
+            // Reflect to find what commandline options are available...
+
+            // Fields
             foreach (var field in optionsObject.GetType().GetFields())
             {
                 var param = GetAttribute<CommandLineParameterAttribute>(field);
@@ -54,6 +56,28 @@ namespace MGCB
                 }
             }
 
+            // Properties
+            foreach (var property in optionsObject.GetType().GetProperties())
+            {
+                var param = GetAttribute<CommandLineParameterAttribute>(property);
+                if (param == null)
+                    continue;
+
+                if (param.Required)
+                {
+                    // Record a required option.
+                    _requiredOptions.Enqueue(property);
+
+                    _requiredUsageHelp.Add(string.Format("<{0}>", param.Name));
+                }
+                else
+                {
+                    // Record an optional option.
+                    _optionalOptions.Add(param.Name.ToLowerInvariant(), property);
+                }
+            }
+
+            // Methods
             foreach (var method in optionsObject.GetType().GetMethods())
             {
                 var param = GetAttribute<CommandLineParameterAttribute>(method);
@@ -158,7 +182,7 @@ namespace MGCB
                 if (IsList(member))
                 {
                     // Append this value to a list of options.
-                    GetList(member).Add(ChangeType(value, ListElementType(member as FieldInfo)));
+                    GetList(member).Add(ChangeType(value, ListElementType(member)));
                 }
                 else
                 {
@@ -172,10 +196,15 @@ namespace MGCB
                         else
                             method.Invoke(_optionsObject, new[] { ChangeType(value, parameters[0].ParameterType) });
                     }
-                    else
+                    else if (member is FieldInfo)
                     {
                         var field = member as FieldInfo;
                         field.SetValue(_optionsObject, ChangeType(value, field.FieldType));
+                    }
+                    else 
+                    {
+                        var property = member as PropertyInfo;
+                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType));
                     }
                 }
 
@@ -197,28 +226,53 @@ namespace MGCB
         }
 
 
-        static bool IsList(MemberInfo field)
+        static bool IsList(MemberInfo member)
         {
-            if (field is MethodInfo)
+            if (member is MethodInfo)
                 return false;
 
-            return typeof (IList).IsAssignableFrom((field as FieldInfo).FieldType);
+            if (member is FieldInfo)
+                return typeof(IList).IsAssignableFrom((member as FieldInfo).FieldType);
+            
+            return typeof(IList).IsAssignableFrom((member as PropertyInfo).PropertyType);
         }
 
 
-        IList GetList(MemberInfo field)
+        IList GetList(MemberInfo member)
         {
-            return (IList)(field as FieldInfo).GetValue(_optionsObject);
+            if (member is PropertyInfo)
+                return (IList)(member as PropertyInfo).GetValue(_optionsObject);
+
+            if (member is FieldInfo)
+                return (IList)(member as FieldInfo).GetValue(_optionsObject);
+
+            throw new Exception();
         }
 
 
-        static Type ListElementType(FieldInfo field)
+        static Type ListElementType(MemberInfo member)
         {
-            var interfaces = from i in field.FieldType.GetInterfaces()
-                             where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                             select i;
+            if (member is FieldInfo)
+            {
+                var field = member as FieldInfo;
+                var interfaces = from i in field.FieldType.GetInterfaces()
+                                 where i.IsGenericType && i.GetGenericTypeDefinition() == typeof (IEnumerable<>)
+                                 select i;
 
-            return interfaces.First().GetGenericArguments()[0];
+                return interfaces.First().GetGenericArguments()[0];
+            }
+
+            if (member is PropertyInfo)
+            {
+                var property = member as PropertyInfo;
+                var interfaces = from i in property.PropertyType.GetInterfaces()
+                                 where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                                 select i;
+
+                return interfaces.First().GetGenericArguments()[0];
+            }
+
+            throw new ArgumentException("Only FieldInfo and PropertyInfo are valid arguments.", "member");
         }
 
         public string Title { get; set; }
@@ -279,7 +333,7 @@ namespace MGCB
     }
 
     // Used on an optionsObject field or method to rename the corresponding commandline option.
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property)]
     public sealed class CommandLineParameterAttribute : Attribute
     {
         public CommandLineParameterAttribute()

@@ -68,9 +68,11 @@ namespace Microsoft.Xna.Framework.Graphics
         private int backBufferHeight = GraphicsDeviceManager.DefaultBackBufferHeight;
         private int backBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
         private IntPtr deviceWindowHandle;
-        private bool isFullScreen;
         private int multiSampleCount;
-        private bool disposed;       	
+        private bool disposed;
+#if !WINRT
+        private bool isFullScreen;
+#endif
 
         #endregion Private Fields
 

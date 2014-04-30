@@ -397,7 +397,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    {
 					leaderboardController.DidFinish += delegate(object sender, EventArgs e) 
 					{
-						leaderboardController.DismissModalViewControllerAnimated(true);
+						leaderboardController.DismissViewController(true, null);
 						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
  					};
@@ -413,7 +413,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 						
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
-                        viewController.PresentModalViewController(leaderboardController, true);
+                        viewController.PresentViewController(leaderboardController, true, null);
 						IsVisible = true;
 					}
 			    }
@@ -442,7 +442,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			    {					
 					achievementController.DidFinish += delegate(object sender, EventArgs e) 
 					{									 
-						achievementController.DismissModalViewControllerAnimated(true);
+						achievementController.DismissViewController(true, null);
 						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
@@ -458,7 +458,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
-						viewController.PresentModalViewController(achievementController, true);						
+						viewController.PresentViewController(achievementController, true, null);
 						IsVisible = true;
 					}
 			    }
@@ -502,7 +502,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         /// </remarks>
         /// <param name="minPlayers">Minimum players to find</param>
         /// <param name="maxPlayers">Maximum players to find</param>
-        /// <param name="playersToInvite">Players to invite/param>
+        /// <param name="playersToInvite">Players to invite</param>
         public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
 		{
 			AssertInitialised ();
@@ -522,7 +522,7 @@ namespace Microsoft.Xna.Framework.GamerServices
                     matchmakerViewController.MatchRequest.PlayersToInvite = playersToInvite;
 
 					matchmakerViewController.DidFailWithError += delegate(object sender, GKErrorEventArgs e) {
-						matchmakerViewController.DismissModalViewControllerAnimated(true);
+						matchmakerViewController.DismissViewController(true, null);
 						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
@@ -536,7 +536,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 					};
 					
 					matchmakerViewController.WasCancelled += delegate(object sender, EventArgs e) {
-						matchmakerViewController.DismissModalViewControllerAnimated(true);
+						matchmakerViewController.DismissViewController(true, null);
 						IsVisible = false;
 						TouchPanel.EnabledGestures=prevGestures;
 					};
@@ -552,9 +552,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
 						prevGestures=TouchPanel.EnabledGestures;
 						TouchPanel.EnabledGestures=GestureType.None;
-						viewController.PresentModalViewController(matchmakerViewController, true);						
+						viewController.PresentViewController(matchmakerViewController, true, null);
 						IsVisible = true;
-					}				
+					}
 			    }
 			}
 		}

@@ -29,47 +29,140 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="SharpDX">
       <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler">
       <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\ThirdParty\Dependencies\SharpDX\Windows\SharpDX.DXGI.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs">
+      <Link>MonoGame.Framework\BoundingBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\BoundingFrustum.cs">
+      <Link>MonoGame.Framework\BoundingFrustum.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\BoundingSphere.cs">
+      <Link>MonoGame.Framework\BoundingSphere.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Color.cs">
+      <Link>MonoGame.Framework\Color.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\ContainmentType.cs">
+      <Link>MonoGame.Framework\ContainmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\ColorWriteChannels.cs">
+      <Link>MonoGame.Framework\ColorWriteChannels.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterClass.cs">
+      <Link>MonoGame.Framework\EffectParameterClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Effect\EffectParameterType.cs">
+      <Link>MonoGame.Framework\EffectParameterType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\GraphicsResource.cs">
+      <Link>MonoGame.Framework\GraphicsResource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\Blend.cs">
+      <Link>MonoGame.Framework\Blend.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendFunction.cs">
+      <Link>MonoGame.Framework\BlendFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\BlendState.cs">
+      <Link>MonoGame.Framework\BlendState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CompareFunction.cs">
+      <Link>MonoGame.Framework\CompareFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\CullMode.cs">
+      <Link>MonoGame.Framework\CullMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\DepthStencilState.cs">
+      <Link>MonoGame.Framework\DepthStencilState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\FillMode.cs">
+      <Link>MonoGame.Framework\FillMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\RasterizerState.cs">
+      <Link>MonoGame.Framework\RasterizerState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\SamplerState.cs">
+      <Link>MonoGame.Framework\SamplerState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\StencilOperation.cs">
+      <Link>MonoGame.Framework\StencilOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TargetBlendState.cs">
+      <Link>MonoGame.Framework\TargetBlendState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureAddressMode.cs">
+      <Link>MonoGame.Framework\TextureAddressMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\States\TextureFilter.cs">
+      <Link>MonoGame.Framework\TextureFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Graphics\Vertices\VertexElementUsage.cs">
+      <Link>MonoGame.Framework\VertexElementUsage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\MathHelper.cs">
+      <Link>MonoGame.Framework\MathHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Matrix.cs">
+      <Link>MonoGame.Framework\Matrix.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Plane.cs">
+      <Link>MonoGame.Framework\Plane.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\PlaneIntersectionType.cs">
+      <Link>MonoGame.Framework\PlaneIntersectionType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Quaternion.cs">
+      <Link>MonoGame.Framework\Quaternion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Ray.cs">
+      <Link>MonoGame.Framework\Ray.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Utilities\ObjectFactoryWithReset.cs">
+      <Link>MonoGame.Framework\ObjectFactoryWithReset.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Vector2.cs">
+      <Link>MonoGame.Framework\Vector2.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Vector3.cs">
+      <Link>MonoGame.Framework\Vector3.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework\Vector4.cs">
+      <Link>MonoGame.Framework\Vector4.cs</Link>
+    </Compile>
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBufferData.cs" />
@@ -81,6 +174,7 @@
     <Compile Include="EffectObject.pssl.cs" />
     <Compile Include="EffectObject.writer.cs" />
     <Compile Include="MarshalHelper.cs" />
+    <Compile Include="MonoGame.Framework\GraphicsDevice.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
     <Compile Include="ShaderData.pssl.cs" />
@@ -124,17 +218,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ThirdParty\Dependencies\libmojoshader_32.dll">
-      <Link>libmojoshader_32.dll</Link>
+    <None Include="..\..\ThirdParty\Dependencies\libmojoshader_64.dll">
+      <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MGFX.tpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\ThirdParty\Dependencies\SharpDX\Windows\sharpdx_direct3d11_effects_x86.dll">
-      <Link>sharpdx_direct3d11_effects_x86.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

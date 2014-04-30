@@ -136,7 +136,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="content">The content to write to the XNB file.</param>
         /// <param name="targetPlatform">The platform the XNB is intended for.</param>
         /// <param name="targetProfile">The graphics profile of the target.</param>
-        /// <param name="compress">True if the content should be compressed.</param>
+        /// <param name="compressContent">True if the content should be compressed.</param>
         /// <param name="rootDirectory">The root directory of the content.</param>
         /// <param name="referenceRelocationPath">The path of the XNB file, used to calculate relative paths for external references.</param>
         public void Compile(Stream stream, object content, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)
