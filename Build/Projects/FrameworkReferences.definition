@@ -29,7 +29,7 @@
       Path="ThirdParty/Dependencies/OpenTK.dll" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.Linux"
       Guid="758CB33D-6EBD-41EA-BB0C-55B1C97A325F"
@@ -44,7 +44,7 @@
       Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.MacOS"
       Guid="5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130"
@@ -58,7 +58,7 @@
     <Reference Include="System.Core" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/MonoDroid-Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/MonoDroid/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
@@ -122,7 +122,7 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
@@ -153,7 +153,7 @@
       Path="ThirdParty/Dependencies/SharpDX/Windows 8 Metro/SharpDX.XInput.dll" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
   </Platform>
 
   <Platform Type="WindowsGL">
@@ -171,7 +171,7 @@
       Path="ThirdParty/Dependencies/OpenTK.dll" />
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
     <Project
       Name="Lidgren.Network.Windows"
       Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
@@ -203,7 +203,7 @@
   <Platform Type="Web">
     <Binary
       Name="ProtoBuf"
-      Path="ThirdParty/protobuf-net/Debug/protobuf-net.dll" />
+      Path="ThirdParty/protobuf-net/Net30/protobuf-net.dll" />
     <Reference Include="JSIL.Meta" />
   </Platform>
 
