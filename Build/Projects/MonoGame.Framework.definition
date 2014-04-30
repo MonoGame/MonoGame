@@ -696,7 +696,6 @@
         <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexElement.cs" />
-    <Compile Include="Graphics\Vertices\VertexElementDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexElementFormat.cs" />
     <Compile Include="Graphics\Vertices\VertexElementUsage.cs" />
     <Compile Include="Graphics\Vertices\VertexPosition2ColorTexture.cs" />
