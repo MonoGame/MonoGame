@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexElementUsage usage;
             public int index;
             public string name;
-            public short format;
             public int location;
         }
 
@@ -52,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].name = reader.ReadString();
                 _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 _attributes[a].index = reader.ReadByte();
-                _attributes[a].format = reader.ReadInt16();
+                var unused = reader.ReadInt16();
             }
         }
 
