@@ -169,7 +169,7 @@ namespace MonoGame.Tools.Pipeline
                 process.BeginErrorReadLine();
                 process.WaitForExit();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // TODO: What if we fail here?
             }
