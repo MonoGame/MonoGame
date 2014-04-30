@@ -155,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Wrap:
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
-        return (int)TextureWrapMode.MirroredRepeat;
+        return (int)All.MirroredRepeat;
       default:
         throw new ArgumentException("No support for " + textureAddressMode);
       }

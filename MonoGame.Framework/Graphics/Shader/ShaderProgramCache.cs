@@ -1,4 +1,4 @@
-﻿#if OPENGL
+#if OPENGL
 
 using System;
 using System.Collections.Generic;
@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var linked = 0;
 
-#if GLES
+#if GLES && !ANGLE
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, ref linked);
 #else
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);
