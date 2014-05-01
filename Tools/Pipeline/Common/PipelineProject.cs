@@ -6,14 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tools.Pipeline.Common;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -25,7 +26,7 @@ namespace MonoGame.Tools.Pipeline
     /// NOTE: This class should never have any dependancy on the 
     /// controller or view... it is only the data "model".
     /// </remarks>
-    class PipelineProject : IProjectItem
+    class PipelineProject : IProjectItem, INotifyPropertyChanged
     {        
         #region CommandLineParameters
 
@@ -48,14 +49,24 @@ namespace MonoGame.Tools.Pipeline
             ValueName = "directoryPath",
             Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir { get; set; }
-        
+
+        private List<string> _references;
+
         [Editor(typeof(AssemblyReferenceListEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(AssemblyReferenceListConverter))]
+        //[TypeConverter(typeof(AssemblyReferenceListConverter))]
         [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public List<string> References { get; private set; }
+        public List<string> References
+        {
+            get { return _references; }
+            set
+            {
+                _references = value;
+                OnPropertyChanged("References");
+            }
+        }
 
         [CommandLineParameter(
             Name = "platform",
@@ -185,6 +196,8 @@ namespace MonoGame.Tools.Pipeline
         {
             ContentItems = new ReadOnlyCollection<ContentItem>(_content);
             References = new List<string>();
+            //References.RaiseListChangedEvents = true;
+            //References.ListChanged += (e, f) => OnPropertyChanged("References");
         }
 
         public void Attach(IProjectObserver observer)
@@ -445,6 +458,20 @@ namespace MonoGame.Tools.Pipeline
             }
 
             processorParams = parameters.ToArray();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+                handler(this, e);
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
     }
 }

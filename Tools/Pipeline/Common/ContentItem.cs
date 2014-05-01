@@ -100,11 +100,11 @@ namespace MonoGame.Tools.Pipeline
         public void ResolveTypes()
         {
             _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
-            if (string.IsNullOrEmpty(ImporterName) && _importer != null)
+            if (_importer != null && (string.IsNullOrEmpty(ImporterName) || ImporterName != _importer.TypeName))
                 ImporterName = _importer.TypeName;
             
             _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
-            if (string.IsNullOrEmpty(ProcessorName) && _processor != null)
+            if (_processor != null && (string.IsNullOrEmpty(ProcessorName) || ProcessorName != _processor.TypeName ))
                 ProcessorName = _processor.TypeName;
 
             if (_processor == null)

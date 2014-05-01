@@ -43,14 +43,14 @@ namespace MonoGame.Tools.Pipeline
             _contextMenu = new ContextMenuStrip();
             _contextMenu.ItemClicked += OnContextMenuItemClicked;
 
-            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
+            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;            
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            //if (e.ChangedItem.PropertyDescriptor is ReferenceListElementPropertyDescriptor)            
-            //    _controller.OnReferencesModified();
-            //else
+            if (e.ChangedItem.Label == "References")            
+                _controller.OnReferencesModified();
+            else
                 _controller.OnProjectModified();
         }
 

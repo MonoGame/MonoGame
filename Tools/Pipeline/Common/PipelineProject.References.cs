@@ -1,14 +1,12 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace MonoGame.Tools.Pipeline.Common
+namespace MonoGame.Tools.Pipeline
 {
     /// <summary>
     /// Custom converter for the References property of a PipelineProject.
@@ -17,7 +15,7 @@ namespace MonoGame.Tools.Pipeline.Common
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(string))
+            if (sourceType == typeof (string))
                 return true;
 
             return false;
@@ -25,7 +23,7 @@ namespace MonoGame.Tools.Pipeline.Common
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(string))
+            if (destinationType == typeof (string))
                 return true;
 
             return false;
@@ -33,13 +31,13 @@ namespace MonoGame.Tools.Pipeline.Common
 
         public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
         {
-            var words = ((string)value).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var words = ((string)value).Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
             return new List<string>(words);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            return string.Join(";", (List<string>)value);
+            return string.Join("\n", (List<string>)value);
         }
     }
 
@@ -56,19 +54,20 @@ namespace MonoGame.Tools.Pipeline.Common
         public override object EditValue(ITypeDescriptorContext context, System.IServiceProvider provider, object value)
         {
             var svc = provider.GetService(typeof (IWindowsFormsEditorService)) as IWindowsFormsEditorService;
-            var str = value as string;
-            if (svc != null && str != null)
+            var lines = (List<string>)value;
+            if (svc != null && lines != null)
             {
                 using (var form = new AssemblyReferenceListEditForm())
                 {
-                    form.Value = str;
+                    form.Lines = lines.ToArray();
                     if (svc.ShowDialog(form) == DialogResult.OK)
                     {
-                        str = form.Value; 
+                        lines = new List<string>(form.Lines);
                     }
                 }
             }
-            return str;
+
+            return lines;            
         }
     }
 
@@ -77,27 +76,37 @@ namespace MonoGame.Tools.Pipeline.Common
     /// </summary>
     public class AssemblyReferenceListEditForm : Form
     {
-        private readonly TextBox _textbox;
+        private readonly RichTextBox _textbox;
         private readonly Button _okButton;
 
         public AssemblyReferenceListEditForm()
-        {
-            _textbox = new TextBox();
+        {            
+            StartPosition = FormStartPosition.CenterScreen;
+
+            _textbox = new RichTextBox()
+                {
+                    Dock = DockStyle.Fill,
+                };
             Controls.Add(_textbox);
 
             _okButton = new Button
                 {
-                    Text = "OK", 
-                    Dock = DockStyle.Bottom, 
+                    Text = "OK",
+                    Dock = DockStyle.Bottom,
                     DialogResult = DialogResult.OK
                 };
             Controls.Add(_okButton);
         }
 
-        public string Value
+        public string[] Lines
         {
-            get { return _textbox.Text; }
-            set { _textbox.Text = value; }
+            get { return _textbox.Lines; }
+            set 
+            { 
+                _textbox.Lines = value;
+                var size = TextRenderer.MeasureText(_textbox.Text, _textbox.Font, _textbox.Size, TextFormatFlags.Internal);
+                Size = size;
+            }
         }
     }
 }

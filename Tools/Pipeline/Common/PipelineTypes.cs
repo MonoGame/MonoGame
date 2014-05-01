@@ -145,6 +145,24 @@ namespace MonoGame.Tools.Pipeline
         public static ImporterTypeDescription InvalidImporter { get; private set; }
         public static ProcessorTypeDescription InvalidProcessor { get; private set; }
 
+        private static readonly Dictionary<string, string> _oldNameRemap = new Dictionary<string, string>()
+            {
+                { "MGMaterialProcessor", "MaterialProcessor" },
+                { "MGSongProcessor", "SongProcessor" },
+                { "MGSoundEffectProcessor", "SoundEffectProcessor" },
+                { "MGSpriteFontDescriptionProcessor", "FontDescriptionProcessor" },
+                { "MGSpriteFontTextureProcessor", "FontTextureProcessor" },
+                { "MGTextureProcessor", "TextureProcessor" },
+            };
+
+        private static string RemapOldNames(string name)
+        {
+            if (_oldNameRemap.ContainsKey(name))
+                return _oldNameRemap[name];
+
+            return name;
+        }
+
         static PipelineTypes()
         {
             InvalidImporter = new ImporterTypeDescription()
@@ -256,6 +274,8 @@ namespace MonoGame.Tools.Pipeline
         {
             if (!string.IsNullOrEmpty(name))
             {
+                name = RemapOldNames(name);
+                
                 foreach (var i in Importers)
                 {
                     if (i.TypeName.Equals(name))
@@ -286,6 +306,8 @@ namespace MonoGame.Tools.Pipeline
         {
             if (!string.IsNullOrEmpty(name))
             {
+                name = RemapOldNames(name);
+
                 foreach (var i in Processors)
                 {
                     if (i.TypeName.Equals(name))
@@ -316,7 +338,7 @@ namespace MonoGame.Tools.Pipeline
             
             var assemblies = new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
 
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var asm in assemblies)
             {
 #if SHIPPING
                 try
