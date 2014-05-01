@@ -17,6 +17,10 @@ using OpenTK.Graphics.OpenGL;
 using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 #endif
 
+#if ANGLE
+using OpenTK.Graphics;
+#endif
+
 #if GLES
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
@@ -39,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
         internal IGraphicsContext Context { get; private set; }
 #endif
 
@@ -113,9 +117,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+
+            #if GLES
+            // Create an OpenGL ES 2.0 context
+            var flags = GraphicsContextFlags.Embedded;
+            int major = 2;
+            int minor = 0;
+            #else
+            // Create an OpenGL compatibility context
+            var flags = GraphicsContextFlags.Default;
+            int major = 1;
+            int minor = 0;
+            #endif
 
             if (Context == null || Context.IsDisposed)
             {
@@ -142,23 +158,38 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 mode = new GraphicsMode(color, depth, stencil, samples);
-                Context = new GraphicsContext(mode, wnd);
+                try
+                {
+                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                }
+                catch (Exception e)
+                {
+                    Game.Instance.Log("Failed to create OpenGL context, retrying. Error: " +
+                        e.ToString());
+                    major = 1;
+                    minor = 0;
+                    flags = GraphicsContextFlags.Default;
+                    Context = new GraphicsContext(mode, wnd, major, minor, flags);
+                }
             }
             Context.MakeCurrent(wnd);
             (Context as IGraphicsContextInternal).LoadAll();
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
             // Provide the graphics context for background loading
+            // Note: this context should use the same GraphicsMode,
+            // major, minor version and flags parameters as the main
+            // context. Otherwise, context sharing will very likely fail.
             if (Threading.BackgroundContext == null)
             {
-                Threading.BackgroundContext = new GraphicsContext(mode, wnd);
+                Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
                 Threading.WindowInfo = wnd;
             }
 #endif
 
             MaxTextureSlots = 16;
 
-#if GLES
+#if ANDROID || IOS
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -167,8 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.GetInteger(All.MaxTextureSize, ref _maxTextureSize);
             GraphicsExtensions.CheckGLError();
-#endif
-#if !GLES
+#else
             GL.GetInteger(GetPName.MaxTextureImageUnits, out MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -178,13 +208,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxTextureSize, out _maxTextureSize);
             GraphicsExtensions.CheckGLError();
 
-            // Initialize draw buffer attachment array
-            int maxDrawBuffers;
-            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-            GraphicsExtensions.CheckGLError();
-            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-            for (int i = 0; i < maxDrawBuffers; i++)
-                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+#if !GLES
+			// Initialize draw buffer attachment array
+			int maxDrawBuffers;
+			GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+			for (int i = 0; i < maxDrawBuffers; i++)
+				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+#endif
 #endif
             _extensions = GetGLExtensions();
         }
@@ -298,12 +329,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES
+#if GLES && !ANGLE
 			GL.Clear((uint)bufferMask);
-            GraphicsExtensions.CheckGLError();
 #else
 			GL.Clear(bufferMask);
 #endif
+            GraphicsExtensions.CheckGLError();
            		
             // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;
@@ -323,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     Framebuffer.Delete(this.glRenderTargetFrameBuffer);
                 }
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
                 Context.Dispose();
                 Context = null;
 
@@ -361,7 +392,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
             Context.SwapBuffers();
 #else
             GL.Flush();

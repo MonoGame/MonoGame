@@ -15,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
 
     interface IView
     {
-        event SelectionChanged OnSelectionChanged;
+        //event SelectionChanged OnSelectionChanged;
 
         void Attach(IController controller);
 

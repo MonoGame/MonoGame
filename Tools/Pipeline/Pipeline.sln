@@ -2,12 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline", "Pipeline.csproj", "{734BF273-699A-4139-9124-AD4F4A66B50C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32} = {DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.Pipeline.Windows", "..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj", "{B950DE10-AC5D-4BD9-B817-51247C4A732D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Windows", "..\..\MonoGame.Framework\MonoGame.Framework.Windows.csproj", "{7DE47032-A904-4C29-BD22-2D235E8D91BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGCB", "..\MGCB\MGCB.csproj", "{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Windows", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.Windows.csproj", "{AE483C29-042E-4226-BA52-D247CE7676DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +36,10 @@ Global
 		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Debug|Any CPU.Build.0 = Debug|x64
 		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Release|Any CPU.ActiveCfg = Release|x64
 		{DCC0B1AD-8DC5-41C1-B6EC-404534CDEB32}.Release|Any CPU.Build.0 = Release|x64
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE483C29-042E-4226-BA52-D247CE7676DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

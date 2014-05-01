@@ -4,12 +4,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
+
 
 namespace MGCB
 {
@@ -18,7 +18,7 @@ namespace MGCB
         [CommandLineParameter(
             Name = "quiet",
             Description = "Only output content build errors.")]
-        public bool Quiet;
+        public bool Quiet = false;
 
         [CommandLineParameter(
             Name = "@",
@@ -41,17 +41,17 @@ namespace MGCB
         [CommandLineParameter(
             Name = "rebuild",
             Description = "Forces a full rebuild of all content.")]
-        public bool Rebuild;
+        public bool Rebuild = false;
 
         [CommandLineParameter(
             Name = "clean",            
             Description = "Delete all previously built content and intermediate files.")]
-        public bool Clean;
+        public bool Clean = false;
 
         [CommandLineParameter(
             Name = "incremental",
             Description = "Skip cleaning files not included in the current build.")]
-        public bool Incremental;
+        public bool Incremental = false;
 
         [CommandLineParameter(
             Name = "reference",
@@ -63,13 +63,13 @@ namespace MGCB
             Name = "platform",
             ValueName = "targetPlatform",
             Description = "Set the target platform for this build.  Defaults to Windows.")]
-        public TargetPlatform Platform;
+        public TargetPlatform Platform = TargetPlatform.Windows;
 
         [CommandLineParameter(
             Name = "profile",
             ValueName = "graphicsProfile",
             Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
-        public GraphicsProfile Profile;
+        public GraphicsProfile Profile = GraphicsProfile.HiDef;
 
         [CommandLineParameter(
             Name = "config",
@@ -81,13 +81,13 @@ namespace MGCB
             Name = "importer",
             ValueName = "className",
             Description = "Defines the class name of the content importer for reading source content.")]
-        public string Importer;
+        public string Importer = null;
 
         [CommandLineParameter(
             Name = "processor",
             ValueName = "className",
             Description = "Defines the class name of the content processor for processing imported content.")]
-        public string Processor;
+        public string Processor = null;
 
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
 

@@ -101,7 +101,6 @@ namespace Microsoft.Xna.Framework
 			//MultipleTouchEnabled = true;
 			
 			Mouse.Window = this;
-            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 		}
 
 		public GameWindow(Game game, RectangleF frame, NSOpenGLContext context) :
@@ -123,7 +122,6 @@ namespace Microsoft.Xna.Framework
 			// Enable multi-touch
 			//MultipleTouchEnabled = true;
 
-            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 		}
 
 		~GameWindow ()
@@ -157,6 +155,7 @@ namespace Microsoft.Xna.Framework
 		protected override void OnLoad (EventArgs e)
 		{
 			base.OnLoad (e);
+			Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 		}
 
 		protected override void OnRenderFrame (FrameEventArgs e)
@@ -680,19 +679,25 @@ namespace Microsoft.Xna.Framework
 		}
 		
 		public override void ScrollWheel (NSEvent theEvent)
-		{
-			PointF loc = theEvent.LocationInWindow;
-			UpdateMousePosition(loc);
-			
-			switch (theEvent.Type) {
-				case NSEventType.ScrollWheel:
-					if (theEvent.DeltaY > 0) {
-						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f+0.09f)*1200;
-					} else {
-						Mouse.ScrollWheelValue += (theEvent.DeltaY*0.1f-0.09f)*1200;
-					}
-				break;
-			}	
+		{ 
+			PointF loc = theEvent.LocationInWindow; 
+			UpdateMousePosition (loc); 
+			switch (theEvent.Type) 
+			{ 
+			case NSEventType.ScrollWheel: 
+				if (theEvent.ScrollingDeltaY != 0) 
+				{ 
+					if (theEvent.ScrollingDeltaY > 0) 
+					{ 
+						Mouse.ScrollWheelValue += (theEvent.ScrollingDeltaY * 0.1f + 0.09f) * 1200; 
+					} 
+					else 
+					{ 
+						Mouse.ScrollWheelValue += (theEvent.ScrollingDeltaY * 0.1f - 0.09f) * 1200; 
+					} 
+				} 
+				break; 
+			} 
 		}
 
 		public override void MouseMoved (NSEvent theEvent)

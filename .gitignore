@@ -58,6 +58,8 @@ Documentation/Output/
 # all projects have been converted over.
 MonoGame.Framework.Android.csproj
 MonoGame.Framework.Android.sln
+MonoGame.Framework.Angle.csproj
+MonoGame.Framework.Angle.sln
 MonoGame.Framework.iOS.csproj
 MonoGame.Framework.iOS.sln
 MonoGame.Framework.Linux.csproj

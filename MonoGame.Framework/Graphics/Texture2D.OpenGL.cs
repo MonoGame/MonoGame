@@ -47,7 +47,7 @@ using Android.Graphics;
 #endif
 #endif // OPENGL
 
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MONOMAC || ANGLE
 using System.Drawing.Imaging;
 #endif
 
@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         else
                         {
                             GL.TexImage2D(TextureTarget.Texture2D, level,
-#if GLES
+#if GLES && !ANGLE
                                 (int)glInternalFormat,
 #else
                                 glInternalFormat,
@@ -478,7 +478,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return texture;
             }
 #endif
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
             Bitmap image = (Bitmap)Bitmap.FromStream(stream);
             try
             {

@@ -292,15 +292,15 @@ namespace TwoMGFX
 			public uint rows;
 			public uint columns;
 			public uint element_count;
-			public uint annotation_count;
+			public uint annotation_count = 0;
 			public uint member_count;
-			public uint flags;
-			public uint bytes;
+			public uint flags = 0;
+			public uint bytes = 0;
 
             public int bufferIndex = -1;
             public int bufferOffset = -1;
 
-			public d3dx_parameter[] annotation_handles;
+		    public d3dx_parameter[] annotation_handles = null;
 			public d3dx_parameter[] member_handles;
 
             public override string ToString()
@@ -322,31 +322,31 @@ namespace TwoMGFX
 
 		public class d3dx_sampler
 		{
-			public uint state_count;
-			public d3dx_state[] states;
+		    public uint state_count = 0;
+		    public d3dx_state[] states = null;
 		}
 		
 		public class d3dx_pass
 		{
 			public string name;
 			public uint state_count;
-			public uint annotation_count;
+		    public uint annotation_count = 0;
 
 			public BlendState blendState;
 			public DepthStencilState depthStencilState;
 			public RasterizerState rasterizerState;
 
 			public d3dx_state[] states;
-			public d3dx_parameter[] annotation_handles;
+		    public d3dx_parameter[] annotation_handles = null;
 		}
 
 		public class d3dx_technique
 		{
 			public string name;
 			public uint pass_count;
-			public uint annotation_count;
+		    public uint annotation_count = 0;
 
-			public d3dx_parameter[] annotation_handles;
+		    public d3dx_parameter[] annotation_handles = null;
 			public d3dx_pass[] pass_handles;
 		}
 
