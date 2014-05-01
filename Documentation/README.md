@@ -34,13 +34,13 @@ The API reference documentation is a big part of the documentation effort for Mo
 In the reference documentation every word should strive to provide additional information beyond the API itself.  If the documentation only rehashes or rephrases what is already apparent in the class, method, parameter, or property name it has zero value and will only waste the time of both the writer and reader.
 
 #### The First Sentence Is The Most Importaint
-There is no garanteee that the reader will read beyond the first sentance of the reference documentation.  This is why that first sentance is the most importaint and should convey the most key peice of information.  Take your time to write the most concise and clear first sentance possible.  This helps users tremendously and goes a long way towards having great documentation.
+There is no guarantee that the reader will read beyond the first sentence of the reference documentation.  This is why that first sentence is the most important and should convey the most key piece of information.  Take your time to write the most concise and clear first sentence possible.  This helps users tremendously and goes a long way towards having great documentation.
 
 #### Surface Information Hidden In the Code
 Being inline with the code allows you to easily look for critical information within it that the user might not know from looking at the API alone.  Take your time to explore inner method calls and platform specific sections of the code.  The time to write the documentation is once you feel you fully understand the code you are documenting.  If you don't feel you understand the code then leave the documentation for someone else to write.
 
 #### Documentation Is Referenced Not Read
-Remeber that the user is searching for an awnser for a specific question.  It is your job to predict these questions and provide them clear awnsers.
+Remember that the user is searching for an answer for a specific question.  It is your job to predict these questions and provide them clear answers.
 
 
 ## License
