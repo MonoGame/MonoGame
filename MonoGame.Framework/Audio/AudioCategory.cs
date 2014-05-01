@@ -192,9 +192,9 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns the name of this AudioCategoty
+        /// Returns the name of this AudioCategory
         /// </summary>
-        /// <returns>Friendly name of the AudioCategoty</returns>
+        /// <returns>Friendly name of the AudioCategory</returns>
         public override string ToString()
         {
             return name;
