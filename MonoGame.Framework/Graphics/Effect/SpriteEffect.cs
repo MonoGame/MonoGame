@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"
 #elif PSM
-            "MonoGame.Framework.PSMobile.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
+            "Microsoft.Xna.Framework.PSSuite.Graphics.Resources.SpriteEffect.cgx" //FIXME: This shader is totally incomplete
 #else
             "Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"
 #endif
