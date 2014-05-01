@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tools.Pipeline.Common;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -46,7 +48,8 @@ namespace MonoGame.Tools.Pipeline
             ValueName = "directoryPath",
             Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir { get; set; }
-
+        
+        [Editor(typeof(AssemblyReferenceListEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(AssemblyReferenceListConverter))]
         [CommandLineParameter(
             Name = "reference",
@@ -313,8 +316,6 @@ namespace MonoGame.Tools.Pipeline
 
             using (var io = XmlReader.Create(File.OpenText(projectFilePath)))
             {
-                string element = null;
-
                 while (io.Read())
                 {
                     if (io.NodeType == XmlNodeType.Element)

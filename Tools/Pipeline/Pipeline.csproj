@@ -58,6 +58,9 @@
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\PipelineProject.References.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\MainView.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -48,9 +48,9 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if (e.ChangedItem.PropertyDescriptor is ReferenceListElementPropertyDescriptor)            
-                _controller.OnReferencesModified();
-            else
+            //if (e.ChangedItem.PropertyDescriptor is ReferenceListElementPropertyDescriptor)            
+            //    _controller.OnReferencesModified();
+            //else
                 _controller.OnProjectModified();
         }
 
