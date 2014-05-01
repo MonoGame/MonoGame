@@ -17,10 +17,14 @@ namespace TwoMGFX
             this.scanner = scanner;
         }
 
+         public ParseTree Parse(string input)
+        {
+            return Parse(input, "", new ParseTree());
+        }
+
         public ParseTree Parse(string input, string fileName)
         {
-            tree = new ParseTree();
-            return Parse(input, fileName, tree);
+            return Parse(input, fileName, new ParseTree());
         }
 
         public ParseTree Parse(string input, string fileName, ParseTree tree)
@@ -34,7 +38,7 @@ namespace TwoMGFX
             return tree;
         }
 
-        private void ParseStart(ParseNode parent)
+        private void ParseStart(ParseNode parent) // NonTerminalSymbol: Start
         {
             Token tok;
             ParseNode n;
@@ -42,17 +46,17 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler); // ZeroOrMore Rule
             while (tok.Type == TokenType.Code
                 || tok.Type == TokenType.Technique
                 || tok.Type == TokenType.Sampler)
             {
-                tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler);
+                tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler); // Choice Rule
                 switch (tok.Type)
-                {
+                { // Choice Rule
                     case TokenType.Code:
-                        tok = scanner.Scan(TokenType.Code);
+                        tok = scanner.Scan(TokenType.Code); // Terminal Rule: Code
                         n = node.CreateNode(tok, tok.ToString() );
                         node.Token.UpdateRange(tok);
                         node.Nodes.Add(n);
@@ -62,20 +66,20 @@ namespace TwoMGFX
                         }
                         break;
                     case TokenType.Technique:
-                        ParseTechnique_Declaration(node);
+                        ParseTechnique_Declaration(node); // NonTerminal Rule: Technique_Declaration
                         break;
                     case TokenType.Sampler:
-                        ParseSampler_Declaration(node);
+                        ParseSampler_Declaration(node); // NonTerminal Rule: Sampler_Declaration
                         break;
                     default:
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                         break;
-                }
-            tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler);
+                } // Choice Rule
+            tok = scanner.LookAhead(TokenType.Code, TokenType.Technique, TokenType.Sampler); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.EndOfFile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.EndOfFile); // Terminal Rule: EndOfFile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -85,9 +89,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Start
 
-        private void ParseTechnique_Declaration(ParseNode parent)
+        private void ParseTechnique_Declaration(ParseNode parent) // NonTerminalSymbol: Technique_Declaration
         {
             Token tok;
             ParseNode n;
@@ -95,8 +99,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Technique);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Technique); // Terminal Rule: Technique
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -105,11 +109,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                tok = scanner.Scan(TokenType.Identifier);
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -119,8 +123,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -129,14 +133,14 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            do {
-                ParsePass_Declaration(node);
-                tok = scanner.LookAhead(TokenType.Pass);
-            } while (tok.Type == TokenType.Pass);
+             // Concat Rule
+            do { // OneOrMore Rule
+                ParsePass_Declaration(node); // NonTerminal Rule: Pass_Declaration
+                tok = scanner.LookAhead(TokenType.Pass); // OneOrMore Rule
+            } while (tok.Type == TokenType.Pass); // OneOrMore Rule
 
-            
-            tok = scanner.Scan(TokenType.CloseBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -146,9 +150,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Technique_Declaration
 
-        private void ParseRender_State_Expression(ParseNode parent)
+        private void ParseRender_State_Expression(ParseNode parent) // NonTerminalSymbol: Render_State_Expression
         {
             Token tok;
             ParseNode n;
@@ -156,8 +160,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -166,8 +170,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -176,12 +180,12 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier, TokenType.Sign, TokenType.Number);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier, TokenType.Sign, TokenType.Number); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.Identifier:
-                    tok = scanner.Scan(TokenType.Identifier);
+                    tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -193,11 +197,11 @@ namespace TwoMGFX
                 case TokenType.Sign:
                 case TokenType.Number:
 
-                    
-                    tok = scanner.LookAhead(TokenType.Sign);
+                     // Concat Rule
+                    tok = scanner.LookAhead(TokenType.Sign); // Option Rule
                     if (tok.Type == TokenType.Sign)
                     {
-                        tok = scanner.Scan(TokenType.Sign);
+                        tok = scanner.Scan(TokenType.Sign); // Terminal Rule: Sign
                         n = node.CreateNode(tok, tok.ToString() );
                         node.Token.UpdateRange(tok);
                         node.Nodes.Add(n);
@@ -207,8 +211,8 @@ namespace TwoMGFX
                         }
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.Number);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -220,10 +224,10 @@ namespace TwoMGFX
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -233,9 +237,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Render_State_Expression
 
-        private void ParsePass_Declaration(ParseNode parent)
+        private void ParsePass_Declaration(ParseNode parent) // NonTerminalSymbol: Pass_Declaration
         {
             Token tok;
             ParseNode n;
@@ -243,8 +247,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Pass);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Pass); // Terminal Rule: Pass
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -253,11 +257,11 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Identifier); // Option Rule
             if (tok.Type == TokenType.Identifier)
             {
-                tok = scanner.Scan(TokenType.Identifier);
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -267,8 +271,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -277,33 +281,33 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier); // ZeroOrMore Rule
             while (tok.Type == TokenType.VertexShader
                 || tok.Type == TokenType.PixelShader
                 || tok.Type == TokenType.Identifier)
             {
-                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier);
+                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier); // Choice Rule
                 switch (tok.Type)
-                {
+                { // Choice Rule
                     case TokenType.VertexShader:
-                        ParseVertexShader_Pass_Expression(node);
+                        ParseVertexShader_Pass_Expression(node); // NonTerminal Rule: VertexShader_Pass_Expression
                         break;
                     case TokenType.PixelShader:
-                        ParsePixelShader_Pass_Expression(node);
+                        ParsePixelShader_Pass_Expression(node); // NonTerminal Rule: PixelShader_Pass_Expression
                         break;
                     case TokenType.Identifier:
-                        ParseRender_State_Expression(node);
+                        ParseRender_State_Expression(node); // NonTerminal Rule: Render_State_Expression
                         break;
                     default:
                         tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                         break;
-                }
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier);
+                } // Choice Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.Identifier); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseBracket);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -313,9 +317,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Pass_Declaration
 
-        private void ParseVertexShader_Pass_Expression(ParseNode parent)
+        private void ParseVertexShader_Pass_Expression(ParseNode parent) // NonTerminalSymbol: VertexShader_Pass_Expression
         {
             Token tok;
             ParseNode n;
@@ -323,8 +327,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.VertexShader);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.VertexShader); // Terminal Rule: VertexShader
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -333,8 +337,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -343,8 +347,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Compile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Compile); // Terminal Rule: Compile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -353,8 +357,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.ShaderModel);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ShaderModel); // Terminal Rule: ShaderModel
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -363,8 +367,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -373,8 +377,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -383,8 +387,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -393,8 +397,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -404,9 +408,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: VertexShader_Pass_Expression
 
-        private void ParsePixelShader_Pass_Expression(ParseNode parent)
+        private void ParsePixelShader_Pass_Expression(ParseNode parent) // NonTerminalSymbol: PixelShader_Pass_Expression
         {
             Token tok;
             ParseNode n;
@@ -414,8 +418,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.PixelShader);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.PixelShader); // Terminal Rule: PixelShader
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -424,8 +428,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -434,8 +438,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Compile);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Compile); // Terminal Rule: Compile
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -444,8 +448,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.ShaderModel);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ShaderModel); // Terminal Rule: ShaderModel
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -454,8 +458,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -464,8 +468,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -474,8 +478,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -484,8 +488,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -495,9 +499,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: PixelShader_Pass_Expression
 
-        private void ParseSampler_State_Expression(ParseNode parent)
+        private void ParseSampler_State_Expression(ParseNode parent) // NonTerminalSymbol: Sampler_State_Expression
         {
             Token tok;
             ParseNode n;
@@ -505,8 +509,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -515,8 +519,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -525,19 +529,19 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis, TokenType.Identifier, TokenType.Sign, TokenType.Number);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis, TokenType.Identifier, TokenType.Sign, TokenType.Number); // Choice Rule
             switch (tok.Type)
-            {
+            { // Choice Rule
                 case TokenType.LessThan:
                 case TokenType.OpenParenthesis:
 
-                    
-                    tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis);
+                     // Concat Rule
+                    tok = scanner.LookAhead(TokenType.LessThan, TokenType.OpenParenthesis); // Choice Rule
                     switch (tok.Type)
-                    {
+                    { // Choice Rule
                         case TokenType.LessThan:
-                            tok = scanner.Scan(TokenType.LessThan);
+                            tok = scanner.Scan(TokenType.LessThan); // Terminal Rule: LessThan
                             n = node.CreateNode(tok, tok.ToString() );
                             node.Token.UpdateRange(tok);
                             node.Nodes.Add(n);
@@ -547,7 +551,7 @@ namespace TwoMGFX
                             }
                             break;
                         case TokenType.OpenParenthesis:
-                            tok = scanner.Scan(TokenType.OpenParenthesis);
+                            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
                             n = node.CreateNode(tok, tok.ToString() );
                             node.Token.UpdateRange(tok);
                             node.Nodes.Add(n);
@@ -559,10 +563,10 @@ namespace TwoMGFX
                         default:
                             tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                             break;
-                    }
+                    } // Choice Rule
 
-                    
-                    tok = scanner.Scan(TokenType.Identifier);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -571,12 +575,12 @@ namespace TwoMGFX
                         return;
                     }
 
-                    
-                    tok = scanner.LookAhead(TokenType.GreaterThan, TokenType.CloseParenthesis);
+                     // Concat Rule
+                    tok = scanner.LookAhead(TokenType.GreaterThan, TokenType.CloseParenthesis); // Choice Rule
                     switch (tok.Type)
-                    {
+                    { // Choice Rule
                         case TokenType.GreaterThan:
-                            tok = scanner.Scan(TokenType.GreaterThan);
+                            tok = scanner.Scan(TokenType.GreaterThan); // Terminal Rule: GreaterThan
                             n = node.CreateNode(tok, tok.ToString() );
                             node.Token.UpdateRange(tok);
                             node.Nodes.Add(n);
@@ -586,7 +590,7 @@ namespace TwoMGFX
                             }
                             break;
                         case TokenType.CloseParenthesis:
-                            tok = scanner.Scan(TokenType.CloseParenthesis);
+                            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
                             n = node.CreateNode(tok, tok.ToString() );
                             node.Token.UpdateRange(tok);
                             node.Nodes.Add(n);
@@ -598,10 +602,10 @@ namespace TwoMGFX
                         default:
                             tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                             break;
-                    }
+                    } // Choice Rule
                     break;
                 case TokenType.Identifier:
-                    tok = scanner.Scan(TokenType.Identifier);
+                    tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -613,11 +617,11 @@ namespace TwoMGFX
                 case TokenType.Sign:
                 case TokenType.Number:
 
-                    
-                    tok = scanner.LookAhead(TokenType.Sign);
+                     // Concat Rule
+                    tok = scanner.LookAhead(TokenType.Sign); // Option Rule
                     if (tok.Type == TokenType.Sign)
                     {
-                        tok = scanner.Scan(TokenType.Sign);
+                        tok = scanner.Scan(TokenType.Sign); // Terminal Rule: Sign
                         n = node.CreateNode(tok, tok.ToString() );
                         node.Token.UpdateRange(tok);
                         node.Nodes.Add(n);
@@ -627,8 +631,8 @@ namespace TwoMGFX
                         }
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.Number);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -640,10 +644,10 @@ namespace TwoMGFX
                 default:
                     tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", 0x0002, tok));
                     break;
-            }
+            } // Choice Rule
 
-            
-            tok = scanner.Scan(TokenType.Semicolon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -653,9 +657,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_State_Expression
 
-        private void ParseSampler_Register_Expression(ParseNode parent)
+        private void ParseSampler_Register_Expression(ParseNode parent) // NonTerminalSymbol: Sampler_Register_Expression
         {
             Token tok;
             ParseNode n;
@@ -663,8 +667,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Colon); // Terminal Rule: Colon
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -673,8 +677,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Register);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Register); // Terminal Rule: Register
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -683,8 +687,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.OpenParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.OpenParenthesis); // Terminal Rule: OpenParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -693,8 +697,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -703,13 +707,13 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Comma);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Comma); // Option Rule
             if (tok.Type == TokenType.Comma)
             {
 
-                
-                tok = scanner.Scan(TokenType.Comma);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Comma); // Terminal Rule: Comma
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -718,8 +722,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.Identifier);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -728,13 +732,13 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.LookAhead(TokenType.OpenSquareBracket);
+                 // Concat Rule
+                tok = scanner.LookAhead(TokenType.OpenSquareBracket); // Option Rule
                 if (tok.Type == TokenType.OpenSquareBracket)
                 {
 
-                    
-                    tok = scanner.Scan(TokenType.OpenSquareBracket);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.OpenSquareBracket); // Terminal Rule: OpenSquareBracket
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -743,8 +747,8 @@ namespace TwoMGFX
                         return;
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.Number);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Number); // Terminal Rule: Number
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -753,8 +757,8 @@ namespace TwoMGFX
                         return;
                     }
 
-                    
-                    tok = scanner.Scan(TokenType.CloseSquareBracket);
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.CloseSquareBracket); // Terminal Rule: CloseSquareBracket
                     n = node.CreateNode(tok, tok.ToString() );
                     node.Token.UpdateRange(tok);
                     node.Nodes.Add(n);
@@ -765,8 +769,8 @@ namespace TwoMGFX
                 }
             }
 
-            
-            tok = scanner.Scan(TokenType.CloseParenthesis);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.CloseParenthesis); // Terminal Rule: CloseParenthesis
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -776,9 +780,9 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_Register_Expression
 
-        private void ParseSampler_Declaration(ParseNode parent)
+        private void ParseSampler_Declaration(ParseNode parent) // NonTerminalSymbol: Sampler_Declaration
         {
             Token tok;
             ParseNode n;
@@ -786,8 +790,8 @@ namespace TwoMGFX
             parent.Nodes.Add(node);
 
 
-            
-            tok = scanner.Scan(TokenType.Sampler);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Sampler); // Terminal Rule: Sampler
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -796,8 +800,8 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.Scan(TokenType.Identifier);
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Identifier); // Terminal Rule: Identifier
             n = node.CreateNode(tok, tok.ToString() );
             node.Token.UpdateRange(tok);
             node.Nodes.Add(n);
@@ -806,21 +810,21 @@ namespace TwoMGFX
                 return;
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Colon);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Colon); // ZeroOrMore Rule
             while (tok.Type == TokenType.Colon)
             {
-                ParseSampler_Register_Expression(node);
-            tok = scanner.LookAhead(TokenType.Colon);
+                ParseSampler_Register_Expression(node); // NonTerminal Rule: Sampler_Register_Expression
+            tok = scanner.LookAhead(TokenType.Colon); // ZeroOrMore Rule
             }
 
-            
-            tok = scanner.LookAhead(TokenType.Equals);
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Equals); // Option Rule
             if (tok.Type == TokenType.Equals)
             {
 
-                
-                tok = scanner.Scan(TokenType.Equals);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -829,8 +833,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.SamplerState);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.SamplerState); // Terminal Rule: SamplerState
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -839,8 +843,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.OpenBracket);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.OpenBracket); // Terminal Rule: OpenBracket
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -849,16 +853,16 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.LookAhead(TokenType.Identifier);
+                 // Concat Rule
+                tok = scanner.LookAhead(TokenType.Identifier); // ZeroOrMore Rule
                 while (tok.Type == TokenType.Identifier)
                 {
-                    ParseSampler_State_Expression(node);
-                tok = scanner.LookAhead(TokenType.Identifier);
+                    ParseSampler_State_Expression(node); // NonTerminal Rule: Sampler_State_Expression
+                tok = scanner.LookAhead(TokenType.Identifier); // ZeroOrMore Rule
                 }
 
-                
-                tok = scanner.Scan(TokenType.CloseBracket);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.CloseBracket); // Terminal Rule: CloseBracket
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -867,8 +871,8 @@ namespace TwoMGFX
                     return;
                 }
 
-                
-                tok = scanner.Scan(TokenType.Semicolon);
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
                 n = node.CreateNode(tok, tok.ToString() );
                 node.Token.UpdateRange(tok);
                 node.Nodes.Add(n);
@@ -879,7 +883,7 @@ namespace TwoMGFX
             }
 
             parent.Token.UpdateRange(node.Token);
-        }
+        } // NonTerminalSymbol: Sampler_Declaration
 
 
     }

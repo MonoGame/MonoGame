@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < _buffers.Length; i++)
             {
                 var buffer = _buffers[i];
-                if (buffer != null)
+                if (buffer != null && !buffer.IsDisposed)
                 {
 #if DIRECTX
                     buffer.PlatformApply(device, _stage, i);

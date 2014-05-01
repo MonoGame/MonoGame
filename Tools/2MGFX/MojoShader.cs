@@ -85,7 +85,7 @@ namespace TwoMGFX
 		    /// MOJOSHADER_SRC_PROFILE_HLSL_PS_3_0 -> "hlsl_ps_3_0"
 		    public const string MOJOSHADER_SRC_PROFILE_HLSL_PS_3_0 = "hlsl_ps_3_0";
 		    
-		    /// MOJOSHADER_AST_DATATYPE_CONST -> (1 << 31)
+		    // MOJOSHADER_AST_DATATYPE_CONST -> (1 << 31)
 		    public const int MOJOSHADER_AST_DATATYPE_CONST = (1) << (31);
 		}
 		
@@ -1055,31 +1055,31 @@ namespace TwoMGFX
 		
 		public enum MOJOSHADER_astVariableAttributes {
 		    
-		    /// MOJOSHADER_AST_VARATTR_EXTERN -> (1<<0)
+		    // MOJOSHADER_AST_VARATTR_EXTERN -> (1<<0)
 		    MOJOSHADER_AST_VARATTR_EXTERN = (1) << (0),
 		    
-		    /// MOJOSHADER_AST_VARATTR_NOINTERPOLATION -> (1<<1)
+		    // MOJOSHADER_AST_VARATTR_NOINTERPOLATION -> (1<<1)
 		    MOJOSHADER_AST_VARATTR_NOINTERPOLATION = (1) << (1),
 		    
-		    /// MOJOSHADER_AST_VARATTR_SHARED -> (1<<2)
+		    // MOJOSHADER_AST_VARATTR_SHARED -> (1<<2)
 		    MOJOSHADER_AST_VARATTR_SHARED = (1) << (2),
 		    
-		    /// MOJOSHADER_AST_VARATTR_STATIC -> (1<<3)
+		    // MOJOSHADER_AST_VARATTR_STATIC -> (1<<3)
 		    MOJOSHADER_AST_VARATTR_STATIC = (1) << (3),
 		    
-		    /// MOJOSHADER_AST_VARATTR_UNIFORM -> (1<<4)
+		    // MOJOSHADER_AST_VARATTR_UNIFORM -> (1<<4)
 		    MOJOSHADER_AST_VARATTR_UNIFORM = (1) << (4),
 		    
-		    /// MOJOSHADER_AST_VARATTR_VOLATILE -> (1<<5)
+		    // MOJOSHADER_AST_VARATTR_VOLATILE -> (1<<5)
 		    MOJOSHADER_AST_VARATTR_VOLATILE = (1) << (5),
 		    
-		    /// MOJOSHADER_AST_VARATTR_CONST -> (1<<6)
+		    // MOJOSHADER_AST_VARATTR_CONST -> (1<<6)
 		    MOJOSHADER_AST_VARATTR_CONST = (1) << (6),
 		    
-		    /// MOJOSHADER_AST_VARATTR_ROWMAJOR -> (1<<7)
+		    // MOJOSHADER_AST_VARATTR_ROWMAJOR -> (1<<7)
 		    MOJOSHADER_AST_VARATTR_ROWMAJOR = (1) << (7),
 		    
-		    /// MOJOSHADER_AST_VARATTR_COLUMNMAJOR -> (1<<8)
+		    // MOJOSHADER_AST_VARATTR_COLUMNMAJOR -> (1<<8)
 		    MOJOSHADER_AST_VARATTR_COLUMNMAJOR = (1) << (8),
 		}
 		
@@ -2723,19 +2723,19 @@ namespace TwoMGFX
 		
 		public enum MOJOSHADER_shaderType {
 		    
-		    /// MOJOSHADER_TYPE_UNKNOWN -> 0
+		    // MOJOSHADER_TYPE_UNKNOWN -> 0
 		    MOJOSHADER_TYPE_UNKNOWN = 0,
 		    
-		    /// MOJOSHADER_TYPE_PIXEL -> (1<<0)
+		    // MOJOSHADER_TYPE_PIXEL -> (1<<0)
 		    MOJOSHADER_TYPE_PIXEL = (1) << (0),
 		    
-		    /// MOJOSHADER_TYPE_VERTEX -> (1<<1)
+		    // MOJOSHADER_TYPE_VERTEX -> (1<<1)
 		    MOJOSHADER_TYPE_VERTEX = (1) << (1),
 		    
-		    /// MOJOSHADER_TYPE_GEOMETRY -> (1<<2)
+		    // MOJOSHADER_TYPE_GEOMETRY -> (1<<2)
 		    MOJOSHADER_TYPE_GEOMETRY = (1) << (2),
 		    
-		    /// MOJOSHADER_TYPE_ANY -> 0xFFFFFFFF
+		    // MOJOSHADER_TYPE_ANY -> 0xFFFFFFFF
 		    MOJOSHADER_TYPE_ANY = -1,
 		}
 		
@@ -2748,7 +2748,7 @@ namespace TwoMGFX
 		
 		public enum MOJOSHADER_attributeType {
 		    
-		    /// MOJOSHADER_ATTRIBUTE_UNKNOWN -> -1
+		    // MOJOSHADER_ATTRIBUTE_UNKNOWN -> -1
 		    MOJOSHADER_ATTRIBUTE_UNKNOWN = -1,
 		    
 		    MOJOSHADER_ATTRIBUTE_BYTE,

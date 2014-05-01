@@ -53,7 +53,7 @@ namespace TwoMGFX
                 writer.Write(attrib.name);
                 writer.Write((byte)attrib.usage);
                 writer.Write((byte)attrib.index);
-                writer.Write(attrib.format);
+                writer.Write((short)0); // Unused
             }
         }
     }

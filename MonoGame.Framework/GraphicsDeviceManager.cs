@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -284,6 +284,8 @@ namespace Microsoft.Xna.Framework
 
 #elif WINDOWS || LINUX
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
+            _graphicsDevice.Context.SwapInterval =
+                _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
