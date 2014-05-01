@@ -7,11 +7,11 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    /// <summary>Provides a loaded sound resource. You can play multiple instances of the SoundEffect by calling Play.</summary>
+    /// <summary>Represents a loaded sound resource.</summary>
     /// <remarks>
-    /// <para>A SoundEffect contains the audio data and metadata (such as wave data and loop information) loaded from a sound file. You can create multiple SoundEffectInstance objects, and play them from a single SoundEffect. These objects share the resources of that SoundEffect.</para>
-    /// <para>You can create a SoundEffect by calling ContentManager.Load. When you make that call, use the type SoundEffect and the asset name of an audio file. The audio file must be part of the Content project. Be sure to use the SoundEffect - XNA Framework content processor.</para>
-    /// <para>The only limit to the number of loaded SoundEffect objects is memory. A loaded SoundEffect will continue to hold its memory resources throughout its lifetime. All SoundEffectInstance objects created from a SoundEffect share memory resources. When a SoundEffect object is destroyed, all SoundEffectInstance objects previously created by that SoundEffect will stop playing and become invalid.</para>
+    /// <para>A SoundEffect represents the buffer used to hold audio data and metadata. SoundEffectInstances are used to play from SoundEffects. Multiple SoundEffectinstance objects can be created and played from the same SoundEffect object.</para>
+    /// <para>The only limit on the number of loaded SoundEffects allowed is only restricted by available memory. When a SoundEffect is disposed, all SoundEffectInstances created from it will become invalid.</para>
+    /// <para>SoundEffect.Play() can be used for 'fire and forget' sounds. If advanced playback controls like volume or pitch is required, use SoundEffect.CreateInstance().</para>
     /// </remarks>
     public sealed partial class SoundEffect : IDisposable
     {
@@ -32,12 +32,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Public Constructors
 
-        /// <summary>
-        /// Initializes a new instance of SoundEffect based on an audio buffer, sample rate, and number of audio channels.
-        /// </summary>
-        /// <param name="buffer">Buffer that contains the audio data. The audio format must be PCM wave data.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio data.</param>
-        /// <param name="channels">Number of channels (mono or stereo) of audio data.</param>
+        /// <param name="buffer">Buffer containing PCM wave data.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
+        /// <param name="channels">Number of channels (mono or stereo).</param>
         public SoundEffect(byte[] buffer, int sampleRate, AudioChannels channels)
         {
             _duration = GetSampleDuration(buffer.Length, sampleRate, channels);
@@ -45,16 +42,14 @@ namespace Microsoft.Xna.Framework.Audio
             PlatformInitialize(buffer, sampleRate, channels);
         }
 
-        /// <summary>
-        /// Initializes a new instance of SoundEffect with specified parameters such as audio sample rate, channels, looping criteria, and a buffer to hold the audio.
-        /// </summary>
-        /// <param name="buffer">Buffer that contains the audio data. The audio format must be PCM wave data.</param>
+        /// <param name="buffer">Buffer containing PCM wave data.</param>
         /// <param name="offset">Offset, in bytes, to the starting position of the audio data.</param>
         /// <param name="count">Amount, in bytes, of audio data.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio data.</param>
-        /// <param name="channels">Number of channels (mono or stereo) of audio data.</param>
-        /// <param name="loopStart">Loop start in samples.</param>
-        /// <param name="loopLength">Loop length in samples.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz)</param>
+        /// <param name="channels">Number of channels (mono or stereo).</param>
+        /// <param name="loopStart">The position, in samples, where the audio should begin looping.</param>
+        /// <param name="loopLength">The duration, in samples, that audio should loop over.</param>
+        /// <remarks>Use SoundEffect.GetSampleDuration() to convert time to samples.</remarks>
         public SoundEffect(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
             _duration = GetSampleDuration(count, sampleRate, channels);
@@ -70,7 +65,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Creates a new SoundEffectInstance for this SoundEffect.
         /// </summary>
         /// <returns>A new SoundEffectInstance for this SoundEffect.</returns>
-        /// <remarks>Creating a SoundEffectInstance before calling Play allows you to access advanced playback features, such as 3D positioning.</remarks>
+        /// <remarks>Creating a SoundEffectInstance before calling SoundEffectInstance.Play() allows you to access advanced playback features, such as volume, pitch, and 3D positioning.</remarks>
         public SoundEffectInstance CreateInstance()
         {
             var inst = new SoundEffectInstance();
@@ -84,8 +79,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Creates a SoundEffect object based on the specified data stream.
         /// </summary>
-        /// <param name="s">Stream object that contains the data for this SoundEffect object.</param>
-        /// <returns>SoundEffect object that this method creates.</returns>
+        /// <param name="s">Stream object containing PCM wave data.</param>
+        /// <returns>A new SoundEffect object.</returns>
         /// <remarks>The Stream object must point to the head of a valid PCM wave file. Also, this wave file must be in the RIFF bitstream format.</remarks>
         public static SoundEffect FromStream(Stream s)
         {
@@ -109,10 +104,10 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns the sample duration based on the specified sample size and sample rate.
+        /// Gets the TimeSpan representation of a single sample.
         /// </summary>
         /// <param name="sizeInBytes">Size, in bytes, of audio data.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio content. The sampleRate must be between 8000 Hz and 48000 Hz</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz). Must be between 8000 Hz and 48000 Hz</param>
         /// <param name="channels">Number of channels in the audio data.</param>
         /// <returns>TimeSpan object that represents the calculated sample duration.</returns>
         public static TimeSpan GetSampleDuration(int sizeInBytes, int sampleRate, AudioChannels channels)
@@ -131,12 +126,12 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns the size of the audio sample based on duration, sample rate, and audio channels.
+        /// Gets the size of a sample from a TimeSpan.
         /// </summary>
         /// <param name="duration">TimeSpan object that contains the sample duration.</param>
-        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio content. The sampleRate parameter must be between 8,000 Hz and 48,000 Hz.</param>
+        /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio data. Must be between 8,000 and 48,000 Hz.</param>
         /// <param name="channels">Number of channels in the audio data.</param>
-        /// <returns></returns>
+        /// <returns>Size of a single sample of audio data.</returns>
         public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
         {
             if (sampleRate < 8000 || sampleRate > 48000)
@@ -155,27 +150,27 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region Play
 
-        /// <summary>Plays a sound</summary>
-        /// <returns>true if the sound is playing back successfully; otherwise, false.</returns>
+        /// <summary>Gets an internal SoundEffectInstance and plays it.</summary>
+        /// <returns>True if a SoundEffectInstance was successfully played, false if not.</returns>
         /// <remarks>
-        /// <para>Play returns false if too many sounds already are playing.</para>
-        /// <para>To loop a sound or apply 3D effects, call CreateInstance instead of Play, and SoundEffectInstance.Play.</para>
-        /// <para>Sounds play in a "fire and forget" fashion with Play; therefore, the lifetime of these sounds is managed by the framework. These sounds will play once, and then stop. They cannot be looped or 3D positioned. To loop a sound or apply 3D effects, call CreateInstance instead of Play, or SoundEffectInstance.Play.</para>
+        /// <para>Play returns false if more SoundEffectInstances are currently playing then the platform allows..</para>
+        /// <para>To loop a sound or apply 3D effects, call SoundEffect.CreateInstance() and SoundEffectInstance.Play() instead.</para>
+        /// <para>SoundEffectInstances used by SoundEffect.Play() are pooled internally.</para>
         /// </remarks>
         public bool Play()
         {
             return Play(1.0f, 0.0f, 0.0f);
         }
 
-        /// <summary>Plays a sound based on specified volume, pitch, and panning.</summary>
-        /// <returns>true if the sound is playing back successfully; otherwise, false.</returns>
-        /// <param name="volume">Volume, ranging from 0.0f (silence) to 1.0f (full volume). 1.0f is full volume relative to SoundEffect.MasterVolume.</param>
-        /// <param name="pitch">Pitch adjustment, ranging from -1.0f (down one octave) to 1.0f (up one octave). 0.0f is unity (normal) pitch.</param>
-        /// <param name="pan">Panning, ranging from -1.0f (full left) to 1.0f (full right). 0.0f is centered.</param>
+        /// <summary>Gets an internal SoundEffectInstance and plays it with the specified volume, pitch, and panning.</summary>
+        /// <returns>True if a SoundEffectInstance was successfully created and played, false if not.</returns>
+        /// <param name="volume">Volume, ranging from 0.0 (silence) to 1.0 (full volume). Volume during playback is scaled by SoundEffect.MasterVolume.</param>
+        /// <param name="pitch">Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave).</param>
+        /// <param name="pan">Panning, ranging from -1.0 (left speaker) to 0.0 (centered), 1.0 (right speaker).</param>
         /// <remarks>
-        /// <para>Play returns false if too many sounds already are playing.</para>
-        /// <para>To loop a sound or apply 3D effects, call CreateInstance instead of Play, and SoundEffectInstance.Play.</para>
-        /// <para>Sounds play in a "fire and forget" fashion with Play; therefore, the lifetime of these sounds is managed by the framework. These sounds will play once, and then stop. They cannot be looped or 3D positioned. To loop a sound or apply 3D effects, call CreateInstance instead of Play, or SoundEffectInstance.Play.</para>
+        /// <para>Play returns false if more SoundEffectInstances are currently playing then the platform allows.</para>
+        /// <para>To apply looping or simulate 3D audio, call SoundEffect.CreateInstance() and SoundEffectInstance.Play() instead.</para>
+        /// <para>SoundEffectInstances used by SoundEffect.Play() are pooled internally.</para>
         /// </remarks>
         public bool Play(float volume, float pitch, float pan)
         {
@@ -199,7 +194,6 @@ namespace Microsoft.Xna.Framework.Audio
         #region Public Properties
 
         /// <summary>Gets the duration of the SoundEffect.</summary>
-        /// <remarks>This is a read-only property. The sound duration is initialized from the sound file and cannot be changed.</remarks>
         public TimeSpan Duration { get { return _duration; } }
 
         /// <summary>Gets or sets the asset name of the SoundEffect.</summary>
@@ -215,11 +209,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         static float _masterVolume = 1.0f;
         /// <summary>
-        /// Gets or sets the master volume that affects all SoundEffectInstance sounds.
+        /// Gets or sets the master volume scale applied to all SoundEffectInstances.
         /// </summary>
         /// <remarks>
-        /// <para>The sound effect master volume affects all sound effect instances, including currently playing instances and newly created instances. Each SoundEffectInstance also has its own volume (SoundEffectInstance.Volume) that is relative to the master volume.</para>
-        /// <para>You can adjust the volume of all sounds effects by changing MasterVolume. You can adjust the volume of an individual SoundEffectInstance by changing SoundEffectInstance.Volume, or by specifying an instance volume when you call Play to create the instance.</para>
+        /// <para>Each SoundEffectInstance has its own Volume property that is independent to SoundEffect.MasterVolume. During playback SoundEffectInstance.Volume is multiplied by SoundEffect.MasterVolume.</para>
+        /// <para>This property is used to adjust the volume on all current and newly created SoundEffectInstances. The volume of an individual SoundEffectInstance can be adjusted on its own.</para>
         /// </remarks>
         public static float MasterVolume 
         { 
@@ -240,9 +234,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         static float _distanceScale = 1.0f;
         /// <summary>
-        /// Gets or sets a value that adjusts the effect of distance calculations on the sound (emitter).
+        /// Gets or sets the scale of distance calculations.
         /// </summary>
-        /// <remarks>If sounds are attenuating too fast, which means that the sounds get quiet too quickly as they move away from the listener, you need to increase the DistanceScale. If sounds are not attenuating fast enough, decrease the DistanceScale.</remarks>
+        /// <remarks> 
+        /// <para>DistanceScale defaults to 1.0 and must be greater than 0.0.</para>
+        /// <para>Higher values reduce the rate of falloff between the sound and listener.</para>
+        /// </remarks>
         public static float DistanceScale
         {
             get { return _distanceScale; }
@@ -257,11 +254,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         static float _dopplerScale = 1f;
         /// <summary>
-        /// Gets or sets a value that adjusts the effect of doppler calculations on the sound (emitter).
+        /// Gets or sets the scale of Doppler calculations applied to sounds.
         /// </summary>
         /// <remarks>
-        /// <para>DopplerScale changes the relative velocities of emitters and listeners.</para>
-        /// <para>If sounds are shifting (pitch) too much for the given relative velocity of the emitter and listener, decrease the DopplerScale. If sounds are not shifting enough for the given relative velocity of the emitter and listener, increase the DopplerScale.</para>
+        /// <para>DopplerScale defaults to 1.0 and must be greater or equal to 0.0</para>
+        /// <para>Affects the relative velocity of emitters and listeners.</para>
+        /// <para>Higher values more dramatically shift the pitch for the given relative velocity of the emitter and listener.</para>
         /// </remarks>
         public static float DopplerScale
         {
@@ -279,8 +277,11 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         static float speedOfSound = 343.5f;
-        /// <summary>Returns the speed of sound: 343.5 meters per second.</summary>
-        /// <remarks>Use this value to simulate different environments. A smaller speed of sound will exaggerate the doppler effect. A higher speed of sound will reduce the doppler effect. Speed of sound has no impact on distance attenuation.</remarks>
+        /// <summary>Returns the speed of sound used when calculating the Doppler effect..</summary>
+        /// <remarks>
+        /// <para>Defaults to 343.5. Value is measured in meters per second.</para>
+        /// <para>Has no effect on distance attenuation.</para>
+        /// </remarks>
         public static float SpeedOfSound
         {
             get { return speedOfSound; }
@@ -297,7 +298,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         #region IDisposable Members
 
-        /// <summary>Gets a value that indicates whether the object is disposed.</summary>
+        /// <summary>Indicates whether the object is disposed.</summary>
         public bool IsDisposed { get { return isDisposed; } }
 
         public void Dispose()

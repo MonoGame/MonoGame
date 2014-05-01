@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    /// <summary>Represents a sound bank, which is a collection of cues.</summary>
+    /// <summary>Represents a collection of Cues.</summary>
     public class SoundBank : IDisposable
     {
         //string name;
@@ -21,11 +21,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal AudioEngine AudioEngine { get { return audioengine; } }
 		
-        /// <summary>
-        /// Initializes a new instance of this class using a sound bank from file.
-        /// </summary>
-        /// <param name="audioEngine">Audio engine that will be associated with this sound bank.</param>
-        /// <param name="fileName">Path to the sound bank file.</param>
+        /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
+        /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
 #if WINRT
@@ -207,13 +204,12 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		
         /// <summary>
-        /// Gets a cue from the sound bank.
+        /// Returns a pooled Cue object.
         /// </summary>
         /// <param name="name">Friendly name of the cue to get.</param>
-        /// <returns>Cue object.</returns>
+        /// <returns>a unique Cue object from a pool.</returns>
         /// <remarks>
-        /// <para>Each Cue instance that you retrieve is unique, even when retrieving multiple cues with the same name. This allows multiple instances of the same Cue to exist and play simultaneously.</para>
-        /// <para>The Cue instance that you retrieve using this method is valid only as long as it is in scope. If the Cue instance is allowed to go out of scope, such as in the case of the Cue being retrieved and played without otherwise being stored, the Cue is marked to be disposed by the garbage collector. This will result in the Cue stopping playback at an indeterminate time when the garbage collector disposes of the Cue. To prevent this behavior, store Cue objects to prevent them from falling out of scope. Alternatively, you can call PlayCue to play a cue immediately that will not fall out of scope.</para>
+        /// <para>Cue instances are unique, even when sharing the same name. This allows multiple instances to simultaneously play.</para>
         /// </remarks>
         public Cue GetCue(string name)
         {
@@ -242,7 +238,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		#region IDisposable implementation
         /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
+        /// Immediately releases any unmanaged resources used by this object.
         /// </summary>
 		public void Dispose ()
 		{

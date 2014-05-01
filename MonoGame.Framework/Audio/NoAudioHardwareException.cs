@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
 
     /// <summary>
-    /// The exception that is thrown when no audio hardware is present, or when audio hardware is installed, but the device drivers for the audio hardware are not present or enabled.
+    /// The exception thrown when no audio hardware is present, or driver issues are detected.
     /// </summary>
     [DataContract]
 #if WINRT
@@ -19,20 +19,14 @@ namespace Microsoft.Xna.Framework.Audio
     public sealed class NoAudioHardwareException : ExternalException
 #endif
     {
-        /// <summary>
-        /// Initializes a new instance of this class with a specified error message and a reference to the inner exception that is the cause of this exception.
-        /// </summary>
-        /// <param name="msg">A message that describes the error.</param>
+        /// <param name="msg">A message describing the error.</param>
         public NoAudioHardwareException(string msg)
             : base(msg)
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of this class with a specified error message and a reference to the inner exception that is the cause of this exception.
-        /// </summary>
-        /// <param name="msg">A message that describes the error.</param>
-        /// <param name="innerException">The exception that is the cause of the current exception. If the inner parameter is not a null reference, the current exception is raised in a catch block that handles the inner exception.</param>
+        /// <param name="msg">A message describing the error.</param>
+        /// <param name="innerException">The exception that is the underlying cause of the current exception. If not null, the current exception is raised in a try/catch block thathandeled the innerException.</param>
         public NoAudioHardwareException(string msg, Exception innerException)
             : base(msg, innerException)
         {

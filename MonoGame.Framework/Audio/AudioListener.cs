@@ -9,11 +9,10 @@ using System.Text;
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>
-    /// Represents a 3D audio listener. This object, used in combination with an AudioEmitter, can simulate 3D audio effects for a given Cue or SoundEffectInstance.
+    /// Represents a 3D audio listener. Used when simulating 3D Audio.
     /// </summary>
 	public class AudioListener
 	{
-        /// <summary>Initializes a new instance of this class.</summary>
 		public AudioListener ()
 		{
 			Forward = Vector3.Forward;
@@ -22,21 +21,20 @@ namespace Microsoft.Xna.Framework.Audio
 			Velocity = Vector3.Zero;
 		}
 
-        /// <summary>Gets or sets the forward orientation vector for this listener.</summary>
+        /// <summary>Gets or sets the listener's forward vector.</summary>
         /// <remarks>
-        /// <para>By default, this value is Vector3.Forward. In most cases, it is not necessary to modify this value.</para>
-        /// <para>Doppler values between an AudioEmitter and an AudioListener are calculated by the relationship between AudioListener.Velocity and AudioEmitter.Velocity with respect to the axes defined by the Forward and Up vectors of each.</para>
-        /// <para>The values of the Forward and Up vectors must be orthonormal (at right angles to one another). Behavior is undefined if these vectors are not orthonormal.</para>
+        /// <para>Defaults to Vector3.Forward. (new Vector3(0, 0, -1))</para>
+        /// <para>Used with AudioListener.Velocity and AudioEmitter.Velocity to calculate Doppler values.</para>
+        /// <para>The Forward and Up vectors must be orthonormal.</para>
         /// </remarks>
 		public Vector3 Forward {
 			get;
 			set;
 		}
 
-        /// <summary>Gets or sets the position of this listener.</summary>
+        /// <summary>Gets or sets the listener's position.</summary>
         /// <remarks>
-        /// <para>By default, the value of this property is Vector3.Zero.</para>
-        /// <para>The relative positions of an AudioEmitter and an AudioListener are used to determine speaker positioning of a sound.</para>
+        /// Defaults to Vector3.Zero.
         /// </remarks>
 		public Vector3 Position {
 			get;
@@ -44,23 +42,23 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Gets or sets the upward orientation vector for this listener.
+        /// Gets or sets the listener's up vector..
         /// </summary>
         /// <remarks>
-        /// <para>By default, this value is Vector3.Up. In most cases, it is not necessary to modify this value.</para>
-        /// <para>Doppler values between an AudioEmitter and an AudioListener are calculated by the relationship between AudioListener.Velocity and AudioEmitter.Velocity with respect to the axes defined by the Forward and Up vectors of each.</para>
-        /// <para>The values of the Forward and Up vectors must be orthonormal (at right angles to one another). Behavior is undefined if these vectors are not orthonormal.</para>
+        /// <para>Defaults to Vector3.Up (New Vector3(0, -1, 0)).</para>
+        /// <para>Used with AudioListener.Velocity and AudioEmitter.Velocity to calculate Doppler values.</para>
+        /// <para>The values of the Forward and Up vectors must be orthonormal.</para>
         /// </remarks>
 		public Vector3 Up {
 			get;
 			set;
 		}
 
-        /// <summary>Gets or sets the velocity vector of this listener.</summary>
+        /// <summary>Gets or sets the listener's velocity vector.</summary>
         /// <remarks>
-        /// <para>By default, the value of this property is Vector3.Zero.</para>
-        /// <para>The Doppler effect value applied to a Cue is based on the relative Velocity values of the AudioEmitter and AudioListener, scaled by the DopplerScale value.</para>
-        /// <para>The Velocity property is used only to calculate Doppler values. It is not applied to the Position vector or otherwise used to set game state. You must set Velocity and Position each frame to maintain accurate 3D audio values in your game.</para>
+        /// <para>Defaults to Vector3.Zero.</para>
+        /// <para>Scaled by DopplerScale to calculate the Doppler effect value applied to a Cue.</para>
+        /// <para>This value is only used to calculate Doppler values.</para>
         /// </remarks>
 		public Vector3 Velocity {
 			get;

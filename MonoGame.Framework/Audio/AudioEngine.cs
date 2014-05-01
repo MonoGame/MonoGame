@@ -10,10 +10,14 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    /// <summary>Represents the audio engine. Applications use the methods of the audio engine to instantiate and manipulate core audio objects.</summary> 
+    /// <summary>
+    /// Class used to create and manipulate code audio objects.
+    /// </summary> 
 	public class AudioEngine : IDisposable
 	{
-        /// <summary>Specifies the current content version.</summary>
+        ///<summary>
+        ///Specifies the current content version.
+        ///</summary>
 		public const int ContentVersion = 46;
 		
 		internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
@@ -68,18 +72,16 @@ namespace Microsoft.Xna.Framework.Audio
 
 
 
-        /// <summary>Initializes a new instance of this class, using a path to an XACT global settings file.</summary>
-        /// <param name="settingsFile">Path to a global settings file.</param>
+        /// <param name="settingsFile">Path to a XACT settings file.</param>
 		public AudioEngine (string settingsFile)
 			: this(settingsFile, TimeSpan.Zero, "")
 		{
 		}
 
-        /// <summary>Initializes a new instance of this class, using a settings file, a specific audio renderer, and a specific speaker configuration.</summary> 
-        /// <param name="settingsFile">Path to a global settings file.</param>
-        /// <param name="lookAheadTime">Interactive audio and branch event look-ahead time, in milliseconds.</param>
+        /// <param name="settingsFile">Path to a XACT settings file.</param>
+        /// <param name="lookAheadTime">Determines how many milliseconds the engine will look ahead when determing when to transition to another sound.</param>
         /// <param name="rendererId">A string that specifies the audio renderer to use.</param>
-        /// <remarks>The lookAheadTime parameter specifies how far ahead the audio engine will look when determining when to transition to another sound. For sounds linked to Play events that use a wave variation list, this parameter should be set to greater than 250 milliseconds. Doing so should give the audio engine enough time to prepare streamed data before it is needed for the loop iteration.</remarks>
+        /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
 		public AudioEngine (string settingsFile, TimeSpan lookAheadTime, string rendererId)
 		{
 			//Read the xact settings file
@@ -205,15 +207,15 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>Performs periodic work required by the audio engine.</summary>
-        /// <remarks>This method drives the audio engine, and must be called once per frame.</remarks>
+        /// <remarks>Must be called at least once per frame.</remarks>
 		public void Update ()
 		{
 			// TODO throw new NotImplementedException ();
 		}
 
-        /// <summary>Gets an audio category.</summary>
+        /// <summary>Returns an audio category by name.</summary>
         /// <param name="name">Friendly name of the category to get.</param>
-        /// <returns>Audio category.</returns>
+        /// <returns>The AudioCategory with a matching name. Throws an exception if not found.</returns>
 		public AudioCategory GetCategory (string name)
 		{
 			return categories [categoryLookup [name]];
@@ -221,7 +223,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         /// <summary>Gets the value of a global variable.</summary>
         /// <param name="name">Friendly name of the variable.</param>
-        /// <returns>Value of the variable.</returns>
+        /// <returns>float value of the queried variable.</returns>
         /// <remarks>A global variable has global scope. It can be accessed by all code within a project.</remarks>
 		public float GetGlobalVariable(string name)
 		{
@@ -229,9 +231,8 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>Sets the value of a global variable.</summary>
-        /// <param name="name">Value of the global variable.</param>
-        /// <param name="value">Friendly name of the variable.</param>
-        /// <remarks>A global variable has global scope. It can be accessed by all code within a project.</remarks>
+        /// <param name="name">Friendly name of the variable.</param>
+        /// <param name="value">Value of the global variable.</param>
 		public void SetGlobalVariable (string name, float value)
 		{
 			variables [variableLookup [name]].value = value;

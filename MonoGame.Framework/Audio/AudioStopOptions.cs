@@ -6,12 +6,12 @@ using System;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    /// <summary>Controls how Cue objects should stop when Stop is called.</summary>
+    /// <summary>Controls how Cue objects should cease playback when told to stop.</summary>
 	public enum AudioStopOptions
 	{
-        /// <summary>Indicates the cue should stop normally, playing any release phase or transition specified in the content.</summary>
+        /// <summary>Stop normally, playing any pending release phases or transitions.</summary>
 		AsAuthored,
-        /// <summary>Indicates the cue should stop immediately, ignoring any release phase or transition specified in the content.</summary>
+        /// <summary>Immediately stops the cue, ignoring any pending release phases or transitions.</summary>
 		Immediate
 	}
 }

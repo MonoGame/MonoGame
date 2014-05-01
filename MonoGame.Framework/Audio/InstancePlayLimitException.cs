@@ -9,10 +9,10 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>
-    /// The exception that is thrown when there is an attempt to play more than the platform specific maximum SoundEffectInstance sounds concurrently.
+    /// The exception thrown when the system attempts to play more SoundEffectInstances than alloted.
     /// </summary>
     /// <remarks>
-    /// Each platform has limits on the number of sounds playing simultaneously. InstancePlayLimitException is thrown if this limit is exceeded. Paused or stopped SoundEffectInstance objects do not count against this limit.
+    /// Most platforms have a hard limit on how many sounds can be played simultaneously. This exception is thrown when that limit is exceeded.
     /// </remarks>
     [DataContract]
 #if WINRT

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>
-    /// Represents a particular category of sounds.
+    /// Provides functionality for manipulating multiple sounds at a time.
     /// </summary>
 	public struct AudioCategory : IEquatable<AudioCategory>
 	{
@@ -94,12 +94,12 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Specifies the friendly name of this category.
+        /// Gets the category's friendly name.
         /// </summary>
 		public string Name { get { return name; } }
 
         /// <summary>
-        /// Pauses all sounds associated with this category.
+        /// Pauses all associated sounds.
         /// </summary>
 		public void Pause ()
 		{
@@ -108,7 +108,7 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Resumes all paused sounds associated with this category.
+        /// Resumes all associated paused sounds.
         /// </summary>
 		public void Resume ()
 		{
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
         /// <summary>
-        /// Stops all sounds associated with this category.
+        /// Stops all associated sounds.
         /// </summary>
 		public void Stop ()
 		{
@@ -128,49 +128,49 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Sets the volume of all sounds associated with this category.
         /// </summary>
-        /// <param name="volume">Volume amplitude multiplier. volume is normally between 0.0 (silence) and 1.0 (full volume), but can range from 0.0f to float.MaxValue.</param>
+        /// <param name="volume">Volume scale applied to all sounds. A value of 1.0 is full volume.</param>
 		public void SetVolume(float volume) {
 			foreach (var sound in sounds)
 				sound.Volume = volume;
 		}
 
         /// <summary>
-        /// Determines whether the specified AudioCategory instances are equal.
+        /// Determines whether two AudioCategory instances are equal.
         /// </summary>
-        /// <param name="first">Object to the left of the equality operator.</param>
-        /// <param name="second">Object to the right of the equality operator.</param>
-        /// <returns>true if the objects are equal; false otherwise.</returns>
+        /// <param name="first">First AudioCategory instance to compare.</param>
+        /// <param name="second">Second AudioCategory instance to compare.</param>
+        /// <returns>true if the objects are equal or false if they aren't.</returns>
         public static bool operator ==(AudioCategory first, AudioCategory second)
         {
             return first.engine == second.engine && first.name.Equals(second.name, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// Determines whether the specified AudioCategory instances are not equal.
+        /// Determines whether two AudioCategory instances are not equal.
         /// </summary>
-        /// <param name="first">Object to the left of the inequality operator.</param>
-        /// <param name="second">Object to the right of the inequality operator.</param>
-        /// <returns>true if the objects are not equal; false otherwise.</returns>
+        /// <param name="first">First AudioCategory instance to compare.</param>
+        /// <param name="second">Second AudioCategory instance to compare.</param>
+        /// <returns>true if the objects are not equal or false if they are.</returns>
         public static bool operator !=(AudioCategory first, AudioCategory second)
 	    {
             return first.engine != second.engine || !first.name.Equals(second.name, StringComparison.Ordinal);
 	    }
 
         /// <summary>
-        /// Determines whether the specified AudioCategory is equal to this AudioCategory.
+        /// Determines whether two AudioCategory instances are equal.
         /// </summary>
         /// <param name="other">AudioCategory to compare with this instance.</param>
-        /// <returns>true if the objects are equal; false otherwise.</returns>
+        /// <returns>true if the objects are equal or false if they aren't</returns>
 	    public bool Equals(AudioCategory other)
 		{
             return engine == other.engine && name.Equals(other.name, StringComparison.Ordinal);
 		}
 
         /// <summary>
-        /// Determines whether the specified Object is equal to this AudioCategory.
+        /// Determines whether two AudioCategory instances are equal.
         /// </summary>
         /// <param name="obj">Object to compare with this instance.</param>
-        /// <returns>true if the objects are equal; false otherwise.</returns>
+        /// <returns>true if the objects are equal or false if they aren't.</returns>
         public override bool Equals(object obj)
         {
             if (obj is AudioCategory)
@@ -192,9 +192,9 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>
-        /// Returns a String representation of this AudioCategory.
+        /// Returns the name of this AudioCategoty
         /// </summary>
-        /// <returns>String representation of this object.</returns>
+        /// <returns>Friendly name of the AudioCategoty</returns>
         public override string ToString()
         {
             return name;
