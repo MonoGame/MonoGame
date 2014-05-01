@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a vertex index from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the vertex to be removed.</param>
         public void RemoveAt(int index)
@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel<T>.
+        /// Removes a range of vertex indices from the specified location in both PositionIndices and VertexChannel&lt;T&gt;.
         /// </summary>
         /// <param name="index">Index of the first vertex index to be removed.</param>
         /// <param name="count">Number of indices to remove.</param>

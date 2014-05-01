@@ -186,31 +186,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 throw new ObjectDisposedException("AudioContent");
 
 
-	    switch (formatType)
+        switch (formatType)
             {
                 case ConversionFormat.Adpcm:
 #if WINDOWS
                     ConvertWav(new AdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount));
-#else
-				throw new NotSupportedException("Adpcm encoding supported on Windows only");
-#endif
                     break;
+#else
+                    throw new NotSupportedException("Adpcm encoding supported on Windows only");
+#endif
 
                 case ConversionFormat.Pcm:
 #if WINDOWS
                     ConvertWav(new WaveFormat(QualityToSampleRate(quality), format.ChannelCount));
+                    break;
 #elif LINUX
                     // TODO Do the conversion for Linux platform
-#else
-				targetFileName = Guid.NewGuid().ToString() + ".wav";
-				if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.LinearPCM, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
-					throw new InvalidDataException("Failed to convert to PCM");
-				}
-				Read(targetFileName);
-				if (File.Exists(targetFileName))
-					File.Delete(targetFileName);
-#endif
+                    throw new NotSupportedException("Pcm has not been implemented on this platform");
+#else //MONOMAC
+                    targetFileName = Guid.NewGuid().ToString() + ".wav";
+                    if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.LinearPCM, MonoMac.AudioToolbox.AudioFileType.WAVE, quality)) {
+                        throw new InvalidDataException("Failed to convert to PCM");
+                    }
+                    Read(targetFileName);
+                    if (File.Exists(targetFileName))
+                        File.Delete(targetFileName);
                     break;
+#endif
 
                 case ConversionFormat.WindowsMedia:
 #if WINDOWS
@@ -227,29 +229,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 case ConversionFormat.ImaAdpcm:
 #if WINDOWS
                     ConvertWav(new ImaAdpcmWaveFormat(QualityToSampleRate(quality), format.ChannelCount, 4));
-#else
-				throw new NotImplementedException("ImaAdpcm has not been implemented on this platform");
-#endif
                     break;
+#else
+                    throw new NotImplementedException("ImaAdpcm has not been implemented on this platform");
+#endif
 
                 case ConversionFormat.Aac:
 #if WINDOWS
-				    reader.Position = 0;
-				    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
-				    if (mediaType == null) {
-					    throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
-				    }
-				    using (var encoder = new MediaFoundationEncoder (mediaType)) {
-					    encoder.Encode (targetFileName, reader);
-				    } 
+                    reader.Position = 0;
+                    var mediaType = SelectMediaType (AudioSubtypes.MFAudioFormat_AAC, reader.WaveFormat, QualityToBitRate (quality));
+                    if (mediaType == null) {
+                        throw new InvalidDataException ("Cound not find a suitable mediaType to convert to.");
+                    }
+                    using (var encoder = new MediaFoundationEncoder (mediaType)) {
+                        encoder.Encode (targetFileName, reader);
+                    }
+                    break;
 #elif LINUX
-					// TODO: Code for Linux convertion
-#else
-					if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
-						throw new InvalidDataException("Failed to convert to AAC");
-					}
+                    // TODO: Code for Linux convertion
+                    throw new NotImplementedException("Aac has not been implemented on this platform");
+#else //MONOMAC
+                    if (!ConvertAudio.Convert(fileName, targetFileName, AudioFormatType.MPEG4AAC, MonoMac.AudioToolbox.AudioFileType.MPEG4, quality)) {
+                        throw new InvalidDataException("Failed to convert to AAC");
+                    }
+                    break;
 #endif
-				break;
 
                 case ConversionFormat.Vorbis:
                     throw new NotImplementedException("Vorbis is not yet implemented as an encoding format.");

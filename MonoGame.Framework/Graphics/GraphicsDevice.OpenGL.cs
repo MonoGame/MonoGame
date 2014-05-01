@@ -5,17 +5,16 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input.Touch;
-using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
+using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
 #endif
 
 #if WINDOWS || LINUX
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 #endif
 
 #if GLES
@@ -32,6 +31,7 @@ using FramebufferTarget = OpenTK.Graphics.ES20.All;
 using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+using GLPrimitiveType = OpenTK.Graphics.ES20.All;
 #endif
 
 
@@ -39,6 +39,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
+#if WINDOWS || LINUX
+        internal IGraphicsContext Context { get; private set; }
+#endif
+
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
 #endif
@@ -109,6 +113,49 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
+#if WINDOWS || LINUX
+            GraphicsMode mode = GraphicsMode.Default;
+            var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
+
+            if (Context == null || Context.IsDisposed)
+            {
+                var color = PresentationParameters.BackBufferFormat.GetColorFormat();
+                var depth =
+                    PresentationParameters.DepthStencilFormat == DepthFormat.None ? 0 :
+                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth16 ? 16 :
+                    24;
+                var stencil =
+                    PresentationParameters.DepthStencilFormat == DepthFormat.Depth24Stencil8 ? 8 :
+                    0;
+
+                var samples = 0;
+                if (Game.Instance.graphicsDeviceManager.PreferMultiSampling)
+                {
+                    // Use a default of 4x samples if PreferMultiSampling is enabled
+                    // without explicitly setting the desired MultiSampleCount.
+                    if (PresentationParameters.MultiSampleCount == 0)
+                    {
+                        PresentationParameters.MultiSampleCount = 4;
+                    }
+
+                    samples = PresentationParameters.MultiSampleCount;
+                }
+
+                mode = new GraphicsMode(color, depth, stencil, samples);
+                Context = new GraphicsContext(mode, wnd);
+            }
+            Context.MakeCurrent(wnd);
+            (Context as IGraphicsContextInternal).LoadAll();
+            Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
+
+            // Provide the graphics context for background loading
+            if (Threading.BackgroundContext == null)
+            {
+                Threading.BackgroundContext = new GraphicsContext(mode, wnd);
+                Threading.WindowInfo = wnd;
+            }
+#endif
+
             MaxTextureSlots = 16;
 
 #if GLES
@@ -275,6 +322,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     Framebuffer.Delete(this.glRenderTargetFrameBuffer);
                 }
+
+#if WINDOWS || LINUX
+                Context.Dispose();
+                Context = null;
+
+                if (Threading.BackgroundContext != null)
+                {
+                    Threading.BackgroundContext.Dispose();
+                    Threading.BackgroundContext = null;
+                    Threading.WindowInfo = null;
+                }
+#endif
             });
         }
 
@@ -302,7 +361,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void PlatformPresent()
         {
-			GL.Flush();
+#if WINDOWS || LINUX
+            Context.SwapBuffers();
+#else
+            GL.Flush();
+#endif
             GraphicsExtensions.CheckGLError();
 
             // Dispose of any GL resources that were disposed in another thread
@@ -404,18 +467,18 @@ namespace Microsoft.Xna.Framework.Graphics
             return renderTarget;
         }
 
-        private static BeginMode PrimitiveTypeGL(PrimitiveType primitiveType)
+        private static GLPrimitiveType PrimitiveTypeGL(PrimitiveType primitiveType)
         {
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
-                    return BeginMode.Lines;
+                    return GLPrimitiveType.Lines;
                 case PrimitiveType.LineStrip:
-                    return BeginMode.LineStrip;
+                    return GLPrimitiveType.LineStrip;
                 case PrimitiveType.TriangleList:
-                    return BeginMode.Triangles;
+                    return GLPrimitiveType.Triangles;
                 case PrimitiveType.TriangleStrip:
-                    return BeginMode.TriangleStrip;
+                    return GLPrimitiveType.TriangleStrip;
             }
 
             throw new ArgumentException();
