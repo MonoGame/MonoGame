@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Resumes playback for a SoundEffectInstance.</summary>
-        /// <remarks>Only has effect on an SoundEffectInstance in a paused state.</remarks>
+        /// <remarks>Only has effect on a SoundEffectInstance in a paused state.</remarks>
         public void Resume()
         {
             PlatformResume();
