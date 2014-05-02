@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (_format != SurfaceFormat.Color)
                 throw new NotImplementedException();
 
-            var formatSize = _format.Size();
+            var formatSize = _format.GetSize();
             var dataSize = Width * Height * formatSize;
             var outputData = new byte[dataSize];
 
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public override void SetPixelData(byte[] sourceData)
         {
-            var size = _format.Size();
+            var size = _format.GetSize();
 
             for(var x = 0; x < Height; x++)
             {

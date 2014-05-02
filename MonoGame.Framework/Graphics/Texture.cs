@@ -52,11 +52,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.RgbPvrtc4Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:
                     Debug.Assert(MathHelper.IsPowerOfTwo(width), "This format must be power of two!");
-                    pitch = ((width + 3) / 4) * GraphicsExtensions.GetSize(_format);
+                    pitch = ((width + 3) / 4) * _format.GetSize();
                     break;
 
                 default:
-                    pitch = width * GraphicsExtensions.GetSize(_format);
+                    pitch = width * _format.GetSize();
                     break;
             };
 
