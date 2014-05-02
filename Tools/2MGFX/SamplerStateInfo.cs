@@ -121,24 +121,38 @@ namespace TwoMGFX
 
             // Figure out what kind of filter to set based on each
             // individual min, mag, and mip filter settings.
+            //
+            // NOTE: We're treating "None" and "Point" the same here
+            // and disabling mipmapping further below.
+            //
             if (_minFilter == TextureFilterType.Anisotropic)
                 _state.Filter = TextureFilter.Anisotropic;
             else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Linear)
                 _state.Filter = TextureFilter.Linear;
-            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Point)
+            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Linear && _mipFilter <= TextureFilterType.Point)
                 _state.Filter = TextureFilter.LinearMipPoint;
-            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
+            else if (_minFilter == TextureFilterType.Linear && _magFilter <= TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
                 _state.Filter = TextureFilter.MinLinearMagPointMipLinear;
-            else if (_minFilter == TextureFilterType.Linear && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Point)
+            else if (_minFilter == TextureFilterType.Linear && _magFilter <= TextureFilterType.Point && _mipFilter <= TextureFilterType.Point)
                 _state.Filter = TextureFilter.MinLinearMagPointMipPoint;
-            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Linear)
+            else if (_minFilter <= TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Linear)
                 _state.Filter = TextureFilter.MinPointMagLinearMipLinear;
-            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter == TextureFilterType.Point)
+            else if (_minFilter <= TextureFilterType.Point && _magFilter == TextureFilterType.Linear && _mipFilter <= TextureFilterType.Point)
                 _state.Filter = TextureFilter.MinPointMagLinearMipPoint;
-            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Point)
+            else if (_minFilter <= TextureFilterType.Point && _magFilter <= TextureFilterType.Point && _mipFilter <= TextureFilterType.Point)
                 _state.Filter = TextureFilter.Point;
-            else if (_minFilter == TextureFilterType.Point && _magFilter == TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
+            else if (_minFilter <= TextureFilterType.Point && _magFilter <= TextureFilterType.Point && _mipFilter == TextureFilterType.Linear)
                 _state.Filter = TextureFilter.PointMipLinear;
+
+            // Do we need to disable mipmapping?
+            if (_mipFilter == TextureFilterType.None)
+            {
+                // TODO: This is the only option we have right now for 
+                // disabling mipmapping.  We should add support for MinLod
+                // and MaxLod which potentially does a better job at this.
+                _state.MipMapLevelOfDetailBias = -16.0f;
+                _state.MaxMipLevel = 0;
+            }
 
             _dirty = false;
         }

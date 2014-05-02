@@ -52,12 +52,18 @@ namespace TwoMGFX
 		{
 			switch (value.ToLower())
 			{
+                case "none":
+                    return TextureFilterType.None;
 				case "linear":
 					return TextureFilterType.Linear;
 				case "point":
 					return TextureFilterType.Point;
 				case "anisotropic":
 					return TextureFilterType.Anisotropic;
+                case "pyramidalquad":
+                case "gaussianquad":
+                case "convolutionmono":
+                    throw new Exception("Unsupported texture filter type '" + value + "'.");
 				default:
 					throw new Exception("Unknown texture filter type '" + value + "'.");
 			}
