@@ -58,7 +58,7 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    public class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow
     {
         internal WinFormsGameForm _form;
 

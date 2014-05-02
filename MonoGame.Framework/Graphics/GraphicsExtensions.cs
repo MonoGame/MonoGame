@@ -30,7 +30,7 @@ using GetPName = OpenTK.Graphics.ES20.All;
 namespace Microsoft.Xna.Framework.Graphics
 {
 	[CLSCompliant(false)]
-    public static class GraphicsExtensions
+    internal static class GraphicsExtensions
     {
 #if OPENGL
         public static All OpenGL11(CullMode cull)
@@ -840,7 +840,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
     }
 
-    public class MonoGameGLException : Exception
+    internal class MonoGameGLException : Exception
     {
         public MonoGameGLException(string message)
             : base(message)
