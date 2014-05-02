@@ -17,17 +17,30 @@ namespace MonoGame.Tools.Pipeline
 
         private Task _buildProcess;
 
-        public PipelineProject Project
-        {
-            get { return _project; }
-        }
-
         public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
             _view.Attach(this);
             _project = project;
-            _project.Attach(_view as IProjectObserver);            
+            _project.Attach(_view as IProjectObserver);
+            ProjectOpen = false;
+        }
+
+        public bool ProjectOpen { get; private set; }
+
+        public bool ProjectDiry { get; set; }
+
+        public void OnProjectModified()
+        {            
+            Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
+            ProjectDiry = true;
+        }
+
+        public void OnReferencesModified()
+        {
+            Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
+            ProjectDiry = true;
+            ResolveTypes();
         }
 
         public void NewProject()
@@ -37,17 +50,61 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            // Clear the existing model data.
+            ProjectDiry = false;
+
+            // Clear existing project data, initialize to a new blank project.
             _project.NewProject();
             PipelineTypes.Load(_project);
 
-            string projectFilePath = Environment.CurrentDirectory;
-            if (!_view.AskSaveName(ref projectFilePath ))
+            // Ask user to choose a location on disk for the new project.
+            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
+            var projectFilePath = Environment.CurrentDirectory;
+            if (!_view.AskSaveName(ref projectFilePath))
+            {
+                // User canceled the save operation, so we cannot create the new project, unload it.
+                _project.CloseProject();
+                PipelineTypes.Unload();                
+                ProjectOpen = false;                
+            }
+            else
+            {
+                // User saved the new project.
+                _project.FilePath = projectFilePath;
+                ProjectOpen = true;
+            }            
+            
+            UpdateTree();
+        }
+
+        public void ImportProject()
+        {
+            // Make sure we give the user a chance to
+            // save the project if they need too.
+            if (!AskSaveProject())
                 return;
 
-            _project.FilePath = projectFilePath;            
+            string projectFilePath;
+            if (!_view.AskImportProject(out projectFilePath))
+                return;
 
-            // Setup a default project.
+#if SHIPPING
+            try
+#endif
+            {
+                _project.ImportProject(projectFilePath);
+                ResolveTypes();                
+                
+                ProjectOpen = true;
+                ProjectDiry = true;
+            }
+#if SHIPPING
+            catch (Exception e)
+            {
+                _view.ShowError("Open Project", "Failed to open project!");
+                return;
+            }
+#endif
+
             UpdateTree();
         }
 
@@ -67,13 +124,10 @@ namespace MonoGame.Tools.Pipeline
 #endif
             {
                 _project.OpenProject(projectFilePath);
-                PipelineTypes.Load(_project);
+                ResolveTypes();
 
-                foreach (var i in _project.ContentItems)
-                {
-                    i.View = _view;
-                    i.ResolveTypes();                    
-                }
+                ProjectOpen = true;
+                ProjectDiry = false;
             }
 #if SHIPPING
             catch (Exception e)
@@ -83,7 +137,7 @@ namespace MonoGame.Tools.Pipeline
             }
 #endif
 
-                UpdateTree();
+            UpdateTree();
         }
 
         public void CloseProject()
@@ -93,6 +147,8 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
+            ProjectOpen = false;
+            ProjectDiry = false;
             _project.CloseProject();
             UpdateTree();
         }
@@ -110,7 +166,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Do the save.
-            _project.IsDirty = false;
+            ProjectDiry = false;            
             _project.SaveProject();
 
             return true;
@@ -180,11 +236,17 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        /// <summary>
+        /// Prompt the user if they wish to save the project.
+        /// Save it if yes is chosen.
+        /// Return true if yes or no is chosen.
+        /// Return false if cancel is chosen.
+        /// </summary>
         private bool AskSaveProject()
         {
             // If the project is not dirty 
             // then we can simply skip it.
-            if (!_project.IsDirty)
+            if (!ProjectDiry)
                 return true;
 
             // Ask the user if they want to save or cancel.
@@ -236,7 +298,7 @@ namespace MonoGame.Tools.Pipeline
                 _view.AddTreeItem(item);
                 _view.SelectTreeItem(item);
 
-                _project.IsDirty = true;
+                ProjectDiry = true;
             }                      
         }
 
@@ -245,12 +307,18 @@ namespace MonoGame.Tools.Pipeline
             _project.RemoveItem(item);
             _view.RemoveTreeItem(item);
 
-            _project.IsDirty = true;
-        }
-
-        public void ProjectModified()
+            ProjectDiry = true;
+        }            
+    
+        private void ResolveTypes()
         {
-            _project.IsDirty = true;
+            PipelineTypes.Load(_project);
+            foreach (var i in _project.ContentItems)
+            {
+                i.View = _view;
+                i.ResolveTypes();
+                _view.UpdateProperties(i);
+            }                        
         }
     }
 }

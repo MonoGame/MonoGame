@@ -36,7 +36,7 @@ namespace MonoGame.Tools.Pipeline
             var processors = new List<ProcessorTypeDescription>();
             foreach (var p in PipelineTypes.Processors)
             {
-                if (p.InputType == importer.OutputType)
+                if (importer.OutputType.IsAssignableFrom(p.InputType))
                 {
                     processors.Add(p);
                 }
@@ -97,20 +97,43 @@ namespace MonoGame.Tools.Pipeline
             // Create the property collection and filter
             var props = new PropertyDescriptorCollection(null);
 
-            // Emit regular properties.
-            foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
+            if (value == PipelineTypes.InvalidProcessor)
             {
-                props.Add(prop);
-            }
-            
-            var processor = value as ProcessorTypeDescription;
-            var contentItem = context.Instance as ContentItem;
+                var contentItem = context.Instance as ContentItem;
 
-            foreach (var p in processor.Properties)
+                props.Add(new ReadonlyPropertyDescriptor("Name", typeof (string), typeof (ProcessorTypeDescription), contentItem.ProcessorName));
+
+                foreach (var p in contentItem.ProcessorParams)
+                {
+                    var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Key,
+                                                                                 p.Value.GetType(),
+                                                                                 typeof (ProcessorTypeDescription),
+                                                                                 contentItem.ProcessorParams);
+                    
+
+                    props.Add(desc);
+                }
+            }
+            else
             {
-                var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name, p.Type, typeof(ProcessorTypeDescription), contentItem.ProcessorParams);
-                props.Add(desc);                
-            }            
+                // Emit regular properties.
+                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
+                {
+                    props.Add(prop);
+                }
+
+                var processor = value as ProcessorTypeDescription;
+                var contentItem = context.Instance as ContentItem;
+
+                foreach (var p in processor.Properties)
+                {
+                    var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name,
+                                                                                 p.Type,
+                                                                                 typeof (ProcessorTypeDescription),
+                                                                                 contentItem.ProcessorParams);
+                    props.Add(desc);
+                }
+            }
 
             return props;
         }
@@ -119,6 +142,9 @@ namespace MonoGame.Tools.Pipeline
         {
             var contentItem = context.Instance as ContentItem;
             if (contentItem.Processor.Properties.Count() > 0)
+                return true;
+
+            if (contentItem.Processor == PipelineTypes.InvalidProcessor)
                 return true;
             
             return false;

@@ -139,66 +139,68 @@ namespace MonoGame.Tools.Pipeline
         private static List<ImporterInfo> _importers;
         private static List<ProcessorInfo> _processors;
 
-        //private List<Type> _writers;
-
-        public string ProjectDirectory { get; private set; }
-        public string OutputDirectory { get; private set; }
-        public string IntermediateDirectory { get; private set; }
-
-        public static ContentBuildLogger Logger { get; set; }
-
-        public static List<string> Assemblies { get; private set; }
-
-        /// <summary>
-        /// The current target graphics profile for which all content is built.
-        /// </summary>
-        public GraphicsProfile Profile { get; set; }
-
-        /// <summary>
-        /// The current target platform for which all content is built.
-        /// </summary>
-        public TargetPlatform Platform { get; set; }
-
-        /// <summary>
-        /// The build configuration passed thru to content processors.
-        /// </summary>
-        public string Config { get; set; }
-
         public static ImporterTypeDescription[] Importers { get; private set; }
-        public static ProcessorTypeDescription[] Processors { get; private set; }        
+        public static ProcessorTypeDescription[] Processors { get; private set; }
+
+        public static ImporterTypeDescription InvalidImporter { get; private set; }
+        public static ProcessorTypeDescription InvalidProcessor { get; private set; }
+
+        private static readonly Dictionary<string, string> _oldNameRemap = new Dictionary<string, string>()
+            {
+                { "MGMaterialProcessor", "MaterialProcessor" },
+                { "MGSongProcessor", "SongProcessor" },
+                { "MGSoundEffectProcessor", "SoundEffectProcessor" },
+                { "MGSpriteFontDescriptionProcessor", "FontDescriptionProcessor" },
+                { "MGSpriteFontTextureProcessor", "FontTextureProcessor" },
+                { "MGTextureProcessor", "TextureProcessor" },
+            };
+
+        private static string RemapOldNames(string name)
+        {
+            if (_oldNameRemap.ContainsKey(name))
+                return _oldNameRemap[name];
+
+            return name;
+        }
+
+        static PipelineTypes()
+        {
+            InvalidImporter = new ImporterTypeDescription()
+                {
+                    DisplayName = "Invalid / Missing Importer",
+                };
+
+            InvalidProcessor = new ProcessorTypeDescription()
+                {
+                    DisplayName = "Invalid / Missing Processor",
+                    Properties = new ProcessorTypeDescription.ProcessorPropertyCollection(new ProcessorTypeDescription.Property[0]),
+                };
+        }
 
         public static void Load(PipelineProject project)
         {
-            Assemblies = new List<string>();
-            Logger = new PipelineBuildLogger();
+            Unload();
 
-            var dir = Path.GetDirectoryName(project.FilePath);
-            //var ProjectDirectory = PathHelper.NormalizeDirectory(dir);
-            //OutputDirectory = PathHelper.NormalizeDirectory(Path.Combine(dir, project.OutputDir));
-            //IntermediateDirectory = PathHelper.NormalizeDirectory(Path.Combine(dir, project.IntermediateDir));
+            var assemblyPaths = new List<string>();
+
+            var projectRoot = project.Location;
 
             foreach (var i in project.References)
             {
-                var assemblyFilePath = Path.Combine(dir, i);
+                var path = Path.Combine(projectRoot, i);
 
-                if (assemblyFilePath == null)
+                if (string.IsNullOrEmpty(path))
                     throw new ArgumentException("assemblyFilePath cannot be null!");
-                if (!Path.IsPathRooted(assemblyFilePath))
+                if (!Path.IsPathRooted(path))
                     throw new ArgumentException("assemblyFilePath must be absolute!");
 
                 // Make sure we're not adding the same assembly twice.
-                assemblyFilePath = PathHelper.Normalize(assemblyFilePath);
-                if (!Assemblies.Contains(assemblyFilePath))
-                {
-                    Assemblies.Add(assemblyFilePath);
-
-                    //TODO need better way to update caches
-                    _processors = null;
-                    _importers = null;
-                }
+                path = PathHelper.Normalize(path);
+                if (!assemblyPaths.Contains(path))
+                    assemblyPaths.Add(path);                
             }
 
-            ResolveAssemblies();
+            ResolveAssemblies(assemblyPaths);
 
             var importerDescriptions = new ImporterTypeDescription[_importers.Count];
             var cur = 0;
@@ -256,18 +258,24 @@ namespace MonoGame.Tools.Pipeline
                 cur++;
             }
 
-            Processors = processorDescriptions;
+            Processors = processorDescriptions;            
         }
 
-        public void Unload()
-        {
-            
-        }
+        public static void Unload()
+        {            
+            _importers = null;
+            Importers = null;
+         
+            _processors = null;
+            Processors = null;
+        }        
 
         public static ImporterTypeDescription FindImporter(string name, string fileExtension)
         {
             if (!string.IsNullOrEmpty(name))
             {
+                name = RemapOldNames(name);
+                
                 foreach (var i in Importers)
                 {
                     if (i.TypeName.Equals(name))
@@ -280,7 +288,7 @@ namespace MonoGame.Tools.Pipeline
                         return i;
                 }
 
-                Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
+                //Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
                 return null;
             }
 
@@ -290,7 +298,7 @@ namespace MonoGame.Tools.Pipeline
                     return i;
             }
 
-            Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
+            //Debug.Fail(string.Format("Importer not found! name={0}, ext={1}", name, fileExtension));
             return null;
         }
 
@@ -298,34 +306,39 @@ namespace MonoGame.Tools.Pipeline
         {
             if (!string.IsNullOrEmpty(name))
             {
+                name = RemapOldNames(name);
+
                 foreach (var i in Processors)
                 {
                     if (i.TypeName.Equals(name))
                         return i;
                 }
 
-                Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
+                //Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
                 return null;
             }
 
-            foreach (var i in Processors)
+            if (importer != null)
             {
-                if (i.TypeName.Equals(importer.DefaultProcessor))
-                    return i;
+                foreach (var i in Processors)
+                {
+                    if (i.TypeName.Equals(importer.DefaultProcessor))
+                        return i;
+                }
             }
 
-            Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
+            //Debug.Fail(string.Format("Processor not found! name={0}, importer={1}", name, importer));
             return null;
         }
 
-        private static void ResolveAssemblies()
+        private static void ResolveAssemblies(IEnumerable<string> assemblyPaths)
         {
             _importers = new List<ImporterInfo>();
             _processors = new List<ProcessorInfo>();
             
             var assemblies = new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
 
-            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var asm in assemblies)
             {
 #if SHIPPING
                 try
@@ -342,26 +355,21 @@ namespace MonoGame.Tools.Pipeline
 #endif
             }
 
-            foreach (var assemblyPath in Assemblies)
+            foreach (var path in assemblyPaths)
             {
-                Type[] types;
-#if SHIPPING
                 try
-#endif
-                {
-                    var a = Assembly.LoadFrom(assemblyPath);
-                    types = a.GetExportedTypes();
+                {                    
+                    var a = Assembly.LoadFrom(path);
+                    var types = a.GetExportedTypes();
                     ProcessTypes(types);
                 }
-#if SHIPPING
-                catch (Exception e)
+                catch 
                 {
-                    Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
+                    //Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
                     // The assembly failed to load... nothing
                     // we can do but ignore it.
                     continue;
                 }                
-#endif
             }
         }
 
@@ -372,7 +380,7 @@ namespace MonoGame.Tools.Pipeline
                 if (t.IsAbstract)
                     continue;
 
-                if (t.GetInterface(@"IContentImporter") != null)
+                if (t.GetInterface(@"IContentImporter") == typeof(IContentImporter))
                 {
                     var attributes = t.GetCustomAttributes(typeof(ContentImporterAttribute), false);
                     if (attributes.Length != 0)
@@ -389,7 +397,7 @@ namespace MonoGame.Tools.Pipeline
                         _importers.Add(new ImporterInfo { Attribute = importerAttribute, Type = t });
                     }
                 }
-                else if (t.GetInterface(@"IContentProcessor") != null)
+                else if (t.GetInterface(@"IContentProcessor") == typeof(IContentProcessor))
                 {
                     var attributes = t.GetCustomAttributes(typeof(ContentProcessorAttribute), false);
                     if (attributes.Length != 0)
