@@ -699,7 +699,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static int Size(this SurfaceFormat surfaceFormat)
+        public static int GetSize(SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)
             {
@@ -744,7 +744,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 		
-        public static int GetTypeSize(this VertexElementFormat elementFormat)
+        public static int GetSize(VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
