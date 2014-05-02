@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <param name="msg">A message describing the error.</param>
-        /// <param name="innerException">The exception that is the underlying cause of the current exception. If not null, the current exception is raised in a try/catch block that handeled the innerException.</param>
+        /// <param name="innerException">The exception that is the underlying cause of the current exception. If not null, the current exception is raised in a try/catch block that handled the innerException.</param>
         public NoAudioHardwareException(string msg, Exception innerException)
             : base(msg, innerException)
         {
