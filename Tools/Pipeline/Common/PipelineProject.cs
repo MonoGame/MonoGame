@@ -26,7 +26,7 @@ namespace MonoGame.Tools.Pipeline
     /// NOTE: This class should never have any dependancy on the 
     /// controller or view... it is only the data "model".
     /// </remarks>
-    class PipelineProject : IProjectItem, INotifyPropertyChanged
+    class PipelineProject : IProjectItem
     {        
         #region CommandLineParameters
 
@@ -50,23 +50,12 @@ namespace MonoGame.Tools.Pipeline
             Description = "The directory where all intermediate files are written.")]
         public string IntermediateDir { get; set; }
 
-        private List<string> _references;
-
         [Editor(typeof(AssemblyReferenceListEditor), typeof(UITypeEditor))]
-        //[TypeConverter(typeof(AssemblyReferenceListConverter))]
         [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public List<string> References
-        {
-            get { return _references; }
-            set
-            {
-                _references = value;
-                OnPropertyChanged("References");
-            }
-        }
+        public List<string> References { get; set; }
 
         [CommandLineParameter(
             Name = "platform",
@@ -235,14 +224,13 @@ namespace MonoGame.Tools.Pipeline
         public void SaveProject()
         {
             const string lineFormat = "/{0}:{1}";
-            const string processorParamFormat = "{0}={1}";
-            const string commentFormat = "\n#---------------------- {0} ----------------------#\n";
+            const string processorParamFormat = "{0}={1}";            
             string line;
             var parameterLines = new List<string>();
 
             using (var io = File.CreateText(FilePath))
             {
-                line = string.Format(commentFormat, "Global Properties");
+                line = FormatDivider("Global Properties");
                 io.WriteLine(line);
 
                 line = string.Format(lineFormat, "outputDir", OutputDir);
@@ -257,7 +245,7 @@ namespace MonoGame.Tools.Pipeline
                 line = string.Format(lineFormat, "config", Config);
                 io.WriteLine(line);
 
-                line = string.Format(commentFormat, "References");
+                line = FormatDivider("References");
                 io.WriteLine(line);
 
                 foreach (var i in References)
@@ -266,12 +254,17 @@ namespace MonoGame.Tools.Pipeline
                     io.WriteLine(line);
                 }
 
-                line = string.Format(commentFormat, "Content");
+                line = FormatDivider("Content");
                 io.WriteLine(line);
 
                 //string prevProcessor = null;
                 foreach (var i in ContentItems)
                 {
+                    // Wrap content item lines with a begin comment line
+                    // to make them more cohesive (for version control).                    
+                    line = string.Format("#begin {0}", i.SourceFile);
+                    io.WriteLine(line);
+
                     // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
                     //if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
                     {
@@ -338,7 +331,7 @@ namespace MonoGame.Tools.Pipeline
                             string include, hintPath;
                             ReadReference(io, out include, out hintPath);
 
-                            if (!string.IsNullOrEmpty(hintPath))
+                            if (!string.IsNullOrEmpty(hintPath) && !hintPath.Contains("Microsoft"))
                                 References.Add(hintPath);
                         }
                         else if (io.LocalName.Equals("Compile"))
@@ -460,18 +453,15 @@ namespace MonoGame.Tools.Pipeline
             processorParams = parameters.ToArray();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(PropertyChangedEventArgs e)
+        private string FormatDivider(string label)
         {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, e);
-        }
+            const string commentFormat = "\n#----------------------------------------------------------------------------#\n";
 
-        protected void OnPropertyChanged(string propertyName)
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            label = " " + label + " ";
+            var src = commentFormat.Length/2 - label.Length/2;
+            var dst = src + label.Length;
+
+            return commentFormat.Substring(0, src) + label + commentFormat.Substring(dst);            
         }
     }
 }

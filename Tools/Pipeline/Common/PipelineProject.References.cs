@@ -9,39 +9,6 @@ using System.Windows.Forms.Design;
 namespace MonoGame.Tools.Pipeline
 {
     /// <summary>
-    /// Custom converter for the References property of a PipelineProject.
-    /// </summary>
-    internal class AssemblyReferenceListConverter : TypeConverter
-    {
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-        {
-            if (sourceType == typeof (string))
-                return true;
-
-            return false;
-        }
-
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
-            if (destinationType == typeof (string))
-                return true;
-
-            return false;
-        }
-
-        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
-        {
-            var words = ((string)value).Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
-            return new List<string>(words);
-        }
-
-        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
-        {
-            return string.Join("\n", (List<string>)value);
-        }
-    }
-
-    /// <summary>
     /// Custom editor for a the References property of a PipelineProject.
     /// </summary>
     public class AssemblyReferenceListEditor : UITypeEditor
@@ -80,7 +47,10 @@ namespace MonoGame.Tools.Pipeline
         private readonly Button _okButton;
 
         public AssemblyReferenceListEditForm()
-        {            
+        {
+            MinimizeBox = false;
+            MaximizeBox = false;
+            
             StartPosition = FormStartPosition.CenterScreen;
 
             _textbox = new RichTextBox()
@@ -104,8 +74,13 @@ namespace MonoGame.Tools.Pipeline
             set 
             { 
                 _textbox.Lines = value;
-                var size = TextRenderer.MeasureText(_textbox.Text, _textbox.Font, _textbox.Size, TextFormatFlags.Internal);
-                Size = size;
+
+                var size = TextRenderer.MeasureText(_textbox.Text, _textbox.Font, _textbox.Size, TextFormatFlags.TextBoxControl);
+                size.Height += _okButton.Height;
+                size.Height += _textbox.Font.Height;
+                size.Width += 50;
+
+                ClientSize = size;
             }
         }
     }
