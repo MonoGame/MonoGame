@@ -2,8 +2,9 @@
 {
     public enum TextureFilterType
     {
+        None,
+        Point,
         Linear, 
-        Anisotropic, 
-        Point
+        Anisotropic,
     }
 }
