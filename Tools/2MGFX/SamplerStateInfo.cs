@@ -150,7 +150,7 @@ namespace TwoMGFX
                 // TODO: This is the only option we have right now for 
                 // disabling mipmapping.  We should add support for MinLod
                 // and MaxLod which potentially does a better job at this.
-                _state.MipMapLevelOfDetailBias = -32.0f;
+                _state.MipMapLevelOfDetailBias = -16.0f;
                 _state.MaxMipLevel = 0;
             }
 
