@@ -331,15 +331,19 @@ namespace MonoGame.Tools.Pipeline
                             string include, hintPath;
                             ReadReference(io, out include, out hintPath);
 
-                            if (!string.IsNullOrEmpty(hintPath) && !hintPath.Contains("Microsoft"))
+                            if (!string.IsNullOrEmpty(hintPath) && 
+                                hintPath.IndexOf("microsoft", StringComparison.CurrentCultureIgnoreCase) == -1 &&
+                                hintPath.IndexOf("monogamecontentprocessors", StringComparison.CurrentCultureIgnoreCase) == -1)
+                            {
                                 References.Add(hintPath);
+                            }
                         }
                         else if (io.LocalName.Equals("Compile"))
                         {
                             string include, name, importer, processor;
                             string[] processorParams;
                             ReadCompile(io, out include, out name, out importer, out processor, out processorParams);
-                            
+
                             Importer = importer;
                             Processor = processor;
 
