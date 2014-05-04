@@ -2,19 +2,24 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>MonoGame.ContentProcessors</id>
-        <version>3.2</version>
+        <version>3.2.1</version>
         <title>MonoGame.ContentProcessors</title>
         <authors>Simon-Darkside</authors>
         <owners>MonoGameTeam</owners>
         <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
         <projectUrl>http://monogame.net/</projectUrl>
-        <iconUrl>http://monogame.net/themes/_bartik/css/logo.png</iconUrl>
+        <iconUrl>http://www.monogame.net/wp-content/themes/monogame/images/monogame.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Content Processors reference package for MonoGame Content Projects
 		MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
       The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
         <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
-        <releaseNotes>Updated dev release - 07 January 2014</releaseNotes>
+        <releaseNotes>New 3.2 release 
+Aligned with the official MonoGame 3.2 release install found at 
+http://MonoGame.Net
+
+**This release also now includes iOS / Android and MacOS Support
+(Related content package update to follow, check notes)</releaseNotes>
         <copyright>Copyright  2013</copyright>
         <language>en-US</language>
         <references>
@@ -22,11 +27,11 @@
         </references>
     </metadata>
     <files>
-        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\lame_enc.dll" target="lib\lame_enc.dll" />
-        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\libmojoshader_32.dll" target="lib\libmojoshader.dll" />
-        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\ManagedPVRTC.dll" target="lib\ManagedPVRTC.dll" />
         <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\MonoGameContentProcessors.dll" target="lib\MonoGameContentProcessors.dll" />
-        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\NAudio.dll" target="lib\net\NAudio.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\lame_enc.dll" target="lib\lame_enc.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\libmojoshader_32.dll" target="lib\libmojoshader_32.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\ManagedPVRTC.dll" target="lib\ManagedPVRTC.dll" />
+        <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\NAudio.dll" target="lib\NAudio.dll" />
         <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\NAudio.WindowsMediaFormat.dll" target="lib\NAudio.WindowsMediaFormat.dll" />
         <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\pvrtc.dll" target="lib\pvrtc.dll" />
         <file src="..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\SharpDX.D3DCompiler.dll" target="lib\SharpDX.D3DCompiler.dll" />
