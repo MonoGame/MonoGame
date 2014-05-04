@@ -203,7 +203,7 @@ namespace Microsoft.Xna.Framework
             // we need to handle the Back key here because it doesnt work any other way
 #if !OUYA
             if (keyCode == Keycode.Back)
-                GamePad.Instance.SetBack();
+                GamePad.Back = true;
 #endif
 
             if (keyCode == Keycode.VolumeUp)
