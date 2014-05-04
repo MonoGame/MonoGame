@@ -14,7 +14,7 @@
 // TOKENS
 [IgnoreCase] Pass -> @"pass";
 [IgnoreCase] Technique -> @"technique";
-[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
+[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|SamplerState|sampler";
 [IgnoreCase] SamplerState -> @"sampler_state";
 [IgnoreCase] VertexShader -> @"VertexShader";
 [IgnoreCase] PixelShader -> @"PixelShader";
@@ -131,9 +131,9 @@ Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma 
 	return null;
 };
 
-Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* ((Equals SamplerState)? OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
 {
-	if ($SamplerState == null)
+	if ($OpenBracket == null)
 		return null;
 	
 	var sampler = new SamplerStateInfo();

@@ -819,28 +819,35 @@ namespace TwoMGFX
             }
 
              // Concat Rule
-            tok = scanner.LookAhead(TokenType.Equals); // Option Rule
-            if (tok.Type == TokenType.Equals)
+            tok = scanner.LookAhead(TokenType.Equals, TokenType.OpenBracket); // Option Rule
+            if (tok.Type == TokenType.Equals
+                || tok.Type == TokenType.OpenBracket)
             {
 
                  // Concat Rule
-                tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
-                n = node.CreateNode(tok, tok.ToString() );
-                node.Token.UpdateRange(tok);
-                node.Nodes.Add(n);
-                if (tok.Type != TokenType.Equals) {
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Equals.ToString(), 0x1001, tok));
-                    return;
-                }
+                tok = scanner.LookAhead(TokenType.Equals); // Option Rule
+                if (tok.Type == TokenType.Equals)
+                {
 
-                 // Concat Rule
-                tok = scanner.Scan(TokenType.SamplerState); // Terminal Rule: SamplerState
-                n = node.CreateNode(tok, tok.ToString() );
-                node.Token.UpdateRange(tok);
-                node.Nodes.Add(n);
-                if (tok.Type != TokenType.SamplerState) {
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.SamplerState.ToString(), 0x1001, tok));
-                    return;
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.Equals) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Equals.ToString(), 0x1001, tok));
+                        return;
+                    }
+
+                     // Concat Rule
+                    tok = scanner.Scan(TokenType.SamplerState); // Terminal Rule: SamplerState
+                    n = node.CreateNode(tok, tok.ToString() );
+                    node.Token.UpdateRange(tok);
+                    node.Nodes.Add(n);
+                    if (tok.Type != TokenType.SamplerState) {
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.SamplerState.ToString(), 0x1001, tok));
+                        return;
+                    }
                 }
 
                  // Concat Rule

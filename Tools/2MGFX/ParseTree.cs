@@ -306,7 +306,7 @@ namespace TwoMGFX
 
         protected virtual object EvalSampler_Declaration(ParseTree tree, params object[] paramlist)
         {
-            if (this.GetValue(tree, TokenType.SamplerState, 0) == null)
+            if (this.GetValue(tree, TokenType.OpenBracket, 0) == null)
         		return null;
         	
         	var sampler = new SamplerStateInfo();
