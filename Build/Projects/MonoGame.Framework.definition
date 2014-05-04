@@ -713,7 +713,6 @@
     <Compile Include="Input\AccelerometerState.cs">
       <Platforms>iOS,Linux,MacOS,Windows8,WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
