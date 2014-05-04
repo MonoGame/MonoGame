@@ -169,6 +169,8 @@ namespace TwoMGFX
                         rasterizerState = new RasterizerState();
                     rasterizerState.SlopeScaleDepthBias = float.Parse(value);
                     break;
+                default:
+                    throw new Exception("Unknown render state '" + name + "'!");
             }            
         }
     }
