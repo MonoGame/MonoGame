@@ -90,7 +90,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         case SurfaceFormat.Dxt1a:
                         case SurfaceFormat.Dxt3:
                         case SurfaceFormat.Dxt5:
-                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * format.Size();
+                            imageSize = ((this.width + 3) / 4) * ((this.height + 3) / 4) * GraphicsExtensions.GetSize(format);
                             break;
                         default:
                             throw new NotSupportedException();
@@ -193,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     else
                     {
                         // Set pixel alignment to match texel size in bytes
-                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.Size(this.Format));
+                        GL.PixelStore(PixelStoreParameter.UnpackAlignment, GraphicsExtensions.GetSize(this.Format));
                         if (rect.HasValue)
                         {
                             GL.TexSubImage2D(TextureTarget.Texture2D, level,

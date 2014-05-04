@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Applies 3D positioning to the SoundEffectInstance using multiple listeners.</summary>
-        /// <param name="listener">Data about each listener.</param>
+        /// <param name="listeners">Data about each listener.</param>
         /// <param name="emitter">Data about the source of emission.</param>
         public void Apply3D(AudioListener[] listeners, AudioEmitter emitter)
         {

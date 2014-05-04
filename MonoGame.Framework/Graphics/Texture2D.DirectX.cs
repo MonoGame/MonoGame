@@ -200,7 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if WINDOWS_PHONE
 
-            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];
             GetData(pixelData);
 
             //We Must convert from BGRA to RGBA
@@ -257,7 +257,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void SaveAsImage(Guid encoderId, Stream stream, int width, int height)
         {
-            var pixelData = new byte[Width * Height * GraphicsExtensions.Size(Format)];
+            var pixelData = new byte[Width * Height * GraphicsExtensions.GetSize(Format)];
             GetData(pixelData);
 
             // TODO: We need to convert from Format to R8G8B8A8!
