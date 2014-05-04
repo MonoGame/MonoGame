@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -194,7 +195,9 @@ namespace TwoMGFX
                 case "miplodbias":
                     MipMapLevelOfDetailBias = float.Parse(value);
                     break;
-            }            
+                default:
+                    throw new Exception("Unknown sampler state '" + name + "'.");
+            }
         }
 
         public SamplerState State
