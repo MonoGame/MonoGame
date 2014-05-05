@@ -302,6 +302,227 @@ namespace TwoMGFX
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: CullModes
 
+        private void ParseColors_None(ParseNode parent) // NonTerminalSymbol: Colors_None
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_None), "Colors_None");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.None); // Terminal Rule: None
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.None) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.None.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_None
+
+        private void ParseColors_Red(ParseNode parent) // NonTerminalSymbol: Colors_Red
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Red), "Colors_Red");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Red); // Terminal Rule: Red
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Red) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Red.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_Red
+
+        private void ParseColors_Green(ParseNode parent) // NonTerminalSymbol: Colors_Green
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Green), "Colors_Green");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Green); // Terminal Rule: Green
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Green) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Green.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_Green
+
+        private void ParseColors_Blue(ParseNode parent) // NonTerminalSymbol: Colors_Blue
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Blue), "Colors_Blue");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Blue); // Terminal Rule: Blue
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Blue) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Blue.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_Blue
+
+        private void ParseColors_Alpha(ParseNode parent) // NonTerminalSymbol: Colors_Alpha
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Alpha), "Colors_Alpha");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Alpha); // Terminal Rule: Alpha
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Alpha) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Alpha.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_Alpha
+
+        private void ParseColors_All(ParseNode parent) // NonTerminalSymbol: Colors_All
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_All), "Colors_All");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.All); // Terminal Rule: All
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.All) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.All.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_All
+
+        private void ParseColors(ParseNode parent) // NonTerminalSymbol: Colors
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors), "Colors");
+            parent.Nodes.Add(node);
+
+            tok = scanner.LookAhead(TokenType.Red, TokenType.Green, TokenType.Blue, TokenType.Alpha, TokenType.None, TokenType.All); // Choice Rule
+            switch (tok.Type)
+            { // Choice Rule
+                case TokenType.Red:
+                    ParseColors_Red(node); // NonTerminal Rule: Colors_Red
+                    break;
+                case TokenType.Green:
+                    ParseColors_Green(node); // NonTerminal Rule: Colors_Green
+                    break;
+                case TokenType.Blue:
+                    ParseColors_Blue(node); // NonTerminal Rule: Colors_Blue
+                    break;
+                case TokenType.Alpha:
+                    ParseColors_Alpha(node); // NonTerminal Rule: Colors_Alpha
+                    break;
+                case TokenType.None:
+                    ParseColors_None(node); // NonTerminal Rule: Colors_None
+                    break;
+                case TokenType.All:
+                    ParseColors_All(node); // NonTerminal Rule: Colors_All
+                    break;
+                default:
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Red, Green, Blue, Alpha, None, or All.", 0x0002, tok));
+                    break;
+            } // Choice Rule
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors
+
+        private void ParseColorsMasks(ParseNode parent) // NonTerminalSymbol: ColorsMasks
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.ColorsMasks), "ColorsMasks");
+            parent.Nodes.Add(node);
+
+
+             // Concat Rule
+            ParseColors(node); // NonTerminal Rule: Colors
+
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
+            if (tok.Type == TokenType.Or)
+            {
+
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
+                n = node.CreateNode(tok, tok.ToString() );
+                node.Token.UpdateRange(tok);
+                node.Nodes.Add(n);
+                if (tok.Type != TokenType.Or) {
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Or.ToString(), 0x1001, tok));
+                    return;
+                }
+
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
+            }
+
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
+            if (tok.Type == TokenType.Or)
+            {
+
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
+                n = node.CreateNode(tok, tok.ToString() );
+                node.Token.UpdateRange(tok);
+                node.Nodes.Add(n);
+                if (tok.Type != TokenType.Or) {
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Or.ToString(), 0x1001, tok));
+                    return;
+                }
+
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
+            }
+
+             // Concat Rule
+            tok = scanner.LookAhead(TokenType.Or); // Option Rule
+            if (tok.Type == TokenType.Or)
+            {
+
+                 // Concat Rule
+                tok = scanner.Scan(TokenType.Or); // Terminal Rule: Or
+                n = node.CreateNode(tok, tok.ToString() );
+                node.Token.UpdateRange(tok);
+                node.Nodes.Add(n);
+                if (tok.Type != TokenType.Or) {
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Or.ToString(), 0x1001, tok));
+                    return;
+                }
+
+                 // Concat Rule
+                ParseColors(node); // NonTerminal Rule: Colors
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: ColorsMasks
+
         private void ParseBlend_Zero(ParseNode parent) // NonTerminalSymbol: Blend_Zero
         {
             Token tok;
@@ -1005,6 +1226,50 @@ namespace TwoMGFX
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: Render_State_BlendOp
 
+        private void ParseRender_State_ColorWriteEnable(ParseNode parent) // NonTerminalSymbol: Render_State_ColorWriteEnable
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Render_State_ColorWriteEnable), "Render_State_ColorWriteEnable");
+            parent.Nodes.Add(node);
+
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.ColorWriteEnable); // Terminal Rule: ColorWriteEnable
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.ColorWriteEnable) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.ColorWriteEnable.ToString(), 0x1001, tok));
+                return;
+            }
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Equals); // Terminal Rule: Equals
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Equals) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Equals.ToString(), 0x1001, tok));
+                return;
+            }
+
+             // Concat Rule
+            ParseColorsMasks(node); // NonTerminal Rule: ColorsMasks
+
+             // Concat Rule
+            tok = scanner.Scan(TokenType.Semicolon); // Terminal Rule: Semicolon
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Semicolon) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Semicolon.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Render_State_ColorWriteEnable
+
         private void ParseRender_State_DepthBias(ParseNode parent) // NonTerminalSymbol: Render_State_DepthBias
         {
             Token tok;
@@ -1267,7 +1532,7 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Render_State_Expression), "Render_State_Expression");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // Choice Rule
+            tok = scanner.LookAhead(TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // Choice Rule
             switch (tok.Type)
             { // Choice Rule
                 case TokenType.CullMode:
@@ -1288,6 +1553,9 @@ namespace TwoMGFX
                 case TokenType.BlendOp:
                     ParseRender_State_BlendOp(node); // NonTerminal Rule: Render_State_BlendOp
                     break;
+                case TokenType.ColorWriteEnable:
+                    ParseRender_State_ColorWriteEnable(node); // NonTerminal Rule: Render_State_ColorWriteEnable
+                    break;
                 case TokenType.DepthBias:
                     ParseRender_State_DepthBias(node); // NonTerminal Rule: Render_State_DepthBias
                     break;
@@ -1304,7 +1572,7 @@ namespace TwoMGFX
                     ParseRender_State_MultiSampleAntiAlias(node); // NonTerminal Rule: Render_State_MultiSampleAntiAlias
                     break;
                 default:
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, or MultiSampleAntiAlias.", 0x0002, tok));
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, ColorWriteEnable, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, or MultiSampleAntiAlias.", 0x0002, tok));
                     break;
             } // Choice Rule
 
@@ -1354,7 +1622,7 @@ namespace TwoMGFX
             }
 
              // Concat Rule
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // ZeroOrMore Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // ZeroOrMore Rule
             while (tok.Type == TokenType.VertexShader
                 || tok.Type == TokenType.PixelShader
                 || tok.Type == TokenType.CullMode
@@ -1363,13 +1631,14 @@ namespace TwoMGFX
                 || tok.Type == TokenType.SrcBlend
                 || tok.Type == TokenType.DestBlend
                 || tok.Type == TokenType.BlendOp
+                || tok.Type == TokenType.ColorWriteEnable
                 || tok.Type == TokenType.DepthBias
                 || tok.Type == TokenType.SlopeScaleDepthBias
                 || tok.Type == TokenType.ZEnable
                 || tok.Type == TokenType.ZWriteEnable
                 || tok.Type == TokenType.MultiSampleAntiAlias)
             {
-                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // Choice Rule
+                tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // Choice Rule
                 switch (tok.Type)
                 { // Choice Rule
                     case TokenType.VertexShader:
@@ -1384,6 +1653,7 @@ namespace TwoMGFX
                     case TokenType.SrcBlend:
                     case TokenType.DestBlend:
                     case TokenType.BlendOp:
+                    case TokenType.ColorWriteEnable:
                     case TokenType.DepthBias:
                     case TokenType.SlopeScaleDepthBias:
                     case TokenType.ZEnable:
@@ -1392,10 +1662,10 @@ namespace TwoMGFX
                         ParseRender_State_Expression(node); // NonTerminal Rule: Render_State_Expression
                         break;
                     default:
-                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected VertexShader, PixelShader, CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, or MultiSampleAntiAlias.", 0x0002, tok));
+                        tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected VertexShader, PixelShader, CullMode, FillMode, AlphaBlendEnable, SrcBlend, DestBlend, BlendOp, ColorWriteEnable, DepthBias, SlopeScaleDepthBias, ZEnable, ZWriteEnable, or MultiSampleAntiAlias.", 0x0002, tok));
                         break;
                 } // Choice Rule
-            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // ZeroOrMore Rule
+            tok = scanner.LookAhead(TokenType.VertexShader, TokenType.PixelShader, TokenType.CullMode, TokenType.FillMode, TokenType.AlphaBlendEnable, TokenType.SrcBlend, TokenType.DestBlend, TokenType.BlendOp, TokenType.ColorWriteEnable, TokenType.DepthBias, TokenType.SlopeScaleDepthBias, TokenType.ZEnable, TokenType.ZWriteEnable, TokenType.MultiSampleAntiAlias); // ZeroOrMore Rule
             }
 
              // Concat Rule
