@@ -3,9 +3,23 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
-	public class ParseTreeTools
+	public static class ParseTreeTools
 	{
-        public static FillMode ParseFillMode(string value)
+        public static float ParseFloat(string value)
+	    {
+            // Remove all whitespace and trailing F or f.
+	        value = value.Replace("f", "");
+            value = value.Replace("F", "");
+	        value = value.Replace(" ", "");
+            return float.Parse(value);
+	    }
+
+        public static int ParseInt(string value)
+        {
+            return (int)Math.Floor(ParseFloat(value));
+        }
+
+	    public static FillMode ParseFillMode(string value)
         {
             switch (value.ToLower())
             {
@@ -32,43 +46,7 @@ namespace TwoMGFX
                     throw new Exception("Unknown cull mode '" + value + "'.");
             }
         }
-
-		public static TextureAddressMode ParseAddressMode(string value)
-		{
-			switch (value.ToLower())
-			{
-				case "clamp":
-					return TextureAddressMode.Clamp;
-				case "mirror":
-					return TextureAddressMode.Mirror;
-				case "wrap":
-					return TextureAddressMode.Wrap;
-				default:
-					throw new Exception("Unknown texture address mode '" + value + "'.");
-			}
-		}
-
-		public static TextureFilterType ParseTextureFilterType(string value)
-		{
-			switch (value.ToLower())
-			{
-                case "none":
-                    return TextureFilterType.None;
-				case "linear":
-					return TextureFilterType.Linear;
-				case "point":
-					return TextureFilterType.Point;
-				case "anisotropic":
-					return TextureFilterType.Anisotropic;
-                case "pyramidalquad":
-                case "gaussianquad":
-                case "convolutionmono":
-                    throw new Exception("Unsupported texture filter type '" + value + "'.");
-				default:
-					throw new Exception("Unknown texture filter type '" + value + "'.");
-			}
-		}
-
+        
 		public static bool ParseBool(string value)
 		{
 			if (value.ToLower() == "true" || value == "1")

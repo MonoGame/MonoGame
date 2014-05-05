@@ -19,7 +19,7 @@
 [IgnoreCase] VertexShader -> @"VertexShader";
 [IgnoreCase] PixelShader -> @"PixelShader";
 [IgnoreCase] Register -> @"register";
-Number -> @"[0-9]?\.?[0-9]+";
+Number -> @"[+-] ?[0-9]?\.?[0-9]+[fF]?";
 Sign -> @"-|\+";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
@@ -38,6 +38,31 @@ GreaterThan -> @">";
 ShaderModel -> @"[A-Za-z_][A-Za-z0-9_]*";
 Code -> @"[\S]+";
 EndOfFile -> @"^$";
+
+// Sampler states
+[IgnoreCase] MinFilter -> @"MinFilter";
+[IgnoreCase] MagFilter -> @"MagFilter";
+[IgnoreCase] MipFilter -> @"MipFilter";
+[IgnoreCase] Filter -> @"Filter";
+[IgnoreCase] Texture -> @"Texture";
+[IgnoreCase] AddressU -> @"AddressU";
+[IgnoreCase] AddressV -> @"AddressV";
+[IgnoreCase] AddressW -> @"AddressW";
+[IgnoreCase] MaxAnisotropy -> @"MaxAnisotropy";
+[IgnoreCase] MaxMipLevel -> @"MaxMipLevel|MaxLod";
+[IgnoreCase] MipLodBias -> @"MipLodBias";
+
+// Address Mode
+[IgnoreCase] Clamp -> @"Clamp";
+[IgnoreCase] Wrap -> @"Wrap";
+[IgnoreCase] Mirror -> @"Mirror";
+
+// Texture Filters
+[IgnoreCase] None -> @"None";
+[IgnoreCase] Linear -> @"Linear";
+[IgnoreCase] Point -> @"Point";
+[IgnoreCase] Anisotropic -> @"Anisotropic";
+
 
 // Productions
 Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
@@ -70,10 +95,10 @@ Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ Clo
    return null;
 };
 
-Render_State_Expression -> Identifier Equals (Identifier | Sign? Number) Semicolon
+Render_State_Expression -> Identifier Equals (Identifier | Number) Semicolon
 {
 	var name = $Identifier[0] as string;
-	var value = (string)($Sign ?? "") + (string)($Identifier[1] ?? $Number);
+	var value = (string)($Identifier[1] ?? $Number);
 	
 	var pass = paramlist[0] as PassInfo;
 	pass.ParseRenderState(name, value);
@@ -115,23 +140,56 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
    return null;
 };
 
-Sampler_State_Expression -> Identifier Equals ((LessThan|OpenParenthesis) Identifier (GreaterThan|CloseParenthesis) | Identifier | Sign? Number) Semicolon
+AddressMode_Clamp -> Clamp { return TextureAddressMode.Clamp; };
+AddressMode_Wrap -> Wrap { return TextureAddressMode.Wrap; };
+AddressMode_Mirror -> Mirror { return TextureAddressMode.Mirror; };
+AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror)
 {
-	var name = $Identifier[0] as string;
-	var value = (string)($Sign ?? "") + (string)($Identifier[1] ?? ($Identifier[2] ?? $Number[0]));	
-
-	var sampler = paramlist[0] as SamplerStateInfo;
-	sampler.Parse(name, value);
-
-	return null;
+	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror;
 };
+
+TextureFilter_None -> None { return TextureFilterType.None; };
+TextureFilter_Linear -> Linear { return TextureFilterType.Linear; };
+TextureFilter_Point -> Point { return TextureFilterType.Point; };
+TextureFilter_Anisotropic -> Anisotropic { return TextureFilterType.Anisotropic; };
+TextureFilter -> (TextureFilter_None|TextureFilter_Linear|TextureFilter_Point|TextureFilter_Anisotropic)
+{
+	return $TextureFilter_None ?? $TextureFilter_Linear ?? $TextureFilter_Point ?? $TextureFilter_Anisotropic;
+};
+
+// Sampler States
+Sampler_State_Texture -> Texture Equals (LessThan|OpenParenthesis) Identifier (GreaterThan|CloseParenthesis) Semicolon { (paramlist[0] as SamplerStateInfo).TextureName = (string)$Identifier; return null; };
+Sampler_State_MinFilter -> MinFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MinFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_MagFilter -> MagFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MagFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_MipFilter -> MipFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MipFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_Filter -> Filter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).Filter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_AddressU -> AddressU Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressU = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_AddressV -> AddressV Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressV = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_AddressW -> AddressW Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_MaxMipLevel -> MaxMipLevel Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxMipLevel = ParseTreeTools.ParseInt((string)$Number); return null; };
+Sampler_State_MaxAnisotropy -> MaxAnisotropy Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxAnisotropy = ParseTreeTools.ParseInt((string)$Number); return null; };
+Sampler_State_MipLodBias -> MipLodBias Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MipMapLevelOfDetailBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
+
+
+Sampler_State_Expression ->	
+				Sampler_State_Texture |
+				Sampler_State_MinFilter |
+				Sampler_State_MagFilter |
+				Sampler_State_MipFilter |
+				Sampler_State_Filter |
+				Sampler_State_AddressU |
+				Sampler_State_AddressV |
+				Sampler_State_AddressW |
+				Sampler_State_MaxMipLevel |
+				Sampler_State_MaxAnisotropy |
+				Sampler_State_MipLodBias;
 
 Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma Identifier (OpenSquareBracket Number CloseSquareBracket)?)? CloseParenthesis
 {
 	return null;
 };
 
-Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* ((Equals SamplerState)? OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* ((Equals SamplerState)? OpenBracket Sampler_State_Expression* CloseBracket Semicolon)?
 {
 	if ($OpenBracket == null)
 		return null;

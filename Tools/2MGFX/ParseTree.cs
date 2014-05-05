@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -196,6 +197,66 @@ namespace TwoMGFX
                 case TokenType.PixelShader_Pass_Expression:
                     Value = EvalPixelShader_Pass_Expression(tree, paramlist);
                     break;
+                case TokenType.AddressMode_Clamp:
+                    Value = EvalAddressMode_Clamp(tree, paramlist);
+                    break;
+                case TokenType.AddressMode_Wrap:
+                    Value = EvalAddressMode_Wrap(tree, paramlist);
+                    break;
+                case TokenType.AddressMode_Mirror:
+                    Value = EvalAddressMode_Mirror(tree, paramlist);
+                    break;
+                case TokenType.AddressMode:
+                    Value = EvalAddressMode(tree, paramlist);
+                    break;
+                case TokenType.TextureFilter_None:
+                    Value = EvalTextureFilter_None(tree, paramlist);
+                    break;
+                case TokenType.TextureFilter_Linear:
+                    Value = EvalTextureFilter_Linear(tree, paramlist);
+                    break;
+                case TokenType.TextureFilter_Point:
+                    Value = EvalTextureFilter_Point(tree, paramlist);
+                    break;
+                case TokenType.TextureFilter_Anisotropic:
+                    Value = EvalTextureFilter_Anisotropic(tree, paramlist);
+                    break;
+                case TokenType.TextureFilter:
+                    Value = EvalTextureFilter(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_Texture:
+                    Value = EvalSampler_State_Texture(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MinFilter:
+                    Value = EvalSampler_State_MinFilter(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MagFilter:
+                    Value = EvalSampler_State_MagFilter(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MipFilter:
+                    Value = EvalSampler_State_MipFilter(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_Filter:
+                    Value = EvalSampler_State_Filter(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_AddressU:
+                    Value = EvalSampler_State_AddressU(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_AddressV:
+                    Value = EvalSampler_State_AddressV(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_AddressW:
+                    Value = EvalSampler_State_AddressW(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MaxMipLevel:
+                    Value = EvalSampler_State_MaxMipLevel(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MaxAnisotropy:
+                    Value = EvalSampler_State_MaxAnisotropy(tree, paramlist);
+                    break;
+                case TokenType.Sampler_State_MipLodBias:
+                    Value = EvalSampler_State_MipLodBias(tree, paramlist);
+                    break;
                 case TokenType.Sampler_State_Expression:
                     Value = EvalSampler_State_Expression(tree, paramlist);
                     break;
@@ -246,7 +307,7 @@ namespace TwoMGFX
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
         {
             var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (string)(this.GetValue(tree, TokenType.Sign, 0) ?? "") + (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0));
+        	var value = (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0));
         	
         	var pass = paramlist[0] as PassInfo;
         	pass.ParseRenderState(name, value);
@@ -288,15 +349,111 @@ namespace TwoMGFX
            return null;
         }
 
+        protected virtual object EvalAddressMode_Clamp(ParseTree tree, params object[] paramlist)
+        {
+            return TextureAddressMode.Clamp;
+        }
+
+        protected virtual object EvalAddressMode_Wrap(ParseTree tree, params object[] paramlist)
+        {
+            return TextureAddressMode.Wrap;
+        }
+
+        protected virtual object EvalAddressMode_Mirror(ParseTree tree, params object[] paramlist)
+        {
+            return TextureAddressMode.Mirror;
+        }
+
+        protected virtual object EvalAddressMode(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.AddressMode_Clamp, 0) ?? this.GetValue(tree, TokenType.AddressMode_Wrap, 0) ?? this.GetValue(tree, TokenType.AddressMode_Mirror, 0);
+        }
+
+        protected virtual object EvalTextureFilter_None(ParseTree tree, params object[] paramlist)
+        {
+            return TextureFilterType.None;
+        }
+
+        protected virtual object EvalTextureFilter_Linear(ParseTree tree, params object[] paramlist)
+        {
+            return TextureFilterType.Linear;
+        }
+
+        protected virtual object EvalTextureFilter_Point(ParseTree tree, params object[] paramlist)
+        {
+            return TextureFilterType.Point;
+        }
+
+        protected virtual object EvalTextureFilter_Anisotropic(ParseTree tree, params object[] paramlist)
+        {
+            return TextureFilterType.Anisotropic;
+        }
+
+        protected virtual object EvalTextureFilter(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.TextureFilter_None, 0) ?? this.GetValue(tree, TokenType.TextureFilter_Linear, 0) ?? this.GetValue(tree, TokenType.TextureFilter_Point, 0) ?? this.GetValue(tree, TokenType.TextureFilter_Anisotropic, 0);
+        }
+
+        protected virtual object EvalSampler_State_Texture(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).TextureName = (string)this.GetValue(tree, TokenType.Identifier, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_MinFilter(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MinFilter = (TextureFilterType)this.GetValue(tree, TokenType.TextureFilter, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_MagFilter(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MagFilter = (TextureFilterType)this.GetValue(tree, TokenType.TextureFilter, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_MipFilter(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MipFilter = (TextureFilterType)this.GetValue(tree, TokenType.TextureFilter, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_Filter(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).Filter = (TextureFilterType)this.GetValue(tree, TokenType.TextureFilter, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_AddressU(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).AddressU = (TextureAddressMode)this.GetValue(tree, TokenType.AddressMode, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_AddressV(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).AddressV = (TextureAddressMode)this.GetValue(tree, TokenType.AddressMode, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_AddressW(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)this.GetValue(tree, TokenType.AddressMode, 0); return null;
+        }
+
+        protected virtual object EvalSampler_State_MaxMipLevel(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MaxMipLevel = ParseTreeTools.ParseInt((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalSampler_State_MaxAnisotropy(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MaxAnisotropy = ParseTreeTools.ParseInt((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalSampler_State_MipLodBias(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as SamplerStateInfo).MipMapLevelOfDetailBias = ParseTreeTools.ParseFloat((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
         protected virtual object EvalSampler_State_Expression(ParseTree tree, params object[] paramlist)
         {
-            var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (string)(this.GetValue(tree, TokenType.Sign, 0) ?? "") + (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? (this.GetValue(tree, TokenType.Identifier, 2) ?? this.GetValue(tree, TokenType.Number, 0)));	
-        
-        	var sampler = paramlist[0] as SamplerStateInfo;
-        	sampler.Parse(name, value);
-        
-        	return null;
+            foreach (var node in Nodes)
+                node.Eval(tree, paramlist);
+            return null;
         }
 
         protected virtual object EvalSampler_Register_Expression(ParseTree tree, params object[] paramlist)

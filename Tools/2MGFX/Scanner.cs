@@ -85,7 +85,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Register, regex);
             Tokens.Add(TokenType.Register);
 
-            regex = new Regex(@"[0-9]?\.?[0-9]+", RegexOptions.Compiled);
+            regex = new Regex(@"[+-] ?[0-9]?\.?[0-9]+[fF]?", RegexOptions.Compiled);
             Patterns.Add(TokenType.Number, regex);
             Tokens.Add(TokenType.Number);
 
@@ -160,6 +160,78 @@ namespace TwoMGFX
             regex = new Regex(@"^$", RegexOptions.Compiled);
             Patterns.Add(TokenType.EndOfFile, regex);
             Tokens.Add(TokenType.EndOfFile);
+
+            regex = new Regex(@"MinFilter", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MinFilter, regex);
+            Tokens.Add(TokenType.MinFilter);
+
+            regex = new Regex(@"MagFilter", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MagFilter, regex);
+            Tokens.Add(TokenType.MagFilter);
+
+            regex = new Regex(@"MipFilter", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MipFilter, regex);
+            Tokens.Add(TokenType.MipFilter);
+
+            regex = new Regex(@"Filter", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Filter, regex);
+            Tokens.Add(TokenType.Filter);
+
+            regex = new Regex(@"Texture", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Texture, regex);
+            Tokens.Add(TokenType.Texture);
+
+            regex = new Regex(@"AddressU", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.AddressU, regex);
+            Tokens.Add(TokenType.AddressU);
+
+            regex = new Regex(@"AddressV", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.AddressV, regex);
+            Tokens.Add(TokenType.AddressV);
+
+            regex = new Regex(@"AddressW", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.AddressW, regex);
+            Tokens.Add(TokenType.AddressW);
+
+            regex = new Regex(@"MaxAnisotropy", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MaxAnisotropy, regex);
+            Tokens.Add(TokenType.MaxAnisotropy);
+
+            regex = new Regex(@"MaxMipLevel|MaxLod", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MaxMipLevel, regex);
+            Tokens.Add(TokenType.MaxMipLevel);
+
+            regex = new Regex(@"MipLodBias", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.MipLodBias, regex);
+            Tokens.Add(TokenType.MipLodBias);
+
+            regex = new Regex(@"Clamp", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Clamp, regex);
+            Tokens.Add(TokenType.Clamp);
+
+            regex = new Regex(@"Wrap", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Wrap, regex);
+            Tokens.Add(TokenType.Wrap);
+
+            regex = new Regex(@"Mirror", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Mirror, regex);
+            Tokens.Add(TokenType.Mirror);
+
+            regex = new Regex(@"None", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.None, regex);
+            Tokens.Add(TokenType.None);
+
+            regex = new Regex(@"Linear", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Linear, regex);
+            Tokens.Add(TokenType.Linear);
+
+            regex = new Regex(@"Point", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Point, regex);
+            Tokens.Add(TokenType.Point);
+
+            regex = new Regex(@"Anisotropic", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Patterns.Add(TokenType.Anisotropic, regex);
+            Tokens.Add(TokenType.Anisotropic);
 
 
         }
@@ -296,7 +368,7 @@ namespace TwoMGFX
                     var match = Patterns[tok.Type].Match(tok.Text);
                     var fileMatch = match.Groups["File"];
                     if (fileMatch.Success)
-                        currentFile = fileMatch.Value;
+                        currentFile = fileMatch.Value.Replace("\\\\", "\\");
                     var lineMatch = match.Groups["Line"];
                     if (lineMatch.Success)
                         currentline = int.Parse(lineMatch.Value);
@@ -327,41 +399,79 @@ namespace TwoMGFX
             Pass_Declaration= 5,
             VertexShader_Pass_Expression= 6,
             PixelShader_Pass_Expression= 7,
-            Sampler_State_Expression= 8,
-            Sampler_Register_Expression= 9,
-            Sampler_Declaration= 10,
+            AddressMode_Clamp= 8,
+            AddressMode_Wrap= 9,
+            AddressMode_Mirror= 10,
+            AddressMode= 11,
+            TextureFilter_None= 12,
+            TextureFilter_Linear= 13,
+            TextureFilter_Point= 14,
+            TextureFilter_Anisotropic= 15,
+            TextureFilter= 16,
+            Sampler_State_Texture= 17,
+            Sampler_State_MinFilter= 18,
+            Sampler_State_MagFilter= 19,
+            Sampler_State_MipFilter= 20,
+            Sampler_State_Filter= 21,
+            Sampler_State_AddressU= 22,
+            Sampler_State_AddressV= 23,
+            Sampler_State_AddressW= 24,
+            Sampler_State_MaxMipLevel= 25,
+            Sampler_State_MaxAnisotropy= 26,
+            Sampler_State_MipLodBias= 27,
+            Sampler_State_Expression= 28,
+            Sampler_Register_Expression= 29,
+            Sampler_Declaration= 30,
 
             //Terminal tokens:
-            BlockComment= 11,
-            Comment = 12,
-            Whitespace= 13,
-            LinePragma= 14,
-            Pass    = 15,
-            Technique= 16,
-            Sampler = 17,
-            SamplerState= 18,
-            VertexShader= 19,
-            PixelShader= 20,
-            Register= 21,
-            Number  = 22,
-            Sign    = 23,
-            Identifier= 24,
-            OpenBracket= 25,
-            CloseBracket= 26,
-            Equals  = 27,
-            Colon   = 28,
-            Comma   = 29,
-            Semicolon= 30,
-            OpenParenthesis= 31,
-            CloseParenthesis= 32,
-            OpenSquareBracket= 33,
-            CloseSquareBracket= 34,
-            LessThan= 35,
-            GreaterThan= 36,
-            Compile = 37,
-            ShaderModel= 38,
-            Code    = 39,
-            EndOfFile= 40
+            BlockComment= 31,
+            Comment = 32,
+            Whitespace= 33,
+            LinePragma= 34,
+            Pass    = 35,
+            Technique= 36,
+            Sampler = 37,
+            SamplerState= 38,
+            VertexShader= 39,
+            PixelShader= 40,
+            Register= 41,
+            Number  = 42,
+            Sign    = 43,
+            Identifier= 44,
+            OpenBracket= 45,
+            CloseBracket= 46,
+            Equals  = 47,
+            Colon   = 48,
+            Comma   = 49,
+            Semicolon= 50,
+            OpenParenthesis= 51,
+            CloseParenthesis= 52,
+            OpenSquareBracket= 53,
+            CloseSquareBracket= 54,
+            LessThan= 55,
+            GreaterThan= 56,
+            Compile = 57,
+            ShaderModel= 58,
+            Code    = 59,
+            EndOfFile= 60,
+            MinFilter= 61,
+            MagFilter= 62,
+            MipFilter= 63,
+            Filter  = 64,
+            Texture = 65,
+            AddressU= 66,
+            AddressV= 67,
+            AddressW= 68,
+            MaxAnisotropy= 69,
+            MaxMipLevel= 70,
+            MipLodBias= 71,
+            Clamp   = 72,
+            Wrap    = 73,
+            Mirror  = 74,
+            None    = 75,
+            Linear  = 76,
+            Point   = 77,
+            Anisotropic= 78
     }
 
     public class Token
