@@ -7,8 +7,16 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
+    internal enum BuildAction
+    {
+        Build,
+        Copy,
+    }
+
     internal class ContentItem : IProjectItem
-    {       
+    {
+        public IController Controller;
+
         public string SourceFile;
         public string ImporterName;
         public string ProcessorName;
@@ -16,8 +24,7 @@ namespace MonoGame.Tools.Pipeline
 
         private ImporterTypeDescription _importer;
         private ProcessorTypeDescription _processor;
-
-        public IView View;
+        private BuildAction _buildAction;
 
         #region IProjectItem
 
@@ -42,6 +49,21 @@ namespace MonoGame.Tools.Pipeline
 
         #endregion
 
+        public BuildAction BuildAction
+        {
+            get { return _buildAction; }
+            set
+            {
+                if (_buildAction == value)
+                    return;
+
+                _buildAction = value;
+
+                if (Controller != null)
+                    Controller.OnItemModified(this);
+            }
+        }
+
         [TypeConverter(typeof(ImporterConverter))]
         public ImporterTypeDescription Importer
         {
@@ -53,17 +75,17 @@ namespace MonoGame.Tools.Pipeline
                     return;
 
                 _importer = value;
-                ImporterName = _importer.TypeName;
+                ImporterName = _importer.TypeName;                
 
-                View.UpdateProperties(this);
-
-                // Validate that our processor can accept input content of the type
-                // output by the new importer.
-                if ((_processor == null || _processor.InputType != _importer.OutputType) && _processor != PipelineTypes.InvalidProcessor)
+                // Validate that our processor can accept input content of the type output by the new importer.
+                if ((_processor == null || _processor.InputType != _importer.OutputType) && _processor != PipelineTypes.MissingProcessor)
                 {
                     // If it cannot, set the default processor.
                     Processor = PipelineTypes.FindProcessor(_importer.DefaultProcessor, _importer);
                 }
+
+                if (Controller != null)
+                    Controller.OnItemModified(this);
             }
         }
 
@@ -87,8 +109,9 @@ namespace MonoGame.Tools.Pipeline
                 {
                     ProcessorParams.Add(p.Name, p.DefaultValue);
                 }
-                
-                View.UpdateProperties(this);
+
+                if (Controller != null)
+                    Controller.OnItemModified(this);
 
                 // Note:
                 // There is no need to validate that the new processor can accept input
@@ -99,42 +122,54 @@ namespace MonoGame.Tools.Pipeline
 
         public void ResolveTypes()
         {
-            _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
-            if (_importer != null && (string.IsNullOrEmpty(ImporterName) || ImporterName != _importer.TypeName))
-                ImporterName = _importer.TypeName;
-            
-            _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
-            if (_processor != null && (string.IsNullOrEmpty(ProcessorName) || ProcessorName != _processor.TypeName ))
-                ProcessorName = _processor.TypeName;
-
-            if (_processor == null)
-                _processor = PipelineTypes.InvalidProcessor;
-
-            // ProcessorParams get deserialized as strings
-            // this code converts them to object(s) of their actual type
-            // so that the correct editor appears within the property grid.
-            foreach (var p in _processor.Properties)
+            if (BuildAction == BuildAction.Copy)
             {
-                if (!ProcessorParams.ContainsKey(p.Name))
+                // Copy items do not have importers or processors.
+                _importer = PipelineTypes.NullImporter;
+                _processor = PipelineTypes.NullProcessor;
+            }
+            else
+            {
+                _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
+                if (_importer != null && (string.IsNullOrEmpty(ImporterName) || ImporterName != _importer.TypeName))
+                    ImporterName = _importer.TypeName;
+
+                if (_importer == null)
+                    _importer = PipelineTypes.MissingImporter;
+
+                _processor = PipelineTypes.FindProcessor(ProcessorName, _importer);
+                if (_processor != null && (string.IsNullOrEmpty(ProcessorName) || ProcessorName != _processor.TypeName))
+                    ProcessorName = _processor.TypeName;
+
+                if (_processor == null)
+                    _processor = PipelineTypes.MissingProcessor;
+
+                // ProcessorParams get deserialized as strings
+                // this code converts them to object(s) of their actual type
+                // so that the correct editor appears within the property grid.
+                foreach (var p in _processor.Properties)
                 {
-                    ProcessorParams[p.Name] = p.DefaultValue;
-                }
-                else
-                {
-                    var src = ProcessorParams[p.Name];
-                    if (src != null)
+                    if (!ProcessorParams.ContainsKey(p.Name))
                     {
-                        var srcType = src.GetType();
-
-                        var converter = TypeDescriptor.GetConverter(p.Type);
-
-                        // Should we throw an exception here?
-                        // This property will actually not be editable in the property grid
-                        // since we do not have a type converter for it.
-                        if (converter.CanConvertFrom(srcType))
+                        ProcessorParams[p.Name] = p.DefaultValue;
+                    }
+                    else
+                    {
+                        var src = ProcessorParams[p.Name];
+                        if (src != null)
                         {
-                            var dst = converter.ConvertFrom(src);
-                            ProcessorParams[p.Name] = dst;
+                            var srcType = src.GetType();
+
+                            var converter = TypeDescriptor.GetConverter(p.Type);
+
+                            // Should we throw an exception here?
+                            // This property will actually not be editable in the property grid
+                            // since we do not have a type converter for it.
+                            if (converter.CanConvertFrom(srcType))
+                            {
+                                var dst = converter.ConvertFrom(src);
+                                ProcessorParams[p.Name] = dst;
+                            }
                         }
                     }
                 }

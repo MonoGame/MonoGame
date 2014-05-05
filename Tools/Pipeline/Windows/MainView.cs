@@ -48,10 +48,15 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if (e.ChangedItem.Label == "References")            
+            if (e.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
             else
-                _controller.OnProjectModified();
+            {
+                if (_propertyGrid.SelectedObject is ContentItem)
+                    _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
+                else
+                    _controller.OnProjectModified();
+            }
         }
 
         private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -239,13 +244,33 @@ namespace MonoGame.Tools.Pipeline
         public void RemoveTreeItem(ContentItem item)
         {
             var node = _treeView.AllNodes().Find(f => f.Tag == item);
-            _treeView.Nodes.Remove(node);
+            if (node != null)
+                _treeView.Nodes.Remove(node);
         }
 
         public void SelectTreeItem(IProjectItem item)
         {
             var node = _treeView.AllNodes().Find(e => e.Tag == item);
-            _treeView.SelectedNode = node;
+            if (node != null)
+                _treeView.SelectedNode = node;
+        }
+
+        public void UpdateTreeItem(IProjectItem item)
+        {
+            var node = _treeView.AllNodes().Find(e => e.Tag == item);
+            if (node != null)
+			{
+				// Do something useful, eg...
+				/* 
+				if (!node.IsValid)
+				{
+	                node.ForeColor = Color.Red;
+				}
+				else
+				{
+					node.ForeColor = Color.Black;
+				}*/
+			}
         }
 
         public void ShowProperties(IProjectItem item)

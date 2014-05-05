@@ -3,9 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {    
@@ -16,30 +18,52 @@ namespace MonoGame.Tools.Pipeline
     {                
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            // True means show a combobox.
             if (GetStandardValues(context).Count > 0)
                 return true;
-
+                        
             return false;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
         {
-            // True means that values returned by GetStandardValues is exclusive (contains all possible valid values).
             return true;
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {            
+        {
+            var importers = new List<ImporterTypeDescription>();
+            var contentItem = (context.Instance as ContentItem);
+            
+            if (contentItem.BuildAction == BuildAction.Copy)
+            {
+                // Copy items do not have importers.
+                return new StandardValuesCollection(importers);
+            }
+            else if (!string.IsNullOrEmpty(contentItem.SourceFile))
+            {
+                // If the asset has a file extension then show only importers which accept it.
+                var ext = Path.GetExtension(contentItem.SourceFile);
+                if (!string.IsNullOrEmpty(ext))
+                {
+                    foreach (var i in PipelineTypes.Importers)
+                    {
+                        if (i.FileExtensions.Contains(ext))
+                        {
+                            importers.Add(i);
+                        }
+                    }
+
+                    // If we didn't find any importers targeting this extensions, just show all of them.
+                    if (importers.Count > 0)
+                        return new StandardValuesCollection(importers);
+                }
+            }
+
+            // Default case, show all importers.
             return new StandardValuesCollection(PipelineTypes.Importers);
         }
 
-        // Overrides the CanConvertFrom method of TypeConverter.
-        // The ITypeDescriptorContext interface provides the context for the
-        // conversion. Typically, this interface is used at design time to 
-        // provide information about the design-time container.
-        public override bool CanConvertFrom(ITypeDescriptorContext context,
-                                            Type sourceType)
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == typeof (string))
             {
@@ -50,37 +74,46 @@ namespace MonoGame.Tools.Pipeline
         }
 
 
-        public override object ConvertFrom(ITypeDescriptorContext context,
-                                           CultureInfo culture,
-                                           object value)
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string)
             {
-                var contentItem = (context.Instance as ContentItem);
-                return PipelineTypes.FindImporter(value as string, Path.GetExtension(contentItem.SourceFile));                
+                var str = value as string;
+
+                foreach (var i in PipelineTypes.Importers)
+                {
+                    if (i.DisplayName.Equals(str))
+                    {
+                        return i;
+                    }
+                }
+                
+                if (string.IsNullOrEmpty(str))
+                    return PipelineTypes.NullImporter;
+                else
+                    return PipelineTypes.MissingImporter;  
             }
 
             return base.ConvertFrom(context, culture, value);
         }
 
 
-        public override object ConvertTo(ITypeDescriptorContext context,
-                                         CultureInfo culture,
-                                         object value,
-                                         Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
+            var contentItem = (ContentItem)context.Instance;
+            var importer = (ImporterTypeDescription)value;// contentItem.Importer;
+            //System.Diagnostics.Debug.Assert(importer == value);
+
             if (destinationType == typeof (string))
-            {                
+            {
+                if (importer == PipelineTypes.MissingImporter)
+                    return string.Format("[missing] {0}", contentItem.ImporterName ?? "[null]");
+
                 return ((ImporterTypeDescription)value).DisplayName;
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
         }
-
-        //public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
-        //{
-        //    return TypeDescriptor.GetProperties(value, attributes, true);
-        //}
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {            
