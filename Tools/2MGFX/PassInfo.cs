@@ -102,7 +102,18 @@ namespace TwoMGFX
         {
             set
             {
-                if (!value)
+                if (value)
+                {
+                    if (blendState == null)
+                    {
+                        blendState = new BlendState();
+                        blendState.ColorSourceBlend = Blend.One;
+                        blendState.AlphaSourceBlend = Blend.One;
+                        blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
+                        blendState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
+                    }
+                }
+                else if (!value)
                 {
                     if (blendState == null)
                         blendState = new BlendState();
