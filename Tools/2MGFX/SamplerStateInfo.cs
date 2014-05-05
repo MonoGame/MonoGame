@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TwoMGFX
 {
@@ -47,6 +48,15 @@ namespace TwoMGFX
             set
             {
                 _mipFilter = value;
+                _dirty = true;
+            }
+        }
+
+        public TextureFilterType Filter
+        {
+            set
+            {
+                _minFilter = _magFilter = _mipFilter = value;
                 _dirty = true;
             }
         }
@@ -156,47 +166,7 @@ namespace TwoMGFX
 
             _dirty = false;
         }
-
-        public void Parse(string name, string value)
-        {
-            switch (name.ToLower())
-            {
-                case "texture":
-                    TextureName = value;
-                    break;
-                case "minfilter":
-                    MinFilter = ParseTreeTools.ParseTextureFilterType(value);
-                    break;
-                case "magfilter":
-                    MagFilter = ParseTreeTools.ParseTextureFilterType(value);
-                    break;
-                case "mipfilter":
-                    MipFilter = ParseTreeTools.ParseTextureFilterType(value);
-                    break;
-                case "filter":
-                    MinFilter = MagFilter = MipFilter = ParseTreeTools.ParseTextureFilterType(value);
-                    break;
-                case "addressu":
-                    AddressU = ParseTreeTools.ParseAddressMode(value);
-                    break;
-                case "addressv":
-                    AddressV = ParseTreeTools.ParseAddressMode(value);
-                    break;
-                case "addressw":
-                    AddressW = ParseTreeTools.ParseAddressMode(value);
-                    break;
-                case "maxanisotropy":
-                    MaxAnisotropy = int.Parse(value);
-                    break;
-                case "maxlod":
-                    MaxMipLevel = int.Parse(value);
-                    break;
-                case "miplodbias":
-                    MipMapLevelOfDetailBias = float.Parse(value);
-                    break;
-            }            
-        }
-
+        
         public SamplerState State
         {
             get

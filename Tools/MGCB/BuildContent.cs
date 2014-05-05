@@ -183,8 +183,15 @@ namespace MGCB
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
-            var outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, OutputDir)));
-            var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+
+            var outputPath = OutputDir;
+            if (!Path.IsPathRooted(outputPath))
+                outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
+
+            var intermediatePath = IntermediateDir;
+            if (!Path.IsPathRooted(intermediatePath))
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+            
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
 
