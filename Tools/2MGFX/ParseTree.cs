@@ -185,6 +185,120 @@ namespace TwoMGFX
                 case TokenType.Technique_Declaration:
                     Value = EvalTechnique_Declaration(tree, paramlist);
                     break;
+                case TokenType.FillMode_Solid:
+                    Value = EvalFillMode_Solid(tree, paramlist);
+                    break;
+                case TokenType.FillMode_WireFrame:
+                    Value = EvalFillMode_WireFrame(tree, paramlist);
+                    break;
+                case TokenType.FillModes:
+                    Value = EvalFillModes(tree, paramlist);
+                    break;
+                case TokenType.CullMode_None:
+                    Value = EvalCullMode_None(tree, paramlist);
+                    break;
+                case TokenType.CullMode_Cw:
+                    Value = EvalCullMode_Cw(tree, paramlist);
+                    break;
+                case TokenType.CullMode_Ccw:
+                    Value = EvalCullMode_Ccw(tree, paramlist);
+                    break;
+                case TokenType.CullModes:
+                    Value = EvalCullModes(tree, paramlist);
+                    break;
+                case TokenType.Blend_Zero:
+                    Value = EvalBlend_Zero(tree, paramlist);
+                    break;
+                case TokenType.Blend_One:
+                    Value = EvalBlend_One(tree, paramlist);
+                    break;
+                case TokenType.Blend_SrcColor:
+                    Value = EvalBlend_SrcColor(tree, paramlist);
+                    break;
+                case TokenType.Blend_InvSrcColor:
+                    Value = EvalBlend_InvSrcColor(tree, paramlist);
+                    break;
+                case TokenType.Blend_SrcAlpha:
+                    Value = EvalBlend_SrcAlpha(tree, paramlist);
+                    break;
+                case TokenType.Blend_InvSrcAlpha:
+                    Value = EvalBlend_InvSrcAlpha(tree, paramlist);
+                    break;
+                case TokenType.Blend_DestAlpha:
+                    Value = EvalBlend_DestAlpha(tree, paramlist);
+                    break;
+                case TokenType.Blend_InvDestAlpha:
+                    Value = EvalBlend_InvDestAlpha(tree, paramlist);
+                    break;
+                case TokenType.Blend_DestColor:
+                    Value = EvalBlend_DestColor(tree, paramlist);
+                    break;
+                case TokenType.Blend_InvDestColor:
+                    Value = EvalBlend_InvDestColor(tree, paramlist);
+                    break;
+                case TokenType.Blend_SrcAlphaSat:
+                    Value = EvalBlend_SrcAlphaSat(tree, paramlist);
+                    break;
+                case TokenType.Blend_BlendFactor:
+                    Value = EvalBlend_BlendFactor(tree, paramlist);
+                    break;
+                case TokenType.Blend_InvBlendFactor:
+                    Value = EvalBlend_InvBlendFactor(tree, paramlist);
+                    break;
+                case TokenType.Blends:
+                    Value = EvalBlends(tree, paramlist);
+                    break;
+                case TokenType.BlendOp_Add:
+                    Value = EvalBlendOp_Add(tree, paramlist);
+                    break;
+                case TokenType.BlendOp_Subtract:
+                    Value = EvalBlendOp_Subtract(tree, paramlist);
+                    break;
+                case TokenType.BlendOp_RevSubtract:
+                    Value = EvalBlendOp_RevSubtract(tree, paramlist);
+                    break;
+                case TokenType.BlendOp_Min:
+                    Value = EvalBlendOp_Min(tree, paramlist);
+                    break;
+                case TokenType.BlendOp_Max:
+                    Value = EvalBlendOp_Max(tree, paramlist);
+                    break;
+                case TokenType.BlendOps:
+                    Value = EvalBlendOps(tree, paramlist);
+                    break;
+                case TokenType.Render_State_CullMode:
+                    Value = EvalRender_State_CullMode(tree, paramlist);
+                    break;
+                case TokenType.Render_State_FillMode:
+                    Value = EvalRender_State_FillMode(tree, paramlist);
+                    break;
+                case TokenType.Render_State_AlphaBlendEnable:
+                    Value = EvalRender_State_AlphaBlendEnable(tree, paramlist);
+                    break;
+                case TokenType.Render_State_SrcBlend:
+                    Value = EvalRender_State_SrcBlend(tree, paramlist);
+                    break;
+                case TokenType.Render_State_DestBlend:
+                    Value = EvalRender_State_DestBlend(tree, paramlist);
+                    break;
+                case TokenType.Render_State_BlendOp:
+                    Value = EvalRender_State_BlendOp(tree, paramlist);
+                    break;
+                case TokenType.Render_State_DepthBias:
+                    Value = EvalRender_State_DepthBias(tree, paramlist);
+                    break;
+                case TokenType.Render_State_SlopeScaleDepthBias:
+                    Value = EvalRender_State_SlopeScaleDepthBias(tree, paramlist);
+                    break;
+                case TokenType.Render_State_ZEnable:
+                    Value = EvalRender_State_ZEnable(tree, paramlist);
+                    break;
+                case TokenType.Render_State_ZWriteEnable:
+                    Value = EvalRender_State_ZWriteEnable(tree, paramlist);
+                    break;
+                case TokenType.Render_State_MultiSampleAntiAlias:
+                    Value = EvalRender_State_MultiSampleAntiAlias(tree, paramlist);
+                    break;
                 case TokenType.Render_State_Expression:
                     Value = EvalRender_State_Expression(tree, paramlist);
                     break;
@@ -304,15 +418,203 @@ namespace TwoMGFX
            return null;
         }
 
+        protected virtual object EvalFillMode_Solid(ParseTree tree, params object[] paramlist)
+        {
+            return FillMode.Solid;
+        }
+
+        protected virtual object EvalFillMode_WireFrame(ParseTree tree, params object[] paramlist)
+        {
+            return FillMode.WireFrame;
+        }
+
+        protected virtual object EvalFillModes(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.FillMode_Solid, 0) ?? this.GetValue(tree, TokenType.FillMode_WireFrame, 0);
+        }
+
+        protected virtual object EvalCullMode_None(ParseTree tree, params object[] paramlist)
+        {
+            return CullMode.None;
+        }
+
+        protected virtual object EvalCullMode_Cw(ParseTree tree, params object[] paramlist)
+        {
+            return CullMode.CullClockwiseFace;
+        }
+
+        protected virtual object EvalCullMode_Ccw(ParseTree tree, params object[] paramlist)
+        {
+            return CullMode.CullCounterClockwiseFace;
+        }
+
+        protected virtual object EvalCullModes(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.CullMode_None, 0) ?? this.GetValue(tree, TokenType.CullMode_Cw, 0) ?? this.GetValue(tree, TokenType.CullMode_Ccw, 0);
+        }
+
+        protected virtual object EvalBlend_Zero(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.Zero;
+        }
+
+        protected virtual object EvalBlend_One(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.One;
+        }
+
+        protected virtual object EvalBlend_SrcColor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.SourceColor;
+        }
+
+        protected virtual object EvalBlend_InvSrcColor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.InverseSourceColor;
+        }
+
+        protected virtual object EvalBlend_SrcAlpha(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.SourceAlpha;
+        }
+
+        protected virtual object EvalBlend_InvSrcAlpha(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.InverseSourceAlpha;
+        }
+
+        protected virtual object EvalBlend_DestAlpha(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.DestinationAlpha;
+        }
+
+        protected virtual object EvalBlend_InvDestAlpha(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.InverseDestinationAlpha;
+        }
+
+        protected virtual object EvalBlend_DestColor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.DestinationColor;
+        }
+
+        protected virtual object EvalBlend_InvDestColor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.InverseDestinationColor;
+        }
+
+        protected virtual object EvalBlend_SrcAlphaSat(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.SourceAlphaSaturation;
+        }
+
+        protected virtual object EvalBlend_BlendFactor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.BlendFactor;
+        }
+
+        protected virtual object EvalBlend_InvBlendFactor(ParseTree tree, params object[] paramlist)
+        {
+            return Blend.InverseBlendFactor;
+        }
+
+        protected virtual object EvalBlends(ParseTree tree, params object[] paramlist)
+        {
+            return	this.GetValue(tree, TokenType.Blend_Zero, 0) ?? this.GetValue(tree, TokenType.Blend_One, 0) ?? this.GetValue(tree, TokenType.Blend_SrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcColor, 0) ?? this.GetValue(tree, TokenType.Blend_SrcAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_InvSrcAlpha, 0) ?? 
+        			this.GetValue(tree, TokenType.Blend_DestAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_InvDestAlpha, 0) ?? this.GetValue(tree, TokenType.Blend_DestColor, 0) ?? this.GetValue(tree, TokenType.Blend_InvDestColor, 0) ?? this.GetValue(tree, TokenType.Blend_SrcAlphaSat, 0) ??
+        			this.GetValue(tree, TokenType.Blend_BlendFactor, 0) ?? this.GetValue(tree, TokenType.Blend_InvBlendFactor, 0);
+        }
+
+        protected virtual object EvalBlendOp_Add(ParseTree tree, params object[] paramlist)
+        {
+            return BlendFunction.Add;
+        }
+
+        protected virtual object EvalBlendOp_Subtract(ParseTree tree, params object[] paramlist)
+        {
+            return BlendFunction.Subtract;
+        }
+
+        protected virtual object EvalBlendOp_RevSubtract(ParseTree tree, params object[] paramlist)
+        {
+            return BlendFunction.ReverseSubtract;
+        }
+
+        protected virtual object EvalBlendOp_Min(ParseTree tree, params object[] paramlist)
+        {
+            return BlendFunction.Min;
+        }
+
+        protected virtual object EvalBlendOp_Max(ParseTree tree, params object[] paramlist)
+        {
+            return BlendFunction.Max;
+        }
+
+        protected virtual object EvalBlendOps(ParseTree tree, params object[] paramlist)
+        {
+            return	this.GetValue(tree, TokenType.BlendOp_Add, 0) ?? this.GetValue(tree, TokenType.BlendOp_Subtract, 0) ?? this.GetValue(tree, TokenType.BlendOp_RevSubtract, 0) ?? this.GetValue(tree, TokenType.BlendOp_Min, 0) ?? this.GetValue(tree, TokenType.BlendOp_Max, 0);
+        }
+
+        protected virtual object EvalRender_State_CullMode(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).CullMode = (CullMode)this.GetValue(tree, TokenType.CullModes, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_FillMode(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).FillMode = (FillMode)this.GetValue(tree, TokenType.FillModes, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_AlphaBlendEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).AlphaBlendEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_SrcBlend(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).SrcBlend = (Blend)this.GetValue(tree, TokenType.Blends, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_DestBlend(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).DestBlend = (Blend)this.GetValue(tree, TokenType.Blends, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_BlendOp(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).BlendOp = (BlendFunction)this.GetValue(tree, TokenType.BlendOps, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_DepthBias(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).DepthBias = ParseTreeTools.ParseFloat((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_SlopeScaleDepthBias(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).SlopeScaleDepthBias = ParseTreeTools.ParseFloat((string)this.GetValue(tree, TokenType.Number, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_ZEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).ZEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_ZWriteEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).ZWriteEnable = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
+        protected virtual object EvalRender_State_MultiSampleAntiAlias(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).MultiSampleAntiAlias = ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)); return null;
+        }
+
         protected virtual object EvalRender_State_Expression(ParseTree tree, params object[] paramlist)
         {
-            var name = this.GetValue(tree, TokenType.Identifier, 0) as string;
-        	var value = (string)(this.GetValue(tree, TokenType.Identifier, 1) ?? this.GetValue(tree, TokenType.Number, 0));
-        	
-        	var pass = paramlist[0] as PassInfo;
-        	pass.ParseRenderState(name, value);
-        		
-        	return null;
+            foreach (var node in Nodes)
+                node.Eval(tree, paramlist);
+            return null;
         }
 
         protected virtual object EvalPass_Declaration(ParseTree tree, params object[] paramlist)
