@@ -206,6 +206,30 @@ namespace TwoMGFX
                 case TokenType.CullModes:
                     Value = EvalCullModes(tree, paramlist);
                     break;
+                case TokenType.Colors_None:
+                    Value = EvalColors_None(tree, paramlist);
+                    break;
+                case TokenType.Colors_Red:
+                    Value = EvalColors_Red(tree, paramlist);
+                    break;
+                case TokenType.Colors_Green:
+                    Value = EvalColors_Green(tree, paramlist);
+                    break;
+                case TokenType.Colors_Blue:
+                    Value = EvalColors_Blue(tree, paramlist);
+                    break;
+                case TokenType.Colors_Alpha:
+                    Value = EvalColors_Alpha(tree, paramlist);
+                    break;
+                case TokenType.Colors_All:
+                    Value = EvalColors_All(tree, paramlist);
+                    break;
+                case TokenType.Colors:
+                    Value = EvalColors(tree, paramlist);
+                    break;
+                case TokenType.ColorsMasks:
+                    Value = EvalColorsMasks(tree, paramlist);
+                    break;
                 case TokenType.Blend_Zero:
                     Value = EvalBlend_Zero(tree, paramlist);
                     break;
@@ -283,6 +307,9 @@ namespace TwoMGFX
                     break;
                 case TokenType.Render_State_BlendOp:
                     Value = EvalRender_State_BlendOp(tree, paramlist);
+                    break;
+                case TokenType.Render_State_ColorWriteEnable:
+                    Value = EvalRender_State_ColorWriteEnable(tree, paramlist);
                     break;
                 case TokenType.Render_State_DepthBias:
                     Value = EvalRender_State_DepthBias(tree, paramlist);
@@ -453,6 +480,49 @@ namespace TwoMGFX
             return this.GetValue(tree, TokenType.CullMode_None, 0) ?? this.GetValue(tree, TokenType.CullMode_Cw, 0) ?? this.GetValue(tree, TokenType.CullMode_Ccw, 0);
         }
 
+        protected virtual object EvalColors_None(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.None;
+        }
+
+        protected virtual object EvalColors_Red(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.Red;
+        }
+
+        protected virtual object EvalColors_Green(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.Green;
+        }
+
+        protected virtual object EvalColors_Blue(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.Blue;
+        }
+
+        protected virtual object EvalColors_Alpha(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.Alpha;
+        }
+
+        protected virtual object EvalColors_All(ParseTree tree, params object[] paramlist)
+        {
+            return ColorWriteChannels.All;
+        }
+
+        protected virtual object EvalColors(ParseTree tree, params object[] paramlist)
+        {
+            return this.GetValue(tree, TokenType.Colors_Red, 0) ?? this.GetValue(tree, TokenType.Colors_Green, 0) ?? this.GetValue(tree, TokenType.Colors_Blue, 0) ?? this.GetValue(tree, TokenType.Colors_Alpha, 0) ?? this.GetValue(tree, TokenType.Colors_None, 0) ?? this.GetValue(tree, TokenType.Colors_All, 0);
+        }
+
+        protected virtual object EvalColorsMasks(ParseTree tree, params object[] paramlist)
+        {
+            return	(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 0) ?? 0) | 
+        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 1) ?? 0) | 
+        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 2) ?? 0) | 
+        			(ColorWriteChannels)(this.GetValue(tree, TokenType.Colors, 3) ?? 0);
+        }
+
         protected virtual object EvalBlend_Zero(ParseTree tree, params object[] paramlist)
         {
             return Blend.Zero;
@@ -583,6 +653,11 @@ namespace TwoMGFX
         protected virtual object EvalRender_State_BlendOp(ParseTree tree, params object[] paramlist)
         {
             (paramlist[0] as PassInfo).BlendOp = (BlendFunction)this.GetValue(tree, TokenType.BlendOps, 0); return null;
+        }
+
+        protected virtual object EvalRender_State_ColorWriteEnable(ParseTree tree, params object[] paramlist)
+        {
+            (paramlist[0] as PassInfo).ColorWriteEnable = (ColorWriteChannels)this.GetValue(tree, TokenType.ColorsMasks, 0); return null;
         }
 
         protected virtual object EvalRender_State_DepthBias(ParseTree tree, params object[] paramlist)

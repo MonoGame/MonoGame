@@ -207,6 +207,15 @@ namespace TwoMGFX
             }
         }
 
+        public ColorWriteChannels ColorWriteEnable
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorWriteChannels = value;
+            }    
+        }
 
         public float DepthBias
         {
