@@ -8,7 +8,7 @@ using Windows.Storage;
 
 namespace Microsoft.Xna.Framework
 {
-    static public class MetroHelper
+    static internal class MetroHelper
     {
         static public bool AppDataFileExists(string fileName)
         {

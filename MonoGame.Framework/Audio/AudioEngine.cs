@@ -1,42 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
@@ -46,8 +10,14 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>
+    /// Class used to create and manipulate code audio objects.
+    /// </summary> 
 	public class AudioEngine : IDisposable
 	{
+        ///<summary>
+        ///Specifies the current content version.
+        ///</summary>
 		public const int ContentVersion = 46;
 		
 		internal Dictionary<string, WaveBank> Wavebanks = new Dictionary<string, WaveBank>();
@@ -102,11 +72,16 @@ namespace Microsoft.Xna.Framework.Audio
 
 
 
+        /// <param name="settingsFile">Path to a XACT settings file.</param>
 		public AudioEngine (string settingsFile)
 			: this(settingsFile, TimeSpan.Zero, "")
 		{
 		}
-		
+
+        /// <param name="settingsFile">Path to a XACT settings file.</param>
+        /// <param name="lookAheadTime">Determines how many milliseconds the engine will look ahead when determing when to transition to another sound.</param>
+        /// <param name="rendererId">A string that specifies the audio renderer to use.</param>
+        /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
 		public AudioEngine (string settingsFile, TimeSpan lookAheadTime, string rendererId)
 		{
 			//Read the xact settings file
@@ -230,22 +205,34 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 			return ret;
 		}
-		
+
+        /// <summary>Performs periodic work required by the audio engine.</summary>
+        /// <remarks>Must be called at least once per frame.</remarks>
 		public void Update ()
 		{
 			// TODO throw new NotImplementedException ();
 		}
-		
+
+        /// <summary>Returns an audio category by name.</summary>
+        /// <param name="name">Friendly name of the category to get.</param>
+        /// <returns>The AudioCategory with a matching name. Throws an exception if not found.</returns>
 		public AudioCategory GetCategory (string name)
 		{
 			return categories [categoryLookup [name]];
 		}
 
+        /// <summary>Gets the value of a global variable.</summary>
+        /// <param name="name">Friendly name of the variable.</param>
+        /// <returns>float value of the queried variable.</returns>
+        /// <remarks>A global variable has global scope. It can be accessed by all code within a project.</remarks>
 		public float GetGlobalVariable(string name)
 		{
 			return variables[variableLookup[name]].value;
 		}
 
+        /// <summary>Sets the value of a global variable.</summary>
+        /// <param name="name">Friendly name of the variable.</param>
+        /// <param name="value">Value of the global variable.</param>
 		public void SetGlobalVariable (string name, float value)
 		{
 			variables [variableLookup [name]].value = value;

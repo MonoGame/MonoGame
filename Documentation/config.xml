@@ -57,9 +57,11 @@
 			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
 
   <!-- Windows 8 Store -->
+  <!--
   <source	api="win8metro|Windows 8 Store" 
-			xml="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+			xml="..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.xml"
+			>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
+  -->
 
   <!-- Windows Phone 8 -->
   <source	api="wp8|Windows Phone 8" 

@@ -91,28 +91,24 @@ namespace Microsoft.Xna.Framework {
 		{
 			base.TouchesBegan (touches, evt);
 			FillTouchCollection (touches);
-			GamePad.Instance.TouchesBegan (touches, evt, this);
 		}
 
 		public override void TouchesEnded (NSSet touches, UIEvent evt)
 		{
 			base.TouchesEnded (touches, evt);
 			FillTouchCollection (touches);
-			GamePad.Instance.TouchesEnded (touches, evt, this);
 		}
 
 		public override void TouchesMoved (NSSet touches, UIEvent evt)
 		{
 			base.TouchesMoved (touches, evt);
 			FillTouchCollection (touches);
-			GamePad.Instance.TouchesMoved (touches, evt, this);
 		}
 
 		public override void TouchesCancelled (NSSet touches, UIEvent evt)
 		{
 			base.TouchesCancelled (touches, evt);
 			FillTouchCollection (touches);
-			GamePad.Instance.TouchesCancelled (touches, evt);
 		}
 		
 		// TODO: Review FillTouchCollection

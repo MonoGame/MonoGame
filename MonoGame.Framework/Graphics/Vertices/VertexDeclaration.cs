@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			int max = 0;
 			for (var i = 0; i < elements.Length; i++)
 			{
-                var start = elements[i].Offset + elements[i].VertexElementFormat.GetTypeSize();
+                var start = elements[i].Offset + elements[i].VertexElementFormat.GetSize();
 				if (max < start)
 					max = start;
 			}

@@ -32,6 +32,7 @@ using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>Represents a collection of wave files.</summary>
     public class WaveBank : IDisposable
     {
         internal SoundEffectInstance[] sounds;
@@ -79,7 +80,10 @@ namespace Microsoft.Xna.Framework.Audio
         private const int MiniFormatTag_XMA = 0x1;
         private const int MiniFormatTag_ADPCM = 0x2;
         private const int MiniForamtTag_WMA = 0x3;
-        
+
+        /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
+        /// <param name="nonStreamingWaveBankFilename">Path to the .xwb file to load.</param>
+        /// <remarks>This constructor immediately loads all wave data into memory at once.</remarks>
         public WaveBank(AudioEngine audioEngine, string nonStreamingWaveBankFilename)
         {
             //XWB PARSING
@@ -436,6 +440,15 @@ namespace Microsoft.Xna.Framework.Audio
 			audioEngine.Wavebanks[BankName] = this;
         }
 		
+        /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
+        /// <param name="streamingWaveBankFilename">Path to the .xwb to stream from.</param>
+        /// <param name="offset">DVD sector-aligned offset within the wave bank data file.</param>
+        /// <param name="packetsize">Stream packet size, in sectors, to use for each stream. The minimum value is 2.</param>
+        /// <remarks>
+        /// <para>This constructor streams wave data as needed.</para>
+        /// <para>Note that packetsize is in sectors, which is 2048 bytes.</para>
+        /// <para>AudioEngine.Update() must be called at least once before using data from a streaming wave bank.</para>
+        /// </remarks>
 		public WaveBank(AudioEngine audioEngine, string streamingWaveBankFilename, int offset, short packetsize)
 			: this(audioEngine, streamingWaveBankFilename)
 		{
