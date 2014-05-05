@@ -26,6 +26,11 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         void OnReferencesModified();
 
+        /// <summary>
+        /// Notify controller that a property of ContentItem has been modified.
+        /// </summary>        
+        void OnItemModified(ContentItem contentItem);
+
         void NewProject();
 
         void ImportProject();
@@ -46,6 +51,6 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);    
+        void Exclude(ContentItem item);        
     }
 }

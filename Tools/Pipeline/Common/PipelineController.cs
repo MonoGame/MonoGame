@@ -22,7 +22,7 @@ namespace MonoGame.Tools.Pipeline
             _view = view;
             _view.Attach(this);
             _project = project;
-            _project.Attach(_view as IProjectObserver);
+            _project.Controller = this;
             ProjectOpen = false;
         }
 
@@ -41,6 +41,14 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
             ProjectDiry = true;
             ResolveTypes();
+        }
+
+        public void OnItemModified(ContentItem contentItem)
+        {
+            Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
+            ProjectDiry = true;
+            _view.UpdateProperties(contentItem);
+            _view.UpdateTreeItem(contentItem);
         }
 
         public void NewProject()
@@ -284,16 +292,13 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {            
-            var projectRoot = _project.Location;
-            var path = projectRoot + "\\" + initialDirectory;
-
+        {                        
             string file;
             if (_view.ChooseContentFile(initialDirectory, out file))
             {
                 _project.OnBuild(file);
                 var item = _project.ContentItems.Last();
-                item.View = _view;
+                item.Controller = this;
                 item.ResolveTypes();
                 _view.AddTreeItem(item);
                 _view.SelectTreeItem(item);
@@ -315,10 +320,10 @@ namespace MonoGame.Tools.Pipeline
             PipelineTypes.Load(_project);
             foreach (var i in _project.ContentItems)
             {
-                i.View = _view;
+                i.Controller = this;
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
-            }                        
+            }        
         }
     }
 }

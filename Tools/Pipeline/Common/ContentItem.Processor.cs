@@ -26,30 +26,43 @@ namespace MonoGame.Tools.Pipeline
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
         {
-            // True means that values returned by GetStandardValues is exclusive (contains all possible valid values).
             return true;
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            var importer = ((ContentItem)context.Instance).Importer;
+            var contentItem = (ContentItem)context.Instance;
             var processors = new List<ProcessorTypeDescription>();
-            foreach (var p in PipelineTypes.Processors)
+
+            if (contentItem.BuildAction == BuildAction.Copy)
             {
-                if (importer.OutputType.IsAssignableFrom(p.InputType))
-                {
-                    processors.Add(p);
-                }
+                // Copy items do not have processors.
+                return new StandardValuesCollection(processors);
             }
-            return new StandardValuesCollection(processors);
+            else
+            {
+                var importer = contentItem.Importer;
+
+                // If the importer is invalid then we do not know its real outputtype
+                // so just show all processors.
+                if (importer == PipelineTypes.MissingImporter)
+                {
+                    return new StandardValuesCollection(PipelineTypes.Processors);
+                }
+                
+                foreach (var p in PipelineTypes.Processors)
+                {
+                    if (importer.OutputType.IsAssignableFrom(p.InputType))
+                    {
+                        processors.Add(p);
+                    }
+                }
+
+                return new StandardValuesCollection(processors);
+            }            
         }
 
-        // Overrides the CanConvertFrom method of TypeConverter.
-        // The ITypeDescriptorContext interface provides the context for the
-        // conversion. Typically, this interface is used at design time to 
-        // provide information about the design-time container.
-        public override bool CanConvertFrom(ITypeDescriptorContext context,
-                                            Type sourceType)
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == typeof (string))
             {
@@ -60,9 +73,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
 
-        public override object ConvertFrom(ITypeDescriptorContext context,
-                                           CultureInfo culture,
-                                           object value)
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string)
             {
@@ -79,13 +90,16 @@ namespace MonoGame.Tools.Pipeline
         }
 
 
-        public override object ConvertTo(ITypeDescriptorContext context,
-                                         CultureInfo culture,
-                                         object value,
-                                         Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (destinationType == typeof (string))
             {
+                var contentItem = context.Instance as ContentItem;
+                var processor = (ProcessorTypeDescription)value;
+
+                if (processor == PipelineTypes.MissingProcessor)
+                    return string.Format("[missing] {0}", contentItem.ProcessorName);
+
                 return ((ProcessorTypeDescription)value).DisplayName;
             }
 
@@ -94,13 +108,13 @@ namespace MonoGame.Tools.Pipeline
 
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
         {
-            // Create the property collection and filter
             var props = new PropertyDescriptorCollection(null);
 
-            if (value == PipelineTypes.InvalidProcessor)
-            {
-                var contentItem = context.Instance as ContentItem;
+            var processor = value as ProcessorTypeDescription;
+            var contentItem = context.Instance as ContentItem;
 
+            if (value == PipelineTypes.MissingProcessor)
+            {            
                 props.Add(new ReadonlyPropertyDescriptor("Name", typeof (string), typeof (ProcessorTypeDescription), contentItem.ProcessorName));
 
                 foreach (var p in contentItem.ProcessorParams)
@@ -118,13 +132,9 @@ namespace MonoGame.Tools.Pipeline
             {
                 // Emit regular properties.
                 foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
-                {
                     props.Add(prop);
-                }
 
-                var processor = value as ProcessorTypeDescription;
-                var contentItem = context.Instance as ContentItem;
-
+                // Emit processor parameters.
                 foreach (var p in processor.Properties)
                 {
                     var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name,
@@ -141,10 +151,13 @@ namespace MonoGame.Tools.Pipeline
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
             var contentItem = context.Instance as ContentItem;
-            if (contentItem.Processor.Properties.Count() > 0)
+            if (contentItem.BuildAction == BuildAction.Copy)
+                return false;
+
+            if (contentItem.Processor.Properties.Any())
                 return true;
 
-            if (contentItem.Processor == PipelineTypes.InvalidProcessor)
+            if (contentItem.Processor == PipelineTypes.MissingProcessor)
                 return true;
             
             return false;

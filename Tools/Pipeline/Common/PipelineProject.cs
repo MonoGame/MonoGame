@@ -27,16 +27,24 @@ namespace MonoGame.Tools.Pipeline
     /// controller or view... it is only the data "model".
     /// </remarks>
     class PipelineProject : IProjectItem
-    {        
-        #region CommandLineParameters
+    {
+        #region Other Data
 
         private readonly List<ContentItem> _content = new List<ContentItem>();
+        private string _processor;
+        private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
+
+        public IController Controller;
 
         [Browsable(false)]
         public ReadOnlyCollection<ContentItem> ContentItems { get; private set; }
 
         [Browsable(false)]
         public string FilePath { get; set; }
+
+        #endregion
+
+        #region CommandLineParameters
 
         [CommandLineParameter(
             Name = "outputDir",
@@ -79,9 +87,7 @@ namespace MonoGame.Tools.Pipeline
             Name = "importer",
             ValueName = "className",
             Description = "Defines the class name of the content importer for reading source content.")]
-        public string Importer;
-
-        private string _processor;
+        public string Importer;        
 
         [Browsable(false)]
         [CommandLineParameter(
@@ -96,9 +102,7 @@ namespace MonoGame.Tools.Pipeline
                 _processor = value;
                 _processorParams.Clear();
             }
-        }
-
-        private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
+        }        
 
         [CommandLineParameter(
             Name = "processorParam",
@@ -135,9 +139,42 @@ namespace MonoGame.Tools.Pipeline
             // Create the item for processing later.
             var item = new ContentItem
             {
+                Controller = Controller,
+                BuildAction = BuildAction.Build,
                 SourceFile = sourceFile,
                 ImporterName = Importer,
                 ProcessorName = Processor,
+                ProcessorParams = new OpaqueDataDictionary()
+            };
+            _content.Add(item);
+
+            // Copy the current processor parameters blind as we
+            // will validate and remove invalid parameters during
+            // the build process later.
+            foreach (var pair in _processorParams)
+                item.ProcessorParams.Add(pair.Key, pair.Value);
+        }
+
+        [CommandLineParameter(
+            Name = "copy",
+            ValueName = "sourceFile",
+            Description = "Copy the content source file verbatim to the output directory.")]
+        public void OnCopy(string sourceFile)
+        {
+            // Make sure the source file is relative to the project.
+            var projectDir = Location + "\\";
+            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
+
+            // Remove duplicates... keep this new one.
+            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            if (previous != -1)
+                _content.RemoveAt(previous);
+
+            // Create the item for processing later.
+            var item = new ContentItem
+            {                         
+                BuildAction = BuildAction.Copy,
+                SourceFile = sourceFile,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _content.Add(item);
@@ -185,12 +222,6 @@ namespace MonoGame.Tools.Pipeline
         {
             ContentItems = new ReadOnlyCollection<ContentItem>(_content);
             References = new List<string>();
-            //References.RaiseListChangedEvents = true;
-            //References.ListChanged += (e, f) => OnPropertyChanged("References");
-        }
-
-        public void Attach(IProjectObserver observer)
-        {            
         }
 
         public void NewProject()
@@ -265,46 +296,55 @@ namespace MonoGame.Tools.Pipeline
                     line = string.Format("#begin {0}", i.SourceFile);
                     io.WriteLine(line);
 
-                    // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
-                    //if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
+                    if (i.BuildAction == BuildAction.Copy)
                     {
-                        line = string.Format(lineFormat, "importer", i.ImporterName);
-                        io.WriteLine(line);   
-                    }
-
-                    // Collect lines for each non-default-value processor parameter
-                    // but do not write them yet.
-                    parameterLines.Clear();
-                    foreach (var j in i.ProcessorParams)
-                    {
-                        var defaultValue = i.Processor.Properties[j.Key].DefaultValue;
-                        if (j.Value == null || j.Value == defaultValue)
-                            continue;
-
-                        line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
-                        parameterLines.Add(line);
-                    }
-
-                    // If there were any non-default-value processor parameters
-                    // or, if the processor itself is not the default processor for this content's importer
-                    // or, the processor for this item is different than the previous item's
-                    // then we write out the processor command line and any (non default value) processor parameters.
-                    // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
-                    //if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor) || (prevProcessor != null && prevProcessor != i.Processor.TypeName)
-                    {
-                        line = string.Format(lineFormat, "processor", i.ProcessorName);
+                        line = string.Format(lineFormat, "copy", i.SourceFile);
                         io.WriteLine(line);
-
-                        // Store the last processor we emitted, so we can test if it does not match subsequent items.
-                        //prevProcessor = i.Processor.TypeName;
-
-                        foreach (var ln in parameterLines)
-                            io.WriteLine(ln);
+                        io.WriteLine();
                     }
+                    else
+                    {
+                        // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
+                        //if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
+                        {
+                            line = string.Format(lineFormat, "importer", i.ImporterName);
+                            io.WriteLine(line);
+                        }
 
-                    line = string.Format(lineFormat, "build", i.SourceFile);
-                    io.WriteLine(line);
-                    io.WriteLine();
+                        // Collect lines for each non-default-value processor parameter
+                        // but do not write them yet.
+                        parameterLines.Clear();
+                        foreach (var j in i.ProcessorParams)
+                        {
+                            var defaultValue = i.Processor.Properties[j.Key].DefaultValue;
+                            if (j.Value == null || j.Value == defaultValue)
+                                continue;
+
+                            line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                            parameterLines.Add(line);
+                        }
+
+                        // If there were any non-default-value processor parameters
+                        // or, if the processor itself is not the default processor for this content's importer
+                        // or, the processor for this item is different than the previous item's
+                        // then we write out the processor command line and any (non default value) processor parameters.
+                        // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
+                        //if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor) || (prevProcessor != null && prevProcessor != i.Processor.TypeName)
+                        {
+                            line = string.Format(lineFormat, "processor", i.ProcessorName);
+                            io.WriteLine(line);
+
+                            // Store the last processor we emitted, so we can test if it does not match subsequent items.
+                            //prevProcessor = i.Processor.TypeName;
+
+                            foreach (var ln in parameterLines)
+                                io.WriteLine(ln);
+                        }
+
+                        line = string.Format(lineFormat, "build", i.SourceFile);
+                        io.WriteLine(line);
+                        io.WriteLine();
+                    }
                 }
             }
         }
@@ -338,25 +378,39 @@ namespace MonoGame.Tools.Pipeline
                                 References.Add(hintPath);
                             }
                         }
-                        else if (io.LocalName.Equals("Compile"))
+                        else if (io.LocalName.Equals("Compile") || io.LocalName.Equals("Content"))
                         {
-                            string include, name, importer, processor;
+                            string include, name, importer, processor, copyToOutputDirectory;
                             string[] processorParams;
-                            ReadCompile(io, out include, out name, out importer, out processor, out processorParams);
+                            ReadCompile(io, out include, out name, out importer, out processor, out copyToOutputDirectory, out processorParams);
 
-                            Importer = importer;
-                            Processor = processor;
-
-                            if (processorParams != null)
+                            // JCF: Technically we could support having source files that are both built into content
+                            //      and also get copied to the output directory in their original form. However XNA appears
+                            //      to ignore the value of CopyToOutputDirectory for includes which also specify an
+                            //      importer or processor, so i do the same. 
+                            if (string.IsNullOrEmpty(processor) && 
+                                string.IsNullOrEmpty(importer) && 
+                                !string.IsNullOrEmpty(copyToOutputDirectory) &&
+                                !copyToOutputDirectory.Equals("Never"))
                             {
-                                foreach (var i in processorParams)
-                                    AddProcessorParam(i);
+                                OnCopy(include);
                             }
+                            else
+                            {
+                                Importer = importer;
+                                Processor = processor;
 
-                            var sourceFilePath = Path.GetDirectoryName(projectFilePath);
-                            sourceFilePath += "\\" + include;
+                                if (processorParams != null)
+                                {
+                                    foreach (var i in processorParams)
+                                        AddProcessorParam(i);
+                                }
 
-                            OnBuild(sourceFilePath);
+                                var sourceFilePath = Path.GetDirectoryName(projectFilePath);
+                                sourceFilePath += "\\" + include;
+
+                                OnBuild(sourceFilePath);
+                            }
                         }
                     }                   
                 }
@@ -366,7 +420,7 @@ namespace MonoGame.Tools.Pipeline
         public void RemoveItem(ContentItem item)
         {
             _content.Remove(item);
-        }         
+        }
 
         private void Clear()
         {
@@ -407,11 +461,13 @@ namespace MonoGame.Tools.Pipeline
                                  out string name,
                                  out string importer,
                                  out string processor,
+                                 out string copyToOutputDirectory,
                                  out string[] processorParams)
         {
             name = null;
             importer = null;
             processor = null;
+            copyToOutputDirectory = null;
 
             include = io.GetAttribute("Include");
             var parameters = new List<string>();
@@ -438,7 +494,11 @@ namespace MonoGame.Tools.Pipeline
                             case "Processor":
                                 io.Read();
                                 processor = io.Value;
-                                break;      
+                                break;
+                            case "CopyToOutputDirectory":
+                                io.Read();
+                                copyToOutputDirectory = io.Value;
+                                break;
                             default:
                                 if (io.LocalName.Contains("ProcessorParameters_"))
                                 {
