@@ -307,7 +307,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // DepthStencilState.Default has the Stencil Test disabled; 
             // make sure stencil test is enabled before we clear since
             // some drivers won't clear with stencil test disabled
-            DepthStencilState = this.clearDepthStencilState
+            DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
             PlatformApplyState(false);
 
