@@ -72,11 +72,6 @@ namespace Microsoft.Xna.Framework
         private bool _drawBegun;
         bool disposed;
 
-		private bool _SynchronizedWithVerticalRetrace 
-		{
-			get { return _synchronizedWithVerticalRetrace; }
-		}
-
 #if !WINRT
         private bool _wantFullScreen = false;
 #endif
@@ -286,6 +281,7 @@ namespace Microsoft.Xna.Framework
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
             _graphicsDevice.Context.SwapInterval =
                 _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
+            _game.Platform.VSyncEnabled = _synchronizedWithVerticalRetrace;
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
@@ -526,20 +522,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if LINUX || (WINDOWS && OPENGL)
-                return _game.Platform.VSyncEnabled;
-#else
                 return _synchronizedWithVerticalRetrace;
-#endif
             }
             set
             {
-#if LINUX || (WINDOWS && OPENGL)
-                // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
-                _game.Platform.VSyncEnabled = value;
-#else
                 _synchronizedWithVerticalRetrace = value;
-#endif
             }
         }
 
