@@ -119,8 +119,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // We always have a position channel
             result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, VertexElementFormat.Vector3,
-                                                                          VertexElementUsage.Position, 0));
-            offset += VertexElementFormat.Vector3.GetTypeSize();
+                                                                           VertexElementUsage.Position, 0));
+            offset += VertexElementFormat.Vector3.GetSize();
 
             // Optional channels
             foreach (var channel in Channels)
@@ -149,7 +149,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var usageIndex = VertexChannelNames.DecodeUsageIndex(channel.Name);
 
                 result.VertexDeclaration.VertexElements.Add(new VertexElement(offset, format, usage, usageIndex));
-                offset += format.GetTypeSize();
+                offset += format.GetSize();
                 result.VertexDeclaration.VertexStride = offset;
             }
             return offset;

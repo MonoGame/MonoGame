@@ -184,7 +184,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
                 Threading.WindowInfo = wnd;
+                Threading.BackgroundContext.MakeCurrent(null);
             }
+            Context.MakeCurrent(wnd);
 #endif
 
             MaxTextureSlots = 16;

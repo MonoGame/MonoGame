@@ -36,6 +36,8 @@ namespace MonoGame.Tools.Pipeline
         void RemoveTreeItem(ContentItem contentItem);
 
         void SelectTreeItem(IProjectItem item);
+    
+        void UpdateTreeItem(IProjectItem item);
 
         void ShowProperties(IProjectItem item);
 

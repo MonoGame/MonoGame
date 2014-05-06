@@ -14,13 +14,13 @@
 // TOKENS
 [IgnoreCase] Pass -> @"pass";
 [IgnoreCase] Technique -> @"technique";
-[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|sampler";
+[IgnoreCase] Sampler -> @"sampler1D|sampler2D|sampler3D|samplerCUBE|SamplerState|sampler";
 [IgnoreCase] SamplerState -> @"sampler_state";
 [IgnoreCase] VertexShader -> @"VertexShader";
 [IgnoreCase] PixelShader -> @"PixelShader";
 [IgnoreCase] Register -> @"register";
-Number -> @"[0-9]?\.?[0-9]+";
-Sign -> @"-|\+";
+[IgnoreCase] Boolean -> @"true|false|0|1";
+Number -> @"[+-] ?[0-9]?\.?[0-9]+[fF]?";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";
@@ -28,6 +28,7 @@ Equals -> @"=";
 Colon -> @":";
 Comma -> @",";
 Semicolon -> @";";
+Or -> @"\|";
 OpenParenthesis -> @"\(";
 CloseParenthesis -> @"\)";
 OpenSquareBracket -> @"\[";
@@ -38,6 +39,82 @@ GreaterThan -> @">";
 ShaderModel -> @"[A-Za-z_][A-Za-z0-9_]*";
 Code -> @"[\S]+";
 EndOfFile -> @"^$";
+
+// Sampler states
+[IgnoreCase] MinFilter -> @"MinFilter";
+[IgnoreCase] MagFilter -> @"MagFilter";
+[IgnoreCase] MipFilter -> @"MipFilter";
+[IgnoreCase] Filter -> @"Filter";
+[IgnoreCase] Texture -> @"Texture";
+[IgnoreCase] AddressU -> @"AddressU";
+[IgnoreCase] AddressV -> @"AddressV";
+[IgnoreCase] AddressW -> @"AddressW";
+[IgnoreCase] MaxAnisotropy -> @"MaxAnisotropy";
+[IgnoreCase] MaxMipLevel -> @"MaxMipLevel|MaxLod";
+[IgnoreCase] MipLodBias -> @"MipLodBias";
+
+// Address Mode
+[IgnoreCase] Clamp -> @"Clamp";
+[IgnoreCase] Wrap -> @"Wrap";
+[IgnoreCase] Mirror -> @"Mirror";
+
+// Texture Filters
+[IgnoreCase] None -> @"None";
+[IgnoreCase] Linear -> @"Linear";
+[IgnoreCase] Point -> @"Point";
+[IgnoreCase] Anisotropic -> @"Anisotropic";
+
+// Render states
+[IgnoreCase] AlphaBlendEnable -> @"AlphaBlendEnable";
+[IgnoreCase] SrcBlend -> @"SrcBlend";
+[IgnoreCase] DestBlend -> @"DestBlend";
+[IgnoreCase] BlendOp -> @"BlendOp";
+[IgnoreCase] ColorWriteEnable -> @"ColorWriteEnable";
+[IgnoreCase] ZEnable -> @"ZEnable";
+[IgnoreCase] ZWriteEnable -> @"ZWriteEnable";
+[IgnoreCase] DepthBias -> @"DepthBias";
+[IgnoreCase] CullMode -> @"CullMode";
+[IgnoreCase] FillMode -> @"FillMode";
+[IgnoreCase] MultiSampleAntiAlias -> @"MultiSampleAntiAlias";
+[IgnoreCase] SlopeScaleDepthBias -> @"SlopeScaleDepthBias";
+
+// Colors
+[IgnoreCase] Red -> @"Red";
+[IgnoreCase] Green -> @"Green";
+[IgnoreCase] Blue -> @"Blue";
+[IgnoreCase] Alpha -> @"Alpha";
+[IgnoreCase] All -> @"All";
+
+// Cull mode
+[IgnoreCase] Cw -> @"Cw";
+[IgnoreCase] Ccw -> @"Ccw";
+
+// Fill mode
+[IgnoreCase] Solid -> @"Solid";
+[IgnoreCase] WireFrame -> @"WireFrame";
+
+// Blend function
+[IgnoreCase] Add -> @"Add";
+[IgnoreCase] Subtract -> @"Subtract";
+[IgnoreCase] RevSubtract -> @"RevSubtract";
+[IgnoreCase] Min -> @"Min";
+[IgnoreCase] Max -> @"Max";
+
+// Blend 
+[IgnoreCase] Zero -> @"Zero";
+[IgnoreCase] One -> @"One";
+[IgnoreCase] SrcColor -> @"SrcColor";
+[IgnoreCase] InvSrcColor -> @"InvSrcColor";
+[IgnoreCase] SrcAlpha -> @"SrcAlpha";
+[IgnoreCase] InvSrcAlpha -> @"InvSrcAlpha";
+[IgnoreCase] DestAlpha -> @"DestAlpha";
+[IgnoreCase] InvDestAlpha -> @"InvDestAlpha";
+[IgnoreCase] DestColor -> @"DestColor";
+[IgnoreCase] InvDestColor -> @"InvDestColor";
+[IgnoreCase] SrcAlphaSat -> @"SrcAlphaSat";
+[IgnoreCase] BlendFactor -> @"BlendFactor";
+[IgnoreCase] InvBlendFactor -> @"InvBlendFactor";
+
 
 // Productions
 Start -> (Code | Technique_Declaration | Sampler_Declaration)* EndOfFile
@@ -70,16 +147,100 @@ Technique_Declaration -> Technique Identifier? OpenBracket Pass_Declaration+ Clo
    return null;
 };
 
-Render_State_Expression -> Identifier Equals (Identifier | Sign? Number) Semicolon
+FillMode_Solid -> Solid { return FillMode.Solid; };
+FillMode_WireFrame -> WireFrame { return FillMode.WireFrame; };
+FillModes -> (FillMode_Solid|FillMode_WireFrame)
 {
-	var name = $Identifier[0] as string;
-	var value = (string)($Sign ?? "") + (string)($Identifier[1] ?? $Number);
-	
-	var pass = paramlist[0] as PassInfo;
-	pass.ParseRenderState(name, value);
-		
-	return null;
+	return $FillMode_Solid ?? $FillMode_WireFrame;
 };
+
+CullMode_None -> None { return CullMode.None; };
+CullMode_Cw -> Cw { return CullMode.CullClockwiseFace; };
+CullMode_Ccw -> Ccw { return CullMode.CullCounterClockwiseFace; };
+CullModes -> (CullMode_None|CullMode_Cw|CullMode_Ccw)
+{
+	return $CullMode_None ?? $CullMode_Cw ?? $CullMode_Ccw;
+};
+
+Colors_None -> None { return ColorWriteChannels.None; };
+Colors_Red -> Red { return ColorWriteChannels.Red; };
+Colors_Green -> Green { return ColorWriteChannels.Green; };
+Colors_Blue -> Blue { return ColorWriteChannels.Blue; };
+Colors_Alpha -> Alpha { return ColorWriteChannels.Alpha; };
+Colors_All -> All { return ColorWriteChannels.All; };
+Colors -> (Colors_Red|Colors_Green|Colors_Blue|Colors_Alpha|Colors_None|Colors_All)
+{
+	return $Colors_Red ?? $Colors_Green ?? $Colors_Blue ?? $Colors_Alpha ?? $Colors_None ?? $Colors_All;
+};
+ColorsMasks -> Colors (Or Colors)? (Or Colors)? (Or Colors)?
+{
+	return	(ColorWriteChannels)($Colors[0] ?? 0) | 
+			(ColorWriteChannels)($Colors[1] ?? 0) | 
+			(ColorWriteChannels)($Colors[2] ?? 0) | 
+			(ColorWriteChannels)($Colors[3] ?? 0);
+};
+
+Blend_Zero -> Zero { return Blend.Zero; };
+Blend_One -> One { return Blend.One; };
+Blend_SrcColor -> SrcColor { return Blend.SourceColor; };
+Blend_InvSrcColor -> InvSrcColor { return Blend.InverseSourceColor; };
+Blend_SrcAlpha -> SrcAlpha { return Blend.SourceAlpha; };
+Blend_InvSrcAlpha -> InvSrcAlpha { return Blend.InverseSourceAlpha; };
+Blend_DestAlpha -> DestAlpha { return Blend.DestinationAlpha; };
+Blend_InvDestAlpha -> InvDestAlpha { return Blend.InverseDestinationAlpha; };
+Blend_DestColor -> DestColor { return Blend.DestinationColor; };
+Blend_InvDestColor -> InvDestColor { return Blend.InverseDestinationColor; };
+Blend_SrcAlphaSat -> SrcAlphaSat { return Blend.SourceAlphaSaturation; };
+Blend_BlendFactor -> BlendFactor { return Blend.BlendFactor; };
+Blend_InvBlendFactor -> InvBlendFactor { return Blend.InverseBlendFactor; };
+Blends -> (	Blend_Zero|Blend_One|Blend_SrcColor|Blend_InvSrcColor|Blend_SrcAlpha|Blend_InvSrcAlpha|
+			Blend_DestAlpha|Blend_InvDestAlpha|Blend_DestColor|Blend_InvDestColor|Blend_SrcAlphaSat|
+			Blend_BlendFactor|Blend_InvBlendFactor)
+{
+	return	$Blend_Zero ?? $Blend_One ?? $Blend_SrcColor ?? $Blend_InvSrcColor ?? $Blend_SrcAlpha ?? $Blend_InvSrcAlpha ?? 
+			$Blend_DestAlpha ?? $Blend_InvDestAlpha ?? $Blend_DestColor ?? $Blend_InvDestColor ?? $Blend_SrcAlphaSat ??
+			$Blend_BlendFactor ?? $Blend_InvBlendFactor;
+};
+
+BlendOp_Add -> Add { return BlendFunction.Add; };
+BlendOp_Subtract -> Subtract { return BlendFunction.Subtract; };
+BlendOp_RevSubtract -> RevSubtract { return BlendFunction.ReverseSubtract; };
+BlendOp_Min -> Min { return BlendFunction.Min; };
+BlendOp_Max -> Max { return BlendFunction.Max; };
+BlendOps -> (BlendOp_Add|BlendOp_Subtract|BlendOp_RevSubtract|BlendOp_Min|BlendOp_Max)
+{
+	return	$BlendOp_Add ?? $BlendOp_Subtract ?? $BlendOp_RevSubtract ?? $BlendOp_Min ?? $BlendOp_Max;
+};
+
+// Render states
+Render_State_CullMode -> CullMode Equals CullModes Semicolon { (paramlist[0] as PassInfo).CullMode = (CullMode)$CullModes; return null; };
+Render_State_FillMode -> FillMode Equals FillModes Semicolon { (paramlist[0] as PassInfo).FillMode = (FillMode)$FillModes; return null; };
+Render_State_AlphaBlendEnable -> AlphaBlendEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).AlphaBlendEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_SrcBlend -> SrcBlend Equals Blends Semicolon { (paramlist[0] as PassInfo).SrcBlend = (Blend)$Blends; return null; };
+Render_State_DestBlend -> DestBlend Equals Blends Semicolon { (paramlist[0] as PassInfo).DestBlend = (Blend)$Blends; return null; };
+Render_State_BlendOp -> BlendOp Equals BlendOps Semicolon { (paramlist[0] as PassInfo).BlendOp = (BlendFunction)$BlendOps; return null; };
+Render_State_ColorWriteEnable -> ColorWriteEnable Equals ColorsMasks Semicolon { (paramlist[0] as PassInfo).ColorWriteEnable = (ColorWriteChannels)$ColorsMasks; return null; };
+Render_State_DepthBias -> DepthBias Equals Number Semicolon { (paramlist[0] as PassInfo).DepthBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
+Render_State_SlopeScaleDepthBias -> SlopeScaleDepthBias Equals Number Semicolon { (paramlist[0] as PassInfo).SlopeScaleDepthBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
+Render_State_ZEnable -> ZEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_ZWriteEnable -> ZWriteEnable Equals Boolean Semicolon { (paramlist[0] as PassInfo).ZWriteEnable = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+Render_State_MultiSampleAntiAlias -> MultiSampleAntiAlias Equals Boolean Semicolon { (paramlist[0] as PassInfo).MultiSampleAntiAlias = ParseTreeTools.ParseBool((string)$Boolean); return null; };
+
+
+Render_State_Expression ->	
+				Render_State_CullMode |
+				Render_State_FillMode |
+				Render_State_AlphaBlendEnable |
+				Render_State_SrcBlend |
+				Render_State_DestBlend |
+				Render_State_BlendOp |
+				Render_State_ColorWriteEnable |
+				Render_State_DepthBias |
+				Render_State_SlopeScaleDepthBias |
+				Render_State_ZEnable |
+				Render_State_ZWriteEnable |
+				Render_State_MultiSampleAntiAlias;
+
 
 Pass_Declaration ->	Pass Identifier? OpenBracket (VertexShader_Pass_Expression | PixelShader_Pass_Expression | Render_State_Expression)* CloseBracket 
 { 
@@ -115,25 +276,58 @@ PixelShader_Pass_Expression -> PixelShader Equals Compile ShaderModel Identifier
    return null;
 };
 
-Sampler_State_Expression -> Identifier Equals ((LessThan|OpenParenthesis) Identifier (GreaterThan|CloseParenthesis) | Identifier | Sign? Number) Semicolon
+AddressMode_Clamp -> Clamp { return TextureAddressMode.Clamp; };
+AddressMode_Wrap -> Wrap { return TextureAddressMode.Wrap; };
+AddressMode_Mirror -> Mirror { return TextureAddressMode.Mirror; };
+AddressMode -> (AddressMode_Clamp|AddressMode_Wrap|AddressMode_Mirror)
 {
-	var name = $Identifier[0] as string;
-	var value = (string)($Sign ?? "") + (string)($Identifier[1] ?? ($Identifier[2] ?? $Number[0]));	
-
-	var sampler = paramlist[0] as SamplerStateInfo;
-	sampler.Parse(name, value);
-
-	return null;
+	return $AddressMode_Clamp ?? $AddressMode_Wrap ?? $AddressMode_Mirror;
 };
+
+TextureFilter_None -> None { return TextureFilterType.None; };
+TextureFilter_Linear -> Linear { return TextureFilterType.Linear; };
+TextureFilter_Point -> Point { return TextureFilterType.Point; };
+TextureFilter_Anisotropic -> Anisotropic { return TextureFilterType.Anisotropic; };
+TextureFilter -> (TextureFilter_None|TextureFilter_Linear|TextureFilter_Point|TextureFilter_Anisotropic)
+{
+	return $TextureFilter_None ?? $TextureFilter_Linear ?? $TextureFilter_Point ?? $TextureFilter_Anisotropic;
+};
+
+// Sampler States
+Sampler_State_Texture -> Texture Equals (LessThan|OpenParenthesis) Identifier (GreaterThan|CloseParenthesis) Semicolon { (paramlist[0] as SamplerStateInfo).TextureName = (string)$Identifier; return null; };
+Sampler_State_MinFilter -> MinFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MinFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_MagFilter -> MagFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MagFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_MipFilter -> MipFilter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).MipFilter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_Filter -> Filter Equals TextureFilter Semicolon { (paramlist[0] as SamplerStateInfo).Filter = (TextureFilterType)$TextureFilter; return null; };
+Sampler_State_AddressU -> AddressU Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressU = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_AddressV -> AddressV Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressV = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_AddressW -> AddressW Equals AddressMode Semicolon { (paramlist[0] as SamplerStateInfo).AddressW = (TextureAddressMode)$AddressMode; return null; };
+Sampler_State_MaxMipLevel -> MaxMipLevel Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxMipLevel = ParseTreeTools.ParseInt((string)$Number); return null; };
+Sampler_State_MaxAnisotropy -> MaxAnisotropy Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MaxAnisotropy = ParseTreeTools.ParseInt((string)$Number); return null; };
+Sampler_State_MipLodBias -> MipLodBias Equals Number Semicolon { (paramlist[0] as SamplerStateInfo).MipMapLevelOfDetailBias = ParseTreeTools.ParseFloat((string)$Number); return null; };
+
+
+Sampler_State_Expression ->	
+				Sampler_State_Texture |
+				Sampler_State_MinFilter |
+				Sampler_State_MagFilter |
+				Sampler_State_MipFilter |
+				Sampler_State_Filter |
+				Sampler_State_AddressU |
+				Sampler_State_AddressV |
+				Sampler_State_AddressW |
+				Sampler_State_MaxMipLevel |
+				Sampler_State_MaxAnisotropy |
+				Sampler_State_MipLodBias;
 
 Sampler_Register_Expression -> Colon Register OpenParenthesis Identifier (Comma Identifier (OpenSquareBracket Number CloseSquareBracket)?)? CloseParenthesis
 {
 	return null;
 };
 
-Sampler_Declaration -> Sampler Identifier (Sampler_Register_Expression)* (Equals SamplerState OpenBracket (Sampler_State_Expression)* CloseBracket Semicolon)?
+Sampler_Declaration -> Sampler Identifier Sampler_Register_Expression* ((Equals SamplerState)? OpenBracket Sampler_State_Expression* CloseBracket Semicolon)?
 {
-	if ($SamplerState == null)
+	if ($OpenBracket == null)
 		return null;
 	
 	var sampler = new SamplerStateInfo();

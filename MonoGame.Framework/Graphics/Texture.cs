@@ -51,11 +51,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.RgbPvrtc4Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:                    
-                    pitch = ((width + 3) / 4) * _format.Size();
+                    pitch = ((width + 3) / 4) * _format.GetSize();
                     break;
 
                 default:
-                    pitch = width * _format.Size();
+                    pitch = width * _format.GetSize();
                     break;
             };
 

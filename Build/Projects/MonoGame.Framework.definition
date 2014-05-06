@@ -713,12 +713,11 @@
     <Compile Include="Input\AccelerometerState.cs">
       <Platforms>iOS,Linux,MacOS,Windows8,WindowsPhone</Platforms>
     </Compile>
-    <Compile Include="Input\ButtonDefinition.cs" />
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
-    <Compile Include="Input\GamePad.Android.cs">
-      <Platforms>Android</Platforms>
+    <Compile Include="Input\GamePad.Default.cs">
+      <Platforms>Android,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -734,9 +733,6 @@
     </Compile>
     <Compile Include="Input\GamePad.Web.cs">
       <Platforms>Web</Platforms>
-    </Compile>
-    <Compile Include="Input\GamePad.WP.cs">
-      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.XInput.cs">
       <Platforms>Windows8,Windows</Platforms>

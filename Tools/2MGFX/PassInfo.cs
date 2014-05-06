@@ -98,78 +98,143 @@ namespace TwoMGFX
             return blend;
         }
 
-        public void ParseRenderState(string name, string value)
+        public bool AlphaBlendEnable
         {
-            Blend blend;
-
-            switch (name.ToLower())
+            set
             {
-                case "alphablendenable":
-                    if (!ParseTreeTools.ParseBool(value))
+                if (value)
+                {
+                    if (blendState == null)
                     {
-                        if (blendState == null)
-                            blendState = new BlendState();
+                        blendState = new BlendState();
                         blendState.ColorSourceBlend = Blend.One;
                         blendState.AlphaSourceBlend = Blend.One;
-                        blendState.ColorDestinationBlend = Blend.Zero;
-                        blendState.AlphaDestinationBlend = Blend.Zero;
+                        blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
+                        blendState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
                     }
-                    break;
-                case "srcblend":
-                    blend = ParseTreeTools.ParseBlend(value);
+                }
+                else if (!value)
+                {
                     if (blendState == null)
                         blendState = new BlendState();
-                    blendState.ColorSourceBlend = blend;
-                    blendState.AlphaSourceBlend = ToAlphaBlend(blend);
-                    break;
-                case "destblend":
-                    blend = ParseTreeTools.ParseBlend(value);
-                    if (blendState == null)
-                        blendState = new BlendState();
-                    blendState.ColorDestinationBlend = blend;
-                    blendState.AlphaDestinationBlend = ToAlphaBlend(blend);
-                    break;
-                case "blendop":
-                    if (blendState == null)
-                        blendState = new BlendState();
-                    blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
-                    break;
-                case "zenable":
-                    if (depthStencilState == null)
-                        depthStencilState = new DepthStencilState();
-                    depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
-                    break;
-                case "zwriteenable":
-                    if (depthStencilState == null)
-                        depthStencilState = new DepthStencilState();
-                    depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
-                    break;
-                case "depthbias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.DepthBias = float.Parse(value);
-                    break;
-                case "cullmode":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
-                    break;
-                case "fillmode":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
-                    break;
-                case "multisampleantialias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
-                    break;
-                case "slopescaledepthbias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.SlopeScaleDepthBias = float.Parse(value);
-                    break;
-            }            
+                    blendState.ColorSourceBlend = Blend.One;
+                    blendState.AlphaSourceBlend = Blend.One;
+                    blendState.ColorDestinationBlend = Blend.Zero;
+                    blendState.AlphaDestinationBlend = Blend.Zero;
+                }
+            }
+        }
+
+        public FillMode FillMode
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.FillMode = value;             
+            }
+        }
+
+        public CullMode CullMode
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.CullMode = value;
+            }
+        }
+
+        public bool ZEnable
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.DepthBufferEnable = value;
+            }
+        }
+
+        public bool ZWriteEnable
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.DepthBufferWriteEnable = value;
+            }
+        }
+
+        public bool MultiSampleAntiAlias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.MultiSampleAntiAlias = value;
+            }
+        }
+
+        public Blend SrcBlend
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorSourceBlend = value;
+                blendState.AlphaSourceBlend = ToAlphaBlend(value);
+            }
+        }
+
+        public Blend DestBlend
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorDestinationBlend = value;
+                blendState.AlphaDestinationBlend = ToAlphaBlend(value);
+            }
+        }
+
+        public BlendFunction BlendOp
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.AlphaBlendFunction = value;
+            }
+        }
+
+        public ColorWriteChannels ColorWriteEnable
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorWriteChannels = value;
+            }    
+        }
+
+        public float DepthBias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.DepthBias = value;
+            }
+        }
+
+        public float SlopeScaleDepthBias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.SlopeScaleDepthBias = value;
+            }
         }
     }
 }

@@ -148,7 +148,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>Cue-instance variables are useful when multiple instantiations of a single cue (and its associated sounds) are required (for example, a "car" cue where there may be more than one car at any given time). While a global variable allows multiple audio elements to be controlled in unison, a cue instance variable grants discrete control of each instance of a cue, even for each copy of the same cue.</para>
         /// <para>The friendly name is a value set from the designer.</para>
         /// </remarks>
-		public float GetVariable (string name, float value)
+		public float GetVariable (string name)
 		{
 			if (name == "Volume") {
 				return volume;
