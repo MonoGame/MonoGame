@@ -279,9 +279,15 @@ namespace Microsoft.Xna.Framework
 
 #elif WINDOWS || LINUX
             ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
-            _graphicsDevice.Context.SwapInterval =
-                _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
-            _game.Platform.VSyncEnabled = _synchronizedWithVerticalRetrace;
+
+            //Set the swap interval based on if vsync is desired or not.
+            //See GetSwapInterval for more details
+            int swapInterval;
+            if (_synchronizedWithVerticalRetrace)
+                swapInterval = _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
+            else
+                swapInterval = 0;
+            _graphicsDevice.Context.SwapInterval = swapInterval;
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
