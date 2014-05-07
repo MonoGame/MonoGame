@@ -991,6 +991,8 @@
     </Compile>
     <Compile Include="Utilities\Hash.cs" />
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
+    <Compile Include="Utilities\FileHelpers.cs" />
+    <Compile Include="Utilities\ReflectionHelpers.cs" />
 
     
     <!-- Android/OUYA Platform -->
