@@ -15,7 +15,41 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// Provides methods for reading texture files for use in the Content Pipeline.
     /// </summary>
+#if WINDOWS
+    [ContentImporter(   ".bmp", // Bitmap Image File
+                        ".cut", // Dr Halo CUT
+                        ".dds", // Direct Draw Surface
+                        ".g3", // Raw Fax G3
+                        ".hdr", // RGBE
+                        ".gif", // Graphcis Interchange Format
+                        ".ico", // Microsoft Windows Icon
+                        ".iff", // Interchange File Format
+                        ".jbg", ".jbig", // JBIG
+                        ".jng", ".jpg", ".jpeg", ".jpe", ".jif", ".jfif", ".jfi", // JPEG
+                        ".jp2", ".j2k", ".jpf", ".jpx", ".jpm", ".mj2", // JPEG 2000
+                        ".jxr", ".hdp", ".wdp", // JPEG XR
+                        ".koa", ".gg", // Koala
+                        ".pcd", // Kodak PhotoCD
+                        ".mng", // Multiple-Image Network Graphics
+                        ".pcx", //Personal Computer Exchange
+                        ".pbm", ".pgm", ".ppm", ".pnm", // Netpbm
+                        ".pfm", // Printer Font Metrics
+                        ".png", //Portable Network Graphics
+                        ".pict", ".pct", ".pic", // PICT
+                        ".psd", // Photoshop
+                        ".3fr", ".ari", ".arw", ".bay", ".crw", ".cr2", ".cap", ".dcs", ".dcr", ".dng", ".drf", ".eip", ".erf", ".fff", ".iiq", ".k25", ".kdc", ".mdc", ".mef", ".mos", ".mrw", ".nef", ".nrw", ".obm", ".orf", ".pef", ".ptx", ".pxn", ".r3d", ".raf", ".raw", ".rwl", ".rw2", ".rwz", ".sr2", ".srf", ".srw", ".x3f", /// RAW
+                        ".ras", ".sun", // Sun RAS
+                        ".sgi", ".rgba", ".bw", ".int", ".inta", // Silicon Graphics Image
+                        ".tga", // Truevision TGA/TARGA
+                        ".tiff", ".tif", // Tagged Image File Format
+                        ".wbmp", // Wireless Application Protocol Bitmap Format
+                        ".webp", // WebP
+                        ".xbm", // X BitMap
+                        ".xpm", // X PixMap
+                    DisplayName = "Texture Importer - MonoGame", DefaultProcessor = "TextureProcessor")]
+#else
     [ContentImporter(".png", ".jpg", ".bmp", DisplayName = "Texture Importer - MonoGame", DefaultProcessor = "TextureProcessor")]
+#endif
     public class TextureImporter : ContentImporter<TextureContent>
     {
         /// <summary>
