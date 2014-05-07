@@ -118,28 +118,39 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
-            sourceFile = PathHelper.Normalize(sourceFile);
-
-            // Remove duplicates... keep this new one.
-            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
-            if (previous != -1)
-                _content.RemoveAt(previous);
-
-            // Create the item for processing later.
-            var item = new ContentItem
+            var directory = Path.GetDirectoryName(sourceFile);
+            var fileName = Path.GetFileName(sourceFile);
+            
+            // Since a filename may contain wildcards, 
+            // search the directory for any matching files.
+            // Wildcards will return an enumerable with all matching files in the
+            // specified directory while single files will return an enumerable 
+            // with a single item in it; The supplied file.
+            foreach (var file in Directory.EnumerateFiles(directory, fileName))
             {
-                SourceFile = sourceFile, 
-                Importer = Importer, 
-                Processor = Processor,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _content.Add(item);
+                sourceFile = PathHelper.Normalize(file);
 
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
+                // Remove duplicates... keep this new one.
+                var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+                if (previous != -1)
+                    _content.RemoveAt(previous);
+
+                // Create the item for processing later.
+                var item = new ContentItem
+                {
+                    SourceFile = sourceFile,
+                    Importer = Importer,
+                    Processor = Processor,
+                    ProcessorParams = new OpaqueDataDictionary()
+                };
+                _content.Add(item);
+
+                // Copy the current processor parameters blind as we
+                // will validate and remove invalid parameters during
+                // the build process later.
+                foreach (var pair in _processorParams)
+                    item.ProcessorParams.Add(pair.Key, pair.Value);
+            }
         }
 
         [CommandLineParameter(
