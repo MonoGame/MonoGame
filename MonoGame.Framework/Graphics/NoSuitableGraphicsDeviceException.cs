@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [SerializableAttribute]
+    [DataContract]
     public sealed class NoSuitableGraphicsDeviceException : Exception
     {
         public NoSuitableGraphicsDeviceException()
