@@ -119,7 +119,14 @@ namespace MGCB
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
             var directory = Path.GetDirectoryName(sourceFile);
-            foreach (var file in Directory.EnumerateFiles(directory, Path.GetFileName(sourceFile)))
+            var fileName = Path.GetFileName(sourceFile);
+            
+            // Since a filename may contain wildcards, 
+            // search the directory for any matching files.
+            // Wildcards will return an enumerable with all matching files in the
+            // specified directory while single files will return an enumerable 
+            // with a single item in it; The supplied file.
+            foreach (var file in Directory.EnumerateFiles(directory, fileName))
             {
                 sourceFile = PathHelper.Normalize(file);
 
