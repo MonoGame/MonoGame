@@ -190,6 +190,12 @@ namespace MonoGame.Tools.Pipeline
 
         #region IPipelineItem
 
+        [Browsable(false)]
+        public string OriginalPath
+        {
+            get { return FilePath; }
+        }
+
         public string Name
         {
             get

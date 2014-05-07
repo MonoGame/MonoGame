@@ -87,7 +87,7 @@ namespace MonoGame.Tools.Pipeline
             // _toolStripSeparator2
             // 
             _toolStripSeparator2.Name = "_toolStripSeparator2";
-            _toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            _toolStripSeparator2.Size = new System.Drawing.Size(143, 6);
             // 
             // _splitTreeProps
             // 
@@ -153,10 +153,9 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.Multiline = true;
             this._outputWindow.Name = "_outputWindow";
             this._outputWindow.ReadOnly = true;
-            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._outputWindow.Size = new System.Drawing.Size(531, 537);
             this._outputWindow.TabIndex = 0;
-            this._outputWindow.WordWrap = false;
             // 
             // toolStripSeparator1
             // 
@@ -262,21 +261,21 @@ namespace MonoGame.Tools.Pipeline
             // 
             this._buildMenuItem.Name = "_buildMenuItem";
             this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this._buildMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._buildMenuItem.Size = new System.Drawing.Size(120, 22);
             this._buildMenuItem.Text = "&Build";
             this._buildMenuItem.Click += new System.EventHandler(this.BuildMenuItemClick);
             // 
             // _rebuilMenuItem
             // 
             this._rebuilMenuItem.Name = "_rebuilMenuItem";
-            this._rebuilMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rebuilMenuItem.Size = new System.Drawing.Size(120, 22);
             this._rebuilMenuItem.Text = "&Rebuild";
             this._rebuilMenuItem.Click += new System.EventHandler(this.RebuilMenuItemClick);
             // 
             // _cleanMenuItem
             // 
             this._cleanMenuItem.Name = "_cleanMenuItem";
-            this._cleanMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._cleanMenuItem.Size = new System.Drawing.Size(120, 22);
             this._cleanMenuItem.Text = "&Clean";
             this._cleanMenuItem.Click += new System.EventHandler(this.CleanMenuItemClick);
             // 
@@ -294,13 +293,13 @@ namespace MonoGame.Tools.Pipeline
             // 
             this._viewHelpMenuItem.Name = "_viewHelpMenuItem";
             this._viewHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this._viewHelpMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._viewHelpMenuItem.Size = new System.Drawing.Size(146, 22);
             this._viewHelpMenuItem.Text = "&View Help";
             // 
             // _aboutMenuItem
             // 
             this._aboutMenuItem.Name = "_aboutMenuItem";
-            this._aboutMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._aboutMenuItem.Size = new System.Drawing.Size(146, 22);
             this._aboutMenuItem.Text = "&About...";
             // 
             // MainView

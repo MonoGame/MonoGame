@@ -191,7 +191,7 @@ namespace MonoGame.Tools.Pipeline
             };
         }
 
-        public static void Load(PipelineProject project)
+        public static void Load(PipelineProject project, IUserOutput userOutput)
         {
             Unload();
 
@@ -201,7 +201,9 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var i in project.References)
             {
-                var path = Path.Combine(projectRoot, i);
+                var path = i;
+                if (!Path.IsPathRooted(path))
+                    path = Path.Combine(projectRoot, path);
 
                 if (string.IsNullOrEmpty(path))
                     throw new ArgumentException("assemblyFilePath cannot be null!");
@@ -211,10 +213,10 @@ namespace MonoGame.Tools.Pipeline
                 // Make sure we're not adding the same assembly twice.
                 path = PathHelper.Normalize(path);
                 if (!assemblyPaths.Contains(path))
-                    assemblyPaths.Add(path);                
+                    assemblyPaths.Add(path);      
             }
 
-            ResolveAssemblies(assemblyPaths);
+            ResolveAssemblies(assemblyPaths, userOutput);
 
             var importerDescriptions = new ImporterTypeDescription[_importers.Count];
             var cur = 0;
@@ -345,7 +347,7 @@ namespace MonoGame.Tools.Pipeline
             return null;
         }
 
-        private static void ResolveAssemblies(IEnumerable<string> assemblyPaths)
+        private static void ResolveAssemblies(IEnumerable<string> assemblyPaths, IUserOutput userOutput)
         {
             _importers = new List<ImporterInfo>();
             _processors = new List<ProcessorInfo>();
@@ -376,13 +378,12 @@ namespace MonoGame.Tools.Pipeline
                     var a = Assembly.LoadFrom(path);
                     var types = a.GetExportedTypes();
                     ProcessTypes(types);
+
+                    userOutput.OutputAppend(string.Format("Loaded reference assembly '{0}'", path));  
                 }
-                catch 
+                catch
                 {
-                    //Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
-                    // The assembly failed to load... nothing
-                    // we can do but ignore it.
-                    continue;
+                    userOutput.ShowError("Error", string.Format("Failed to load reference assembly'{0}'", path));                    
                 }                
             }
         }

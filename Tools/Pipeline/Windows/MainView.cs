@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -21,6 +22,8 @@ namespace MonoGame.Tools.Pipeline
         private const int ProjectIcon = 3;
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
+        private const string ContextMenuOpenFile = "Open File";
+        private const string ContextMenuOpenFileLocation = "Open File Location";
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -70,7 +73,27 @@ namespace MonoGame.Tools.Pipeline
                 case ContextMenuExclude:
                     {
                         _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
-                    } break;                
+                    } break;
+                case ContextMenuOpenFile:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath))
+                        {
+                            Process.Start(filePath);                            
+                        }
+                    } break;
+                case ContextMenuOpenFileLocation:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath) || Directory.Exists(filePath))
+                        {
+                            Process.Start("explorer.exe", "/select, " + filePath);
+                        }
+                    } break;
                 default:
                     throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
             }
@@ -91,24 +114,23 @@ namespace MonoGame.Tools.Pipeline
                     // Select the node the user has clicked.
                     _treeView.SelectedNode = node;
 
-                    if (node.Tag is ContentItem)
-                    {
-                        _contextMenu.Items.Clear();
+                    _contextMenu.Items.Clear();
 
-                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
+                    if (node.Tag is ContentItem)                    
+                        _contextMenu.Items.Add(ContextMenuExclude).Tag = node.Tag;                    
+                    else                    
+                        _contextMenu.Items.Add(ContextMenuInclude).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p);
-                    }
-                    else
-                    {
-                        _contextMenu.Items.Clear();
+                    var filePath = (node.Tag as IProjectItem).OriginalPath;
+                    filePath = _controller.GetFullPath(filePath);
 
-                        var item = _contextMenu.Items.Add(ContextMenuInclude);
-                        item.Tag = node.Tag;
+                    if (File.Exists(filePath))
+                        _contextMenu.Items.Add(ContextMenuOpenFile).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p); 
-                    }                   
+                    if (File.Exists(filePath) || Directory.Exists(filePath))                    
+                        _contextMenu.Items.Add(ContextMenuOpenFileLocation).Tag = node.Tag;
+
+                    _contextMenu.Show(_treeView, p);
                 }
             }
         }

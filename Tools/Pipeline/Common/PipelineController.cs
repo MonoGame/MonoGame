@@ -62,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
 
             // Clear existing project data, initialize to a new blank project.
             _project.NewProject();
-            PipelineTypes.Load(_project);
+            PipelineTypes.Load(_project, _view);
 
             // Ask user to choose a location on disk for the new project.
             // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
@@ -211,7 +211,11 @@ namespace MonoGame.Tools.Pipeline
 
         private void DoBuild(string command)
         {
-            var arguments = string.Format("/@:{0} {1}", _project.FilePath, command);
+            var arguments = string.Format("/@:\"{0}\" {1}", _project.FilePath, command);
+
+            _view.OutputAppend("Launching content builder.");
+            _view.OutputAppend(string.Format("MGCB.exe {0}\n",arguments));
+            _view.OutputAppend("");
 
             var process = new Process();
             process.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
@@ -313,11 +317,23 @@ namespace MonoGame.Tools.Pipeline
             _view.RemoveTreeItem(item);
 
             ProjectDiry = true;
-        }            
-    
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            filePath = filePath.Replace("/", "\\");
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(2);
+
+            if (Path.IsPathRooted(filePath))
+                return filePath;
+            
+            return _project.Location + "\\" + filePath;
+        }
+
         private void ResolveTypes()
         {
-            PipelineTypes.Load(_project);
+            PipelineTypes.Load(_project, _view);
             foreach (var i in _project.ContentItems)
             {
                 i.Controller = this;

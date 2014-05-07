@@ -10,12 +10,14 @@ namespace MonoGame.Tools.Pipeline
     {                
         public FolderItem(string path)
         {
+            OriginalPath = path;
             Location = path;
             Name = path;
             if (Name.Contains("/"))
                 Name = Name.Split('/').Last();
         }
-        
+
+        public string OriginalPath { get; private set; }
         public string Name { get; private set; }
         public string Location { get; private set; }
         public string Icon { get; set; }

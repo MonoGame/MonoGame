@@ -13,7 +13,14 @@ namespace MonoGame.Tools.Pipeline
         Cancel
     }
 
-    interface IView
+    interface IUserOutput
+    {
+        void OutputClear();
+        void OutputAppend(string text);        
+        void ShowError(string title, string message); 
+    }
+
+    interface IView : IUserOutput
     {
         //event SelectionChanged OnSelectionChanged;
 
@@ -25,9 +32,7 @@ namespace MonoGame.Tools.Pipeline
 
         bool AskOpenProject(out string projectFilePath);
 
-        bool AskImportProject(out string projectFilePath);
-
-        void ShowError(string title, string message);        
+        bool AskImportProject(out string projectFilePath);     
 
         void SetTreeRoot(IProjectItem item);
 
@@ -42,10 +47,6 @@ namespace MonoGame.Tools.Pipeline
         void ShowProperties(IProjectItem item);
 
         void UpdateProperties(IProjectItem item);
-
-        void OutputAppend(string text);
-
-        void OutputClear();
 
         bool ChooseContentFile(string initialDirectory, out string file);        
     }

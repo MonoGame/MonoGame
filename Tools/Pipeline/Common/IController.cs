@@ -51,6 +51,12 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(ContentItem item);
+
+        /// <summary>
+        /// If the passed path is not already rooted return the absolute path
+        /// making this one relative to the currently open project location.
+        /// </summary>        
+        string GetFullPath(string filePath);
     }
 }

@@ -28,6 +28,11 @@ namespace MonoGame.Tools.Pipeline
 
         #region IProjectItem
 
+        public string OriginalPath
+        {
+            get { return SourceFile; }
+        }
+
         public string Name 
         { 
             get
