@@ -266,9 +266,7 @@
     <Compile Include="Content\ContentReaders\Vector3Reader.cs" />
     <Compile Include="Content\ContentReaders\Vector4Reader.cs" />
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
-    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs">
-      <Platforms>Android,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
+    <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
       <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
