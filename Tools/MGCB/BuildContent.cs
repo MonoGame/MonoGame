@@ -118,50 +118,32 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
-            // If this contains a wildcard character,
-            // build content for each file with a matching
-            // extension.
-            if (sourceFile.Contains('*'))
+            var directory = Path.GetDirectoryName(sourceFile);
+            foreach (var file in Directory.EnumerateFiles(directory, Path.GetFileName(sourceFile)))
             {
-                var fileExt = Path.GetExtension(sourceFile);
-                var directory = Path.GetDirectoryName(sourceFile);
+                sourceFile = PathHelper.Normalize(file);
 
-                var files = Directory.GetFiles(directory, '*' + fileExt);
+                // Remove duplicates... keep this new one.
+                var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+                if (previous != -1)
+                    _content.RemoveAt(previous);
 
-                foreach (var file in files)
-                    BuildItem(file);
+                // Create the item for processing later.
+                var item = new ContentItem
+                {
+                    SourceFile = sourceFile,
+                    Importer = Importer,
+                    Processor = Processor,
+                    ProcessorParams = new OpaqueDataDictionary()
+                };
+                _content.Add(item);
 
-                return;
+                // Copy the current processor parameters blind as we
+                // will validate and remove invalid parameters during
+                // the build process later.
+                foreach (var pair in _processorParams)
+                    item.ProcessorParams.Add(pair.Key, pair.Value);
             }
-
-            // Build normally if this is a single file.
-            BuildItem(sourceFile);
-        }
-
-        private void BuildItem(string sourceFile)
-        {
-            sourceFile = PathHelper.Normalize(sourceFile);
-
-            // Remove duplicates... keep this new one.
-            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
-            if (previous != -1)
-                _content.RemoveAt(previous);
-
-            // Create the item for processing later.
-            var item = new ContentItem
-            {
-                SourceFile = sourceFile,
-                Importer = Importer,
-                Processor = Processor,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _content.Add(item);
-
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
         }
 
         [CommandLineParameter(
