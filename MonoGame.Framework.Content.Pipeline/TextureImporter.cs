@@ -37,7 +37,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         ".png", //Portable Network Graphics
                         ".pict", ".pct", ".pic", // PICT
                         ".psd", // Photoshop
-                        ".3fr", ".ari", ".arw", ".bay", ".crw", ".cr2", ".cap", ".dcs", ".dcr", ".dng", ".drf", ".eip", ".erf", ".fff", ".iiq", ".k25", ".kdc", ".mdc", ".mef", ".mos", ".mrw", ".nef", ".nrw", ".obm", ".orf", ".pef", ".ptx", ".pxn", ".r3d", ".raf", ".raw", ".rwl", ".rw2", ".rwz", ".sr2", ".srf", ".srw", ".x3f", /// RAW
+                        ".3fr", ".ari", ".arw", ".bay", ".crw", ".cr2", ".cap", ".dcs", // RAW
+                        ".dcr", ".dng", ".drf", ".eip", ".erf", ".fff", ".iiq", ".k25", // RAW
+                        ".kdc", ".mdc", ".mef", ".mos", ".mrw", ".nef", ".nrw", ".obm", // RAW
+                        ".orf", ".pef", ".ptx", ".pxn", ".r3d", ".raf", ".raw", ".rwl", // RAW
+                        ".rw2", ".rwz", ".sr2", ".srf", ".srw", ".x3f", // RAW
                         ".ras", ".sun", // Sun RAS
                         ".sgi", ".rgba", ".bw", ".int", ".inta", // Silicon Graphics Image
                         ".tga", // Truevision TGA/TARGA
