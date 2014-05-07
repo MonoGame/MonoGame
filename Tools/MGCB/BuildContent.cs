@@ -118,6 +118,28 @@ namespace MGCB
             if (!Path.IsPathRooted(sourceFile))
                 sourceFile = Path.Combine(Directory.GetCurrentDirectory(), sourceFile);
 
+            // If this contains a wildcard character,
+            // build content for each file with a matching
+            // extension.
+            if (sourceFile.Contains('*'))
+            {
+                var fileExt = Path.GetExtension(sourceFile);
+                var directory = Path.GetDirectoryName(sourceFile);
+
+                var files = Directory.GetFiles(directory, '*' + fileExt);
+
+                foreach (var file in files)
+                    BuildItem(file);
+
+                return;
+            }
+
+            // Build normally if this is a single file.
+            BuildItem(sourceFile);
+        }
+
+        private void BuildItem(string sourceFile)
+        {
             sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
@@ -128,8 +150,8 @@ namespace MGCB
             // Create the item for processing later.
             var item = new ContentItem
             {
-                SourceFile = sourceFile, 
-                Importer = Importer, 
+                SourceFile = sourceFile,
+                Importer = Importer,
                 Processor = Processor,
                 ProcessorParams = new OpaqueDataDictionary()
             };
