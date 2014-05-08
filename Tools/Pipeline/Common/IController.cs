@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace MonoGame.Tools.Pipeline
 {
     interface IController
@@ -15,6 +17,31 @@ namespace MonoGame.Tools.Pipeline
         /// True if the project has unsaved changes.
         /// </summary>
         bool ProjectDiry { get; }
+
+        /// <summary>
+        /// True if the project is actively building.
+        /// </summary>
+        bool ProjectBuilding { get; }
+
+        /// <summary>
+        /// Triggered when the project starts loading.
+        /// </summary>
+        event Action OnProjectLoading;
+
+        /// <summary>
+        /// Triggered when the project finishes loading.
+        /// </summary>
+        event Action OnProjectLoaded;
+
+        /// <summary>
+        /// Triggered when the project finishes building.
+        /// </summary>
+        event Action OnBuildStarted;
+
+        /// <summary>
+        /// Triggered when the project finishes building.
+        /// </summary>
+        event Action OnBuildFinished;
 
         /// <summary>
         /// Notify controller that a property of Project or its contents has been modified.

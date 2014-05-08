@@ -25,6 +25,7 @@ namespace MonoGame.Tools.Pipeline
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
+
         public MainView()
         {            
             InitializeComponent();
@@ -118,6 +119,13 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+
+            // Make sure build and project trigger updates to all the menu items.
+            Action activate = delegate { this.Invoke(new MethodInvoker(UpdateMenus)); };
+            _controller.OnBuildStarted += activate;
+            _controller.OnBuildFinished += activate;
+            _controller.OnProjectLoading += activate;
+            _controller.OnProjectLoaded += activate;
         }
 
         public AskResult AskSaveOrCancel()
@@ -430,26 +438,30 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void FileMenu_Click(object sender, EventArgs e)
+        private void _mainMenu_MenuActivate(object sender, EventArgs e)
         {
-            // Update the enabled state for menu items.
-
-            _newMenuItem.Enabled = true;
-            _openMenuItem.Enabled = true;
-            _importMenuItem.Enabled = true;
-
-            _saveMenuItem.Enabled = _controller.ProjectOpen && _controller.ProjectDiry;
-            _saveAsMenuItem.Enabled = _controller.ProjectOpen;
-            _closeMenuItem.Enabled = _controller.ProjectOpen;
+            UpdateMenus();
         }
 
-        private void BuildMenu_Click(object sender, EventArgs e)
+        private void UpdateMenus()
         {
-            // Update the enabled state for menu items.
+            // Update the state of all menu items.
+            var notBuilding = !_controller.ProjectBuilding;
+            var projectOpenAndNotBuilding = _controller.ProjectOpen && notBuilding;
 
-            _buildMenuItem.Enabled = _controller.ProjectOpen;
-            _cleanMenuItem.Enabled = _controller.ProjectOpen;
-            _rebuilMenuItem.Enabled = _controller.ProjectOpen;
+            _newMenuItem.Enabled = notBuilding;
+            _openMenuItem.Enabled = notBuilding;
+            _importMenuItem.Enabled = notBuilding;
+
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
+            _closeMenuItem.Enabled = projectOpenAndNotBuilding;
+
+            _exitMenuItem.Enabled = notBuilding;
+
+            _buildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
+            _rebuilMenuItem.Enabled = projectOpenAndNotBuilding;
         }
     }
 }
