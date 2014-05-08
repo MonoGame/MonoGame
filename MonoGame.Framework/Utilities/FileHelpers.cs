@@ -12,7 +12,7 @@ using Windows.Storage;
 using Windows.Storage.Search;
 #elif WINDOWS_PHONE
 using System.IO.IsolatedStorage; 
-#elif IOS
+#elif IOS || MONOMAC
 using MonoTouch.Foundation;
 #endif
 
