@@ -67,6 +67,8 @@ namespace MonoGame.Tools.Pipeline
         {
             ContentItems = new List<ContentItem>();
             References = new List<string>();
+            OutputDir = "bin";
+            IntermediateDir = "obj";
         }
     }
 }
