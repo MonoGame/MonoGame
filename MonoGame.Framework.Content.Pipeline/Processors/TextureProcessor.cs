@@ -78,12 +78,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 return input;
 			try 
 			{
-			if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
-                TextureFormat == TextureProcessorOutputFormat.Compressed ) {
-                	context.Logger.LogMessage("Compressing using {0}",TextureFormat);
+			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
+                    TextureFormat == TextureProcessorOutputFormat.Compressed )
                 	GraphicsUtil.CompressTexture(input, context, GenerateMipmaps, PremultiplyAlpha);
-					context.Logger.LogMessage("Compression {0} Suceeded", TextureFormat);
-				}
 			}
 			catch(EntryPointNotFoundException ex) {
 				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());

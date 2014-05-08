@@ -87,8 +87,16 @@ namespace MGCB
             Name = "processor",
             ValueName = "className",
             Description = "Defines the class name of the content processor for processing imported content.")]
-        public string Processor = null;
+        public void SetProcessor(string processor)
+        {
+            _processor = processor;
+            
+            // If you are changing the processor then reset all 
+            // the processor parameters.
+            _processorParams.Clear();
+        }
 
+        private string _processor = null;
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
 
         [CommandLineParameter(
@@ -130,7 +138,7 @@ namespace MGCB
             {
                 SourceFile = sourceFile, 
                 Importer = Importer, 
-                Processor = Processor,
+                Processor = _processor,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _content.Add(item);
