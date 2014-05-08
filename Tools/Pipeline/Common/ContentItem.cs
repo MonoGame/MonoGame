@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -160,7 +161,7 @@ namespace MonoGame.Tools.Pipeline
                         {
                             var srcType = src.GetType();
 
-                            var converter = TypeDescriptor.GetConverter(p.Type);
+                            var converter = PipelineTypes.FindConverter(p.Type);
 
                             // Should we throw an exception here?
                             // This property will actually not be editable in the property grid

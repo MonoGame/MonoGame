@@ -5,10 +5,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using MonoGame.Framework.Content.Pipeline.Builder;
@@ -96,6 +99,11 @@ namespace MonoGame.Tools.Pipeline
                 }
             }
 
+            public bool Contains(string name)
+            {
+                return _properties.Any(e => e.Name == name);
+            }
+
             public IEnumerator<Property> GetEnumerator()
             {
                 return _properties.AsEnumerable().GetEnumerator();
@@ -156,6 +164,7 @@ namespace MonoGame.Tools.Pipeline
                 { "MGSpriteFontDescriptionProcessor", "FontDescriptionProcessor" },
                 { "MGSpriteFontTextureProcessor", "FontTextureProcessor" },
                 { "MGTextureProcessor", "TextureProcessor" },
+                { "MGEffectProcessor", "EffectProcessor" },
             };
 
         private static string RemapOldNames(string name)
@@ -283,6 +292,14 @@ namespace MonoGame.Tools.Pipeline
             _processors = null;
             Processors = null;
         }        
+
+        public static TypeConverter FindConverter(Type type)
+        {
+            if (type == typeof(Color))
+                return new StringToColorConverter();
+
+            return TypeDescriptor.GetConverter(type);
+        }
 
         public static ImporterTypeDescription FindImporter(string name, string fileExtension)
         {
