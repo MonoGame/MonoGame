@@ -210,16 +210,16 @@ namespace MonoGame.Tools.Pipeline
                 line = FormatDivider("Global Properties");
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "outputDir", OutputDir);
+                line = string.Format(lineFormat, "outputDir", _project.OutputDir);
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "intermediateDir", IntermediateDir);
+                line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "platform", Platform);
+                line = string.Format(lineFormat, "platform", _project.Platform);
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "config", Config);
+                line = string.Format(lineFormat, "config", _project.Config);
                 io.WriteLine(line);
 
                 line = FormatDivider("References");
