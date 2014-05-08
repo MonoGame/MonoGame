@@ -22,12 +22,8 @@ namespace Microsoft.Xna.Framework.Utilities
 	{
 		#region internal properties
 #if WINDOWS_PHONE
-		//If no storage file supplied, use the default isolated storage folder
 		static IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication();
 #elif ANDROID
-		// Keep this static so we only call Game.Activity.Assets.List() once
-		// No need to call it for each file if the list will never change.
-		// We do need one file list per folder though.
 		static Dictionary<string, string[]> filesInFolders = new Dictionary<string,string[]>();
 #endif
 		#endregion
@@ -75,7 +71,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			}
 			else
 			{
-				//if (fileMode == FileMode.Append)
 				// Not using OpenStreamForReadAsync because the stream position is placed at the end of the file, instead of the beginning
 				folder.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult().OpenAsync(FileAccessMode.ReadWrite).AsTask().GetAwaiter().GetResult().AsStream();
 				var f = folder.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
@@ -148,7 +143,6 @@ namespace Microsoft.Xna.Framework.Utilities
 				path = fileName.Substring(0, index);
 			}
 
-			// Only read the assets file list once
 			string[] files = DirectoryGetFiles(path);
 
 			if (files.Any(s => s.ToLower() == file.ToLower()))
@@ -172,7 +166,6 @@ namespace Microsoft.Xna.Framework.Utilities
 #elif WINDOWS_PHONE
 			return storage.CreateFile(filePath);
 #else
-			// return A new file with read/write access.
 			return File.Create(filePath);
 #endif
 		}
@@ -186,7 +179,6 @@ namespace Microsoft.Xna.Framework.Utilities
 #elif WINDOWS_PHONE
 			storage.DeleteFile(filePath);
 #else
-			// Now let's try to delete it
 			File.Delete(filePath);
 #endif
 		}
@@ -197,13 +189,11 @@ namespace Microsoft.Xna.Framework.Utilities
 			if (FileExists(fileName))
 				return fileName;
 
-			// Check the file extension
 			if (!string.IsNullOrEmpty(Path.GetExtension(fileName)))
 				return null;
 
 			foreach (string ext in extensions)
 			{
-				// Concat the file name with valid extensions
 				string fileNamePlusExt = fileName + ext;
 
 				if (FileExists(fileNamePlusExt))
@@ -217,10 +207,8 @@ namespace Microsoft.Xna.Framework.Utilities
 		public static string NormalizeFilePathSeperators(string name)
 		{
 #if WINRT
-			// Replace non-windows seperators.
 			name = name.Replace('/', '\\');
 #else
-			// Replace Windows path separators with local path separators
 			name = name.Replace('\\', Path.DirectorySeparatorChar);
 #endif
 			return name;
@@ -372,7 +360,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			if (string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("Parameter directory must contain a value.");
 
-			// Now let's try to create it
 #if WINDOWS_STOREAPP
 			var folder = ApplicationData.Current.LocalFolder;
 			var task = folder.CreateFolderAsync(directory, CreationCollisionOption.OpenIfExists);
@@ -392,7 +379,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			if (string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("Parameter directory must contain a value.");
 
-			// relative so combine with our path
 			var dirPath = Path.Combine(storagePath, directory);
 
 			DirectoryCreate(dirPath);
@@ -412,7 +398,6 @@ namespace Microsoft.Xna.Framework.Utilities
 		public static string GetInstallPath()
 		{
 			string Location = string.Empty;
-		//Get Install Path 
 #if WINDOWS || LINUX
 			Location = AppDomain.CurrentDomain.BaseDirectory;
 #elif WINRT
@@ -499,14 +484,13 @@ namespace Microsoft.Xna.Framework.Utilities
 		{
 #if ANDROID
 				// Android native stream does not support the Position property. LzxDecoder.Decompress also uses
-				// Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
+				// Seek.  So we read the entirety of the stream into a memory stream and replace stream with the
 				// memory stream.
 				MemoryStream memStream = new MemoryStream();
 				stream.CopyTo(memStream);
 				memStream.Seek(0, SeekOrigin.Begin);
 				stream.Dispose();
 				stream = memStream;
-				// Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
 				pos = 0;
 #else
 				pos = StartPos;
@@ -535,7 +519,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			}
 			catch (IOException)
 			{
-				// The file must not exist... return a null stream.
 				return null;
 			}
 		}
