@@ -11,6 +11,8 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -46,12 +48,14 @@ namespace MonoGame.Tools.Pipeline
 
         #region CommandLineParameters
 
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
         public string OutputDir { get; set; }
 
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         [CommandLineParameter(
             Name = "intermediateDir",
             ValueName = "directoryPath",
