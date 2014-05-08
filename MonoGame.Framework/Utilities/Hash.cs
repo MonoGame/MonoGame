@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MonoGame.Utilities
 {
-    internal class Hash
+    internal static class Hash
     {
         // Modified FNV Hash in C#
         // http://stackoverflow.com/a/468084
