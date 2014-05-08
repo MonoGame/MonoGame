@@ -194,7 +194,9 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             _view.OutputClear();
-            _buildProcess = Task.Run(() => DoBuild(rebuild ? "/rebuild" : string.Empty));            
+
+            var commands = string.Format("/@:{0} {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            _buildProcess = Task.Run(() => DoBuild(commands));            
         }
 
         public void Clean()
@@ -206,17 +208,17 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             _view.OutputClear();
-            _buildProcess = Task.Run(() => DoBuild("/clean"));            
+
+            var commands = string.Format("/clean /intermediateDir:{0} /outputDir:{1}", _project.IntermediateDir, _project.OutputDir);
+            _buildProcess = Task.Run(() => DoBuild(commands));            
         }
 
-        private void DoBuild(string command)
+        private void DoBuild(string commands)
         {
-            var arguments = string.Format("/@:{0} {1}", _project.FilePath, command);
-
             var process = new Process();
             process.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
             process.StartInfo.FileName = "MGCB.exe";
-            process.StartInfo.Arguments = arguments;
+            process.StartInfo.Arguments = commands;
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.UseShellExecute = false;
