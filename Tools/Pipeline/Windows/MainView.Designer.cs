@@ -38,6 +38,7 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this._treeView = new System.Windows.Forms.TreeView();
             this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._outputWindow = new System.Windows.Forms.TextBox();
@@ -309,6 +310,7 @@ namespace MonoGame.Tools.Pipeline
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(_splitEditorOutput);
             this.Controls.Add(this._mainMenu);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this._mainMenu;
             this.MinimumSize = new System.Drawing.Size(320, 240);
             this.Name = "MainView";
