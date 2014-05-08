@@ -12,8 +12,10 @@ using Windows.Storage;
 using Windows.Storage.Search;
 #elif WINDOWS_PHONE
 using System.IO.IsolatedStorage; 
-#elif IOS || MONOMAC
+#elif IOS
 using MonoTouch.Foundation;
+#elif MONOMAC
+using MonoMac.Foundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Utilities
