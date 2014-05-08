@@ -362,12 +362,11 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
-#if WINDOWS_STOREAPP
+#if IOS || WINDOWS_STOREAPP
         [Obsolete("This platform's policy does not allow programmatically closing.", true)]
 #endif
         public void Exit()
         {
-            Platform.Exit();
 			_suppressDraw = true;
         }
 
