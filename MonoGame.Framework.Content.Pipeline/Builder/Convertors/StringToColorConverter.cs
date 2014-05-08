@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
 {
-	class StringToColorConverter : TypeConverter
+	public class StringToColorConverter : TypeConverter
 	{
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {

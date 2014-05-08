@@ -11,6 +11,8 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -46,12 +48,14 @@ namespace MonoGame.Tools.Pipeline
 
         #region CommandLineParameters
 
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
         public string OutputDir { get; set; }
 
+        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         [CommandLineParameter(
             Name = "intermediateDir",
             ValueName = "directoryPath",
@@ -257,7 +261,6 @@ namespace MonoGame.Tools.Pipeline
             const string lineFormat = "/{0}:{1}";
             const string processorParamFormat = "{0}={1}";
             string line;
-            var parameterLines = new List<string>();
 
             using (var io = File.CreateText(FilePath))
             {
@@ -288,11 +291,10 @@ namespace MonoGame.Tools.Pipeline
                 line = FormatDivider("Content");
                 io.WriteLine(line);
 
-                //string prevProcessor = null;
                 foreach (var i in ContentItems)
                 {
                     // Wrap content item lines with a begin comment line
-                    // to make them more cohesive (for version control).                    
+                    // to make them more cohesive (for version control).                  
                     line = string.Format("#begin {0}", i.SourceFile);
                     io.WriteLine(line);
 
@@ -304,42 +306,52 @@ namespace MonoGame.Tools.Pipeline
                     }
                     else
                     {
-                        // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
-                        //if (!i.Importer.FileExtensions.Contains(System.IO.Path.GetExtension(i.SourceFile)))
+
+                        // Write importer.
                         {
                             line = string.Format(lineFormat, "importer", i.ImporterName);
                             io.WriteLine(line);
                         }
 
-                        // Collect lines for each non-default-value processor parameter
-                        // but do not write them yet.
-                        parameterLines.Clear();
-                        foreach (var j in i.ProcessorParams)
-                        {
-                            var defaultValue = i.Processor.Properties[j.Key].DefaultValue;
-                            if (j.Value == null || j.Value == defaultValue)
-                                continue;
-
-                            line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
-                            parameterLines.Add(line);
-                        }
-
-                        // If there were any non-default-value processor parameters
-                        // or, if the processor itself is not the default processor for this content's importer
-                        // or, the processor for this item is different than the previous item's
-                        // then we write out the processor command line and any (non default value) processor parameters.
-                        // JCF: Logic for not writting out default values / redundant values is disabled, always write out everything.
-                        //if (parameterLines.Count > 0 || !i.Processor.TypeName.Equals(i.Importer.DefaultProcessor) || (prevProcessor != null && prevProcessor != i.Processor.TypeName)
+                        // Write processor.
                         {
                             line = string.Format(lineFormat, "processor", i.ProcessorName);
                             io.WriteLine(line);
-
-                            // Store the last processor we emitted, so we can test if it does not match subsequent items.
-                            //prevProcessor = i.Processor.TypeName;
-
-                            foreach (var ln in parameterLines)
-                                io.WriteLine(ln);
                         }
+
+                        // Write processor parameters.
+                        {                        
+                            if (i.Processor == PipelineTypes.MissingProcessor)
+                            {
+                                // Could still be missing the real processor.
+                                // If so, write the string parameters from import.
+                                foreach (var j in i.ProcessorParams)
+                                {
+                                    line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                                    io.WriteLine(line);
+                                }
+                            }                            
+                            else
+                            {
+                                // Otherwise, write only values which are defined by the real processor.
+                                foreach (var j in i.Processor.Properties)
+                                {
+                                    object value = null;
+                                    if (i.ProcessorParams.ContainsKey(j.Name))
+                                        value = i.ProcessorParams[j.Name];
+
+                                    // JCF: I 'think' writting an empty string for null would be appropriate but to be on the safe side
+                                    //      im just not writting the value at all.
+                                    if (value != null)
+                                    {
+                                        var converter = PipelineTypes.FindConverter(value.GetType());
+                                        var valueStr = converter.ConvertTo(value, typeof (string));
+                                        line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
+                                        io.WriteLine(line);
+                                    }
+                                }
+                            }
+                        }                        
 
                         line = string.Format(lineFormat, "build", i.SourceFile);
                         io.WriteLine(line);
