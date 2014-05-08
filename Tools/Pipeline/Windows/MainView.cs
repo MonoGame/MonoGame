@@ -200,6 +200,11 @@ namespace MonoGame.Tools.Pipeline
             MessageBox.Show(this, message, title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
         }
 
+        public void ShowMessage(string message)
+        {
+            MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();

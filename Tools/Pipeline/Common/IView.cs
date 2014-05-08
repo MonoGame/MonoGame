@@ -27,7 +27,9 @@ namespace MonoGame.Tools.Pipeline
 
         bool AskImportProject(out string projectFilePath);
 
-        void ShowError(string title, string message);        
+        void ShowError(string title, string message);
+
+        void ShowMessage(string message);
 
         void SetTreeRoot(IProjectItem item);
 

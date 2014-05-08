@@ -332,6 +332,13 @@ namespace MonoGame.Tools.Pipeline
 
         public bool Exit()
         {
+            // Can't exit if we're building!
+            if (ProjectBuilding)
+            {
+                _view.ShowMessage("You cannot exit while the project is building!");
+                return false;
+            }
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             return AskSaveProject();
