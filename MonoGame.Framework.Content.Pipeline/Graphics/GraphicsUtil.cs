@@ -171,11 +171,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.MacOSX:
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
-					context.Logger.LogMessage ("Detected {0} using DXT Compression", context.TargetPlatform);
+					context.Logger.LogMessage("Using DXT Compression");
 				    CompressDxt(content, generateMipmaps);
 				    break;
                 case TargetPlatform.iOS:
-					context.Logger.LogMessage ("Detected {0} using PVRTC Compression", context.TargetPlatform);
+					context.Logger.LogMessage("Using PVRTC Compression");
                     CompressPvrtc(content, generateMipmaps, premultipliedAlpha);
                     break;
 
