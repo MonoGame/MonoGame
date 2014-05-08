@@ -209,10 +209,11 @@ namespace MonoGame.Tools.Pipeline
         {
             _treeView.Nodes.Clear();
 
-            if (item != null)
+            var project = item as PipelineProject;
+            if (project != null)
             {
                 var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
-                root.Tag = item;
+                root.Tag = new PipelineProjectProxy(project);
                 root.SelectedImageIndex = ProjectIcon;
                 root.ImageIndex = ProjectIcon;
             }

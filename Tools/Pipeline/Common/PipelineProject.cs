@@ -15,17 +15,16 @@ namespace MonoGame.Tools.Pipeline
 {
     internal class PipelineProject : IProjectItem
     {        
-        public IController Controller;        
+        public IController Controller;      
+  
         public string FilePath { get; set; }
+
         public List<ContentItem> ContentItems { get; private set; }                
 
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string OutputDir { get; set; }
 
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string IntermediateDir { get; set; }
 
-        [Editor(typeof (AssemblyReferenceListEditor), typeof (UITypeEditor))]
         public List<string> References { get; set; }
 
         public TargetPlatform Platform { get; set; }
