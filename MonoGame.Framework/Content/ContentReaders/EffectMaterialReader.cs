@@ -60,22 +60,69 @@ namespace Microsoft.Xna.Framework.Content
 			foreach (KeyValuePair<string, object> item in dict) {
 				var parameter = effectMaterial.Parameters [item.Key];
 				if (parameter != null) {
-#if WINRT
-					if (typeof(Texture).GetTypeInfo().IsAssignableFrom(item.Value.GetType().GetTypeInfo())){
-#else
-					if (typeof(Texture).IsAssignableFrom (item.Value.GetType ())) {
-#endif
+
+					Type itemType = item.Value.GetType();
+
+					if (IsAssignableFromInternal(typeof(Texture), itemType)) {
 						parameter.SetValue ((Texture)item.Value);
-					} else {
-						throw new NotImplementedException ();
+					}
+					else if (IsAssignableFromInternal(typeof(int), itemType)) {
+						parameter.SetValue((int) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(bool), itemType)) {
+						parameter.SetValue((bool) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(float), itemType)) {
+						parameter.SetValue((float) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(float []), itemType)) {
+						parameter.SetValue((float[]) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector2), itemType)) {
+						parameter.SetValue((Vector2) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector2 []), itemType)) {
+						parameter.SetValue((Vector2 []) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector3), itemType)) {
+						parameter.SetValue((Vector3) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector3 []), itemType)) {
+						parameter.SetValue((Vector3 []) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector4), itemType)) {
+						parameter.SetValue((Vector4) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Vector4 []), itemType)) {
+						parameter.SetValue((Vector4 []) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Matrix), itemType)) {
+						parameter.SetValue((Matrix) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Matrix []), itemType)) {
+						parameter.SetValue((Matrix[]) item.Value);
+					}
+					else if (IsAssignableFromInternal(typeof(Quaternion), itemType)) {
+						parameter.SetValue((Quaternion) item.Value);
+					}                   
+					else {
+						throw new NotSupportedException ("Parameter type is not supported");
 					}
 				} else {
 					Debug.WriteLine ("No parameter " + item.Key);
 				}
 			}
 
-
 			return effectMaterial;
 		}
+
+        internal static bool IsAssignableFromInternal(Type type1, Type type2 ) {
+#if WINRT
+			return type1.GetTypeInfo().IsAssignableFrom(type2.GetTypeInfo());
+#else
+			return type1.IsAssignableFrom(type2);
+#endif
+        }
+        
 	}
 }
