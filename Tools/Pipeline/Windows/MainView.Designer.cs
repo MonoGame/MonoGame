@@ -174,6 +174,7 @@ namespace MonoGame.Tools.Pipeline
             this._mainMenu.Size = new System.Drawing.Size(784, 24);
             this._mainMenu.TabIndex = 0;
             this._mainMenu.Text = "menuStrip1";
+            this._mainMenu.MenuActivate += new System.EventHandler(this._mainMenu_MenuActivate);
             // 
             // _fileMenu
             // 
@@ -191,7 +192,6 @@ namespace MonoGame.Tools.Pipeline
             this._fileMenu.Name = "_fileMenu";
             this._fileMenu.Size = new System.Drawing.Size(37, 20);
             this._fileMenu.Text = "&File";
-            this._fileMenu.Click += new System.EventHandler(this.FileMenu_Click);
             // 
             // _newMenuItem
             // 
@@ -256,27 +256,26 @@ namespace MonoGame.Tools.Pipeline
             this._buildMenu.Name = "_buildMenu";
             this._buildMenu.Size = new System.Drawing.Size(46, 20);
             this._buildMenu.Text = "&Build";
-            this._buildMenu.Click += new System.EventHandler(this.BuildMenu_Click);
             // 
             // _buildMenuItem
             // 
             this._buildMenuItem.Name = "_buildMenuItem";
             this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this._buildMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._buildMenuItem.Size = new System.Drawing.Size(120, 22);
             this._buildMenuItem.Text = "&Build";
             this._buildMenuItem.Click += new System.EventHandler(this.BuildMenuItemClick);
             // 
             // _rebuilMenuItem
             // 
             this._rebuilMenuItem.Name = "_rebuilMenuItem";
-            this._rebuilMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._rebuilMenuItem.Size = new System.Drawing.Size(120, 22);
             this._rebuilMenuItem.Text = "&Rebuild";
             this._rebuilMenuItem.Click += new System.EventHandler(this.RebuilMenuItemClick);
             // 
             // _cleanMenuItem
             // 
             this._cleanMenuItem.Name = "_cleanMenuItem";
-            this._cleanMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._cleanMenuItem.Size = new System.Drawing.Size(120, 22);
             this._cleanMenuItem.Text = "&Clean";
             this._cleanMenuItem.Click += new System.EventHandler(this.CleanMenuItemClick);
             // 

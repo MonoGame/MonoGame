@@ -30,6 +30,22 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ProjectDiry { get; set; }
 
+        public bool ProjectBuilding 
+        {
+            get
+            {
+                return _buildProcess != null && !_buildProcess.IsCompleted;
+            }
+        }
+
+        public event Action OnProjectLoading;
+
+        public event Action OnProjectLoaded;
+
+        public event Action OnBuildStarted;
+
+        public event Action OnBuildFinished;
+
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
@@ -60,7 +76,10 @@ namespace MonoGame.Tools.Pipeline
 
             ProjectDiry = false;
 
-            // Clear existing project data, initialize to a new blank project.
+            if (OnProjectLoading != null)
+                OnProjectLoading();
+
+            // Clear existing project data, initialize to a new blank project.           
             _project.NewProject();
             PipelineTypes.Load(_project);
 
@@ -82,6 +101,9 @@ namespace MonoGame.Tools.Pipeline
             }            
             
             UpdateTree();
+
+            if (OnProjectLoaded != null)
+                OnProjectLoaded();
         }
 
         public void ImportProject()
@@ -94,6 +116,9 @@ namespace MonoGame.Tools.Pipeline
             string projectFilePath;
             if (!_view.AskImportProject(out projectFilePath))
                 return;
+
+            if (OnProjectLoading != null)
+                OnProjectLoading();
 
 #if SHIPPING
             try
@@ -114,6 +139,9 @@ namespace MonoGame.Tools.Pipeline
 #endif
 
             UpdateTree();
+
+            if (OnProjectLoaded != null)
+                OnProjectLoaded();
         }
 
         public void OpenProject()
@@ -126,6 +154,9 @@ namespace MonoGame.Tools.Pipeline
             string projectFilePath;
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
+
+            if (OnProjectLoading != null)
+                OnProjectLoading();
 
 #if SHIPPING
             try
@@ -146,6 +177,9 @@ namespace MonoGame.Tools.Pipeline
 #endif
 
             UpdateTree();
+
+            if (OnProjectLoaded != null)
+                OnProjectLoaded();
         }
 
         public void CloseProject()
@@ -193,10 +227,15 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
+            if (OnBuildStarted != null)
+                OnBuildStarted();
+
             _view.OutputClear();
 
             var commands = string.Format("/@:{0} {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
-            _buildProcess = Task.Run(() => DoBuild(commands));            
+            _buildProcess = Task.Run(() => DoBuild(commands));
+            if (OnBuildFinished != null)
+                _buildProcess.ContinueWith((e) => OnBuildFinished());
         }
 
         public void Clean()
@@ -207,10 +246,15 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
+            if (OnBuildStarted != null)
+                OnBuildStarted();
+
             _view.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:{0} /outputDir:{1}", _project.IntermediateDir, _project.OutputDir);
-            _buildProcess = Task.Run(() => DoBuild(commands));            
+            _buildProcess = Task.Run(() => DoBuild(commands));
+            if (OnBuildFinished != null)
+                _buildProcess.ContinueWith((e) => OnBuildFinished());          
         }
 
         private void DoBuild(string commands)
