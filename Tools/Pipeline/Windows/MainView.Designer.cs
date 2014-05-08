@@ -310,9 +310,9 @@ namespace MonoGame.Tools.Pipeline
             this.Controls.Add(_splitEditorOutput);
             this.Controls.Add(this._mainMenu);
             this.MainMenuStrip = this._mainMenu;
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(320, 240);
             this.Name = "MainView";
-            this.Text = "Pipeline";
+            this.Text = "MonoGame Pipeline";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
             _splitTreeProps.Panel1.ResumeLayout(false);
             _splitTreeProps.Panel2.ResumeLayout(false);
