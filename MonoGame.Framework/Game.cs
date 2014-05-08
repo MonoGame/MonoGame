@@ -367,7 +367,8 @@ namespace Microsoft.Xna.Framework
 #endif
         public void Exit()
         {
-			_suppressDraw = true;
+            Platform.Exit();
+            _suppressDraw = true;
         }
 
         public void ResetElapsedTime()
