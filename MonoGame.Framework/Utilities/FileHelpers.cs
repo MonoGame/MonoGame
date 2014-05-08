@@ -6,12 +6,12 @@ using System.Linq;
 
 
 //Non Core assemblies
-#if WINRT
+#if WINDOWS_PHONE
+using System.IO.IsolatedStorage; 
+#elif WINRT
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Search;
-#elif WINDOWS_PHONE
-using System.IO.IsolatedStorage; 
 #elif IOS
 using MonoTouch.Foundation;
 #elif MONOMAC
@@ -85,7 +85,9 @@ namespace Microsoft.Xna.Framework.Utilities
 
 		public static Stream FileOpenRead(string Location, string safeName)
 		{
-#if WINRT
+#if WINDOWS_PHONE
+			return storage.OpenFile(safeName, FileMode.Open, FileAccess.Read);
+#elif WINRT
 			var stream = Task.Run( () => FileHelpers.OpenStreamAsync(safeName).Result ).Result;
 			if (stream == null)
 				throw new FileNotFoundException(safeName);
@@ -106,8 +108,6 @@ namespace Microsoft.Xna.Framework.Utilities
 					return File.OpenRead(absolutePath2x);
 			}
 			return File.OpenRead(absolutePath);
-#elif WINDOWS_PHONE
-			return storage.OpenFile(safeName, FileMode.Open, FileAccess.Read);
 #else
 			var absolutePath = Path.Combine(Location, safeName);
 			return File.OpenRead(absolutePath);
@@ -116,7 +116,10 @@ namespace Microsoft.Xna.Framework.Utilities
 
 		public static bool FileExists(string fileName)
 		{
-#if WINRT
+#if WINDOWS_PHONE
+			if(storage.FileExists(fileName))
+				return true;
+#elif WINRT
 			var result = Task.Run(async () =>
 			{
 				try
@@ -148,9 +151,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			string[] files = DirectoryGetFiles(path);
 
 			if (files.Any(s => s.ToLower() == file.ToLower()))
-				return true;
-#elif WINDOWS_PHONE
-			if(storage.FileExists(fileName))
 				return true;
 #else
 			if (File.Exists(fileName))
@@ -507,7 +507,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
 		}
 
-#if WINRT
+#if !WINDOWS_PHONE && WINRT 
 
 		public static async Task<Stream> OpenStreamAsync(string name)
 		{
