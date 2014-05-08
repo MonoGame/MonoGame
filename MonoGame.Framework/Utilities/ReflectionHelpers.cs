@@ -1,5 +1,4 @@
 ﻿
-//using Microsoft.Xna.Framework.Content;
 using System;
 using System.IO;
 using System.Reflection;
@@ -22,7 +21,6 @@ namespace Microsoft.Xna.Framework.Utilities
 		   
 		}
 
-		//GetBase Type
 		public static Type GetBaseTpye(Type targetType)
 		{
 			if (targetType == null)
@@ -37,7 +35,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			return type;
 		}
 
-//Test isAbstract
 		public static bool IsAbstractClass(Type t)
 		{
 			if (t == null)
@@ -55,7 +52,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			return false;
 			}
 
-//?? Reflective Methods
 		public static MethodInfo GetPropertyMethod(PropertyInfo property, string method)
 		{
 			if (property == null)
@@ -79,7 +75,6 @@ namespace Microsoft.Xna.Framework.Utilities
 
 		}
 
-// Get custom type from member
 		public static Attribute GetCustomAttribute(MemberInfo member, Type memberType)
 		{
 			if (member == null)
@@ -98,7 +93,6 @@ namespace Microsoft.Xna.Framework.Utilities
 			return attr;
 		}
 
-//Check for public methods
 		public static bool HasPublicProperties(PropertyInfo property)
 		{
 			if (property == null)
