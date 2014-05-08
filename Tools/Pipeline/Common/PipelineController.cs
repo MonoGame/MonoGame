@@ -239,7 +239,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = string.Format("/@:{0} {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
             _buildProcess = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildProcess.ContinueWith((e) => OnBuildFinished());
@@ -258,7 +258,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = string.Format("/clean /intermediateDir:{0} /outputDir:{1}", _project.IntermediateDir, _project.OutputDir);
+            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
             _buildProcess = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildProcess.ContinueWith((e) => OnBuildFinished());          
