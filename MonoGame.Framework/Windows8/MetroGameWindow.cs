@@ -163,7 +163,8 @@ namespace Microsoft.Xna.Framework
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
-            Game.Exit();
+            Game.SuppressDraw();
+            Game.Platform.Exit();
         }
 
         private void SetClientBounds(double width, double height)
