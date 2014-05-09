@@ -222,6 +222,9 @@ namespace MonoGame.Tools.Pipeline
                 line = string.Format(lineFormat, "config", _project.Config);
                 io.WriteLine(line);
 
+                line = string.Format(lineFormat, "profile", _project.Profile);
+                io.WriteLine(line);
+
                 line = FormatDivider("References");
                 io.WriteLine(line);
 
