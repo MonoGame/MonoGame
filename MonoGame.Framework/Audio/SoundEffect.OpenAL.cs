@@ -8,12 +8,16 @@ using System.IO;
 #if MONOMAC
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
+using MonoMac.AVFoundation;
+using MonoMac.Foundation;
 using MonoMac.OpenAL;
 #elif OPENAL
 using OpenTK.Audio.OpenAL;
 #if IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AudioUnit;
+using MonoTouch.AVFoundation;
+using MonoTouch.Foundation;
 #endif
 #elif ANDROID
 using Android.Content;
@@ -63,30 +67,48 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if MONOMAC || IOS
 
-            AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE);
+            var audiodata = new byte[s.Length];
+            s.Read(audiodata, 0, (int)s.Length);
 
-			var audiodata = new byte[s.Length];
-			s.Read(audiodata, 0, (int)s.Length);
-            afs.ParseBytes (audiodata, false); // AudioFileStreamStatus status
-            AudioStreamBasicDescription asbd = afs.StreamBasicDescription;
-            
-            Rate = (float)asbd.SampleRate;
-            Size = (int)afs.DataByteCount;
-            
-            if (asbd.ChannelsPerFrame == 1)
-                Format = asbd.BitsPerChannel == 8 ? ALFormat.Mono8 : ALFormat.Mono16;
-            else
-                Format = asbd.BitsPerChannel == 8 ? ALFormat.Stereo8 : ALFormat.Stereo16;
+            using (AudioFileStream afs = new AudioFileStream (AudioFileType.WAVE))
+            {
+                afs.ParseBytes (audiodata, false);
+                Size = (int)afs.DataByteCount;
 
-            byte []d = new byte[afs.DataByteCount];
-            Array.Copy (audiodata, afs.DataOffset, d, 0, afs.DataByteCount);
+                _data = new byte[afs.DataByteCount];
+                Array.Copy (audiodata, afs.DataOffset, _data, 0, afs.DataByteCount);
 
-            _data = d;
+                AudioStreamBasicDescription asbd = afs.DataFormat;
+                int channelsPerFrame = asbd.ChannelsPerFrame;
+                int bitsPerChannel = asbd.BitsPerChannel;
 
-            var _dblDuration = (Size / ((asbd.BitsPerChannel / 8) * ((asbd.ChannelsPerFrame == 0) ? 1 : asbd.ChannelsPerFrame))) / asbd.SampleRate;
-            _duration = TimeSpan.FromSeconds(_dblDuration);
+                // There is a random chance that properties asbd.ChannelsPerFrame and asbd.BitsPerChannel are invalid because of a bug in Xamarin.iOS
+                // See: https://bugzilla.xamarin.com/show_bug.cgi?id=11074 (Failed to get buffer attributes error when playing sounds)
+                if (channelsPerFrame <= 0 || bitsPerChannel <= 0)
+                {
+                    NSError err;
+                    using (NSData nsData = NSData.FromArray(audiodata))
+                    using (AVAudioPlayer player = AVAudioPlayer.FromData(nsData, out err))
+                    {
+                        channelsPerFrame = (int)player.NumberOfChannels;
+                        bitsPerChannel = player.SoundSetting.LinearPcmBitDepth.GetValueOrDefault(16);
 
-			afs.Close ();
+                        Rate = player.Settings.SampleRate;
+                        _duration = TimeSpan.FromSeconds(player.Duration);
+                    }
+                }
+                else
+                {
+                    Rate = (float)asbd.SampleRate;
+                    double duration = (Size / ((bitsPerChannel / 8) * channelsPerFrame)) / asbd.SampleRate;
+                    _duration = TimeSpan.FromSeconds(duration);
+                }
+
+                if (channelsPerFrame == 1)
+                    Format = (bitsPerChannel == 8) ? ALFormat.Mono8 : ALFormat.Mono16;
+                else
+                    Format = (bitsPerChannel == 8) ? ALFormat.Stereo8 : ALFormat.Stereo16;
+            }
 
 #endif
 
