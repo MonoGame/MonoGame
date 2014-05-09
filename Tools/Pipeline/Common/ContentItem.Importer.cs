@@ -100,14 +100,16 @@ namespace MonoGame.Tools.Pipeline
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var contentItem = (ContentItem)context.Instance;
             var importer = (ImporterTypeDescription)value;// contentItem.Importer;
             //System.Diagnostics.Debug.Assert(importer == value);
 
             if (destinationType == typeof (string))
             {
                 if (importer == PipelineTypes.MissingImporter)
+                {
+                    var contentItem = (ContentItem)context.Instance;
                     return string.Format("[missing] {0}", contentItem.ImporterName ?? "[null]");
+                }
 
                 return ((ImporterTypeDescription)value).DisplayName;
             }
