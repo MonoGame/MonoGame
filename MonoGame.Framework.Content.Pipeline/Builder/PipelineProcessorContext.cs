@@ -64,7 +64,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                     OpaqueDataDictionary processorParameters,
                                                                     string importerName)
         {
-            throw new NotImplementedException();
+            var sourceFilepath = PathHelper.Normalize(sourceAsset.Filename);
+            _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
+
+            var buildEvent = new PipelineBuildEvent 
+            { 
+                SourceFile = sourceFilepath,
+                Importer = importerName,
+                Processor = processorName,
+                Parameters = processorParameters 
+            };
+
+            var processedObject = _manager.ProcessContent(buildEvent);
+            return (TOutput)processedObject;
         }
 
         public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,
