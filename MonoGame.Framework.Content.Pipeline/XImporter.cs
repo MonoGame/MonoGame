@@ -28,7 +28,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            throw new NotImplementedException();
+            var importer = new OpenAssetImporter();
+            return importer.Import(filename, context);
         }
     }
 }
