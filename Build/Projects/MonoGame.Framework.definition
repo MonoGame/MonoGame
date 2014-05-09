@@ -708,12 +708,6 @@
 
     
     <!-- Microsoft.Xna.Framework.Input -->
-    <Compile Include="Input\AccelerometerCapabilities.cs">
-      <Platforms>iOS,Windows8,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="Input\AccelerometerState.cs">
-      <Platforms>iOS,Linux,MacOS,Windows8,WindowsPhone</Platforms>
-    </Compile>
     <Compile Include="Input\Buttons.cs" />
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
