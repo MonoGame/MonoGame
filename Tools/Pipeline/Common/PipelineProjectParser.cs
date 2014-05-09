@@ -39,37 +39,41 @@ namespace MonoGame.Tools.Pipeline
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
-        public string OutputDir { get; set; }
+        public string OutputDir { set { _project.OutputDir = value; } }
 
         [CommandLineParameter(
             Name = "intermediateDir",
             ValueName = "directoryPath",
             Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir { get; set; }
+        public string IntermediateDir { set { _project.IntermediateDir = value; } }
 
         [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public List<string> References { get; set; }
+        public List<string> References 
+        {
+            set { _project.References = value; }
+            get { return _project.References; } 
+        }
 
         [CommandLineParameter(
             Name = "platform",
             ValueName = "targetPlatform",
             Description = "Set the target platform for this build.  Defaults to Windows.")]
-        public TargetPlatform Platform { get; set; }
+        public TargetPlatform Platform { set { _project.Platform = value; } }
 
         [CommandLineParameter(
             Name = "profile",
             ValueName = "graphicsProfile",
             Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
-        public GraphicsProfile Profile { get; set; }
+        public GraphicsProfile Profile { set { _project.Profile = value; } }
 
         [CommandLineParameter(
             Name = "config",
             ValueName = "string",
             Description = "The optional build config string from the build system.")]
-        public string Config { get; set; }
+        public string Config { set { _project.Config = value; } }
 
         [CommandLineParameter(
             Name = "importer",
