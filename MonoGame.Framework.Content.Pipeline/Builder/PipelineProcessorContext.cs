@@ -72,7 +72,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 SourceFile = sourceFilepath,
                 Importer = importerName,
                 Processor = processorName,
-                Parameters = processorParameters 
+                Parameters = _manager.ValidateProcessorParameters(processorName, processorParameters),
             };
 
             var processedObject = _manager.ProcessContent(buildEvent);
