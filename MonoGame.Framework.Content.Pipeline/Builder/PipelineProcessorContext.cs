@@ -41,7 +41,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         public override void AddOutputFile(string filename)
-        {            
+        {
+            if (!_pipelineEvent.BuildOutput.Contains(filename))
+                _pipelineEvent.BuildOutput.Add(filename);
         }
 
         public override TOutput Convert<TInput, TOutput>(   TInput input, 

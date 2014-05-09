@@ -559,7 +559,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                     // Give the asset a chance to rebuild.                    
                     CleanContent(string.Empty, asset);
-                }                
+                }
+
+                foreach (var asset in cachedEvent.BuildOutput)
+                {
+                    Logger.LogMessage("Cleaning {0}", asset);
+                    FileHelper.DeleteIfExists(asset);
+                }
             }
 
             Logger.LogMessage("Cleaning {0}", outputFilepath);
