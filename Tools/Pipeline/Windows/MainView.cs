@@ -208,17 +208,18 @@ namespace MonoGame.Tools.Pipeline
         public void SetTreeRoot(IProjectItem item)
         {
             _treeView.Nodes.Clear();
+            _propertyGrid.SelectedObject = null;
 
             var project = item as PipelineProject;
-            if (project != null)
-            {
-                var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
-                root.Tag = new PipelineProjectProxy(project);
-                root.SelectedImageIndex = ProjectIcon;
-                root.ImageIndex = ProjectIcon;
-            }
+            if (project == null)
+                return;
 
-            _propertyGrid.SelectedObject = item;
+            var root = _treeView.Nodes.Add(string.Empty, item.Name, -1);
+            root.Tag = new PipelineProjectProxy(project);
+            root.SelectedImageIndex = ProjectIcon;
+            root.ImageIndex = ProjectIcon;
+
+            _propertyGrid.SelectedObject = root.Tag;
         }
 
         public void AddTreeItem(IProjectItem item)
