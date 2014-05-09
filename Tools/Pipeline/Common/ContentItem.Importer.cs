@@ -31,35 +31,16 @@ namespace MonoGame.Tools.Pipeline
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            var importers = new List<ImporterTypeDescription>();
             var contentItem = (context.Instance as ContentItem);
             
             if (contentItem.BuildAction == BuildAction.Copy)
             {
                 // Copy items do not have importers.
-                return new StandardValuesCollection(importers);
-            }
-            else if (!string.IsNullOrEmpty(contentItem.SourceFile))
-            {
-                // If the asset has a file extension then show only importers which accept it.
-                var ext = Path.GetExtension(contentItem.SourceFile);
-                if (!string.IsNullOrEmpty(ext))
-                {
-                    foreach (var i in PipelineTypes.Importers)
-                    {
-                        if (i.FileExtensions.Contains(ext))
-                        {
-                            importers.Add(i);
-                        }
-                    }
-
-                    // If we didn't find any importers targeting this extensions, just show all of them.
-                    if (importers.Count > 0)
-                        return new StandardValuesCollection(importers);
-                }
+                return new StandardValuesCollection(new List<ImporterTypeDescription>());
             }
 
-            // Default case, show all importers.
+            // Show all importers as the user best knows the content
+            // type regardless of the file extension.
             return new StandardValuesCollection(PipelineTypes.Importers);
         }
 
@@ -100,14 +81,16 @@ namespace MonoGame.Tools.Pipeline
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var contentItem = (ContentItem)context.Instance;
             var importer = (ImporterTypeDescription)value;// contentItem.Importer;
             //System.Diagnostics.Debug.Assert(importer == value);
 
             if (destinationType == typeof (string))
             {
                 if (importer == PipelineTypes.MissingImporter)
+                {
+                    var contentItem = (ContentItem)context.Instance;
                     return string.Format("[missing] {0}", contentItem.ImporterName ?? "[null]");
+                }
 
                 return ((ImporterTypeDescription)value).DisplayName;
             }

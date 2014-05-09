@@ -94,11 +94,13 @@ namespace MonoGame.Tools.Pipeline
         {
             if (destinationType == typeof (string))
             {
-                var contentItem = context.Instance as ContentItem;
                 var processor = (ProcessorTypeDescription)value;
 
                 if (processor == PipelineTypes.MissingProcessor)
+                {
+                    var contentItem = context.Instance as ContentItem;
                     return string.Format("[missing] {0}", contentItem.ProcessorName);
+                }
 
                 return ((ProcessorTypeDescription)value).DisplayName;
             }

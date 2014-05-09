@@ -41,7 +41,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         public override void AddOutputFile(string filename)
-        {            
+        {
+            if (!_pipelineEvent.BuildOutput.Contains(filename))
+                _pipelineEvent.BuildOutput.Add(filename);
         }
 
         public override TOutput Convert<TInput, TOutput>(   TInput input, 
@@ -64,7 +66,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                     OpaqueDataDictionary processorParameters,
                                                                     string importerName)
         {
-            throw new NotImplementedException();
+            var sourceFilepath = PathHelper.Normalize(sourceAsset.Filename);
+            _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
+
+            var buildEvent = new PipelineBuildEvent 
+            { 
+                SourceFile = sourceFilepath,
+                Importer = importerName,
+                Processor = processorName,
+                Parameters = _manager.ValidateProcessorParameters(processorName, processorParameters),
+            };
+
+            var processedObject = _manager.ProcessContent(buildEvent);
+            return (TOutput)processedObject;
         }
 
         public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,

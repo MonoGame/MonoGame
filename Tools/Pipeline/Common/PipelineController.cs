@@ -13,7 +13,7 @@ namespace MonoGame.Tools.Pipeline
     internal class PipelineController : IController
     {
         private readonly IView _view;
-        private readonly PipelineProject _project;
+        private PipelineProject _project;
 
         private Task _buildProcess;
 
@@ -79,8 +79,8 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
-            // Clear existing project data, initialize to a new blank project.           
-            _project.NewProject();
+            // Clear existing project data, initialize to a new blank project.
+            _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
             // Ask user to choose a location on disk for the new project.
@@ -89,7 +89,7 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskSaveName(ref projectFilePath))
             {
                 // User canceled the save operation, so we cannot create the new project, unload it.
-                _project.CloseProject();
+                _project = null;
                 PipelineTypes.Unload();                
                 ProjectOpen = false;                
             }
@@ -124,7 +124,10 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
-                _project.ImportProject(projectFilePath);
+                _project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, _project);
+                parser.ImportProject(projectFilePath);
+
                 ResolveTypes();                
                 
                 ProjectOpen = true;
@@ -162,7 +165,9 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
-                _project.OpenProject(projectFilePath);
+                _project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, _project);
+                parser.OpenProject(projectFilePath);
                 ResolveTypes();
 
                 ProjectOpen = true;
@@ -191,7 +196,8 @@ namespace MonoGame.Tools.Pipeline
 
             ProjectOpen = false;
             ProjectDiry = false;
-            _project.CloseProject();
+            _project = null;
+
             UpdateTree();
         }
 
@@ -208,8 +214,9 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Do the save.
-            ProjectDiry = false;            
-            _project.SaveProject();
+            ProjectDiry = false;
+            var parser = new PipelineProjectParser(this, _project);
+            parser.SaveProject();            
 
             return true;
         }
@@ -232,7 +239,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = string.Format("/@:{0} {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
             _buildProcess = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildProcess.ContinueWith((e) => OnBuildFinished());
@@ -251,7 +258,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = string.Format("/clean /intermediateDir:{0} /outputDir:{1}", _project.IntermediateDir, _project.OutputDir);
+            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
             _buildProcess = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildProcess.ContinueWith((e) => OnBuildFinished());          
@@ -319,7 +326,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateTree()
         {
-            if (string.IsNullOrEmpty(_project.FilePath))
+            if (_project == null || string.IsNullOrEmpty(_project.FilePath))
                 _view.SetTreeRoot(null);
             else
             {
@@ -349,7 +356,9 @@ namespace MonoGame.Tools.Pipeline
             string file;
             if (_view.ChooseContentFile(initialDirectory, out file))
             {
-                _project.OnBuild(file);
+                var parser = new PipelineProjectParser(this, _project);
+                parser.OnBuild(file);
+
                 var item = _project.ContentItems.Last();
                 item.Controller = this;
                 item.ResolveTypes();
@@ -362,7 +371,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void Exclude(ContentItem item)
         {
-            _project.RemoveItem(item);
+            _project.ContentItems.Remove(item);
             _view.RemoveTreeItem(item);
 
             ProjectDiry = true;
