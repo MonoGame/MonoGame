@@ -340,12 +340,14 @@ namespace MonoGame.Tools.Pipeline
             this._viewHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
             this._viewHelpMenuItem.Size = new System.Drawing.Size(146, 22);
             this._viewHelpMenuItem.Text = "&View Help";
+            this._viewHelpMenuItem.Click += new System.EventHandler(this.ViewHelpMenuItemClick);
             // 
             // _aboutMenuItem
             // 
             this._aboutMenuItem.Name = "_aboutMenuItem";
             this._aboutMenuItem.Size = new System.Drawing.Size(146, 22);
             this._aboutMenuItem.Text = "&About...";
+            this._aboutMenuItem.Click += new System.EventHandler(this.AboutMenuItemClick);
             // 
             // MainView
             // 

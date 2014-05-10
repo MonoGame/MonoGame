@@ -537,5 +537,15 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.Exclude(item);
         }
+
+        private void ViewHelpMenuItemClick(object sender, EventArgs e)
+        {
+            Process.Start("http://www.monogame.net/documentation/");
+        }
+
+        private void AboutMenuItemClick(object sender, EventArgs e)
+        {
+            Process.Start("http://www.monogame.net/about/");
+        }
     }
 }
