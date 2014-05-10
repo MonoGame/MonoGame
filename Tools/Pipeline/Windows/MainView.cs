@@ -35,6 +35,15 @@ namespace MonoGame.Tools.Pipeline
         {            
             InitializeComponent();
 
+            // Find an appropriate font for console like output.
+            var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
+            for (var f=0; f < faces.Length; f++)
+            {
+                _outputWindow.Font = new System.Drawing.Font(faces[f], 9F, FontStyle.Regular, GraphicsUnit.Point, (byte)0);
+                if (_outputWindow.Font.Name == faces[f])
+                    break;               
+            }
+
             _treeIcons = new ImageList();
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
