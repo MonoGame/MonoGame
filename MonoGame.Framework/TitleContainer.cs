@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework
 {
     public static class TitleContainer
     {
-        static TitleContainer() 
+        internal static void Initialize() 
         {
 #if WINDOWS || LINUX
             Location = AppDomain.CurrentDomain.BaseDirectory;

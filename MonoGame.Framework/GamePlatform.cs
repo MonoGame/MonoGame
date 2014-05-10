@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework
             return new iOSGamePlatform(game);
 #elif MONOMAC
             return new MacGamePlatform(game);
-#elif (WINDOWS && OPENGL) || LINUX
+#elif (WINDOWS && OPENGL) || LINUX || ANGLE
             return new OpenTKGamePlatform(game);
 #elif ANDROID
             return new AndroidGamePlatform(game);
@@ -218,17 +218,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 #endif
-  
-        public virtual bool VSyncEnabled
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set {
-            }
-        }
-        
+
         #endregion
 
         #region Events

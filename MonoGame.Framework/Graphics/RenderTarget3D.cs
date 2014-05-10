@@ -44,14 +44,5 @@ namespace Microsoft.Xna.Framework.Graphics
 		public RenderTarget3D(GraphicsDevice graphicsDevice, int width, int height, int depth)
 			: this(graphicsDevice, width, height, depth, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents) 
 		{}
-
-		protected override void Dispose(bool disposing)
-		{
-            if (!IsDisposed)
-            {
-                PlatformDispose(disposing);
-            }
-            base.Dispose(disposing);
-		}
 	}
 }

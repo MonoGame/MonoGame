@@ -22,7 +22,6 @@ namespace TwoMGFX
 			public int index;
 			public string name;
 			public VertexElementUsage usage;
-			public short format;
 		}
 
 		/// <summary>

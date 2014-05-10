@@ -2,22 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Input
 {
     static partial class GamePad
     {
-        internal static bool back;
-
-        internal static void GamePageWP8_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (!e.Cancel)
-            {
-                back = true;
-                e.Cancel = true;
-            }
-        }
+        internal static bool Back;
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
@@ -32,10 +21,10 @@ namespace Microsoft.Xna.Framework.Input
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
             GamePadState state;
-            if (index == 0 && back)
+            if (index == 0 && Back)
             {
                 // Consume state
-                back = false;
+                Back = false;
                 state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
             }
             else

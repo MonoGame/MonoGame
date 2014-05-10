@@ -65,18 +65,18 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly MouseState _defaultState = new MouseState();
 
-#if (WINDOWS && OPENGL) || LINUX
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
 	private static OpenTK.Input.MouseDevice _mouse = null;			
-#endif
 
-#if (WINDOWS && OPENGL)
+        static OpenTK.INativeWindow Window;
 
-        static OpenTK.GameWindow Window;
-
-        internal static void setWindows(OpenTK.GameWindow window)
+        internal static void setWindows(OpenTK.INativeWindow window)
         {
             Window = window;
-            _mouse = window.Mouse;        
+            _mouse = window.InputDriver.Mouse[0];
+#if LINUX
+            _mouse.Move += (sender, e) => UpdateStatePosition(e.X, e.Y);
+#endif
         }
 
 #elif (WINDOWS && DIRECTX)
@@ -87,23 +87,6 @@ namespace Microsoft.Xna.Framework.Input
         {
             Window = window;
         }
-        
-#elif LINUX         
-        
-        static OpenTK.GameWindow Window;
-
-        internal static void setWindows(OpenTK.GameWindow window)
-	{
-            Window = window;
-            
-	    _mouse = window.Mouse;
-	    _mouse.Move += HandleWindowMouseMove;
-	}
-
-        internal static void HandleWindowMouseMove (object sender, OpenTK.Input.MouseMoveEventArgs e)
-	{          
-	    UpdateStatePosition(e.X, e.Y);
-	}
 
 #elif MONOMAC
         internal static GameWindow Window;

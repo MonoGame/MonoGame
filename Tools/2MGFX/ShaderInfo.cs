@@ -42,6 +42,7 @@ namespace TwoMGFX
             }
             else if (options.Profile == ShaderProfile.PlayStation4)
             {
+                throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
             }
 
 			// If we're building shaders for debug set that flag too.
@@ -51,14 +52,13 @@ namespace TwoMGFX
 			// Use the D3DCompiler to pre-process the file resolving 
 			// all #includes and macros.... this even works for GLSL.
 			string newFile;
-		    var full = Path.GetFullPath(filePath);
-		    var dir = Path.GetDirectoryName(full);
+		    var fullPath = Path.GetFullPath(filePath);
 		    var dependencies = new List<string>();
             using (var includer = new CompilerInclude(Path.GetDirectoryName(Path.GetFullPath(filePath)), dependencies))
-                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, Path.GetFullPath(filePath));
+                newFile = SharpDX.D3DCompiler.ShaderBytecode.Preprocess(effectSource, macros.ToArray(), includer, fullPath);
 
 			// Parse the resulting file for techniques and passes.
-			var tree = new Parser(new Scanner()).Parse(newFile, filePath);
+            var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
 			if (tree.Errors.Count > 0)
 			{
                 var errors = String.Empty;

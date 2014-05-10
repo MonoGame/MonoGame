@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.IO;
 
 #if IOS
+using MonoTouch.Foundation;
 using MonoTouch.MediaPlayer;
 #endif
 
@@ -93,10 +94,12 @@ namespace Microsoft.Xna.Framework.Media
 
 #if IOS
 
+        private static readonly NSString MPMediaPlaylistPropertyName = new NSString(MPMediaPlaylistProperty.Name);
+
 		public PlaylistCollection Playlists
 		{
 			get
-			{				
+			{
 				if (_playLists == null)
 				{
 					_playLists = new PlaylistCollection();
@@ -105,12 +108,12 @@ namespace Microsoft.Xna.Framework.Media
 					playlists.GroupingType = MPMediaGrouping.Playlist; 
 					for (int i=0;i<playlists.Collections.Length;i++)
 					{
-						MPMediaItemCollection item = playlists.Collections[i];					
+						MPMediaItemCollection item = playlists.Collections[i];
 						Playlist list = new Playlist();
-						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistProperty.Name).ToString();
+						list.Name = playlists.Items[i].ValueForProperty(MPMediaPlaylistPropertyName).ToString();
 						for (int k=0;k<item.Items.Length;k++)
 						{
-							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItemProperty.PlaybackDuration).ToString());
+							TimeSpan time = TimeSpan.Parse(item.Items[k].ValueForProperty(MPMediaItem.PlaybackDurationProperty).ToString());
 							list.Duration += time;
 						}
 						_playLists.Add(list);

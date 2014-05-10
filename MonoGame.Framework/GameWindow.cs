@@ -135,10 +135,7 @@ namespace Microsoft.Xna.Framework {
 
         protected GameWindow()
         {
-#if !ANDROID
-            // TODO: Fix the AndroidGameWindow!
             TouchPanelState = new TouchPanelState(this);
-#endif
         }
 
 		#endregion Properties
@@ -149,9 +146,9 @@ namespace Microsoft.Xna.Framework {
 		public event EventHandler<EventArgs> OrientationChanged;
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
 
-		/// <summary>
+        /// <summary>
 		/// Use this event to retrieve text for objects like textbox's.
 		/// This event is not raised by noncharacter keys.
 		/// This event also supports key repeat.
@@ -206,7 +203,7 @@ namespace Microsoft.Xna.Framework {
 				ScreenDeviceNameChanged (this, EventArgs.Empty);
 		}
 
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || ANGLE
 		protected void OnTextInput(object sender, TextInputEventArgs e)
 		{
 			if (TextInput != null)

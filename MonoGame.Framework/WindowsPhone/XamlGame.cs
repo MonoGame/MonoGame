@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Xna.Framework.Input;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Microsoft.Phone.Controls;
@@ -134,7 +136,7 @@ namespace MonoGame.Framework.WindowsPhone
 
             Microsoft.Xna.Framework.Audio.SoundEffect.InitializeSoundEffect();
 
-            page.BackKeyPress += Microsoft.Xna.Framework.Input.GamePad.GamePageWP8_BackKeyPress;
+            page.BackKeyPress += PageOnBackKeyPress;
 
             // Construct the game.
             var game = new T();
@@ -181,6 +183,15 @@ namespace MonoGame.Framework.WindowsPhone
 
             // Return the constructed, but not initialized game.
             return game;
+        }
+
+        private static void PageOnBackKeyPress(object sender, CancelEventArgs e)
+        {
+            if (!e.Cancel)
+            {
+                GamePad.Back = true;
+                e.Cancel = true;
+            }
         }
 
         private static readonly System.Collections.Generic.Dictionary<DrawingSurface, bool> initializedSurfaces = new System.Collections.Generic.Dictionary<DrawingSurface, bool>();

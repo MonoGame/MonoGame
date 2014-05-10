@@ -74,5 +74,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // Apply the state!
             device._d3dContext.Rasterizer.State = _state;
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                SharpDX.Utilities.Dispose(ref _state);
+            base.Dispose(disposing);
+        }
     }
 }

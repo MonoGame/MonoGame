@@ -156,6 +156,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformReload(Stream textureStream)
         {
         }
+		
+		
+		protected override void Dispose(bool disposing)
+        {
+		    if (disposing)
+		    {
+			    if (_texture2D != null)
+			        _texture2D.Dispose();
+		    }
+            base.Dispose(disposing);
+        }
 	}
 }
 

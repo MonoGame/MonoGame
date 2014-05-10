@@ -235,16 +235,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _nonPremultiplied.Reset();
             _opaque.Reset();
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                PlatformDispose();
-            }
-
-            base.Dispose(disposing);
-        }
 	}
 }
 

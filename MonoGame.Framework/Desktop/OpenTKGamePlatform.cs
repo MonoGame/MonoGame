@@ -77,6 +77,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
 
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -88,27 +89,13 @@ namespace Microsoft.Xna.Framework
         private bool isCurrentlyFullScreen = false;
         private Toolkit toolkit;
         
-        public override bool VSyncEnabled
-        {
-            get
-            {
-                return _view.Window.VSync == OpenTK.VSyncMode.On ? true : false;
-            }
-            
-            set
-            {
-                _view.Window.VSync = value ? OpenTK.VSyncMode.On : OpenTK.VSyncMode.Off;
-            }
-        }
-        
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
             toolkit = Toolkit.Init();
-            _view = new OpenTKGameWindow();
-            _view.Game = game;
+            _view = new OpenTKGameWindow(game);
             this.Window = _view;
-			
+
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
             try
             {
@@ -138,7 +125,7 @@ namespace Microsoft.Xna.Framework
 #if WINDOWS
         protected override void OnIsMouseVisibleChanged()
         {
-            _view.MouseVisibleToggled();
+            _view.SetMouseVisible(IsMouseVisible);
         }
 #endif
 
@@ -155,8 +142,8 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
-            ResetWindowBounds(false);
-            _view.Window.Run(0);
+            ResetWindowBounds();
+            _view.Run();
         }
 
         public override void StartRunLoop()
@@ -166,15 +153,21 @@ namespace Microsoft.Xna.Framework
         
         public override void Exit()
         {
-            if (!_view.Window.IsExiting)
+            if (_view.Window.Exists)
             {
                 Net.NetworkSession.Exit();
-                _view.Window.Exit();
+                _view.Window.Close();
             }
 #if LINUX
             Tao.Sdl.SdlMixer.Mix_CloseAudio();
 #endif
             OpenTK.DisplayDevice.Default.RestoreResolution();
+        }
+
+        public override void BeforeInitialize()
+        {
+            _view.Window.Visible = true;
+            base.BeforeInitialize();
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -194,15 +187,15 @@ namespace Microsoft.Xna.Framework
 
         public override void EnterFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
         public override void ExitFullScreen()
         {
-            ResetWindowBounds(false);
+            ResetWindowBounds();
         }
 
-        internal void ResetWindowBounds(bool toggleFullScreen)
+        internal void ResetWindowBounds()
         {
             Rectangle bounds;
 
@@ -292,9 +285,6 @@ namespace Microsoft.Xna.Framework
             var device = Game.GraphicsDevice;
             if (device != null)
                 device.Present();
-
-            if (_view != null)
-                _view.Window.SwapBuffers();
         }
 		
         protected override void Dispose(bool disposing)

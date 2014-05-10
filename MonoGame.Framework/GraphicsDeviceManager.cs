@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009 The MonoGame Team
@@ -71,11 +71,6 @@ namespace Microsoft.Xna.Framework
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
         bool disposed;
-
-		private bool _SynchronizedWithVerticalRetrace 
-		{
-			get { return _synchronizedWithVerticalRetrace; }
-		}
 
 #if !WINRT
         private bool _wantFullScreen = false;
@@ -280,10 +275,19 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.CreateSizeDependentResources();
             _graphicsDevice.ApplyRenderTargets(null);
 
-            _game.ResizeWindow(false);
+            ((MonoGame.Framework.WinFormsGamePlatform)_game.Platform).ResetWindowBounds();
 
 #elif WINDOWS || LINUX
-            _game.ResizeWindow(false);
+            ((OpenTKGamePlatform)_game.Platform).ResetWindowBounds();
+
+            //Set the swap interval based on if vsync is desired or not.
+            //See GetSwapInterval for more details
+            int swapInterval;
+            if (_synchronizedWithVerticalRetrace)
+                swapInterval = _graphicsDevice.PresentationParameters.PresentationInterval.GetSwapInterval();
+            else
+                swapInterval = 0;
+            _graphicsDevice.Context.SwapInterval = swapInterval;
 #elif MONOMAC
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
@@ -524,20 +528,11 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if LINUX || (WINDOWS && OPENGL)
-                return _game.Platform.VSyncEnabled;
-#else
                 return _synchronizedWithVerticalRetrace;
-#endif
             }
             set
             {
-#if LINUX || (WINDOWS && OPENGL)
-                // TODO: I'm pretty sure this shouldn't occur until ApplyChanges().
-                _game.Platform.VSyncEnabled = value;
-#else
                 _synchronizedWithVerticalRetrace = value;
-#endif
             }
         }
 

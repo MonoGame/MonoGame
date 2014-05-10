@@ -18,44 +18,67 @@ namespace TwoMGFX
         public RasterizerState rasterizerState;
         public DepthStencilState depthStencilState;
 		
-        private static readonly Regex _shaderModelRegex = new Regex(@"(vs_|ps_)(1|2|3|4|5)(_)(0|1|)((_level_)(9_1|9_2|9_3))?", RegexOptions.Compiled);
+        private static readonly Regex _hlslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(9_1|9_2|9_3))?$", RegexOptions.Compiled);
+        private static readonly Regex _hlslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)(_level_(9_1|9_2|9_3))?$", RegexOptions.Compiled);
 
-        public static void ParseShaderModel(string text, out int major, out int minor)
+        private static readonly Regex _glslPixelShaderRegex = new Regex(@"^ps_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
+        private static readonly Regex _glslVertexShaderRegex = new Regex(@"^vs_(?<major>1|2|3|4|5)_(?<minor>0|1|)$", RegexOptions.Compiled);
+
+
+        public static void ParseShaderModel(string text, Regex regex, out int major, out int minor)
         {
-            var match = _shaderModelRegex.Match(text);
-            if (match.Groups.Count < 5)
+            var match = regex.Match(text);
+            if (!match.Success)
             {
                 major = 0;
                 minor = 0;
                 return;
             }
 
-            major = int.Parse(match.Groups[2].Value);
-            minor = int.Parse(match.Groups[4].Value);
+            major = int.Parse(match.Groups["major"].Value);
+            minor = int.Parse(match.Groups["minor"].Value);
         }
 
         public void ValidateShaderModels(ShaderProfile profile)
         {
             int major, minor;
 
-            var dx11Profile = profile != ShaderProfile.OpenGL;
-
             if (!string.IsNullOrEmpty(vsFunction))
             {
-                ParseShaderModel(vsModel, out major, out minor);
-                if (dx11Profile && major <= 3)
-                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 4.0 level 9.1 or higher!", vsFunction));
-                if (!dx11Profile && major > 3)
-                    throw new Exception(String.Format("Vertex shader '{0}' must be SM 3.0 or lower!", vsFunction));
+                switch (profile)
+                {
+                    case ShaderProfile.DirectX_11:
+                        ParseShaderModel(vsModel, _hlslVertexShaderRegex, out major, out minor);
+                        if (major <= 3)
+                            throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 4.0 level 9.1 or higher!", vsModel, vsFunction));
+                        break;
+                    case ShaderProfile.OpenGL:
+                        ParseShaderModel(vsModel, _glslVertexShaderRegex, out major, out minor);
+                        if (major > 3)
+                            throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", vsModel, vsFunction));
+                        break;
+                    case ShaderProfile.PlayStation4:
+                        throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
+                }
             }
 
             if (!string.IsNullOrEmpty(psFunction))
             {
-                ParseShaderModel(psModel, out major, out minor);
-                if (dx11Profile && major <= 3)
-                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 4.0 level 9.1 or higher!", psFunction));
-                if (!dx11Profile && major > 3)
-                    throw new Exception(String.Format("Pixel shader '{0}' must be SM 3.0 or lower!", psFunction));
+                switch (profile)
+                {
+                    case ShaderProfile.DirectX_11:
+                        ParseShaderModel(psModel, _hlslPixelShaderRegex, out major, out minor);
+                        if (major <= 3)
+                            throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 4.0 level 9.1 or higher!", vsModel, psFunction));
+                        break;
+                    case ShaderProfile.OpenGL:
+                        ParseShaderModel(psModel, _glslPixelShaderRegex, out major, out minor);
+                        if (major > 3)
+                            throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", vsModel, psFunction));
+                        break;
+                    case ShaderProfile.PlayStation4:
+                        throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
+                }
             }
         }
 
@@ -75,78 +98,143 @@ namespace TwoMGFX
             return blend;
         }
 
-        public void ParseRenderState(string name, string value)
+        public bool AlphaBlendEnable
         {
-            Blend blend;
-
-            switch (name.ToLower())
+            set
             {
-                case "alphablendenable":
-                    if (!ParseTreeTools.ParseBool(value))
+                if (value)
+                {
+                    if (blendState == null)
                     {
-                        if (blendState == null)
-                            blendState = new BlendState();
+                        blendState = new BlendState();
                         blendState.ColorSourceBlend = Blend.One;
                         blendState.AlphaSourceBlend = Blend.One;
-                        blendState.ColorDestinationBlend = Blend.Zero;
-                        blendState.AlphaDestinationBlend = Blend.Zero;
+                        blendState.ColorDestinationBlend = Blend.InverseSourceAlpha;
+                        blendState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
                     }
-                    break;
-                case "srcblend":
-                    blend = ParseTreeTools.ParseBlend(value);
+                }
+                else if (!value)
+                {
                     if (blendState == null)
                         blendState = new BlendState();
-                    blendState.ColorSourceBlend = blend;
-                    blendState.AlphaSourceBlend = ToAlphaBlend(blend);
-                    break;
-                case "destblend":
-                    blend = ParseTreeTools.ParseBlend(value);
-                    if (blendState == null)
-                        blendState = new BlendState();
-                    blendState.ColorDestinationBlend = blend;
-                    blendState.AlphaDestinationBlend = ToAlphaBlend(blend);
-                    break;
-                case "blendop":
-                    if (blendState == null)
-                        blendState = new BlendState();
-                    blendState.AlphaBlendFunction = ParseTreeTools.ParseBlendFunction(value);
-                    break;
-                case "zenable":
-                    if (depthStencilState == null)
-                        depthStencilState = new DepthStencilState();
-                    depthStencilState.DepthBufferEnable = ParseTreeTools.ParseBool(value);
-                    break;
-                case "zwriteenable":
-                    if (depthStencilState == null)
-                        depthStencilState = new DepthStencilState();
-                    depthStencilState.DepthBufferWriteEnable = ParseTreeTools.ParseBool(value);
-                    break;
-                case "depthbias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.DepthBias = float.Parse(value);
-                    break;
-                case "cullmode":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.CullMode = ParseTreeTools.ParseCullMode(value);
-                    break;
-                case "fillmode":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.FillMode = ParseTreeTools.ParseFillMode(value);
-                    break;
-                case "multisampleantialias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.MultiSampleAntiAlias = ParseTreeTools.ParseBool(value);
-                    break;
-                case "slopescaledepthbias":
-                    if (rasterizerState == null)
-                        rasterizerState = new RasterizerState();
-                    rasterizerState.SlopeScaleDepthBias = float.Parse(value);
-                    break;
-            }            
+                    blendState.ColorSourceBlend = Blend.One;
+                    blendState.AlphaSourceBlend = Blend.One;
+                    blendState.ColorDestinationBlend = Blend.Zero;
+                    blendState.AlphaDestinationBlend = Blend.Zero;
+                }
+            }
+        }
+
+        public FillMode FillMode
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.FillMode = value;             
+            }
+        }
+
+        public CullMode CullMode
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.CullMode = value;
+            }
+        }
+
+        public bool ZEnable
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.DepthBufferEnable = value;
+            }
+        }
+
+        public bool ZWriteEnable
+        {
+            set
+            {
+                if (depthStencilState == null)
+                    depthStencilState = new DepthStencilState();
+                depthStencilState.DepthBufferWriteEnable = value;
+            }
+        }
+
+        public bool MultiSampleAntiAlias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.MultiSampleAntiAlias = value;
+            }
+        }
+
+        public Blend SrcBlend
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorSourceBlend = value;
+                blendState.AlphaSourceBlend = ToAlphaBlend(value);
+            }
+        }
+
+        public Blend DestBlend
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorDestinationBlend = value;
+                blendState.AlphaDestinationBlend = ToAlphaBlend(value);
+            }
+        }
+
+        public BlendFunction BlendOp
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.AlphaBlendFunction = value;
+            }
+        }
+
+        public ColorWriteChannels ColorWriteEnable
+        {
+            set
+            {
+                if (blendState == null)
+                    blendState = new BlendState();
+                blendState.ColorWriteChannels = value;
+            }    
+        }
+
+        public float DepthBias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.DepthBias = value;
+            }
+        }
+
+        public float SlopeScaleDepthBias
+        {
+            set
+            {
+                if (rasterizerState == null)
+                    rasterizerState = new RasterizerState();
+                rasterizerState.SlopeScaleDepthBias = value;
+            }
         }
     }
 }

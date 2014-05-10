@@ -44,7 +44,7 @@ namespace Microsoft.Xna.Framework.Media
 
             MovieView = new MPMoviePlayerViewController(url);
             MovieView.MoviePlayer.ScalingMode = MPMovieScalingMode.AspectFill;
-            MovieView.MoviePlayer.MovieControlMode = MPMovieControlMode.Hidden;
+            MovieView.MoviePlayer.ControlStyle = MPMovieControlStyle.None;
             MovieView.MoviePlayer.PrepareToPlay();
         }
 

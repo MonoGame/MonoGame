@@ -20,12 +20,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
   public partial class SamplerState
   {
-        private static float MaxTextureMaxAnisotropy = 4;
+        private static float MaxTextureMaxAnisotropy = GraphicsCapabilities.MaxTextureAnisotropy;
 #if GLES
-        private const GetPName GetPNameMaxTextureMaxAnisotropy = (GetPName)All.MaxTextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
 #else
-        private const GetPName GetPNameMaxTextureMaxAnisotropy = (GetPName)ExtTextureFilterAnisotropic.MaxTextureMaxAnisotropyExt;
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
 #endif
 
@@ -157,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
       case TextureAddressMode.Wrap:
         return (int)TextureWrapMode.Repeat;
       case TextureAddressMode.Mirror:
-        return (int)TextureWrapMode.MirroredRepeat;
+        return (int)All.MirroredRepeat;
       default:
         throw new ArgumentException("No support for " + textureAddressMode);
       }

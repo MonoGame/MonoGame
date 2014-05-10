@@ -181,6 +181,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
+		/// <param name="charRegions">The characters to include. Defaults to the base ASCII set.</param>
 		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning, List<CharacterRegion> charRegions)
 		{
 			// Write to the properties so the validation is run

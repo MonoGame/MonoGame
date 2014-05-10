@@ -158,16 +158,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
-                if (_buffer != null)
-                {
-                    _buffer.Dispose();
-                    _buffer = null;
-                }
-            }
+                SharpDX.Utilities.Dispose(ref _buffer);
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+#elif ANGLE // Review for iOS and Android, and change to GLES
+using OpenTK.Graphics.ES30;
 #endif
 #endif
 
@@ -15,7 +17,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	public class OcclusionQuery : GraphicsResource
 	{
 #if OPENGL
-		private uint glQueryId;
+		private int glQueryId;
 #endif
 
 		public OcclusionQuery (GraphicsDevice graphicsDevice)
@@ -31,7 +33,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void Begin ()
 		{
 #if OPENGL
+#if GLES 
+			GL.BeginQuery (QueryTarget.AnySamplesPassed, glQueryId);
+#else
 			GL.BeginQuery (QueryTarget.SamplesPassed, glQueryId);
+#endif
             GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 #endif
@@ -41,7 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public void End ()
 		{
 #if OPENGL
+#if GLES 
+			GL.EndQuery (QueryTarget.AnySamplesPassed);
+#else
 			GL.EndQuery (QueryTarget.SamplesPassed);
+#endif
             GraphicsExtensions.CheckGLError();
 #elif DIRECTX
 #endif
@@ -66,32 +76,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public bool IsComplete {
 			get {
-				int[] resultReady = {0};
+				int resultReady = 0;
 #if MONOMAC               
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResultAvailable,
-				                 resultReady);
+				                 out resultReady);
 #elif OPENGL
-                GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, resultReady);
+                GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out resultReady);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX                
+#elif DIRECTX               
 #endif
-				return resultReady[0] != 0;
+				return resultReady != 0;
 			}
 		}
 		public int PixelCount {
 			get {
-				int[] result = {0};
+				int result = 0;
 #if MONOMAC
 				GetQueryObjectiv(glQueryId,
 				                 (int)GetQueryObjectParam.QueryResult,
-				                 result);
+				                 out result);
 #elif OPENGL
-                GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, result);
+                GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out result);
                 GraphicsExtensions.CheckGLError();
-#elif DIRECTX             
+#elif DIRECTX               
 #endif
-                return result[0];
+                return result;
 			}
         }
 
@@ -101,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		[System.Security.SuppressUnmanagedCodeSecurity()]
 		[DllImport(OpenGLLibrary, EntryPoint = "glGetQueryObjectiv", ExactSpelling = true)]
-		extern static unsafe void GetQueryObjectiv(UInt32 id, int pname, [OutAttribute] Int32[] @params);
+		extern static unsafe void GetQueryObjectiv(int id, int pname, out int @params);
 #endif
     }
 }

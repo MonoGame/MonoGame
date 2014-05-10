@@ -58,7 +58,7 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    public class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow
     {
         internal WinFormsGameForm _form;
 
@@ -173,6 +173,7 @@ namespace MonoGame.Framework
             var assembly = Assembly.GetEntryAssembly();
             if (assembly != null)
                 _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             _form.MaximizeBox = false;
             _form.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -359,7 +360,6 @@ namespace MonoGame.Framework
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [CLSCompliant(false)]
         public struct NativeMessage
         {
             public IntPtr handle;

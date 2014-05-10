@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
             public VertexElementUsage usage;
             public int index;
             public string name;
-            public short format;
             public int location;
         }
 
@@ -52,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _attributes[a].name = reader.ReadString();
                 _attributes[a].usage = (VertexElementUsage)reader.ReadByte();
                 _attributes[a].index = reader.ReadByte();
-                _attributes[a].format = reader.ReadInt16();
+                reader.ReadInt16(); //format, unused
             }
         }
 
@@ -75,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
 
             var compiled = 0;
-#if GLES
+#if GLES && !ANGLE
 			GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, ref compiled);
 #else
             GL.GetShader(_shaderHandle, ShaderParameter.CompileStatus, out compiled);
@@ -83,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             if (compiled == (int)All.False)
             {
-#if GLES
+#if GLES && !ANGLE
                 string log = "";
                 int length = 0;
 				GL.GetShader(_shaderHandle, ShaderParameter.InfoLogLength, ref length);
@@ -160,20 +159,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformDispose()
+        protected override void Dispose(bool disposing)
         {
-            GraphicsDevice.AddDisposeAction(() =>
+            if (!IsDisposed)
             {
-                if (_shaderHandle != -1)
+                GraphicsDevice.AddDisposeAction(() =>
                 {
-                    if (GL.IsShader(_shaderHandle))
+                    if (_shaderHandle != -1)
                     {
-                        GL.DeleteShader(_shaderHandle);
-                        GraphicsExtensions.CheckGLError();
+                        if (GL.IsShader(_shaderHandle))
+                        {
+                            GL.DeleteShader(_shaderHandle);
+                            GraphicsExtensions.CheckGLError();
+                        }
+                        _shaderHandle = -1;
                     }
-                    _shaderHandle = -1;
-                }
-            });
+                });
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

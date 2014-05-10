@@ -22,18 +22,6 @@ namespace Microsoft.Xna.Framework.Graphics
   {
         static SamplerState () 
         {
-#if OPENGL
-#if GLES
-			if (GraphicsCapabilities.SupportsTextureFilterAnisotropic)
-            {
-                GL.GetFloat(GetPNameMaxTextureMaxAnisotropy, ref SamplerState.MaxTextureMaxAnisotropy);
-            }
-#else
-            GL.GetFloat(GetPNameMaxTextureMaxAnisotropy, out SamplerState.MaxTextureMaxAnisotropy);
-#endif
-            GraphicsExtensions.CheckGLError();
-#endif
-	
 			_anisotropicClamp = new Utilities.ObjectFactoryWithReset<SamplerState>(() => new SamplerState
             {
                 Name = "SamplerState.AnisotropicClamp",
