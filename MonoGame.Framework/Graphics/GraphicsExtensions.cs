@@ -660,6 +660,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     
 
 #if IOS || ANDROID
+            case SurfaceFormat.RgbEtc1:
+                glInternalFormat = (PixelInternalFormat)0x8D64; // GL_ETC1_RGB8_OES
+                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                break;
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
