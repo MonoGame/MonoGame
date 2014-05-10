@@ -118,14 +118,25 @@ namespace MonoGame.Tools.Pipeline
             Description = "Build the content source file using the previously set switches and options.")]
         public void OnBuild(string sourceFile)
         {
+            AddContent(sourceFile, false);
+        }
+
+        public bool AddContent(string sourceFile, bool skipDuplicates)
+        {
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + "\\";
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
-            // Remove duplicates... keep this new one.
+            // Do we have a duplicate?
             var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
+            {
+                if (skipDuplicates)
+                    return false;
+
+                // Replace the duplicate.
                 _project.ContentItems.RemoveAt(previous);
+            }
 
             // Create the item for processing later.
             var item = new ContentItem
@@ -144,6 +155,8 @@ namespace MonoGame.Tools.Pipeline
             // the build process later.
             foreach (var pair in _processorParams)
                 item.ProcessorParams.Add(pair.Key, pair.Value);
+
+            return true;
         }
 
         [CommandLineParameter(
