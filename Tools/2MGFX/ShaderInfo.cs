@@ -42,6 +42,7 @@ namespace TwoMGFX
             }
             else if (options.Profile == ShaderProfile.PlayStation4)
             {
+                throw new NotSupportedException("PlayStation 4 support isn't available in this build.");
             }
 
 			// If we're building shaders for debug set that flag too.
