@@ -52,10 +52,10 @@ namespace Microsoft.Xna.Framework
     /// Example usage in Game.Initialise():
     /// 
     /// #if ANDROID
-    ///    this.Window.SetResumer(new ResumeManager(this.Services, 
-    ///                                             spriteBatch, 
-    ///                                             "UI/ResumingTexture",
-    ///                                             1.0f, 0.01f));
+    ///    (this.Window as AndroidGameWindow).SetResumer(new ResumeManager(this.Services, 
+    ///													spriteBatch, 
+    ///													"UI/ResumingTexture",
+    ///													1.0f, 0.01f));
     /// #endif                                         
     /// </summary>
     public class ResumeManager : IResumeManager
@@ -89,6 +89,10 @@ namespace Microsoft.Xna.Framework
             resumeTexture = content.Load<Texture2D>(resumeTextureName);
         }
 
+		public virtual void OnProgress(float progress)
+		{
+		}
+
         public virtual void Draw()
         {
             rotation += rotateSpeed;
@@ -97,6 +101,7 @@ namespace Microsoft.Xna.Framework
             int sh = device.PresentationParameters.BackBufferHeight;
             int tw = resumeTexture.Width;
             int th = resumeTexture.Height;
+
 
             // Draw the resume texture in the middle of the screen and make it spin
             spriteBatch.Begin();

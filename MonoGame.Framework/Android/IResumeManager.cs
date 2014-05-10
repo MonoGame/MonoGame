@@ -59,5 +59,13 @@ namespace Microsoft.Xna.Framework
         /// Called whilst the game is resuming. Draw something to the screen here.
         /// </summary>
         void Draw();
+
+        /// <summary>
+        /// Called everytime the progress amount is changed.
+        /// </summary>
+		/// <param name='progress'>
+		/// Loading progress amount, from 0 to 1
+		/// </param>
+        void OnProgress(float progress);
     }
 }
