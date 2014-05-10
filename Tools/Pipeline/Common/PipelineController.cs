@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -64,7 +65,10 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
             ProjectDiry = true;
             _view.UpdateProperties(contentItem);
+
+            _view.BeginTreeUpdate();
             _view.UpdateTreeItem(contentItem);
+            _view.EndTreeUpdate();
         }
 
         public void NewProject()
@@ -326,6 +330,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateTree()
         {
+            _view.BeginTreeUpdate();
+
             if (_project == null || string.IsNullOrEmpty(_project.FilePath))
                 _view.SetTreeRoot(null);
             else
@@ -335,6 +341,8 @@ namespace MonoGame.Tools.Pipeline
                 foreach (var item in _project.ContentItems)
                     _view.AddTreeItem(item);
             }
+
+            _view.EndTreeUpdate();
         }
 
         public bool Exit()
@@ -353,26 +361,36 @@ namespace MonoGame.Tools.Pipeline
 
         public void Include(string initialDirectory)
         {                        
-            string file;
-            if (_view.ChooseContentFile(initialDirectory, out file))
+            List<string> files;
+            if (!_view.ChooseContentFile(initialDirectory, out files))
+                return;
+
+            var parser = new PipelineProjectParser(this, _project);
+            _view.BeginTreeUpdate();
+
+            foreach (var file in files)
             {
-                var parser = new PipelineProjectParser(this, _project);
-                parser.OnBuild(file);
+                if (!parser.AddContent(file, true))
+                    return;
 
                 var item = _project.ContentItems.Last();
                 item.Controller = this;
                 item.ResolveTypes();
                 _view.AddTreeItem(item);
                 _view.SelectTreeItem(item);
+            }
 
-                ProjectDiry = true;
-            }                      
+            _view.EndTreeUpdate();
+            ProjectDiry = true;                  
         }
 
         public void Exclude(ContentItem item)
         {
             _project.ContentItems.Remove(item);
+
+            _view.BeginTreeUpdate();
             _view.RemoveTreeItem(item);
+            _view.EndTreeUpdate();
 
             ProjectDiry = true;
         }            
