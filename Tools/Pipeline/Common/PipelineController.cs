@@ -371,7 +371,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var file in files)
             {
                 if (!parser.AddContent(file, true))
-                    return;
+                    continue;
 
                 var item = _project.ContentItems.Last();
                 item.Controller = this;
