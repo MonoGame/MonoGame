@@ -1,13 +1,21 @@
 ﻿namespace MonoGame.Web
 {
     using JSIL.Meta;
+    using Microsoft.Xna.Framework;
 
     [JSStubOnly]
     public class JSAPI
     {
-        public string Test()
+        public void GamePlatformStartRunLoop(IHasCallback game)
         {
-            return null;
+        }
+
+        public void GraphicsDevicePlatformSetup()
+        {
+        }
+
+        public void GraphicsDevicePlatformClear()
+        {
         }
     }
 }

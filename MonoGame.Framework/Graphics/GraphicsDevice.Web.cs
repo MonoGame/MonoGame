@@ -12,76 +12,68 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    using MonoGame.Web;
+
     public partial class GraphicsDevice
     {
         private void PlatformSetup()
         {
-            throw new NotImplementedException();
+            JSAPIAccess.Instance.GraphicsDevicePlatformSetup();
         }
 
         private void PlatformInitialize()
         {
-            throw new NotImplementedException();
         }
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
-            throw new NotImplementedException();
+            // TODO: This is just a test at the moment.
+            JSAPIAccess.Instance.GraphicsDevicePlatformClear();
         }
 
         private void PlatformDispose()
         {
-            throw new NotImplementedException();
         }
 
         public void PlatformPresent()
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformSetViewport(ref Viewport value)
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            throw new NotImplementedException();
         }
 
         private IRenderTarget PlatformApplyRenderTargets()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         internal void PlatformApplyState(bool applyShaders)
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
-            throw new NotImplementedException();
         }
 
         private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
-            throw new NotImplementedException();
         }
 
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
