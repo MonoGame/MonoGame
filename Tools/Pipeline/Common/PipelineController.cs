@@ -16,7 +16,8 @@ namespace MonoGame.Tools.Pipeline
         private readonly IView _view;
         private PipelineProject _project;
 
-        private Task _buildProcess;
+        private Task _buildTask;
+        private Process _buildProcess;
 
         public PipelineController(IView view, PipelineProject project)
         {
@@ -35,7 +36,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                return _buildProcess != null && !_buildProcess.IsCompleted;
+                return _buildTask != null && !_buildTask.IsCompleted;
             }
         }
 
@@ -78,7 +79,11 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            ProjectDiry = false;
+           // Ask user to choose a location on disk for the new project.
+            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
+            var projectFilePath = Environment.CurrentDirectory;
+            if (!_view.AskSaveName(ref projectFilePath, "New Project"))
+                return;
 
             if (OnProjectLoading != null)
                 OnProjectLoading();
@@ -87,22 +92,9 @@ namespace MonoGame.Tools.Pipeline
             _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
-            // Ask user to choose a location on disk for the new project.
-            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
-            var projectFilePath = Environment.CurrentDirectory;
-            if (!_view.AskSaveName(ref projectFilePath))
-            {
-                // User canceled the save operation, so we cannot create the new project, unload it.
-                _project = null;
-                PipelineTypes.Unload();                
-                ProjectOpen = false;                
-            }
-            else
-            {
-                // User saved the new project.
-                _project.FilePath = projectFilePath;
-                ProjectOpen = true;
-            }            
+            // Save the new project.
+            _project.FilePath = projectFilePath;
+            ProjectOpen = true;
             
             UpdateTree();
 
@@ -211,7 +203,7 @@ namespace MonoGame.Tools.Pipeline
             if (saveAs || string.IsNullOrEmpty(_project.FilePath))
             {
                 string newFilePath = _project.FilePath;
-                if (!_view.AskSaveName(ref newFilePath))
+                if (!_view.AskSaveName(ref newFilePath, null))
                     return false;
 
                 _project.FilePath = newFilePath;
@@ -232,7 +224,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            Debug.Assert(_buildProcess == null || _buildProcess.IsCompleted, "The previous build wasn't completed!");
+            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
             // Make sure we save first!
             if (!AskSaveProject())
@@ -244,14 +236,14 @@ namespace MonoGame.Tools.Pipeline
             _view.OutputClear();
 
             var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
-            _buildProcess = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
-                _buildProcess.ContinueWith((e) => OnBuildFinished());
+                _buildTask.ContinueWith((e) => OnBuildFinished());
         }
 
         public void Clean()
         {
-            Debug.Assert(_buildProcess == null || _buildProcess.IsCompleted, "The previous build wasn't completed!");
+            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
             // Make sure we save first!
             if (!AskSaveProject())
@@ -263,41 +255,58 @@ namespace MonoGame.Tools.Pipeline
             _view.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            _buildProcess = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
-                _buildProcess.ContinueWith((e) => OnBuildFinished());          
+                _buildTask.ContinueWith((e) => OnBuildFinished());          
         }
 
         private void DoBuild(string commands)
         {
-            var process = new Process();
-            process.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
-            process.StartInfo.FileName = "MGCB.exe";
-            process.StartInfo.Arguments = commands;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
-            process.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+            _buildProcess = new Process();
+            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
+            _buildProcess.StartInfo.FileName = "MGCB.exe";
+            _buildProcess.StartInfo.Arguments = commands;
+            _buildProcess.StartInfo.CreateNoWindow = true;
+            _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            _buildProcess.StartInfo.UseShellExecute = false;
+            _buildProcess.StartInfo.RedirectStandardError = true;
+            _buildProcess.StartInfo.RedirectStandardOutput = true;
+            _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
 
             //string stdError = null;
             try
             {
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                process.WaitForExit();
+                _buildProcess.Start();
+                _buildProcess.BeginOutputReadLine();
+                _buildProcess.BeginErrorReadLine();
+                _buildProcess.WaitForExit();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: What if we fail here?
+                _view.OutputAppend("Build process failed!" + Environment.NewLine);
+                _view.OutputAppend(ex.Message);
+                _view.OutputAppend(ex.StackTrace);
             }
 
-            if (process.ExitCode != 0)
+            // Clear the process pointer, so that cancel
+            // can run after we've already finished.
+            lock (_buildTask)
+                _buildProcess = null;
+        }
+
+        public void CancelBuild()
+        {
+            if (_buildTask == null || _buildTask.IsCompleted)
+                return;
+
+            lock (_buildTask)
             {
-                // TODO: Build failed!
+                if (_buildProcess == null)
+                    return;
+
+                _buildProcess.Kill();
+                _view.OutputAppend("Build terminated!" + Environment.NewLine);
             }
         }
 
@@ -371,7 +380,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var file in files)
             {
                 if (!parser.AddContent(file, true))
-                    return;
+                    continue;
 
                 var item = _project.ContentItems.Last();
                 item.Controller = this;
