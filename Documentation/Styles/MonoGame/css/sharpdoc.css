@@ -105,8 +105,7 @@
     position: absolute;
 	padding-left:1em;
 	width:330px;
-    height: 100%;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .sharpdoc #pane_resizer {

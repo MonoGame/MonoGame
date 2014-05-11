@@ -37,10 +37,28 @@
             Model.WriteTo(indexTopic, @Helpers.PageIndexBody.Dump());
 	    
 		<script>
-		function resizeIframe(newHeight)
+		function resizeDocs()
 		{
-		    newHeight = Math.max( newHeight + 150, window.innerHeight + 200);
-		    document.getElementById('the_docs').style.height = newHeight + 'px';
+			var docFrame = document.getElementById('the_docs');
+			var tocDoc = docFrame.contentDocument || docFrame.contentWindow.document;
+			var contentFrame = tocDoc.getElementById('mainFrame');
+			var contentDoc = contentFrame.contentDocument || contentFrame.contentWindow.document;
+
+			var tocElem = tocDoc.getElementById('toc_content');
+			var tocSize =	tocElem.scrollHeight ||
+					tocElem.offsetHeight ||
+					tocElem.clientHeight ||
+					0;
+
+			var contentSize =	contentDoc.body.scrollHeight || 
+						contentDoc.documentElement.offsetHeight || 
+						contentDoc.offsetHeight ||
+						contentDoc.documentElement.clientHeight || 
+						contentDoc.documentElement.scrollHeight ||										
+						0;
+								
+			var pageHeight = Math.max(contentSize, tocSize, 720);
+			docFrame.style.height = pageHeight + 'px';
 		}
 		</script>
 

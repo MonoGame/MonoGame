@@ -33,7 +33,7 @@
     <head>
     @Helpers.PageHead.Dump(title)
     </head>
-	<body onload="window.top.resizeIframe(document.body.scrollHeight)">
+	<body onload="window.top.resizeDocs();window.top.scrollTo(0,0);">
     @Helpers.PageBody.Dump(bodyTemplateName)
 	</body>
 </html>                                                                                
