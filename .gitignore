@@ -84,3 +84,13 @@ MonoGame.Framework.Content.Pipeline.MacOS.csproj
 MonoGame.Framework.Web.csproj
 MonoGame.Framework.Web.sln
 /ThirdParty/*.sln
+/MonoGame.Framework/MonoGame.Framework.Net.Android.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.Angle.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.iOS.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.Linux.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.Ouya.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.PSMobile.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.Windows.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.Windows8.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.WindowsGL.csproj
+/MonoGame.Framework/MonoGame.Framework.Net.WindowsPhone.csproj
