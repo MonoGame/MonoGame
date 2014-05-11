@@ -55,27 +55,69 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     
     <!-- Microsoft.Xna.Framework.GamerServices -->
-    <Compile Include="GamerServices\AchievementCollection.cs"/>
-    <Compile Include="GamerServices\Achievement.cs"/>
-    <Compile Include="GamerServices\FriendCollection.cs"/>
-    <Compile Include="GamerServices\FriendGamer.cs"/>
-    <Compile Include="GamerServices\GamerCollection.cs"/>
-    <Compile Include="GamerServices\Gamer.cs"/>
-    <Compile Include="GamerServices\GamerDefaults.cs"/>
-    <Compile Include="GamerServices\GamerPresence.cs"/>
-    <Compile Include="GamerServices\GamerPresenceMode.cs"/>
-    <Compile Include="GamerServices\GamerPrivileges.cs"/>
-    <Compile Include="GamerServices\GamerPrivilegeSetting.cs"/>
-    <Compile Include="GamerServices\GamerProfile.cs"/>
-    <Compile Include="GamerServices\GamerZone.cs"/>
-    <Compile Include="GamerServices\LeaderboardEntry.cs"/>
-    <Compile Include="GamerServices\LeaderboardIdentity.cs"/>
-    <Compile Include="GamerServices\LeaderboardKey.cs"/>
-    <Compile Include="GamerServices\LeaderboardReader.cs"/>
-    <Compile Include="GamerServices\LeaderboardWriter.cs"/>
-    <Compile Include="GamerServices\MessageBoxIcon.cs" />
-    <Compile Include="GamerServices\PropertyDictionary.cs"/>
-    <Compile Include="GamerServices\SignedInGamerCollection.cs"/>
+    <Compile Include="GamerServices\AchievementCollection.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\Achievement.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\FriendCollection.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\FriendGamer.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerCollection.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\Gamer.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerDefaults.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPresence.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPresenceMode.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivileges.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerProfile.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\GamerZone.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardEntry.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardIdentity.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardKey.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardReader.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\LeaderboardWriter.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\MessageBoxIcon.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\PropertyDictionary.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="GamerServices\SignedInGamerCollection.cs">
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+    </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
       <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
