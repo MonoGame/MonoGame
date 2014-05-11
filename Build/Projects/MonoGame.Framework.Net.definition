@@ -56,67 +56,67 @@
     
     <!-- Microsoft.Xna.Framework.GamerServices -->
     <Compile Include="GamerServices\AchievementCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\Achievement.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\FriendCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\FriendGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\Gamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerDefaults.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerPresence.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerPresenceMode.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerPrivileges.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerProfile.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GamerZone.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\LeaderboardEntry.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\LeaderboardIdentity.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\LeaderboardKey.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\LeaderboardReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\LeaderboardWriter.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\MessageBoxIcon.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\PropertyDictionary.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\SignedInGamerCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <ExcludePlatforms>Web</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
       <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
@@ -125,101 +125,101 @@
       <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
  
 
  
     <!-- Microsoft.Xna.Framework.Net -->
     <Compile Include="Net\AvailableNetworkSessionCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\AvailableNetworkSession.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEvent.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEventType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerJoined.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerLeft.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerStateChange.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandReceiveData.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSendData.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSessionStateChange.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\GamerStates.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\ICommand.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\LocalNetworkGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\MonoGamerPeer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMachine.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMessageType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkNotAvailableException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSession.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionEndReason.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinError.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionState.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketWriter.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\QualityOfService.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\SendDataOptions.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
 
     <!-- Android/OUYA Platform -->
