@@ -478,6 +478,11 @@ namespace MonoGame.Tools.Pipeline
             _controller.Clean();
         }
 
+        private void CancelBuildMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.CancelBuild();
+        }
+
         private void ImportMenuItem_Click(object sender, EventArgs e)
         {
             _controller.ImportProject();
@@ -531,6 +536,9 @@ namespace MonoGame.Tools.Pipeline
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
             _rebuilMenuItem.Enabled = projectOpenAndNotBuilding;
+            _cancelBuildSeparator.Visible = !notBuilding;
+            _cancelBuildMenuItem.Enabled = !notBuilding;
+            _cancelBuildMenuItem.Visible = !notBuilding;
         }
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)

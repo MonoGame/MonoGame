@@ -74,6 +74,8 @@ namespace MonoGame.Tools.Pipeline
 
         void Clean();
 
+        void CancelBuild();
+
         bool Exit();
 
         void Include(string initialDirectory);
