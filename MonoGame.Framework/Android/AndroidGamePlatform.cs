@@ -39,7 +39,8 @@ namespace Microsoft.Xna.Framework
 					AndroidGameActivity.Paused -= Activity_Paused;
 					AndroidGameActivity.Resumed -= Activity_Resumed;
 					Game.DoExiting();
-                    Net.NetworkSession.Exit();
+                    //(SJ) Why is this called here when it's not in any other project
+                    //Net.NetworkSession.Exit();
                	    Game.Activity.Finish();
 				    _gameWindow.GameView.Close();
 				}
