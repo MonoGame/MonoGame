@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
 
   <ProjectGuids>
 	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
@@ -14,6 +14,7 @@
 	<Platform Name="WindowsGL">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
 	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
   </ProjectGuids>
+
 
   <!-- Common assembly references -->
   <References>
@@ -55,69 +56,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     
     <!-- Microsoft.Xna.Framework.GamerServices -->
-    <Compile Include="GamerServices\AchievementCollection.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\Achievement.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\FriendCollection.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\FriendGamer.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerCollection.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\Gamer.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerDefaults.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerPresence.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerPresenceMode.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerPrivileges.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerProfile.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\GamerZone.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardEntry.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardIdentity.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardKey.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardReader.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardWriter.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\MessageBoxIcon.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\PropertyDictionary.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
-    <Compile Include="GamerServices\SignedInGamerCollection.cs">
-      <ExcludePlatforms>Web</ExcludePlatforms> 
-    </Compile>
+    <Compile Include="GamerServices\AchievementCollection.cs"/>
+    <Compile Include="GamerServices\Achievement.cs"/>
+    <Compile Include="GamerServices\FriendCollection.cs"/>
+    <Compile Include="GamerServices\FriendGamer.cs"/>
+    <Compile Include="GamerServices\GamerCollection.cs"/>
+    <Compile Include="GamerServices\Gamer.cs"/>
+    <Compile Include="GamerServices\GamerDefaults.cs"/>
+    <Compile Include="GamerServices\GamerPresence.cs"/>
+    <Compile Include="GamerServices\GamerPresenceMode.cs"/>
+    <Compile Include="GamerServices\GamerPrivileges.cs"/>
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs"/>
+    <Compile Include="GamerServices\GamerProfile.cs"/>
+    <Compile Include="GamerServices\GamerZone.cs"/>
+    <Compile Include="GamerServices\LeaderboardEntry.cs"/>
+    <Compile Include="GamerServices\LeaderboardIdentity.cs"/>
+    <Compile Include="GamerServices\LeaderboardKey.cs"/>
+    <Compile Include="GamerServices\LeaderboardReader.cs"/>
+    <Compile Include="GamerServices\LeaderboardWriter.cs"/>
+    <Compile Include="GamerServices\MessageBoxIcon.cs" />
+    <Compile Include="GamerServices\PropertyDictionary.cs"/>
+    <Compile Include="GamerServices\SignedInGamerCollection.cs"/>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
       <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
@@ -125,101 +84,101 @@
       <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
     </Compile>
  
 
  
     <!-- Microsoft.Xna.Framework.Net -->
     <Compile Include="Net\AvailableNetworkSessionCollection.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\AvailableNetworkSession.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEvent.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandEventType.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerJoined.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerLeft.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandGamerStateChange.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandReceiveData.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSendData.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\CommandSessionStateChange.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\GamerStates.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\ICommand.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\LocalNetworkGamer.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\MonoGamerPeer.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkException.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkGamer.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMachine.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkMessageType.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkNotAvailableException.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSession.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionEndReason.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinError.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionJoinException.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionProperties.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionState.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\NetworkSessionType.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketReader.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\PacketWriter.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\QualityOfService.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
     <Compile Include="Net\SendDataOptions.cs">
-      <ExcludePlatforms>Web,WindowsPhone,Windows8</ExcludePlatforms> 
+      <ExcludePlatforms>WindowsPhone,Windows8</ExcludePlatforms> 
     </Compile>
 
     <!-- Android/OUYA Platform -->
@@ -316,8 +275,8 @@
         <Generator>MSBuild:Compile</Generator>
         <SubType>Designer</SubType>
     </Page>
-	
-	
+
+
     <!-- Windows Desktop Platform -->
     <Compile Include="Windows\GamerServices\Guide.cs">
       <Platforms>Angle,Windows8,Windows,WindowsGL</Platforms>
@@ -328,7 +287,7 @@
     <Compile Include="Windows\GamerServices\SignedInGamer.cs">
       <Platforms>Angle,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
-	
+
  
   </Files>
 </Project>
