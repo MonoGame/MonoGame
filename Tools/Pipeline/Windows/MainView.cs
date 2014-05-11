@@ -507,9 +507,11 @@ namespace MonoGame.Tools.Pipeline
 
         private void UpdateMenus()
         {
-            // Update the state of all menu items.
             var notBuilding = !_controller.ProjectBuilding;
-            var projectOpenAndNotBuilding = _controller.ProjectOpen && notBuilding;
+            var projectOpen = _controller.ProjectOpen;
+            var projectOpenAndNotBuilding = projectOpen && notBuilding;
+
+            // Update the state of all menu items.
 
             _newMenuItem.Enabled = notBuilding;
             _openMenuItem.Enabled = notBuilding;
@@ -520,6 +522,10 @@ namespace MonoGame.Tools.Pipeline
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 
             _exitMenuItem.Enabled = notBuilding;
+
+            _newItemMenuItem.Enabled = projectOpen;
+            _addItemMenuItem.Enabled = projectOpen;
+            _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
@@ -546,6 +552,13 @@ namespace MonoGame.Tools.Pipeline
         private void AboutMenuItemClick(object sender, EventArgs e)
         {
             Process.Start("http://www.monogame.net/about/");
+        }
+
+        private void AddMenuItemClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            var item = node.Tag as IProjectItem;
+            _controller.Include(item.Location);
         }
     }
 }
