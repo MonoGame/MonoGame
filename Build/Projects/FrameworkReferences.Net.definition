@@ -24,6 +24,7 @@
 
   <Platform Type="MacOS">
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Project
       Name="Lidgren.Network.MacOS"
       Guid="5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130"
