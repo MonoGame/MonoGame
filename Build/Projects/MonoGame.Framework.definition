@@ -1315,6 +1315,9 @@
     <Compile Include="Libraries\JSAPI.cs">
       <Platforms>Web</Platforms>
     </Compile>
+    <Compile Include="Libraries\JSAPIAccess.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
     <Content Include="Libraries\MonoGame.Web.js">
       <Platforms>Web</Platforms>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
