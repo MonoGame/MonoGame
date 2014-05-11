@@ -78,7 +78,11 @@ namespace MonoGame.Tools.Pipeline
             if (!AskSaveProject())
                 return;
 
-            ProjectDiry = false;
+           // Ask user to choose a location on disk for the new project.
+            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
+            var projectFilePath = Environment.CurrentDirectory;
+            if (!_view.AskSaveName(ref projectFilePath, "New Project"))
+                return;
 
             if (OnProjectLoading != null)
                 OnProjectLoading();
@@ -87,22 +91,9 @@ namespace MonoGame.Tools.Pipeline
             _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
-            // Ask user to choose a location on disk for the new project.
-            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
-            var projectFilePath = Environment.CurrentDirectory;
-            if (!_view.AskSaveName(ref projectFilePath))
-            {
-                // User canceled the save operation, so we cannot create the new project, unload it.
-                _project = null;
-                PipelineTypes.Unload();                
-                ProjectOpen = false;                
-            }
-            else
-            {
-                // User saved the new project.
-                _project.FilePath = projectFilePath;
-                ProjectOpen = true;
-            }            
+            // Save the new project.
+            _project.FilePath = projectFilePath;
+            ProjectOpen = true;
             
             UpdateTree();
 
@@ -211,7 +202,7 @@ namespace MonoGame.Tools.Pipeline
             if (saveAs || string.IsNullOrEmpty(_project.FilePath))
             {
                 string newFilePath = _project.FilePath;
-                if (!_view.AskSaveName(ref newFilePath))
+                if (!_view.AskSaveName(ref newFilePath, null))
                     return false;
 
                 _project.FilePath = newFilePath;

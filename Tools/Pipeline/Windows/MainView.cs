@@ -160,10 +160,11 @@ namespace MonoGame.Tools.Pipeline
             return AskResult.Cancel;
         }
 
-        public bool AskSaveName(ref string filePath)
+        public bool AskSaveName(ref string filePath, string title)
         {
             var dialog = new SaveFileDialog
             {
+                Title = title,
                 RestoreDirectory = true,
                 InitialDirectory = Path.GetDirectoryName(filePath),
                 FileName = Path.GetFileName(filePath),
