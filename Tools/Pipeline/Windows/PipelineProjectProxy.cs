@@ -17,6 +17,9 @@ namespace MonoGame.Tools.Pipeline
     {
         private readonly PipelineProject _project;
 
+        [Category("Settings")]
+        [DisplayName("Output Folder")]
+        [Description("The folder where the final build content is placed.")]
         [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string OutputDir
         {
@@ -24,6 +27,9 @@ namespace MonoGame.Tools.Pipeline
             set { _project.OutputDir = value; }
         }
 
+        [Category("Settings")]
+        [DisplayName("Intermediate Folder")]
+        [Description("The folder where intermediate files are placed when building content.")]
         [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string IntermediateDir
         {
@@ -31,6 +37,7 @@ namespace MonoGame.Tools.Pipeline
             set { _project.IntermediateDir = value; }
         }
 
+        [Category("Settings")]
         [Editor(typeof (AssemblyReferenceListEditor), typeof (UITypeEditor))]
         public List<string> References
         {
@@ -38,26 +45,45 @@ namespace MonoGame.Tools.Pipeline
             set { _project.References = value; }
         }
 
+        [Category("Settings")]
+        [Description("The platform to target when building content.")]
         public TargetPlatform Platform
         {
             get { return _project.Platform; }
             set { _project.Platform = value; }
         }
 
+        [Category("Settings")]
+        [Description("The graphics profile to target when building content.")]
         public GraphicsProfile Profile
         {
             get { return _project.Profile; }
             set { _project.Profile = value; }
         }
 
+        [Category("Settings")]
+        [Description("The configuration to target when building content.")]
         public string Config 
         {
             get { return _project.Config; }
             set { _project.Config = value; }
         }
 
+        [Category("Statistics")]
+        [DisplayName("Total Items")]
+        [Description("The total amount of content items in the project.")]
+        public int TotalItems
+        {
+            get
+            {
+                return _project.ContentItems.Count;
+            }
+        }
+
         #region IPipelineItem
 
+        [Category("Common")]
+        [Description("The name of this project.")]
         public string Name
         {
             get
@@ -66,6 +92,8 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
+        [Category("Common")]
+        [Description("The folder where this project file is located.")]
         public string Location
         {
             get
