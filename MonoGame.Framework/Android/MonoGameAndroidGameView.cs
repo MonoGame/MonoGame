@@ -6,6 +6,7 @@ using System;
 using Android.Content;
 using Android.Media;
 using Android.Views;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -92,8 +93,8 @@ namespace Microsoft.Xna.Framework
 
 				// setup data for resumer progress notification
 				currentReloadAssetCount=0;
-				totalReloadAssetCount=Microsoft.Xna.Framework.Content.ContentManager.ComputeTotalAssets();
-				Microsoft.Xna.Framework.Content.ContentManager.AssetReloadedEvent+=OnAssetReloaded;
+				totalReloadAssetCount=ContentManager.ComputeTotalAssets();
+				ContentManager.AssetReloadedEvent+=OnAssetReloaded;
 
 
                 IsResuming = true;
@@ -108,7 +109,7 @@ namespace Microsoft.Xna.Framework
                     o =>
                     {
                         Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                        ContentManager.ReloadGraphicsContent();
                         Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                         // DeviceReset events
@@ -117,7 +118,7 @@ namespace Microsoft.Xna.Framework
 
 						if (_gameWindow.Resumer != null)
 						{
-							Microsoft.Xna.Framework.Content.ContentManager.AssetReloadedEvent-=OnAssetReloaded;
+							ContentManager.AssetReloadedEvent-=OnAssetReloaded;
 						}
 
                         IsResuming = false;
