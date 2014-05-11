@@ -116,6 +116,7 @@ namespace Microsoft.Xna.Framework
                         _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
                         _game.GraphicsDevice.OnDeviceReset();
 
+
 						if (_gameWindow.Resumer != null)
 						{
 							ContentManager.AssetReloadedEvent-=OnAssetReloaded;
@@ -129,7 +130,7 @@ namespace Microsoft.Xna.Framework
         }
 
 
-		void OnAssetReloaded (object sender,object test)
+		void OnAssetReloaded (object sender,bool endedLoading)
 		{
 			currentReloadAssetCount++;
 			if (_gameWindow.Resumer!=null)

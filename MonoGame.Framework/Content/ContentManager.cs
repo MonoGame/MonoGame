@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
-		internal static event EventHandler<object> AssetReloadedEvent;
+		internal static event EventHandler<bool> AssetReloadedEvent;
 
 	static List<char> targetPlatformIdentifiers = new List<char>()
         {
@@ -166,6 +166,8 @@ namespace Microsoft.Xna.Framework.Content
                         ContentManagers.RemoveAt(i);
                     }
                 }
+
+				if (AssetReloadedEvent!=null) AssetReloadedEvent (null,true);
             }
         }
 
@@ -598,7 +600,7 @@ namespace Microsoft.Xna.Framework.Content
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
                 genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
 
-				if (AssetReloadedEvent!=null) AssetReloadedEvent (this,null);
+				if (AssetReloadedEvent!=null) AssetReloadedEvent (this,false);
             }
         }
 
