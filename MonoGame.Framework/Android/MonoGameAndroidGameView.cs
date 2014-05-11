@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework
         }
 
 
-		void OnAssetReloaded (object sender,bool endedLoading)
+		void OnAssetReloaded (object sender,EventArgs args)
 		{
 			currentReloadAssetCount++;
 			if (_gameWindow.Resumer!=null)
