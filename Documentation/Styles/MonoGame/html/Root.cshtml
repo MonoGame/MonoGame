@@ -31,11 +31,13 @@
 					tocElem.clientHeight ||
 					0;
 
-			var contentSize =	contentDoc.body.scrollHeight || 
-						contentDoc.documentElement.offsetHeight || 
+			// The order here is very specifc to ensure it
+			// works on IE and Chrome with fallbacks.
+			var contentSize =	contentDoc.documentElement.offsetHeight || 
+						contentDoc.body.scrollHeight || 						
+						contentDoc.documentElement.scrollHeight ||										
 						contentDoc.offsetHeight ||
 						contentDoc.documentElement.clientHeight || 
-						contentDoc.documentElement.scrollHeight ||										
 						0;
 								
 			var pageHeight = Math.max(contentSize, tocSize, 720);
