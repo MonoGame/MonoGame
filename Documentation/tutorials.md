@@ -4,7 +4,7 @@ Links to various tutorials and articles to help you get started with MonoGame.
  - [Cross Platform Game Development with MonoGame](http://pluralsight.com/training/courses/TableOfContents?courseName=monogame)
 
 ### Microsoft
- Tara Walker's "Building a Shooter Game":
+Tara Walker's "Building a Shooter Game" tutorial series.
  - [Part 1: Overview, Installation, MonoGame 3.0 Project Creation](http://blogs.msdn.com/b/tarawalker/archive/2012/12/04/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-1-overview-installation-monogame-3-0-project-creation.aspx)
  - [Part 2: Creating the Shooter/Player Asset of the Game](http://blogs.msdn.com/b/tarawalker/archive/2012/12/10/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-2-creating-the-shooter-player-asset-of-the-game.aspx)
  - [Part 3: Updating Graphics using Content Pipeline with MonoGame](http://blogs.msdn.com/b/tarawalker/archive/2013/01/04/windows-8-game-development-using-c-xna-and-monogame-3-0-building-a-shooter-game-walkthrough-part-3-updating-graphics-using-content-pipeline-with-monogame.aspx)

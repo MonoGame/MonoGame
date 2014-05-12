@@ -1,0 +1,52 @@
+﻿@*
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+*@
+@model SharpDoc.TemplateContext
+@using SharpDoc.Model
+@Import("PageIndexBody")
+<html>
+    <head>
+        <title>@Param.Title</title>
+    </head>
+    <body>
+        @if (Model.RootTopic != null)
+        {
+            NTopic indexTopic = new NTopic {PageId = "index"};
+            Model.Topic = indexTopic;
+            Model.WriteTo(indexTopic, @Helpers.PageIndexBody.Dump());
+	    
+		<script>
+		function resizeDocs()
+		{
+			var docFrame = document.getElementById('the_docs');
+			var tocDoc = docFrame.contentDocument || docFrame.contentWindow.document;
+			var contentFrame = tocDoc.getElementById('mainFrame');
+			var contentDoc = contentFrame.contentDocument || contentFrame.contentWindow.document;
+
+			var tocElem = tocDoc.getElementById('toc_content');
+			var tocSize =	tocElem.scrollHeight ||
+					tocElem.offsetHeight ||
+					tocElem.clientHeight ||
+					0;
+
+			// The order here is very specifc to ensure it
+			// works on IE and Chrome with fallbacks.
+			var contentSize =	contentDoc.documentElement.offsetHeight || 
+						contentDoc.body.scrollHeight || 						
+						contentDoc.documentElement.scrollHeight ||										
+						contentDoc.offsetHeight ||
+						contentDoc.documentElement.clientHeight || 
+						0;
+								
+			var pageHeight = Math.max(contentSize, tocSize, 720);
+			docFrame.style.height = pageHeight + 'px';
+		}
+		</script>
+
+	    <iframe id="the_docs" src="html/@indexTopic.PageId@Param.FileExt" frameborder="0" scrolling="no" width="100%" height="100%"></iframe>
+        }
+
+    </body>
+</html>
