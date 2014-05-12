@@ -514,8 +514,8 @@
 
 .sharpdoc .content .section div.title
 {
-	margin-bottom:19px;
-	margin-top:9px;
+	margin-bottom:8px;
+	margin-top:22px;
 }
 
 .sharpdoc .content .section div.toggle_icon
@@ -669,16 +669,12 @@
 
 .sharpdoc div.hr
 {
-	padding-top:15px;
+	padding:0px;
 }
 
 .sharpdoc hr
 {
-	border-bottom:#E5E5E5 1px solid;
-	border-right:none;
-	border-top:none;
-	color:#e5e5e5;
-	margin-left:4px;
+	border:none;
 }
 
 .sharpdoc .warning.webNotFound .icon
