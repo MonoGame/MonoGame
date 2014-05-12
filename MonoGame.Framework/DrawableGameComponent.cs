@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DrawOrderChanged;
         public event EventHandler<EventArgs> VisibleChanged;
 
-        public DrawableGameComponent(Game game)
+        public DrawableGameComponent(IGame game)
             : base(game)
         {
         }

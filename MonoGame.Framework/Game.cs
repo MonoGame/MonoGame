@@ -80,7 +80,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    public class Game : IDisposable
+    public class Game : IGame
     {
         private const float DefaultTargetFramesPerSecond = 60.0f;
 

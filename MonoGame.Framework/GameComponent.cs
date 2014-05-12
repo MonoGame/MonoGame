@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
         bool _enabled = true;
         int _updateOrder;
 
-        public Game Game { get; private set; }
+        public IGame Game { get; private set; }
 
         public bool Enabled
         {
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> EnabledChanged;
         public event EventHandler<EventArgs> UpdateOrderChanged;
 
-        public GameComponent(Game game)
+        public GameComponent(IGame game)
         {
             this.Game = game;
         }
