@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				bitmapContent.SetPixelData(outputBitmap.GetData());
 				output.Texture.Faces.Add(new MipmapChain(bitmapContent));
 
-            	GraphicsUtil.CompressTexture(output.Texture, context, false, false);
+                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false);
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
