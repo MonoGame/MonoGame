@@ -54,6 +54,29 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Effect : GraphicsResource
     {
+        struct MGFXHeader 
+        {
+            /// <summary>
+            /// The MonoGame Effect file format header identifier.
+            /// </summary>
+            public static string MGFXSignature = "MGFX";
+
+            /// <summary>
+            /// The current MonoGame Effect file format versions
+            /// used to detect old packaged content.
+            /// </summary>
+            /// <remarks>
+            /// We should avoid supporting old versions for very long if at all 
+            /// as users should be rebuilding content when packaging their game.
+            /// </remarks>
+            public const int MGFXVersion = 6;
+
+            public string Signature;
+            public int Version;
+            public int Profile;
+            public int EffectKey;
+        }
+
         public EffectParameterCollection Parameters { get; private set; }
 
         public EffectTechniqueCollection Techniques { get; private set; }
@@ -102,31 +125,65 @@ namespace Microsoft.Xna.Framework.Graphics
 			// shared constant buffers as 'new' should return unique
 			// effects without any shared instance state.
             
-
-            // First look for it in the cache.
-            //
-            // TODO: We could generate a strong and unique signature
-            // offline during content processing and just read it from 
-            // the front of the effectCode instead of computing a fast
-            // hash here at runtime.
-            //
-            var effectKey = MonoGame.Utilities.Hash.ComputeHash(effectCode);
             Effect cloneSource;
-            if (!EffectCache.TryGetValue(effectKey, out cloneSource))
+
+            using (var stream = new MemoryStream(effectCode, false))
+            using (var reader = new BinaryReader(stream))
             {
-                // Create one.
-                cloneSource = new Effect(graphicsDevice);
-                using (var stream = new MemoryStream(effectCode))
-                using (var reader = new BinaryReader(stream))
+                //Read the header
+                MGFXHeader header = ReadHeader(reader);
+
+            	// First look for it in the cache.
+            	//
+            	if (!EffectCache.TryGetValue(header.EffectKey, out cloneSource))
+                {
+                    // Create one.
+                    cloneSource = new Effect(graphicsDevice);
                     cloneSource.ReadEffect(reader);
 
-                // Cache the effect for later in its original unmodified state.
-                EffectCache.Add(effectKey, cloneSource);
+                    // Cache the effect for later in its original unmodified state.
+                    EffectCache.Add(header.EffectKey, cloneSource);
+                }
             }
 
             // Clone it.
             _isClone = true;
             Clone(cloneSource);
+        }
+
+        private MGFXHeader ReadHeader(BinaryReader reader)
+        {
+            MGFXHeader header;
+            header.Signature = new string(reader.ReadChars(MGFXHeader.MGFXSignature.Length));
+            header.Version = (int)reader.ReadByte();
+            header.Profile = (int)reader.ReadByte();
+
+            if (header.Signature != MGFXHeader.MGFXSignature)
+                throw new Exception("The MGFX file is corrupt!");
+            if (header.Version != MGFXHeader.MGFXVersion)
+                throw new Exception("Wrong MGFX file version!");
+
+#if DIRECTX
+            if (header.Profile != 1)
+#else
+			if (header.Profile != 0)
+#endif
+                throw new Exception("The MGFX effect is the wrong profile for this platform!");
+            
+
+            //switch (header.Version)
+            //{
+            //    case 5:
+            //        header.EffectKey = MonoGame.Utilities.Hash.ComputeHash(reader.BaseStream);
+            //        break;
+            //    case 6:
+            //    default:
+            //        header.EffectKey = reader.ReadInt32();
+            //        break;
+            //} 
+            header.EffectKey = reader.ReadInt32();
+            
+            return header;
         }
 
         /// <summary>
@@ -234,41 +291,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <summary>
-        /// The MonoGame Effect file format header identifier.
-        /// </summary>
-        private const string MGFXHeader = "MGFX";
-
-        /// <summary>
-        /// The current MonoGame Effect file format versions
-        /// used to detect old packaged content.
-        /// </summary>
-        /// <remarks>
-        /// We should avoid supporting old versions for very long if at all 
-        /// as users should be rebuilding content when packaging their game.
-        /// </remarks>
-        private const int MGFXVersion = 5;
+        
 
 #if !PSM
 
 		private void ReadEffect (BinaryReader reader)
 		{
-			// Check the header to make sure the file and version is correct!
-			var header = new string (reader.ReadChars (MGFXHeader.Length));
-			var version = (int)reader.ReadByte ();
-			if (header != MGFXHeader)
-				throw new Exception ("The MGFX file is corrupt!");
-            if (version != MGFXVersion)
-                throw new Exception("Wrong MGFX file version!");
-
-			var profile = reader.ReadByte ();
-#if DIRECTX
-            if (profile != 1)
-#else
-			if (profile != 0)
-#endif
-				throw new Exception("The MGFX effect is the wrong profile for this platform!");
-
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
 
