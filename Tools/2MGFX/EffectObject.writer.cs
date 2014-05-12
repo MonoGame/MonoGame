@@ -25,9 +25,9 @@ namespace TwoMGFX
             writer.Write(profile);
 
             // Write the rest to a memory stream.
-            MemoryStream memStream = new MemoryStream();
-            BinaryWriter memWriter = new BinaryWriter(memStream);
-            
+            using(MemoryStream memStream = new MemoryStream())
+            using (BinaryWriter memWriter = new BinaryWriter(memStream))
+            {
             // Write all the constant buffers.
             memWriter.Write((byte)ConstantBuffers.Count);
             foreach (var cbuffer in ConstantBuffers)
@@ -131,7 +131,7 @@ namespace TwoMGFX
 
             //write content from memory stream to final stream.
             memStream.WriteTo(writer.BaseStream);
-
+            }
         }
 
         private static void WriteParameters(BinaryWriter writer, d3dx_parameter[] parameters, int count)
