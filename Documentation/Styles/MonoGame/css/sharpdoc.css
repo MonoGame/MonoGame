@@ -73,7 +73,7 @@
 
 .sdoc-subheading
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1em;
 	font-weight:bold;
 }
@@ -545,7 +545,7 @@
 
 .sharpdoc .content .section span.title
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1.53em;
 	font-weight:bold;
 	padding-left:6px;
@@ -556,7 +556,7 @@
 
 .sharpdoc .content  .sub_section.title
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1.05em;
 	font-weight:bold;
 	padding-left:6px;
@@ -567,7 +567,7 @@
 
 .sharpdoc .content  .code_section.title 
 {
-	color: #D32600;
+	color: #393939;
 	font-size: 0.995em;
 	font-weight: bold;
 	padding-left: 6px;
@@ -657,7 +657,7 @@
 }
 
 .sharpdoc h1.top-title, .sharpdoc h1.content-title {
-	color:#D32600;
+	color:#393939;
 	font-size:1.77em;
 	font-weight:bold;   
 }
@@ -799,10 +799,10 @@ h4.sdoc-subheading {
 
 html,body
 {
-    font-family: Helvetica, arial, freesans, clean, sans-serif;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 0.95em;
     line-height: 1.6;
-    color: #333;
+    color: #393939;
     background-color: #fff;
 	margin:0;
 }
@@ -847,13 +847,13 @@ h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, 
 
 h1 {
   font-size: 28px;
-  color: #000;
+  color: #393939;
 }
 
 h2 {
   font-size: 24px;
   border-bottom: 1px solid #ccc;
-  color: #000;
+  color: #393939;
 }
 
 h3 {
