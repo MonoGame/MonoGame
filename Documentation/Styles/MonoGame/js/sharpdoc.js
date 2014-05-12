@@ -234,7 +234,7 @@ function openToc(nodeId) {
 
     if (nodeClass.indexOf('opened') == -1) {
         var subNodes = $_(nodeId + "_SubTopics");
-        if (subNodes != undefined)
+        if (subNodes != undefined && subNodes.set != undefined)
             subNodes.set('class', 'visible');
 
         node.set('class', nodeClass.replace('closed', 'opened'));
@@ -257,7 +257,7 @@ function closeToc(nodeId) {
     // The highlighten topic could not be closed
     if (nodeClass.indexOf('highlighting') == -1) {
         var subNodes = $_(nodeId + "_SubTopics");
-        if (subNodes != undefined)
+        if (subNodes != undefined && subNodes.set != undefined)
             subNodes.set('class', 'hidden');
 
         node.set('class', nodeClass.replace('opened', 'closed'));
@@ -305,6 +305,9 @@ function $_(id) {
 function $$_(id) {
     var elements = $$(id);
     if (elements == undefined || elements.length == 0)
-        elements = window.parent.$$(id);
+    {
+        if (window.parent.$$ != undefined)
+            elements = window.parent.$$(id);
+    }
     return elements;
 }
