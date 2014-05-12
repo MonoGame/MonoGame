@@ -24,6 +24,7 @@ namespace TwoMGFX
             var profile = (byte)options.Profile;
             writer.Write(profile);
 
+            // Write the rest to a memory stream.
             MemoryStream memStream = new MemoryStream();
             BinaryWriter memWriter = new BinaryWriter(memStream);
             
@@ -123,7 +124,8 @@ namespace TwoMGFX
                 }
             }
             
-            // Write hash code
+            // Calculate a hash code from memory stream
+            // and write it to the header.
             var effectKey = MonoGame.Utilities.Hash.ComputeHash(memStream);
             writer.Write((Int32)memStream.Length);
 
