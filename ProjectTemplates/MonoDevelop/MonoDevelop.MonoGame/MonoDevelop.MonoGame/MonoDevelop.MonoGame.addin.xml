@@ -41,7 +41,6 @@
 		<Import file="templates/MonoGameApplication/Styles.xml" />
     <!-- Runtime assemblies -->
     <Import file="assemblies/WindowsGL/MonoGame.Framework.dll"/>    
-    <Import file="assemblies/WindowsGL/Lidgren.Network.dll"/>
 	</Runtime>
 	<Dependencies>
 		<Addin id="Core" version="3.0" />
@@ -85,10 +84,6 @@
         <Assembly file="assemblies/iOS/MonoGame.Framework.dll" />
         <Assembly file="assemblies/Android/MonoGame.Framework.dll" />
 
-        <Assembly file="assemblies/WindowsGL/Lidgren.Network.dll" />
-        <Assembly file="assemblies/Android/Lidgren.Network.dll" />
-        <Assembly file="assemblies/MacOS/Lidgren.Network.dll" />
-        <Assembly file="assemblies/iOS/Lidgren.Network.dll" />
         <Assembly file="assemblies/OpenTK.dll" />
         <Assembly file="assemblies/Tao.Sdl.dll" />
         <Assembly file="assemblies/sdl.dll" />
