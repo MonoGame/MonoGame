@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics;
 using Nvidia.TextureTools;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -155,10 +156,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha)
+        public static void CompressTexture(GraphicsProfile profile, TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
-            // Add more here as they become available.
+            //       Add more here as they become available.
             switch (context.TargetPlatform)
             {
                 case TargetPlatform.Windows:
@@ -172,7 +173,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
 					context.Logger.LogMessage("Using DXT Compression");
-				    CompressDxt(content, generateMipmaps);
+				    CompressDxt(profile, content, generateMipmaps);
 				    break;
                 case TargetPlatform.iOS:
 					context.Logger.LogMessage("Using PVRTC Compression");
@@ -250,12 +251,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private static void CompressDxt(TextureContent content, bool generateMipmaps)
+        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipmaps)
         {
             var texData = content.Faces[0][0];
 
-            if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
-                throw new PipelineException("DXT Compressed textures width and height must be powers of two.");
+            if (profile == GraphicsProfile.Reach)
+            {
+                if (!IsPowerOfTwo(texData.Width) || !IsPowerOfTwo(texData.Height))
+                    throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
+            }
 
             var _dxtCompressor = new Compressor();
             var inputOptions = new InputOptions();
