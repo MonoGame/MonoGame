@@ -88,9 +88,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // creating a System.Drawing.Bitmap from a >= 64bpp image isn't
             // supported.
             if (info.biBitCount > 32)
-                fBitmap = FreeImage.ConvertTo32Bits(fBitmap);
+            {
+                var temp = FreeImage.ConvertTo32Bits(fBitmap);
+
+                // The docs are unclear on what's happening here...
+                // If a new bitmap is created or if the old is just converted.
+                // UnloadEx doesn't throw any exceptions if it's called multiple
+                // times on the same bitmap, so just being cautious here.
+                FreeImage.UnloadEx(ref fBitmap);
+                fBitmap = temp;
+            }
 
             output._bitmap = FreeImage.GetBitmap(fBitmap);
+            FreeImage.UnloadEx(ref fBitmap);
+            
 #else
             output._bitmap = new Bitmap(filename);
 #endif
