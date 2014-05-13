@@ -5,16 +5,26 @@ using XnaKeys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Microsoft.Xna.Framework
 {
-    class WebGamePlatform : GamePlatform
+    using MonoGame.Web;
+
+    public interface IHasCallback
+    {
+        void Callback();
+    }
+
+    class WebGamePlatform : GamePlatform, IHasCallback
     {
         private WebGameWindow _window;
 
         public WebGamePlatform(Game game)
             : base(game)
         {
-            _window = new WebGameWindow(this);
-            
-            Window = _window;
+            Window = new WebGameWindow(this);
+        }
+
+        public virtual void Callback()
+        {
+            this.Game.Tick();
         }
         
         public override void Exit()
@@ -23,10 +33,12 @@ namespace Microsoft.Xna.Framework
 
         public override void RunLoop()
         {
+            throw new InvalidOperationException("You can not run a synchronous loop on the web platform.");
         }
 
         public override void StartRunLoop()
         {
+            JSAPIAccess.Instance.GamePlatformStartRunLoop(this);
         }
 
         public override bool BeforeUpdate(GameTime gameTime)
@@ -59,7 +71,7 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return GameRunBehavior.Synchronous;
+                return GameRunBehavior.Asynchronous;
             }
         }
     }
