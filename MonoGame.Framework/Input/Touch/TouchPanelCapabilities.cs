@@ -74,6 +74,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 var pointerDevices = Windows.Devices.Input.PointerDevice.GetPointerDevices();
                 foreach (var pointerDevice in pointerDevices)
                     maximumTouchCount = Math.Max(maximumTouchCount, (int)pointerDevice.MaxContacts);
+#elif WINDOWS
+                maximumTouchCount = GetSystemMetrics(SM_MAXIMUMTOUCHES);
+                isConnected = (maximumTouchCount > 0);
 #else
 		        isConnected = true;
 		        maximumTouchCount = 8;
@@ -110,5 +113,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return maximumTouchCount;
             }
         }
+
+#if WINDOWS
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, ExactSpelling = true)]
+        static extern int GetSystemMetrics(int nIndex);
+
+        const int SM_MAXIMUMTOUCHES = 95;
+#endif
     }
 }
