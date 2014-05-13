@@ -6,6 +6,10 @@ using System;
 #if ANDROID
 using Android.Content.PM;
 #endif
+#if IOS
+using MonoTouch.UIKit;
+#endif
+
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
@@ -52,6 +56,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 2;
                 else
                     maximumTouchCount = 1;
+#elif IOS
+                //iPhone supports 5, iPad 11
+                isConnected = true;
+                if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)
+                    maximumTouchCount = 5;
+                else //Pad
+                    maximumTouchCount = 11;
 #else
                 isConnected = true;
                 maximumTouchCount = 8;
