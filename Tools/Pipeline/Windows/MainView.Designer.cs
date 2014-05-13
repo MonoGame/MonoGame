@@ -163,10 +163,9 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.Multiline = true;
             this._outputWindow.Name = "_outputWindow";
             this._outputWindow.ReadOnly = true;
-            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._outputWindow.Size = new System.Drawing.Size(531, 537);
             this._outputWindow.TabIndex = 0;
-            this._outputWindow.WordWrap = false;
             // 
             // _mainMenu
             // 
@@ -405,6 +404,7 @@ namespace MonoGame.Tools.Pipeline
             this.Name = "MainView";
             this.Text = "MonoGame Pipeline";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
+            this.Load += new System.EventHandler(this.MainView_Load);
             _splitTreeProps.Panel1.ResumeLayout(false);
             _splitTreeProps.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).EndInit();

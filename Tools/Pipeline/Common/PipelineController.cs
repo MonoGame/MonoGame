@@ -40,13 +40,13 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public event Action OnProjectLoading;
+        public event ProjectEventCallback OnProjectLoading;
 
-        public event Action OnProjectLoaded;
+        public event ProjectEventCallback OnProjectLoaded;
 
-        public event Action OnBuildStarted;
+        public event BuildEventCallback OnBuildStarted;
 
-        public event Action OnBuildFinished;
+        public event BuildEventCallback OnBuildFinished;
 
         public void OnProjectModified()
         {            
@@ -222,7 +222,7 @@ namespace MonoGame.Tools.Pipeline
             _view.ShowProperties(item);
         }
 
-        public void Build(bool rebuild)
+        public void Execute(BuildCommand cmd)
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
@@ -231,41 +231,37 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (OnBuildStarted != null)
-                OnBuildStarted();
+                OnBuildStarted(cmd);
 
             _view.OutputClear();
+            _view.OutputAppendLine(string.Format("Executing BuildCommand: {0}.", cmd));
 
-            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
-            _buildTask = Task.Run(() => DoBuild(commands));
+            var parameters = new List<string>();
+            if (cmd == BuildCommand.Clean)
+            {
+                parameters.Add("/clean");
+                parameters.Add(string.Format("/intermediateDir:\"{0}\"", _project.IntermediateDir));
+                parameters.Add(string.Format("/outputDir:\"{0}\"", _project.OutputDir));                
+            }
+            else
+            {
+                parameters.Add(string.Format("/@:\"{0}\"", _project.FilePath));
+
+                if (cmd == BuildCommand.Rebuild)
+                    parameters.Add("/rebuild");
+            }
+            
+            _buildTask = Task.Run(() => DoBuild(parameters.ToArray()));
             if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());
+                _buildTask.ContinueWith((e) => OnBuildFinished(cmd));
         }
 
-        public void Clean()
-        {
-            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
-
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
-
-            if (OnBuildStarted != null)
-                OnBuildStarted();
-
-            _view.OutputClear();
-
-            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            _buildTask = Task.Run(() => DoBuild(commands));
-            if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());          
-        }
-
-        private void DoBuild(string commands)
+        private void DoBuild(string[] parameters)
         {
             _buildProcess = new Process();
             _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
             _buildProcess.StartInfo.FileName = "MGCB.exe";
-            _buildProcess.StartInfo.Arguments = commands;
+            _buildProcess.StartInfo.Arguments = string.Join(" ", parameters);
             _buildProcess.StartInfo.CreateNoWindow = true;
             _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _buildProcess.StartInfo.UseShellExecute = false;

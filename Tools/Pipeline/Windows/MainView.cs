@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using MonoGame.Tools.Pipeline.Properties;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -59,6 +60,38 @@ namespace MonoGame.Tools.Pipeline
             _contextMenu.ItemClicked += OnContextMenuItemClicked;
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;            
+        }
+
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            // Set window location
+            if (Settings.Default.WindowLocation != null)
+                Location = Settings.Default.WindowLocation;
+
+            // Set window size
+            if (Settings.Default.WindowSize != null)
+                Size = Settings.Default.WindowSize;
+        }
+
+        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (!_controller.Exit())
+                    e.Cancel = true;
+            }
+
+            // Copy window location to app settings
+            Settings.Default.WindowLocation = this.Location;
+
+            // Copy window size to app settings
+            if (this.WindowState == FormWindowState.Normal)
+                Settings.Default.WindowSize = this.Size;
+            else
+                Settings.Default.WindowSize = this.RestoreBounds.Size;
+
+            // Save settings
+            Settings.Default.Save();
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -134,12 +167,15 @@ namespace MonoGame.Tools.Pipeline
         {
             _controller = controller;
 
-            // Make sure build and project trigger updates to all the menu items.
-            Action activate = delegate { this.Invoke(new MethodInvoker(UpdateMenus)); };
-            _controller.OnBuildStarted += activate;
-            _controller.OnBuildFinished += activate;
-            _controller.OnProjectLoading += activate;
-            _controller.OnProjectLoaded += activate;
+            // Make sure build and project trigger updates to all the menu items...
+
+            var voidCallback = new ProjectEventCallback(() => this.Invoke(new MethodInvoker(UpdateMenus)));
+            _controller.OnProjectLoading += voidCallback;
+            _controller.OnProjectLoaded += voidCallback;
+
+            var buildCallback = new BuildEventCallback((e) => this.Invoke(new MethodInvoker(UpdateMenus)));
+            _controller.OnBuildStarted += buildCallback;
+            _controller.OnBuildFinished += buildCallback;
         }
 
         public AskResult AskSaveOrCancel()
@@ -353,21 +389,6 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void OutputAppend(string text)
-        {
-            if (text == null)
-                return;
-
-            // We need to append newlines.
-            var line = string.Concat(text, Environment.NewLine);
-
-            // Write the output... safely if needed.
-            if (InvokeRequired)
-                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
-            else
-                _outputWindow.AppendText(line);
-        }
-
         public bool ChooseContentFile(string initialDirectory, out List<string> files)
         {
             var dlg = new OpenFileDialog()
@@ -393,6 +414,43 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
+        public void OutputAppend(string text)
+        {
+            if (text == null)
+                return;
+
+            System.Diagnostics.Debug.Write(text);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { text });
+            else
+                _outputWindow.AppendText(text);
+        }
+
+        public void OutputAppendLine()
+        {
+            System.Diagnostics.Debug.WriteLine(string.Empty);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { Environment.NewLine });
+            else
+                _outputWindow.AppendText(Environment.NewLine);
+        }
+
+        public void OutputAppendLine(string text)
+        {
+            if (text == null)
+                return;
+
+            text = string.Concat(text, Environment.NewLine);
+            System.Diagnostics.Debug.Write(text);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { text });
+            else
+                _outputWindow.AppendText(text);
+        }
+
         public void OutputClear()
         {
             _outputWindow.Clear();
@@ -412,15 +470,6 @@ namespace MonoGame.Tools.Pipeline
         private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             _controller.CloseProject();
-        }
-
-        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                if (!_controller.Exit())
-                    e.Cancel = true;
-            }
         }
 
         private void SaveMenuItemClick(object sender, System.EventArgs e)
@@ -465,17 +514,17 @@ namespace MonoGame.Tools.Pipeline
 
         private void BuildMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Build(false);
+            _controller.Execute(BuildCommand.Build);
         }
 
         private void RebuilMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Build(true);
+            _controller.Execute(BuildCommand.Rebuild);
         }
 
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Clean();
+            _controller.Execute(BuildCommand.Clean);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)

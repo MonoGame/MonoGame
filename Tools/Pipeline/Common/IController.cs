@@ -6,6 +6,16 @@ using System;
 
 namespace MonoGame.Tools.Pipeline
 {
+    public enum BuildCommand
+    {
+        Build,
+        Rebuild,
+        Clean,
+    }
+
+    public delegate void BuildEventCallback(BuildCommand command);
+    public delegate void ProjectEventCallback();
+
     interface IController
     {
         /// <summary>
@@ -26,22 +36,22 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// Triggered when the project starts loading.
         /// </summary>
-        event Action OnProjectLoading;
+        event ProjectEventCallback OnProjectLoading;
 
         /// <summary>
         /// Triggered when the project finishes loading.
         /// </summary>
-        event Action OnProjectLoaded;
+        event ProjectEventCallback OnProjectLoaded;
 
         /// <summary>
-        /// Triggered when the project finishes building.
+        /// Triggered before a BuildCommand is executed.
         /// </summary>
-        event Action OnBuildStarted;
+        event BuildEventCallback OnBuildStarted;
 
         /// <summary>
-        /// Triggered when the project finishes building.
+        /// Triggered after a BuildCommand is finished.
         /// </summary>
-        event Action OnBuildFinished;
+        event BuildEventCallback OnBuildFinished;
 
         /// <summary>
         /// Notify controller that a property of Project or its contents has been modified.
@@ -68,11 +78,9 @@ namespace MonoGame.Tools.Pipeline
 
         bool SaveProject(bool saveAs);
 
-        void OnTreeSelect(IProjectItem item);
-        
-        void Build(bool rebuild);
+        void Execute(BuildCommand cmd);
 
-        void Clean();
+        void OnTreeSelect(IProjectItem item);                
 
         void CancelBuild();
 
