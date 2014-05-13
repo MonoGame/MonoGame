@@ -82,11 +82,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // to System.Drawing.Bitmap and replace it with FreeImage. For now
             // this is the quickest way to add support for virtually every input Texture
             // format without breaking functionality in other places.
-            var format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
-            var fiBitmap = FreeImage.LoadEx(filename, ref format);
+            var fBitmap = FreeImage.LoadEx(filename);
+            var info = FreeImage.GetInfoHeaderEx(fBitmap);
 
-            output._bitmap = FreeImage.GetBitmap(fiBitmap);
-            FreeImage.UnloadEx(ref fiBitmap);
+            // creating a System.Drawing.Bitmap from a >= 64bpp image isn't
+            // supported.
+            if (info.biBitCount > 32)
+            {
+                var temp = FreeImage.ConvertTo32Bits(fBitmap);
+
+                // The docs are unclear on what's happening here...
+                // If a new bitmap is created or if the old is just converted.
+                // UnloadEx doesn't throw any exceptions if it's called multiple
+                // times on the same bitmap, so just being cautious here.
+                FreeImage.UnloadEx(ref fBitmap);
+                fBitmap = temp;
+            }
+
+            output._bitmap = FreeImage.GetBitmap(fBitmap);
+            FreeImage.UnloadEx(ref fBitmap);
+            
 #else
             output._bitmap = new Bitmap(filename);
 #endif
