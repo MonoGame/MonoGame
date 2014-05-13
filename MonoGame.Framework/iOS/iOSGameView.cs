@@ -70,11 +70,8 @@ using System;
 using System.Drawing;
 using System.Text;
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 
 using MonoTouch.CoreGraphics;
 using MonoTouch.CoreText;
@@ -493,11 +490,12 @@ namespace Microsoft.Xna.Framework {
         }
 
 
-		[Export ("insertDictationResult:")]
+		/*[Export ("insertDictationResult:")]
         void insertDictationResult(NSArray a)
         {
             NSNotificationCenter.DefaultCenter.PostNotificationName ("DictationRecognitionSucceededNotification", this);
-        }
+			OnKeyboardTextEntry (new KeyboardEntryEventArgs (text));
+        }*/
 
 
         [Export ("dictationRecordingDidEnd")]
@@ -517,19 +515,19 @@ namespace Microsoft.Xna.Framework {
         UITextInputStringTokenizer tokenizer;
         public SimpleCoreTextView textView;
         NSDictionary markedTextStyle;
-        UITextInputDelegate inputDelegate;
+		IUITextInputDelegate inputDelegate;
 
         public delegate void ViewWillEditDelegate (iOSGameViewController editableCoreTextView);
         public event ViewWillEditDelegate ViewWillEdit;
 
         #region UITextInput methods
         [Export ("inputDelegate")]
-        public UITextInputDelegate InputDelegate {
+		public IUITextInputDelegate InputDelegate {
             get {
                 return inputDelegate;
             }
             set {
-                inputDelegate = value;
+	             inputDelegate = value;
             }
         }
 

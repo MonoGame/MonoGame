@@ -202,7 +202,6 @@ namespace Microsoft.Xna.Framework
 
             BeginObservingUIApplication();
 
-            _viewController.View.BecomeFirstResponder();
             CreateDisplayLink();
         }
 
