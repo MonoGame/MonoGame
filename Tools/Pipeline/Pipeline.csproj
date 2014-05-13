@@ -60,6 +60,7 @@
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
+    <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Windows\AssemblyReferenceEditing.cs">
       <SubType>Form</SubType>
     </Compile>
