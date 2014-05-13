@@ -354,7 +354,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
                     //  so that text does not hang off the left side of its rectangle.
                     if (firstGlyphOfLine) {
-                        offset.X = Math.Max(offset.X, 0);
+                        offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
                         firstGlyphOfLine = false;
                     } else {
                         offset.X += currentGlyph.LeftSideBearing;
