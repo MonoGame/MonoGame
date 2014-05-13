@@ -178,7 +178,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             while (Refresh(consumeState, _touchState, _touchEvents))
                 consumeState = false;
 
-            return new TouchCollection(_touchState.ToArray());
+            return new TouchCollection(Capabilities.IsConnected, _touchState.ToArray());
         }
 
         internal void AddEvent(int id, TouchLocationState state, Vector2 position)
