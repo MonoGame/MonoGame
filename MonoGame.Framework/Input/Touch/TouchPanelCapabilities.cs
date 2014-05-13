@@ -63,11 +63,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 5;
                 else //Pad
                     maximumTouchCount = 11;
+#elif MONOMAC || LINUX
+                //In theory you can have touch on mac, but there aren't official drivers for it yet
+                //Touch isn't implemented in OpenTK, so no linux https://github.com/opentk/opentk/issues/80
+                isConnected = false;
 #else
                 isConnected = true;
                 maximumTouchCount = 8;
 #endif
-            }
+			}
 		}
 
         public bool HasPressure
