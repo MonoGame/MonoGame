@@ -40,6 +40,8 @@
 
 #region Using clause
 using System;
+using Android.Content.PM;
+
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -77,9 +79,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
 #elif WINDOWS
                 maximumTouchCount = GetSystemMetrics(SM_MAXIMUMTOUCHES);
                 isConnected = (maximumTouchCount > 0);
+#elif ANDROID
+                // http://developer.android.com/reference/android/content/pm/PackageManager.html#FEATURE_TOUCHSCREEN
+                PackageManager pm = Game.Activity.PackageManager;
+                isConnected = pm.HasSystemFeature(PackageManager.FeatureTouchscreen);
+                if (pm.HasSystemFeature(PackageManager.FeatureTouchscreenMultitouchJazzhand))
+                    maximumTouchCount = 5;
+                else if (pm.HasSystemFeature(PackageManager.FeatureTouchscreenMultitouchDistinct))
+                    maximumTouchCount = 2;
+                else
+                    maximumTouchCount = 1;
 #else
-		        isConnected = true;
-		        maximumTouchCount = 8;
+                isConnected = true;
+                maximumTouchCount = 8;
 #endif
             }
 		}
