@@ -63,13 +63,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 5;
                 else //Pad
                     maximumTouchCount = 11;
-#elif MONOMAC || LINUX
-                //In theory you can have touch on mac, but there aren't official drivers for it yet
-                //Touch isn't implemented in OpenTK, so no linux https://github.com/opentk/opentk/issues/80
-                isConnected = false;
-#else
+#elif WINDOWS_PHONE
+                // There is no API on WP8, XNA returns 4 according to the docs
+                // http://msdn.microsoft.com/en-nz/library/ff434208.aspx
+                // http://en.wikipedia.org/wiki/Windows_Phone_8#Hardware_requirements
                 isConnected = true;
-                maximumTouchCount = 8;
+                maximumTouchCount = 4;
+#elif PSM
+                isConnected = true;
+                maximumTouchCount = 2; //TODO: This number is made up, needs to be tested on Vita
+#else
+                //Touch isn't implemented in OpenTK, so no linux or mac https://github.com/opentk/opentk/issues/80
+                isConnected = false;
 #endif
 			}
 		}
