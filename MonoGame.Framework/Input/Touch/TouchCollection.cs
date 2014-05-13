@@ -71,10 +71,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
         /// </summary>
+        /// <param name="isConnected">True if the TouchPanel is connected</param>
         /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
-        public TouchCollection(TouchLocation[] touches)
+        public TouchCollection(bool isConnected, TouchLocation[] touches)
         {
-            _isConnected = true;
+            _isConnected = isConnected;
             _collection = touches;
         }
 
