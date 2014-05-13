@@ -60,10 +60,12 @@
     <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
+    <Compile Include="Common\Util.cs" />
     <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Windows\AssemblyReferenceEditing.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\FolderEditing.cs" />
     <Compile Include="Windows\MainView.cs">
       <SubType>Form</SubType>
     </Compile>
