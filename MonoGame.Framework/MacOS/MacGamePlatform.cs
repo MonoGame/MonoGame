@@ -77,7 +77,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.GamerServices;
+//using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -261,7 +261,7 @@ namespace Microsoft.Xna.Framework
             if (_needsToResetElapsedTime)
                 _needsToResetElapsedTime = false;
 
-            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo) // || Guide.isVisible) (SJ) this seems very odd
                 return false;
 
             return true;
@@ -269,7 +269,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
-            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo || Guide.isVisible)
+            if (AreUpdatingAndDrawingSuspended || IsPlayingVideo) // || Guide.isVisible) (SJ) this seems very odd
                 return false;
             return true;
         }

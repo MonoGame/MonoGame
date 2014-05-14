@@ -155,7 +155,8 @@ namespace Microsoft.Xna.Framework
         {
             if (_view.Window.Exists)
             {
-                Net.NetworkSession.Exit();
+                //(SJ) Why is this called here when it's not in any other project
+                //Net.NetworkSession.Exit();
                 _view.Window.Close();
             }
 #if LINUX

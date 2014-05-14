@@ -28,7 +28,6 @@
 				<Reference type="Gac" refto="Mono.Android" />
 				<Reference type="Gac" refto="OpenTK" />
 				<Reference type="Gac" refto="MonoGame.Framework.Android" />
-				<Reference type="Gac" refto="Lidgren.Network.Android" />
 			</References>
 			<Files>
 				<File name="Activity1.cs" src="MonoGameApplication/Activity1.cs" />
