@@ -55,8 +55,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	{
         private TouchLocation[] _collection;
 
-        private bool _isConnected;
-
         private static readonly TouchLocation[] emptyCollection = new TouchLocation[0];
 
 		#region Properties
@@ -64,7 +62,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// States if a touch screen is available.
         /// </summary>
-		public bool IsConnected { get { return _isConnected; } }
+        public bool IsConnected { get { return TouchPanel.GetCapabilities().IsConnected; } }
 
 		#endregion
 
@@ -74,7 +72,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
         public TouchCollection(TouchLocation[] touches)
         {
-            _isConnected = true;
             _collection = touches;
         }
 
