@@ -192,10 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-
-        /// <summary>
-        /// Gets or sets the lighting enable flag.
-        /// </summary>
+        /// <inheritdoc/>
         public bool LightingEnabled
         {
             get { return lightingEnabled; }
@@ -229,9 +226,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the ambient light color (range 0 to 1).
-        /// </summary>
+        /// <inheritdoc/>
         public Vector3 AmbientLightColor
         {
             get { return ambientLightColor; }
@@ -244,27 +239,19 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets the first directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight0 { get { return light0; } }
 
 
-        /// <summary>
-        /// Gets the second directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight1 { get { return light1; } }
 
 
-        /// <summary>
-        /// Gets the third directional light.
-        /// </summary>
+        /// <inheritdoc/>
         public DirectionalLight DirectionalLight2 { get { return light2; } }
 
 
-        /// <summary>
-        /// Gets or sets the fog enable flag.
-        /// </summary>
+        /// <inheritdoc/>
         public bool FogEnabled
         {
             get { return fogEnabled; }
@@ -280,9 +267,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog start distance.
-        /// </summary>
+        /// <inheritdoc/>
         public float FogStart
         {
             get { return fogStart; }
@@ -295,9 +280,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog end distance.
-        /// </summary>
+        /// <inheritdoc/>
         public float FogEnd
         {
             get { return fogEnd; }
@@ -310,9 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Gets or sets the fog color.
-        /// </summary>
+        /// <inheritdoc/>
         public Vector3 FogColor
         {
             get { return fogColorParam.GetValueVector3(); }
@@ -421,9 +402,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 
-        /// <summary>
-        /// Sets up the standard key/fill/back lighting rig.
-        /// </summary>
+        /// <inheritdoc/>
         public void EnableDefaultLighting()
         {
             LightingEnabled = true;
