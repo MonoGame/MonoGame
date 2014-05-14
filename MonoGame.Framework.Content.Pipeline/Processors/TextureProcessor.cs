@@ -72,7 +72,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Set the first layer
-            input.Faces[0][0].SetPixelData(input._bitmap.GetData());
+            // JCF: This should be already set...
+            //input.Faces[0][0].SetPixelData(input._bitmap.GetData());
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
@@ -80,7 +81,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			{
 			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
                     TextureFormat == TextureProcessorOutputFormat.Compressed )
-                	GraphicsUtil.CompressTexture(input, context, GenerateMipmaps, PremultiplyAlpha);
+                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha);
 			}
 			catch(EntryPointNotFoundException ex) {
 				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());

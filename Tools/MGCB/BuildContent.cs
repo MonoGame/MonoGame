@@ -311,6 +311,11 @@ namespace MGCB
 
                     File.Copy(c, dest, true);
 
+                    // Destination file should not be read-only even if original was.
+                    var fileAttr = File.GetAttributes(dest);
+                    fileAttr = fileAttr & (~FileAttributes.ReadOnly);
+                    File.SetAttributes(dest, fileAttr);
+
                     ++successCount;
                 }
                 catch (Exception ex)
