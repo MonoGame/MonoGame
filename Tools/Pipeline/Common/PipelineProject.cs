@@ -15,8 +15,8 @@ namespace MonoGame.Tools.Pipeline
 {
     internal class PipelineProject : IProjectItem
     {        
-        public IController Controller;      
-  
+        public IController Controller;
+
         public string FilePath { get; set; }
 
         public List<ContentItem> ContentItems { get; private set; }                
@@ -34,6 +34,11 @@ namespace MonoGame.Tools.Pipeline
         public string Config { get; set; }     
 
         #region IPipelineItem
+        
+        public string OriginalPath
+        {
+            get { return FilePath; }
+        }
 
         public string Name
         {
@@ -42,7 +47,7 @@ namespace MonoGame.Tools.Pipeline
                 if (string.IsNullOrEmpty(FilePath))
                     return "";
 
-                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
+                return Path.GetFileNameWithoutExtension(FilePath);
             }
         }
 
@@ -57,8 +62,7 @@ namespace MonoGame.Tools.Pipeline
                 return FilePath.Remove(idx);
             }
         }
-
-        [Browsable(false)]
+        
         public string Icon { get; set; }
 
         #endregion

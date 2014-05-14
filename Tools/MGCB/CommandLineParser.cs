@@ -26,8 +26,38 @@ namespace MGCB
 
         readonly Queue<MemberInfo> _requiredOptions = new Queue<MemberInfo>();
         readonly Dictionary<string, MemberInfo> _optionalOptions = new Dictionary<string, MemberInfo>();
-
         readonly List<string> _requiredUsageHelp = new List<string>();
+
+        public TextWriter Error;
+        public TextWriter Out;
+
+        private TextWriter GetErrorWriter()
+        {
+            if (Error != null)
+                return Error;
+
+            if (Out != null)
+                return Out;
+
+            if (Console.Error != null)
+                return Console.Error;
+
+            if (Console.Out != null)
+                return Console.Out;
+
+            return null;
+        }
+
+        private TextWriter GetOutWriter()
+        {
+            if (Out != null)
+                return Out;
+
+            if (Console.Out != null)
+                return Console.Out;
+
+            return null;
+        }
 
         public CommandLineParser(object optionsObject)
         {
@@ -286,27 +316,31 @@ namespace MGCB
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
+            var writer = GetErrorWriter();
+            if (writer == null)
+                return;
+
             if (!string.IsNullOrEmpty(Title))
             {
-                Console.Error.WriteLine(Title);
-                Console.Error.WriteLine();
+                writer.WriteLine(Title);
+                writer.WriteLine();
             }
 
             if (!string.IsNullOrEmpty(message))
             {
-                Console.Error.WriteLine(message, args);
-                Console.Error.WriteLine();
+                writer.WriteLine(message, args);
+                writer.WriteLine();
             }
 
-            Console.Error.WriteLine("Usage: {0} {1}{2}", 
+            writer.WriteLine("Usage: {0} {1}{2}", 
                 name, 
                 string.Join(" ", _requiredUsageHelp), 
                 _optionalOptions.Count > 0 ? " <Options>" : string.Empty);
 
             if (_optionalOptions.Count > 0)
             {
-                Console.Error.WriteLine();
-                Console.Error.WriteLine("Options:\n");
+                writer.WriteLine();
+                writer.WriteLine("Options:\n");
 
                 foreach (var pair in _optionalOptions)
                 {
@@ -318,9 +352,9 @@ namespace MGCB
                                    (method != null && method.GetParameters().Length != 0);
 
                     if (hasValue)
-                        Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
+                        writer.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
                     else
-                        Console.Error.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
+                        writer.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
                 }
             }
         }

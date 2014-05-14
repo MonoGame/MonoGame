@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -21,12 +22,18 @@ namespace MonoGame.Tools.Pipeline
 
         public PipelineController(IView view, PipelineProject project)
         {
+            OutputWriter = new OutputWriter(view);
+            Console.SetError(OutputWriter);
+            Console.SetOut(OutputWriter);
+
             _view = view;
             _view.Attach(this);
             _project = project;
             _project.Controller = this;
             ProjectOpen = false;
         }
+
+        public TextWriter OutputWriter { get; private set; }
 
         public bool ProjectOpen { get; private set; }
 
@@ -88,9 +95,14 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            _view.OutputClear();
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("Command NewProject: '{0}'.", Path.GetFileName(projectFilePath));
+            _view.OutputAppendLine();
+
             // Clear existing project data, initialize to a new blank project.
             _project = new PipelineProject();            
-            PipelineTypes.Load(_project);
+            PipelineTypes.Load(_project, _view);
 
             // Save the new project.
             _project.FilePath = projectFilePath;
@@ -116,13 +128,21 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            _view.OutputClear();
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("Command ImportProject: '{0}'.", Path.GetFileName(projectFilePath));
+            _view.OutputAppendLine();
+
 #if SHIPPING
             try
 #endif
             {
                 _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project);
+                var parser = new PipelineProjectParser(this, _project, _view);
                 parser.ImportProject(projectFilePath);
+
+                _view.OutputAppendLine();
+                OutputProjectSummary(); 
 
                 ResolveTypes();                
                 
@@ -141,6 +161,10 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
+
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("ImportProject Done.");
+            _view.OutputAppendLine();
         }
 
         public void OpenProject()
@@ -157,13 +181,20 @@ namespace MonoGame.Tools.Pipeline
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
+            _view.OutputClear();
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("Command OpenProject: '{0}'.", Path.GetFileName(projectFilePath));
+            _view.OutputAppendLine();
 #if SHIPPING
             try
 #endif
             {
                 _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project);
+                var parser = new PipelineProjectParser(this, _project, _view);
                 parser.OpenProject(projectFilePath);
+
+                OutputProjectSummary();                
+
                 ResolveTypes();
 
                 ProjectOpen = true;
@@ -181,6 +212,22 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
+
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("OpenProject Done.");
+            _view.OutputAppendLine();
+        }
+
+        private void OutputProjectSummary()
+        {
+            _view.OutputAppendLine();
+
+            var numRefs = _project.References.Count;
+            var numCopy = _project.ContentItems.Count(e => e.BuildAction == BuildAction.Copy);
+            var numBuild = _project.ContentItems.Count(e => e.BuildAction == BuildAction.Build);
+            _view.OutputAppendLine("Project Summary: {0} Reference(s), {1} Copy ContentItem(s), {2} Build ContentItem(s)", numRefs, numCopy, numBuild);
+            
+            _view.OutputAppendLine();
         }
 
         public void CloseProject()
@@ -195,6 +242,11 @@ namespace MonoGame.Tools.Pipeline
             _project = null;
 
             UpdateTree();
+
+            _view.OutputClear();
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("Project Closed.");
+            _view.OutputAppendLine();
         }
 
         public bool SaveProject(bool saveAs)
@@ -209,10 +261,21 @@ namespace MonoGame.Tools.Pipeline
                 _project.FilePath = newFilePath;
             }
 
+            _view.OutputClear();
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("Command SaveProject: '{0}'", Path.GetFileName(_project.OriginalPath));
+            _view.OutputAppendLine();
+
             // Do the save.
             ProjectDiry = false;
-            var parser = new PipelineProjectParser(this, _project);
-            parser.SaveProject();            
+            var parser = new PipelineProjectParser(this, _project, _view);
+            parser.SaveProject();
+
+            OutputProjectSummary();
+
+            _view.OutputAppendLine();
+            _view.OutputAppendLine("SaveProject Done.");
+            _view.OutputAppendLine();
 
             return true;
         }
@@ -234,7 +297,9 @@ namespace MonoGame.Tools.Pipeline
                 OnBuildStarted(cmd);
 
             _view.OutputClear();
+            _view.OutputAppendLine();
             _view.OutputAppendLine(string.Format("Executing BuildCommand: {0}.", cmd));
+            _view.OutputAppendLine();
 
             var parameters = new List<string>();
             if (cmd == BuildCommand.Clean)
@@ -268,7 +333,7 @@ namespace MonoGame.Tools.Pipeline
             _buildProcess.StartInfo.RedirectStandardError = true;
             _buildProcess.StartInfo.RedirectStandardOutput = true;
             _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
-            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppendLine(args.Data);
 
             //string stdError = null;
             try
@@ -280,9 +345,9 @@ namespace MonoGame.Tools.Pipeline
             }
             catch (Exception ex)
             {
-                _view.OutputAppend("Build process failed!" + Environment.NewLine);
-                _view.OutputAppend(ex.Message);
-                _view.OutputAppend(ex.StackTrace);
+                _view.OutputAppendLine("Build process failed!");
+                _view.OutputAppendLine(ex.Message);
+                _view.OutputAppendLine(ex.StackTrace);                
             }
 
             // Clear the process pointer, so that cancel
@@ -370,12 +435,12 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var parser = new PipelineProjectParser(this, _project);
+            var parser = new PipelineProjectParser(this, _project, _view);
             _view.BeginTreeUpdate();
 
             foreach (var file in files)
             {
-                if (!parser.AddContent(file, true))
+                if (!parser.AddBuildItem(file, true))
                     continue;
 
                 var item = _project.ContentItems.Last();
@@ -398,11 +463,23 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }            
-    
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            filePath = filePath.Replace("/", "\\");
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(2);
+
+            if (Path.IsPathRooted(filePath))
+                return filePath;
+            
+            return _project.Location + "\\" + filePath;
+        }
+
         private void ResolveTypes()
         {
-            PipelineTypes.Load(_project);
+            PipelineTypes.Load(_project, _view);
             foreach (var i in _project.ContentItems)
             {
                 i.Controller = this;

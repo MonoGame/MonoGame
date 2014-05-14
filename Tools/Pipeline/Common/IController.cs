@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -18,6 +19,8 @@ namespace MonoGame.Tools.Pipeline
 
     interface IController
     {
+        TextWriter OutputWriter { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -88,6 +91,12 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(ContentItem item);
+
+        /// <summary>
+        /// If the passed path is not already rooted return the absolute path
+        /// making this one relative to the currently open project location.
+        /// </summary>        
+        string GetFullPath(string filePath);
     }
 }

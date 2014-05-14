@@ -109,6 +109,12 @@ namespace MonoGame.Tools.Pipeline
             set { _project.Icon = value; }
         }
 
+        [Browsable(false)]
+        public string OriginalPath
+        {
+            get { return _project.OriginalPath; }            
+        }
+
         #endregion
 
         public PipelineProjectProxy(PipelineProject project)

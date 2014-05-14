@@ -27,10 +27,11 @@ namespace MonoGame.Tools.Pipeline
         private const int ProjectIcon = 3;
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
+        private const string ContextMenuOpenFile = "Open File";
+        private const string ContextMenuOpenFileLocation = "Open File Location";
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
-
 
         public MainView()
         {            
@@ -118,7 +119,27 @@ namespace MonoGame.Tools.Pipeline
                 case ContextMenuExclude:
                     {
                         _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
-                    } break;                
+                    } break;
+                case ContextMenuOpenFile:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath))
+                        {
+                            Process.Start(filePath);                            
+                        }
+                    } break;
+                case ContextMenuOpenFileLocation:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath) || Directory.Exists(filePath))
+                        {
+                            Process.Start("explorer.exe", "/select, " + filePath);
+                        }
+                    } break;
                 default:
                     throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
             }
@@ -139,24 +160,23 @@ namespace MonoGame.Tools.Pipeline
                     // Select the node the user has clicked.
                     _treeView.SelectedNode = node;
 
-                    if (node.Tag is ContentItem)
-                    {
-                        _contextMenu.Items.Clear();
+                    _contextMenu.Items.Clear();
 
-                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
+                    if (node.Tag is ContentItem)                    
+                        _contextMenu.Items.Add(ContextMenuExclude).Tag = node.Tag;                    
+                    else                    
+                        _contextMenu.Items.Add(ContextMenuInclude).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p);
-                    }
-                    else
-                    {
-                        _contextMenu.Items.Clear();
+                    var filePath = (node.Tag as IProjectItem).OriginalPath;
+                    filePath = _controller.GetFullPath(filePath);
 
-                        var item = _contextMenu.Items.Add(ContextMenuInclude);
-                        item.Tag = node.Tag;
+                    if (File.Exists(filePath))
+                        _contextMenu.Items.Add(ContextMenuOpenFile).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p); 
-                    }                   
+                    if (File.Exists(filePath) || Directory.Exists(filePath))                    
+                        _contextMenu.Items.Add(ContextMenuOpenFileLocation).Tag = node.Tag;
+
+                    _contextMenu.Show(_treeView, p);
                 }
             }
         }
@@ -414,12 +434,12 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
-        public void OutputAppend(string text)
+        public void OutputAppend(string text, params object[] args)
         {
             if (text == null)
                 return;
 
-            System.Diagnostics.Debug.Write(text);
+            Debug.Write(string.Format(text, args));
 
             if (InvokeRequired)
                 _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { text });
@@ -427,33 +447,36 @@ namespace MonoGame.Tools.Pipeline
                 _outputWindow.AppendText(text);
         }
 
+        public void OutputAppendLine(string text, params object[] args)
+        {
+            if (text == null)
+                return;
+
+            var line = string.Format(text + Environment.NewLine, args);            
+            Debug.Write(line);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
+            else
+                _outputWindow.AppendText(line);
+        }
+
         public void OutputAppendLine()
         {
-            System.Diagnostics.Debug.WriteLine(string.Empty);
+            Debug.Write(Environment.NewLine);
 
             if (InvokeRequired)
                 _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { Environment.NewLine });
             else
                 _outputWindow.AppendText(Environment.NewLine);
-        }
-
-        public void OutputAppendLine(string text)
-        {
-            if (text == null)
-                return;
-
-            text = string.Concat(text, Environment.NewLine);
-            System.Diagnostics.Debug.Write(text);
-
-            if (InvokeRequired)
-                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { text });
-            else
-                _outputWindow.AppendText(text);
-        }
+        }        
 
         public void OutputClear()
         {
-            _outputWindow.Clear();
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action(_outputWindow.Clear));
+            else
+                _outputWindow.Clear();
         }
 
         private void NewMenuItemClick(object sender, System.EventArgs e)

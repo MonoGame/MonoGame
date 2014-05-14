@@ -29,6 +29,11 @@ namespace MonoGame.Tools.Pipeline
 
         #region IProjectItem
 
+        public string OriginalPath
+        {
+            get { return SourceFile; }
+        }
+		
         [Category("Common")]
         [Description("The file name of this item.")]
         public string Name 

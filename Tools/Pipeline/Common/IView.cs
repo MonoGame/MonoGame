@@ -62,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// Append passed string to output window.
         /// </summary>
-        void OutputAppend(string text);
+        void OutputAppend(string text, params object[] args);
 
         /// <summary>
         /// Append a newline character to output window.
@@ -72,7 +72,7 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// Append passed string followed by a newline to the output window.
         /// </summary>
-        void OutputAppendLine(string text);
+        void OutputAppendLine(string text, params object[] args);
 
         /// <summary>
         /// Clear output window.

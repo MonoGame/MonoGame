@@ -4,15 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -21,14 +14,17 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
+    /// <summary>
+    /// Performs save, load, and import actions for/on a PipelineProject.
+    /// </summary>
     internal class PipelineProjectParser
     {
         #region Other Data
 
         private readonly PipelineProject _project;
         private readonly IController _controller;
+        private readonly IView _view;
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
-        
         private string _processor;
         
         #endregion
@@ -45,17 +41,7 @@ namespace MonoGame.Tools.Pipeline
             Name = "intermediateDir",
             ValueName = "directoryPath",
             Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir { set { _project.IntermediateDir = value; } }
-
-        [CommandLineParameter(
-            Name = "reference",
-            ValueName = "assemblyNameOrFile",
-            Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public List<string> References 
-        {
-            set { _project.References = value; }
-            get { return _project.References; } 
-        }
+        public string IntermediateDir { set { _project.IntermediateDir = value; } }       
 
         [CommandLineParameter(
             Name = "platform",
@@ -99,103 +85,45 @@ namespace MonoGame.Tools.Pipeline
             Name = "processorParam",
             ValueName = "name=value",
             Description = "Defines a parameter name and value to set on a content processor.")]
-        public void AddProcessorParam(string nameAndValue)
+        public void OnProcessorParam(string nameAndValue)
         {
-            var keyAndValue = nameAndValue.Split('=');
-            if (keyAndValue.Length != 2)
-            {
-                // Do we error out or something?
-                return;
-            }
-
-            _processorParams.Remove(keyAndValue[0]);
-            _processorParams.Add(keyAndValue[0], keyAndValue[1]);
+            AddProcessorParam(nameAndValue);            
         }
 
         [CommandLineParameter(
             Name = "build",
             ValueName = "sourceFile",
             Description = "Build the content source file using the previously set switches and options.")]
-        public void OnBuild(string sourceFile)
+        public void OnBuild(string path)
         {
-            AddContent(sourceFile, false);
+            AddBuildItem(path, false);
         }
 
-        public bool AddContent(string sourceFile, bool skipDuplicates)
+         [CommandLineParameter(
+            Name = "reference",
+            ValueName = "assemblyNameOrFile",
+            Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
+        public void OnReference(string path)
         {
-            // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory + "\\";
-            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
-
-            // Do we have a duplicate?
-            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
-            if (previous != -1)
-            {
-                if (skipDuplicates)
-                    return false;
-
-                // Replace the duplicate.
-                _project.ContentItems.RemoveAt(previous);
-            }
-
-            // Create the item for processing later.
-            var item = new ContentItem
-            {
-                Controller = _controller,
-                BuildAction = BuildAction.Build,
-                SourceFile = sourceFile,
-                ImporterName = Importer,
-                ProcessorName = Processor,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _project.ContentItems.Add(item);
-
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
-
-            return true;
+            AddReference(path);
         }
 
         [CommandLineParameter(
             Name = "copy",
             ValueName = "sourceFile",
             Description = "Copy the content source file verbatim to the output directory.")]
-        public void OnCopy(string sourceFile)
+        public void OnCopy(string path)
         {
-            // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory + "\\";
-            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
-
-            // Remove duplicates... keep this new one.
-            var previous = _project.ContentItems.FirstOrDefault(e => e.SourceFile.Equals(sourceFile));
-            if (previous != null)
-                _project.ContentItems.Remove(previous);
-
-            // Create the item for processing later.
-            var item = new ContentItem
-            {
-                BuildAction = BuildAction.Copy,
-                SourceFile = sourceFile,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _project.ContentItems.Add(item);
-
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
-        }
+            AddCopyItem(path);
+        }        
 
         #endregion
 
-        public PipelineProjectParser(IController controller, PipelineProject project)
+        public PipelineProjectParser(IController controller, PipelineProject project, IView view)
         {
             _controller = controller;
             _project = project;
+            _view = view;
         }        
 
         public void OpenProject(string projectFilePath)
@@ -205,8 +133,11 @@ namespace MonoGame.Tools.Pipeline
             // Store the file name for saving later.
             _project.FilePath = projectFilePath;
 
-            var parser = new CommandLineParser(this);
-            parser.Title = "Pipeline";
+            var parser = new CommandLineParser(this)
+                {
+                    Title = "Pipeline",
+                    Error = _controller.OutputWriter,
+                };            
 
             var commands = File.ReadAllLines(projectFilePath).
                                 Select(x => x.Trim()).
@@ -343,8 +274,8 @@ namespace MonoGame.Tools.Pipeline
                             if (!string.IsNullOrEmpty(hintPath) &&
                                 hintPath.IndexOf("microsoft", StringComparison.CurrentCultureIgnoreCase) == -1 &&
                                 hintPath.IndexOf("monogamecontentprocessors", StringComparison.CurrentCultureIgnoreCase) == -1)
-                            {
-                                _project.References.Add(hintPath);
+                            {                                                                
+                                AddReference(hintPath);
                             }
                         }
                         else if (buildAction.Equals("Content"))
@@ -353,11 +284,11 @@ namespace MonoGame.Tools.Pipeline
                             ReadIncludeContent(io, out include, out copyToOutputDirectory);
 
                             if (!copyToOutputDirectory.Equals("Never"))
-                            {
+                            {         
                                 var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                                 sourceFilePath += "\\" + include;
-
-                                OnCopy(sourceFilePath);
+                                
+                                AddCopyItem(sourceFilePath);
                             }
                         }
                         else if (buildAction.Equals("Compile"))
@@ -376,20 +307,116 @@ namespace MonoGame.Tools.Pipeline
 
                             var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                             sourceFilePath += "\\" + include;
-
-                            OnBuild(sourceFilePath);
+                            
+                            AddBuildItem(sourceFilePath, false);
                         }
                     }
                 }
             }
         }
 
-        private string ProjectDirectory
-        {
-            get
+        public bool AddBuildItem(string path, bool skipDuplicate)
+        {            
+            // Make path relative to project.
+            var projectDir = _project.Location + "\\";
+            path = PathHelper.GetRelativePath(projectDir, path);            
+
+            // Avoid duplicates.
+            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, path, StringComparison.InvariantCultureIgnoreCase));
+            if (previous != -1)
             {
-                return _project.Location;                
+                if (skipDuplicate)
+                {
+                    _view.OutputAppendLine("Skipped adding '{0}' because Build ContentItem was a duplicate.", path);
+                    return false;
+                }
+
+                _view.OutputAppendLine("Existing Build ContentItem with path '{0}' has been removed.", path);
+
+                _project.ContentItems.RemoveAt(previous);
             }
+
+            // Create the item for processing later.
+            var item = new ContentItem
+            {
+                Controller = _controller,
+                BuildAction = BuildAction.Build,
+                SourceFile = path,
+                ImporterName = Importer,
+                ProcessorName = Processor,
+                ProcessorParams = new OpaqueDataDictionary()
+            };
+            _project.ContentItems.Add(item);
+
+            // Copy the current processor parameters blind as we
+            // will validate and remove invalid parameters during
+            // the build process later.
+            foreach (var pair in _processorParams)
+                item.ProcessorParams.Add(pair.Key, pair.Value);
+
+            _view.OutputAppendLine("Adding Build ContentItem '{0}'.", path);
+
+            return true;
+        }
+
+        public bool AddCopyItem(string path)
+        {
+            // Make path relative to project.
+            var projectDir = _project.Location + "\\";
+            path = PathHelper.GetRelativePath(projectDir, path);            
+
+            // Avoid duplicates.
+            var previous = _project.ContentItems.FirstOrDefault(e => e.SourceFile.Equals(path));
+            if (previous != null)
+            {
+                _view.OutputAppendLine("Skipped adding '{0}' because Copy ContentItem was a duplicate.", path);
+                return false;
+            }
+
+            // Create the item for processing later.
+            var item = new ContentItem
+            {
+                BuildAction = BuildAction.Copy,
+                SourceFile = path,
+                ProcessorParams = new OpaqueDataDictionary()
+            };
+            _project.ContentItems.Add(item);
+
+            _view.OutputAppendLine("Adding Copy ContentItem '{0}'.", path);
+
+            return true;
+        }
+
+        public bool AddReference(string path)
+        {
+            // Make path relative to project.
+            var projectDir = _project.Location + "\\";
+            path = PathHelper.GetRelativePath(projectDir, path);            
+
+            // Avoid duplicates.
+            if (_project.References.Contains(path))
+            {
+                _view.OutputAppendLine("Skipped adding '{0}' because Reference was a duplicate.", path);
+                return false;
+            }
+
+            _project.References.Add(path);
+
+            _view.OutputAppendLine("Adding Reference '{0}'.", path);
+
+            return true;
+        }
+
+        private bool AddProcessorParam(string namevalue)
+        {
+            var words = namevalue.Split('=');
+            if (words.Length != 2)
+                return false;
+
+            _processorParams.Remove(words[0]);
+            _processorParams.Add(words[0], words[1]);
+
+            return true;
         }
 
         private void ReadIncludeReference(XmlReader io, out string include, out string hintPath)
