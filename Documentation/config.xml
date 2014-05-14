@@ -27,77 +27,70 @@
   <!-- List the assemblies to include for the class library-->
   
   <!-- Windows Desktop -->
-  <source	api="default|Windows DirectX Desktop" 
-			xml="..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll</source>
-  <source	api="default|Windows DirectX Desktop" 
-			xml="..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
-			>..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  <group api="default|Windows DirectX Desktop">    
+    <source>..\MonoGame.Framework\bin\Windows\AnyCPU\Release\MonoGame.Framework.dll</source>
+    <source>..\MonoGame.Framework.Content.Pipeline\bin\Windows\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  </group>
 
   <!-- Linux Desktop -->
-  <source	api="linux|Linux Desktop" 
-			xml="..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.dll</source>
-  <source	api="linux|Linux Desktop" 
-			xml="..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
-			>..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  <group api="linux|Linux Desktop">    
+    <source>..\MonoGame.Framework\bin\Linux\AnyCPU\Release\MonoGame.Framework.dll</source>
+    <source>..\MonoGame.Framework.Content.Pipeline\bin\Linux\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  </group>
   
   <!-- MacOS Desktop -->
   <!--
-  <source	api="macos|MacOS Desktop" 
-			xml="..\MonoGame.Framework\bin\MacOS\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\MacOS\AnyCPU\Release\MonoGame.Framework.dll</source>
-  <source	api="macos|MacOS Desktop" 
-			xml="..\MonoGame.Framework.Content.Pipeline\bin\MacOS\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.xml"
-			>..\MonoGame.Framework.Content.Pipeline\bin\MacOS\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  <group api="macos|MacOS Desktop">    
+    <source>..\MonoGame.Framework\bin\MacOS\AnyCPU\Release\MonoGame.Framework.dll</source>
+    <source>..\MonoGame.Framework.Content.Pipeline\bin\MacOS\AnyCPU\Release\MonoGame.Framework.Content.Pipeline.dll</source>
+  </group>
   -->
 
   <!-- WindowsGL Desktop -->
-  <source	api="wingl|Windows OpenGL Desktop" 
-			xml="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <group api="wingl|Windows OpenGL Desktop">    
+    <source>..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
 
   <!-- Windows 8 Store -->
-  <!--
-  <source	api="win8metro|Windows 8 Store" 
-			xml="..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
-  -->
+  <group api="win8metro|Windows 8 Store">
+    <searchdir>C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral</searchdir>
+    <source>..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
 
   <!-- Windows Phone 8 -->
-  <source	api="wp8|Windows Phone 8" 
-			xml="..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
+  <group api="wp8|Windows Phone 8">    
+    <source>..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll</source>
+  </group>
 
   <!-- Web -->
-  <source	api="web|Web" 
-			xml="..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <group api="web|Web">    
+    <source>..\MonoGame.Framework\bin\Web\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
 
   <!-- iOS -->
   <!--
-  <source	api="ios|iOS" 
-			xml="..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.dll</source>
+  <group api="ios|iOS">    
+    <source>..\MonoGame.Framework\bin\iOS\iPhoneSimulator\Release\MonoGame.Framework.dll</source>
+  </group>
   -->
 
   <!-- Android -->
   <!--
-  <source	api="android|Android" 
-			xml="..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <group api="android|Android">    
+    <source>..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
   -->
 
   <!-- Ouya -->
   <!--
-  <source	api="ouya|OUYA" 
-			xml="..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <group api="ouya|OUYA">    
+    <source>..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
   -->
 
   <!-- PSMobile -->
-  <source	api="psm|PlayStation Mobile" 
-			xml="..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.xml"
-			>..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.dll</source>
+  <group api="psm|PlayStation Mobile">    
+    <source>..\MonoGame.Framework\bin\PSMobile\AnyCPU\Release\MonoGame.Framework.dll</source>
+  </group>
 
- </config>
+</config>
