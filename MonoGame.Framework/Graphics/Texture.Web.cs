@@ -9,14 +9,22 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract partial class Texture
     {
+        internal int glTexture = -1;
+        internal SamplerState glLastSamplerState;
+
         private void PlatformGraphicsDeviceResetting()
         {
-            throw new NotImplementedException();
+            glTexture = -1;
+            glLastSamplerState = null;
         }
 
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
+            if (!IsDisposed)
+            {
+                glTexture = -1;
+                glLastSamplerState = null;
+            }
 
             base.Dispose(disposing);
         }

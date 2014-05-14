@@ -104,19 +104,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destRegion)
+        protected override bool TryCopyFrom(BitmapContent srcBitmap, Rectangle srcRect, Rectangle dstRect)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
-        protected override bool TryCopyTo(BitmapContent destBitmap, Rectangle sourceRegion, Rectangle destRegion)
+        protected override bool TryCopyTo(BitmapContent dstBitmap, Rectangle srcRect, Rectangle dstRect)
         {
-            throw new NotImplementedException();
-        }
+            SurfaceFormat format;
+            if (!dstBitmap.TryGetFormat(out format) || format != _format)
+                return false;
 
-        public override string ToString()
-        {
-            return base.ToString();
+            var dst = dstBitmap as PixelBitmapContent<T>;
+            for (var i = 0; i < dstRect.Height; i++)
+            {
+                var dy = dstRect.Y + i;
+                for (var j = 0; j < dstRect.Width; j++)
+                {
+                    var dx = dstRect.X + j;
+
+                    var uv = new Vector2()
+                    {
+                        X = j / (float)dstRect.Width,
+                        Y = i / (float)dstRect.Height,
+                    };
+
+                    var sx = MathHelper.Clamp((int)Math.Round(uv.X * srcRect.Width) + srcRect.X, 0, Width - 1);
+                    var sy = MathHelper.Clamp((int)Math.Round(uv.Y * srcRect.Height) + srcRect.Y, 0, Height - 1);
+                    var pixel = GetPixel(sx, sy);
+                    dst.SetPixel(dx, dy, pixel);
+                }
+            }
+
+            return true;
         }
     }
 }

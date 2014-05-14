@@ -14,6 +14,8 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainView : Form, IView, IProjectObserver
     {
+        public static MainView Form { get; private set; }
+
         private IController _controller;
         private ImageList _treeIcons;
         private ContextMenuStrip _contextMenu;
@@ -34,7 +36,9 @@ namespace MonoGame.Tools.Pipeline
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
         public MainView()
-        {            
+        {
+            Form = this;
+
             InitializeComponent();
 
             // Find an appropriate font for console like output.

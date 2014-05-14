@@ -1312,6 +1312,20 @@
     <Compile Include="Web\WebGameWindow.cs">
       <Platforms>Web</Platforms>
     </Compile>
+    <Compile Include="Libraries\JSAPI.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Compile Include="Libraries\JSAPIAccess.cs">
+      <Platforms>Web</Platforms>
+    </Compile>
+    <Content Include="Libraries\MonoGame.Web.js">
+      <Platforms>Web</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MonoGame.Framework.manifest.js">
+      <Platforms>Web</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 	
     <!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">

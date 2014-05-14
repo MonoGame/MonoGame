@@ -3,13 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.IO;
-using System.Windows.Forms.Design;
+using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -20,21 +19,27 @@ namespace MonoGame.Tools.Pipeline
         [Category("Settings")]
         [DisplayName("Output Folder")]
         [Description("The folder where the final build content is placed.")]
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string OutputDir
         {
             get { return _project.OutputDir; }
-            set { _project.OutputDir = value; }
+            set
+            {
+                _project.OutputDir = Util.GetRelativePath(value, _project.Location);
+            }
         }
 
         [Category("Settings")]
         [DisplayName("Intermediate Folder")]
         [Description("The folder where intermediate files are placed when building content.")]
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string IntermediateDir
         {
             get { return _project.IntermediateDir; }
-            set { _project.IntermediateDir = value; }
+            set
+            {
+                _project.IntermediateDir = Util.GetRelativePath(value, _project.Location);
+            }
         }
 
         [Category("Settings")]

@@ -14,6 +14,7 @@
   <!-- Topics -->
   <topic id="welcome.md" page-id="main" name="MonoGame Documentation" filename="welcome.md">
 
+    <topic id="introduction.md" name="Introduction" filename="introduction.md"/>
     <topic id="getting_started.md" name="Getting Started" filename="getting_started.md"/>
     <topic id="tutorials.md" name="Tutorials" filename="tutorials.md"/>
     <topic id="links.md" name="External Links" filename="links.md"/>
