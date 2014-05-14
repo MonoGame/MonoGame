@@ -83,17 +83,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
-            SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
+            var options = _isDynamic ? SetDataOptions.Discard : SetDataOptions.None;
+            SetDataInternal<T>(offsetInBytes, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
         }
         		
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, SetDataOptions.None);
+            var options = _isDynamic ? SetDataOptions.Discard : SetDataOptions.None;
+            SetDataInternal<T>(0, data, startIndex, elementCount, VertexDeclaration.VertexStride, options);
 		}
 		
         public void SetData<T>(T[] data) where T : struct
         {
-            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, SetDataOptions.None);
+            var options = _isDynamic ? SetDataOptions.Discard : SetDataOptions.None;
+            SetDataInternal<T>(0, data, 0, data.Length, VertexDeclaration.VertexStride, options);
         }
 
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
