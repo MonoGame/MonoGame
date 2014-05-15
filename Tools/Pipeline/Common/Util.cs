@@ -1,24 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MonoGame.Tools.Pipeline.Common
 {
     internal static class Util
     {
+        /// <summary>        
+        /// Returns the path 'filspec' made relative path 'folder'.
+        /// 
+        /// If 'folder' is not an absolute path, throws ArgumentException.
+        /// If 'filespec' is not an absolute path, returns 'filespec' unmodified.
+        /// </summary>
         public static string GetRelativePath(string filespec, string folder)
         {
+            if (!Path.IsPathRooted(filespec))
+                return filespec;
+
+            if (!Path.IsPathRooted(folder))
+                throw new ArgumentException("Must be an absolute path.", "folder");
+
             var pathUri = new Uri(filespec);
 
-            // Folders must end in a slash
-            if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            if (folder[folder.Length-1] != Path.DirectorySeparatorChar)
                 folder += Path.DirectorySeparatorChar;
 
             var folderUri = new Uri(folder);
-            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+            var result = folderUri.MakeRelativeUri(pathUri).ToString();
+            result = result.Replace('/', Path.DirectorySeparatorChar);
+            result = Uri.UnescapeDataString(result);
+
+            return result;
         }
     }
 }
