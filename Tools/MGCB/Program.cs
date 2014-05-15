@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -27,15 +28,25 @@ namespace MGCB
             // Process all resoponse files.
             foreach (var r in content.ResponseFiles)
             {
-                // Read in all the lines, trim whitespace, and remove empty or comment lines.
-                var commands = File.ReadAllLines(r).
-                                Select(x => x.Trim()).
-                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
-                                ToArray();
+                var lines = File.ReadAllLines(r);
 
-                // Parse the commands like they came from the command line.
-                if (!parser.ParseCommandLine(commands))
-                    return -1;
+                for (var i = 0; i < lines.Count(); i++)
+                {
+                    var l = lines[i].Trim();
+                    if (string.IsNullOrEmpty(l))
+                        continue;
+
+                    if (l[0] == '#')
+                        continue;
+
+                    int errorPosition;
+                    string errorMessage;
+                    if (!parser.ParseArgument(lines[i], out errorPosition, out errorMessage))
+                    {
+                        Console.WriteLine("{0}({1},{2}): Parse Error: {3}", r, i, errorPosition, errorMessage);
+                        return -1;
+                    }
+                }
             }
             
             // Do we have anything to do?

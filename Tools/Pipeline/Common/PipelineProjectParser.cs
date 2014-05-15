@@ -124,9 +124,9 @@ namespace MonoGame.Tools.Pipeline
             _controller = controller;
             _project = project;
             _view = view;
-        }        
+        }
 
-        public void OpenProject(string projectFilePath)
+        public bool OpenProject(string projectFilePath)
         {
             _project.ContentItems.Clear();
 
@@ -137,14 +137,29 @@ namespace MonoGame.Tools.Pipeline
                 {
                     Title = "Pipeline",
                     Error = _controller.OutputWriter,
-                };            
+                };
 
-            var commands = File.ReadAllLines(projectFilePath).
-                                Select(x => x.Trim()).
-                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
-                                ToArray();
+            var lines = File.ReadAllLines(projectFilePath);
 
-            parser.ParseCommandLine(commands);
+            for (var i = 0; i < lines.Count(); i++)
+            {
+                var l = lines[i].Trim();
+                if (string.IsNullOrEmpty(l))
+                    continue;
+
+                if (l[0] == '#')
+                    continue;
+
+                int errorPosition;
+                string errorMessage;
+                if (!parser.ParseArgument(lines[i], out errorPosition, out errorMessage))
+                {
+                    Console.WriteLine("{0}({1},{2}): Parse Error: {3}", projectFilePath, i, errorPosition, errorMessage);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void SaveProject()
@@ -255,7 +270,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void ImportProject(string projectFilePath)
+        public bool ImportProject(string projectFilePath)
         {
             _project.FilePath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
 
@@ -313,6 +328,8 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
             }
+
+            return true;
         }
 
         public bool AddBuildItem(string path, bool skipDuplicate)
@@ -327,11 +344,11 @@ namespace MonoGame.Tools.Pipeline
             {
                 if (skipDuplicate)
                 {
-                    _view.OutputAppendLine("Skipped adding '{0}' because Build ContentItem was a duplicate.", path);
+                    //_view.OutputAppendLine("Skipped adding '{0}' because Build ContentItem was a duplicate.", path);
                     return false;
                 }
 
-                _view.OutputAppendLine("Existing Build ContentItem with path '{0}' has been removed.", path);
+                //_view.OutputAppendLine("Existing Build ContentItem with path '{0}' has been removed.", path);
 
                 _project.ContentItems.RemoveAt(previous);
             }
@@ -354,7 +371,7 @@ namespace MonoGame.Tools.Pipeline
             foreach (var pair in _processorParams)
                 item.ProcessorParams.Add(pair.Key, pair.Value);
 
-            _view.OutputAppendLine("Adding Build ContentItem '{0}'.", path);
+            //_view.OutputAppendLine("Adding Build ContentItem '{0}'.", path);
 
             return true;
         }
@@ -369,7 +386,7 @@ namespace MonoGame.Tools.Pipeline
             var previous = _project.ContentItems.FirstOrDefault(e => e.SourceFile.Equals(path));
             if (previous != null)
             {
-                _view.OutputAppendLine("Skipped adding '{0}' because Copy ContentItem was a duplicate.", path);
+                //_view.OutputAppendLine("Skipped adding '{0}' because Copy ContentItem was a duplicate.", path);
                 return false;
             }
 
@@ -382,7 +399,7 @@ namespace MonoGame.Tools.Pipeline
             };
             _project.ContentItems.Add(item);
 
-            _view.OutputAppendLine("Adding Copy ContentItem '{0}'.", path);
+            //_view.OutputAppendLine("Adding Copy ContentItem '{0}'.", path);
 
             return true;
         }
@@ -396,13 +413,13 @@ namespace MonoGame.Tools.Pipeline
             // Avoid duplicates.
             if (_project.References.Contains(path))
             {
-                _view.OutputAppendLine("Skipped adding '{0}' because Reference was a duplicate.", path);
+                //_view.OutputAppendLine("Skipped adding '{0}' because Reference was a duplicate.", path);
                 return false;
             }
 
             _project.References.Add(path);
 
-            _view.OutputAppendLine("Adding Reference '{0}'.", path);
+            //_view.OutputAppendLine("Adding Reference '{0}'.", path);
 
             return true;
         }

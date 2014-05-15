@@ -48,17 +48,6 @@ namespace MGCB
             return null;
         }
 
-        private TextWriter GetOutWriter()
-        {
-            if (Out != null)
-                return Out;
-
-            if (Console.Out != null)
-                return Console.Out;
-
-            return null;
-        }
-
         public CommandLineParser(object optionsObject)
         {
             _optionsObject = optionsObject;
@@ -141,8 +130,11 @@ namespace MGCB
             // Parse each argument in turn.
             foreach (var arg in args)
             {
-                if (!ParseArgument(arg.Trim()))
+                int errorPosition;
+                string errorMessage;
+                if (!ParseArgument(arg.Trim(), out errorPosition, out errorMessage))
                 {
+                    ShowError(errorMessage);
                     success = false;
                     break;
                 }
@@ -160,17 +152,18 @@ namespace MGCB
         }
 
 
-        bool ParseArgument(string arg)
+        public bool ParseArgument(string arg, out int errorPosition, out string errorMessage)
         {
             if (arg.StartsWith("/"))
             {
-                // After the first escaped argument we can no
-                // longer read non-escaped arguments.
                 if (_requiredOptions.Count > 0)
+                {
+                    errorPosition = 0;
+                    errorMessage = "After the first escaped argument we can no longer read non-escaped arguments.";
                     return false;
+                }
 
-                // Parse an optional argument.
-                char[] separators = { ':' };
+                char[] separators = {':'};
 
                 var split = arg.Substring(1).Split(separators, 2, StringSplitOptions.None);
 
@@ -181,13 +174,23 @@ namespace MGCB
 
                 if (!_optionalOptions.TryGetValue(name.ToLowerInvariant(), out member))
                 {
-                    ShowError("Unknown option '{0}'", name);
+                    errorPosition = arg.IndexOf(name);
+                    errorMessage = string.Format("Unknown option '{0}'.", name);
                     return false;
                 }
 
-                return SetOption(member, value);
+                if (!SetOption(member, value, out errorMessage))
+                {
+                    errorPosition = arg.IndexOf(value);
+                    return false;
+                }
+
+                errorMessage = null;
+                errorPosition = 0;
+                return true;
             }
-            else if ( _requiredOptions.Count > 0 )
+
+            if (_requiredOptions.Count > 0)
             {
                 // Parse the next non escaped argument.
                 var field = _requiredOptions.Peek();
@@ -195,17 +198,24 @@ namespace MGCB
                 if (!IsList(field))
                     _requiredOptions.Dequeue();
 
-                return SetOption(field, arg);
+                if (!SetOption(field, arg, out errorMessage))
+                {
+                    errorPosition = arg.IndexOf(arg);
+                    return false;
+                }
+
+                errorMessage = null;
+                errorPosition = 0;
+                return true;
             }
-            else
-            {
-                ShowError("Too many arguments");
-                return false;
-            }
+
+            errorPosition = 0;
+            errorMessage = "Too many arguments.";
+            return false;
         }
 
 
-        bool SetOption(MemberInfo member, string value)
+        bool SetOption(MemberInfo member, string value, out string errorMessage)
         {
             try
             {
@@ -238,11 +248,12 @@ namespace MGCB
                     }
                 }
 
+                errorMessage = null;
                 return true;
             }
             catch
             {
-                ShowError("Invalid value '{0}' for option '{1}'", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
+                errorMessage = string.Format("Invalid value '{0}' for option '{1}'.", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
                 return false;
             }
         }

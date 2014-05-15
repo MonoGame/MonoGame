@@ -12,7 +12,7 @@ using MonoGame.Tools.Pipeline.Properties;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class MainView : Form, IView, IProjectObserver
+    partial class MainView : Form, IView
     {
         public static MainView Form { get; private set; }
 
@@ -242,6 +242,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new OpenFileDialog()
             {
+                Title = "Open",
                 RestoreDirectory = true,
                 AddExtension = true,
                 CheckPathExists = true,
@@ -258,6 +259,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new OpenFileDialog()
             {
+                Title = "Import",
                 RestoreDirectory = true,
                 AddExtension = true,
                 CheckPathExists = true,

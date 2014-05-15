@@ -81,32 +81,28 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
                 return;
 
-           // Ask user to choose a location on disk for the new project.
-            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
+            // Ask user to choose a location on disk for the new project.            
             var projectFilePath = Environment.CurrentDirectory;
             if (!_view.AskSaveName(ref projectFilePath, "New Project"))
                 return;
 
             if (OnProjectLoading != null)
-                OnProjectLoading();
+                OnProjectLoading();            
 
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("Command NewProject: '{0}'.", Path.GetFileName(projectFilePath));
-            _view.OutputAppendLine();
-
-            // Clear existing project data, initialize to a new blank project.
+            // Create blank project.
             _project = new PipelineProject();            
             PipelineTypes.Load(_project, _view);
-
-            // Save the new project.
+            
             _project.FilePath = projectFilePath;
             ProjectOpen = true;
+            ProjectDiry = true;
             
             UpdateTree();
 
@@ -116,6 +112,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void ImportProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -126,28 +124,21 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (OnProjectLoading != null)
-                OnProjectLoading();
-
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("Command ImportProject: '{0}'.", Path.GetFileName(projectFilePath));
-            _view.OutputAppendLine();
+                OnProjectLoading();            
 
 #if SHIPPING
             try
 #endif
             {
-                _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project, _view);
-                parser.ImportProject(projectFilePath);
-
-                _view.OutputAppendLine();
-                OutputProjectSummary(); 
-
-                ResolveTypes();                
-                
-                ProjectOpen = true;
-                ProjectDiry = true;
+                var project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, project, _view);
+                if (parser.ImportProject(projectFilePath))
+                {                    
+                    _project = project;
+                    ResolveTypes();
+                    ProjectOpen = true;
+                    ProjectDiry = true;
+                }                                
             }
 #if SHIPPING
             catch (Exception e)
@@ -156,19 +147,16 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 #endif
-
             UpdateTree();
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
-
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("ImportProject Done.");
-            _view.OutputAppendLine();
         }
 
         public void OpenProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -180,25 +168,19 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoading != null)
                 OnProjectLoading();
-
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("Command OpenProject: '{0}'.", Path.GetFileName(projectFilePath));
-            _view.OutputAppendLine();
 #if SHIPPING
             try
 #endif
             {
-                _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project, _view);
-                parser.OpenProject(projectFilePath);
-
-                OutputProjectSummary();                
-
-                ResolveTypes();
-
-                ProjectOpen = true;
-                ProjectDiry = false;
+                var project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, project, _view);
+                if (parser.OpenProject(projectFilePath))
+                {
+                    _project = project;                    
+                    ResolveTypes();
+                    ProjectOpen = true;
+                    ProjectDiry = false;                
+                }
             }
 #if SHIPPING
             catch (Exception e)
@@ -207,31 +189,16 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 #endif
-
             UpdateTree();
 
             if (OnProjectLoaded != null)
                 OnProjectLoaded();
-
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("OpenProject Done.");
-            _view.OutputAppendLine();
-        }
-
-        private void OutputProjectSummary()
-        {
-            _view.OutputAppendLine();
-
-            var numRefs = _project.References.Count;
-            var numCopy = _project.ContentItems.Count(e => e.BuildAction == BuildAction.Copy);
-            var numBuild = _project.ContentItems.Count(e => e.BuildAction == BuildAction.Build);
-            _view.OutputAppendLine("Project Summary: {0} Reference(s), {1} Copy ContentItem(s), {2} Build ContentItem(s)", numRefs, numCopy, numBuild);
-            
-            _view.OutputAppendLine();
         }
 
         public void CloseProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -241,16 +208,13 @@ namespace MonoGame.Tools.Pipeline
             ProjectDiry = false;
             _project = null;
 
-            UpdateTree();
-
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("Project Closed.");
-            _view.OutputAppendLine();
+            UpdateTree();            
         }
 
         public bool SaveProject(bool saveAs)
         {
+            _view.OutputClear();
+
             // Do we need file name?
             if (saveAs || string.IsNullOrEmpty(_project.FilePath))
             {
@@ -261,21 +225,10 @@ namespace MonoGame.Tools.Pipeline
                 _project.FilePath = newFilePath;
             }
 
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("Command SaveProject: '{0}'", Path.GetFileName(_project.OriginalPath));
-            _view.OutputAppendLine();
-
             // Do the save.
             ProjectDiry = false;
             var parser = new PipelineProjectParser(this, _project, _view);
             parser.SaveProject();
-
-            OutputProjectSummary();
-
-            _view.OutputAppendLine();
-            _view.OutputAppendLine("SaveProject Done.");
-            _view.OutputAppendLine();
 
             return true;
         }
@@ -287,6 +240,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void Execute(BuildCommand cmd)
         {
+            _view.OutputClear();
+
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
             // Make sure we save first!
@@ -294,12 +249,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (OnBuildStarted != null)
-                OnBuildStarted(cmd);
-
-            _view.OutputClear();
-            _view.OutputAppendLine();
-            _view.OutputAppendLine(string.Format("Executing BuildCommand: {0}.", cmd));
-            _view.OutputAppendLine();
+                OnBuildStarted(cmd);           
 
             var parameters = new List<string>();
             if (cmd == BuildCommand.Clean)
