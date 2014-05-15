@@ -8,11 +8,14 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using MonoGame.Tools.Pipeline.Properties;
 
 namespace MonoGame.Tools.Pipeline
 {
-    partial class MainView : Form, IView, IProjectObserver
+    partial class MainView : Form, IView
     {
+        public static MainView Form { get; private set; }
+
         private IController _controller;
         private ImageList _treeIcons;
         private ContextMenuStrip _contextMenu;
@@ -26,14 +29,16 @@ namespace MonoGame.Tools.Pipeline
         private const int ProjectIcon = 3;
         private const string ContextMenuInclude = "Add";
         private const string ContextMenuExclude = "Remove";
+        private const string ContextMenuOpenFile = "Open File";
+        private const string ContextMenuOpenFileLocation = "Open File Location";
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
-        public static MainView Form { get; private set; }
-
         public MainView()
-        {            
+        {
+            Form = this;
+
             InitializeComponent();
 
             // Find an appropriate font for console like output.
@@ -59,9 +64,39 @@ namespace MonoGame.Tools.Pipeline
             _contextMenu = new ContextMenuStrip();
             _contextMenu.ItemClicked += OnContextMenuItemClicked;
 
-            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
+            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;            
+        }
 
-            Form = this;
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            // Set window location
+            if (Settings.Default.WindowLocation != null)
+                Location = Settings.Default.WindowLocation;
+
+            // Set window size
+            if (Settings.Default.WindowSize != null)
+                Size = Settings.Default.WindowSize;
+        }
+
+        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (!_controller.Exit())
+                    e.Cancel = true;
+            }
+
+            // Copy window location to app settings
+            Settings.Default.WindowLocation = this.Location;
+
+            // Copy window size to app settings
+            if (this.WindowState == FormWindowState.Normal)
+                Settings.Default.WindowSize = this.Size;
+            else
+                Settings.Default.WindowSize = this.RestoreBounds.Size;
+
+            // Save settings
+            Settings.Default.Save();
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -88,7 +123,27 @@ namespace MonoGame.Tools.Pipeline
                 case ContextMenuExclude:
                     {
                         _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
-                    } break;                
+                    } break;
+                case ContextMenuOpenFile:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath))
+                        {
+                            Process.Start(filePath);                            
+                        }
+                    } break;
+                case ContextMenuOpenFileLocation:
+                    {
+                        var filePath = (e.ClickedItem.Tag as IProjectItem).OriginalPath;
+                        filePath = _controller.GetFullPath(filePath);
+
+                        if (File.Exists(filePath) || Directory.Exists(filePath))
+                        {
+                            Process.Start("explorer.exe", "/select, " + filePath);
+                        }
+                    } break;
                 default:
                     throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
             }
@@ -109,24 +164,23 @@ namespace MonoGame.Tools.Pipeline
                     // Select the node the user has clicked.
                     _treeView.SelectedNode = node;
 
-                    if (node.Tag is ContentItem)
-                    {
-                        _contextMenu.Items.Clear();
+                    _contextMenu.Items.Clear();
 
-                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
+                    if (node.Tag is ContentItem)                    
+                        _contextMenu.Items.Add(ContextMenuExclude).Tag = node.Tag;                    
+                    else                    
+                        _contextMenu.Items.Add(ContextMenuInclude).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p);
-                    }
-                    else
-                    {
-                        _contextMenu.Items.Clear();
+                    var filePath = (node.Tag as IProjectItem).OriginalPath;
+                    filePath = _controller.GetFullPath(filePath);
 
-                        var item = _contextMenu.Items.Add(ContextMenuInclude);
-                        item.Tag = node.Tag;
+                    if (File.Exists(filePath))
+                        _contextMenu.Items.Add(ContextMenuOpenFile).Tag = node.Tag;
 
-                        _contextMenu.Show(_treeView, p); 
-                    }                   
+                    if (File.Exists(filePath) || Directory.Exists(filePath))                    
+                        _contextMenu.Items.Add(ContextMenuOpenFileLocation).Tag = node.Tag;
+
+                    _contextMenu.Show(_treeView, p);
                 }
             }
         }
@@ -137,12 +191,15 @@ namespace MonoGame.Tools.Pipeline
         {
             _controller = controller;
 
-            // Make sure build and project trigger updates to all the menu items.
-            Action activate = delegate { this.Invoke(new MethodInvoker(UpdateMenus)); };
-            _controller.OnBuildStarted += activate;
-            _controller.OnBuildFinished += activate;
-            _controller.OnProjectLoading += activate;
-            _controller.OnProjectLoaded += activate;
+            // Make sure build and project trigger updates to all the menu items...
+
+            var voidCallback = new ProjectEventCallback(() => this.Invoke(new MethodInvoker(UpdateMenus)));
+            _controller.OnProjectLoading += voidCallback;
+            _controller.OnProjectLoaded += voidCallback;
+
+            var buildCallback = new BuildEventCallback((e) => this.Invoke(new MethodInvoker(UpdateMenus)));
+            _controller.OnBuildStarted += buildCallback;
+            _controller.OnBuildFinished += buildCallback;
         }
 
         public AskResult AskSaveOrCancel()
@@ -185,6 +242,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new OpenFileDialog()
             {
+                Title = "Open",
                 RestoreDirectory = true,
                 AddExtension = true,
                 CheckPathExists = true,
@@ -201,6 +259,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new OpenFileDialog()
             {
+                Title = "Import",
                 RestoreDirectory = true,
                 AddExtension = true,
                 CheckPathExists = true,
@@ -356,21 +415,6 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void OutputAppend(string text)
-        {
-            if (text == null)
-                return;
-
-            // We need to append newlines.
-            var line = string.Concat(text, Environment.NewLine);
-
-            // Write the output... safely if needed.
-            if (InvokeRequired)
-                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
-            else
-                _outputWindow.AppendText(line);
-        }
-
         public bool ChooseContentFile(string initialDirectory, out List<string> files)
         {
             var dlg = new OpenFileDialog()
@@ -396,9 +440,49 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
+        public void OutputAppend(string text, params object[] args)
+        {
+            if (text == null)
+                return;
+
+            Debug.Write(string.Format(text, args));
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { text });
+            else
+                _outputWindow.AppendText(text);
+        }
+
+        public void OutputAppendLine(string text, params object[] args)
+        {
+            if (text == null)
+                return;
+
+            var line = string.Format(text + Environment.NewLine, args);            
+            Debug.Write(line);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { line });
+            else
+                _outputWindow.AppendText(line);
+        }
+
+        public void OutputAppendLine()
+        {
+            Debug.Write(Environment.NewLine);
+
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action<string>(_outputWindow.AppendText), new object[] { Environment.NewLine });
+            else
+                _outputWindow.AppendText(Environment.NewLine);
+        }        
+
         public void OutputClear()
         {
-            _outputWindow.Clear();
+            if (InvokeRequired)
+                _outputWindow.Invoke(new Action(_outputWindow.Clear));
+            else
+                _outputWindow.Clear();
         }
 
         private void NewMenuItemClick(object sender, System.EventArgs e)
@@ -415,15 +499,6 @@ namespace MonoGame.Tools.Pipeline
         private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             _controller.CloseProject();
-        }
-
-        private void MainView_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                if (!_controller.Exit())
-                    e.Cancel = true;
-            }
         }
 
         private void SaveMenuItemClick(object sender, System.EventArgs e)
@@ -468,17 +543,17 @@ namespace MonoGame.Tools.Pipeline
 
         private void BuildMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Build(false);
+            _controller.Execute(BuildCommand.Build);
         }
 
         private void RebuilMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Build(true);
+            _controller.Execute(BuildCommand.Rebuild);
         }
 
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
-            _controller.Clean();
+            _controller.Execute(BuildCommand.Clean);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)

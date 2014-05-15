@@ -83,6 +83,21 @@ namespace MonoGame.Tools.Pipeline
                     if (svc.ShowDialog(form) == DialogResult.OK)
                     {
                         lines = new List<string>(form.Lines);
+
+                        // Windows explorer 'copy as path' puts quotes around the string.
+                        // Remove them as a convenience.
+                        for (var i = 0; i < lines.Count; i++)
+                        {
+                            var l = lines[i];
+                            if (string.IsNullOrEmpty(l))
+                            {
+                                lines.RemoveAt(i);
+                                i--;
+                                continue;
+                            }
+
+                            lines[i] = l.Trim('"');
+                        }
                     }
                 }
             }

@@ -17,8 +17,10 @@ namespace MonoGame.Tools.Pipeline
 
     interface IView
     {
-        //event SelectionChanged OnSelectionChanged;
-
+        /// <summary>
+        /// Notifies IView of the current IController object.
+        /// Chance to hook in to IController events, etc.
+        /// </summary>        
         void Attach(IController controller);
 
         AskResult AskSaveOrCancel();
@@ -28,10 +30,6 @@ namespace MonoGame.Tools.Pipeline
         bool AskOpenProject(out string projectFilePath);
 
         bool AskImportProject(out string projectFilePath);
-
-        void ShowError(string title, string message);
-
-        void ShowMessage(string message);
 
         void BeginTreeUpdate();
 
@@ -51,9 +49,35 @@ namespace MonoGame.Tools.Pipeline
 
         void UpdateProperties(IProjectItem item);
 
-        void OutputAppend(string text);
+        /// <summary>
+        /// Show the user an error message within a modal dialog.
+        /// </summary>        
+        void ShowError(string title, string message);
 
-        void OutputClear();
+        /// <summary>
+        /// Show the user a message within a modal dialog.
+        /// </summary>
+        void ShowMessage(string message);
+
+        /// <summary>
+        /// Append passed string to output window.
+        /// </summary>
+        void OutputAppend(string text, params object[] args);
+
+        /// <summary>
+        /// Append a newline character to output window.
+        /// </summary>
+        void OutputAppendLine();
+
+        /// <summary>
+        /// Append passed string followed by a newline to the output window.
+        /// </summary>
+        void OutputAppendLine(string text, params object[] args);
+
+        /// <summary>
+        /// Clear output window.
+        /// </summary>
+        void OutputClear();               
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);        
     }

@@ -11,12 +11,15 @@ namespace MonoGame.Tools.Pipeline
     {                
         public FolderItem(string path)
         {
+            OriginalPath = path;
             Location = path;
             Name = path;
             if (Name.Contains("/"))
                 Name = Name.Split('/').Last();
         }
 
+        public string OriginalPath { get; private set; }
+		
         [Category("Common")]
         [Description("The name of this folder.")]
         public string Name { get; private set; }

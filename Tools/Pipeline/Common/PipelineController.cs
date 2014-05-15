@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -21,12 +22,18 @@ namespace MonoGame.Tools.Pipeline
 
         public PipelineController(IView view, PipelineProject project)
         {
+            OutputWriter = new OutputWriter(view);
+            Console.SetError(OutputWriter);
+            Console.SetOut(OutputWriter);
+
             _view = view;
             _view.Attach(this);
             _project = project;
             _project.Controller = this;
             ProjectOpen = false;
         }
+
+        public TextWriter OutputWriter { get; private set; }
 
         public bool ProjectOpen { get; private set; }
 
@@ -40,13 +47,13 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public event Action OnProjectLoading;
+        public event ProjectEventCallback OnProjectLoading;
 
-        public event Action OnProjectLoaded;
+        public event ProjectEventCallback OnProjectLoaded;
 
-        public event Action OnBuildStarted;
+        public event BuildEventCallback OnBuildStarted;
 
-        public event Action OnBuildFinished;
+        public event BuildEventCallback OnBuildFinished;
 
         public void OnProjectModified()
         {            
@@ -74,27 +81,28 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
                 return;
 
-           // Ask user to choose a location on disk for the new project.
-            // Note: It is impossible to have a project without a project root directory, hence it has to be saved immediately.
+            // Ask user to choose a location on disk for the new project.            
             var projectFilePath = Environment.CurrentDirectory;
             if (!_view.AskSaveName(ref projectFilePath, "New Project"))
                 return;
 
             if (OnProjectLoading != null)
-                OnProjectLoading();
+                OnProjectLoading();            
 
-            // Clear existing project data, initialize to a new blank project.
+            // Create blank project.
             _project = new PipelineProject();            
-            PipelineTypes.Load(_project);
-
-            // Save the new project.
+            PipelineTypes.Load(_project, _view);
+            
             _project.FilePath = projectFilePath;
             ProjectOpen = true;
+            ProjectDiry = true;
             
             UpdateTree();
 
@@ -104,6 +112,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void ImportProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -114,20 +124,21 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (OnProjectLoading != null)
-                OnProjectLoading();
+                OnProjectLoading();            
 
 #if SHIPPING
             try
 #endif
             {
-                _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project);
-                parser.ImportProject(projectFilePath);
-
-                ResolveTypes();                
-                
-                ProjectOpen = true;
-                ProjectDiry = true;
+                var project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, project, _view);
+                if (parser.ImportProject(projectFilePath))
+                {                    
+                    _project = project;
+                    ResolveTypes();
+                    ProjectOpen = true;
+                    ProjectDiry = true;
+                }                                
             }
 #if SHIPPING
             catch (Exception e)
@@ -136,7 +147,6 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 #endif
-
             UpdateTree();
 
             if (OnProjectLoaded != null)
@@ -145,6 +155,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void OpenProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -156,18 +168,19 @@ namespace MonoGame.Tools.Pipeline
 
             if (OnProjectLoading != null)
                 OnProjectLoading();
-
 #if SHIPPING
             try
 #endif
             {
-                _project = new PipelineProject();
-                var parser = new PipelineProjectParser(this, _project);
-                parser.OpenProject(projectFilePath);
-                ResolveTypes();
-
-                ProjectOpen = true;
-                ProjectDiry = false;
+                var project = new PipelineProject();
+                var parser = new PipelineProjectParser(this, project, _view);
+                if (parser.OpenProject(projectFilePath))
+                {
+                    _project = project;                    
+                    ResolveTypes();
+                    ProjectOpen = true;
+                    ProjectDiry = false;                
+                }
             }
 #if SHIPPING
             catch (Exception e)
@@ -176,7 +189,6 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 #endif
-
             UpdateTree();
 
             if (OnProjectLoaded != null)
@@ -185,6 +197,8 @@ namespace MonoGame.Tools.Pipeline
 
         public void CloseProject()
         {
+            _view.OutputClear();
+
             // Make sure we give the user a chance to
             // save the project if they need too.
             if (!AskSaveProject())
@@ -194,11 +208,13 @@ namespace MonoGame.Tools.Pipeline
             ProjectDiry = false;
             _project = null;
 
-            UpdateTree();
+            UpdateTree();            
         }
 
         public bool SaveProject(bool saveAs)
         {
+            _view.OutputClear();
+
             // Do we need file name?
             if (saveAs || string.IsNullOrEmpty(_project.FilePath))
             {
@@ -211,8 +227,8 @@ namespace MonoGame.Tools.Pipeline
 
             // Do the save.
             ProjectDiry = false;
-            var parser = new PipelineProjectParser(this, _project);
-            parser.SaveProject();            
+            var parser = new PipelineProjectParser(this, _project, _view);
+            parser.SaveProject();
 
             return true;
         }
@@ -222,8 +238,10 @@ namespace MonoGame.Tools.Pipeline
             _view.ShowProperties(item);
         }
 
-        public void Build(bool rebuild)
+        public void Execute(BuildCommand cmd)
         {
+            _view.OutputClear();
+
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
             // Make sure we save first!
@@ -231,48 +249,41 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             if (OnBuildStarted != null)
-                OnBuildStarted();
+                OnBuildStarted(cmd);           
 
-            _view.OutputClear();
+            var parameters = new List<string>();
+            if (cmd == BuildCommand.Clean)
+            {
+                parameters.Add("/clean");
+                parameters.Add(string.Format("/intermediateDir:\"{0}\"", _project.IntermediateDir));
+                parameters.Add(string.Format("/outputDir:\"{0}\"", _project.OutputDir));                
+            }
+            else
+            {
+                parameters.Add(string.Format("/@:\"{0}\"", _project.FilePath));
 
-            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
-            _buildTask = Task.Run(() => DoBuild(commands));
+                if (cmd == BuildCommand.Rebuild)
+                    parameters.Add("/rebuild");
+            }
+            
+            _buildTask = Task.Run(() => DoBuild(parameters.ToArray()));
             if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());
+                _buildTask.ContinueWith((e) => OnBuildFinished(cmd));
         }
 
-        public void Clean()
-        {
-            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
-
-            // Make sure we save first!
-            if (!AskSaveProject())
-                return;
-
-            if (OnBuildStarted != null)
-                OnBuildStarted();
-
-            _view.OutputClear();
-
-            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
-            _buildTask = Task.Run(() => DoBuild(commands));
-            if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());          
-        }
-
-        private void DoBuild(string commands)
+        private void DoBuild(string[] parameters)
         {
             _buildProcess = new Process();
             _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
             _buildProcess.StartInfo.FileName = "MGCB.exe";
-            _buildProcess.StartInfo.Arguments = commands;
+            _buildProcess.StartInfo.Arguments = string.Join(" ", parameters);
             _buildProcess.StartInfo.CreateNoWindow = true;
             _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _buildProcess.StartInfo.UseShellExecute = false;
             _buildProcess.StartInfo.RedirectStandardError = true;
             _buildProcess.StartInfo.RedirectStandardOutput = true;
             _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
-            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppendLine(args.Data);
 
             //string stdError = null;
             try
@@ -284,9 +295,9 @@ namespace MonoGame.Tools.Pipeline
             }
             catch (Exception ex)
             {
-                _view.OutputAppend("Build process failed!" + Environment.NewLine);
-                _view.OutputAppend(ex.Message);
-                _view.OutputAppend(ex.StackTrace);
+                _view.OutputAppendLine("Build process failed!");
+                _view.OutputAppendLine(ex.Message);
+                _view.OutputAppendLine(ex.StackTrace);                
             }
 
             // Clear the process pointer, so that cancel
@@ -374,12 +385,12 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var parser = new PipelineProjectParser(this, _project);
+            var parser = new PipelineProjectParser(this, _project, _view);
             _view.BeginTreeUpdate();
 
             foreach (var file in files)
             {
-                if (!parser.AddContent(file, true))
+                if (!parser.AddBuildItem(file, true))
                     continue;
 
                 var item = _project.ContentItems.Last();
@@ -402,11 +413,23 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }            
-    
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            filePath = filePath.Replace("/", "\\");
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(2);
+
+            if (Path.IsPathRooted(filePath))
+                return filePath;
+            
+            return _project.Location + "\\" + filePath;
+        }
+
         private void ResolveTypes()
         {
-            PipelineTypes.Load(_project);
+            PipelineTypes.Load(_project, _view);
             foreach (var i in _project.ContentItems)
             {
                 i.Controller = this;

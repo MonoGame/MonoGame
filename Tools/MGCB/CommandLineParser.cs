@@ -26,8 +26,27 @@ namespace MGCB
 
         readonly Queue<MemberInfo> _requiredOptions = new Queue<MemberInfo>();
         readonly Dictionary<string, MemberInfo> _optionalOptions = new Dictionary<string, MemberInfo>();
-
         readonly List<string> _requiredUsageHelp = new List<string>();
+
+        public TextWriter Error;
+        public TextWriter Out;
+
+        private TextWriter GetErrorWriter()
+        {
+            if (Error != null)
+                return Error;
+
+            if (Out != null)
+                return Out;
+
+            if (Console.Error != null)
+                return Console.Error;
+
+            if (Console.Out != null)
+                return Console.Out;
+
+            return null;
+        }
 
         public CommandLineParser(object optionsObject)
         {
@@ -111,8 +130,11 @@ namespace MGCB
             // Parse each argument in turn.
             foreach (var arg in args)
             {
-                if (!ParseArgument(arg.Trim()))
+                int errorPosition;
+                string errorMessage;
+                if (!ParseArgument(arg.Trim(), out errorPosition, out errorMessage))
                 {
+                    ShowError(errorMessage);
                     success = false;
                     break;
                 }
@@ -130,17 +152,18 @@ namespace MGCB
         }
 
 
-        bool ParseArgument(string arg)
+        public bool ParseArgument(string arg, out int errorPosition, out string errorMessage)
         {
             if (arg.StartsWith("/"))
             {
-                // After the first escaped argument we can no
-                // longer read non-escaped arguments.
                 if (_requiredOptions.Count > 0)
+                {
+                    errorPosition = 0;
+                    errorMessage = "After the first escaped argument we can no longer read non-escaped arguments.";
                     return false;
+                }
 
-                // Parse an optional argument.
-                char[] separators = { ':' };
+                char[] separators = {':'};
 
                 var split = arg.Substring(1).Split(separators, 2, StringSplitOptions.None);
 
@@ -151,13 +174,23 @@ namespace MGCB
 
                 if (!_optionalOptions.TryGetValue(name.ToLowerInvariant(), out member))
                 {
-                    ShowError("Unknown option '{0}'", name);
+                    errorPosition = arg.IndexOf(name);
+                    errorMessage = string.Format("Unknown option '{0}'.", name);
                     return false;
                 }
 
-                return SetOption(member, value);
+                if (!SetOption(member, value, out errorMessage))
+                {
+                    errorPosition = arg.IndexOf(value);
+                    return false;
+                }
+
+                errorMessage = null;
+                errorPosition = 0;
+                return true;
             }
-            else if ( _requiredOptions.Count > 0 )
+
+            if (_requiredOptions.Count > 0)
             {
                 // Parse the next non escaped argument.
                 var field = _requiredOptions.Peek();
@@ -165,17 +198,24 @@ namespace MGCB
                 if (!IsList(field))
                     _requiredOptions.Dequeue();
 
-                return SetOption(field, arg);
+                if (!SetOption(field, arg, out errorMessage))
+                {
+                    errorPosition = arg.IndexOf(arg);
+                    return false;
+                }
+
+                errorMessage = null;
+                errorPosition = 0;
+                return true;
             }
-            else
-            {
-                ShowError("Too many arguments");
-                return false;
-            }
+
+            errorPosition = 0;
+            errorMessage = "Too many arguments.";
+            return false;
         }
 
 
-        bool SetOption(MemberInfo member, string value)
+        bool SetOption(MemberInfo member, string value, out string errorMessage)
         {
             try
             {
@@ -208,11 +248,12 @@ namespace MGCB
                     }
                 }
 
+                errorMessage = null;
                 return true;
             }
             catch
             {
-                ShowError("Invalid value '{0}' for option '{1}'", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
+                errorMessage = string.Format("Invalid value '{0}' for option '{1}'.", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
                 return false;
             }
         }
@@ -286,27 +327,31 @@ namespace MGCB
         {
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
+            var writer = GetErrorWriter();
+            if (writer == null)
+                return;
+
             if (!string.IsNullOrEmpty(Title))
             {
-                Console.Error.WriteLine(Title);
-                Console.Error.WriteLine();
+                writer.WriteLine(Title);
+                writer.WriteLine();
             }
 
             if (!string.IsNullOrEmpty(message))
             {
-                Console.Error.WriteLine(message, args);
-                Console.Error.WriteLine();
+                writer.WriteLine(message, args);
+                writer.WriteLine();
             }
 
-            Console.Error.WriteLine("Usage: {0} {1}{2}", 
+            writer.WriteLine("Usage: {0} {1}{2}", 
                 name, 
                 string.Join(" ", _requiredUsageHelp), 
                 _optionalOptions.Count > 0 ? " <Options>" : string.Empty);
 
             if (_optionalOptions.Count > 0)
             {
-                Console.Error.WriteLine();
-                Console.Error.WriteLine("Options:\n");
+                writer.WriteLine();
+                writer.WriteLine("Options:\n");
 
                 foreach (var pair in _optionalOptions)
                 {
@@ -318,9 +363,9 @@ namespace MGCB
                                    (method != null && method.GetParameters().Length != 0);
 
                     if (hasValue)
-                        Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
+                        writer.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
                     else
-                        Console.Error.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
+                        writer.WriteLine("  /{0}\n    {1}\n", param.Name, param.Description);
                 }
             }
         }

@@ -3,11 +3,24 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 
 namespace MonoGame.Tools.Pipeline
 {
+    public enum BuildCommand
+    {
+        Build,
+        Rebuild,
+        Clean,
+    }
+
+    public delegate void BuildEventCallback(BuildCommand command);
+    public delegate void ProjectEventCallback();
+
     interface IController
     {
+        TextWriter OutputWriter { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -26,22 +39,22 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// Triggered when the project starts loading.
         /// </summary>
-        event Action OnProjectLoading;
+        event ProjectEventCallback OnProjectLoading;
 
         /// <summary>
         /// Triggered when the project finishes loading.
         /// </summary>
-        event Action OnProjectLoaded;
+        event ProjectEventCallback OnProjectLoaded;
 
         /// <summary>
-        /// Triggered when the project finishes building.
+        /// Triggered before a BuildCommand is executed.
         /// </summary>
-        event Action OnBuildStarted;
+        event BuildEventCallback OnBuildStarted;
 
         /// <summary>
-        /// Triggered when the project finishes building.
+        /// Triggered after a BuildCommand is finished.
         /// </summary>
-        event Action OnBuildFinished;
+        event BuildEventCallback OnBuildFinished;
 
         /// <summary>
         /// Notify controller that a property of Project or its contents has been modified.
@@ -68,11 +81,9 @@ namespace MonoGame.Tools.Pipeline
 
         bool SaveProject(bool saveAs);
 
-        void OnTreeSelect(IProjectItem item);
-        
-        void Build(bool rebuild);
+        void Execute(BuildCommand cmd);
 
-        void Clean();
+        void OnTreeSelect(IProjectItem item);                
 
         void CancelBuild();
 
@@ -80,6 +91,12 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(ContentItem item);
+
+        /// <summary>
+        /// If the passed path is not already rooted return the absolute path
+        /// making this one relative to the currently open project location.
+        /// </summary>        
+        string GetFullPath(string filePath);
     }
 }

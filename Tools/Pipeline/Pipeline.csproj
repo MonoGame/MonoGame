@@ -57,8 +57,8 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
-    <Compile Include="Common\IProjectObserver.cs" />
     <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\OutputWriter.cs" />
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\Util.cs" />
     <Compile Include="Common\StringExtensions.cs" />
