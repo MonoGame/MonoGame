@@ -127,7 +127,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
-			context.Logger.LogMessage ("Building Font {0}", fontName);
 
 			//			if (BitmapFileExtensions.Contains(fileExtension))
 			//			{

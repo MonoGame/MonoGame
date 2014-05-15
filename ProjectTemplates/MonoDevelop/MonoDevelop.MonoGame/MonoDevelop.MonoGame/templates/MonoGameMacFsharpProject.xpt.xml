@@ -27,7 +27,6 @@
 				<Reference type="Gac" refto="System.Drawing" />
 				<Reference type="Gac" refto="MonoMac" SpecificVersion="false" />
 				<Reference type="Gac" refto="MonoGame.Framework.MacOS" />
-				<Reference type="Gac" refto="Lidgren.Network.MacOS" />
 			</References>
 			<Files>
 				<FileTemplateReference TemplateID="FSharpAssemblyInfo" name="AssemblyInfo.fs" />

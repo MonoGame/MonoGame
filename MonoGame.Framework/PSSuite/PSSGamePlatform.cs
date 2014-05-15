@@ -102,7 +102,8 @@ namespace Microsoft.Xna.Framework
             //TODO: Fix this
             try
             {
-                Net.NetworkSession.Exit();
+				//(SJ) Why is this called here when it's not in any other project
+                //Net.NetworkSession.Exit();
                 Window.Close();
             }
             catch

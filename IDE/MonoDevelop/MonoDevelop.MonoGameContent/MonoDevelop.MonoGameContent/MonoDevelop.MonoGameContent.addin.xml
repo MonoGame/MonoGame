@@ -14,7 +14,6 @@
 		<Import file="icons/monogame-icon.png"/>
 		<Import file="AssimpNet.dll"/>
 		<Import file="AssimpNet.dll.config"/>
-		<Import file="Lidgren.Network.dll"/>
 		<Import file="ManagedPVRTC.dll"/>
 		<Import file="ManagedPVRTC.dll.config"/>
 		<Import file="MonoGame.Framework.Content.Pipeline.dll"/>
