@@ -198,8 +198,11 @@ namespace Microsoft.Xna.Framework.Content
 
 				ModelMesh mesh = new ModelMesh(reader.GraphicsDevice, parts);
 				mesh.Name = name;
-				mesh.ParentBone = bones[parentBoneIndex];
-				mesh.ParentBone.AddMesh(mesh);
+                if (parentBoneIndex >= 0)
+                {
+                    mesh.ParentBone = bones[parentBoneIndex];
+                    mesh.ParentBone.AddMesh(mesh);
+                }
 				mesh.BoundingSphere = boundingSphere;
 				meshes.Add(mesh);
             }
