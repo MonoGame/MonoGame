@@ -269,17 +269,14 @@ namespace MonoGame.Tools.Pipeline
             _buildProcess.StartInfo.CreateNoWindow = true;
             _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _buildProcess.StartInfo.UseShellExecute = false;
-            _buildProcess.StartInfo.RedirectStandardError = true;
             _buildProcess.StartInfo.RedirectStandardOutput = true;
             _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
-            _buildProcess.ErrorDataReceived += (sender, args) => _view.OutputAppend(args.Data);
 
             //string stdError = null;
             try
             {
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
-                _buildProcess.BeginErrorReadLine();
                 _buildProcess.WaitForExit();
             }
             catch (Exception ex)

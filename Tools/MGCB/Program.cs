@@ -13,6 +13,10 @@ namespace MGCB
     {
         static int Main(string[] args)
         {
+            // We force all stderr to redirect to stdout
+            // to avoid any out of order console output.
+            Console.SetError(Console.Out);
+
             var content = new BuildContent();
 
             // Parse the command line.
