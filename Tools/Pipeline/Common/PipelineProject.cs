@@ -3,11 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.IO;
-using System.Windows.Forms.Design;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,7 +12,7 @@ namespace MonoGame.Tools.Pipeline
 {
     internal class PipelineProject : IProjectItem
     {        
-        public IController Controller;      
+        public readonly IController Controller;      
   
         public string FilePath { get; set; }
 
@@ -27,11 +24,13 @@ namespace MonoGame.Tools.Pipeline
 
         public List<string> References { get; set; }
 
-        public TargetPlatform Platform { get; set; }
+        public List<string> DefinedConfigs { get; set; }
+
+        public string Config { get; set; }
+
+        public TargetPlatform? Platform { get; set; }
 
         public GraphicsProfile Profile { get; set; }
-
-        public string Config { get; set; }     
 
         #region IPipelineItem
 
@@ -63,12 +62,12 @@ namespace MonoGame.Tools.Pipeline
 
         #endregion
 
-        public PipelineProject()
+        public PipelineProject(IController controller)
         {
+            Controller = controller;
             ContentItems = new List<ContentItem>();
             References = new List<string>();
-            OutputDir = "bin";
-            IntermediateDir = "obj";
+            DefinedConfigs = new List<string>();     
         }
     }
 }

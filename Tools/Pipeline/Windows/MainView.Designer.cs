@@ -68,6 +68,16 @@ namespace MonoGame.Tools.Pipeline
             this._helpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._viewHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._toolStrip = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this._toolStripLabelPlatform = new System.Windows.Forms.ToolStripLabel();
+            this._toolStripComboBoxPlatform = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this._toolStripLabelConfiguration = new System.Windows.Forms.ToolStripLabel();
+            this._toolStripComboBoxConfig = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.toolStripContainer2 = new System.Windows.Forms.ToolStripContainer();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -82,6 +92,12 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.Panel2.SuspendLayout();
             _splitEditorOutput.SuspendLayout();
             this._mainMenu.SuspendLayout();
+            this._toolStrip.SuspendLayout();
+            this.toolStripContainer1.ContentPanel.SuspendLayout();
+            this.toolStripContainer1.SuspendLayout();
+            this.toolStripContainer2.ContentPanel.SuspendLayout();
+            this.toolStripContainer2.TopToolStripPanel.SuspendLayout();
+            this.toolStripContainer2.SuspendLayout();
             this.SuspendLayout();
             // 
             // _toolStripSeparator3
@@ -113,8 +129,8 @@ namespace MonoGame.Tools.Pipeline
             // _splitTreeProps.Panel2
             // 
             _splitTreeProps.Panel2.Controls.Add(this._propertyGrid);
-            _splitTreeProps.Size = new System.Drawing.Size(249, 537);
-            _splitTreeProps.SplitterDistance = 210;
+            _splitTreeProps.Size = new System.Drawing.Size(249, 487);
+            _splitTreeProps.SplitterDistance = 190;
             _splitTreeProps.TabIndex = 1;
             _splitTreeProps.TabStop = false;
             // 
@@ -123,7 +139,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
-            this._treeView.Size = new System.Drawing.Size(249, 210);
+            this._treeView.Size = new System.Drawing.Size(249, 190);
             this._treeView.TabIndex = 0;
             this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
             this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
@@ -133,14 +149,14 @@ namespace MonoGame.Tools.Pipeline
             this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this._propertyGrid.Location = new System.Drawing.Point(0, 0);
             this._propertyGrid.Name = "_propertyGrid";
-            this._propertyGrid.Size = new System.Drawing.Size(249, 323);
+            this._propertyGrid.Size = new System.Drawing.Size(249, 293);
             this._propertyGrid.TabIndex = 0;
             // 
             // _splitEditorOutput
             // 
             _splitEditorOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             _splitEditorOutput.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            _splitEditorOutput.Location = new System.Drawing.Point(0, 24);
+            _splitEditorOutput.Location = new System.Drawing.Point(0, 0);
             _splitEditorOutput.Name = "_splitEditorOutput";
             // 
             // _splitEditorOutput.Panel1
@@ -150,7 +166,7 @@ namespace MonoGame.Tools.Pipeline
             // _splitEditorOutput.Panel2
             // 
             _splitEditorOutput.Panel2.Controls.Add(this._outputWindow);
-            _splitEditorOutput.Size = new System.Drawing.Size(784, 537);
+            _splitEditorOutput.Size = new System.Drawing.Size(784, 487);
             _splitEditorOutput.SplitterDistance = 249;
             _splitEditorOutput.TabIndex = 2;
             _splitEditorOutput.TabStop = false;
@@ -163,13 +179,13 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow.Multiline = true;
             this._outputWindow.Name = "_outputWindow";
             this._outputWindow.ReadOnly = true;
-            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this._outputWindow.Size = new System.Drawing.Size(531, 537);
+            this._outputWindow.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._outputWindow.Size = new System.Drawing.Size(531, 487);
             this._outputWindow.TabIndex = 0;
-            this._outputWindow.WordWrap = false;
             // 
             // _mainMenu
             // 
+            this._mainMenu.Dock = System.Windows.Forms.DockStyle.None;
             this._mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fileMenu,
             this.editToolStripMenuItem,
@@ -392,13 +408,105 @@ namespace MonoGame.Tools.Pipeline
             this._aboutMenuItem.Text = "&About...";
             this._aboutMenuItem.Click += new System.EventHandler(this.AboutMenuItemClick);
             // 
+            // _toolStrip
+            // 
+            this._toolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSeparator4,
+            this._toolStripLabelPlatform,
+            this._toolStripComboBoxPlatform,
+            this.toolStripSeparator5,
+            this._toolStripLabelConfiguration,
+            this._toolStripComboBoxConfig,
+            this.toolStripSeparator6});
+            this._toolStrip.Location = new System.Drawing.Point(3, 24);
+            this._toolStrip.Name = "_toolStrip";
+            this._toolStrip.Size = new System.Drawing.Size(443, 25);
+            this._toolStrip.TabIndex = 3;
+            this._toolStrip.Text = "toolStrip1";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // _toolStripLabelPlatform
+            // 
+            this._toolStripLabelPlatform.Name = "_toolStripLabelPlatform";
+            this._toolStripLabelPlatform.Size = new System.Drawing.Size(53, 22);
+            this._toolStripLabelPlatform.Text = "Platform";
+            // 
+            // _toolStripComboBoxPlatform
+            // 
+            this._toolStripComboBoxPlatform.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._toolStripComboBoxPlatform.Name = "_toolStripComboBoxPlatform";
+            this._toolStripComboBoxPlatform.Size = new System.Drawing.Size(121, 25);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            // 
+            // _toolStripLabelConfiguration
+            // 
+            this._toolStripLabelConfiguration.Name = "_toolStripLabelConfiguration";
+            this._toolStripLabelConfiguration.Size = new System.Drawing.Size(81, 22);
+            this._toolStripLabelConfiguration.Text = "Configuration";
+            // 
+            // _toolStripComboBoxConf
+            // 
+            this._toolStripComboBoxConfig.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._toolStripComboBoxConfig.Name = "_toolStripComboBoxConf";
+            this._toolStripComboBoxConfig.Size = new System.Drawing.Size(121, 25);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripContainer1
+            // 
+            // 
+            // toolStripContainer1.ContentPanel
+            // 
+            this.toolStripContainer1.ContentPanel.Controls.Add(_splitEditorOutput);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(784, 487);
+            this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
+            this.toolStripContainer1.Name = "toolStripContainer1";
+            this.toolStripContainer1.Size = new System.Drawing.Size(784, 512);
+            this.toolStripContainer1.TabIndex = 1;
+            this.toolStripContainer1.Text = "toolStripContainer1";
+            // 
+            // toolStripContainer2
+            // 
+            this.toolStripContainer2.BottomToolStripPanelVisible = false;
+            // 
+            // toolStripContainer2.ContentPanel
+            // 
+            this.toolStripContainer2.ContentPanel.AutoScroll = true;
+            this.toolStripContainer2.ContentPanel.Controls.Add(this.toolStripContainer1);
+            this.toolStripContainer2.ContentPanel.Size = new System.Drawing.Size(784, 512);
+            this.toolStripContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toolStripContainer2.LeftToolStripPanelVisible = false;
+            this.toolStripContainer2.Location = new System.Drawing.Point(0, 0);
+            this.toolStripContainer2.Name = "toolStripContainer2";
+            this.toolStripContainer2.RightToolStripPanelVisible = false;
+            this.toolStripContainer2.Size = new System.Drawing.Size(784, 561);
+            this.toolStripContainer2.TabIndex = 3;
+            this.toolStripContainer2.Text = "toolStripContainer2";
+            // 
+            // toolStripContainer2.TopToolStripPanel
+            // 
+            this.toolStripContainer2.TopToolStripPanel.Controls.Add(this._mainMenu);
+            this.toolStripContainer2.TopToolStripPanel.Controls.Add(this._toolStrip);
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(_splitEditorOutput);
-            this.Controls.Add(this._mainMenu);
+            this.Controls.Add(this.toolStripContainer2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this._mainMenu;
             this.MinimumSize = new System.Drawing.Size(320, 240);
@@ -416,8 +524,17 @@ namespace MonoGame.Tools.Pipeline
             _splitEditorOutput.ResumeLayout(false);
             this._mainMenu.ResumeLayout(false);
             this._mainMenu.PerformLayout();
+            this._toolStrip.ResumeLayout(false);
+            this._toolStrip.PerformLayout();
+            this.toolStripContainer1.ContentPanel.ResumeLayout(false);
+            this.toolStripContainer1.ResumeLayout(false);
+            this.toolStripContainer1.PerformLayout();
+            this.toolStripContainer2.ContentPanel.ResumeLayout(false);
+            this.toolStripContainer2.TopToolStripPanel.ResumeLayout(false);
+            this.toolStripContainer2.TopToolStripPanel.PerformLayout();
+            this.toolStripContainer2.ResumeLayout(false);
+            this.toolStripContainer2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -453,6 +570,16 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem _cancelBuildMenuItem;
         private System.Windows.Forms.ToolStripSeparator _cancelBuildSeparator;
+        private System.Windows.Forms.ToolStrip _toolStrip;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripLabel _toolStripLabelPlatform;
+        private System.Windows.Forms.ToolStripComboBox _toolStripComboBoxPlatform;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripLabel _toolStripLabelConfiguration;
+        private System.Windows.Forms.ToolStripComboBox _toolStripComboBoxConfig;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
+        private System.Windows.Forms.ToolStripContainer toolStripContainer2;
     }
 }
 

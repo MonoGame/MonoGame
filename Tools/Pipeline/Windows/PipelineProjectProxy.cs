@@ -20,30 +20,13 @@ namespace MonoGame.Tools.Pipeline
     {
         private readonly PipelineProject _project;
 
-        [Category("Settings")]
-        [DisplayName("Output Folder")]
-        [Description("The folder where the final build content is placed.")]
-        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
-        public string OutputDir
+        [Category("\tTargets")]
+        [Description("Configurations this project can be built for.")]
+        [Editor(typeof(AssemblyReferenceListEditor), typeof(UITypeEditor))]
+        public List<string> DefinedConfigs
         {
-            get { return _project.OutputDir; }
-            set
-            {
-                _project.OutputDir = Util.GetRelativePath(value, _project.Location);
-            }
-        }
-
-        [Category("Settings")]
-        [DisplayName("Intermediate Folder")]
-        [Description("The folder where intermediate files are placed when building content.")]
-        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
-        public string IntermediateDir
-        {
-            get { return _project.IntermediateDir; }
-            set
-            {       
-                _project.IntermediateDir = Util.GetRelativePath(value, _project.Location);
-            }
+            get { return _project.DefinedConfigs; }
+            set { _project.DefinedConfigs = value; }
         }
 
         [Category("Settings")]
@@ -52,15 +35,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get { return _project.References; }
             set { _project.References = value; }
-        }
-
-        [Category("Settings")]
-        [Description("The platform to target when building content.")]
-        public TargetPlatform Platform
-        {
-            get { return _project.Platform; }
-            set { _project.Platform = value; }
-        }
+        }        
 
         [Category("Settings")]
         [Description("The graphics profile to target when building content.")]
@@ -68,14 +43,6 @@ namespace MonoGame.Tools.Pipeline
         {
             get { return _project.Profile; }
             set { _project.Profile = value; }
-        }
-
-        [Category("Settings")]
-        [Description("The configuration to target when building content.")]
-        public string Config 
-        {
-            get { return _project.Config; }
-            set { _project.Config = value; }
         }
 
         [Category("Statistics")]

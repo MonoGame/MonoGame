@@ -36,18 +36,6 @@ namespace MonoGame.Tools.Pipeline
         #region CommandLineParameters
         
         [CommandLineParameter(
-            Name = "outputDir",
-            ValueName = "directoryPath",
-            Description = "The directory where all content is written.")]
-        public string OutputDir { set { _project.OutputDir = value; } }
-
-        [CommandLineParameter(
-            Name = "intermediateDir",
-            ValueName = "directoryPath",
-            Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir { set { _project.IntermediateDir = value; } }
-
-        [CommandLineParameter(
             Name = "reference",
             ValueName = "assemblyNameOrFile",
             Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
@@ -58,22 +46,14 @@ namespace MonoGame.Tools.Pipeline
         }
 
         [CommandLineParameter(
-            Name = "platform",
-            ValueName = "targetPlatform",
-            Description = "Set the target platform for this build.  Defaults to Windows.")]
-        public TargetPlatform Platform { set { _project.Platform = value; } }
-
-        [CommandLineParameter(
-            Name = "profile",
-            ValueName = "graphicsProfile",
-            Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
-        public GraphicsProfile Profile { set { _project.Profile = value; } }
-
-        [CommandLineParameter(
-            Name = "config",
+            Name = "defineconfig",
             ValueName = "string",
-            Description = "The optional build config string from the build system.")]
-        public string Config { set { _project.Config = value; } }
+            Description = "Adds a configuration this project can be built for.")]
+        public List<string> DefinedConfigs
+        {
+            get { return _project.DefinedConfigs; }
+            set { _project.DefinedConfigs = value; }
+        }
 
         [CommandLineParameter(
             Name = "importer",
@@ -205,15 +185,11 @@ namespace MonoGame.Tools.Pipeline
             // Store the file name for saving later.
             _project.FilePath = projectFilePath;
 
-            var parser = new CommandLineParser(this);
-            parser.Title = "Pipeline";
-
-            var commands = File.ReadAllLines(projectFilePath).
-                                Select(x => x.Trim()).
-                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
-                                ToArray();
-
-            parser.ParseCommandLine(commands);
+            var parser = new MGBuildParser(this)
+                {
+                    Title = "Pipeline"
+                };
+            parser.Parse(new[] {"/set:PipelineTool=True", "/@:" + projectFilePath });
         }
 
         public void SaveProject()
@@ -224,22 +200,19 @@ namespace MonoGame.Tools.Pipeline
 
             using (var io = File.CreateText(_project.FilePath))
             {
+                line = FormatDivider("Targets");
+                io.WriteLine(line);
+                
+                io.WriteLine("/if:PipelineTool=True");
+                foreach (var i in _project.DefinedConfigs)
+                {
+                    line = string.Format(lineFormat, "defineconfig", i);
+                    io.Write('\t');
+                    io.WriteLine(line);
+                }
+                io.WriteLine("/endif");
+
                 line = FormatDivider("Global Properties");
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "outputDir", _project.OutputDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "platform", _project.Platform);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "config", _project.Config);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "profile", _project.Profile);
                 io.WriteLine(line);
 
                 line = FormatDivider("References");

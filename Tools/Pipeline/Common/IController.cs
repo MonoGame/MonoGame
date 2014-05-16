@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -34,9 +36,14 @@ namespace MonoGame.Tools.Pipeline
         event Action OnProjectLoaded;
 
         /// <summary>
+        /// Triggered when the project is closed.
+        /// </summary>
+        event Action OnProjectClosed;
+
+        /// <summary>
         /// Triggered when the project finishes building.
         /// </summary>
-        event Action OnBuildStarted;
+        event Action OnBuildStarted;        
 
         /// <summary>
         /// Triggered when the project finishes building.
@@ -80,6 +87,36 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(ContentItem item);
+
+        /// <summary>
+        /// Enumerate configurations which the project can target. 
+        /// </summary>
+        IEnumerable<string> DefinedConfigurations { get; }
+
+        /// <summary>
+        /// Enumerate platforms which the project can target.
+        /// </summary>
+        IEnumerable<TargetPlatform> DefinedPlatforms { get; }
+
+        /// <summary>
+        /// Event fired when IController.CurrentConfig is assigned a new value.
+        /// </summary>
+        event Action<string> OnConfigChanged;
+
+        /// <summary>
+        /// Event fired when IController.CurrentPlatform is assigned a new value.
+        /// </summary>
+        event Action<TargetPlatform?> OnPlatformChanged;
+
+        /// <summary>
+        /// The config for which build commands will be executed.
+        /// </summary>
+        string CurrentConfig { get; set; }
+
+        /// <summary>
+        /// The platform for which build commands will be executed.
+        /// </summary>
+        TargetPlatform? CurrentPlatform { get; set; }
     }
 }

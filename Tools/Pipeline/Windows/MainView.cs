@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -61,7 +62,20 @@ namespace MonoGame.Tools.Pipeline
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
+            _toolStripComboBoxConfig.SelectedIndexChanged += OnComboBoxConfigSelectionChanged;
+            _toolStripComboBoxPlatform.SelectedIndexChanged += OnComboBoxPlatformSelectionChanged;
+
             Form = this;
+        }
+
+        private void OnComboBoxConfigSelectionChanged(object sender, EventArgs e)
+        {
+            _controller.CurrentConfig = (string)(_toolStripComboBoxConfig.SelectedItem);
+        }
+
+        private void OnComboBoxPlatformSelectionChanged(object sender, EventArgs e)
+        {
+            _controller.CurrentPlatform = (TargetPlatform)(_toolStripComboBoxPlatform.SelectedItem);
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -73,7 +87,12 @@ namespace MonoGame.Tools.Pipeline
                 if (_propertyGrid.SelectedObject is ContentItem)
                     _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
                 else
+                {
+                    if (e.ChangedItem.Label == "DefinedConfigs" || e.ChangedItem.Label == "DefinedPlatforms")
+                        UpdateMenus();
+
                     _controller.OnProjectModified();
+                }
             }
         }
 
@@ -143,6 +162,9 @@ namespace MonoGame.Tools.Pipeline
             _controller.OnBuildFinished += activate;
             _controller.OnProjectLoading += activate;
             _controller.OnProjectLoaded += activate;
+            _controller.OnProjectClosed += activate;
+
+            UpdateMenus();
         }
 
         public AskResult AskSaveOrCancel()
@@ -349,7 +371,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateProperties(IProjectItem item)
         {
-            if (_propertyGrid.SelectedObject == item)
+            if (_propertyGrid.SelectedObject == item || ((item is PipelineProject) && (_propertyGrid.SelectedObject is PipelineProjectProxy)))
             {
                 _propertyGrid.Refresh();
                 _propertyGrid.ExpandAllGridItems();
@@ -519,6 +541,7 @@ namespace MonoGame.Tools.Pipeline
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
             var projectOpenAndNotBuilding = projectOpen && notBuilding;
+            var platformAndConfigSelected = !string.IsNullOrEmpty(_controller.CurrentConfig);
 
             // Update the state of all menu items.
 
@@ -536,12 +559,48 @@ namespace MonoGame.Tools.Pipeline
             _addItemMenuItem.Enabled = projectOpen;
             _deleteMenuItem.Enabled = projectOpen;
 
-            _buildMenuItem.Enabled = projectOpenAndNotBuilding;
-            _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
-            _rebuilMenuItem.Enabled = projectOpenAndNotBuilding;
+            _buildMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
+            _cleanMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
+            _rebuilMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
+
+            if (!projectOpen)
+            {
+                if (_toolStripComboBoxConfig.Enabled)
+                {
+                    _toolStripComboBoxConfig.Items.Clear();
+                    _toolStripComboBoxConfig.Enabled = false;
+                }
+
+                if (_toolStripComboBoxPlatform.Enabled)
+                {
+                    _toolStripComboBoxPlatform.Items.Clear();
+                    _toolStripComboBoxPlatform.Enabled = false;
+                }
+            }
+            else
+            {
+                _toolStripComboBoxConfig.Enabled = true;
+                _toolStripComboBoxPlatform.Enabled = true;
+
+                _toolStripComboBoxConfig.Items.Clear();
+                foreach (var i in _controller.DefinedConfigurations)
+                {
+                    _toolStripComboBoxConfig.Items.Add(i);
+                    if (i.Equals(_controller.CurrentConfig))
+                        _toolStripComboBoxConfig.SelectedItem = i;
+                }
+
+                _toolStripComboBoxPlatform.Items.Clear();
+                foreach (var i in _controller.DefinedPlatforms)
+                {
+                    _toolStripComboBoxPlatform.Items.Add(i);
+                    if (i.Equals(_controller.CurrentPlatform))
+                        _toolStripComboBoxPlatform.SelectedItem = i;
+                }
+            }
         }
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)

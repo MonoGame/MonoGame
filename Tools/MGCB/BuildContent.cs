@@ -21,12 +21,6 @@ namespace MGCB
         public bool Quiet = false;
 
         [CommandLineParameter(
-            Name = "@",
-            ValueName = "responseFile",
-            Description = "Read a text response file with additional command line options and switches.")]
-        public readonly List<string> ResponseFiles = new List<string>();
-
-        [CommandLineParameter(
             Name = "outputDir",
             ValueName = "directoryPath",
             Description = "The directory where all content is written.")]
