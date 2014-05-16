@@ -99,7 +99,10 @@ namespace Microsoft.Xna.Framework
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
-			
+
+            //Run the static constructor of TitleContainer to ensure it happens on the main thread
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(TitleContainer).TypeHandle);
+
             Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
             _applicationObservers = new List<NSObject>();
