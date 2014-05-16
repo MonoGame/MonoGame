@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -17,7 +18,12 @@ namespace Microsoft.Xna.Framework.Audio
 		string name;
 		AudioEngine engine;
 
-		internal float volume;
+        // Thisis a bit gross, but we use an array here
+        // instead of a field since AudioCategory is a struct
+        // This allows us to save _volume when the user
+        // holds onto a reference of AudioCategory, or when a cue
+        // is created/loaded after the volume's already been set.
+		internal float[] _volume;
 		internal bool isBackgroundMusic;
 		internal bool isPublic;
 
@@ -81,7 +87,7 @@ namespace Microsoft.Xna.Framework.Audio
 			var b = 0.432254984608615;
 			var c = 80.1748600297963;
 			var d = 67.7385212334047;
-			volume = (float)(((a-d)/(1+(Math.Pow(vol/c, b)))) + d);
+            _volume = new float[1] {(float)(((a - d) / (1 + (Math.Pow(vol / c, b)))) + d)};
 
 			byte visibilityFlags = reader.ReadByte ();
 			isBackgroundMusic = (visibilityFlags & 0x1) != 0;
@@ -92,6 +98,16 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			sounds.Add(sound);
 		}
+
+        internal int GetPlayingInstanceCount()
+        {
+            return sounds.Count(s => s.Playing);
+        }
+
+        internal XactSound GetOldestInstance()
+        {
+            return sounds.FirstOrDefault(s => s.Playing);
+        }
 
         /// <summary>
         /// Gets the category's friendly name.
@@ -119,19 +135,18 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Stops all associated sounds.
         /// </summary>
-		public void Stop ()
+        public void Stop(AudioStopOptions options)
 		{
 			foreach (var sound in sounds)
-				sound.Stop();
+                sound.Stop(options);
 		}
 
-        /// <summary>
-        /// Sets the volume of all sounds associated with this category.
-        /// </summary>
-        /// <param name="volume">Volume scale applied to all sounds. A value of 1.0 is full volume.</param>
-		public void SetVolume(float volume) {
+		public void SetVolume(float volume)
+        {
+            _volume[0] = volume;
+
 			foreach (var sound in sounds)
-				sound.Volume = volume;
+				sound.SetVolumeInt(volume);
 		}
 
         /// <summary>
