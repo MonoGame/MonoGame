@@ -268,7 +268,9 @@
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler -->
+    <Compile Include="Serialization\Compiler\AlphaTestEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ArrayWriter.cs" />
+    <Compile Include="Serialization\Compiler\BasicEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\BooleanWriter.cs" />
     <Compile Include="Serialization\Compiler\BoundingBoxWriter.cs" />
     <Compile Include="Serialization\Compiler\BoundingFrustumWriter.cs" />
@@ -287,8 +289,10 @@
     <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
     <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
+    <Compile Include="Serialization\Compiler\DualTextureEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
+    <Compile Include="Serialization\Compiler\EnvironmentMapEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
     <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
@@ -305,6 +309,7 @@
     <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
     <Compile Include="Serialization\Compiler\SByteWriter.cs" />
     <Compile Include="Serialization\Compiler\SingleWriter.cs" />
+    <Compile Include="Serialization\Compiler\SkinnedEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
