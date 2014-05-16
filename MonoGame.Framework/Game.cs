@@ -124,8 +124,6 @@ namespace Microsoft.Xna.Framework
         {
             _instance = this;
 
-            TitleContainer.Initialize();
-
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();

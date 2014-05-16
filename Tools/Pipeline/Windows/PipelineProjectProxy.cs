@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.IO;
 using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +13,9 @@ using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline
 {
+    /// <summary>
+    /// Wraps a PipelineProject object, defining its appearance within the windows specific IView (MainView).
+    /// </summary>
     internal class PipelineProjectProxy : IProjectItem
     {
         private readonly PipelineProject _project;
@@ -37,7 +41,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get { return _project.IntermediateDir; }
             set
-            {
+            {       
                 _project.IntermediateDir = Util.GetRelativePath(value, _project.Location);
             }
         }
