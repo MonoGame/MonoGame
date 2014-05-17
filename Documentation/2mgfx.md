@@ -36,7 +36,7 @@ If you use `/?`, `/help`, or simply pass no paramters to 2MGFX.exe you will get 
 The resulting compiled MGFX file can be used from your game code like so:
 
 ```
-var bytecode = File.ReadAllBytes("mycompiled.mgfx");
+byte[] bytecode = File.ReadAllBytes("mycompiled.mgfx");
 var effect = new Effect(bytecode);
 ```
 
