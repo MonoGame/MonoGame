@@ -77,5 +77,20 @@ namespace Microsoft.Xna.Framework
 
             services.Remove(type);
         }
+        
+        public void AddService<T>(T provider)
+        {
+            AddService(typeof(T), provider);
+        }
+
+ 	public T GetService<T>()
+        {
+            var service = GetService(typeof(T));
+
+            if (service == null)
+                throw new ArgumentNullException(string.Format("Service of type {0} is not registered.", typeof(T)));
+
+            return (T)service;
+        }
     }
 }
