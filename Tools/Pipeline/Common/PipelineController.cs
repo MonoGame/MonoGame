@@ -164,6 +164,11 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
+            OpenProject(projectFilePath);
+        }
+
+        public void OpenProject(string projectFilePath)
+        {
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -174,7 +179,7 @@ namespace MonoGame.Tools.Pipeline
                 _project = new PipelineProject(this);
                 var parser = new PipelineProjectParser(this, _project);
                 parser.OpenProject(projectFilePath);
-                
+
                 _project.Platform = TargetPlatform.Windows;
                 if (_project.DefinedConfigs.Count == 0)
                 {
