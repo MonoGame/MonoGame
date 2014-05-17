@@ -1,7 +1,5 @@
 The 2MGFX tool is used to build a MonoGame Effect from an input Microsoft FX or MGFX file.
 
-NOTE: 2MGFX it does not generate an XNB file for use with the ContentManager (see the MonoGame Effect content processor).  
-
 
 ## Command Line
 The command line options are:
@@ -15,6 +13,8 @@ The input effect file in typical FX format with samplers, techniques, and passes
 
 ### Output File
 The file to write for the output compiled MGFX file.  This parameter is required.
+
+NOTE: The generated file is not an XNB file for use with the ContentManager.
 
 ### Debug Info
 If the `/Debug` flag is passed the resulting compiled MGFX file will contain extra debug information and the fewest possible optimizations.
@@ -31,3 +31,14 @@ NOTE: PlayStation 4 support is only available to licensed Sony developers.
 
 ### Help
 If you use `/?`, `/help`, or simply pass no paramters to 2MGFX.exe you will get information about these command line options.
+
+## Runtime Use
+The resulting compiled MGFX file can be used from your game code like so:
+
+```
+var bytecode = File.ReadAllBytes("mycompiled.mgfx");
+var effect = new Effect(bytecode);
+```
+
+This is basically how the stock effects (BasicEffect, DualTextureEffect, etc) are compiled and loaded.
+
