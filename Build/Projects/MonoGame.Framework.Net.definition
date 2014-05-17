@@ -2,19 +2,18 @@
 <Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
 
   <ProjectGuids>
-	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
-	<Platform Name="Angle">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
-	<Platform Name="iOS">B07CEEE7-F70D-462E-96F5-0CD8049BA561</Platform>
-	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
-	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
-	<Platform Name="Ouya">8BEA875D-66D2-4A5F-B137-83D262A3851D</Platform>
-	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
-	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
-	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
-	<Platform Name="WindowsGL">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
-	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
+	<Platform Name="Android">713EE5CA-C850-42AD-AC67-B6546AC8BFFB</Platform>
+	<Platform Name="Angle">090037AF-0C67-4007-87E7-1DED7AE41FC6</Platform>
+	<Platform Name="iOS">D4838656-8545-4DC5-8822-D4AD313E17AC</Platform>
+	<Platform Name="Linux">1B738549-0449-4504-B978-7BFC347E3F3C</Platform>
+	<Platform Name="MacOS">1294038B-66C2-4359-AFE9-EA06A758CA94</Platform>
+	<Platform Name="Ouya">F200645B-20E1-4D6F-8C70-38656F633CFA</Platform>
+	<Platform Name="PSMobile">39DBE7E5-BB4E-4E99-A832-C576F13A593B</Platform>
+	<Platform Name="Windows">87A71215-7CAC-4B80-9D43-1700DECFB828</Platform>
+	<Platform Name="Windows8">A65B8326-1DDD-4E5D-8130-E74F70919E81</Platform>
+	<Platform Name="WindowsGL">6D6009F4-0AFB-4806-89D7-7945F20270F5</Platform>
+	<Platform Name="WindowsPhone">C6DA906E-9E4A-428B-8870-07A39B172F83</Platform>
   </ProjectGuids>
-
 
   <!-- Common assembly references -->
   <References>
