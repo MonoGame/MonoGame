@@ -1,8 +1,8 @@
 The MonoGame Content Builder (MGCB.exe) is a command line tool for building XNB content on Windows, Mac, and Linux desktop systems.
 
-Typically it is executed indirectly by VisualStudio or MonoDevelop during the build process of a MonoGame project.  Alternatively you can use it directly from the command line for specialized build pipelines or for debugging content processing.
+Typically it is executed by the [Pipeline GUI tool](pipeline.md) when editing content or indirectly from VisualStudio or MonoDevelop during the build process of a MonoGame project.  Alternatively you can use it yourself from the command line for specialized build pipelines or for debugging content processing.
 
-## MGCB Options
+## Command Line Options
 The options are processed "left to right".  When an option is repeated the last option always wins.
 
 ### Output Directory
@@ -57,6 +57,7 @@ Set the target platform for this build. It must be a member of the TargetPlatfor
 * NativeClient
 * Ouya
 * PlayStationMobile
+* PlayStation4
 * WindowsPhone8
 * RaspberryPi
 
