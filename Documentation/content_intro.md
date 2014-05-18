@@ -6,6 +6,6 @@ This section will cover the following topics:
 
  - What is Game Content
  - The Pipeline Tool
- - Custom Effects
+ - [Custom Effects](custom_effects.md)
  - Custom Content Types
  
