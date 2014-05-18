@@ -14,11 +14,10 @@ namespace Microsoft.Xna.Framework.Utilities
 				throw new NullReferenceException("Must supply the targetType parameter");
 			}
 #if WINRT
-			return !targetType.GetTypeInfo().IsValueType;
+			return targetType.GetTypeInfo().IsValueType;
 #else
-			return !targetType.IsValueType;
+			return targetType.IsValueType;
 #endif
-		   
 		}
 
 		public static Type GetBaseTpye(Type targetType)
