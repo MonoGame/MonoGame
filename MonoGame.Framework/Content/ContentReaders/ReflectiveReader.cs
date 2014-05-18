@@ -161,18 +161,8 @@ namespace Microsoft.Xna.Framework.Content
             {
                 if (property != null)
                 {
-#if WINRT
-                    if ( property.GetMethod != null && !property.GetMethod.IsPublic )
+                    if (!ReflectionHelpers.PropertyIsPublic(property))
                         return;
-                    if ( property.SetMethod != null && !property.SetMethod.IsPublic )
-                        return;
-#else
-                    foreach (MethodInfo info in property.GetAccessors(true))
-                    {
-                        if (info.IsPublic == false)
-                            return;
-                    }
-#endif
                 }
                 else
                 {

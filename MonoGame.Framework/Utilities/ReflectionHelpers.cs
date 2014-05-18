@@ -100,27 +100,27 @@ namespace Microsoft.Xna.Framework.Utilities
 			return attr;
 		}
 
-		public static bool HasPublicProperties(PropertyInfo property)
-		{
-			if (property == null)
-			{
-				throw new NullReferenceException("Must supply the property parameter");
-			}
-#if WINRT
-			if ( property.GetMethod != null && !property.GetMethod.IsPublic )
-				return true;
-			if ( property.SetMethod != null && !property.SetMethod.IsPublic )
-				return true;
-#else
-			foreach (MethodInfo info in property.GetAccessors(true))
-			{
-				if (info.IsPublic == false)
-					return true;
-			}
-#endif
-			return false;
-		}
-		
+        /// <summary>
+        /// Returns true if the get and set methods of the given property exist and are public
+        /// </summary>
+        public static bool PropertyIsPublic(PropertyInfo property)
+        {
+            if (property == null)
+            {
+                throw new NullReferenceException("Must supply the property parameter");
+            }
+
+            var getMethod = GetPropertyGetMethod(property);
+            if (getMethod == null || !getMethod.IsPublic)
+                return false;
+
+            var setMethod = GetPropertySetMethod(property);
+            if (setMethod == null || !setMethod.IsPublic)
+                return false;
+
+            return true;
+        }
+
 		public static bool IsAssignableFrom(Type type, object provider)
 		{
 			if (type == null)
