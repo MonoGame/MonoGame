@@ -78,6 +78,8 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.toolStripContainer2 = new System.Windows.Forms.ToolStripContainer();
+            this._debugMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -130,7 +132,7 @@ namespace MonoGame.Tools.Pipeline
             // 
             _splitTreeProps.Panel2.Controls.Add(this._propertyGrid);
             _splitTreeProps.Size = new System.Drawing.Size(249, 487);
-            _splitTreeProps.SplitterDistance = 190;
+            _splitTreeProps.SplitterDistance = 189;
             _splitTreeProps.TabIndex = 1;
             _splitTreeProps.TabStop = false;
             // 
@@ -139,7 +141,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
-            this._treeView.Size = new System.Drawing.Size(249, 190);
+            this._treeView.Size = new System.Drawing.Size(249, 189);
             this._treeView.TabIndex = 0;
             this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
             this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
@@ -149,7 +151,7 @@ namespace MonoGame.Tools.Pipeline
             this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this._propertyGrid.Location = new System.Drawing.Point(0, 0);
             this._propertyGrid.Name = "_propertyGrid";
-            this._propertyGrid.Size = new System.Drawing.Size(249, 293);
+            this._propertyGrid.Size = new System.Drawing.Size(249, 294);
             this._propertyGrid.TabIndex = 0;
             // 
             // _splitEditorOutput
@@ -339,6 +341,8 @@ namespace MonoGame.Tools.Pipeline
             this._buildMenuItem,
             this._rebuilMenuItem,
             this._cleanMenuItem,
+            this.toolStripSeparator7,
+            this._debugMenuItem,
             this._cancelBuildSeparator,
             this._cancelBuildMenuItem});
             this._buildMenu.Name = "_buildMenu";
@@ -421,7 +425,7 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator6});
             this._toolStrip.Location = new System.Drawing.Point(3, 24);
             this._toolStrip.Name = "_toolStrip";
-            this._toolStrip.Size = new System.Drawing.Size(443, 25);
+            this._toolStrip.Size = new System.Drawing.Size(410, 25);
             this._toolStrip.TabIndex = 3;
             this._toolStrip.Text = "toolStrip1";
             // 
@@ -453,10 +457,10 @@ namespace MonoGame.Tools.Pipeline
             this._toolStripLabelConfiguration.Size = new System.Drawing.Size(81, 22);
             this._toolStripLabelConfiguration.Text = "Configuration";
             // 
-            // _toolStripComboBoxConf
+            // _toolStripComboBoxConfig
             // 
             this._toolStripComboBoxConfig.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._toolStripComboBoxConfig.Name = "_toolStripComboBoxConf";
+            this._toolStripComboBoxConfig.Name = "_toolStripComboBoxConfig";
             this._toolStripComboBoxConfig.Size = new System.Drawing.Size(121, 25);
             // 
             // toolStripSeparator6
@@ -500,6 +504,19 @@ namespace MonoGame.Tools.Pipeline
             // 
             this.toolStripContainer2.TopToolStripPanel.Controls.Add(this._mainMenu);
             this.toolStripContainer2.TopToolStripPanel.Controls.Add(this._toolStrip);
+            // 
+            // _debugMenuItem
+            // 
+            this._debugMenuItem.Name = "_debugMenuItem";
+            this._debugMenuItem.Size = new System.Drawing.Size(173, 22);
+            this._debugMenuItem.Text = "&Debug MGCB";
+            this._debugMenuItem.Click += new System.EventHandler(this.DebugMenuItemClick);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(170, 6);
+            this.toolStripSeparator7.Visible = false;
             // 
             // MainView
             // 
@@ -580,6 +597,8 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStripContainer toolStripContainer2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem _debugMenuItem;
     }
 }
 

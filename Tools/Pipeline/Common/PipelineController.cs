@@ -273,6 +273,29 @@ namespace MonoGame.Tools.Pipeline
             _buildTask.Start();
         }
 
+        public void DebugBuild()
+        {
+            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
+
+            // Make sure we save first!
+            if (!AskSaveProject())
+                return;
+
+            if (OnBuildStarted != null)
+                OnBuildStarted();
+
+            _view.OutputClear();
+
+            var commands = GetHeader() + string.Format(" /@:\"{0}\"", _project.FilePath);            
+            commands += " /launchdebugger";
+            _buildTask = new Task(DoBuild, commands);
+
+            if (OnBuildFinished != null)
+                _buildTask.ContinueWith((e) => OnBuildFinished());
+
+            _buildTask.Start();
+        }
+
         public void Clean()
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");

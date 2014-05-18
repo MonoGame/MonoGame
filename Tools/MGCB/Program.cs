@@ -32,6 +32,10 @@ namespace MGCB
                 return 0;
             }
 
+            // Launch debugger if requested.
+            if (content.LaunchDebugger)
+                System.Diagnostics.Debugger.Launch();
+
             // Print a startup message.            
             var buildStarted = DateTime.Now;
             if (!content.Quiet)

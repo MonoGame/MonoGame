@@ -503,6 +503,11 @@ namespace MonoGame.Tools.Pipeline
             _controller.Clean();
         }
 
+        private void DebugMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.DebugBuild();
+        }
+
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
         {
             _controller.CancelBuild();
@@ -562,6 +567,7 @@ namespace MonoGame.Tools.Pipeline
             _buildMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
             _rebuilMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
+            _debugMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
