@@ -41,7 +41,6 @@
 using System;
 using System.IO;
 using System.Text;
-
 #if WINRT
 using System.Threading.Tasks;
 #elif IOS
@@ -52,6 +51,7 @@ using MonoMac.Foundation;
 #elif PSM
 using Sce.PlayStation.Core;
 #endif
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -148,15 +148,7 @@ namespace Microsoft.Xna.Framework
         // this same logic is duplicated all over the code base.
         internal static string GetFilename(string name)
         {
-#if WINRT
-            const char notSeparator = '/';
-            const char separator = '\\';
-#else
-            const char notSeparator = '\\';
-            var separator = Path.DirectorySeparatorChar;
-#endif
-
-            return new Uri("file:///" + name).LocalPath.Substring(1).Replace(notSeparator, separator);
+            return FileHelpers.NormalizeFilePathSeparators(new Uri("file:///" + name).LocalPath.Substring(1));
         }
     }
 }

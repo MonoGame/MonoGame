@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -25,15 +26,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
-#if WINRT
-            const char notSeparator = '/';
-            const char separator = '\\';
-#else
-            const char notSeparator = '\\';
-            var separator = Path.DirectorySeparatorChar;
-#endif
-            // Check for windows-style directory separator character
-            filename = fileName.Replace(notSeparator, separator);
+            filename = FileHelpers.NormalizeFilePathSeparators(fileName);
 			audioengine = audioEngine;
 		}
 		

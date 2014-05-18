@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Utilities
 
 		#region public properties
 		
-		#if WINRT
+#if WINRT
 		public static char notSeparator = '/';
 		public static char separator = '\\';
 #else
@@ -206,14 +206,9 @@ namespace Microsoft.Xna.Framework.Utilities
 		}
 
 		// Renamed from - public static string GetFilename(string name)
-		public static string NormalizeFilePathSeperators(string name)
+		public static string NormalizeFilePathSeparators(string name)
 		{
-#if WINRT
-			name = name.Replace('/', '\\');
-#else
-			name = name.Replace('\\', Path.DirectorySeparatorChar);
-#endif
-			return name;
+            return name.Replace(notSeparator, separator);
 		}
 
 

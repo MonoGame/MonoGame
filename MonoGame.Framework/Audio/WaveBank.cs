@@ -29,6 +29,7 @@ using System;
 using System.IO;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -105,15 +106,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             int wavebank_offset = 0;
 
-#if WINRT
-			const char notSeparator = '/';
-			const char separator = '\\';
-#else
-            const char notSeparator = '\\';
-            var separator = Path.DirectorySeparatorChar;
-#endif
-			// Check for windows-style directory separator character
-			nonStreamingWaveBankFilename = nonStreamingWaveBankFilename.Replace(notSeparator, separator);
+            nonStreamingWaveBankFilename = FileHelpers.NormalizeFilePathSeparators(nonStreamingWaveBankFilename);
 
 #if !ANDROID
             BinaryReader reader = new BinaryReader(TitleContainer.OpenStream(nonStreamingWaveBankFilename));

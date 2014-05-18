@@ -148,17 +148,10 @@ namespace Microsoft.Xna.Framework.Content
 
             if (!String.IsNullOrEmpty(externalReference))
             {
-#if WINRT
-                const char notSeparator = '/';
-                const char separator = '\\';
-#else
-                const char notSeparator = '\\';
-                var separator = Path.DirectorySeparatorChar;
-#endif
-                externalReference = externalReference.Replace(notSeparator, separator);
+                externalReference = FileHelpers.NormalizeFilePathSeparators(externalReference);
 
                 // Get a uri for the asset path using the file:// schema and no host
-                var src = new Uri("file:///" + assetName.Replace(notSeparator, separator));
+                var src = new Uri("file:///" + FileHelpers.NormalizeFilePathSeparators(assetName));
 
                 // Add the relative path to the external reference
                 var dst = new Uri(src, externalReference);
