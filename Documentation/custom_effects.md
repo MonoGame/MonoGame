@@ -32,8 +32,8 @@ If your game requires an extra little bit of performance you can easily hand edi
 
 # Custom Effects
 To use a custom effect with MonoGame you must do one of the following (not both):
-* Process your effect file with the [2MGFX tool](2MGFX.md) and load them yourself at runtime.
-* Run the effect file thru the [MonoGame Effect content processor](https://github.com/mono/MonoGame/wiki/MonoGame-Content-Processing) for loading via the `ContentManager`.
+* Process your effect file with the [2MGFX tool](2mgfx.md) and load them yourself at runtime.
+* Run the effect file thru the [MonoGame Effect content processor](mgcb.md) for loading via the `ContentManager`.
 
 
 ### Effect Writing Tips
@@ -46,25 +46,10 @@ These are some tips for writing or converting effects for use with MonoGame.
 * You can use `#if SM4` to add conditional code for DirectX platforms.
 * On DirectX platforms use the `SV_Position` semantic instead of `POSITION` in vertex shader inputs.
 * Note that on GL platforms default values on Effect parameters do not work.  Either set the parameter from code or use a real constant like a #define.
+* Do not name your sampler `Sampler` - it will not compile.
+* The effect compiler is aggressive about removing unused paramters, be sure the parameters you are setting are actually used.
 * If you think you've found a bug porting a shader [please let us know](https://github.com/mono/MonoGame/issues).
-
-### 'Gotchas'/Errors you may see
-* Do not call your sampler Sampler - it will not compile 
-* You cannot have parentheses around your Texture name in a sampler (fixed in latest source)
-e.g. use
-
->  sampler TexSamp = sampler_state
->  {
->      Texture = Texture;
-
- instead of
-
->  sampler TexSamp = sampler_state
->  {
->      Texture = (Texture);
-
-* The HLSL shader compiler (which is used even for OpenGL) is aggressive about removing unused parameters. In XNA unused parameters would still show up in your Effect.Parameters collection. Under MonoGame they will not. Examine your shader to make sure they really are unused.
-
+* 
 # Roadmap
 There is still work to be done for better support of custom effects and shaders in MonoGame:
 
