@@ -18,6 +18,10 @@
     <topic id="getting_started.md" name="Getting Started" filename="getting_started.md"/>
     <topic id="tutorials.md" name="Tutorials" filename="tutorials.md"/>
     
+    <topic id="content_intro.md" name="Adding Art, Sounds, and More" filename="content_intro.md">
+    	<topic id="custom_effects.md" name="Custom Effects" filename="custom_effects.md"/>
+    </topic>
+
     <topic id="tools.md" name="Tools" filename="tools.md">
     	<topic id="2mgfx.md" name="2MGFX" filename="2mgfx.md"/>
     	<topic id="mgcb.md" name="MGCB" filename="mgcb.md"/>
