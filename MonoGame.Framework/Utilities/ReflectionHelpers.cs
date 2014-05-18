@@ -123,14 +123,14 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <summary>
         /// Returns true if the given type can be assigned the given value
         /// </summary>
-		public static bool IsAssignableFrom(Type type, object provider)
+		public static bool IsAssignableFrom(Type type, object value)
 		{
 			if (type == null)
 				throw new ArgumentNullException("type");
-			if (provider == null)
-				throw new ArgumentNullException("provider");
+			if (value == null)
+				throw new ArgumentNullException("value");
 
-            return IsAssignableFromType(type, provider.GetType());
+            return IsAssignableFromType(type, value.GetType());
 		}
 
         /// <summary>
