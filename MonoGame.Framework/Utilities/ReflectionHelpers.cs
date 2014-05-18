@@ -54,28 +54,33 @@ namespace Microsoft.Xna.Framework.Utilities
 			return false;
 		}
 
-		public static MethodInfo GetPropertyMethod(PropertyInfo property, string method)
-		{
-			if (property == null)
-			{
-				throw new NullReferenceException("Must supply the property parameter");
-			}
+        public static MethodInfo GetPropertyGetMethod(PropertyInfo property)
+        {
+            if (property == null)
+            {
+                throw new NullReferenceException("Must supply the property parameter");
+            }
 
-			MethodInfo methodInfo;
 #if WINRT
-			if(method == "get")
-				methodInfo = property.GetMethod;
-			else
-				methodInfo = property.SetMethod;
+            return property.GetMethod;
 #else
-			if(method == "get")
-                methodInfo = property.GetGetMethod();
-			else
-                methodInfo = property.GetSetMethod();
+            return property.GetGetMethod();
 #endif
-			return methodInfo;
+        }
 
-		}
+        public static MethodInfo GetPropertySetMethod(PropertyInfo property)
+        {
+            if (property == null)
+            {
+                throw new NullReferenceException("Must supply the property parameter");
+            }
+
+#if WINRT
+            return property.SetMethod;
+#else
+            return property.GetSetMethod();
+#endif
+        }
 
 		public static Attribute GetCustomAttribute(MemberInfo member, Type memberType)
 		{
