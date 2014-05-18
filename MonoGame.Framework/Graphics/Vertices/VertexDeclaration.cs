@@ -3,10 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
-#if WINRT
-using System.Reflection;
-#endif
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -74,11 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexType == null)
 				throw new ArgumentNullException("vertexType", "Cannot be null");
 
-#if WINRT
-            if (!vertexType.GetTypeInfo().IsValueType)
-#else
-            if (!vertexType.IsValueType)
-#endif
+            if (ReflectionHelpers.IsValueType(vertexType))
             {
 				throw new ArgumentException("vertexType", "Must be value type");
 			}

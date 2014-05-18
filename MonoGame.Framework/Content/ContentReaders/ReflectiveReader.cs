@@ -42,6 +42,7 @@ purpose and non-infringement.
 
 using System;
 using System.Reflection;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -66,11 +67,7 @@ namespace Microsoft.Xna.Framework.Content
             base.Initialize(manager);
             this.manager = manager;
 
-#if WINRT
-            var type = targetType.GetTypeInfo().BaseType;
-#else
-            var type = targetType.BaseType;
-#endif
+            var type = ReflectionHelpers.GetBaseType(targetType);
             if (type != null && type != typeof(object))
 			{
 				baseType = type;
@@ -95,17 +92,12 @@ namespace Microsoft.Xna.Framework.Content
                 t = field.FieldType;
             }
 
-#if WINRT
-            var ti = t.GetTypeInfo();
-            if (ti.IsClass && !ti.IsAbstract)
-#else
-            if (t.IsClass && !t.IsAbstract)
-#endif
+            if (ReflectionHelpers.IsConcreteClass(t))
             {
                 var constructor = t.GetDefaultConstructor();
                 if (constructor != null)
                 {
-                    obj = constructor.Invoke(null);                
+                    obj = constructor.Invoke(null);
                 }
             }
             return obj;
@@ -121,13 +113,8 @@ namespace Microsoft.Xna.Framework.Content
 
             if (property != null && property.Name == "Item")
             {
-#if WINRT
-                var getMethod = property.GetMethod;
-                var setMethod = property.SetMethod;
-#else
-                var getMethod = property.GetGetMethod();
-                var setMethod = property.GetSetMethod();
-#endif
+                var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
+                var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
 
                 if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
                     (setMethod != null && setMethod.GetParameters().Length > 0))
@@ -139,40 +126,23 @@ namespace Microsoft.Xna.Framework.Content
                     return;
                 }
             }
-#if WINRT
-            Attribute attr = member.GetCustomAttribute(typeof(ContentSerializerIgnoreAttribute));
-#else
-            Attribute attr = Attribute.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
-#endif
+            var attr = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
             if (attr != null) 
                 return;
-#if WINRT
-            Attribute attr2 = member.GetCustomAttribute(typeof(ContentSerializerAttribute));
-#else
-            Attribute attr2 = Attribute.GetCustomAttribute(member, typeof(ContentSerializerAttribute));
-#endif
+
+            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
+
             bool isSharedResource = false;
-            if (attr2 != null)
+            if (contentSerializerAttribute != null)
             {
-                var cs = attr2 as ContentSerializerAttribute;
-                isSharedResource = cs.SharedResource;
+                isSharedResource = contentSerializerAttribute.SharedResource;
             }
             else
             {
                 if (property != null)
                 {
-#if WINRT
-                    if ( property.GetMethod != null && !property.GetMethod.IsPublic )
+                    if (!ReflectionHelpers.PropertyIsPublic(property))
                         return;
-                    if ( property.SetMethod != null && !property.SetMethod.IsPublic )
-                        return;
-#else
-                    foreach (MethodInfo info in property.GetAccessors(true))
-                    {
-                        if (info.IsPublic == false)
-                            return;
-                    }
-#endif
                 }
                 else
                 {
@@ -224,7 +194,7 @@ namespace Microsoft.Xna.Framework.Content
                 else
                 {
                     // Private fields can be serialized if they have ContentSerializerAttribute added to them
-                    if (field.IsPrivate == false || attr2 != null)
+                    if (field.IsPrivate == false || contentSerializerAttribute != null)
                         field.SetValue(parent, obj2);
                 }
             }

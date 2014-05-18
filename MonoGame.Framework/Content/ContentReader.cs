@@ -29,12 +29,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-#if WINRT
-using System.Reflection;
-#endif
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -208,7 +206,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         public T ReadObject<T>()
-        {			
+        {
             int typeReaderIndex = Read7BitEncodedInt();
         
             if (typeReaderIndex == 0) 
@@ -246,11 +244,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-#if WINRT
-            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
-#else
-            if (!typeReader.TargetType.IsValueType)
-#endif
+            if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
                 return (T)ReadObject<object>();
 
             var result = (T)typeReader.Read(this, existingInstance);
