@@ -93,11 +93,10 @@ namespace Microsoft.Xna.Framework.Utilities
 				throw new NullReferenceException("Must supply the memberType parameter");
 			}
 #if WINRT
-			Attribute attr = member.GetCustomAttribute(memberType);
+			return member.GetCustomAttribute(memberType);
 #else
-			Attribute attr = Attribute.GetCustomAttribute(member, memberType);
+			return Attribute.GetCustomAttribute(member, memberType);
 #endif
-			return attr;
 		}
 
         /// <summary>
@@ -121,21 +120,37 @@ namespace Microsoft.Xna.Framework.Utilities
             return true;
         }
 
+        /// <summary>
+        /// Returns true if the given type can be assigned the given value
+        /// </summary>
 		public static bool IsAssignableFrom(Type type, object provider)
 		{
 			if (type == null)
 				throw new ArgumentNullException("type");
 			if (provider == null)
 				throw new ArgumentNullException("provider");
-#if WINRT
-			if (type.GetTypeInfo().IsAssignableFrom(provider.GetType().GetTypeInfo()))
-				return true;
-#else
-			if (type.IsAssignableFrom(provider.GetType()))
-				return true;
-#endif
-			return false;
+
+            return IsAssignableFromType(type, provider.GetType());
 		}
+
+        /// <summary>
+        /// Returns true if the given type can be assigned a value with the given object type
+        /// </summary>
+        public static bool IsAssignableFromType(Type type, Type objectType)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+            if (objectType == null)
+                throw new ArgumentNullException("objectType");
+#if WINRT
+            if (type.GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
+                return true;
+#else
+            if (type.IsAssignableFrom(objectType))
+                return true;
+#endif
+            return false;
+        }
 
 	}
 }
