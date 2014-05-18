@@ -1,5 +1,3 @@
-# Overview
-
 A core element of Microsoft XNA is the effect system which is used for all rendering.
 
 For MonoGame we have the burden of supporting stock and custom effects for desktop GLSL, mobile GLSL, DirectX HLSL, and custom formats like that of the PlayStation Mobile.  There currently is no effect system or shader language that supports all the platforms we require, forcing us to build a new custom effect system.
