@@ -34,7 +34,10 @@ namespace Microsoft.Xna.Framework.Utilities
 			return type;
 		}
 
-		public static bool IsAbstractClass(Type t)
+        /// <summary>
+        /// Returns true if the given type represents a class that is not abstract
+        /// </summary>
+		public static bool IsConcreteClass(Type t)
 		{
 			if (t == null)
 			{
@@ -49,7 +52,7 @@ namespace Microsoft.Xna.Framework.Utilities
 				return true;
 #endif
 			return false;
-			}
+		}
 
 		public static MethodInfo GetPropertyMethod(PropertyInfo property, string method)
 		{
