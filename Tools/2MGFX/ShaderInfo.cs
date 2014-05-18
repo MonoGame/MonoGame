@@ -6,10 +6,13 @@ namespace TwoMGFX
 {
     public class ShaderInfo
 	{
-		public string fileName { get; private set; }
-		public string fileContent { get; private set; }
+		public string FilePath { get; private set; }
 
-        public ShaderProfile Profile { get; private set; }
+		public string FileContent { get; private set; }
+
+		public ShaderProfile Profile { get; private set; }
+
+		public string OutputFilePath { get; private set; }
 
 		public bool Debug { get; private set; }
 
@@ -68,11 +71,12 @@ namespace TwoMGFX
 				throw new Exception(errors);
 			}
 
-			// Evaluate the results of the parse tree.
-			var result = tree.Eval() as ShaderInfo;
-		    result.Dependencies = dependencies;
-			result.fileName = filePath;
-			result.fileContent = newFile;
+            // Evaluate the results of the parse tree.
+            var result = tree.Eval() as ShaderInfo;
+            result.Dependencies = dependencies;
+            result.FilePath = fullPath;
+            result.FileContent = newFile;
+            result.OutputFilePath = Path.GetFullPath(options.OutputFile);
 
             // Remove empty techniques.
             for (var i=0; i < result.Techniques.Count; i++)
