@@ -63,6 +63,8 @@ Set the target platform for this build. It must be a member of the TargetPlatfor
 
 If not set it will default to Windows.
 
+NOTE: PlayStation 4 support is only available to licensed Sony developers.
+
 ### Target Graphics Profile
 ```
 /profile:<graphics_Profile> 
