@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
 		}
 
-		public static Type GetBaseTpye(Type targetType)
+		public static Type GetBaseType(Type targetType)
 		{
 			if (targetType == null)
 			{
