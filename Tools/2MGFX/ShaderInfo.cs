@@ -21,6 +21,8 @@ namespace TwoMGFX
 
         public List<string> Dependencies { get; private set; }
 
+        public List<string> AdditionalOutputFiles { get; private set; }
+
 		static public ShaderInfo FromFile(string path, Options options)
 		{
 			var effectSource = File.ReadAllText(path);
@@ -77,6 +79,7 @@ namespace TwoMGFX
             result.FilePath = fullPath;
             result.FileContent = newFile;
             result.OutputFilePath = Path.GetFullPath(options.OutputFile);
+            result.AdditionalOutputFiles = new List<string>();
 
             // Remove empty techniques.
             for (var i=0; i < result.Techniques.Count; i++)
