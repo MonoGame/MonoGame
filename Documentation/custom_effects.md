@@ -49,12 +49,12 @@ These are some tips for writing or converting effects for use with MonoGame.
 * Do not name your sampler `Sampler` - it will not compile.
 * The effect compiler is aggressive about removing unused paramters, be sure the parameters you are setting are actually used.
 * If you think you've found a bug porting a shader [please let us know](https://github.com/mono/MonoGame/issues).
-* 
+
 # Roadmap
 There is still work to be done for better support of custom effects and shaders in MonoGame:
 
 * Support GLSL in FX files.
-* Replace MojoShader with [HL2GLSL](https://github.com/SickheadGames/HL2GLSL).
+* * Replace MojoShader with [HL2GLSL](https://github.com/SickheadGames/HL2GLSL).
 * Create an automated tests for custom effects.
 * Support PlayStation Suite shaders in MGFX tools and formats.
 * Support pre-compiled GLSL assembly instead of GLSL code.
