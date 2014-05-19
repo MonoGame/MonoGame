@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// Implements an importer for reading intermediate XML files. This is a wrapper around IntermediateSerializer.
     /// </summary>
-    [ContentImporter(".xml", DisplayName = "Xml Importer - MonoGame", DefaultProcessor = "ModelProcessor")]
+    [ContentImporter(".xml", DisplayName = "Xml Importer - MonoGame", DefaultProcessor = "PassThroughProcessor")]
     public class XmlImporter : ContentImporter<object>
     {
         private static readonly char[] _elementSeparator = new[] { ' ' };
