@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Model - MonoGame")]
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
-        private readonly List<ModelMeshContent> _meshes = new List<ModelMeshContent>();
+        private readonly Dictionary<MaterialContent, MaterialContent> _processedMaterials = new Dictionary<MaterialContent, MaterialContent>();
 
         private ContentIdentity _identity;
         private ContentBuildLogger _logger;
@@ -98,6 +98,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             _identity = input.Identity;
             _logger = context.Logger;
+            var rootNode = new ModelBoneContent("RootNode", 0, Matrix.Identity, null);
+            rootNode.Transform = Matrix.Identity;
 
             // Gather all the nodes in tree traversal order.
             var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
@@ -105,6 +107,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var meshes = nodes.FindAll(n => n is MeshContent).Cast<MeshContent>().ToList();
             var geometries = meshes.SelectMany(m => m.Geometry).ToList();
             var distinctMaterials = geometries.Select(g => g.Material).Distinct().ToList();
+
+            // Hierarchy
+            var bones = nodes.OfType<BoneContent>().ToList();
+            var modelBones = new List<ModelBoneContent>();
+            for (var i = 0; i < bones.Count; i++)
+            {
+                var bone = bones[i];
+
+                // Find the parent
+                var parentIndex = bones.IndexOf(bone.Parent as BoneContent);
+                ModelBoneContent parent = rootNode;
+                if (parentIndex > -1)
+                    parent = modelBones[parentIndex];
+
+                modelBones.Add(new ModelBoneContent(bone.Name, i, bone.Transform, parent));
+            }
+
+            foreach (var bone in modelBones)
+                bone.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == bone));
+
+            rootNode.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == rootNode));
 
             // Loop through all distinct materials, passing them through the conversion method
             // only once, and then processing all geometries using that material.
@@ -116,59 +139,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 ProcessGeometryUsingMaterial(material, geomsWithMaterial, context);
             }
 
-            // Hierarchy
-            var bones = nodes.OfType<BoneContent>().ToList();
-            var modelBones = new List<ModelBoneContent>();
-            for (var i = 0; i < bones.Count; i++)
-            {
-                var bone = bones[i];
+            var modelMeshes = ProcessMeshes(rootNode, meshes, context);
 
-                // Find the parent
-                var parentIndex = bones.IndexOf(bone.Parent as BoneContent);
-                ModelBoneContent parent = null;
-                if (parentIndex > -1)
-                    parent = modelBones[parentIndex];
-
-                modelBones.Add(new ModelBoneContent(bone.Name, i, bone.Transform, parent));
-            }
-
-            foreach (var bone in modelBones)
-                bone.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == bone));
-
-            return new ModelContent(modelBones[0], modelBones, _meshes);
+            return new ModelContent(rootNode, modelBones, modelMeshes);
         }
 
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
         {
-            // Do nothing for now
-            return material;
+            var parameters = new OpaqueDataDictionary();
+            parameters.Add("ColorKeyColor", ColorKeyColor);
+            parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
+            parameters.Add("GenerateMipmaps", GenerateMipmaps);
+            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
+            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
+            parameters.Add("TextureFormat", TextureFormat);
+
+            return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
         }
 
         protected virtual void ProcessGeometryUsingMaterial(MaterialContent material,
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
         {
+            var basicMaterial = material as BasicMaterialContent;
             if (material == null)
-                material = new BasicMaterialContent();
+                material = basicMaterial = new BasicMaterialContent();
 
             foreach (var geometry in geometryCollection)
             {
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
-                ProcessBasicMaterial(material as BasicMaterialContent, geometry);
+                if (basicMaterial != null)
+                {
+                    // If the basic material specifies a texture, geometry must have coordinates.
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
+                        throw new InvalidContentException(
+                            "Geometry references material with texture, but no texture coordinates were found.",
+                            _identity);
 
-                var vertexBuffer = geometry.Vertices.CreateVertexBuffer();
-                var primitiveCount = geometry.Vertices.PositionIndices.Count;
-                var parts = new List<ModelMeshPartContent>
-                    {
-                        new ModelMeshPartContent(vertexBuffer, geometry.Indices, 0, primitiveCount, 0,
-                                                 primitiveCount / 3)
-                    };
-
-                var parent = geometry.Parent;
-                var bounds = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions);
-                _meshes.Add(new ModelMeshContent(parent.Name, geometry.Parent, null, bounds, parts));
+                    // Enable vertex color if the geometry has the channel to support it.
+                    if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                        basicMaterial.VertexColorEnabled = true;
+                }
             }
         }
 
@@ -254,20 +267,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             outWeights[vertexIndex] = new Vector4(tempWeights[0], tempWeights[1], tempWeights[2], tempWeights[3]);
         }
 
-        private void ProcessBasicMaterial(BasicMaterialContent basicMaterial, GeometryContent geometry)
+        private List<ModelMeshContent> ProcessMeshes(ModelBoneContent parent, List<MeshContent> meshes, ContentProcessorContext context)
         {
-            if (basicMaterial == null)
-                return;
+            var results = new List<ModelMeshContent>();
 
-            // If the basic material specifies a texture, geometry must have coordinates.
-            if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
-                throw new InvalidContentException(
-                    "Geometry references material with texture, but no texture coordinates were found.",
-                    _identity);
+            foreach (var mesh in meshes)
+            {
+                var bounds = new BoundingSphere();
+                var parts = new List<ModelMeshPartContent>();
 
-            // Enable vertex color if the geometry has the channel to support it.
-            if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                basicMaterial.VertexColorEnabled = true;
+                foreach (var geometry in mesh.Geometry)
+                {
+                    var vertexBuffer = geometry.Vertices.CreateVertexBuffer();
+                    var vertexCount = geometry.Vertices.PositionIndices.Count;
+                    var partContent = new ModelMeshPartContent(vertexBuffer, geometry.Indices, 0, vertexCount, 0, vertexCount / 3);
+                    partContent.Material = geometry.Material;
+                    parts.Add(partContent);
+
+                    bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
+                }
+
+                var modelMesh = new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
+                results.Add(modelMesh);
+            }
+
+            return results;
         }
     }
 
