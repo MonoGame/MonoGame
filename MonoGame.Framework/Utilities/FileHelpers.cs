@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Utilities
         public static char separator = '\\';
 #else
         public static char notSeparator = '\\';
-        public static char separator = Path.DirectorySeparatorChar;
+        public static char separator = System.IO.Path.DirectorySeparatorChar;
 #endif
 
         public static string NormalizeFilePathSeparators(string name)
