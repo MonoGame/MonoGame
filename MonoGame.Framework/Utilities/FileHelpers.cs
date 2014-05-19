@@ -17,19 +17,5 @@ namespace Microsoft.Xna.Framework.Utilities
 		{
             return name.Replace(notSeparator, separator);
 		}
-
-		public static void DirectoryCreate(string directory)
-		{
-			if (string.IsNullOrEmpty(directory))
-				throw new ArgumentNullException("Parameter directory must contain a value.");
-
-#if WINDOWS_STOREAPP
-			var folder = ApplicationData.Current.LocalFolder;
-			var task = folder.CreateFolderAsync(directory, CreationCollisionOption.OpenIfExists);
-			task.AsTask().Wait();
-#else
-			Directory.CreateDirectory(directory);
-#endif
-		}
 	}
 }
