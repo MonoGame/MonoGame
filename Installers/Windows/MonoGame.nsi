@@ -119,14 +119,13 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   ; Install Android Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'  
-
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'
+  
   ; Install OUYA Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'  
-  File /nonfatal '..\..\ThirdParty\Dependencies\OUYA\*.dll'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
   
   ; Install Windows Desktop OpenGL Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
@@ -140,11 +139,9 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   
   ; Install Windows Desktop DirectX Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.dll'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.xml'
-
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
+  
   ; Install Linux Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
@@ -158,20 +155,18 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   ; Install Windows 8 Store Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
-  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.xml'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.xml'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
 
   ; Intall iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
