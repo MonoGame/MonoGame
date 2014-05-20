@@ -314,9 +314,6 @@ namespace Microsoft.Xna.Framework
 
             window.KeyPress += OnKeyPress;
 
-            // XNA hides the cursor by default
-            window.Cursor = MouseCursor.Empty;
-
             // Set the window icon.
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
@@ -340,8 +337,11 @@ namespace Microsoft.Xna.Framework
             Mouse.UpdateMouseInfo(window.Mouse);
 #endif
 
-            //Default no resizing
+            // Default no resizing
             AllowUserResizing = false;
+
+            // Default mouse cursor hidden 
+            SetMouseVisible(false);
         }
 
         protected override void SetTitle(string title)
