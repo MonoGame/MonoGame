@@ -148,8 +148,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var basic = input as BasicMaterialContent;
             if (basic != null)
             {
-                if (basic.Textures.ContainsKey(BasicMaterialContent.TextureKey))
-                    basic.Texture = BuildTexture(basic.Texture.Filename, basic.Texture, context);
+                ExternalReference<TextureContent> texture;
+                if (basic.Textures.TryGetValue(BasicMaterialContent.TextureKey, out texture))
+                    basic.Texture = BuildTexture(texture.Filename, texture, context);
 
                 return basic;
             }
