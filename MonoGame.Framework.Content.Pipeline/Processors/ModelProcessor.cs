@@ -226,6 +226,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
             if (channel.Name.StartsWith(VertexChannelNames.Weights()))
                 ProcessWeightsChannel(geometry, vertexChannelIndex);
+
+            // Looks like XNA models usually put a default color channel in..
+            if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                geometry.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, geometry.Vertices.VertexCount));
         }
 
         // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation

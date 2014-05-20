@@ -136,6 +136,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     format = VertexElementFormat.Vector2;
                 else if (channel.ElementType == typeof(Vector3))
                     format = VertexElementFormat.Vector3;
+                else if (channel.ElementType == typeof(Vector4))
+                    format = VertexElementFormat.Vector4;
                 else if (channel.ElementType == typeof(Color))
                     format = VertexElementFormat.Color;
                 else if (channel.ElementType == typeof(Byte4))
