@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -8,16 +10,22 @@ namespace Microsoft.Xna.Framework.Audio
 		bool complexSound;
 		XactClip[] soundClips;
 		SoundEffectInstance wave;
+
+        uint _categoryID;
+
+        AudioEngine _engine;
 		
 		public XactSound (SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
 		{
+            _engine = soundBank.AudioEngine;
+
 			long oldPosition = soundReader.BaseStream.Position;
 			soundReader.BaseStream.Seek (soundOffset, SeekOrigin.Begin);
 			
 			byte flags = soundReader.ReadByte ();
 			complexSound = (flags & 1) != 0;
-			
-			uint category = soundReader.ReadUInt16 ();
+
+            _categoryID = soundReader.ReadUInt16();
 			soundReader.ReadByte (); //unkn
             soundReader.ReadUInt16 (); // volume, maybe pitch?
 			soundReader.ReadByte (); //unkn
@@ -40,7 +48,7 @@ namespace Microsoft.Xna.Framework.Audio
 				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
 			}
 			
-			if (complexSound) {
+			if (complexSound){
 				soundClips = new XactClip[numClips];
 				for (int i=0; i<numClips; i++) {
 					soundReader.ReadByte (); //unkn
@@ -51,21 +59,55 @@ namespace Microsoft.Xna.Framework.Audio
 				}
 			}
 
-			var audioCategory = soundBank.AudioEngine.Categories[category];
-			audioCategory.AddSound(this);
+            var category = soundBank.AudioEngine.Categories[_categoryID];
+            category.AddSound(this);
 
 			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
+
+        internal void SetFade(float fadeInTime, float fadeOutTime)
+        {
+            if (fadeInTime == 0.0f &&
+                fadeOutTime == 0.0f )
+                return;
+
+            if (complexSound)
+            {
+                foreach (var sound in soundClips)
+                    sound.SetFade(fadeInTime, fadeOutTime);
+            }
+            else
+            {
+                // TODO:
+            }
+        }
 		
 //		public XactSound (Sound sound) {
 //			complexSound = false;
 //			wave = sound;
 //		}
-		public XactSound (SoundEffectInstance sound) {
+		public XactSound (SoundEffectInstance sound)
+        {
 			complexSound = false;
 			wave = sound;
-		}		
-		public void Play() {
+		}
+
+		public void Play()
+        {
+            var category = _engine.Categories[_categoryID];
+            var curInstances = category.GetPlayingInstanceCount();
+            if (curInstances >= category.maxInstances)
+            {
+                var prevSound = category.GetOldestInstance();
+
+                if (prevSound != null)
+                {
+                    prevSound.SetFade(0.0f, category.fadeOut);
+                    prevSound.Stop(AudioStopOptions.Immediate);
+                    SetFade(category.fadeIn, 0.0f);
+                }
+            }
+
 			if (complexSound) {
 				foreach (XactClip clip in soundClips) {
 					clip.Play();
@@ -75,61 +117,127 @@ namespace Microsoft.Xna.Framework.Audio
 				wave.Play ();
 			}
 		}
+
+        internal void Update(float dt)
+        {
+            if (complexSound)
+            {
+                foreach(var sound in soundClips)
+                    sound.Update(dt);
+            }
+        }
+
+        internal void StopAll(AudioStopOptions options)
+        {
+            if (complexSound)
+            {
+                foreach (XactClip clip in soundClips)
+                {
+                    clip.Stop();
+                }
+            }
+            else
+            {
+                wave.Stop();
+            }
+        }
 		
-		public void Stop() {
-			if (complexSound) {
-				foreach (XactClip clip in soundClips) {
-					clip.Stop();
-				}
-			} else {
-				wave.Stop ();
-			}
+		public void Stop(AudioStopOptions options)
+        {
+            if (complexSound)
+            {
+                foreach (var sound in soundClips)
+                    sound.Stop();
+            }
+            else
+            {
+                wave.Stop();
+            }
 		}
 		
-		public void Pause() {
-			if (complexSound) {
-				foreach (XactClip clip in soundClips) {
-					clip.Pause();
-				}
-			} else {
+		public void Pause()
+        {
+			if (complexSound)
+            {
+                foreach (var sound in soundClips)
+                {
+                    if(sound.Playing)
+                        sound.Pause();
+                }
+                
+			}
+            else
+            {
 				wave.Pause ();
 			}
 		}
                 
-		public void Resume() {
-			if (complexSound) {
-				foreach (XactClip clip in soundClips) {
-					clip.Resume();
-				}
-			} else {
+		public void Resume()
+        {
+			if (complexSound)
+            {
+                foreach (var sound in soundClips)
+                {
+                    if (sound.IsPaused)
+                        sound.Resume();
+                }
+			}
+            else
+            {
 				wave.Resume ();
 			}
 		}
+
+        // Used to set volume from an Audio category, so volume
+        // scaling isn't applied twice.
+        internal void SetVolumeInt(float newVol)
+        {
+            if (complexSound)
+            {
+                foreach (XactClip clip in soundClips)
+                    clip.Volume = newVol;
+            }
+            else
+                wave.Volume = newVol;
+        }
 		
 		public float Volume {
 			get {
-				if (complexSound) {
+				if (complexSound)
+                {
 					return soundClips[0].Volume;
 				} else {
 					return wave.Volume;
 				}
 			}
-			set {
-				if (complexSound) {
-					foreach (XactClip clip in soundClips) {
-						clip.Volume = value;
-					}
-				} else {
-					wave.Volume = value;
-				}
-			}
+			set
+            {
+                var category = _engine.Categories[_categoryID];
+
+                value *= category._volume[0];
+
+                if (complexSound)
+                {
+                    foreach (XactClip clip in soundClips)
+                    {
+                        clip.Volume = value;
+                    }
+                }
+                else
+                {
+                    wave.Volume = value;
+                }
+            }
 		}
 		
 		public bool Playing {
 			get {
-				if (complexSound) {
-					foreach (XactClip clip in soundClips) {
-						if (clip.Playing) return true;
+				if (complexSound)
+                {
+					foreach (XactClip clip in soundClips)
+                    {
+						if (clip.Playing)
+                            return true;
 					}
 					return false;
 				} else {

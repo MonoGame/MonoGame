@@ -78,8 +78,9 @@ namespace Microsoft.Xna.Framework.Audio
 			variationRand = new Random();
 		}
 		
-		internal Cue(string cuename, XactSound[] _sounds, float[] _probs)
+		internal Cue(AudioEngine engine, string cuename, XactSound[] _sounds, float[] _probs)
 		{
+            this.engine = engine;
 			name = cuename;
 			sounds = _sounds;
 			probs = _probs;
@@ -99,6 +100,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
 		public void Play()
 		{
+            engine._activeCues.Add(this);
+			
 			//TODO: Probabilities
 			curSound = sounds[variationRand.Next (sounds.Length)];
 			
@@ -118,8 +121,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="options">Specifies if the sound should play any pending release phases or transitions before stopping.</param>
 		public void Stop(AudioStopOptions options)
 		{
+            engine._activeCues.Remove(this);
+			
 			if (curSound != null) {
-				curSound.Stop();
+                curSound.Stop(options);
 			}
 		}
 		
@@ -168,7 +173,14 @@ namespace Microsoft.Xna.Framework.Audio
 			
 		}
 
-        /// <summary>Indicateds whether or not the object has been disposed.</summary>
+        internal void Update(float dt)
+        {
+            if (curSound != null)
+                curSound.Update(dt);
+        }
+		
+		
+		/// <summary>Indicateds whether or not the object has been disposed.</summary>
 		public bool IsDisposed { get { return false; } }
 		
 		#region IDisposable implementation

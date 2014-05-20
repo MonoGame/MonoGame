@@ -7,27 +7,38 @@ namespace Microsoft.Xna.Framework.Audio
 	{
 		float volume;
 		
-		abstract class ClipEvent {
+		abstract class ClipEvent
+        {
+            protected float _curTime;
+            public float timeStamp;
+		    public float randomOffset;
+
 			public XactClip clip;
 			
 			public abstract void Play();
 			public abstract void Stop();
 			public abstract void Pause();
 			public abstract void Resume();
+            public abstract void Update(float dt);
+            public abstract void SetFade(float fadeInDuration, float fadeOutDuration);
+            public abstract bool IsReady { get; }
 			public abstract bool Playing { get; }
 			public abstract float Volume { get; set; }
 			public abstract bool IsPaused { get; }
 		}
 		
-		class EventPlayWave : ClipEvent {
+		class EventPlayWave : ClipEvent
+        {
 			public SoundEffectInstance wave;
 			public override void Play() {
 				wave.Volume = clip.Volume;
 				if (wave.State == SoundState.Playing) wave.Stop ();
 				wave.Play ();
 			}
-			public override void Stop() {
+			public override void Stop()
+            {
 				wave.Stop ();
+                _curTime = 0.0f;
 			}
 			public override void Pause() {
 				wave.Pause ();
@@ -58,6 +69,29 @@ namespace Microsoft.Xna.Framework.Audio
 					wave.Volume = value;
 				}
 			}
+
+            public override void SetFade(float fadeInDuration, float fadeOutDuration)
+            {
+                // TODO
+            }
+
+            public override bool IsReady
+            {
+                get { return _curTime >= timeStamp; }
+            }
+
+            public override void Update(float dt)
+            {
+                if (IsReady)
+                    return;
+
+                _curTime += dt;
+
+                if (!IsReady)
+                    return;
+
+                clip.Play();
+            }
 		}
 		
 		ClipEvent[] events;
@@ -71,15 +105,23 @@ namespace Microsoft.Xna.Framework.Audio
 			events = new ClipEvent[numEvents];
 			
 			for (int i=0; i<numEvents; i++) {
-				uint eventInfo = clipReader.ReadUInt32();
-				
-				uint eventId = eventInfo & 0x1F;
+				var eventInfo = clipReader.ReadUInt32();
+                var randomOffset = clipReader.ReadUInt16() * 0.001f;
+
+                // TODO: eventInfo still has 11 bits that are unknown!
+				var eventId = eventInfo & 0x1F;
+                var timeStamp = ((eventInfo >> 5) & 0xFFFF) * 0.001f;
+                var unknown = eventInfo >> 21;
+
 				switch (eventId) {
+                case 0:
+                    // Stop Event
+                    throw new NotImplementedException();
+
 				case 1:
 					EventPlayWave evnt = new EventPlayWave();
 					
-					
-					clipReader.ReadUInt32 (); //unkn
+					clipReader.ReadUInt16 (); //unkn
 					uint trackIndex = clipReader.ReadUInt16 ();
 					byte waveBankIndex = clipReader.ReadByte ();
 					
@@ -96,55 +138,111 @@ namespace Microsoft.Xna.Framework.Audio
 					
 					events[i] = evnt;
 					break;
+
+                case 7:
+                    // Pitch Event
+                    throw new NotImplementedException();
+
+                case 8:
+                    // Volume Event
+                    throw new NotImplementedException();
+
+                case 9:
+                    // Marker Event
+                    throw new NotImplementedException();
+
 				default:
 					throw new NotSupportedException();
 				}
-				
+
+                events[i].timeStamp = timeStamp;
+                events[i].randomOffset = randomOffset;
 				events[i].clip = this;
 			}
 			
-			
 			clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
+
+        internal void Update(float dt)
+        {
+            foreach (var evt in events)
+                evt.Update(dt);
+        }
+
+        internal void SetFade(float fadeInDuration, float fadeOutDuration)
+        {
+            foreach(var evt in events)
+                (evt as EventPlayWave).SetFade(fadeInDuration, fadeOutDuration);
+        }
 		
-		public void Play() {
+		public void Play()
+        {
 			//TODO: run events
-			events[0].Play ();
+            foreach (var evt in events)
+            {
+                if (evt.IsReady)
+                    evt.Play();
+            }
 		}
 
 		public void Resume()
 		{
-			events[0].Resume();
+            foreach (var evt in events)
+            {
+                if (evt.IsReady)
+                    evt.Resume();
+            }
 		}
 		
-		public void Stop() {
-			events[0].Stop ();
+		public void Stop()
+        {
+            foreach (var evt in events)
+                evt.Stop();
 		}
 		
-		public void Pause() {
-			events[0].Pause();
+		public void Pause()
+        {
+            foreach (var evt in events)
+                evt.Pause();
 		}
 		
-		public bool Playing {
-			get {
-				return events[0].Playing;
+		public bool Playing
+        {
+			get
+            {
+                foreach (var evt in events)
+                {
+                    if (evt.Playing)
+                        return true;
+                }
+
+				return false;
 			}
 		}
 		
-		public float Volume {
+		public float Volume
+        {
 			get {
 				return volume;
 			}
 			set {
 				volume = value;
-				events[0].Volume = value;
+                foreach(var evt in events)
+				    evt.Volume = value;
 			}
 		}
 
+		public bool IsPaused
+        { 
+			get
+            {
+                foreach (var evt in events)
+                {
+                    if (evt.IsPaused)
+                        return true;
+                }
 
-		public bool IsPaused { 
-			get { 
-				return events[0].IsPaused; 
+				return false; 
 			} 
 		}
 	}

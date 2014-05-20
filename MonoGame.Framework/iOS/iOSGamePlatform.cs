@@ -80,7 +80,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.GamerServices;
+//using Microsoft.Xna.Framework.GamerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -99,8 +99,9 @@ namespace Microsoft.Xna.Framework
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
 			soundControllerInstance = OpenALSoundController.GetInstance;
-			
-            Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
+
+            //This also runs the TitleContainer static constructor, ensuring it is done on the main thread
+            Directory.SetCurrentDirectory(TitleContainer.Location);
 
             _applicationObservers = new List<NSObject>();
 
@@ -121,7 +122,8 @@ namespace Microsoft.Xna.Framework
 
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
 
-            Guide.Initialise(game);
+            //(SJ) Why is this called here when it's not in any other project
+            //Guide.Initialise(game);
         }
 
         public override void TargetElapsedTimeChanged ()

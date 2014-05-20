@@ -2,8 +2,8 @@
 <Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web">
 
   <ProjectGuids>
-	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
-	<Platform Name="Angle">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
+  	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
+	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>
 	<Platform Name="iOS">DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47</Platform>
 	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
 	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
@@ -11,7 +11,7 @@
 	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
 	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
 	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
-	<Platform Name="WindowsGL">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
+	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
 	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
   </ProjectGuids>
 
@@ -279,82 +279,6 @@
       <Platforms>Angle,Android,iOS,Linux,Ouya,Windows,WindowsGL</Platforms>
     </Compile>
     
-    
-    <!-- Microsoft.Xna.Framework.GamerServices -->
-    <Compile Include="GamerServices\AchievementCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\Achievement.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\FriendCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\FriendGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\Gamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerDefaults.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerPresence.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerPresenceMode.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerPrivileges.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerProfile.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerServicesDispatcher.cs">
-      <Platforms>Angle,MacOS,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GamerZone.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>Angle,MacOS,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardEntry.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardIdentity.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardKey.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\LeaderboardWriter.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\MessageBoxIcon.cs" />
-    <Compile Include="GamerServices\NotificationPosition.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\PropertyDictionary.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="GamerServices\SignedInGamerCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows8,Windows,WindowsGL</Platforms>
-    </Compile>
-
     
     <!-- Microsoft.Xna.Framework.Graphics -->
     <Compile Include="Graphics\ClearOptions.cs" />
@@ -876,99 +800,6 @@
     </Compile>
 
     
-    <!-- Microsoft.Xna.Framework.Net -->
-    <Compile Include="Net\AvailableNetworkSessionCollection.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\AvailableNetworkSession.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandEvent.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandEventType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandGamerJoined.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandGamerLeft.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandGamerStateChange.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandReceiveData.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandSendData.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\CommandSessionStateChange.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\GamerStates.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\ICommand.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\LocalNetworkGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\MonoGamerPeer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkGamer.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkMachine.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkMessageType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkNotAvailableException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSession.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionEndReason.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionJoinError.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionJoinException.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionProperties.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionState.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\NetworkSessionType.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\PacketReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\PacketWriter.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\QualityOfService.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Net\SendDataOptions.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
-    </Compile>
-
-    
     <!-- Microsoft.Xna.Framework.Storage -->
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
@@ -1007,15 +838,6 @@
       <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Android\Devices\Sensors\Compass.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Android\GamerServices\Guide.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Android\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
-    <Compile Include="Android\GamerServices\SignedInGamer.cs">
       <Platforms>Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Android\Input\Keyboard.cs">
@@ -1078,21 +900,6 @@
     <Compile Include="iOS\Devices\Sensors\Compass.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\GamerServices\Guide.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\GamerServices\KeyboardInputViewController.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\GamerServices\KeyboardInputView.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\GamerServices\SignedInGamer.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\GamerServices\TextFieldAlertView.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\iOSGamePlatform.cs">
       <Platforms>iOS</Platforms>
     </Compile>
@@ -1111,27 +918,12 @@
     <Compile Include="iOS\iOSGameWindow.cs">
       <Platforms>iOS</Platforms>
     </Compile>
-    <Compile Include="iOS\Net\MonoGamePeerPickerControllerDelegate.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
-    <Compile Include="iOS\Net\MonoGameSessionDelegate.cs">
-      <Platforms>iOS</Platforms>
-    </Compile>
     <Compile Include="iOS\OrientationConverter.cs">
       <Platforms>iOS</Platforms>
     </Compile>
 
     
     <!-- Linux Platform -->
-    <Compile Include="Linux\GamerServices\Guide.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Linux\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
-    <Compile Include="Linux\GamerServices\SignedInGamer.cs">
-      <Platforms>Linux</Platforms>
-    </Compile>
     <Compile Include="Linux\Input\KeyboardUtil.cs">
       <Platforms>Linux</Platforms>
     </Compile>
@@ -1141,21 +933,6 @@
 
 
     <!-- MacOS Platform -->
-    <Compile Include="MacOS\GamerServices\Guide.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\MonoGameLocalGamerProfile.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\SignedInGamer.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
-    <Compile Include="MacOS\GamerServices\SigninController.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
     <Compile Include="MacOS\GameWindow.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1177,15 +954,6 @@
 
 
     <!-- PlayStation Mobile Platform -->
-    <Compile Include="PSSuite\GamerServices\Guide.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
-    <Compile Include="PSSuite\GamerServices\SignedInGamer.cs">
-      <Platforms>PSMobile</Platforms>
-    </Compile>
     <Compile Include="PSSuite\Graphics\SpriteBatcher.cs">
       <Platforms>PSMobile</Platforms>
     </Compile>
@@ -1222,9 +990,6 @@
     <Compile Include="Windows8\GameFrameworkViewSource.cs">
       <Platforms>Windows8</Platforms>
     </Compile>
-    <Compile Include="Windows8\GamerServices\SignedInGamer.cs">
-      <Platforms>Windows8</Platforms>
-    </Compile>
     <Compile Include="Windows8\InputEvents.cs">
       <Platforms>Windows8</Platforms>
     </Compile>
@@ -1246,28 +1011,8 @@
     <Compile Include="Windows8\XamlGame.cs">
       <Platforms>Windows8</Platforms>
     </Compile>
-    <Compile Include="Windows8\GamerServices\EventAsync.cs">
-      <Platforms>Windows8</Platforms>
-    </Compile>
-    <Compile Include="Windows8\GamerServices\InputDialog.cs">
-      <Platforms>Windows8</Platforms>
-    </Compile>
-    <Page Include="Themes\generic.xaml">
-        <Platforms>Windows8</Platforms>
-        <Generator>MSBuild:Compile</Generator>
-        <SubType>Designer</SubType>
-    </Page>
 
     <!-- Windows Desktop Platfom -->
-    <Compile Include="Windows\GamerServices\Guide.cs">
-      <Platforms>Angle,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
-    </Compile>
-    <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Angle,Windows,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Windows\GamerServices\SignedInGamer.cs">
-      <Platforms>Angle,Windows,WindowsGL</Platforms>
-    </Compile>
     <Compile Include="Windows\Input\KeyboardUtil.cs">
       <Platforms>Angle,WindowsGL</Platforms>
     </Compile>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="FrameworkReferences.Net">
+
+  <Platform Type="iOS">
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+    <Project
+      Name="Lidgren.Network.iOS"
+      Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj">
+        <ConfigurationMapping Old="Debug" New="Debug|Any CPU" />
+        <ConfigurationMapping Old="Release" New="Release|Any CPU" />
+        <ConfigurationMapping Old="Ad-Hoc" New="Release|Any CPU" />
+        <ConfigurationMapping Old="AppStore" New="Release|Any CPU" />
+    </Project>
+  </Platform>
+
+  <Platform Type="Linux">
+    <Project
+      Name="Lidgren.Network.Linux"
+      Guid="758CB33D-6EBD-41EA-BB0C-55B1C97A325F"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Linux.csproj" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Project
+      Name="Lidgren.Network.MacOS"
+      Guid="5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.MacOS.csproj" />
+  </Platform>
+
+  <Platform Type="Android">
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Project
+      Name="Lidgren.Network.Android"
+      Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
+  </Platform>
+
+  <Platform Type="Ouya">
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="mscorlib" />
+    <Project
+      Name="Lidgren.Network.Android"
+      Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
+  </Platform>
+
+  <Platform Type="PSMobile">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Sce.PlayStation.Core" />
+    <Project
+      Name="Lidgren.Network.PSMobile"
+      Guid="167676EE-E2D5-440A-BB2B-EFBD02BC8493"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj" />
+  </Platform>
+
+  <Platform Type="Windows">
+    <Reference Include="System.Core" />
+    <Project
+      Name="Lidgren.Network.Windows"
+      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
+  </Platform>
+
+  <Platform Type="Windows8">
+    <Reference Include="MonoGame.Framework.Windows8" />
+  </Platform>
+
+  <Platform Type="WindowsGL">
+    <Reference Include="System.Core" />
+    <Project
+      Name="Lidgren.Network.Windows"
+      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
+  </Platform>
+
+  <Platform Type="Angle">
+    <Reference Include="System.Core" />
+    <Project
+      Name="Lidgren.Network.Windows"
+      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
+      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
+  </Platform>
+
+  <Platform Type="WindowsPhone">
+    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
+                Aliases="MicrosoftXnaGamerServices" />
+    <Reference  Include="Microsoft.Xna.Framework"
+                Aliases="MicrosoftXnaFramework" />
+  </Platform>
+
+  <Platform Type="Web">
+    <Reference Include="JSIL.Meta" />
+  </Platform>
+
+</ExternalProject>

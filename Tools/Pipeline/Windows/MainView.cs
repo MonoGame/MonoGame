@@ -30,6 +30,7 @@ namespace MonoGame.Tools.Pipeline
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
+        public static MainView Form { get; private set; }
 
         public MainView()
         {            
@@ -58,7 +59,9 @@ namespace MonoGame.Tools.Pipeline
             _contextMenu = new ContextMenuStrip();
             _contextMenu.ItemClicked += OnContextMenuItemClicked;
 
-            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;            
+            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
+
+            Form = this;
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)

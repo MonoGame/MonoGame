@@ -26,10 +26,8 @@ SOFTWARE.
 #endregion License
 
 using System;
-#if WINRT
-using System.Reflection;
-#endif
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
@@ -48,11 +46,7 @@ namespace Microsoft.Xna.Framework
                 throw new ArgumentNullException("type");
             if (provider == null)
                 throw new ArgumentNullException("provider");
-#if WINRT
-            if (!type.GetTypeInfo().IsAssignableFrom(provider.GetType().GetTypeInfo()))
-#else
-            if (!type.IsAssignableFrom(provider.GetType()))
-#endif
+            if (!ReflectionHelpers.IsAssignableFrom(type, provider))
                 throw new ArgumentException("The provider does not match the specified service type!");
 
             services.Add(type, provider);
