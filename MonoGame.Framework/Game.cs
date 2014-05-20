@@ -124,8 +124,6 @@ namespace Microsoft.Xna.Framework
         {
             _instance = this;
 
-            TitleContainer.Initialize();
-
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
@@ -362,10 +360,13 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+#if IOS || WINDOWS_STOREAPP
+        [Obsolete("This platform's policy does not allow programmatically closing.", true)]
+#endif
         public void Exit()
         {
             Platform.Exit();
-			_suppressDraw = true;
+            _suppressDraw = true;
         }
 
         public void ResetElapsedTime()

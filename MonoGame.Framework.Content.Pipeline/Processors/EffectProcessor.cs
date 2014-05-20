@@ -52,11 +52,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 #if WINDOWS
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.Profile =   context.TargetPlatform == TargetPlatform.Windows ||
-                                context.TargetPlatform == TargetPlatform.WindowsPhone8 ||
-                                context.TargetPlatform == TargetPlatform.WindowsStoreApp ||
-                                context.TargetPlatform == TargetPlatform.Xbox360 ? 
-                                ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
+
+            switch (context.TargetPlatform)
+            {
+                case TargetPlatform.Windows:
+                case TargetPlatform.WindowsPhone8:
+                case TargetPlatform.WindowsStoreApp:
+                    options.Profile = ShaderProfile.DirectX_11;
+                    break;
+                case TargetPlatform.iOS:
+                case TargetPlatform.Android:
+                case TargetPlatform.Linux:
+                case TargetPlatform.MacOSX:
+                case TargetPlatform.Ouya:
+                case TargetPlatform.RaspberryPi:
+                    options.Profile = ShaderProfile.OpenGL;
+                    break;
+                default:
+                    throw new InvalidContentException(string.Format("{0} effects are not supported.", context.TargetPlatform), input.Identity);
+            }
+
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
@@ -65,6 +80,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 shaderInfo = ShaderInfo.FromFile(options.SourceFile, options);
+
+                // Add the include dependencies so that if they change
+                // it will trigger a rebuild of this effect.
                 foreach (var dep in shaderInfo.Dependencies)
                     context.AddDependency(dep);
             }
@@ -79,6 +97,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             try
             {
                 effect = EffectObject.FromShaderInfo(shaderInfo);
+
+                // If there were any additional output files we register
+                // them so that the cleanup process can manage them.
+                foreach (var outfile in shaderInfo.AdditionalOutputFiles)
+                    context.AddOutputFile(outfile);
             }
             catch (Exception ex)
             {

@@ -58,7 +58,7 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    public class WinFormsGameWindow : GameWindow
+    class WinFormsGameWindow : GameWindow
     {
         // Amendment: Added events for integrating our key processing logic with monogame.
         public event EventHandler<KeysEventArgs> TSKeyUp;
@@ -396,7 +396,6 @@ namespace MonoGame.Framework
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [CLSCompliant(false)]
         public struct NativeMessage
         {
             public IntPtr handle;

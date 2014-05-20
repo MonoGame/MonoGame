@@ -184,7 +184,9 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BackgroundContext = new GraphicsContext(mode, wnd, major, minor, flags);
                 Threading.WindowInfo = wnd;
+                Threading.BackgroundContext.MakeCurrent(null);
             }
+            Context.MakeCurrent(wnd);
 #endif
 
             MaxTextureSlots = 16;
@@ -291,6 +293,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     "Try updating your graphics drivers.");
             }
         }
+        
+        private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
 
         public void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
         {
@@ -312,7 +316,10 @@ namespace Microsoft.Xna.Framework.Graphics
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
             ScissorRectangle = _viewport.Bounds;
-            DepthStencilState = DepthStencilState.Default;
+            // DepthStencilState.Default has the Stencil Test disabled; 
+            // make sure stencil test is enabled before we clear since
+            // some drivers won't clear with stencil test disabled
+            DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
             PlatformApplyState(false);
 

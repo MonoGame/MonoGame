@@ -385,6 +385,11 @@
       <Link>freetype6.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll">
+      <Platforms>Windows</Platforms>
+      <Link>FreeImage.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
 
     <!-- Linux Additional Binaries -->

@@ -1,0 +1,70 @@
+﻿@*
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+*@
+@model SharpDoc.TemplateContext
+@using SharpDoc.Model
+@Import("Members")
+@Import("Syntax")
+@*
+ * ------------------------------------------------------------------
+ * Dump a section
+ * ------------------------------------------------------------------
+ * sectionId: id for the section
+ * name: display name
+ * content: html content of the section
+ * ------------------------------------------------------------------ 
+*@
+@helper Dump(string sectionId, string name, string content)
+    {
+    <script language="javascript">
+        window.addEvent('domready', function() {   
+            $('@(sectionId)_toggle').addEvent('click', function (event) {
+		
+		var ct = $('@(sectionId)_content');
+		if (ct.isDisplayed())
+		{
+			$('@(sectionId)_icon').setProperty('class', 'toggle_icon in');
+			$('@(sectionId)_content').hide();
+		}
+		else
+		{
+			$('@(sectionId)_icon').setProperty('class', 'toggle_icon out');
+			$('@(sectionId)_content').show();
+		}
+            });
+        });
+    </script>        
+    <div id="@sectionId" class="section">
+        <div class="title"><a id="@(sectionId)_toggle" href="#" class="title"><div id="@(sectionId)_icon" class="toggle_icon out"></div><span class="title">@Escape(name)</span></a><div class="hr"><hr/></div></div>
+        <div id="@(sectionId)_content" class="block">
+        @Raw(content)
+        </div>
+    </div>    
+}
+
+@helper Dump(string name, string content)
+{
+    @Dump("section_" + name.Replace(" ",""), name, content)
+}
+
+@helper Dump(string sectionId, string name, IEnumerable<NModelBase> members, bool showIcons)
+{
+    @Dump(sectionId, name, Helpers.Members.Dump(members, showIcons).ToString())
+}
+
+@helper Dump(string name, IEnumerable<NModelBase> members, bool showIcons)
+{
+    @Dump(name, Helpers.Members.Dump(members, showIcons).ToString())
+}
+
+@helper Dump(string name, IEnumerable<NModelBase> members, bool showIcons, IModelReference context)
+{
+    @Dump(name, Helpers.Members.Dump(members, showIcons, context).ToString())
+}
+
+@helper DumpSyntax(NMember member)
+{
+    @Dump("Syntax", Helpers.Syntax.Dump(member).ToString())   
+}

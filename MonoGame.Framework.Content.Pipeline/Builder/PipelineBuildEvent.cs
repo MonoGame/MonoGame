@@ -26,6 +26,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             ParametersXml = new List<Pair>();
             Dependencies = new List<string>();
             BuildAsset = new List<string>();
+            BuildOutput = new List<string>();
         }
 
         /// <summary>
@@ -59,6 +60,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public List<string> Dependencies { get; set; }
 
         public List<string> BuildAsset { get; set; }
+
+        public List<string> BuildOutput { get; set; }
 
         public static PipelineBuildEvent Load(string filePath)
         {

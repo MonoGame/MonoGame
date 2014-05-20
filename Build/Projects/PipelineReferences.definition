@@ -63,6 +63,9 @@
     <Binary
       Name="ManagedPVRTC"
       Path="ThirdParty\Dependencies\ManagedPVRTC\ManagedPVRTC.dll" />
+  <Binary
+      Name="FreeImageNET"
+      Path="ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImageNET.dll" />
   </Platform>
 	
 </ExternalProject>

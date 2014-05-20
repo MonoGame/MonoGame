@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Content.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Linux", "..\..\..\MonoGame.Framework\MonoGame.Framework.Linux.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.Linux", "..\..\..\ThirdParty\Lidgren.Network\Lidgren.Network.Linux.csproj", "{758CB33D-6EBD-41EA-BB0C-55B1C97A325F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

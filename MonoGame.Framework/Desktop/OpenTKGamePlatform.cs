@@ -89,23 +89,6 @@ namespace Microsoft.Xna.Framework
         private bool isCurrentlyFullScreen = false;
         private Toolkit toolkit;
         
-        public override bool VSyncEnabled
-        {
-            get
-            {
-                var context = GraphicsContext.CurrentContext;
-                return context != null && context.SwapInterval != 0;
-            }
-            set
-            {
-                var context = GraphicsContext.CurrentContext;
-                if (context != null)
-                {
-                    context.SwapInterval = value ? 1 : 0;
-                }
-            }
-        }
-        
 		public OpenTKGamePlatform(Game game)
             : base(game)
         {
@@ -172,7 +155,8 @@ namespace Microsoft.Xna.Framework
         {
             if (_view.Window.Exists)
             {
-                Net.NetworkSession.Exit();
+                //(SJ) Why is this called here when it's not in any other project
+                //Net.NetworkSession.Exit();
                 _view.Window.Close();
             }
 #if LINUX

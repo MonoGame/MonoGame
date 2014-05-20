@@ -56,7 +56,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     [CLSCompliant(false)]
-    public partial class MetroGameWindow : GameWindow
+    partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;
         private DisplayOrientation _orientation;
@@ -163,7 +163,8 @@ namespace Microsoft.Xna.Framework
 
         private void Window_Closed(CoreWindow sender, CoreWindowEventArgs args)
         {
-            Game.Exit();
+            Game.SuppressDraw();
+            Game.Platform.Exit();
         }
 
         private void SetClientBounds(double width, double height)

@@ -221,7 +221,7 @@ namespace Microsoft.Xna.Framework.Content
 						break;
 					case SurfaceFormat.NormalizedByte4:
 						{
-							int bytesPerPixel = surfaceFormat.Size();
+							int bytesPerPixel = surfaceFormat.GetSize();
 							int pitch = levelWidth * bytesPerPixel;
 							for (int y = 0; y < levelHeight; y++)
 							{

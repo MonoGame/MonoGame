@@ -87,8 +87,16 @@ namespace MGCB
             Name = "processor",
             ValueName = "className",
             Description = "Defines the class name of the content processor for processing imported content.")]
-        public string Processor = null;
+        public void SetProcessor(string processor)
+        {
+            _processor = processor;
+            
+            // If you are changing the processor then reset all 
+            // the processor parameters.
+            _processorParams.Clear();
+        }
 
+        private string _processor = null;
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
 
         [CommandLineParameter(
@@ -130,7 +138,7 @@ namespace MGCB
             {
                 SourceFile = sourceFile, 
                 Importer = Importer, 
-                Processor = Processor,
+                Processor = _processor,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _content.Add(item);
@@ -183,8 +191,15 @@ namespace MGCB
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
-            var outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, OutputDir)));
-            var intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+
+            var outputPath = OutputDir;
+            if (!Path.IsPathRooted(outputPath))
+                outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
+
+            var intermediatePath = IntermediateDir;
+            if (!Path.IsPathRooted(intermediatePath))
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+            
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
 
@@ -295,6 +310,11 @@ namespace MGCB
                         Directory.CreateDirectory(destPath);
 
                     File.Copy(c, dest, true);
+
+                    // Destination file should not be read-only even if original was.
+                    var fileAttr = File.GetAttributes(dest);
+                    fileAttr = fileAttr & (~FileAttributes.ReadOnly);
+                    File.SetAttributes(dest, fileAttr);
 
                     ++successCount;
                 }

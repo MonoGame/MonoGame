@@ -1,4 +1,10 @@
-﻿#pane_toggle.collapse
+﻿/*
+	MonoGame - Copyright (C) The MonoGame Team
+	This file is subject to the terms and conditions defined in
+	file 'LICENSE.txt', which is part of this source code package.
+*/
+
+#pane_toggle.collapse
 {
 	background-image:url("../images/pane-collapse.gif");
 }
@@ -67,7 +73,7 @@
 
 .sdoc-subheading
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1em;
 	font-weight:bold;
 }
@@ -105,8 +111,7 @@
     position: absolute;
 	padding-left:1em;
 	width:330px;
-    height: 100%;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .sharpdoc #pane_resizer {
@@ -401,12 +406,7 @@
 }
 
 .sharpdoc #body {
-    top: 100px;
-    bottom: 50px;
-    position: absolute;
     width: 100%;
-	border-top:1px dotted #666666;
-	border-bottom:1px dotted #666666;
 }
 
 .sharpdoc #footer {
@@ -462,23 +462,17 @@
 	margin-left: 0px;
 }
 
-.sharpdoc .content .section .members td.icon-col,td.name-col,td.desc-col
-{
-	border-bottom:1px solid #C1DAD7;
-	border-right:1px solid #C1DAD7;
-}
-
 .sharpdoc .content .section .members th
 {
-	background:url(../images/table-header-bg.png) repeat-x;
+	background-color:#ededed;
 	border-color:#bbb;
 	border-style:solid;
 	border-width:1px;
-	font-size:1.077em;
-	font-style:normal;
-	font-weight:normal;
+	color:#636363;
+	font-weight:bold;
 	height:21px;
 	padding:4px;
+	padding-left: 8px;
 	text-align:left;
 }
 
@@ -520,8 +514,8 @@
 
 .sharpdoc .content .section div.title
 {
-	margin-bottom:19px;
-	margin-top:9px;
+	margin-bottom:8px;
+	margin-top:22px;
 }
 
 .sharpdoc .content .section div.toggle_icon
@@ -545,7 +539,7 @@
 
 .sharpdoc .content .section span.title
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1.53em;
 	font-weight:bold;
 	padding-left:6px;
@@ -556,7 +550,7 @@
 
 .sharpdoc .content  .sub_section.title
 {
-	color:#D32600;
+	color:#393939;
 	font-size:1.05em;
 	font-weight:bold;
 	padding-left:6px;
@@ -567,7 +561,7 @@
 
 .sharpdoc .content  .code_section.title 
 {
-	color: #D32600;
+	color: #393939;
 	font-size: 0.995em;
 	font-weight: bold;
 	padding-left: 6px;
@@ -623,8 +617,8 @@
 .sharpdoc .composed .icon
 {
 	background-repeat:no-repeat;
-	height:15px;
-	width:13px;
+	height:16px;
+	width:16px;
 }
 
 .sharpdoc .composed.opened .icon
@@ -657,7 +651,7 @@
 }
 
 .sharpdoc h1.top-title, .sharpdoc h1.content-title {
-	color:#D32600;
+	color:#393939;
 	font-size:1.77em;
 	font-weight:bold;   
 }
@@ -675,16 +669,12 @@
 
 .sharpdoc div.hr
 {
-	padding-top:15px;
+	padding:0px;
 }
 
 .sharpdoc hr
 {
-	border-bottom:#E5E5E5 1px solid;
-	border-right:none;
-	border-top:none;
-	color:#e5e5e5;
-	margin-left:4px;
+	border:none;
 }
 
 .sharpdoc .warning.webNotFound .icon
@@ -729,7 +719,6 @@
 
 .tabs
 {
-	border-bottom:1px solid #DDD;
 	height:20px;
 	list-style:none;
 	margin:0;
@@ -741,7 +730,7 @@
 	cursor:pointer;
 	float:left;
 	font:bold 1em Helvetica, Arial, sans-serif;
-	margin:0 1px 0 0;
+	margin:0;
 	text-align:center;
 }
 
@@ -759,13 +748,9 @@
 
 .tabs LI.tab
 {
-	-moz-border-radius-topleft:4px;
-	-moz-border-radius-topright:4px;
-	background:#EFF5FF;
+	background:#ededed;
 	border:1px solid #CCC;
 	border-bottom:none;
-	border-top-left-radius:4px;
-	border-top-right-radius:4px;
 	color:#e73c00;
 	height:18px;
 	padding:2px 0 0;
@@ -799,14 +784,12 @@ h4.sdoc-subheading {
 
 html,body
 {
-    font-family: Helvetica, arial, freesans, clean, sans-serif;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 0.95em;
     line-height: 1.6;
-    color: #333;
+    color: #393939;
     background-color: #fff;
-	height:100%;
 	margin:0;
-    overflow-x: hidden;
 }
 
 div.panel.pdl
@@ -849,13 +832,13 @@ h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, 
 
 h1 {
   font-size: 28px;
-  color: #000;
+  color: #393939;
 }
 
 h2 {
   font-size: 24px;
   border-bottom: 1px solid #ccc;
-  color: #000;
+  color: #393939;
 }
 
 h3 {
@@ -1062,10 +1045,6 @@ table th, table td {
 table tr {
   border-top: 1px solid #ccc;
   background-color: #fff;
-}
-
-table tr:nth-child(2n) {
-  background-color: #f8f8f8;
 }
 
 /* IMAGES

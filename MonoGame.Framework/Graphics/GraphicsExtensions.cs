@@ -29,8 +29,7 @@ using GetPName = OpenTK.Graphics.ES20.All;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	[CLSCompliant(false)]
-    public static class GraphicsExtensions
+    static class GraphicsExtensions
     {
 #if OPENGL
         public static All OpenGL11(CullMode cull)
@@ -661,6 +660,10 @@ namespace Microsoft.Xna.Framework.Graphics
                     
 
 #if IOS || ANDROID
+            case SurfaceFormat.RgbEtc1:
+                glInternalFormat = (PixelInternalFormat)0x8D64; // GL_ETC1_RGB8_OES
+                glFormat = (PixelFormat)All.CompressedTextureFormats;
+                break;
 			case SurfaceFormat.RgbPvrtc2Bpp:
 				glInternalFormat = PixelInternalFormat.CompressedRgbPvrtc2Bppv1Img;
 				glFormat = (PixelFormat)All.CompressedTextureFormats;
@@ -700,7 +703,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static int Size(this SurfaceFormat surfaceFormat)
+        public static int GetSize(this SurfaceFormat surfaceFormat)
         {
             switch (surfaceFormat)
             {
@@ -744,8 +747,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     throw new ArgumentException();
             }
         }
-		
-        public static int GetTypeSize(this VertexElementFormat elementFormat)
+
+        public static int GetSize(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -840,7 +843,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
     }
 
-    public class MonoGameGLException : Exception
+    internal class MonoGameGLException : Exception
     {
         public MonoGameGLException(string message)
             : base(message)

@@ -1,36 +1,15 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    /// <summary>Represents a collection of Cues.</summary>
     public class SoundBank : IDisposable
     {
         //string name;
@@ -43,17 +22,11 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal AudioEngine AudioEngine { get { return audioengine; } }
 		
+        /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
+        /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
-#if WINRT
-            const char notSeparator = '/';
-            const char separator = '\\';
-#else
-            const char notSeparator = '\\';
-            var separator = Path.DirectorySeparatorChar;
-#endif
-            // Check for windows-style directory separator character
-            filename = fileName.Replace(notSeparator, separator);
+            filename = FileHelpers.NormalizeFilePathSeparators(fileName);
 			audioengine = audioEngine;
 		}
 		
@@ -203,7 +176,7 @@ namespace Microsoft.Xna.Framework.Audio
 							
 							soundbankstream.Seek (savepos, SeekOrigin.Begin);
 							
-							cue = new Cue(cueNames[numSimpleCues+i], cueSounds, probs);
+							cue = new Cue(audioengine, cueNames[numSimpleCues+i], cueSounds, probs);
 						}
 						
 						//Instance Limit
@@ -223,6 +196,14 @@ namespace Microsoft.Xna.Framework.Audio
 			return waveBanks[waveBankIndex].sounds[trackIndex];
 		}
 		
+        /// <summary>
+        /// Returns a pooled Cue object.
+        /// </summary>
+        /// <param name="name">Friendly name of the cue to get.</param>
+        /// <returns>a unique Cue object from a pool.</returns>
+        /// <remarks>
+        /// <para>Cue instances are unique, even when sharing the same name. This allows multiple instances to simultaneously play.</para>
+        /// </remarks>
         public Cue GetCue(string name)
         {
 			if (!loaded) Load ();
@@ -231,6 +212,10 @@ namespace Microsoft.Xna.Framework.Audio
 			return cues[name];
         }
 		
+        /// <summary>
+        /// Plays a cue.
+        /// </summary>
+        /// <param name="name">Name of the cue to play.</param>
 		public void PlayCue(string name)
 		{
 			var musicCue = GetCue(name);
@@ -245,6 +230,9 @@ namespace Microsoft.Xna.Framework.Audio
         */
 
 		#region IDisposable implementation
+        /// <summary>
+        /// Immediately releases any unmanaged resources used by this object.
+        /// </summary>
 		public void Dispose ()
 		{
 			throw new NotImplementedException ();

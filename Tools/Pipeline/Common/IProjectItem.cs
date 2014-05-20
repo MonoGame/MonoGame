@@ -2,16 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.ComponentModel;
-
 namespace MonoGame.Tools.Pipeline
 {
     interface IProjectItem
     {
         string Name { get; }
         string Location { get; }
-
-        [Browsable(false)]
         string Icon { get; set; }
     }
 }
