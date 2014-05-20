@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -138,6 +139,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     format = VertexElementFormat.Vector2;
                 else if (channel.ElementType == typeof(Single))
                     format = VertexElementFormat.Single;
+                else if (channel.ElementType == typeof(Byte4))
+                    format = VertexElementFormat.Byte4;
                 else
                     throw new InvalidContentException(string.Format("Unrecognized vertex content type: '{0}'", channel.ElementType));
 

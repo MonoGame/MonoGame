@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -239,7 +240,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 boneIndices.Add(flattenedBones[i].Name, i);
 
             var inputWeights = geometry.Vertices.Channels[vertexChannelIndex] as VertexChannel<BoneWeightCollection>;
-            var outputIndices = new Vector4[inputWeights.Count];
+            var outputIndices = new Byte4[inputWeights.Count];
             var outputWeights = new Vector4[inputWeights.Count];
             for (var i = 0; i < inputWeights.Count; i++)
                 ConvertWeights(inputWeights[i], boneIndices, outputIndices, outputWeights, i);
@@ -258,7 +259,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         }
 
         // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
-        private static void ConvertWeights(BoneWeightCollection weights, Dictionary<string, int> boneIndices, Vector4[] outIndices, Vector4[] outWeights, int vertexIndex)
+        private static void ConvertWeights(BoneWeightCollection weights, Dictionary<string, int> boneIndices, Byte4[] outIndices, Vector4[] outWeights, int vertexIndex)
         {
             // we only handle 4 weights per bone
             const int maxWeights = 4;
@@ -293,7 +294,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // output the values
-            outIndices[vertexIndex] = new Vector4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
+            outIndices[vertexIndex] = new Byte4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
             outWeights[vertexIndex] = new Vector4(tempWeights[0], tempWeights[1], tempWeights[2], tempWeights[3]);
         }
     }
