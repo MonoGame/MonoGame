@@ -144,41 +144,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If the MaterialContent is of type EffectMaterialContent, a build is requested for Effect, and validation will be performed on the OpaqueData to ensure that all parameters are valid input to SetValue or SetValueTranspose. If the MaterialContent is a BasicMaterialContent, no validation will be performed on OpaqueData. Process requests builds for all textures in Textures, unless the MaterialContent is of type BasicMaterialContent, in which case a build will only be requested for DiffuseColor. The textures in Textures will be ignored.</remarks>
         public override MaterialContent Process(MaterialContent input, ContentProcessorContext context)
         {
+            // Docs say that if it's a basic effect, only build the diffuse texture.
+            var basic = input as BasicMaterialContent;
+            if (basic != null)
+            {
+                if (basic.Textures.ContainsKey(BasicMaterialContent.TextureKey))
+                    basic.Texture = BuildTexture(basic.Texture.Filename, basic.Texture, context);
+
+                return basic;
+            }
+
+            // Build custom effects
             var effectMaterial = input as EffectMaterialContent;
             if (effectMaterial != null)
             {
                 effectMaterial.CompiledEffect = BuildEffect(effectMaterial.Effect, context);
                 // TODO: Docs say to validate OpaqueData for SetValue/SetValueTranspose
                 // Does that mean to match up with effect param names??
-                return effectMaterial;
             }
 
-            var alphaTest = input as AlphaTestMaterialContent;
-            if (alphaTest != null)
+            // Build all textures
+            foreach (var texture in input.Textures)
             {
-                alphaTest.Texture = BuildTexture(alphaTest.Texture.Filename, alphaTest.Texture, context);
-
-                return alphaTest;
+                var builtTexture = BuildTexture(texture.Value.Filename, texture.Value, context);
+                input.Textures[texture.Key] = builtTexture;
             }
 
-            var basic = input as BasicMaterialContent;
-            if (basic != null)
-            {
-                basic.Texture = BuildTexture(basic.Texture.Filename, basic.Texture, context);
-
-                return basic;
-            }
-
-            var dualTexture = input as DualTextureMaterialContent;
-            if (dualTexture != null)
-            {
-                dualTexture.Texture = BuildTexture(dualTexture.Texture.Filename, dualTexture.Texture, context);
-                dualTexture.Texture2 = BuildTexture(dualTexture.Texture2.Filename, dualTexture.Texture2, context);
-
-                return dualTexture;
-            }
-
-            throw new NotSupportedException("Unknown material type.");
+            return input;
         }
     }
 }

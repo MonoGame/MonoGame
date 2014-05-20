@@ -11,8 +11,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, DualTextureMaterialContent value)
         {
-            output.WriteExternalReference(value.Texture);
-            output.WriteExternalReference(value.Texture2);
+            output.WriteExternalReference(value.Textures.ContainsKey(DualTextureMaterialContent.TextureKey) ? value.Texture : null);
+            output.WriteExternalReference(value.Textures.ContainsKey(DualTextureMaterialContent.Texture2Key) ? value.Texture2 : null);
             output.Write(value.DiffuseColor.HasValue ? value.DiffuseColor.Value : Vector3.One);
             output.Write(value.Alpha.HasValue ? value.Alpha.Value : 1.0f);
             output.Write(value.VertexColorEnabled.HasValue ? value.VertexColorEnabled.Value : false);

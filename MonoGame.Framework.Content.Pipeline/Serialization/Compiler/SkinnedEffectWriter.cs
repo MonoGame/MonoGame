@@ -11,10 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, SkinnedMaterialContent value)
         {
-            if (!value.WeightsPerVertex.HasValue)
-                throw new InvalidContentException("Skinned materials must define a number of weights per vertex.");
-
-            output.WriteExternalReference(value.Texture);
+            output.WriteExternalReference(value.Textures.ContainsKey(SkinnedMaterialContent.TextureKey) ? value.Texture : null);
             output.Write(value.WeightsPerVertex.GetValueOrDefault());
             output.Write(value.DiffuseColor.HasValue ? value.DiffuseColor.Value : Vector3.One);
             output.Write(value.EmissiveColor.HasValue ? value.EmissiveColor.Value : Vector3.Zero);

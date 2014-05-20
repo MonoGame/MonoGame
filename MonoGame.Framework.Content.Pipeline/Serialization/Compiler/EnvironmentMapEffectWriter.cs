@@ -11,8 +11,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, EnvironmentMapMaterialContent value)
         {
-            output.WriteExternalReference(value.Texture);
-            output.WriteExternalReference(value.EnvironmentMap);
+            output.WriteExternalReference(value.Textures.ContainsKey(EnvironmentMapMaterialContent.TextureKey) ? value.Texture : null);
+            output.WriteExternalReference(value.Textures.ContainsKey(EnvironmentMapMaterialContent.EnvironmentMapKey) ? value.EnvironmentMap : null);
             output.Write(value.EnvironmentMapAmount.HasValue ? value.EnvironmentMapAmount.Value : 1.0f);
             output.Write(value.EnvironmentMapSpecular.HasValue ? value.EnvironmentMapSpecular.Value : Vector3.Zero);
             output.Write(value.DiffuseColor.HasValue ? value.DiffuseColor.Value : Vector3.One);
