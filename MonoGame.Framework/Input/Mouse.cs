@@ -69,9 +69,13 @@ namespace Microsoft.Xna.Framework.Input
 
         static OpenTK.INativeWindow Window;
 
-        internal static void setWindows(OpenTK.INativeWindow window)
+        internal static void setWindows(GameWindow window)
         {
-            Window = window;
+            PrimaryWindow = window;
+            if (window is OpenTKGameWindow)
+            {
+                Window = (window as OpenTKGameWindow).Window;
+            }
         }
 
 #elif (WINDOWS && DIRECTX)
@@ -121,7 +125,6 @@ namespace Microsoft.Xna.Framework.Input
         /// presses for the provided window
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
         public static MouseState GetState(GameWindow window)
         {
 #if MONOMAC
