@@ -32,14 +32,14 @@ namespace TwoMGFX
 
                 // Compile the shader into bytecode.                
                 var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                    shaderInfo.fileContent,
+                    shaderInfo.FileContent,
                     shaderFunction,
                     shaderProfile,
                     shaderFlags,
                     0,
                     null,
                     null,
-                    shaderInfo.fileName);
+                    shaderInfo.FilePath);
 
                 if (result.HasErrors)
                     throw new Exception(result.Message);

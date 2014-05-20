@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 
@@ -25,6 +26,8 @@ namespace Microsoft.Xna.Framework.Audio
 		AudioCategory[] categories;
 		Dictionary<string, int> categoryLookup = new Dictionary<string, int>();
 
+        internal List<Cue> _activeCues = new List<Cue>();
+
 		internal AudioCategory[] Categories { get { return categories; } }
 
 		struct Variable {
@@ -42,7 +45,6 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 		Variable[] variables;
 		Dictionary<string, int> variableLookup = new Dictionary<string, int>();
-
 
 		enum RpcPointType {
 			Linear,
@@ -69,13 +71,15 @@ namespace Microsoft.Xna.Framework.Audio
 		}
 
 		RpcCurve[] rpcCurves;
+        private Stopwatch _stopwatch;
+        private TimeSpan _lastUpdateTime;
 
 
 
         /// <param name="settingsFile">Path to a XACT settings file.</param>
 		public AudioEngine (string settingsFile)
 			: this(settingsFile, TimeSpan.Zero, "")
-		{
+		{            
 		}
 
         /// <param name="settingsFile">Path to a XACT settings file.</param>
@@ -189,6 +193,9 @@ namespace Microsoft.Xna.Framework.Audio
 
 				}
 			}
+
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
 		}
 
 		//wtf C#
@@ -209,10 +216,28 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Performs periodic work required by the audio engine.</summary>
         /// <remarks>Must be called at least once per frame.</remarks>
 		public void Update ()
-		{
-			// TODO throw new NotImplementedException ();
-		}
+        {
+            var cur = _stopwatch.Elapsed;
+            var elapsed = cur - _lastUpdateTime;
+            _lastUpdateTime = cur;
+            var dt = (float)elapsed.TotalSeconds;
+            
+            for (var x = 0; x < _activeCues.Count; )
+            {
+                var cue = _activeCues[x];
 
+                cue.Update(dt);
+
+                if (cue.IsStopped)
+                {
+                    _activeCues.Remove(cue);
+                    continue;
+                }
+
+                x++;
+            }
+		}
+		
         /// <summary>Returns an audio category by name.</summary>
         /// <param name="name">Friendly name of the category to get.</param>
         /// <returns>The AudioCategory with a matching name. Throws an exception if not found.</returns>

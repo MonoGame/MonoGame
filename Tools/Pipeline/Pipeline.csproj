@@ -62,6 +62,8 @@
     <Compile Include="Common\PipelineProjectParser.cs" />
     <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Common\Util.cs" />
+    <Compile Include="Common\Util.cs" />
+    <Compile Include="Common\StringExtensions.cs" />
     <Compile Include="Windows\AssemblyReferenceEditing.cs">
       <SubType>Form</SubType>
     </Compile>
