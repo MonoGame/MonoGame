@@ -86,15 +86,20 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt'
-  File '..\..\Tools\2MGFX\bin\Release\*.exe'
   
   File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\libmojoshader_32.dll'
   File '..\..\ThirdParty\Dependencies\lame_enc.dll'
 
-  ; Install the MonoGame Content Builder to a subfolder both
+  
+  ; Install the MonoGame tools to individual subfolders both
   ; to avoid conflicting assemblies and to make it easy for end
   ; users to copy all the necessary files for distribution.
+
+  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\2MGFX
+  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
+  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
+
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\MGCB
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
