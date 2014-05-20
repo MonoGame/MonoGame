@@ -151,8 +151,6 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
-    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
-                Aliases="MicrosoftXnaGamerServices" />
     <Reference  Include="Microsoft.Xna.Framework"
                 Aliases="MicrosoftXnaFramework" />
   </Platform>
