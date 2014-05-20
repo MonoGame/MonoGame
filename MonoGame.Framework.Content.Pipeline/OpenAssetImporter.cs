@@ -70,6 +70,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     CreateAnimation(skeleton);
                 }
 
+                // If we have a simple hierarchy with no bones and just the one
+                // mesh, we can flatten it out so the mesh is the root node.
+                if (_rootNode.Children.Count == 1 && _rootNode.Children[0] is MeshContent)
+                {
+                    var absXform = _rootNode.Children[0].AbsoluteTransform;
+                    _rootNode = _rootNode.Children[0];
+                    _rootNode.Transform = absXform;
+                }
+
                 _scene.Clear();
             }
 
