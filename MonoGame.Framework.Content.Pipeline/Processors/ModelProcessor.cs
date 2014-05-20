@@ -98,8 +98,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             _identity = input.Identity;
             _logger = context.Logger;
-            var rootNode = new ModelBoneContent("RootNode", 0, Matrix.Identity, null);
-            rootNode.Transform = Matrix.Identity;
 
             // Gather all the nodes in tree traversal order.
             var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
@@ -107,27 +105,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var meshes = nodes.FindAll(n => n is MeshContent).Cast<MeshContent>().ToList();
             var geometries = meshes.SelectMany(m => m.Geometry).ToList();
             var distinctMaterials = geometries.Select(g => g.Material).Distinct().ToList();
-
-            // Hierarchy
-            var bones = nodes.OfType<BoneContent>().ToList();
-            var modelBones = new List<ModelBoneContent>();
-            for (var i = 0; i < bones.Count; i++)
-            {
-                var bone = bones[i];
-
-                // Find the parent
-                var parentIndex = bones.IndexOf(bone.Parent as BoneContent);
-                ModelBoneContent parent = rootNode;
-                if (parentIndex > -1)
-                    parent = modelBones[parentIndex];
-
-                modelBones.Add(new ModelBoneContent(bone.Name, i, bone.Transform, parent));
-            }
-
-            foreach (var bone in modelBones)
-                bone.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == bone));
-
-            rootNode.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == rootNode));
 
             // Loop through all distinct materials, passing them through the conversion method
             // only once, and then processing all geometries using that material.
@@ -139,9 +116,62 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 ProcessGeometryUsingMaterial(material, geomsWithMaterial, context);
             }
 
-            var modelMeshes = ProcessMeshes(rootNode, meshes, context);
+            var boneList = new List<ModelBoneContent>();
+            var meshList = new List<ModelMeshContent>();
+            var rootNode = ProcessNode(input, null, boneList, meshList, context);
 
-            return new ModelContent(rootNode, modelBones, modelMeshes);
+            return new ModelContent(rootNode, boneList, meshList);
+        }
+
+        private ModelBoneContent ProcessNode(NodeContent node, ModelBoneContent parent, List<ModelBoneContent> boneList, List<ModelMeshContent> meshList, ContentProcessorContext context)
+        {
+            var result = new ModelBoneContent(node.Name, boneList.Count, node.Transform, parent);
+            boneList.Add(result);
+
+            if (node is MeshContent)
+                meshList.Add(ProcessMesh(node as MeshContent, result, context));
+
+            var children = new List<ModelBoneContent>();
+            foreach (var child in node.Children)
+                children.Add(ProcessNode(child, result, boneList, meshList, context));
+            result.Children = new ModelBoneContentCollection(children);
+
+            return result;
+        }
+
+        private ModelMeshContent ProcessMesh(MeshContent mesh, ModelBoneContent parent, ContentProcessorContext context)
+        {
+            var bounds = new BoundingSphere();
+            var parts = new List<ModelMeshPartContent>();
+            var vertexBuffer = new VertexBufferContent();
+            var indexBuffer = new IndexCollection();
+
+            var startVertex = 0;
+            foreach (var geometry in mesh.Geometry)
+            {
+                var vertices = geometry.Vertices;
+                var vertexCount = vertices.VertexCount;
+                var startIndex = indexBuffer.Count;
+                var geomBuffer = geometry.Vertices.CreateVertexBuffer();
+
+                vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
+                foreach (var index in geometry.Indices)
+                    indexBuffer.Add(startIndex + index);
+
+                var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+                partContent.Material = geometry.Material;
+                parts.Add(partContent);
+
+                // Update mesh bounding box
+                bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
+
+                // Geoms are supposed to all have the same decl, so just steal one of these
+                vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+
+                startVertex += vertexCount;
+            }
+
+            return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
 
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
@@ -265,33 +295,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // output the values
             outIndices[vertexIndex] = new Vector4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
             outWeights[vertexIndex] = new Vector4(tempWeights[0], tempWeights[1], tempWeights[2], tempWeights[3]);
-        }
-
-        private List<ModelMeshContent> ProcessMeshes(ModelBoneContent parent, List<MeshContent> meshes, ContentProcessorContext context)
-        {
-            var results = new List<ModelMeshContent>();
-
-            foreach (var mesh in meshes)
-            {
-                var bounds = new BoundingSphere();
-                var parts = new List<ModelMeshPartContent>();
-
-                foreach (var geometry in mesh.Geometry)
-                {
-                    var vertexBuffer = geometry.Vertices.CreateVertexBuffer();
-                    var vertexCount = geometry.Vertices.PositionIndices.Count;
-                    var partContent = new ModelMeshPartContent(vertexBuffer, geometry.Indices, 0, vertexCount, 0, vertexCount / 3);
-                    partContent.Material = geometry.Material;
-                    parts.Add(partContent);
-
-                    bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
-                }
-
-                var modelMesh = new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
-                results.Add(modelMesh);
-            }
-
-            return results;
         }
     }
 
