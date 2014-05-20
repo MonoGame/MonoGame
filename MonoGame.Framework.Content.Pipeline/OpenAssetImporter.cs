@@ -206,10 +206,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i),
                                            ToXnaTexCoord(aiMesh.TextureCoordinateChannels[i]));
 
-            for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
+            if (aiMesh.VertexColorChannelCount > 0)
             {
-                geom.Vertices.Channels.Add(VertexChannelNames.Color(i),
-                       ToXnaColors(aiMesh.VertexColorChannels[i]));
+                for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
+                {
+                    geom.Vertices.Channels.Add(VertexChannelNames.Color(i),
+                           ToXnaColors(aiMesh.VertexColorChannels[i]));
+                }
+            }
+            else
+            {
+                // The XNA importer appears to always include a color channel.
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, aiMesh.VertexCount));
             }
 
             return geom;
