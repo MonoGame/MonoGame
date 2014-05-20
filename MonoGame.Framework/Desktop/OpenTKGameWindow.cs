@@ -58,10 +58,8 @@ namespace Microsoft.Xna.Framework
     {
         private bool _isResizable;
         private bool _isBorderless;
-#if WINDOWS
-        private bool _isMouseHidden;
         private bool _isMouseInBounds;
-#endif
+
 		//private DisplayOrientation _currentOrientation;
         private IntPtr _windowHandle;
         private INativeWindow window;
@@ -275,11 +273,6 @@ namespace Microsoft.Xna.Framework
         private void OnMouseEnter(object sender, EventArgs e)
         {
             _isMouseInBounds = true;
-            if (!game.IsMouseVisible && !_isMouseHidden)
-            {
-                _isMouseHidden = true;
-                System.Windows.Forms.Cursor.Hide();
-            }
         }
 
         private void OnMouseLeave(object sender, EventArgs e)
@@ -289,11 +282,6 @@ namespace Microsoft.Xna.Framework
             if (Mouse.GetState().LeftButton == ButtonState.Released)
             {
                 _isMouseInBounds = false;
-                if (_isMouseHidden)
-                {
-                    _isMouseHidden = false;
-                    System.Windows.Forms.Cursor.Show();
-                }
             }
         }
 #endif
@@ -325,7 +313,7 @@ namespace Microsoft.Xna.Framework
 #endif
 
             window.KeyPress += OnKeyPress;
-            
+
             // Set the window icon.
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
@@ -344,13 +332,16 @@ namespace Microsoft.Xna.Framework
             // mouse
             // TODO review this when opentk 1.1 is released
 #if WINDOWS || LINUX || ANGLE
-            Mouse.setWindows(window);
+            Mouse.setWindows(this);
 #else
             Mouse.UpdateMouseInfo(window.Mouse);
 #endif
 
-            //Default no resizing
+            // Default no resizing
             AllowUserResizing = false;
+
+            // Default mouse cursor hidden 
+            SetMouseVisible(false);
         }
 
         protected override void SetTitle(string title)
@@ -425,27 +416,10 @@ namespace Microsoft.Xna.Framework
 
         }
 
-#if WINDOWS
-        // Todo: instead of loading winforms, we can either
-        // release the cursor when it reaches the window bounds
-        // or set a blank cursor (review after OpenTK 1.1.2 is released)
         public void SetMouseVisible(bool visible)
         {
-            if (visible)
-            {
-                if (_isMouseHidden)
-                {
-                    System.Windows.Forms.Cursor.Show();
-                    _isMouseHidden = false;
-                }
-            }
-            else if (!_isMouseHidden && _isMouseInBounds)
-            {
-                System.Windows.Forms.Cursor.Hide();
-                _isMouseHidden = true;
-            }
+            window.Cursor = visible ? MouseCursor.Default : MouseCursor.Empty;
         }
-#endif
 
         #endregion
     }
