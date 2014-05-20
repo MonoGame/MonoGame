@@ -320,25 +320,15 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
 #if ANDROID
-			if (sourceId != 0 && _looped != value)
-				_looped = value;
+            if (sourceId != 0)
+                s_soundPool.SetLoop(sourceId, value ? -1 : 0);
+            _looped = value;
 #endif
         }
 
         private bool PlatformGetIsLooped()
         {
-#if OPENAL
-            
             return _looped;
-#endif
-
-#if ANDROID
-
-			if (sourceId != 0)
-				return _looped;
-            
-            return false;
-#endif
         }
 
         private void PlatformSetPan(float value)
