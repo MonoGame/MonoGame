@@ -29,19 +29,11 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
-using ProtoBuf;
-
-#if WINRT
 using System.Runtime.Serialization;
-#endif
 
 namespace Microsoft.Xna.Framework
 {
-#if WINRT
     [DataContract]
-#else
-    [Serializable, ProtoContract]
-#endif
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
@@ -62,25 +54,14 @@ namespace Microsoft.Xna.Framework
 
 
         #region Public Fields
-#if WINRT
+
         [DataMember]
-#else
-        [ProtoMember(1)]
-#endif
         public float X;
 
-#if WINRT
         [DataMember]
-#else
-        [ProtoMember(2)]
-#endif
         public float Y;
 
-#if WINRT
         [DataMember]
-#else
-        [ProtoMember(3)]
-#endif
         public float Z;
 
         #endregion Public Fields
@@ -328,14 +309,14 @@ namespace Microsoft.Xna.Framework
                 return false;
 
             var other = (Vector3)obj;
-            return  X == other.X &&
+            return X == other.X &&
                     Y == other.Y &&
                     Z == other.Z;
         }
 
         public bool Equals(Vector3 other)
         {
-            return  X == other.X && 
+            return X == other.X &&
                     Y == other.Y &&
                     Z == other.Z;
         }
@@ -588,7 +569,7 @@ namespace Microsoft.Xna.Framework
 
         public static void Transform(Vector3[] sourceArray, int sourceIndex, ref Matrix matrix, Vector3[] destinationArray, int destinationIndex, int length)
         {
-            Debug.Assert(sourceArray.Length - sourceIndex >= length, 
+            Debug.Assert(sourceArray.Length - sourceIndex >= length,
                 "The source array is too small for the given sourceIndex and length.");
             Debug.Assert(destinationArray.Length - destinationIndex >= length,
                 "The destination array is too small for the given destinationIndex and length.");
@@ -606,9 +587,6 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
-        /// Transforms a vector by a quaternion rotation.
-        /// </summary>
         /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
@@ -705,7 +683,7 @@ namespace Microsoft.Xna.Framework
 
             // TODO: Are there options on some platforms to implement a vectorized version of this?
 
-            for (var i = 0; i < length; i++) 
+            for (var i = 0; i < length; i++)
             {
                 var position = sourceArray[sourceIndex + i];
 
