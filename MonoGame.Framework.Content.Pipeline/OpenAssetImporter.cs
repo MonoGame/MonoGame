@@ -169,9 +169,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var geom = new GeometryContent { Material = _materials[aiMesh.MaterialIndex] };
 
             // Vertices
+            var baseVertex = mesh.Positions.Count;
             foreach (var vert in aiMesh.Vertices)
                 mesh.Positions.Add(ToXna(vert));
-            geom.Vertices.AddRange(Enumerable.Range(0, aiMesh.VertexCount));
+            geom.Vertices.AddRange(Enumerable.Range(baseVertex, aiMesh.VertexCount));
             geom.Indices.AddRange(aiMesh.GetIndices());
 
             if (aiMesh.HasBones)

@@ -152,12 +152,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 var vertices = geometry.Vertices;
                 var vertexCount = vertices.VertexCount;
-                var startIndex = indexBuffer.Count;
                 var geomBuffer = geometry.Vertices.CreateVertexBuffer();
-
                 vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
-                foreach (var index in geometry.Indices)
-                    indexBuffer.Add(startIndex + index);
+
+                var startIndex = indexBuffer.Count;
+                indexBuffer.AddRange(geometry.Indices);
 
                 var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
                 partContent.Material = geometry.Material;
