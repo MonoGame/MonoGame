@@ -15,8 +15,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Model - MonoGame")]
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
-        private readonly Dictionary<MaterialContent, MaterialContent> _processedMaterials = new Dictionary<MaterialContent, MaterialContent>();
-
         private ContentIdentity _identity;
         private ContentBuildLogger _logger;
 
