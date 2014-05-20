@@ -54,7 +54,7 @@ using OpenTK.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-    class OpenTKGameWindow : GameWindow, IDisposable
+    public class OpenTKGameWindow : GameWindow, IDisposable
     {
         // Amendment: Added events for integrating our key processing logic with monogame.
         public event EventHandler<KeysEventArgs> TSKeyUp;
