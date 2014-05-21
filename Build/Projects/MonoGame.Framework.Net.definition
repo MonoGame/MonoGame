@@ -23,7 +23,7 @@
     <!-- See FrameworkReferences.definition for the platform specific references -->
     <Reference Include="FrameworkReferences.Net" />
 	<Reference Include="MonoGame.Framework" 
-			   Aliases="MonoGameXnaFramework" />
+			   Aliases="global,MonoGameXnaFramework" />
 
   </References>
 
