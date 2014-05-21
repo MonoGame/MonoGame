@@ -31,9 +31,6 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <param name="relativeFile">Relative location of another file to resolve the path to</param>
         public static string ResolveRelativePath(string filePath, string relativeFile)
         {
-            filePath = NormalizeFilePathSeparators(filePath);
-            relativeFile = NormalizeFilePathSeparators(relativeFile);
-
             // Get a uri for filePath using the file:// schema and no host
             var src = new Uri("file:///" + filePath);
 
@@ -42,7 +39,7 @@ namespace Microsoft.Xna.Framework.Utilities
 
             // The uri now contains the path to the relativeFile with relative addresses resolved
             // Get the local path and skip the first character (the path separator)
-            return dst.LocalPath.Substring(1);
+            return NormalizeFilePathSeparators(dst.LocalPath.Substring(1));
         }
     }
 }
