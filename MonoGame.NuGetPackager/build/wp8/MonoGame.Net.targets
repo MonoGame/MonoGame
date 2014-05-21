@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="PlatformCheck" BeforeTargets="InjectReference"
+  Condition=" ( ('$(Platform)' != 'x86') AND ('$(Platform)' != 'ARM') )">
+    <Error  Text="$(MSBuildThisFileName) does not work correctly on '$(Platform)' 
+                     platform. You need to specify platform (x86 or ARM)." />
+  </Target>
+
+	<ItemGroup Condition=" '$(Platform)' == 'x86' or '$(Platform)' == 'ARM'">
+	  <Reference Include="MonoGame.Framework.Net">
+		<HintPath>$(MSBuildThisFileDirectory)$(Platform)\MonoGame.Framework.Net.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+</Project>
