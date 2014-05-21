@@ -14,7 +14,7 @@
     <head>
     @Helpers.PageHead.Dump(title)
     </head>
-	<body onload="window.top.resizeDocs();window.top.scrollTo(0,0);window.top.document.title='@title | MonoGame'">
+	<body onload="onPageLoad('@title | MonoGame', '@Model.Topic.PageId');">
     @Helpers.PageBody.Dump(bodyTemplateName)
 
     <br />
