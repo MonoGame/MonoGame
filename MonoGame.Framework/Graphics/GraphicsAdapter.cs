@@ -319,6 +319,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
         */
 
+        /// <summary>
+        /// Gets a <see cref="System.Boolean"/> indicating whether
+        /// <see cref="GraphicsAdapter.CurrentDisplayMode"/> has a
+        /// Width:Height ratio corresponding to a widescreen <see cref="DisplayMode"/>.
+        /// Common widescreen modes include 16:9, 16:10 and 2:1.
+        /// </summary>
         public bool IsWideScreen
         {
             get
