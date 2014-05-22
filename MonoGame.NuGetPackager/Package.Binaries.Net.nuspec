@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>MonoGame.Binaries.Net</id>
+        <version>3.2.2-alpha</version>
+        <title>MonoGame.Binaries.Net</title>
+        <authors>Simon-darkside-Jackson,Michael Cummings</authors>
+        <owners>MonoGameTeam</owners>
+        <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+        <projectUrl>http://monogame.net/</projectUrl>
+        <iconUrl>http://www.monogame.net/wp-content/themes/monogame/images/monogame.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>MonoGame is an open source implementation of the Microsoft XNA 4.x Framework.
+      The goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse. We currently support iOS, Android, Windows (both OpenGL and DirectX), Mac OS X, Linux, Windows 8 Store, Windows Phone 8, PlayStation Mobile, and the OUYA console.</description>
+        <summary>MonoGame is an open source cross platform implementation of Microsoft's XNA 4.x Framework</summary>
+        <releaseNotes>Updated dev release - 21 May 2014 
+		This package is for the separated .Net and .GamerServices namespaces
+		Also included is the version of Lidgren for Monogame</releaseNotes>
+        <copyright>Copyright  2013</copyright>
+        <language>en-US</language>
+		<dependencies>
+            <dependency id="MonoGame.Binaries"/>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\MonoGame.Framework\bin\Android\AnyCPU\Release\Lidgren.Network.dll" target="build\MonoAndroid\Lidgren.Network.dll" />
+        <file src="build\MonoAndroid\MonoGame.Net.targets" target="build\MonoAndroid\MonoGame.Binaries.Net.targets" />
+        <file src="..\MonoGame.Framework\bin\Android\AnyCPU\Release\MonoGame.Framework.Net.dll" target="build\MonoAndroid\MonoGame.Framework.Net.dll" />
+        <file src="build\MonoMac\Lidgren.Network.dll" target="build\MonoMac\Lidgren.Network.dll" />
+        <file src="build\MonoMac\MonoGame.Net.targets" target="build\MonoMac\MonoGame.Binaries.Net.targets" />
+        <file src="build\MonoMac\MonoGame.Framework.Net.dll" target="build\MonoMac\MonoGame.Net.Framework.dll" />
+        <file src="build\MonoTouch\Lidgren.Network.dll" target="build\MonoTouch\Lidgren.Network.dll" />
+        <file src="build\MonoTouch\MonoGame.Net.targets" target="build\MonoTouch\MonoGame.Binaries.Net.targets" />
+        <file src="build\MonoTouch\MonoGame.Framework.Net.dll" target="build\MonoTouch\MonoGame.Net.Framework.dll" />
+        <file src="build\net40\MonoGame.Net.targets" target="build\net40\MonoGame.Binaries.Net.targets" />
+        <file src="..\MonoGame.Framework\Bin\WindowsGL\AnyCPU\Release\MonoGame.Framework.Net.dll" target="build\net40\AnyCPU\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\Lidgren.Network.dll" target="build\net40\AnyCPU\Lidgren.Network.dll" />
+        <file src="..\MonoGame.Framework\Bin\WindowsGL\x86\Release\MonoGame.Framework.Net.dll" target="build\net40\x86\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\bin\WindowsGL\x86\Release\Lidgren.Network.dll" target="build\net40\x86\Lidgren.Network.dll" />
+        <file src="..\MonoGame.Framework\Bin\WindowsGL\x64\Release\MonoGame.Framework.Net.dll" target="build\net40\x64\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\bin\WindowsGL\x64\Release\Lidgren.Network.dll" target="build\net40\x64\Lidgren.Network.dll" />
+        <file src="build\netcore\MonoGame.Net.targets" target="build\netcore\MonoGame.Binaries.Net.targets" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\AnyCPU\Release\MonoGame.Framework.Net.dll" target="build\netcore\AnyCPU\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\AnyCPU\Release\MonoGame.Framework.Net.pri" target="build\netcore\AnyCPU\MonoGame.Framework.Net.pri" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\AnyCPU\Release\Themes\Generic.xaml" target="build\netcore\AnyCPU\MonoGame.Framework.Net\Themes\Generic.xaml" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\ARM\Release\MonoGame.Framework.Net.dll" target="build\netcore\ARM\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\ARM\Release\MonoGame.Framework.Net.pri" target="build\netcore\ARM\MonoGame.Framework.Net.pri" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\ARM\Release\Themes\Generic.xaml" target="build\netcore\ARM\MonoGame.Framework.Net\Themes\Generic.xaml" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x86\Release\MonoGame.Framework.Net.dll" target="build\netcore\x86\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x86\Release\MonoGame.Framework.Net.pri" target="build\netcore\x86\MonoGame.Framework.Net.pri" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x86\Release\Themes\Generic.xaml" target="build\netcore\x86\MonoGame.Framework.Net\Themes\Generic.xaml" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x64\Release\MonoGame.Framework.Net.dll" target="build\netcore\x64\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x64\Release\MonoGame.Framework.Net.pri" target="build\netcore\x64\MonoGame.Framework.Net.pri" />
+        <file src="..\MonoGame.Framework\Bin\Windows8\x64\Release\Themes\Generic.xaml" target="build\netcore\x64\MonoGame.Framework.Net\Themes\Generic.xaml" />
+        <file src="..\MonoGame.Framework\Bin\WindowsPhone\ARM\Release\MonoGame.Framework.Net.dll" target="build\wp8\ARM\MonoGame.Framework.Net.dll" />
+        <file src="..\MonoGame.Framework\Bin\WindowsPhone\x86\Release\MonoGame.Framework.net.dll" target="build\wp8\x86\MonoGame.Framework.net.dll" />
+        <file src="build\wp8\MonoGame.Net.targets" target="build\wp8\MonoGame.Binaries.Net.targets" />
+		<file src="readme\MonoGame.Binaries.Net\readme.txt" target="" />
+	</files>
+</package>

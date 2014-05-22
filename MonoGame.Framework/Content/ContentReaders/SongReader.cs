@@ -66,19 +66,10 @@ namespace Microsoft.Xna.Framework.Content
 			
 			if (!String.IsNullOrEmpty(path))
 			{
-                path = FileHelpers.NormalizeFilePathSeparators(path);
-				
-				// Get a uri for the asset path using the file:// schema and no host
-                var src = new Uri("file:///" + FileHelpers.NormalizeFilePathSeparators(input.AssetName));
-				
-				// Add the relative path to the external reference
-				var dst = new Uri(src, path);
-				
-				// The uri now contains the path to the external reference within the content manager
-				// Get the local path and skip the first character (the path separator)
-				path = dst.LocalPath.Substring(1);
-				
-				// Adds the ContentManager's RootDirectory
+                //resolve the relative path
+                path = FileHelpers.ResolveRelativePath(input.AssetName, path);
+
+                // Add the ContentManager's RootDirectory
                 path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
 			}
 			

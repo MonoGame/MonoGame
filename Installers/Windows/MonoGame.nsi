@@ -78,6 +78,13 @@ FunctionEnd
 ; The stuff to install
 Section "MonoGame Core Components" CoreComponents ;No components page, name is not important
   SectionIn RO
+
+  
+  ; TODO: This stuff below is a bit of a mess and i 
+  ; suspect some of it can be removed now.  Some can
+  ; be removed after we kill off the old XNA content 
+  ; pipeline support.
+
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
@@ -85,29 +92,42 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\Dependencies\NAudio\*.dll'
   File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
-  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt'
-  File '..\..\Tools\2MGFX\bin\Release\*.exe'
-  
+  File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt' 
   File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\libmojoshader_32.dll'
   File '..\..\ThirdParty\Dependencies\lame_enc.dll'
 
-  ; Install the MonoGame Content Builder to a subfolder both
+  
+  ; Install the MonoGame tools to individual subfolders both
   ; to avoid conflicting assemblies and to make it easy for end
   ; users to copy all the necessary files for distribution.
+
+  SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\2MGFX
+  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
+  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
+
   SetOutPath $PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}\MGCB
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
-
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'  
-
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'  
-  File /nonfatal '..\..\ThirdParty\Dependencies\OUYA\*.dll'
   
+  ; TODO: Add the new Pipeline GUI tool here along with
+  ; registration of file extensions and shortcuts.
+
+
+  ; Install the assemblies for all the platforms we can 
+  ; target from a Windows desktop system.
+
+  ; Install Android Assemblies
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Android'
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'
+  
+  ; Install OUYA Assemblies
+  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\OUYA'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
+  
+  ; Install Windows Desktop OpenGL Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
@@ -117,12 +137,12 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
+  ; Install Windows Desktop DirectX Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
-  File /nonfatal ' ..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.dll'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.xml'
-
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
+  
+  ; Install Linux Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
@@ -133,40 +153,27 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
 
-    
+  ; Install Windows 8 Store Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\Windows8'
-
-  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\MonoGame.Framework.xml'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.dll'
-  File '..\..\ThirdParty\Dependencies\SharpDX\Windows 8 Metro\*.xml'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.xml'
 
   ; Install Windows Phone ARM Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\ARM'
-
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\MonoGame.Framework.xml'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone\x86'
-
-  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.dll'
-  File /nonfatal '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\MonoGame.Framework.xml'
-
-  SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\WindowsPhone'
-
-  File /r '..\..\ThirdParty\Dependencies\SharpDX\Windows Phone\*.dll'
-  File /r '..\..\ThirdParty\Dependencies\SharpDX\Windows Phone\*.xml'  
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
 
   ; Intall iOS Assemblies
-
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
   InstalliOSAssemblies:
   SetOutPath '$PROGRAMFILES\${APPNAME}\v${VERSION}\Assemblies\iOS'
-
   File /nonfatal 'iOS\*.dll'
- ;File /nonfatal 'iOS\*.xml'  
-
+  ;File /nonfatal 'iOS\*.xml'  
   SkipiOSAssemblies:
 
   WriteRegStr HKLM 'SOFTWARE\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\${APPNAME} for Windows GL' '' '$INSTDIR\Assemblies\WindowsGL'
