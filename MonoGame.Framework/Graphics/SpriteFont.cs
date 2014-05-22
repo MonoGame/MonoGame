@@ -106,7 +106,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
 		{
-			_characters = new ReadOnlyCollection<char> (characters.ToArray ());
+			Characters = new ReadOnlyCollection<char>(characters.ToArray());
 			_texture = texture;
 			LineSpacing = lineSpacing;
 			Spacing = spacing;
@@ -148,12 +148,10 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Dictionary<char, Glyph>(_glyphs, _glyphs.Comparer);
         }
 
-		private ReadOnlyCollection<char> _characters;
-
 		/// <summary>
 		/// Gets a collection of the characters in the font.
 		/// </summary>
-		public ReadOnlyCollection<char> Characters { get { return _characters; } }
+		public ReadOnlyCollection<char> Characters { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the character that will be substituted when a
