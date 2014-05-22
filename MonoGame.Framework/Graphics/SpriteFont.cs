@@ -87,6 +87,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal readonly Texture2D _texture;
 
+		class CharComparer: IEqualityComparer<char>
+		{
+			public bool Equals(char x, char y)
+			{
+				return x == y;
+			}
+
+			public int GetHashCode(char b)
+			{
+				return (b | (b << 16));
+			}
+
+			static public readonly CharComparer Default = new CharComparer();
+		}
+
 		internal SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
@@ -97,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Spacing = spacing;
 			DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph>(characters.Count);
+			_glyphs = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -130,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
         public Dictionary<char, Glyph> GetGlyphs()
         {
-            return new Dictionary<char, Glyph>(_glyphs);
+            return new Dictionary<char, Glyph>(_glyphs, _glyphs.Comparer);
         }
 
 		private ReadOnlyCollection<char> _characters;
