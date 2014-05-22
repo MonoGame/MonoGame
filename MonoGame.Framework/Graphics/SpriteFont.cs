@@ -258,15 +258,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
+                if (!_glyphs.TryGetValue(c, out currentGlyph))
                 {
                     if (!defaultGlyph.HasValue)
                         throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
                     currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;                        
                 }
+                hasCurrentGlyph = true;
 
                 var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings + Spacing;
                 if (proposedWidth > width)
@@ -352,15 +351,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
+                if (!_glyphs.TryGetValue(c, out currentGlyph))
                 {
                     if (!defaultGlyph.HasValue)
                         throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
                     currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;
                 }
+                hasCurrentGlyph = true;
 
                 if (hasCurrentGlyph) {
                     // The first character on a line might have a negative left side bearing.
