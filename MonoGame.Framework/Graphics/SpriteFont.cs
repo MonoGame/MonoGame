@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private readonly Dictionary<char, Glyph> _glyphs;
 		
-		internal readonly Texture2D _texture;
+		private readonly Texture2D _texture;
 
 		class CharComparer: IEqualityComparer<char>
 		{
