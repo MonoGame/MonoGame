@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (vertexType == null)
 				throw new ArgumentNullException("vertexType", "Cannot be null");
 
-            if (ReflectionHelpers.IsValueType(vertexType))
+            if (!ReflectionHelpers.IsValueType(vertexType))
             {
 				throw new ArgumentException("vertexType", "Must be value type");
 			}

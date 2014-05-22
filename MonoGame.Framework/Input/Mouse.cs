@@ -66,17 +66,16 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly MouseState _defaultState = new MouseState();
 
 #if (WINDOWS && OPENGL) || LINUX || ANGLE
-	private static OpenTK.Input.MouseDevice _mouse = null;			
 
         static OpenTK.INativeWindow Window;
 
-        internal static void setWindows(OpenTK.INativeWindow window)
+        internal static void setWindows(GameWindow window)
         {
-            Window = window;
-            _mouse = window.InputDriver.Mouse[0];
-#if LINUX
-            _mouse.Move += (sender, e) => UpdateStatePosition(e.X, e.Y);
-#endif
+            PrimaryWindow = window;
+            if (window is OpenTKGameWindow)
+            {
+                Window = (window as OpenTKGameWindow).Window;
+            }
         }
 
 #elif (WINDOWS && DIRECTX)
@@ -100,14 +99,12 @@ namespace Microsoft.Xna.Framework.Input
         { 
             get
             { 
-#if (WINDOWS && OPENGL) 
-                return IntPtr.Zero; // Suggest modify OpenTK.GameWindow to retrive handle.
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
+                return Window.WindowInfo.Handle;
 #elif WINRT
                 return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
 #elif(WINDOWS && DIRECTX)
                 return Window.Handle; 
-#elif LINUX
-                return IntPtr.Zero; // Suggest modify OpenTK.GameWindow to retrive handle.
 #elif MONOMAC
                 return IntPtr.Zero;
 #else
@@ -123,38 +120,33 @@ namespace Microsoft.Xna.Framework.Input
         #region Public methods
 
         /// <summary>
+        /// This API is an extension to XNA.
         /// Gets mouse state information that includes position and button
         /// presses for the provided window
         /// </summary>
         /// <returns>Current state of the mouse.</returns>
-		[CLSCompliant(false)]
         public static MouseState GetState(GameWindow window)
         {
 #if MONOMAC
             //We need to maintain precision...
             window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
 
-#elif (WINDOWS && OPENGL) || LINUX
+#elif (WINDOWS && OPENGL) || LINUX || ANGLE
 
-	    // maybe someone is tring to get mouse before initialize
-	    if (_mouse == null)
-            return window.MouseState;
-
-#if (WINDOWS && OPENGL)
-            var p = new POINT();
-            GetCursorPos(out p);
-            var pc = Window.PointToClient(p.ToPoint());
+            var state = OpenTK.Input.Mouse.GetCursorState();
+            var pc = Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
             window.MouseState.X = pc.X;
             window.MouseState.Y = pc.Y;
-#endif
 
-            window.MouseState.LeftButton = _mouse[OpenTK.Input.MouseButton.Left] ? ButtonState.Pressed : ButtonState.Released;
-			window.MouseState.RightButton = _mouse[OpenTK.Input.MouseButton.Right] ? ButtonState.Pressed : ButtonState.Released;
-			window.MouseState.MiddleButton = _mouse[OpenTK.Input.MouseButton.Middle] ? ButtonState.Pressed : ButtonState.Released;;
+            window.MouseState.LeftButton = (ButtonState)state.LeftButton;
+            window.MouseState.RightButton = (ButtonState)state.RightButton;
+            window.MouseState.MiddleButton = (ButtonState)state.MiddleButton;
+            window.MouseState.XButton1 = (ButtonState)state.XButton1;
+            window.MouseState.XButton2 = (ButtonState)state.XButton2;
 
-		// WheelPrecise is divided by 120 (WHEEL_DELTA) in OpenTK (WinGLNative.cs)
-		// We need to counteract it to get the same value XNA provides
-	    window.MouseState.ScrollWheelValue = (int)( _mouse.WheelPrecise * 120 );
+            // XNA uses the winapi convention of 1 click = 120 delta
+            // OpenTK scales 1 click = 1.0 delta, so make that match
+            window.MouseState.ScrollWheelValue = (int)(state.Scroll.Y * 120);
 #endif
 
             return window.MouseState;
@@ -196,7 +188,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX
+#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX || ANGLE
             // correcting the coordinate system
             // Only way to set the mouse position !!!
             var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
@@ -204,10 +196,10 @@ namespace Microsoft.Xna.Framework.Input
             var pt = new System.Drawing.Point(0, 0);
 #endif
 
-#if WINDOWS
-            SetCursorPos(pt.X, pt.Y);
-#elif LINUX
+#if (WINDOWS && OPENGL) || LINUX || ANGLE
             OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
+#elif WINDOWS
+            SetCursorPos(pt.X, pt.Y);
 #elif MONOMAC
             var mousePt = NSEvent.CurrentMouseLocation;
             NSScreen currentScreen = null;
@@ -262,14 +254,6 @@ namespace Microsoft.Xna.Framework.Input
 
         }
 
-        /// <summary>
-        /// Retrieves the cursor's position, in screen coordinates.
-        /// (Suggestion : Make another class for mouse extensions)
-        /// </summary>
-        /// <see>See MSDN documentation for further information.</see>
-        [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
-        internal static extern bool GetCursorPos(out POINT lpPoint);
-      
 #elif MONOMAC
         [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
         extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);

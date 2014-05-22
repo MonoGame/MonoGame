@@ -44,7 +44,7 @@ function autoResize(id) {
 }
 
 function loadContent(rootTopic, extension) {
-    var data = window.location.search;
+    var data = window.top.location.search;
     var url = rootTopic + extension;
     var topicToHighlight = rootTopic;
 
@@ -61,6 +61,15 @@ function loadContent(rootTopic, extension) {
     
     $("mainFrame").setAttribute("src", url);
     hightLightTopic(topicToHighlight);
+}
+
+function onPageLoad(pageTitle, pageId) 
+{
+	var topWindow = window.top;
+	topWindow.resizeDocs();
+	topWindow.scrollTo(0,0);
+	topWindow.document.title = pageTitle;
+	topWindow.history.replaceState(null, pageTitle, '?page=' + pageId);
 }
 
 /*
