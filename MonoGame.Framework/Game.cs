@@ -421,6 +421,7 @@ namespace Microsoft.Xna.Framework
             }
 
             BeginRun();
+            _gameTimer = Stopwatch.StartNew();
             switch (runBehavior)
             {
             case GameRunBehavior.Asynchronous:
@@ -440,7 +441,7 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
 
