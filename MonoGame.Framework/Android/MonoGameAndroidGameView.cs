@@ -135,7 +135,9 @@ namespace Microsoft.Xna.Framework
 			currentReloadAssetCount++;
 			if (_gameWindow.Resumer!=null)
 			{
-				_gameWindow.Resumer.OnProgress (currentReloadAssetCount/(float)totalReloadAssetCount);
+				float progressAmount=0;
+				if (totalReloadAssetCount>0) progressAmount=currentReloadAssetCount/(float)totalReloadAssetCount;
+				_gameWindow.Resumer.OnProgress (progressAmount);
 			}
 		}
 
