@@ -39,15 +39,17 @@ purpose and non-infringement.
 #endregion License
 
 #region Using clause
-extern alias MonoGameXnaFramework;
 #if WINDOWS_PHONE
+extern alias MonoGameXnaFramework;
 extern alias MicrosoftXnaFramework;
 extern alias MicrosoftXnaGamerServices;
 using MsXna_Guide = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.Guide;
 using MsXna_MessageBoxIcon = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.MessageBoxIcon;
 using MsXna_PlayerIndex = MicrosoftXnaFramework::Microsoft.Xna.Framework.PlayerIndex;
-#endif
 using MGXna_Framework = MonoGameXnaFramework::Microsoft.Xna.Framework;
+#else
+using MGXna_Framework = global::Microsoft.Xna.Framework;
+#endif
 
 using System;
 using System.Collections;
