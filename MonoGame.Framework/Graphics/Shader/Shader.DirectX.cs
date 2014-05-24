@@ -54,16 +54,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _vertexShader);
-            SharpDX.Utilities.Dispose(ref _pixelShader);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _vertexShader);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _pixelShader);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _vertexShader);
-                SharpDX.Utilities.Dispose(ref _pixelShader);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _vertexShader);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _pixelShader);
             }
 
             base.Dispose(disposing);

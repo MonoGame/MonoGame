@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformClear()
         {
-            SharpDX.Utilities.Dispose(ref _cbuffer);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _cbuffer);
             _dirty = true;
         }
 
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                SharpDX.Utilities.Dispose(ref _cbuffer);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _cbuffer);
             base.Dispose(disposing);
         }
     }

@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _buffer);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _buffer);
         }
 
         void GenerateIfRequired()
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                SharpDX.Utilities.Dispose(ref _buffer);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _buffer);
 
             base.Dispose(disposing);
         }

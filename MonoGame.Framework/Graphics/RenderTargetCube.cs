@@ -182,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         _renderTargetViews[i].Dispose();
 
                     _renderTargetViews = null;
-                    SharpDX.Utilities.Dispose(ref _depthStencilView);
+                    Utilities.SharpDxDisposeHelper.SafeDispose(ref _depthStencilView);
                 }
 #endif
             }

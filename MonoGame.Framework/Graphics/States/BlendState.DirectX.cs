@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         protected internal override void GraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _state);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _state);
             base.GraphicsDeviceResetting();
         }
 
@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                SharpDX.Utilities.Dispose(ref _state);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _state);
             base.Dispose(disposing);
         }
     }

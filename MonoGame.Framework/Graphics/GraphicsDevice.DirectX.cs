@@ -780,10 +780,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDispose()
         {
             ClearLayouts();
-            SharpDX.Utilities.Dispose(ref _renderTargetView);
-            SharpDX.Utilities.Dispose(ref _depthStencilView);
-            SharpDX.Utilities.Dispose(ref _d3dDevice);
-            SharpDX.Utilities.Dispose(ref _d3dContext);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _renderTargetView);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _depthStencilView);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _d3dDevice);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _d3dContext);
 
 #if WINDOWS_STOREAPP
 

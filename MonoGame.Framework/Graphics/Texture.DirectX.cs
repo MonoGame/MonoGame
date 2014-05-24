@@ -45,16 +45,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
-            SharpDX.Utilities.Dispose(ref _resourceView);
-            SharpDX.Utilities.Dispose(ref _texture);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _resourceView);
+            Utilities.SharpDxDisposeHelper.SafeDispose(ref _texture);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                SharpDX.Utilities.Dispose(ref _resourceView);
-                SharpDX.Utilities.Dispose(ref _texture);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _resourceView);
+                Utilities.SharpDxDisposeHelper.SafeDispose(ref _texture);
             }
 
             base.Dispose(disposing);
