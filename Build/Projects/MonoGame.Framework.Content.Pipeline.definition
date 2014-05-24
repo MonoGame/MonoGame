@@ -307,6 +307,7 @@
     <Compile Include="Serialization\Compiler\QuaternionWriter.cs" />
     <Compile Include="Serialization\Compiler\RayWriter.cs" />
     <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
+    <Compile Include="Serialization\Compiler\ReflectiveWriter.cs" />
     <Compile Include="Serialization\Compiler\SByteWriter.cs" />
     <Compile Include="Serialization\Compiler\SingleWriter.cs" />
     <Compile Include="Serialization\Compiler\SkinnedEffectWriter.cs" />
