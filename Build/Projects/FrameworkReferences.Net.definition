@@ -82,10 +82,12 @@
   </Platform>
 
   <Platform Type="WindowsPhone">
-    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
-                Aliases="MicrosoftXnaGamerServices" />
-    <Reference  Include="Microsoft.Xna.Framework"
-                Aliases="MicrosoftXnaFramework" />
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
+    </Reference>
   </Platform>
 
   <Platform Type="Web">
