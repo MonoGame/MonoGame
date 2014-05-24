@@ -82,6 +82,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 result = (ContentTypeWriter)Activator.CreateInstance(typeof(ArrayWriter<>).MakeGenericType(type.GetElementType()));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
+            else if (type.IsEnum)
+            {
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type.GetElementType()));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+            }
             else if (type.IsGenericType)
             {
                 var inputTypeDef = type.GetGenericTypeDefinition();
