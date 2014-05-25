@@ -70,6 +70,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -88,6 +89,7 @@ namespace Microsoft.Xna.Framework
         // stored the current screen state, so we can check if it has changed.
         private bool isCurrentlyFullScreen = false;
         private Toolkit toolkit;
+        private int isExiting; // int, so we can use Interlocked.Increment
         
 		public OpenTKGamePlatform(Game game)
             : base(game)
@@ -130,22 +132,40 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             ResetWindowBounds();
-            _view.Run();
+            while (true)
+            {
+                _view.ProcessEvents();
+
+                // Stop the main loop iff Game.Exit() has been called.
+                // This can happen under the following circumstances:
+                // 1. Game.Exit() is called programmatically.
+                // 2. The GameWindow is closed through the 'X' (close) button
+                // 3. The GameWindow is closed through Alt-F4 or Cmd-Q
+                // Note: once Game.Exit() is called, we must stop raising 
+                // Update or Draw events as the GameWindow and/or OpenGL context
+                // may no longer be available. 
+                // Note 2: Game.Exit() can be called asynchronously from
+                // _view.ProcessEvents() (cases #2 and #3 above), so the
+                // isExiting check must be placed *after* _view.ProcessEvents()
+                if (isExiting > 0)
+                {
+                    break;
+                }
+
+                Game.Tick();
+            }
         }
 
         public override void StartRunLoop()
         {
             throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
-        
+
         public override void Exit()
         {
-            if (_view.Window.Exists)
-            {
-                //(SJ) Why is this called here when it's not in any other project
-                //Net.NetworkSession.Exit();
-                _view.Window.Close();
-            }
+            //(SJ) Why is this called here when it's not in any other project
+            //Net.NetworkSession.Exit();
+            Interlocked.Increment(ref isExiting);
 #if LINUX
             Tao.Sdl.SdlMixer.Mix_CloseAudio();
 #endif
