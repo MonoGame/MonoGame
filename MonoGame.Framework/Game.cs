@@ -413,7 +413,11 @@ namespace Microsoft.Xna.Framework
         {
             AssertNotDisposed();
             if (!Platform.BeforeRun())
+            {
+                BeginRun();
+                _gameTimer = Stopwatch.StartNew();
                 return;
+            }
 
             if (!_initialized) {
                 DoInitialize ();
