@@ -141,16 +141,29 @@ namespace Microsoft.Xna.Framework.Graphics
                     SharpDX.DataStream stream;
                     var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
-                    // Some drivers may add pitch to rows.
-                    // We need to copy each row separatly and skip trailing zeros.
-                    var currentIndex = startIndex;
-                    var elementSize = SharpDX.Utilities.SizeOf<T>();
-                    for (var row = 0; row < rows; row++)
+                    var elementSize = _format.GetSize();
+                    var rowSize = elementSize * elementsInRow;
+                    if (rowSize == databox.RowPitch)
+                        stream.ReadRange(data, startIndex, elementCount);
+                    else
                     {
-                        stream.ReadRange(data, currentIndex, elementsInRow);
-                        stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
-                        currentIndex += elementsInRow;
+                        // Some drivers may add pitch to rows.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        stream.Seek(startIndex, SeekOrigin.Begin);
+
+                        for (var row = 0; row < rows; row++)
+                        {
+                            int i;
+                            for (i = row * rowSize; i < elementCount; i++)
+                                data[i] = stream.Read<T>();
+
+                            if (i >= elementCount)
+                                break;
+
+                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                        }
                     }
+
                     stream.Dispose();
                 }
         }
