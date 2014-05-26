@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Some drivers may add pitch to rows or slices.
                     // We need to copy each row separatly and skip trailing zeros.
                     var currentIndex = startIndex;
-                    var elementSize = SharpDX.Utilities.SizeOf<T>();
+                    var elementSize = _format.GetSize();
                     var elementsInRow = right - left;
                     var rowsInSlice = bottom - top;
                     for (var slice = front; slice < back; slice++)
