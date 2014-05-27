@@ -50,7 +50,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </summary>
         private Dictionary<string, string> _namespaceLookup;
 
-        
+        private Dictionary<Type, ContentTypeSerializer> _serializers;
+
         public static T Deserialize<T>(XmlReader input, string referenceRelocationPath)
         {
             var serializer = new IntermediateSerializer();
@@ -69,6 +70,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
             var asset = reader.ReadObject<T>(format);
 
+            // TODO: Read the shared resources and external 
+            // references here!
+
             // Move past the closing XnaContent element.
             input.ReadEndElement();
 
@@ -77,7 +81,38 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public ContentTypeSerializer GetTypeSerializer(Type type)
         {
-            throw new NotImplementedException();
+            // Create the known serializers if we haven't already.
+            if (_serializers == null)
+            {
+                _serializers = new Dictionary<Type, ContentTypeSerializer>();
+
+                var types = ContentTypeSerializerAttribute.GetTypes();
+                foreach (var t in types)
+                {
+                    if (!t.IsGenericType)
+                    {
+                        var cts = Activator.CreateInstance(t) as ContentTypeSerializer;
+                        cts.Initialize(this);
+                        _serializers.Add(cts.TargetType, cts);
+                    }
+                }
+            }
+
+            // Look it up.
+            ContentTypeSerializer serializer;
+            if (_serializers.TryGetValue(type, out serializer))
+                return serializer;
+           
+            // If we still don't have a serializer then 
+            // fallback to the reflection based serializer.
+            if (serializer == null)
+            {
+                serializer = new ReflectiveSerializer(type);
+                serializer.Initialize(this);
+            }
+
+            _serializers.Add(type, serializer);
+            return serializer;
         }
 
         public static void Serialize<T>(XmlWriter output, T value, string referenceRelocationPath)
@@ -91,6 +126,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             // Write the asset.
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
             writer.WriteObject(value, format);
+
+            // TODO: Write the shared resources and external 
+            // references here!
 
             // Close the XnaContent element.
             output.WriteEndElement();
