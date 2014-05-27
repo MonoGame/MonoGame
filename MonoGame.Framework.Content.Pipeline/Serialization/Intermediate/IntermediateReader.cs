@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             {
                 var type = ReadTypeName();
                 typeSerializer = Serializer.GetTypeSerializer(type);
+                Xml.MoveToElement();
             }
 
             return ReadRawObject(format, typeSerializer, existingInstance);
