@@ -336,6 +336,7 @@
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
     <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
     <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
 
 
