@@ -54,7 +54,65 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(0, state.Count);
         }
 
+        [Test]
+        public void PressedAgesToMovedAfterGetState()
+        {
+            var tps = new TouchPanelState(new MockWindow());
 
+            var pos = new Vector2(100, 50);
+            tps.AddEvent(1, TouchLocationState.Pressed, pos);
+
+            tps.GetState(); //Throw the first one away
+            var state = tps.GetState();
+
+            Assert.AreEqual(1, state.Count);
+
+            var touch = state[0];
+            Assert.AreEqual(TouchLocationState.Moved, touch.State);
+            Assert.AreEqual(pos, touch.Position);
+        }
+
+        [Test]
+        public void MovingTouchUpdatesPosition()
+        {
+            var tps = new TouchPanelState(new MockWindow());
+
+            var pos1 = new Vector2(100, 50);
+            tps.AddEvent(1, TouchLocationState.Pressed, pos1);
+
+            var state = tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            var touch = state[0];
+            Assert.AreEqual(TouchLocationState.Pressed, touch.State);
+            Assert.AreEqual(pos1, touch.Position);
+
+            var pos2 = new Vector2(100, 50);
+            tps.AddEvent(1, TouchLocationState.Moved, pos2);
+
+            state = tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            touch = state[0];
+            Assert.AreEqual(TouchLocationState.Moved, touch.State);
+            Assert.AreEqual(pos2, touch.Position); //Location should be updated
+        }
+
+        [Test]
+        public void TouchBetweenGetStateCallsMakesNoTouch()
+        {
+            var tps = new TouchPanelState(new MockWindow());
+
+            var state = tps.GetState();
+            Assert.AreEqual(0, state.Count); //No touches to start with
+
+            var pos = new Vector2(100, 50);
+            tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            tps.AddEvent(1, TouchLocationState.Released, pos);
+
+            state = tps.GetState();
+            Assert.AreEqual(0, state.Count); //Should miss the touch that happened between
+        }
 
         private class MockWindow : GameWindow
         {
