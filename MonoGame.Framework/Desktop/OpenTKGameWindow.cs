@@ -216,6 +216,13 @@ namespace Microsoft.Xna.Framework
             OnClientSizeChanged();
         }
 
+        internal void ProcessEvents()
+        {
+            Window.ProcessEvents();
+            UpdateWindowState();
+            HandleInput();
+        }
+
         private void UpdateWindowState()
         {
             // we should wait until window's not fullscreen to resize
@@ -347,21 +354,6 @@ namespace Microsoft.Xna.Framework
         protected override void SetTitle(string title)
         {
             window.Title = title;            
-        }
-
-        internal void Run()
-        {
-            while (window.Exists)
-            {
-                window.ProcessEvents();
-                UpdateWindowState();
-
-                if (Game != null)
-                {
-                    HandleInput();
-                    Game.Tick();
-                }
-            }
         }
 
         internal void ToggleFullScreen()

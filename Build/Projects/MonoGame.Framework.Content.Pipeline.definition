@@ -307,6 +307,7 @@
     <Compile Include="Serialization\Compiler\QuaternionWriter.cs" />
     <Compile Include="Serialization\Compiler\RayWriter.cs" />
     <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
+    <Compile Include="Serialization\Compiler\ReflectiveWriter.cs" />
     <Compile Include="Serialization\Compiler\SByteWriter.cs" />
     <Compile Include="Serialization\Compiler\SingleWriter.cs" />
     <Compile Include="Serialization\Compiler\SkinnedEffectWriter.cs" />
@@ -324,6 +325,19 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
+    <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline -->
