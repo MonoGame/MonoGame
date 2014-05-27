@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             {
                 var type = ReadTypeName();
                 typeSerializer = Serializer.GetTypeSerializer(type);
+                Xml.MoveToElement();
             }
 
             return ReadRawObject(format, typeSerializer, existingInstance);
@@ -76,7 +77,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer, T existingInstance)
         {
-            throw new NotImplementedException();              
+            if (format.FlattenContent)
+            {
+                Xml.MoveToContent();
+                return (T)typeSerializer.Deserialize(this, format, existingInstance);
+            }
+
+            if (!MoveToElement(format.ElementName))
+                throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
+
+            Xml.ReadStartElement();
+            var result = typeSerializer.Deserialize(this, format, existingInstance);
+            Xml.ReadEndElement();
+            return (T)result;
         }
 
         public T ReadRawObject<T>(ContentSerializerAttribute format, T existingInstance)

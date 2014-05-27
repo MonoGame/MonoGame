@@ -3,13 +3,15 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     /// <summary>
     /// Used to identify custom ContentTypeSerializer classes. 
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ContentTypeSerializerAttribute : Attribute
     {
         /// <summary>
@@ -17,6 +19,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </summary>
         public ContentTypeSerializerAttribute()
         {
+        }
+
+
+        private static readonly object _lock = new object();
+
+        private static ReadOnlyCollection<Type> _types;
+
+        static internal ReadOnlyCollection<Type> GetTypes()
+        {
+            lock (_lock)
+            {
+                if (_types == null)
+                {
+                    var found = new List<Type>();
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach (var assembly in assemblies)
+                    {
+                        var types = assembly.GetTypes();
+                        foreach (var type in types)
+                        {
+                            var attributes = type.GetCustomAttributes(typeof (ContentTypeSerializerAttribute), false);
+                            if (attributes.Length > 0)
+                                found.Add(type);
+                        }
+                    }
+
+                    _types = new ReadOnlyCollection<Type>(found);
+                }
+            }
+
+            return _types;
         }
     }
 }

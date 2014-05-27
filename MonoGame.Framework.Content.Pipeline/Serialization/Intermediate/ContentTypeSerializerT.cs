@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
         }
 
-        protected internal abstract object Deserialize(IntermediateReader input, ContentSerializerAttribute format, T existingInstance);
+        protected internal abstract T Deserialize(IntermediateReader input, ContentSerializerAttribute format, T existingInstance);
 
         protected internal override object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object existingInstance)
         {
