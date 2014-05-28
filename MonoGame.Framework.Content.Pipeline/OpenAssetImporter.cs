@@ -345,6 +345,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             foreach (var aiChannel in aiAnimation.NodeAnimationChannels)
             {
+                if (aiChannel.NodeName.Contains("_$AssimpFbx$"))
+                    continue;
+
                 var channel = new AnimationChannel();
 
                 // We can have different numbers of keyframes for each, so find the max index.
