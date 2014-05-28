@@ -47,8 +47,9 @@ namespace Microsoft.Xna.Framework.Media
                     var nsArtist = itemCollection.Items[j].ValueForProperty(MPMediaItem.ArtistProperty);
                     var nsTitle = itemCollection.Items[j].ValueForProperty(MPMediaItem.TitleProperty);
                     var nsGenre = itemCollection.Items[j].ValueForProperty(MPMediaItem.GenreProperty);
+                    var assetUrl = itemCollection.Items[j].ValueForProperty(MPMediaItem.AssetURLProperty) as NSUrl;
 
-                    if (nsTitle == null)
+                    if (nsTitle == null || assetUrl == null) // The Asset URL check will exclude iTunes match items from the Media Library that are not downloaded, but show up in the music app
                         continue;
 
                     string artist = nsArtist == null ? "Unknown Artist" : nsArtist.ToString();
@@ -56,7 +57,7 @@ namespace Microsoft.Xna.Framework.Media
                     string genre = nsGenre == null ? "Unknown Genre" : nsGenre.ToString();
                     TimeSpan duration = TimeSpan.FromSeconds(((NSNumber)itemCollection.Items[j].ValueForProperty(MPMediaItem.PlaybackDurationProperty)).FloatValue);
 
-                    var song = new Song(album, new Artist(artist), new Genre(genre), title, duration, itemCollection.Items[j]);
+                    var song = new Song(album, new Artist(artist), new Genre(genre), title, duration, itemCollection.Items[j], assetUrl);
                     albumSongs.Add(song);
                     songList.Add(song);
                 }

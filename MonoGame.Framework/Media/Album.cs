@@ -12,6 +12,7 @@ using System.IO;
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
+using MonoTouch.CoreGraphics;
 using MonoTouch.MediaPlayer;
 using MonoTouch.UIKit;
 #endif
@@ -85,8 +86,11 @@ namespace Microsoft.Xna.Framework.Media
             {
 #if WINDOWS_PHONE
                 return this.album.HasArt;
-#elif WINDOWS_STOREAPP || IOS
+#elif WINDOWS_STOREAPP
                 return this.thumbnail != null;
+#elif IOS
+                // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
+                return this.thumbnail != null && this.thumbnail.Bounds.Width != 0;
 #else
                 return false;
 #endif

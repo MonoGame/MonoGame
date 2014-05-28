@@ -17,34 +17,24 @@ namespace Microsoft.Xna.Framework.Media
         private Genre genre;
         private string title;
         private TimeSpan duration;
-        public MPMediaItem MediaItem { get; private set; }
+        private MPMediaItem mediaItem;
         private AVAudioPlayer _sound;
+        private NSUrl assetUrl;
 
-        private Song(Album album, Artist artist, Genre genre)
+        internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
         {
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-        }
-
-        internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem)
-            : this(album, artist, genre)
-        {
             this.title = title;
             this.duration = duration;
-            this.MediaItem = mediaItem;
+            this.mediaItem = mediaItem;
+            this.assetUrl = assetUrl;
         }
 
         private void PlatformInitialize(string fileName)
         {
-            _sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
-        }
-
-        public Song(NSUrl url)
-        {
-            PlatformInitialize(url);
+            this.PlatformInitialize(NSUrl.FromFilename(fileName));
         }
 
         private void PlatformInitialize(NSUrl url)
@@ -52,6 +42,11 @@ namespace Microsoft.Xna.Framework.Media
             _sound = AVAudioPlayer.FromUrl(url);
             _sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
+        }
+
+        public Song(NSUrl url)
+        {
+            PlatformInitialize(url);
         }
 
         private void PlatformDispose(bool disposing)
@@ -86,8 +81,14 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal void Play()
 		{	
-			if ( _sound == null )
-				return;
+            if (_sound == null)
+            {
+                // MediaLibrary items are lazy loaded
+                if (assetUrl != null)
+                    this.PlatformInitialize (assetUrl);
+                else
+                    return;
+            }
 
             PlatformPlay();
 
@@ -179,7 +180,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetDuration()
         {
-            if (this.MediaItem != null)
+            if (this.mediaItem != null)
                 return this.duration;
 
             return _duration;
@@ -197,7 +198,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private string PlatformGetName()
         {
-            return Path.GetFileNameWithoutExtension(_name);
+            return this.title ?? Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()
