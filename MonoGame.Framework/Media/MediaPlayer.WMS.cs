@@ -53,10 +53,37 @@ namespace Microsoft.Xna.Framework.Media
 
         #region Properties
 
-        private static void PlatformSetIsMuted()
+        private static bool PlatformGetIsMuted()
         {
+            return _isMuted;
+        }
+
+        private static void PlatformSetIsMuted(bool muted)
+        {
+            _isMuted = muted;
+
             if (_volumeController != null)
                 _volumeController.Mute = _isMuted;
+        }
+
+        private static bool PlatformGetIsRepeating()
+        {
+            return _isRepeating;
+        }
+
+        private static void PlatformSetIsRepeating(bool repeating)
+        {
+            _isRepeating = repeating;
+        }
+
+        private static bool PlatformGetIsShuffled()
+        {
+            return _isShuffled;
+        }
+
+        private static void PlatformSetIsShuffled(bool shuffled)
+        {
+            _isShuffled = shuffled;
         }
 
         private static TimeSpan PlatformGetPlayPosition()
@@ -70,8 +97,20 @@ namespace Microsoft.Xna.Framework.Media
             return true;
         }
 
-        private static void PlatformSetVolume()
+        private static MediaState PlatformGetState()
         {
+            return _state;
+        }
+
+        private static float PlatformGetVolume()
+        {
+            return _volume;
+        }
+
+        private static void PlatformSetVolume(float volume)
+        {
+            _volume = volume;
+
 			if (_volumeController != null)
                 _volumeController.MasterVolume = _volume;
         }

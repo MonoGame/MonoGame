@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 extern alias MicrosoftXnaFramework;
-using MsXna_MediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaPlayer;
+using MsMediaPlayer = MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaPlayer;
 
 using System;
 using System.Windows;
@@ -77,83 +77,206 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         #region Properties
-
-        private static void PlatformSetIsMuted()
+        private static bool PlatformGetIsMuted()
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (playingInternal)
+                return MsMediaPlayer.IsMuted;
+
+            return _isMuted;
+        }
+
+        private static void PlatformSetIsMuted(bool muted)
+        {
+            _isMuted = muted;
+
+            if (playingInternal)
+                MsMediaPlayer.IsMuted = _isMuted;
+            else
             {
-                _mediaElement.IsMuted = _isMuted;
-            });
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.IsMuted = _isMuted;
+                });
+            }
+        }
+
+
+        private static bool PlatformGetIsRepeating()
+        {
+            return _isRepeating;
+        }
+
+        private static void PlatformSetIsRepeating(bool repeating)
+        {
+            _isRepeating = repeating;
+
+            if (playingInternal)
+                MsMediaPlayer.IsRepeating = _isRepeating;
+        }
+
+        private static bool PlatformGetIsShuffled()
+        {
+            return _isShuffled;
+        }
+
+        private static void PlatformSetIsShuffled(bool shuffled)
+        {
+            _isShuffled = shuffled;
+
+            if (playingInternal)
+                MsMediaPlayer.IsShuffled = _isShuffled;
         }
 
         private static TimeSpan PlatformGetPlayPosition()
         {
-            TimeSpan pos = TimeSpan.Zero;
+            if (playingInternal)
+                return MsMediaPlayer.PlayPosition;
+
+            if (_mediaElement == null)
+                return TimeSpan.Zero;
+
+            if (_mediaElement.Dispatcher.CheckAccess())
+                return _mediaElement.Position;
+
+            TimeSpan pos;
             EventWaitHandle Wait = new AutoResetEvent(false);
-            if(_mediaElement.Dispatcher.CheckAccess()) {
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
                 pos = _mediaElement.Position;
-            }
-            else {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Wait.Set();
+            });
+            Wait.WaitOne();
+            return pos;
+        }
+
+        private static MediaState PlatformGetState()
+        {
+            if (playingInternal)
+            {
+                switch (MsMediaPlayer.State)
                 {
-                    pos = _mediaElement.Position;
-                    Wait.Set();
-                });
-                Wait.WaitOne();
+                    case MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaState.Paused:
+                        return MediaState.Paused;
+                    case MicrosoftXnaFramework::Microsoft.Xna.Framework.Media.MediaState.Playing:
+                        return MediaState.Playing;
+                    default:
+                        return MediaState.Stopped;
+                }
             }
-            return (pos);
+
+            return _state;
         }
 
         private static bool PlatformGetGameHasControl()
         {
-            return State == MediaState.Playing || MsXna_MediaPlayer.GameHasControl;
+            return State == MediaState.Playing || MsMediaPlayer.GameHasControl;
         }
 
-        private static void PlatformSetVolume()
+        private static float PlatformGetVolume()
         {
+            if (playingInternal)
+                return MsMediaPlayer.Volume;
+
+            return _volume;
+        }
+
+        private static void PlatformSetVolume(float volume)
+        {
+            _volume = volume;
+
+            if (playingInternal)
+                MsMediaPlayer.Volume = volume;
+            else
+            {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     _mediaElement.Volume = _volume;
                 });
+            }
         }
 		
 		#endregion
 
         private static void PlatformPause()
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (playingInternal)
+                MsMediaPlayer.Pause();
+            else
             {
-                _mediaElement.Pause();
-            });
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Pause();
+                });
+            }
         }
 
         private static void PlatformPlaySong(Song song)
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (song.InternalSong != null)
             {
-                _mediaElement.Source = new Uri(song.FilePath, UriKind.Relative);
-                _mediaElement.Play();
+                playingInternal = true;
 
-                // Ensure only one subscribe
-                _mediaElement.MediaEnded -= OnSongFinishedPlaying;
-                _mediaElement.MediaEnded += OnSongFinishedPlaying;
-            });
+                // Ensure only one subscription
+                MsMediaPlayer.MediaStateChanged -= MsMediaStateChanged;
+                MsMediaPlayer.MediaStateChanged += MsMediaStateChanged;
+                MsMediaPlayer.ActiveSongChanged -= MsActiveSongChanged;
+                MsMediaPlayer.ActiveSongChanged += MsActiveSongChanged;
+
+                MsMediaPlayer.Play(song.InternalSong);
+            }
+            else
+            {
+                playingInternal = false;
+
+                MsMediaPlayer.MediaStateChanged -= MsMediaStateChanged;
+                MsMediaPlayer.ActiveSongChanged -= MsActiveSongChanged;
+
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Source = new Uri(song.FilePath, UriKind.Relative);
+                    _mediaElement.Play();
+
+                    // Ensure only one subscribe
+                    _mediaElement.MediaEnded -= OnSongFinishedPlaying;
+                    _mediaElement.MediaEnded += OnSongFinishedPlaying;
+                });
+            }
+        }
+
+        private static void MsMediaStateChanged(object sender, EventArgs args)
+        {
+            MediaStateChanged(sender, args);
+        }
+
+        private static void MsActiveSongChanged(object sender, EventArgs args)
+        {
+            ActiveSongChanged(sender, args);
         }
 
         private static void PlatformResume()
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (playingInternal)
+                MsMediaPlayer.Resume();
+            else
             {
-                _mediaElement.Play();
-            });
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Play();
+                });
+            }
         }
 
         private static void PlatformStop()
         {
-            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            if (playingInternal)
+                MsMediaPlayer.Stop();
+            else
             {
-                _mediaElement.Stop();
-            });
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    _mediaElement.Stop();
+                });
+            }
         }
     }
 }
