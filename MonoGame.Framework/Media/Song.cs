@@ -89,6 +89,11 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        public override int GetHashCode ()
+		{
+			return base.GetHashCode ();
+		}
+
         public bool Equals(Song song)
         {
 #if DIRECTX
