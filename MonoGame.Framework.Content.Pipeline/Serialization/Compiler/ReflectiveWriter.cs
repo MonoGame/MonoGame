@@ -91,8 +91,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 }
                 else
                 {
-                    if (field == null)
-
                     if (!field.IsPublic)
                         return;
 
