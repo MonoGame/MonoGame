@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             _fields = TargetType.GetAllFields();
         }
 
-        private void Write(object parent, ContentWriter output, MemberInfo member)
+        private static void Write(object parent, ContentWriter output, MemberInfo member)
         {
             var property = member as PropertyInfo;
             var field = member as FieldInfo;
