@@ -9,9 +9,9 @@ namespace Microsoft.Xna.Framework.Content
     /// <summary>
     /// This is used to specify the type to use when deserializing this object at runtime.
     /// </summary>
-	[AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
     public sealed class ContentSerializerRuntimeTypeAttribute : Attribute
-	{
+    {
         /// <summary>
         /// Creates an instance of the attribute.
         /// </summary>
@@ -25,6 +25,6 @@ namespace Microsoft.Xna.Framework.Content
         /// The name of the type to use at runtime.
         /// </summary>
         public string RuntimeType { get; private set;}
-	}
+    }
 }
 

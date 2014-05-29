@@ -9,9 +9,9 @@ namespace Microsoft.Xna.Framework.Content
     /// <summary>
     /// This is used to specify the version when deserializing this object at runtime.
     /// </summary>
-	[AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
     public sealed class ContentSerializerTypeVersionAttribute : Attribute
-	{
+    {
         /// <summary>
         /// Creates an instance of the attribute.
         /// </summary>
@@ -25,6 +25,6 @@ namespace Microsoft.Xna.Framework.Content
         /// The version passed to the type at runtime.
         /// </summary>
         public int TypeVersion { get; private set; }
-	}
+    }
 }
 
