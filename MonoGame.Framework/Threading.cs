@@ -65,10 +65,12 @@ namespace Microsoft.Xna.Framework
 {
     internal class Threading
     {
-        public const int kMaxWaitForUIThread = 12000; // In milliseconds
+        public const int kMaxWaitForUIThread = 750; // In milliseconds
 
+#if !WINDOWS_PHONE
         static int mainThreadId;
-        //static int currentThreadId;
+#endif
+
 #if ANDROID
         static List<Action> actions = new List<Action>();
         //static Mutex actionsMutex = new Mutex();
@@ -78,19 +80,17 @@ namespace Microsoft.Xna.Framework
         public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
+
+#if !WINDOWS_PHONE
         static Threading()
         {
-#if WINDOWS_PHONE
-            if (Thread.CurrentThread.IsBackground)
-            {
-                mainThreadId = Thread.CurrentThread.ManagedThreadId;
-            }
-#elif WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP
             mainThreadId = Environment.CurrentManagedThreadId;
 #else
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
 #endif
         }
+#endif
 
         /// <summary>
         /// Checks if the code is currently running on the UI thread.
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework
             action();
 #else
             // If we are already on the UI thread, just call the action and be done with it
-            if (mainThreadId == Thread.CurrentThread.ManagedThreadId)
+            if (IsOnUIThread())
             {
                 try
                 {
