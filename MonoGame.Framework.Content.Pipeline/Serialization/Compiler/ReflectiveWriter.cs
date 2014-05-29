@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -11,12 +12,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     class ReflectiveWriter : ContentTypeWriter
     {
-        PropertyInfo[] _properties;
-        FieldInfo[] _fields;
+        private PropertyInfo[] _properties;
+        private FieldInfo[] _fields;
 
-        Type _baseType;
-        ContentTypeWriter _baseTypeWriter;
+        private Type _baseType;
+        private ContentTypeWriter _baseTypeWriter;
 
+        private string _runtimeType;
+
+        
         public ReflectiveWriter(Type targetType)
             : base(targetType)
         {
@@ -31,6 +35,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 _baseTypeWriter = compiler.GetTypeWriter(_baseType);
             }
 
+            var runtimeType = TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() as ContentSerializerRuntimeTypeAttribute;
+            if (runtimeType != null)
+                _runtimeType = runtimeType.RuntimeType;
+
+            var typeVersion = TargetType.GetCustomAttributes(typeof(ContentSerializerTypeVersionAttribute), false).FirstOrDefault() as ContentSerializerTypeVersionAttribute;
+            if (typeVersion != null)
+                _typeVersion = typeVersion.TypeVersion;
+            
             _properties = TargetType.GetAllProperties();
             _fields = TargetType.GetAllFields();
         }
@@ -127,6 +139,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 output.WriteSharedResource(memberObject);
             }
+        }
+
+        public override string GetRuntimeType(TargetPlatform targetPlatform)
+        {
+            if (string.IsNullOrEmpty(_runtimeType))
+                return base.GetRuntimeType(targetPlatform);
+
+            return _runtimeType;
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
