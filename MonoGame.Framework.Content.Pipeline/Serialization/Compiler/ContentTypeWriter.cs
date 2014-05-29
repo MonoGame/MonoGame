@@ -11,8 +11,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// </summary>
     public abstract class ContentTypeWriter
     {
-        readonly Type targetType;
-        protected int typeVersion;
+        private readonly Type _targetType;
+        protected int _typeVersion;
 
         /// <summary>
         /// Determines if deserialization into an existing object is possible.
@@ -30,13 +30,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// Gets the type handled by this compiler component.
         /// </summary>
         /// <value>The type handled by this compiler component.</value>
-        public Type TargetType { get { return targetType; } }
+        public Type TargetType { get { return _targetType; } }
 
         /// <summary>
         /// Gets a format version number for this type.
         /// </summary>
         /// <value>A format version number for this type.</value>
-        public virtual int TypeVersion { get { return typeVersion; } }
+        public virtual int TypeVersion { get { return _typeVersion; } }
 
         /// <summary>
         /// Initializes a new instance of the ContentTypeWriter class.
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             if (targetType == null)
                 throw new ArgumentNullException();
 
-            this.targetType = targetType;
+            _targetType = targetType;
         }
         
         /// <summary>
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <returns>The qualified name.</returns>
         public virtual string GetRuntimeType(TargetPlatform targetPlatform)
         {
-			return targetType.FullName + ", " + targetType.Assembly.FullName;
+            return _targetType.FullName + ", " + _targetType.Assembly.FullName;
         }
 
         /// <summary>
