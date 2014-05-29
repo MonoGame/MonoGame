@@ -185,7 +185,6 @@ namespace Microsoft.Xna.Framework.Audio
 
 #if ANDROID
             inst._soundId = _soundID;
-            inst._sampleRate = Rate;
 #endif
         }
 

@@ -82,9 +82,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 result = (ContentTypeWriter)Activator.CreateInstance(typeof(ArrayWriter<>).MakeGenericType(type.GetElementType()));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
-            else
+            else if (type.IsEnum)
             {
-				var inputTypeDef = type.GetGenericTypeDefinition ();
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type.GetElementType()));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+            }
+            else if (type.IsGenericType)
+            {
+                var inputTypeDef = type.GetGenericTypeDefinition();
 
                 Type chosen = null;
                 foreach (var kvp in typeWriterMap)
@@ -99,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
                     // Compare generic type definition
                     var keyTypeDef = args[0].GetGenericTypeDefinition();
-                    if (inputTypeDef.Equals(keyTypeDef))
+                    if (inputTypeDef == keyTypeDef)
                     {
                         chosen = kvp.Value;
                         break;
@@ -118,14 +123,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 {
                     throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
                 }
-				
+            }
+            else
+            {
+                result = new ReflectiveWriter(type);
             }
 
-            if (result != null)
-            {
-                MethodInfo dynMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
-                dynMethod.Invoke(result, new object[] { this });
-            }
+
+            var initMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
+            initMethod.Invoke(result, new object[] { this });
+
             return result;
         }
 

@@ -19,7 +19,7 @@ Using an existing Content Builder project, remove the existing MonoGame.ContentP
 **After installing this NuGet you will need to manually remove the packages.config NuGet files from the Content Project else you will get a content build error
 
 _Release Notes
-3.2 release in-line with the recent full 3.2 release
+3.2.2 release in-line with the recent full 3.2 release
 More details can be found at http://monogame.net
 
 _Known Issues

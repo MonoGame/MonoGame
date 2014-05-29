@@ -136,14 +136,7 @@ namespace Microsoft.Xna.Framework.Storage
 				_storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
 
             // Create the "device" if need be
-#if WINDOWS_STOREAPP
-            var folder = ApplicationData.Current.LocalFolder;
-            var task = folder.CreateFolderAsync(_storagePath, CreationCollisionOption.OpenIfExists);
-            task.AsTask().Wait();
-#else
-			if (!Directory.Exists(_storagePath))
-				Directory.CreateDirectory(_storagePath);			
-#endif
+            CreateDirectoryAbsolute(_storagePath);
         }
 		
         /// <summary>
@@ -191,16 +184,22 @@ namespace Microsoft.Xna.Framework.Storage
 			var dirPath = Path.Combine(_storagePath, directory);
 
             // Now let's try to create it
+            CreateDirectoryAbsolute(dirPath);
+		}
+
+        private void CreateDirectoryAbsolute(string path)
+        {
+            // Now let's try to create it
 #if WINDOWS_STOREAPP
             var folder = ApplicationData.Current.LocalFolder;
-            var task = folder.CreateFolderAsync(dirPath, CreationCollisionOption.OpenIfExists);
+            var task = folder.CreateFolderAsync(path, CreationCollisionOption.OpenIfExists);
             task.AsTask().Wait();
 #else
-            Directory.CreateDirectory(dirPath);
-#endif			
-		}
-		
-        /// <summary>
+            Directory.CreateDirectory(path);
+#endif
+        }
+
+	    /// <summary>
         /// Creates a file in the storage-container.
         /// </summary>
         /// <param name="file">Relative path of the file to be created.</param>

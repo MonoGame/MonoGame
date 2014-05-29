@@ -32,19 +32,16 @@ namespace Microsoft.Xna.Framework
             _gameWindow = androidGameWindow;
             _game = game;
             _touchManager = new AndroidTouchEventManager(androidGameWindow);
-
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            SetOnTouchListener(this);
         }
 
         public bool TouchEnabled
         {
             get { return _touchManager.Enabled; }
-            set { _touchManager.Enabled = value; }
+            set
+            {
+                _touchManager.Enabled = value;
+                SetOnTouchListener(value ? this : null);
+            }
         }
 
         #region IOnTouchListener implementation

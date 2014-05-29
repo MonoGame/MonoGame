@@ -39,13 +39,16 @@ purpose and non-infringement.
 #endregion License
 
 #region Using clause
-
 #if WINDOWS_PHONE
+extern alias MonoGameXnaFramework;
 extern alias MicrosoftXnaFramework;
 extern alias MicrosoftXnaGamerServices;
 using MsXna_Guide = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.Guide;
 using MsXna_MessageBoxIcon = MicrosoftXnaGamerServices::Microsoft.Xna.Framework.GamerServices.MessageBoxIcon;
 using MsXna_PlayerIndex = MicrosoftXnaFramework::Microsoft.Xna.Framework.PlayerIndex;
+using MGXna_Framework = MonoGameXnaFramework::Microsoft.Xna.Framework;
+#else
+using MGXna_Framework = global::Microsoft.Xna.Framework;
 #endif
 
 using System;
@@ -53,7 +56,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Microsoft.Xna.Framework.Storage;
 
 #if WINRT
 using System.Threading.Tasks;
@@ -103,14 +105,14 @@ namespace Microsoft.Xna.Framework.GamerServices
         }
 
 		delegate string ShowKeyboardInputDelegate(
-		 PlayerIndex player,           
+         MGXna_Framework.PlayerIndex player,           
          string title,
          string description,
          string defaultText,
 		 bool usePasswordMode);
 
 		private static string ShowKeyboardInput(
-         PlayerIndex player,           
+         MGXna_Framework.PlayerIndex player,           
          string title,
          string description,
          string defaultText,
@@ -139,7 +141,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
+         MGXna_Framework.PlayerIndex player,
          string title,
          string description,
          string defaultText,
@@ -156,7 +158,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 		}
 
 		public static IAsyncResult BeginShowKeyboardInput (
-         PlayerIndex player,
+         MGXna_Framework.PlayerIndex player,
          string title,
          string description,
          string defaultText,
@@ -229,7 +231,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         }
 
         public static IAsyncResult BeginShowMessageBox(
-         PlayerIndex player,
+         MGXna_Framework.PlayerIndex player,
          string title,
          string text,
          IEnumerable<string> buttons,
@@ -278,7 +280,7 @@ namespace Microsoft.Xna.Framework.GamerServices
          Object state
         )
         {
-            return BeginShowMessageBox(PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
+            return BeginShowMessageBox(MGXna_Framework.PlayerIndex.One, title, text, buttons, focusButton, icon, callback, state);
         }
 
         public static Nullable<int> EndShowMessageBox(IAsyncResult result)
@@ -292,7 +294,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 #endif
         }
 
-		public static void ShowMarketplace(PlayerIndex player)
+        public static void ShowMarketplace(MGXna_Framework.PlayerIndex player)
         {
 #if WINDOWS_PHONE
 
@@ -408,7 +410,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 			return null;
 		}
 
-		public static StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
+		public static MGXna_Framework.Storage.StorageDevice EndShowStorageDeviceSelector( IAsyncResult result )
 		{
 			return null;
 		}
@@ -466,14 +468,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 			}
 		}
 
-		public static GameWindow Window 
+		public static MGXna_Framework.GameWindow Window 
 		{ 
 			get;
 			set;
 		}
 		#endregion
 
-        internal static void Initialise(Game game)
+        internal static void Initialise(MGXna_Framework.Game game)
         {
 #if !DIRECTX
             MonoGameGamerServicesHelper.Initialise(game);

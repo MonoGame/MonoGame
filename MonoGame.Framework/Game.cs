@@ -413,7 +413,11 @@ namespace Microsoft.Xna.Framework
         {
             AssertNotDisposed();
             if (!Platform.BeforeRun())
+            {
+                BeginRun();
+                _gameTimer = Stopwatch.StartNew();
                 return;
+            }
 
             if (!_initialized) {
                 DoInitialize ();
@@ -421,6 +425,7 @@ namespace Microsoft.Xna.Framework
             }
 
             BeginRun();
+            _gameTimer = Stopwatch.StartNew();
             switch (runBehavior)
             {
             case GameRunBehavior.Asynchronous:
@@ -440,8 +445,9 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private Stopwatch _gameTimer = Stopwatch.StartNew();
+        private Stopwatch _gameTimer;
         private long _previousTicks = 0;
+        private int _updateFrameLag;
 
         public void Tick()
         {
@@ -449,9 +455,6 @@ namespace Microsoft.Xna.Framework
             // with even what looks like a safe change.  Be sure to test 
             // any change fully in both the fixed and variable timestep 
             // modes across multiple devices and platforms.
-
-            // Can only be running slow if we are fixed timestep
-            var possibleToBeRunningSlowly = IsFixedTimeStep;
 
         RetryTick:
 
@@ -466,10 +469,6 @@ namespace Microsoft.Xna.Framework
             if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
             {
                 var sleepTime = (int)(TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-
-                // If we have had to sleep, we shouldn't report being
-                // slow regardless of how long we actually sleep for.
-                possibleToBeRunningSlowly = false;
 
                 // NOTE: While sleep can be inaccurate in general it is 
                 // accurate enough for frame limiting purposes if some
@@ -486,12 +485,6 @@ namespace Microsoft.Xna.Framework
             if (_accumulatedElapsedTime > _maxElapsedTime)
                 _accumulatedElapsedTime = _maxElapsedTime;
 
-            // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.gametime.isrunningslowly.aspx
-            // Calculate IsRunningSlowly for the fixed time step, but only when the accumulated time
-            // exceeds the target time, and we haven't slept.
-            _gameTime.IsRunningSlowly = (possibleToBeRunningSlowly &&
-                                        (_accumulatedElapsedTime > TargetElapsedTime));
-
             if (IsFixedTimeStep)
             {
                 _gameTime.ElapsedGameTime = TargetElapsedTime;
@@ -506,6 +499,25 @@ namespace Microsoft.Xna.Framework
 
                     DoUpdate(_gameTime);
                 }
+
+                //Every update after the first accumulates lag
+                _updateFrameLag += Math.Max(0, stepCount - 1);
+
+                //If we think we are running slowly, wait until the lag clears before resetting it
+                if (_gameTime.IsRunningSlowly)
+                {
+                    if (_updateFrameLag == 0)
+                        _gameTime.IsRunningSlowly = false;
+                }
+                else if (_updateFrameLag >= 5)
+                {
+                    //If we lag more than 5 frames, start thinking we are running slowly
+                    _gameTime.IsRunningSlowly = true;
+                }
+
+                //Every time we just do one update and one draw, then we are not running slowly, so decrease the lag
+                if (stepCount == 1 && _updateFrameLag > 0)
+                    _updateFrameLag--;
 
                 // Draw needs to know the total elapsed time
                 // that occured for the fixed length updates.

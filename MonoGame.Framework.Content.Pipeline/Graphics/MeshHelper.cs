@@ -420,9 +420,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        /// <summary>
+        /// Transforms the contents of a node and its descendants.
+        /// </summary>
+        /// <remarks>The node transforms themselves are unaffected.</remarks>
+        /// <param name="scene">The root node of the scene to transform.</param>
+        /// <param name="transform">The transform matrix to apply to the scene.</param>
         public static void TransformScene(NodeContent scene, Matrix transform)
         {
-            throw new NotImplementedException();
+            if (scene == null)
+                throw new ArgumentException("scene");
+
+            // If the transformation is an identity matrix, this is a no-op and
+            // we can save ourselves a bunch of work in the first place.
+            if (transform == Matrix.Identity)
+                return;
+
+            var work = new Stack<NodeContent>(new[] { scene });
+            while (work.Count > 0)
+            {
+                var top = work.Pop();
+                var mesh = top as MeshContent;
+                if (mesh != null)
+                    mesh.TransformContents(ref transform);
+
+                for (var i = top.Children.Count - 1; i >= 0; i--)
+                    work.Push(top.Children[i]);
+            }
         }
     }
 }

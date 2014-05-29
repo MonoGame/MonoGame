@@ -38,8 +38,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (value < -1.0f || value > 1.0f)
                     throw new ArgumentOutOfRangeException();
 
-                PlatformSetPan(value);
                 _pan = value;
+                PlatformSetPan(value);
             }
         }
 
@@ -53,8 +53,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (value < -1.0f || value > 1.0f)
                     throw new ArgumentOutOfRangeException();
 
-                PlatformSetPitch(value);
                 _pitch = value;
+                PlatformSetPitch(value);
             }
         }
 
@@ -71,8 +71,8 @@ namespace Microsoft.Xna.Framework.Audio
                 if (value < 0.0f || value > 1.0f)
                     throw new ArgumentOutOfRangeException();
 
-                PlatformSetVolume(value);
                 _volume = value;
+                PlatformSetVolume(value);
             }
         }
 

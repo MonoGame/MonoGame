@@ -85,19 +85,34 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private readonly Dictionary<char, Glyph> _glyphs;
 		
-		internal readonly Texture2D _texture;
+		private readonly Texture2D _texture;
+
+		class CharComparer: IEqualityComparer<char>
+		{
+			public bool Equals(char x, char y)
+			{
+				return x == y;
+			}
+
+			public int GetHashCode(char b)
+			{
+				return (b | (b << 16));
+			}
+
+			static public readonly CharComparer Default = new CharComparer();
+		}
 
 		internal SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
 		{
-			_characters = new ReadOnlyCollection<char> (characters.ToArray ());
+			Characters = new ReadOnlyCollection<char>(characters.ToArray());
 			_texture = texture;
 			LineSpacing = lineSpacing;
 			Spacing = spacing;
 			DefaultCharacter = defaultCharacter;
 
-			_glyphs = new Dictionary<char, Glyph>(characters.Count);
+			_glyphs = new Dictionary<char, Glyph>(characters.Count, CharComparer.Default);
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -130,15 +145,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>Can be used to calculate character bounds when implementing custom SpriteFont rendering.</remarks>
         public Dictionary<char, Glyph> GetGlyphs()
         {
-            return new Dictionary<char, Glyph>(_glyphs);
+            return new Dictionary<char, Glyph>(_glyphs, _glyphs.Comparer);
         }
-
-		private ReadOnlyCollection<char> _characters;
 
 		/// <summary>
 		/// Gets a collection of the characters in the font.
 		/// </summary>
-		public ReadOnlyCollection<char> Characters { get { return _characters; } }
+		public ReadOnlyCollection<char> Characters { get; private set; }
 
 		/// <summary>
 		/// Gets or sets the character that will be substituted when a
@@ -245,15 +258,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
+                if (!_glyphs.TryGetValue(c, out currentGlyph))
                 {
                     if (!defaultGlyph.HasValue)
                         throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
                     currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;                        
                 }
+                hasCurrentGlyph = true;
 
                 var proposedWidth = offset.X + currentGlyph.WidthIncludingBearings + Spacing;
                 if (proposedWidth > width)
@@ -339,26 +351,23 @@ namespace Microsoft.Xna.Framework.Graphics
                     offset.X += Spacing + currentGlyph.Width + currentGlyph.RightSideBearing;
                 }
 
-                hasCurrentGlyph = _glyphs.TryGetValue(c, out currentGlyph);
-                if (!hasCurrentGlyph)
+                if (!_glyphs.TryGetValue(c, out currentGlyph))
                 {
                     if (!defaultGlyph.HasValue)
                         throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
 
                     currentGlyph = defaultGlyph.Value;
-                    hasCurrentGlyph = true;
                 }
+                hasCurrentGlyph = true;
 
-                if (hasCurrentGlyph) {
-                    // The first character on a line might have a negative left side bearing.
-                    // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                    //  so that text does not hang off the left side of its rectangle.
-                    if (firstGlyphOfLine) {
-                        offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
-                        firstGlyphOfLine = false;
-                    } else {
-                        offset.X += currentGlyph.LeftSideBearing;
-                    }
+                // The first character on a line might have a negative left side bearing.
+                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
+                //  so that text does not hang off the left side of its rectangle.
+                if (firstGlyphOfLine) {
+                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
+                    firstGlyphOfLine = false;
+                } else {
+                    offset.X += currentGlyph.LeftSideBearing;
                 }
 
                 var p = offset;

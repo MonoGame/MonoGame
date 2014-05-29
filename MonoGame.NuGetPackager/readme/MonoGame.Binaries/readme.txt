@@ -18,6 +18,8 @@ _Contents
 This package contains only MonoGame DLL references for a solution.
 For project templates either use the Monogame Project templates or the Main MonoGame NuGet package
 
+*Note this package no longer contains the .Net and .GamerServices namespaces, please see the ajoining MonoGame.Net NuGet package if you require them
+
 
 _Install Instructions
 If you have created your project using the installed MonoGame templates, you will need to remove any MonoGame references first.
@@ -36,7 +38,8 @@ The MSBuild configuration will remove old XNA references at build time to avoid 
 This also applies to CLASS LIBRARIES, all projects in a Windows Phone project that are referencing MonoGame will need this package installed!
 
 _Release Notes
-3.2 release inline with the recent full 3.2 release
+3.2.2 release
+Updated to latest development build following MonoGame.Framework.Net separation and numerous bug fixes.
 More details can be found at http://monogame.net
 
 _Known Issues
