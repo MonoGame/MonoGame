@@ -272,6 +272,8 @@
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
+    <Compile Include="Content\ContentSerializerRuntimeTypeAttribute.cs" />
+    <Compile Include="Content\ContentSerializerTypeVersionAttribute.cs" />
     <Compile Include="Content\ContentTypeReader.cs" />
     <Compile Include="Content\ContentTypeReaderManager.cs" />
     <Compile Include="Content\LzxDecoder.cs" />
