@@ -8,7 +8,7 @@ using System.Reflection.Emit;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal static class ContentExtensions
+    public static class ContentExtensions
     {
         public static ConstructorInfo GetDefaultConstructor(this Type type)
         {
