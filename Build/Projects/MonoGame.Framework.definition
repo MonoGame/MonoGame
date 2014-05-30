@@ -163,8 +163,11 @@
     </Compile>
     <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
+    <Compile Include="Audio\SoundEffect.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
-      <Platforms>Android,Angle,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
+      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.PSM.cs">
       <Platforms>PSMobile</Platforms>
@@ -176,8 +179,11 @@
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.cs" />
+    <Compile Include="Audio\SoundEffectInstance.Android.cs">
+      <Platforms>Android,Ouya</Platforms>
+    </Compile>
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
-      <Platforms>Android,Angle,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
+      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.PSM.cs">
       <Platforms>PSMobile</Platforms>
