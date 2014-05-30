@@ -446,6 +446,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void ItemRebuildMenuItemClick(object sender, EventArgs e)
         {
+            var item = _treeView.GetSelectedContentItem();
+            _controller.RebuildItem(item);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
