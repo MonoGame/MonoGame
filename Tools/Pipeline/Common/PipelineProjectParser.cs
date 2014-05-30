@@ -218,108 +218,115 @@ namespace MonoGame.Tools.Pipeline
 
         public void SaveProject()
         {
+            using (var io = File.CreateText(_project.FilePath))
+                SaveProject(io, null);
+        }
+        
+        public void SaveProject(TextWriter io, Func<ContentItem, bool> filterItem)
+        {
             const string lineFormat = "/{0}:{1}";
             const string processorParamFormat = "{0}={1}";
             string line;
 
-            using (var io = File.CreateText(_project.FilePath))
+            line = FormatDivider("Global Properties");
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "outputDir", _project.OutputDir);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "platform", _project.Platform);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "config", _project.Config);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "profile", _project.Profile);
+            io.WriteLine(line);
+
+            line = FormatDivider("References");
+            io.WriteLine(line);
+
+            foreach (var i in _project.References)
             {
-                line = FormatDivider("Global Properties");
+                line = string.Format(lineFormat, "reference", i);
+                io.WriteLine(line);
+            }
+
+            line = FormatDivider("Content");
+            io.WriteLine(line);
+
+            foreach (var i in _project.ContentItems)
+            {
+                // Reject any items that don't pass the filter.              
+                if (filterItem != null && filterItem(i))
+                    continue;
+
+                // Wrap content item lines with a begin comment line
+                // to make them more cohesive (for version control).                  
+                line = string.Format("#begin {0}", i.SourceFile);
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "outputDir", _project.OutputDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "platform", _project.Platform);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "config", _project.Config);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "profile", _project.Profile);
-                io.WriteLine(line);
-
-                line = FormatDivider("References");
-                io.WriteLine(line);
-
-                foreach (var i in _project.References)
+                if (i.BuildAction == BuildAction.Copy)
                 {
-                    line = string.Format(lineFormat, "reference", i);
+                    line = string.Format(lineFormat, "copy", i.SourceFile);
                     io.WriteLine(line);
+                    io.WriteLine();
                 }
-
-                line = FormatDivider("Content");
-                io.WriteLine(line);
-
-                foreach (var i in _project.ContentItems)
+                else
                 {
-                    // Wrap content item lines with a begin comment line
-                    // to make them more cohesive (for version control).                  
-                    line = string.Format("#begin {0}", i.SourceFile);
-                    io.WriteLine(line);
 
-                    if (i.BuildAction == BuildAction.Copy)
+                    // Write importer.
                     {
-                        line = string.Format(lineFormat, "copy", i.SourceFile);
+                        line = string.Format(lineFormat, "importer", i.ImporterName);
                         io.WriteLine(line);
-                        io.WriteLine();
                     }
-                    else
+
+                    // Write processor.
                     {
+                        line = string.Format(lineFormat, "processor", i.ProcessorName);
+                        io.WriteLine(line);
+                    }
 
-                        // Write importer.
+                    // Write processor parameters.
+                    {
+                        if (i.Processor == PipelineTypes.MissingProcessor)
                         {
-                            line = string.Format(lineFormat, "importer", i.ImporterName);
-                            io.WriteLine(line);
-                        }
-
-                        // Write processor.
-                        {
-                            line = string.Format(lineFormat, "processor", i.ProcessorName);
-                            io.WriteLine(line);
-                        }
-
-                        // Write processor parameters.
-                        {
-                            if (i.Processor == PipelineTypes.MissingProcessor)
+                            // Could still be missing the real processor.
+                            // If so, write the string parameters from import.
+                            foreach (var j in i.ProcessorParams)
                             {
-                                // Could still be missing the real processor.
-                                // If so, write the string parameters from import.
-                                foreach (var j in i.ProcessorParams)
+                                line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                                io.WriteLine(line);
+                            }
+                        }
+                        else
+                        {
+                            // Otherwise, write only values which are defined by the real processor.
+                            foreach (var j in i.Processor.Properties)
+                            {
+                                object value = null;
+                                if (i.ProcessorParams.ContainsKey(j.Name))
+                                    value = i.ProcessorParams[j.Name];
+
+                                // JCF: I 'think' writting an empty string for null would be appropriate but to be on the safe side
+                                //      im just not writting the value at all.
+                                if (value != null)
                                 {
-                                    line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                                    var converter = PipelineTypes.FindConverter(value.GetType());
+                                    var valueStr = converter.ConvertTo(value, typeof(string));
+                                    line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
                                     io.WriteLine(line);
                                 }
                             }
-                            else
-                            {
-                                // Otherwise, write only values which are defined by the real processor.
-                                foreach (var j in i.Processor.Properties)
-                                {
-                                    object value = null;
-                                    if (i.ProcessorParams.ContainsKey(j.Name))
-                                        value = i.ProcessorParams[j.Name];
-
-                                    // JCF: I 'think' writting an empty string for null would be appropriate but to be on the safe side
-                                    //      im just not writting the value at all.
-                                    if (value != null)
-                                    {
-                                        var converter = PipelineTypes.FindConverter(value.GetType());
-                                        var valueStr = converter.ConvertTo(value, typeof(string));
-                                        line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
-                                        io.WriteLine(line);
-                                    }
-                                }
-                            }
                         }
-
-                        line = string.Format(lineFormat, "build", i.SourceFile);
-                        io.WriteLine(line);
-                        io.WriteLine();
                     }
+
+                    line = string.Format(lineFormat, "build", i.SourceFile);
+                    io.WriteLine(line);
+                    io.WriteLine();
                 }
             }
         }
