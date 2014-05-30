@@ -224,6 +224,45 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
+            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            BuildCommand(commands);
+        }
+
+        public void RebuildItem(IProjectItem item)
+        {
+            // Make sure we save first!
+            if (!AskSaveProject())
+                return;
+
+            // TODO: We can support folders here as well.
+
+            var contentItem = item as ContentItem;
+            if (contentItem != null)
+            {
+                // Create a unique file within the same folder as
+                // the normal project to store this incremental build.
+                var uniqueName = Guid.NewGuid().ToString();
+                var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
+
+                // Write the incremental project file limiting the
+                // content to just the files we want to rebuild.
+                using (var io = File.CreateText(tempPath))
+                {
+                    var parser = new PipelineProjectParser(this, _project);
+                    parser.SaveProject(io, (i) => i != item);
+                }
+
+                // Run the build the command.
+                var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+                BuildCommand(commands);
+
+                // Cleanup the temp file once we're done.
+                _buildTask.ContinueWith((e) => File.Delete(tempPath));
+            }
+        }
+
+        private void BuildCommand(string commands)
+        {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
             // Make sure we save first!
@@ -235,7 +274,6 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
             _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());
