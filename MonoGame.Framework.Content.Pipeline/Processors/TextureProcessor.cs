@@ -39,10 +39,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var idx = 0;
                 for (; idx < data.Length; )
                 {
-                    var r = data[idx + 3];
-                    var g = data[idx + 0];
-                    var b = data[idx + 1];
-                    var a = data[idx + 2];
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
                     var col = new Color(r, g, b, a);
                     if (col.Equals(ColorKeyColor))
                     {
@@ -71,26 +71,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var idx = 0;
                 for (; idx < data.Length;)
                 {
-                    var r = data[idx + 3];
-                    var g = data[idx + 0];
-                    var b = data[idx + 1];
-                    var a = data[idx + 2];
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
                     var col = Color.FromNonPremultiplied(r, g, b, a);
 
-                    data[idx + 3] = col.R;
-                    data[idx + 0] = col.G;
-                    data[idx + 1] = col.B;
-                    data[idx + 2] = col.A;
+                    data[idx + 0] = col.R;
+                    data[idx + 1] = col.G;
+                    data[idx + 2] = col.B;
+                    data[idx + 3] = col.A;
 
                     idx += 4;
-                }      
+                }
          
                 bmp.SetPixelData(data);
             }
-
-            // Set the first layer
-            // JCF: This should be already set...
-            //input.Faces[0][0].SetPixelData(input._bitmap.GetData());
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
