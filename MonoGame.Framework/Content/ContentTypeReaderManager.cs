@@ -211,6 +211,9 @@ namespace Microsoft.Xna.Framework.Content
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", assemblyName));
 			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
+
+            // TODO: find a way to not have to modify MonoGame for this
+            preparedType = preparedType.Replace(", Fds.InfiniteFlight.ContentPipeline", ", Fds.Framework");
 			
 			return preparedType;
 		}

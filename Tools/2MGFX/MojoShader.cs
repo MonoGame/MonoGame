@@ -5,7 +5,7 @@ namespace TwoMGFX
 {
 	internal class MojoShader
     {
-		const string mojoshader_dll = "libmojoshader_64.dll";
+		const string mojoshader_dll = "libmojoshader_32.dll";
 
 		public partial class NativeConstants {
 		    
