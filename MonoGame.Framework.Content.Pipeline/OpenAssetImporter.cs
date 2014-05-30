@@ -31,9 +31,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private Dictionary<string, Matrix4x4> _objectToBone = new Dictionary<string, Matrix4x4>();
         private Dictionary<string, Matrix4x4> _offsetMatrix = new Dictionary<string, Matrix4x4>();
 
+        public string ImporterName { get; set; }
+
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            var identity = new ContentIdentity(filename, GetType().Name);
+            var identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
             {
@@ -111,6 +113,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureOpacity.FilePath, identity);
                     texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureOpacity.UVIndex));
                     material.Textures.Add("Transparency", texture);
+                }
+
+                if (sceneMaterial.HasTextureSpecular)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureSpecular.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureSpecular.UVIndex));
+                    material.Textures.Add("Specular", texture);
+                }
+
+                if (sceneMaterial.HasTextureHeight)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureHeight.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureHeight.UVIndex));
+                    material.Textures.Add("Bump", texture);
                 }
 
                 if (sceneMaterial.HasColorDiffuse)
