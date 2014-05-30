@@ -99,33 +99,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 fBitmap = temp;
             }
 
-            output._bitmap = FreeImage.GetBitmap(fBitmap);
+            var systemBitmap = FreeImage.GetBitmap(fBitmap);
             FreeImage.UnloadEx(ref fBitmap);
             
 #else
-            output._bitmap = new Bitmap(filename);
+            var systemBitmap = new Bitmap(filename);
 #endif
 
-            var height = output._bitmap.Height;
-            var width = output._bitmap.Width;
+            var height = systemBitmap.Height;
+            var width = systemBitmap.Width;
 
             // Force the input's pixelformat to ARGB32, so we can have a common pixel format to deal with.
-			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb) {
-
+            if (systemBitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+            {
 				var bitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				using ( var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
-					graphics.DrawImage(output._bitmap, 0,0, width, height);
+                    graphics.DrawImage(systemBitmap, 0, 0, width, height);
 				}
 
-				output._bitmap = bitmap;
+				systemBitmap = bitmap;
 			}
 
-			var imageData = output._bitmap.GetData();
-
-            var bitmapContent = new PixelBitmapContent<Color>(width, height);
-            bitmapContent.SetPixelData(imageData);
-
-            output.Faces.Add(new MipmapChain(bitmapContent));
+            output.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap()));
+            systemBitmap.Dispose();
 
             return output;
         }
