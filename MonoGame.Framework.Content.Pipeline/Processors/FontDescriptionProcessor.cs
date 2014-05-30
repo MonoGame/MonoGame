@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-				Bitmap outputBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
 
 				//outputBitmap.Save ("/Users/Jimmy/Desktop/Cocos2D-XNAImages/fontglyphs.png");
 
@@ -102,12 +102,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
 				}
 
-//				outputBitmap.Save("/Users/Jimmy/Desktop/Cocos2D-XNAImages/test.png");
-				output.Texture._bitmap = outputBitmap;
-
-				var bitmapContent = new PixelBitmapContent<Color>(outputBitmap.Width, outputBitmap.Height);
-				bitmapContent.SetPixelData(outputBitmap.GetData());
-				output.Texture.Faces.Add(new MipmapChain(bitmapContent));
+                output.Texture.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap()));
+			    systemBitmap.Dispose();
 
                 GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false);
 			}
