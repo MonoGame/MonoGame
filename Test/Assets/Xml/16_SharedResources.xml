@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="SharedResources">
+  <Asset Type="MonoGame.Tests.ContentPipeline.SharedResources">
     <Head>#Resource1</Head>
   </Asset>
   <Resources>
