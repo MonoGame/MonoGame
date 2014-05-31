@@ -1,4 +1,5 @@
 using System;
+using Android.App;
 using Android.Content.Res;
 using Android.Hardware;
 using Android.Views;
@@ -9,7 +10,6 @@ namespace Microsoft.Xna.Framework
     {
         readonly object _orientationChangedLock = new object();
         
-        readonly AndroidGameActivity _activity;
         readonly AndroidGameWindow _gameWindow;
 
         readonly Orientation _defaultOrientation;
@@ -21,10 +21,9 @@ namespace Microsoft.Xna.Framework
         public OrientationListener(AndroidGameActivity activity, AndroidGameWindow gameWindow)
             : base(activity, SensorDelay.Ui)
         {
-            _activity = activity;
             _gameWindow = gameWindow;
 
-            _defaultOrientation = GetDeviceDefaultOrientation();
+            _defaultOrientation = GetDeviceDefaultOrientation(activity);
         }
 
         public override void OnOrientationChanged(int orientation)
@@ -72,11 +71,11 @@ namespace Microsoft.Xna.Framework
             }
         }
             
-        Orientation GetDeviceDefaultOrientation()
+        private Orientation GetDeviceDefaultOrientation(Activity activity)
         {
-            var windowManager = _activity.WindowManager;
+            var windowManager = activity.WindowManager;
 
-            Configuration config = _activity.Resources.Configuration;
+            Configuration config = activity.Resources.Configuration;
 
             SurfaceOrientation rotation = windowManager.DefaultDisplay.Rotation;
 

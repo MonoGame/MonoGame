@@ -85,20 +85,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			// we need to call GtCharacterForIndex for each glyph in the Texture to 
 			// get the char for that glyph, by default we start at ' ' then '!' and then ASCII
 			// after that. 
-			if (input._bitmap == null)
-				throw new ArgumentNullException ("Texture Bitmap cannot be null");
+		    var systemBitmap = input.Faces[0][0].ToSystemBitmap();
 
 			int linespacing = 0;
-			var glyphs = ExtractGlyphs (input._bitmap, out linespacing);
+            var glyphs = ExtractGlyphs(systemBitmap, out linespacing);
 			// Optimize.
 			foreach (Glyph glyph in glyphs) {
 				GlyphCropper.Crop (glyph);
 			}
 
-			var outputBitmap = GlyphPacker.ArrangeGlyphs (glyphs.ToArray(), true, true);
-
-			//outputBitmap.Save ("fontglyphs.png");
-
+            systemBitmap.Dispose();
+            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), true, true);
 			
 			foreach (Glyph glyph in glyphs) {
 				glyph.XAdvance += linespacing;
@@ -109,12 +106,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				ABCFloat abc = glyph.CharacterWidths;
 				output.Kerning.Add (new Vector3 (abc.A, abc.B, abc.C));
 			}
-
-			output.Texture._bitmap = outputBitmap;
-
-			var bitmapContent = new PixelBitmapContent<Color> (outputBitmap.Width, outputBitmap.Height);
-			bitmapContent.SetPixelData (outputBitmap.GetData ());
-			output.Texture.Faces.Add (new MipmapChain (bitmapContent));
+			
+			output.Texture.Faces.Add (new MipmapChain (systemBitmap.ToXnaBitmap()));
+            systemBitmap.Dispose();
 
             GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false);
 

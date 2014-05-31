@@ -318,6 +318,24 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         */
+
+        /// <summary>
+        /// Gets a <see cref="System.Boolean"/> indicating whether
+        /// <see cref="GraphicsAdapter.CurrentDisplayMode"/> has a
+        /// Width:Height ratio corresponding to a widescreen <see cref="DisplayMode"/>.
+        /// Common widescreen modes include 16:9, 16:10 and 2:1.
+        /// </summary>
+        public bool IsWideScreen
+        {
+            get
+            {
+                // Common non-widescreen modes: 4:3, 5:4, 1:1
+                // Common widescreen modes: 16:9, 16:10, 2:1
+                // XNA does not appear to account for rotated displays on the desktop
+                const float limit = 4.0f / 3.0f;
+                float aspect = CurrentDisplayMode.AspectRatio;
+                return aspect > limit;
+            }
+        }
     }
 }
-

@@ -482,6 +482,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (!File.Exists(pipelineEvent.SourceFile))
                 throw new PipelineException("The source file '{0}' does not exist!", pipelineEvent.SourceFile);
 
+            // Store the last write time of the source file
+            // so we can detect if it has been changed.
+            pipelineEvent.SourceTime = File.GetLastWriteTime(pipelineEvent.SourceFile);
+
             // Make sure we can find the importer and processor.
             var importer = CreateImporter(pipelineEvent.Importer);
             if (importer == null)

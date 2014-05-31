@@ -70,6 +70,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     CreateAnimation(skeleton);
                 }
 
+                // If we have a simple hierarchy with no bones and just the one
+                // mesh, we can flatten it out so the mesh is the root node.
+                if (_rootNode.Children.Count == 1 && _rootNode.Children[0] is MeshContent)
+                {
+                    var absXform = _rootNode.Children[0].AbsoluteTransform;
+                    _rootNode = _rootNode.Children[0];
+                    _rootNode.Transform = absXform;
+                }
+
                 _scene.Clear();
             }
 
@@ -123,34 +132,67 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return materials;
         }
 
-        private MeshContent CreateMesh(Mesh sceneMesh)
+        private void FindMeshes(Node aiNode, Matrix4x4 parentXform)
         {
-            var mesh = new MeshContent { Name = sceneMesh.Name };
+            var transform = parentXform * aiNode.Transform;
 
-            // Position vertices are shared at the mesh level
-            foreach (var vert in sceneMesh.Vertices)
-                mesh.Positions.Add(new Vector3(vert.X, vert.Y, vert.Z));
-
-            var geom = new GeometryContent
+            if (aiNode.HasMeshes)
             {
-                Material = _materials[sceneMesh.MaterialIndex]
-            };
+                var mesh = new MeshContent
+                {
+                    Name = aiNode.Name,
+                    Transform = ToXna(transform)
+                };
 
-            // Geometry vertices reference 1:1 with the MeshContent parent,
-            // no indirection is necessary.
-            //geom.Vertices.Positions.AddRange(mesh.Positions);
-            geom.Vertices.AddRange(Enumerable.Range(0, sceneMesh.VertexCount));
-            geom.Indices.AddRange(sceneMesh.GetIndices());
+                foreach (var meshIndex in aiNode.MeshIndices)
+                {
+                    var aiMesh = _scene.Meshes[meshIndex];
+                    if (!aiMesh.HasVertices)
+                        continue;
 
-            if (sceneMesh.HasBones)
+                    // Extract bind pose.
+                    foreach (var bone in aiMesh.Bones)
+                    {
+                        if (!_boneNames.Contains(bone.Name))
+                            _boneNames.Add(bone.Name);
+
+                        var boneName = bone.Name;
+                        _objectToBone[boneName] = Matrix4x4.Identity;
+                        //_objectToBone[boneName].Inverse();
+                    }
+
+                    var geom = CreateGeometry(mesh, aiMesh);
+                    mesh.Geometry.Add(geom);
+                }
+
+                _rootNode.Children.Add(mesh);
+            }
+
+            // Children
+            foreach (var child in aiNode.Children)
+                FindMeshes(child, transform);
+        }
+
+        private GeometryContent CreateGeometry(MeshContent mesh, Mesh aiMesh)
+        {
+            var geom = new GeometryContent { Material = _materials[aiMesh.MaterialIndex] };
+
+            // Vertices
+            var baseVertex = mesh.Positions.Count;
+            foreach (var vert in aiMesh.Vertices)
+                mesh.Positions.Add(ToXna(vert));
+            geom.Vertices.AddRange(Enumerable.Range(baseVertex, aiMesh.VertexCount));
+            geom.Indices.AddRange(aiMesh.GetIndices());
+
+            if (aiMesh.HasBones)
             {
                 var xnaWeights = new List<BoneWeightCollection>();
                 for (var i = 0; i < geom.Indices.Count; i++)
                 {
                     var list = new BoneWeightCollection();
-                    for (var boneIndex = 0; boneIndex < sceneMesh.BoneCount; boneIndex++)
+                    for (var boneIndex = 0; boneIndex < aiMesh.BoneCount; boneIndex++)
                     {
-                        var bone = sceneMesh.Bones[boneIndex];
+                        var bone = aiMesh.Bones[boneIndex];
                         foreach (var weight in bone.VertexWeights)
                         {
                             if (weight.VertexID != i)
@@ -167,47 +209,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             // Individual channels go here
-            if (sceneMesh.HasNormals)
-                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(sceneMesh.Normals));
+            if (aiMesh.HasNormals)
+                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(aiMesh.Normals));
 
-            for (var i = 0; i < sceneMesh.TextureCoordinateChannelCount; i++)
+            for (var i = 0; i < aiMesh.TextureCoordinateChannelCount; i++)
                 geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i),
-                                           ToXnaTexCoord(sceneMesh.TextureCoordinateChannels[i]));
+                                           ToXnaTexCoord(aiMesh.TextureCoordinateChannels[i]));
 
-            mesh.Geometry.Add(geom);
-
-            return mesh;
-        }
-
-        private void FindMeshes(Node aiNode, Matrix4x4 parentXform)
-        {
-            var transform = parentXform * aiNode.Transform;
-            foreach (var meshIndex in aiNode.MeshIndices)
+            for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
             {
-                var aiMesh = _scene.Meshes[meshIndex];
-
-                // Extract bind pose.
-                foreach (var bone in aiMesh.Bones)
-                {
-                    if (!_boneNames.Contains(bone.Name))
-                        _boneNames.Add(bone.Name);
-
-                    var boneName = bone.Name;
-                    _objectToBone[boneName] = Matrix4x4.Identity;
-                    //_objectToBone[boneName].Inverse();
-                }
-
-                // Extract geometry
-                var mesh = CreateMesh(aiMesh);
-                mesh.Name = aiNode.Name;
-                mesh.Transform = ToXna(transform);
-
-                _rootNode.Children.Add(mesh);
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(i),
+                       ToXnaColors(aiMesh.VertexColorChannels[i]));
             }
 
-            // Children
-            foreach (var child in aiNode.Children)
-                FindMeshes(child, transform);
+            return geom;
         }
 
         private BoneContent CreateSkeleton()
@@ -441,6 +456,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public static Vector3 ToXna(Assimp.Color4D color)
         {
             return new Vector3(color.R, color.G, color.B);
+        }
+
+        public static IEnumerable<Color> ToXnaColors(IEnumerable<Color4D> colors)
+        {
+            foreach (var color in colors)
+                yield return new Color(color.R, color.G, color.B, color.A);
         }
 
         #endregion

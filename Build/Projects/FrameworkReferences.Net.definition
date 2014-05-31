@@ -81,19 +81,13 @@
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
   </Platform>
 
-  <Platform Type="Angle">
-    <Reference Include="System.Core" />
-    <Project
-      Name="Lidgren.Network.Windows"
-      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
-  </Platform>
-
   <Platform Type="WindowsPhone">
-    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
-                Aliases="MicrosoftXnaGamerServices" />
-    <Reference  Include="Microsoft.Xna.Framework"
-                Aliases="MicrosoftXnaFramework" />
+    <Reference Include="Microsoft.Xna.Framework.GamerServices">
+      <Alias Platform="WindowsPhone">MicrosoftXnaGamerServices</Alias>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
+    </Reference>
   </Platform>
 
   <Platform Type="Web">
