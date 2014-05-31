@@ -324,7 +324,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)((this._packedValue & 0x00ff0000) >> 16);
+                unchecked
+                {
+                    return (byte) (this._packedValue >> 16);
+                }
             }
             set
             {
@@ -340,7 +343,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)((this._packedValue & 0x0000ff00) >> 8);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 8);
+                }
             }
             set
             {
@@ -356,7 +362,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue & 0x000000ff);
+                unchecked
+                {
+                    return (byte) this._packedValue;
+                }
             }
             set
             {
@@ -372,7 +381,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)((this._packedValue & 0xff000000) >> 24);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 24);
+                }
             }
             set
             {
