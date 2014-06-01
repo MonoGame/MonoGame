@@ -72,6 +72,8 @@ namespace MonoGame.Tools.Pipeline
         
         void Build(bool rebuild);
 
+        void RebuildItem(IProjectItem item);
+
         void Clean();
 
         void CancelBuild();

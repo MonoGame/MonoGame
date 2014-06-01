@@ -31,49 +31,62 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
+            var bmp = input.Faces[0][0];
+
             if (ColorKeyEnabled)
             {
-                var replaceColor = System.Drawing.Color.FromArgb(0);
-                for (var x = 0; x < input._bitmap.Width; x++)
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length; )
                 {
-                    for (var y = 0; y < input._bitmap.Height; y++)
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
+                    var col = new Color(r, g, b, a);
+                    if (col.Equals(ColorKeyColor))
                     {
-                        var col = input._bitmap.GetPixel(x, y);
+                        data[idx + 0] = 0;
+                        data[idx + 1] = 0;
+                        data[idx + 2] = 0;
+                        data[idx + 3] = 0;    
+                    }                    
 
-                        if (col.ColorsEqual(ColorKeyColor))
-                        {
-                            input._bitmap.SetPixel(x, y, replaceColor);
-                        }
-                    }
+                    idx += 4;
                 }
+
+                bmp.SetPixelData(data);
             }
 
-            var face = input.Faces[0][0];
+            
             if (ResizeToPowerOfTwo)
             {
-                if (!GraphicsUtil.IsPowerOfTwo(face.Width) || !GraphicsUtil.IsPowerOfTwo(face.Height))
-                    input.Resize(GraphicsUtil.GetNextPowerOfTwo(face.Width), GraphicsUtil.GetNextPowerOfTwo(face.Height));
+                if (!GraphicsUtil.IsPowerOfTwo(bmp.Width) || !GraphicsUtil.IsPowerOfTwo(bmp.Height))
+                    input.Resize(GraphicsUtil.GetNextPowerOfTwo(bmp.Width), GraphicsUtil.GetNextPowerOfTwo(bmp.Height));
             }
 
             if (PremultiplyAlpha)
-            {
-                for (var x = 0; x < input._bitmap.Width; x++)
+            {                
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length;)
                 {
-                    for (var y = 0; y < input._bitmap.Height; y++)
-                    {
-                        var oldCol = input._bitmap.GetPixel(x, y);
-                        var preMultipliedColor = Color.FromNonPremultiplied(oldCol.R, oldCol.G, oldCol.B, oldCol.A);
-                        input._bitmap.SetPixel(x, y, System.Drawing.Color.FromArgb(preMultipliedColor.A, 
-                                                                                   preMultipliedColor.R,
-                                                                                   preMultipliedColor.G,
-                                                                                   preMultipliedColor.B));
-                    }
-                }
-            }
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
+                    var col = Color.FromNonPremultiplied(r, g, b, a);
 
-            // Set the first layer
-            // JCF: This should be already set...
-            //input.Faces[0][0].SetPixelData(input._bitmap.GetData());
+                    data[idx + 0] = col.R;
+                    data[idx + 1] = col.G;
+                    data[idx + 2] = col.B;
+                    data[idx + 3] = col.A;
+
+                    idx += 4;
+                }
+         
+                bmp.SetPixelData(data);
+            }
 
             if (TextureFormat == TextureProcessorOutputFormat.NoChange)
                 return input;
