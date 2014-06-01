@@ -8,6 +8,9 @@ using System.Xml;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    // These tests are based on "Everything you ever wanted to know about IntermediateSerializer" by Shawn Hargreaves
+    // http://blogs.msdn.com/b/shawnhar/archive/2008/08/12/everything-you-ever-wanted-to-know-about-intermediateserializer.aspx
+
     class IntermediateDeserializerTest
     {
         [Test]
