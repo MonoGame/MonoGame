@@ -104,17 +104,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_serializers.TryGetValue(type, out serializer))
                 return serializer;
 
-            // This better not be a primitive type!
-            if (type.IsPrimitive)
-                throw new NotImplementedException(string.Format("Unhandled primitive type `{0}`!", type.FullName));
-           
-            // We still don't have a serializer then we 
-            // fallback to the reflection based serializer.
-            serializer = new ReflectiveSerializer(type);
-            serializer.Initialize(this);
+            // Is this an enum?
+            if (type.IsEnum)
+                serializer = new EnumSerializer(type);                
+            else
+            {
+                // The reflective serializer is not for primitive types!
+                if (type.IsPrimitive)
+                    throw new NotImplementedException(string.Format("Unhandled primitive type `{0}`!", type.FullName));
+
+                // We still don't have a serializer then we 
+                // fallback to the reflection based serializer.
+                serializer = new ReflectiveSerializer(type);
+            }
 
             Debug.Assert(serializer.TargetType == type, "Target type mismatch!");
+
+            // Initialize and cache the serializer.
+            serializer.Initialize(this);
             _serializers.Add(type, serializer);
+
             return serializer;
         }
 

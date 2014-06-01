@@ -331,6 +331,7 @@
     <Compile Include="Serialization\Intermediate\BoolSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />
     <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
