@@ -104,9 +104,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_serializers.TryGetValue(type, out serializer))
                 return serializer;
 
-            // Is this an enum?
-            if (type.IsEnum)
-                serializer = new EnumSerializer(type);                
+            if (type.IsArray)
+            {
+                if (type.GetArrayRank() != 1)
+                    throw new RankException("We only support single dimension arrays.");
+
+                var arrayType = typeof(ArraySerializer<>).MakeGenericType(new[] { type.GetElementType() });
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(arrayType);
+            }
+            else if (type.IsEnum)
+            {
+                serializer = new EnumSerializer(type);
+            }
             else
             {
                 // The reflective serializer is not for primitive types!
