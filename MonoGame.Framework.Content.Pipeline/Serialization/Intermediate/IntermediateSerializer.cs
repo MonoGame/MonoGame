@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 
@@ -102,15 +103,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             ContentTypeSerializer serializer;
             if (_serializers.TryGetValue(type, out serializer))
                 return serializer;
-           
-            // If we still don't have a serializer then 
-            // fallback to the reflection based serializer.
-            if (serializer == null)
-            {
-                serializer = new ReflectiveSerializer(type);
-                serializer.Initialize(this);
-            }
 
+            // This better not be a primitive type!
+            if (type.IsPrimitive)
+                throw new NotImplementedException(string.Format("Unhandled primitive type `{0}`!", type.FullName));
+           
+            // We still don't have a serializer then we 
+            // fallback to the reflection based serializer.
+            serializer = new ReflectiveSerializer(type);
+            serializer.Initialize(this);
+
+            Debug.Assert(serializer.TargetType == type, "Target type mismatch!");
             _serializers.Add(type, serializer);
             return serializer;
         }
