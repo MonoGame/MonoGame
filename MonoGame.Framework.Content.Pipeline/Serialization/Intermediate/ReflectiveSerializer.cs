@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using Microsoft.Xna.Framework.Utilities;
@@ -81,7 +82,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
-            var properties = TargetType.GetAllProperties();
+            var properties = TargetType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in properties)
             {
                 ElementInfo info;
@@ -89,7 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     _elements.Add(info.Name, info);
             }
 
-            var fields = TargetType.GetAllFields();
+            var fields = TargetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             foreach (var field in fields)
             {
                 ElementInfo info;
