@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="ExcludingPublicMembers">
+  <Asset Type="MonoGame.Tests.ContentPipeline.ExcludingPublicMembers">
     <elf>23</elf> <!-- Should NOT be serialized -->
   </Asset>
 </XnaContent>
