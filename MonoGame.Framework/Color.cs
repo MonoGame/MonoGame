@@ -315,8 +315,8 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
-        
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -324,15 +324,18 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 16);
+                unchecked
+                {
+                    return (byte) (this._packedValue >> 16);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xff00ffff) | (uint)(value << 16);
+                this._packedValue = (this._packedValue & 0xff00ffff) | ((uint)value << 16);
             }
         }
-	
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -340,15 +343,18 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 8);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 8);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
+                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)value << 8);
             }
         }
-	
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -356,7 +362,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue);
+                unchecked
+                {
+                    return (byte) this._packedValue;
+                }
             }
             set
             {
@@ -364,7 +373,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
+        /// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -372,11 +381,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 24);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 24);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
+                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)value << 24);
             }
         }
 		
