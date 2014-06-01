@@ -38,6 +38,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var attrib = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
             if (attrib != null)
             {
+                // Store the attribute for later use.
                 info.Attribute = attrib.Clone();
 
                 // Default the to member name as the element name.
@@ -46,16 +47,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             }
             else
             {
+                // We don't have a serializer attribute, so we can
+                // only access this member thru a public field/property.
+
                 if (prop != null)
                 {
-                    // If we can't at least read the property then it
-                    // can't be serialized or deserialized in any way.
-                    if (!prop.CanRead)
+                    // If we don't have at least a public getter then this 
+                    // property can't be serialized or deserialized in any way.
+                    if (prop.GetGetMethod() == null)
                         return false;
 
-                    // If we can't write to this property and it is a
-                    // system type then it can't be deserialized.
-                    if (!prop.CanWrite && prop.PropertyType.Namespace == "System")
+                    // If there is no public setter and the property is a system
+                    // type then we have no way for it to be deserialized.
+                    if (prop.GetSetMethod() == null &&
+                        prop.PropertyType.Namespace == "System")
                         return false;
                 }
                 else if (field != null)
