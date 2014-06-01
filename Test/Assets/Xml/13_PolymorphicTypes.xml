@@ -7,10 +7,10 @@
       <Item>
         <Value>true</Value>
       </Item>
-      <Item Type="PolymorphicB">
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicB">
         <Value>true</Value>
       </Item>
-      <Item Type="PolymorphicC">
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
         <Value>true</Value>
       </Item>
     </PolymorphicArray>
