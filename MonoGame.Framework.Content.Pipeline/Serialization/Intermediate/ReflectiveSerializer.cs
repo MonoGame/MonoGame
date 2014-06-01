@@ -135,6 +135,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             // Read the next node.
             while (reader.Read())
             {
+                // Skip over any whitespace.
+                if (reader.NodeType == XmlNodeType.Whitespace)
+                    continue;
+
                 // Did we reach the end of this object?
                 if (reader.NodeType == XmlNodeType.EndElement)
                     break;

@@ -86,9 +86,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!MoveToElement(format.ElementName))
                 throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
 
-            Xml.ReadStartElement();
+            var isEmpty = Xml.IsEmptyElement;
+            if (!isEmpty)
+                Xml.ReadStartElement();
+
             var result = typeSerializer.Deserialize(this, format, existingInstance);
-            Xml.ReadEndElement();
+
+            if (!isEmpty)
+                Xml.ReadEndElement();
+
             return (T)result;
         }
 
