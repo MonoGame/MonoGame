@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
     {
         private struct ElementInfo
         {
-            public string Name;
+            public ContentSerializerAttribute Attribute;
             public ContentTypeSerializer Serializer;
             public Action<object, object> Setter;
             public Func<object, object> Getter;
@@ -35,34 +35,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var prop = member as PropertyInfo;
             var field = member as FieldInfo;
             
-            // If we can write or read from it we can skip it.
-            if (prop != null && (!prop.CanWrite || !prop.CanRead))
-                return false;
-
-            // Default the to member name as the element name.
-            info.Name = member.Name;
-
             var attrib = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
             if (attrib != null)
             {
-                if (!string.IsNullOrEmpty(attrib.ElementName))
-                    info.Name = attrib.ElementName;
+                info.Attribute = attrib.Clone();
+
+                // Default the to member name as the element name.
+                if (string.IsNullOrEmpty(attrib.ElementName))
+                    info.Attribute.ElementName = member.Name;
             }
-            else if (prop != null)
+            else
             {
-                if (!ReflectionHelpers.PropertyIsPublic(prop))
-                    return false;
-            }
-            else if (field != null)
-            {
-                if (!field.IsPublic)
-                    return false;
+                if (prop != null)
+                {
+                    // If we can't at least read the property then it
+                    // can't be serialized or deserialized in any way.
+                    if (!prop.CanRead)
+                        return false;
+
+                    // If we can't write to this property and it is a
+                    // system type then it can't be deserialized.
+                    if (!prop.CanWrite && prop.PropertyType.Namespace == "System")
+                        return false;
+                }
+                else if (field != null)
+                {
+                    if (!field.IsPublic)
+                        return false;
+                }
+
+                info.Attribute = new ContentSerializerAttribute();
+                info.Attribute.ElementName = member.Name;
             }
 
             if (prop != null)
             {
                 info.Serializer = serializer.GetTypeSerializer(prop.PropertyType);
-                info.Setter = (o, v) => prop.SetValue(o, v, null);
+                if (prop.CanWrite)
+                    info.Setter = (o, v) => prop.SetValue(o, v, null);
                 info.Getter = (o) => prop.GetValue(o, null);
             }
             else if (field != null)
@@ -87,7 +97,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             {
                 ElementInfo info;
                 if (GetElementInfo(serializer, prop, out info))
-                    _elements.Add(info.Name, info);
+                    _elements.Add(info.Attribute.ElementName, info);
             }
 
             var fields = TargetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -95,7 +105,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             {
                 ElementInfo info;
                 if (GetElementInfo(serializer, field, out info))
-                    _elements.Add(info.Name, info);                
+                    _elements.Add(info.Attribute.ElementName, info);                
             }
         }
 
@@ -129,14 +139,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (reader.NodeType == XmlNodeType.Element)
                 {
                     var elementName = reader.Name;
-                    reader.ReadStartElement();
 
                     ElementInfo info;
                     if (!_elements.TryGetValue(elementName, out info))
                         throw new InvalidContentException(string.Format("Element `{0}` was not found in type `{1}`.", elementName, TargetType));
-                    var value = info.Serializer.Deserialize(input, format, null);
-                    info.Setter(result, value);
-                    reader.ReadEndElement();
+
+                    if (info.Setter == null)
+                    {
+                        var value = info.Getter(result);
+                        input.ReadObject(info.Attribute, info.Serializer, value);
+                    }
+                    else
+                    {
+                        var value = input.ReadObject<object>(info.Attribute, info.Serializer, null);
+                        info.Setter(result, value);
+                    }
+
                     continue;
                 }
 
