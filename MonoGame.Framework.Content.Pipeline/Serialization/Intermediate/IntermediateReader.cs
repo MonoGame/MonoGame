@@ -49,6 +49,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!MoveToElement(format.ElementName))
                 throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
 
+            // Is the object null?
+            var isNull = Xml.GetAttribute("Null");
+            if (isNull != null && XmlConvert.ToBoolean(isNull))
+            {
+                if (!format.AllowNull)
+                    throw new InvalidContentException(string.Format("Element `{0}` cannot be null.", format.ElementName));
+
+                Xml.Skip();
+                return default(T);
+            }
+
             // Is the object overloading the serialized type?
             if (Xml.MoveToAttribute("Type"))
             {
