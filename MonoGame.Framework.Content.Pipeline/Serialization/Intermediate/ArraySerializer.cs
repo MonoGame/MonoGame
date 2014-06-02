@@ -4,12 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
-    [ContentTypeSerializer]
     class ArraySerializer<T> : ContentTypeSerializer<T[]>
     {
         private ContentTypeSerializer _itemSerializer;
