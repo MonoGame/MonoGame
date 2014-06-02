@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -111,6 +112,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 var arrayType = typeof(ArraySerializer<>).MakeGenericType(new[] { type.GetElementType() });
                 serializer = (ContentTypeSerializer)Activator.CreateInstance(arrayType);
+            }
+            else if (type.IsGenericType && typeof(IList).IsAssignableFrom(type))
+            {
+                var listSerializerType = typeof(ListSerializer<>).MakeGenericType(type.GetGenericArguments());
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(listSerializerType);                
             }
             else if (type.IsEnum)
             {
