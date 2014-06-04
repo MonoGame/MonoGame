@@ -205,15 +205,14 @@ namespace MonoGame.Tools.Pipeline
             // Store the file name for saving later.
             _project.FilePath = projectFilePath;
 
-            var parser = new CommandLineParser(this);
+            var parser = new MGBuildParser(this);
             parser.Title = "Pipeline";
 
-            var commands = File.ReadAllLines(projectFilePath).
-                                Select(x => x.Trim()).
-                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
-                                ToArray();
-
-            parser.ParseCommandLine(commands);
+            var commands = new string[]
+                {
+                    string.Format("/@:{0}", projectFilePath),
+                };
+            parser.Parse(commands);
         }
 
         public void SaveProject()
