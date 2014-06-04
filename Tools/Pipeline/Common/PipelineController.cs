@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -20,10 +19,12 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
-        public PipelineController(IView view)
+        public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
-            _view.Attach(this);            
+            _view.Attach(this);
+            _project = project;
+            _project.Controller = this;
             ProjectOpen = false;
         }
 
@@ -42,8 +43,6 @@ namespace MonoGame.Tools.Pipeline
         public event Action OnProjectLoading;
 
         public event Action OnProjectLoaded;
-
-        public event Action OnProjectClosed;
 
         public event Action OnBuildStarted;
 
@@ -90,11 +89,7 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoading();
 
             // Clear existing project data, initialize to a new blank project.
-            _project = new PipelineProject(this);            
-            _project.DefinedConfigs.Add("Debug");
-            _project.DefinedConfigs.Add("Release");
-            _project.Platform = TargetPlatform.Windows;
-            _project.Config = "Debug";
+            _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
             // Save the new project.
@@ -125,12 +120,7 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
-                _project = new PipelineProject(this);
-                _project.DefinedConfigs.Add("Debug");
-                _project.DefinedConfigs.Add("Release");
-                _project.Platform = TargetPlatform.Windows;
-                _project.Config = "Debug";
-
+                _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.ImportProject(projectFilePath);
 
@@ -164,11 +154,6 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
-            OpenProject(projectFilePath);
-        }
-
-        public void OpenProject(string projectFilePath)
-        {
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -176,18 +161,9 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
-                _project = new PipelineProject(this);
+                _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.OpenProject(projectFilePath);
-
-                _project.Platform = TargetPlatform.Windows;
-                if (_project.DefinedConfigs.Count == 0)
-                {
-                    _project.DefinedConfigs.Add("Debug");
-                    _project.DefinedConfigs.Add("Release");
-                }
-                _project.Config = _project.DefinedConfigs[0];
-
                 ResolveTypes();
 
                 ProjectOpen = true;
@@ -219,9 +195,6 @@ namespace MonoGame.Tools.Pipeline
             _project = null;
 
             UpdateTree();
-
-            if (OnProjectClosed != null)
-                OnProjectClosed();
         }
 
         public bool SaveProject(bool saveAs)
@@ -251,29 +224,44 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
+            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            BuildCommand(commands);
+        }
 
+        public void RebuildItem(IProjectItem item)
+        {
             // Make sure we save first!
             if (!AskSaveProject())
                 return;
 
-            if (OnBuildStarted != null)
-                OnBuildStarted();
+            // TODO: We can support folders here as well.
 
-            _view.OutputClear();
-                        
-            var commands = GetHeader() + string.Format(" /@:\"{0}\"", _project.FilePath);
-            if (rebuild)
-                commands += " /rebuild";
-            _buildTask = new Task(DoBuild, commands);
+            var contentItem = item as ContentItem;
+            if (contentItem != null)
+            {
+                // Create a unique file within the same folder as
+                // the normal project to store this incremental build.
+                var uniqueName = Guid.NewGuid().ToString();
+                var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
 
-            if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());
+                // Write the incremental project file limiting the
+                // content to just the files we want to rebuild.
+                using (var io = File.CreateText(tempPath))
+                {
+                    var parser = new PipelineProjectParser(this, _project);
+                    parser.SaveProject(io, (i) => i != item);
+                }
 
-            _buildTask.Start();
+                // Run the build the command.
+                var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+                BuildCommand(commands);
+
+                // Cleanup the temp file once we're done.
+                _buildTask.ContinueWith((e) => File.Delete(tempPath));
+            }
         }
 
-        public void DebugBuild()
+        private void BuildCommand(string commands)
         {
             Debug.Assert(_buildTask == null || _buildTask.IsCompleted, "The previous build wasn't completed!");
 
@@ -286,14 +274,9 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = GetHeader() + string.Format(" /@:\"{0}\"", _project.FilePath);            
-            commands += " /launchdebugger";
-            _buildTask = new Task(DoBuild, commands);
-
+            _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());
-
-            _buildTask.Start();
         }
 
         public void Clean()
@@ -309,21 +292,18 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            var commands = GetHeader() + " /clean";
-            _buildTask = new Task(DoBuild, commands);
-
+            var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
+            _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
-                _buildTask.ContinueWith((e) => OnBuildFinished());       
-   
-            _buildTask.Start();
+                _buildTask.ContinueWith((e) => OnBuildFinished());          
         }
 
-        private void DoBuild(object commands)
+        private void DoBuild(string commands)
         {
             _buildProcess = new Process();
             _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
             _buildProcess.StartInfo.FileName = "MGCB.exe";
-            _buildProcess.StartInfo.Arguments = (string)commands;
+            _buildProcess.StartInfo.Arguments = commands;
             _buildProcess.StartInfo.CreateNoWindow = true;
             _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _buildProcess.StartInfo.UseShellExecute = false;
@@ -457,93 +437,8 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }
-
-        public string GetFullPath(string filePath)
-        {
-            filePath = filePath.Replace("/", "\\");
-            if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(2);
-
-            if (Path.IsPathRooted(filePath))
-                return filePath;
-            
-            return _project.Location + "\\" + filePath;
-        }
-
-        public IEnumerable<string> DefinedConfigurations
-        {
-            get
-            {
-                if (_project != null && _project.DefinedConfigs != null)
-                {
-                    foreach (var i in _project.DefinedConfigs)
-                        yield return i;
-                }
-            }
-        }
-
-        private readonly TargetPlatform[] _definedPlatforms = (TargetPlatform[])Enum.GetValues(typeof (TargetPlatform));
-
-        public IEnumerable<TargetPlatform> DefinedPlatforms
-        {
-            get
-            {
-                if (_project != null)
-                {
-                    foreach (var i in _definedPlatforms)
-                        yield return i;
-                }
-            }
-        }
-
-        public event Action<string> OnConfigChanged;
-
-        public event Action<TargetPlatform?> OnPlatformChanged;
-        
-        public string CurrentConfig
-        {
-            get
-            {
-                if (_project == null)
-                    return null;
-
-                return _project.Config;
-            }
-            set
-            {
-                if (_project.Config.Equals(value))
-                    return;
-
-                _project.Config = value;
-                if (OnConfigChanged != null)
-                    OnConfigChanged(value);
-            }
-        }
-
-        public TargetPlatform? CurrentPlatform
-        {
-            get
-            {
-                if (_project == null)                    
-                    return null;
-
-                return _project.Platform;
-            }
-            set
-            {
-                if (_project == null)
-                    return;
-                                
-                if (_project.Platform.Equals(value))
-                    return;
-                
-                _project.Platform = value;
-                if (OnPlatformChanged != null)
-                    OnPlatformChanged(value);
-            }
-        }
-
+        }            
+    
         private void ResolveTypes()
         {
             PipelineTypes.Load(_project);
@@ -553,32 +448,6 @@ namespace MonoGame.Tools.Pipeline
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
             }        
-        }
-
-        /// <summary>
-        /// Command arguments for the platform, config, intermediatedir, outputdir, and other common
-        /// values needed for all build actions.
-        /// </summary>        
-        private string GetHeader()
-        {
-            var targetDir = TargetDir;
-            var outDir = "bin/" + targetDir;
-            var intDir = "obj/" + targetDir;
-            return string.Format("/platform:{0} /config:{1} /intermediateDir:\"{2}\" /outputDir:\"{3}\"", CurrentPlatform.Value, CurrentConfig, intDir, outDir, _project.FilePath);
-        }
-
-        /// <summary>
-        /// Returns the path (relative to the output/intermediate directories, respectively) which is targeted by the current platform/config.
-        /// </summary>
-        private string TargetDir
-        {
-            get
-            {
-                if (_project == null)
-                    return null;
-
-                return string.Format("{0}/{1}", CurrentPlatform.ToString(), CurrentConfig);
-            }
         }
     }
 }

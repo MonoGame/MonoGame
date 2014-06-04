@@ -35,10 +35,18 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public string SourceFile { get; set; }
 
         /// <summary>
+        /// The date/time stamp of the source file.
+        /// </summary>
+        public DateTime SourceTime { get; set; }
+
+        /// <summary>
         /// Absolute path to the output file.
         /// </summary>
         public string DestFile { get; set; }
 
+        /// <summary>
+        /// The date/time stamp of the destination file.
+        /// </summary>
         public DateTime DestTime { get; set; }
 
         public string Importer { get; set; }
@@ -113,15 +121,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (cachedEvent == null)
                 return true;
 
-            // Verify that the last write time of the dest file matches
+            // Verify that the last write time of the source file matches
             // what we recorded when it was built.  If it is different
             // that means someone modified it and we need to rebuild.
+            var sourceWriteTime = File.GetLastWriteTime(SourceFile);
+            if (cachedEvent.SourceTime != sourceWriteTime)
+                return true;
+
+            // Do the same test for the dest file.
             var destWriteTime = File.GetLastWriteTime(DestFile);
             if (cachedEvent.DestTime != destWriteTime)
                 return true;
 
-            // If the source and dest files changed... this is always a rebuild.
-            if (File.GetLastWriteTime(SourceFile) >= destWriteTime)
+            // If the source file is newer than the dest file
+            // then it must have been updated and needs a rebuild.
+            if (sourceWriteTime >= destWriteTime)
                 return true;
 
             // Are any of the dependancy files newer than the dest file?

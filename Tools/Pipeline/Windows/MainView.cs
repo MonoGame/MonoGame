@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -16,7 +15,6 @@ namespace MonoGame.Tools.Pipeline
     {
         private IController _controller;
         private ImageList _treeIcons;
-        private ContextMenuStrip _contextMenu;
 
         private bool _treeUpdating;
         private bool _treeSort;
@@ -25,8 +23,6 @@ namespace MonoGame.Tools.Pipeline
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
         private const int ProjectIcon = 3;
-        private const string ContextMenuInclude = "Add";
-        private const string ContextMenuExclude = "Remove";
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -57,25 +53,9 @@ namespace MonoGame.Tools.Pipeline
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
 
-            _contextMenu = new ContextMenuStrip();
-            _contextMenu.ItemClicked += OnContextMenuItemClicked;
-
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
-            _toolStripComboBoxConfig.SelectedIndexChanged += OnComboBoxConfigSelectionChanged;
-            _toolStripComboBoxPlatform.SelectedIndexChanged += OnComboBoxPlatformSelectionChanged;
-
             Form = this;
-        }
-
-        private void OnComboBoxConfigSelectionChanged(object sender, EventArgs e)
-        {
-            _controller.CurrentConfig = (string)(_toolStripComboBoxConfig.SelectedItem);
-        }
-
-        private void OnComboBoxPlatformSelectionChanged(object sender, EventArgs e)
-        {
-            _controller.CurrentPlatform = (TargetPlatform)(_toolStripComboBoxPlatform.SelectedItem);
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -87,29 +67,7 @@ namespace MonoGame.Tools.Pipeline
                 if (_propertyGrid.SelectedObject is ContentItem)
                     _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
                 else
-                {
-                    if (e.ChangedItem.Label == "DefinedConfigs" || e.ChangedItem.Label == "DefinedPlatforms")
-                        UpdateMenus();
-
                     _controller.OnProjectModified();
-                }
-            }
-        }
-
-        private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            switch (e.ClickedItem.Text)
-            {
-                case ContextMenuInclude:
-                    {
-                        _controller.Include((e.ClickedItem.Tag as IProjectItem).Location);                        
-                    } break;
-                case ContextMenuExclude:
-                    {
-                        _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
-                    } break;                
-                default:
-                    throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
             }
         }
 
@@ -129,23 +87,9 @@ namespace MonoGame.Tools.Pipeline
                     _treeView.SelectedNode = node;
 
                     if (node.Tag is ContentItem)
-                    {
-                        _contextMenu.Items.Clear();
-
-                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
-
-                        _contextMenu.Show(_treeView, p);
-                    }
+                        _itemContextMenu.Show(_treeView, p);
                     else
-                    {
-                        _contextMenu.Items.Clear();
-
-                        var item = _contextMenu.Items.Add(ContextMenuInclude);
-                        item.Tag = node.Tag;
-
-                        _contextMenu.Show(_treeView, p); 
-                    }                   
+                        _folderContextMenu.Show(_treeView, p);    
                 }
             }
         }
@@ -162,9 +106,6 @@ namespace MonoGame.Tools.Pipeline
             _controller.OnBuildFinished += activate;
             _controller.OnProjectLoading += activate;
             _controller.OnProjectLoaded += activate;
-            _controller.OnProjectClosed += activate;
-
-            UpdateMenus();
         }
 
         public AskResult AskSaveOrCancel()
@@ -371,7 +312,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateProperties(IProjectItem item)
         {
-            if (_propertyGrid.SelectedObject == item || ((item is PipelineProject) && (_propertyGrid.SelectedObject is PipelineProjectProxy)))
+            if (_propertyGrid.SelectedObject == item)
             {
                 _propertyGrid.Refresh();
                 _propertyGrid.ExpandAllGridItems();
@@ -493,7 +434,7 @@ namespace MonoGame.Tools.Pipeline
             _controller.Build(false);
         }
 
-        private void RebuilMenuItemClick(object sender, EventArgs e)
+        private void RebuildMenuItemClick(object sender, EventArgs e)
         {
             _controller.Build(true);
         }
@@ -503,9 +444,10 @@ namespace MonoGame.Tools.Pipeline
             _controller.Clean();
         }
 
-        private void DebugMenuItemClick(object sender, EventArgs e)
+        private void ItemRebuildMenuItemClick(object sender, EventArgs e)
         {
-            _controller.DebugBuild();
+            var item = _treeView.GetSelectedContentItem();
+            _controller.RebuildItem(item);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
@@ -546,7 +488,6 @@ namespace MonoGame.Tools.Pipeline
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
             var projectOpenAndNotBuilding = projectOpen && notBuilding;
-            var platformAndConfigSelected = !string.IsNullOrEmpty(_controller.CurrentConfig);
 
             // Update the state of all menu items.
 
@@ -564,49 +505,12 @@ namespace MonoGame.Tools.Pipeline
             _addItemMenuItem.Enabled = projectOpen;
             _deleteMenuItem.Enabled = projectOpen;
 
-            _buildMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
-            _cleanMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
-            _rebuilMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
-            _debugMenuItem.Enabled = projectOpenAndNotBuilding && platformAndConfigSelected;
+            _buildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _itemRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
-
-            if (!projectOpen)
-            {
-                if (_toolStripComboBoxConfig.Enabled)
-                {
-                    _toolStripComboBoxConfig.Items.Clear();
-                    _toolStripComboBoxConfig.Enabled = false;
-                }
-
-                if (_toolStripComboBoxPlatform.Enabled)
-                {
-                    _toolStripComboBoxPlatform.Items.Clear();
-                    _toolStripComboBoxPlatform.Enabled = false;
-                }
-            }
-            else
-            {
-                _toolStripComboBoxConfig.Enabled = true;
-                _toolStripComboBoxPlatform.Enabled = true;
-
-                _toolStripComboBoxConfig.Items.Clear();
-                foreach (var i in _controller.DefinedConfigurations)
-                {
-                    _toolStripComboBoxConfig.Items.Add(i);
-                    if (i.Equals(_controller.CurrentConfig))
-                        _toolStripComboBoxConfig.SelectedItem = i;
-                }
-
-                _toolStripComboBoxPlatform.Items.Clear();
-                foreach (var i in _controller.DefinedPlatforms)
-                {
-                    _toolStripComboBoxPlatform.Items.Add(i);
-                    if (i.Equals(_controller.CurrentPlatform))
-                        _toolStripComboBoxPlatform.SelectedItem = i;
-                }
-            }
         }
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)

@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
@@ -14,21 +13,14 @@ namespace MonoGame.Tools.Pipeline
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string [] args)
+        static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             var view = new MainView();
-            var controller = new PipelineController(view);
-            if (args.Length > 0)
-            {
-                view.Shown += (e, f) =>
-                                  {
-                                      controller.OpenProject(args[0]);                                      
-                                  }; 
-            }
-
+            var model = new PipelineProject();
+            var controller = new PipelineController(view, model);          
             Application.Run(view);
         }
     }

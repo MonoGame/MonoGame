@@ -7,7 +7,7 @@ using System.Windows.Forms.Design;
 namespace MonoGame.Tools.Pipeline
 {
     /// <summary>
-    /// Modal dialog for editing a list of strings by interpreting it as a collection of lines.
+    /// Modal dialog for editing individual lines within PipelineProject.References.
     /// </summary>
     public class AssemblyReferenceListEditForm : Form
     {
@@ -75,13 +75,6 @@ namespace MonoGame.Tools.Pipeline
         {
             var svc = provider.GetService(typeof (IWindowsFormsEditorService)) as IWindowsFormsEditorService;
             var lines = (List<string>)value;
-            if (lines == null)
-            {
-                // Could support List<T> by converting each element to its string equivalent
-                // and then back.
-                return value;
-            }
-
             if (svc != null && lines != null)
             {
                 using (var form = new AssemblyReferenceListEditForm())

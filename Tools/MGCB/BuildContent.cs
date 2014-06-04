@@ -16,14 +16,15 @@ namespace MGCB
     class BuildContent
     {
         [CommandLineParameter(
-            Name = "launchdebugger",
-            Description = "Wait for debugger to attack before building content.")]
-        public bool LaunchDebugger = false;
-
-        [CommandLineParameter(
             Name = "quiet",
             Description = "Only output content build errors.")]
         public bool Quiet = false;
+
+        [CommandLineParameter(
+            Name = "@",
+            ValueName = "responseFile",
+            Description = "Read a text response file with additional command line options and switches.")]
+        public readonly List<string> ResponseFiles = new List<string>();
 
         [CommandLineParameter(
             Name = "outputDir",
