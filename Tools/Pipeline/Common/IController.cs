@@ -24,6 +24,11 @@ namespace MonoGame.Tools.Pipeline
         bool ProjectBuilding { get; }
 
         /// <summary>
+        /// Passes /launchdebugger option when launching MGCB.
+        /// </summary>
+        bool LaunchDebugger { get; set; }
+
+        /// <summary>
         /// Triggered when the project starts loading.
         /// </summary>
         event Action OnProjectLoading;
