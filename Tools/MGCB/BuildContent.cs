@@ -16,6 +16,11 @@ namespace MGCB
     class BuildContent
     {
         [CommandLineParameter(
+            Name = "launchdebugger",
+            Description = "Wait for debugger to attach before building content.")]
+        public bool LaunchDebugger = false;
+
+        [CommandLineParameter(
             Name = "quiet",
             Description = "Only output content build errors.")]
         public bool Quiet = false;
