@@ -19,6 +19,8 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
+        private List<ContentItemTemplate> _templateItems;
+
         public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
@@ -26,6 +28,16 @@ namespace MonoGame.Tools.Pipeline
             _project = project;
             _project.Controller = this;
             ProjectOpen = false;
+
+            _templateItems = new List<ContentItemTemplate>();
+            var spriteFont = new ContentItemTemplate()
+                {
+                    Label = "Sprite Font",
+                    ProcessorName = "SpriteFontDescriptionProcessor",
+                    ImporterName = "SpriteFontDescriptionImporter",
+                    TemplateFile = "Templates/SpriteFont.spritefont",
+                };
+            _templateItems.Add(spriteFont);
         }
 
         public bool ProjectOpen { get; private set; }
@@ -403,6 +415,12 @@ namespace MonoGame.Tools.Pipeline
             return AskSaveProject();
         }
 
+        public List<ContentItemTemplate> TemplateItems
+        {
+            get { return _templateItems; }
+            set { _templateItems = value; }
+        }
+
         public void Include(string initialDirectory)
         {                        
             List<string> files;
@@ -437,7 +455,7 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }            
+        }                    
     
         private void ResolveTypes()
         {

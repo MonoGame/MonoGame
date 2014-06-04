@@ -82,6 +82,6 @@ namespace MonoGame.Tools.Pipeline
 
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(ContentItem item);
     }
 }

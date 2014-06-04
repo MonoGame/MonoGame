@@ -75,6 +75,7 @@ namespace MonoGame.Tools.Pipeline
             this._itemRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._folderContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._folderAddItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._folderNewItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -408,42 +409,50 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator4,
             this._itemRebuildMenuItem});
             this._itemContextMenu.Name = "itemContextMenu";
-            this._itemContextMenu.Size = new System.Drawing.Size(153, 76);
+            this._itemContextMenu.Size = new System.Drawing.Size(132, 54);
             this._itemContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this._mainMenu_MenuActivate);
             // 
             // _itemDeleteMenuItem
             // 
             this._itemDeleteMenuItem.Name = "_itemDeleteMenuItem";
             this._itemDeleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this._itemDeleteMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._itemDeleteMenuItem.Size = new System.Drawing.Size(131, 22);
             this._itemDeleteMenuItem.Text = "&Delete";
             this._itemDeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(128, 6);
             // 
             // _itemRebuildMenuItem
             // 
             this._itemRebuildMenuItem.Name = "_itemRebuildMenuItem";
-            this._itemRebuildMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._itemRebuildMenuItem.Size = new System.Drawing.Size(131, 22);
             this._itemRebuildMenuItem.Text = "Rebuild";
             this._itemRebuildMenuItem.Click += new System.EventHandler(this.ItemRebuildMenuItemClick);
             // 
             // _folderContextMenu
             // 
             this._folderContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._folderAddItemMenuItem});
+            this._folderAddItemMenuItem,
+            this._folderNewItemMenuItem});
             this._folderContextMenu.Name = "_folderContextMenu";
-            this._folderContextMenu.Size = new System.Drawing.Size(133, 26);
+            this._folderContextMenu.Size = new System.Drawing.Size(153, 70);
             // 
             // _folderAddItemMenuItem
             // 
             this._folderAddItemMenuItem.Name = "_folderAddItemMenuItem";
-            this._folderAddItemMenuItem.Size = new System.Drawing.Size(132, 22);
+            this._folderAddItemMenuItem.Size = new System.Drawing.Size(152, 22);
             this._folderAddItemMenuItem.Text = "&Add Item...";
             this._folderAddItemMenuItem.Click += new System.EventHandler(this.AddMenuItemClick);
+            // 
+            // _folderNewItemMenuItem
+            // 
+            this._folderNewItemMenuItem.Name = "_folderNewItemMenuItem";
+            this._folderNewItemMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._folderNewItemMenuItem.Text = "&New Item...";
+            this._folderNewItemMenuItem.Click += new System.EventHandler(this.NewMenuItemClick);
             // 
             // MainView
             // 
@@ -514,6 +523,7 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _itemRebuildMenuItem;
         private System.Windows.Forms.ContextMenuStrip _folderContextMenu;
         private System.Windows.Forms.ToolStripMenuItem _folderAddItemMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _folderNewItemMenuItem;
     }
 }
 
