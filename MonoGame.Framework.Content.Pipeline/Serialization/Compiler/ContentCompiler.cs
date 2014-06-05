@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (type.IsEnum)
             {
-                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type.GetElementType()));
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
             else if (type.IsGenericType)
