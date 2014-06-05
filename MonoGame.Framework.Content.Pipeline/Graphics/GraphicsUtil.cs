@@ -76,31 +76,66 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     
     public static class GraphicsUtil
     {
-        public static byte[] GetData(this Bitmap bmp)
+        internal static Bitmap ToSystemBitmap(this BitmapContent bitmapContent)
+        {
+            var srcBmp = bitmapContent;
+            var srcData = srcBmp.GetPixelData();
+
+            var srcDataHandle = GCHandle.Alloc(srcData, GCHandleType.Pinned);
+            var srcDataPtr = (IntPtr)(srcDataHandle.AddrOfPinnedObject().ToInt64());
+
+            // stride must be aligned on a 32 bit boundary or 4 bytes
+            int stride = ((srcBmp.Width * 32 + 31) & ~31) >> 3;
+
+            var systemBitmap = new Bitmap(srcBmp.Width, srcBmp.Height, stride, PixelFormat.Format32bppArgb | PixelFormat.Alpha, srcDataPtr);
+            srcDataHandle.Free();
+
+            return systemBitmap;
+        }
+
+        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
+        {
+            var source = content.Faces[0][0].ToSystemBitmap();
+
+            var destination = new Bitmap(newWidth, newHeight);
+            using (var graphics = System.Drawing.Graphics.FromImage(destination))
+            {
+                graphics.DrawImage(source, 0, 0, newWidth, newHeight);
+                source.Dispose();
+            }
+
+            content.Faces.Clear();
+            content.Faces.Add(new MipmapChain(destination.ToXnaBitmap()));
+        }
+
+        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
             // swizzle the channels later
-            System.Diagnostics.Debug.Assert(bmp.PixelFormat == PixelFormat.Format32bppArgb);
+            System.Diagnostics.Debug.Assert(systemBitmap.PixelFormat == PixelFormat.Format32bppArgb);
 
-            var bitmapData = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+            var bitmapData = systemBitmap.LockBits(new System.Drawing.Rectangle(0, 0, systemBitmap.Width, systemBitmap.Height),
                                     ImageLockMode.ReadOnly,
-                                    bmp.PixelFormat);
+                                    systemBitmap.PixelFormat);
 
             var length = bitmapData.Stride * bitmapData.Height;
-            var output = new byte[length];
+            var pixelData = new byte[length];
 
             // Copy bitmap to byte[]
-            Marshal.Copy(bitmapData.Scan0, output, 0, length);
-            bmp.UnlockBits(bitmapData);
+            Marshal.Copy(bitmapData.Scan0, pixelData, 0, length);
+            systemBitmap.UnlockBits(bitmapData);
 
             // NOTE: According to http://msdn.microsoft.com/en-us/library/dd183449%28VS.85%29.aspx
             // and http://stackoverflow.com/questions/8104461/pixelformat-format32bppargb-seems-to-have-wrong-byte-order
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
-            BGRAtoRGBA(output);
-  
-            return output;
+            BGRAtoRGBA(pixelData);
+
+            var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
+            xnaBitmap.SetPixelData(pixelData);
+
+            return xnaBitmap;
         }
 
         public static void BGRAtoRGBA(byte[] data)
@@ -304,27 +339,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             return false;
-        }
-
-        internal static void Resize(this TextureContent content, int newWidth, int newHeight)
-        {
-            var resizedBmp = new Bitmap(newWidth, newHeight);
-
-            using (var graphics = System.Drawing.Graphics.FromImage(resizedBmp))
-            {
-                graphics.DrawImage(content._bitmap, 0, 0, newWidth, newHeight);
-
-                content._bitmap.Dispose();
-                content._bitmap = resizedBmp;
-            }
-
-            var imageData = content._bitmap.GetData();
-
-            var bitmapContent = new PixelBitmapContent<Color>(content._bitmap.Width, content._bitmap.Height);
-            bitmapContent.SetPixelData(imageData);
-
-            content.Faces.Clear();
-            content.Faces.Add(new MipmapChain(bitmapContent));
-        }
+        }        
     }
 }

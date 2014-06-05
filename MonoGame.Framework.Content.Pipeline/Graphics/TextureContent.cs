@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public abstract class TextureContent : ContentItem, IDisposable
     {
         MipmapChainCollection faces;
-        internal Bitmap _bitmap;
 
         /// <summary>
         /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
@@ -91,11 +90,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public virtual void Dispose()
         {
-            if (_bitmap != null)
-            {
-                _bitmap.Dispose();
-                _bitmap = null;
-            }
         }
     }
 }

@@ -200,6 +200,11 @@ namespace MonoGame.Framework
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+            var buttons = Control.MouseButtons;
+            var position = Control.MousePosition;
+            _mouseDownButtonsState = buttons;
+            OnMouseState(null, new MouseEventArgs(buttons, 0, position.X, position.Y, 0));
+
             _platform.IsActive = true;
         }
 

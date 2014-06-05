@@ -34,7 +34,7 @@ using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public class ListReader<T> : ContentTypeReader<List<T>>
+    internal class ListReader<T> : ContentTypeReader<List<T>>
     {
         ContentTypeReader elementReader;
 

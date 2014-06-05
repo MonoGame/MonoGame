@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -22,6 +23,11 @@ namespace MonoGame.Tools.Pipeline
         /// True if the project is actively building.
         /// </summary>
         bool ProjectBuilding { get; }
+
+        /// <summary>
+        /// Passes /launchdebugger option when launching MGCB.
+        /// </summary>
+        bool LaunchDebugger { get; set; }
 
         /// <summary>
         /// Triggered when the project starts loading.
@@ -71,6 +77,8 @@ namespace MonoGame.Tools.Pipeline
         void OnTreeSelect(IProjectItem item);
         
         void Build(bool rebuild);
+
+        void RebuildItems(IEnumerable<IProjectItem> items);
 
         void Clean();
 
