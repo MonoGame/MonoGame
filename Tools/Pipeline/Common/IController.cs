@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -77,7 +78,7 @@ namespace MonoGame.Tools.Pipeline
         
         void Build(bool rebuild);
 
-        void RebuildItem(IProjectItem item);
+        void RebuildItems(IEnumerable<IProjectItem> items);
 
         void Clean();
 
