@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -11,6 +12,8 @@ namespace MonoGame.Tools.Pipeline
 		#region Selected Node(s) Properties
 
 		private readonly List<TreeNode> _selectedNodes = null;		
+
+        [Browsable(false)]
 		public IEnumerable<TreeNode> SelectedNodes
 		{
 			get
@@ -30,6 +33,7 @@ namespace MonoGame.Tools.Pipeline
 			}
 		}
 
+        [Browsable(false)]
 	    public IEnumerable<TreeNode> SelectedNodesRecursive
 	    {
             get
@@ -57,6 +61,8 @@ namespace MonoGame.Tools.Pipeline
 
 		// Note we use the new keyword to Hide the native treeview's SelectedNode property.
 		private TreeNode _selectedNode;
+
+        [Browsable(false)]
 		public new TreeNode SelectedNode
 		{
 			get { return _selectedNode; }
