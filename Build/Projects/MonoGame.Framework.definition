@@ -271,6 +271,7 @@
       <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
+    <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
     <Compile Include="Content\ContentSerializerIgnoreAttribute.cs" />
     <Compile Include="Content\ContentSerializerRuntimeTypeAttribute.cs" />
     <Compile Include="Content\ContentSerializerTypeVersionAttribute.cs" />
