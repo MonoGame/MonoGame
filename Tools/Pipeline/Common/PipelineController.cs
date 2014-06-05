@@ -408,7 +408,11 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {                        
+        {       
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+
             List<string> files;
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
