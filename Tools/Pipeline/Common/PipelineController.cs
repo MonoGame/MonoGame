@@ -28,6 +28,8 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
         }
 
+        public bool LaunchDebugger { get; set; }
+
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDiry { get; set; }
@@ -225,40 +227,39 @@ namespace MonoGame.Tools.Pipeline
         public void Build(bool rebuild)
         {
             var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
             BuildCommand(commands);
         }
 
-        public void RebuildItem(IProjectItem item)
+        public void RebuildItems(IEnumerable<IProjectItem> items)
         {
             // Make sure we save first!
             if (!AskSaveProject())
                 return;
 
-            // TODO: We can support folders here as well.
+            // Create a unique file within the same folder as
+            // the normal project to store this incremental build.
+            var uniqueName = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
 
-            var contentItem = item as ContentItem;
-            if (contentItem != null)
+            // Write the incremental project file limiting the
+            // content to just the files we want to rebuild.
+            using (var io = File.CreateText(tempPath))
             {
-                // Create a unique file within the same folder as
-                // the normal project to store this incremental build.
-                var uniqueName = Guid.NewGuid().ToString();
-                var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
-
-                // Write the incremental project file limiting the
-                // content to just the files we want to rebuild.
-                using (var io = File.CreateText(tempPath))
-                {
-                    var parser = new PipelineProjectParser(this, _project);
-                    parser.SaveProject(io, (i) => i != item);
-                }
-
-                // Run the build the command.
-                var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-                BuildCommand(commands);
-
-                // Cleanup the temp file once we're done.
-                _buildTask.ContinueWith((e) => File.Delete(tempPath));
+                var parser = new PipelineProjectParser(this, _project);
+                parser.SaveProject(io, (i) => !items.Contains(i));
             }
+
+            // Run the build the command.
+            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
+
+            BuildCommand(commands);
+
+            // Cleanup the temp file once we're done.
+            _buildTask.ContinueWith((e) => File.Delete(tempPath));
         }
 
         private void BuildCommand(string commands)
@@ -293,6 +294,9 @@ namespace MonoGame.Tools.Pipeline
             _view.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
+
             _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());          

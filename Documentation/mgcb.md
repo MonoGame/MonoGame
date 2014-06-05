@@ -133,5 +133,34 @@ An example response file could look like this:
 /build:Textures\metal.png
 /build:Textures\plastic.png
 ```
+### Launch Debugger
+```
+/launchdebugger
+```
+Allows a debugger to attach to the MGCB executable before content is built.
+### Define Preprocessor Parameter
+```
+/define <name>=<value>
+```
+Sets or creates a preprocessor parameter with the given name and value.
+### Preprocessor Macros
+```
+$if <name>=<value>
+$endif
+```
+Preprocessor macros are intended to allow conditionals within a response file.
 
+The preprocess step is what expands a response file command into its composite commands for each line in the file. However, a line is only emitted if all conditionals which contain the line evaluate true.
+```
+<example command line>
+MGCB.exe /define:BuildEffects=No /@:example.mgcb
+
+<example.mgcb file>
+$if BuildEffects=Yes
+   /importer:EffectImporter
+   /processor:EffectProcessor
+   /build:Effects\custom.fx
+   # all other effects here....
+$endif
+```
 
