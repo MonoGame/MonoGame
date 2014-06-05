@@ -343,7 +343,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             else
             {
 		    Type objectType = typeof (T);
-		    if (!objectType.IsValueType) {
+            if (!objectType.IsValueType && !typeWriter.TargetType.IsValueType)
+            {
 			    var index = typeWriterMap[typeWriter.GetType ()];
 			    // Because zero means null object, we add one to the index before writing it to the file
 			    Write7BitEncodedInt (index + 1);
