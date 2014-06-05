@@ -228,7 +228,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
             if (LaunchDebugger)
-                commands += "/launchdebugger";
+                commands += " /launchdebugger";
             BuildCommand(commands);
         }
 
@@ -254,7 +254,7 @@ namespace MonoGame.Tools.Pipeline
             // Run the build the command.
             var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
             if (LaunchDebugger)
-                commands += "/launchdebugger";
+                commands += " /launchdebugger";
 
             BuildCommand(commands);
 
@@ -295,7 +295,7 @@ namespace MonoGame.Tools.Pipeline
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
             if (LaunchDebugger)
-                commands += "/launchdebugger";
+                commands += " /launchdebugger";
 
             _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
@@ -408,7 +408,11 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {                        
+        {       
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+
             List<string> files;
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
@@ -432,12 +436,16 @@ namespace MonoGame.Tools.Pipeline
             ProjectDiry = true;                  
         }
 
-        public void Exclude(ContentItem item)
+        public void Exclude(IEnumerable<ContentItem> items)
         {
-            _project.ContentItems.Remove(item);
-
             _view.BeginTreeUpdate();
-            _view.RemoveTreeItem(item);
+
+            foreach (var item in items)
+            {
+                _project.ContentItems.Remove(item);
+                _view.RemoveTreeItem(item);
+            }
+
             _view.EndTreeUpdate();
 
             ProjectDiry = true;

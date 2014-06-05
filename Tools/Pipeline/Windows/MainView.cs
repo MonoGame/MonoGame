@@ -90,9 +90,15 @@ namespace MonoGame.Tools.Pipeline
                     }
 
                     if (node.Tag is ContentItem)
-                        _itemContextMenu.Show(_treeView, p);
+                    {
+                        _treeAddItemMenuItem.Visible = false;
+                    }
                     else
-                        _folderContextMenu.Show(_treeView, p);    
+                    {
+                        _treeAddItemMenuItem.Visible = true;
+                    }
+
+                    _treeContextMenu.Show(_treeView, p);
                 }
             }
         }
@@ -258,8 +264,20 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
             var node = _treeView.AllNodes().Find(f => f.Tag == item);
-            if (node != null)
-                _treeView.Nodes.Remove(node);
+            if (node == null)
+                return;
+
+            var parent = node.Parent;
+            node.Remove();
+
+            // Clean up the parent nodes without children
+            // and be sure not to delete the root node.
+            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
+            {
+                var parentParent = parent.Parent;
+                parent.Remove();
+                parent = parentParent;
+            }
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -434,46 +452,26 @@ namespace MonoGame.Tools.Pipeline
 
         private void BuildMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Build(false);
         }
 
         private void RebuildMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Build(true);
         }
 
-        private void BuildLaunchDebuggerMenuItemClick(object sender, EventArgs e)
+        private void RebuildItemsMenuItemClick(object sender, EventArgs e)
         {
-            _controller.LaunchDebugger = true;
-            _controller.Build(false);
-            _controller.LaunchDebugger = false;
-        }
-
-        private void RebuildLaunchDebuggerMenuItemClick(object sender, EventArgs e)
-        {
-            _controller.LaunchDebugger = true;
-            _controller.Build(true);
-            _controller.LaunchDebugger = false;
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
+            _controller.RebuildItems(_treeView.GetSelectedContentItems());
         }
 
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Clean();
-        }
-
-        private void ItemRebuildMenuItemClick(object sender, EventArgs e)
-        {
-            var items = new List<ContentItem>();
-            var nodes = _treeView.SelectedNodesRecursive;
-
-            foreach (var node in nodes)
-            {
-                var item = node.Tag as ContentItem;
-                if (item != null && !items.Contains(item))
-                    items.Add(item);                
-            }
-
-            _controller.RebuildItems(items);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
@@ -532,10 +530,9 @@ namespace MonoGame.Tools.Pipeline
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
-            _buildLaunchDebuggerMenuItem.Enabled = _buildMenuItem.Enabled;
 
-            _itemRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
-            _rebuildMenuItem.Enabled = _itemRebuildMenuItem.Enabled;
+            _treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _rebuildMenuItem.Enabled = _treeRebuildMenuItem.Enabled;
 
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
             _cancelBuildSeparator.Visible = !notBuilding;
@@ -552,18 +549,10 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = node.Tag as ContentItem;
                 if (item != null && !items.Contains(item))
-                {
                     items.Add(item);                    
-                }
-
-                if (!(node.Tag is PipelineProject))
-                    _treeView.Nodes.Remove(node);
             }
 
-            foreach (var item in items)
-            {
-                _controller.Exclude(item);
-            }            
+            _controller.Exclude(items);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
