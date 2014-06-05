@@ -120,6 +120,8 @@ namespace Microsoft.Xna.Framework.Graphics
         internal static int MaxTextureAnisotropy { get; private set; }
 #endif
 
+        internal static bool SupportsTextureMaxLevel { get; private set; }
+
         internal static void Initialize(GraphicsDevice device)
         {
 			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
@@ -129,11 +131,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			SupportsDepth24 = device._extensions.Contains("GL_OES_depth24");
 			SupportsPackedDepthStencil = device._extensions.Contains("GL_OES_packed_depth_stencil");
 			SupportsDepthNonLinear = device._extensions.Contains("GL_NV_depth_nonlinear");
+            SupportsTextureMaxLevel = device._extensions.Contains("GL_APPLE_texture_max_level");
 #else
-			SupportsTextureFilterAnisotropic = true;
+            SupportsTextureFilterAnisotropic = true;
 			SupportsDepth24 = true;
 			SupportsPackedDepthStencil = true;
 			SupportsDepthNonLinear = false;
+            SupportsTextureMaxLevel = true;
 #endif
 
             // Texture compression

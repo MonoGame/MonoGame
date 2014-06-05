@@ -23,8 +23,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private static float MaxTextureMaxAnisotropy = GraphicsCapabilities.MaxTextureAnisotropy;
 #if GLES
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)All.TextureMaxAnisotropyExt;
+        private const TextureParameterName TextureParameterNameTextureMaxLevel = (TextureParameterName)0x813D;
 #else
         private const TextureParameterName TextureParameterNameTextureMaxAnisotropy = (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt;
+        private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 
     internal void Activate(TextureTarget target, bool useMipmaps = false)
@@ -144,6 +146,17 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(target, TextureParameterName.TextureLodBias, MipMapLevelOfDetailBias);
             GraphicsExtensions.CheckGLError();
 #endif
+            if (GraphicsCapabilities.SupportsTextureMaxLevel)
+            {
+                if (this.MaxMipLevel > 0)
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, this.MaxMipLevel);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterNameTextureMaxLevel, 1000);
+                }
+            }
         }
 
     private int GetWrapMode(TextureAddressMode textureAddressMode)

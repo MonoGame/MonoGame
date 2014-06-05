@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="MathTypes">
+  <Asset Type="MonoGame.Tests.ContentPipeline.MathTypes">
     <Vector>1 2 3</Vector>
     <Rectangle>1 2 3 4</Rectangle>
     <Quaternion>1 2 3 4</Quaternion>
