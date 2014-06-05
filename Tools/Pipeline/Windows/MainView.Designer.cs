@@ -447,7 +447,6 @@ namespace MonoGame.Tools.Pipeline
             this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._treeView.Location = new System.Drawing.Point(0, 0);
             this._treeView.Name = "_treeView";
-            this._treeView.SelectedNodes = ((System.Collections.Generic.IEnumerable<System.Windows.Forms.TreeNode>)(resources.GetObject("_treeView.SelectedNodes")));
             this._treeView.Size = new System.Drawing.Size(249, 210);
             this._treeView.TabIndex = 0;
             this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
