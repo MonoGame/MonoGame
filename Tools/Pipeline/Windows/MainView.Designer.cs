@@ -495,6 +495,10 @@ namespace MonoGame.Tools.Pipeline
 
         #endregion
 
+        private System.Windows.Forms.ToolStripMenuItem _buildLaunchDebuggerMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _folderRebuildMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _folderDeleteMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _rebuildLaunchDebuggerMenuItem;
         private System.Windows.Forms.MenuStrip _mainMenu;
         private System.Windows.Forms.ToolStripMenuItem _fileMenu;
         private MultiSelectTreeview _treeView;
