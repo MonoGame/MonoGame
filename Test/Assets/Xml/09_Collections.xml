@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="Collections">
+  <Asset Type="MonoGame.Tests.ContentPipeline.Collections">
     <StringArray>
       <Item>Hello</Item>
       <Item>World</Item>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="OptionalElements">
+  <Asset Type="MonoGame.Tests.ContentPipeline.OptionalElements">
     <b Null="true" />
     <c></c>
   </Asset>

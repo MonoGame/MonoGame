@@ -442,6 +442,20 @@ namespace MonoGame.Tools.Pipeline
             _controller.Build(true);
         }
 
+        private void BuildLaunchDebuggerMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = true;
+            _controller.Build(false);
+            _controller.LaunchDebugger = false;
+        }
+
+        private void RebuildLaunchDebuggerMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = true;
+            _controller.Build(true);
+            _controller.LaunchDebugger = false;
+        }
+
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
             _controller.Clean();
@@ -518,7 +532,11 @@ namespace MonoGame.Tools.Pipeline
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _buildLaunchDebuggerMenuItem.Enabled = _buildMenuItem.Enabled;
+
             _itemRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _rebuildMenuItem.Enabled = _itemRebuildMenuItem.Enabled;
+
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;

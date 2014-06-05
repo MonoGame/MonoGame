@@ -28,6 +28,8 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
         }
 
+        public bool LaunchDebugger { get; set; }
+
         public bool ProjectOpen { get; private set; }
 
         public bool ProjectDiry { get; set; }
@@ -225,6 +227,8 @@ namespace MonoGame.Tools.Pipeline
         public void Build(bool rebuild)
         {
             var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
             BuildCommand(commands);
         }
 
@@ -249,6 +253,9 @@ namespace MonoGame.Tools.Pipeline
 
             // Run the build the command.
             var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
+
             BuildCommand(commands);
 
             // Cleanup the temp file once we're done.
@@ -287,6 +294,9 @@ namespace MonoGame.Tools.Pipeline
             _view.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
+            if (LaunchDebugger)
+                commands += "/launchdebugger";
+
             _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());          

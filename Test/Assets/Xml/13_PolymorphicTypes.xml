@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="PolymorphicTypes">
+  <Asset Type="MonoGame.Tests.ContentPipeline.PolymorphicTypes">
     <Hello Type="string">World</Hello>
     <Elf Type="int">23</Elf>
     <PolymorphicArray>
       <Item>
         <Value>true</Value>
       </Item>
-      <Item Type="PolymorphicB">
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicB">
         <Value>true</Value>
       </Item>
-      <Item Type="PolymorphicC">
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
         <Value>true</Value>
       </Item>
     </PolymorphicArray>

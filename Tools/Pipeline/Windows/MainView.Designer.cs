@@ -77,6 +77,8 @@ namespace MonoGame.Tools.Pipeline
             this._folderAddItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._folderDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._folderRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._buildLaunchDebuggerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._rebuildLaunchDebuggerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -343,6 +345,8 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _buildMenuItem
             // 
+            this._buildMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._buildLaunchDebuggerMenuItem});
             this._buildMenuItem.Name = "_buildMenuItem";
             this._buildMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F6;
             this._buildMenuItem.Size = new System.Drawing.Size(173, 22);
@@ -351,6 +355,8 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _rebuildMenuItem
             // 
+            this._rebuildMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._rebuildLaunchDebuggerMenuItem});
             this._rebuildMenuItem.Name = "_rebuildMenuItem";
             this._rebuildMenuItem.Size = new System.Drawing.Size(173, 22);
             this._rebuildMenuItem.Text = "&Rebuild";
@@ -451,20 +457,10 @@ namespace MonoGame.Tools.Pipeline
             this._folderAddItemMenuItem.Text = "&Add Item...";
             this._folderAddItemMenuItem.Click += new System.EventHandler(this.AddMenuItemClick);
             // 
-            // _folderDeleteMenuItem
             // 
-            this._folderDeleteMenuItem.Name = "_folderDeleteMenuItem";
             this._folderDeleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this._folderDeleteMenuItem.Size = new System.Drawing.Size(132, 22);
-            this._folderDeleteMenuItem.Text = "&Delete";
-            this._folderDeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
             // 
-            // _folderRebuildMenuItem
             // 
-            this._folderRebuildMenuItem.Name = "_folderRebuildMenuItem";
-            this._folderRebuildMenuItem.Size = new System.Drawing.Size(132, 22);
-            this._folderRebuildMenuItem.Text = "Rebuild";
-            this._folderRebuildMenuItem.Click += new System.EventHandler(this.ItemRebuildMenuItemClick);
             // 
             // MainView
             // 
@@ -535,8 +531,6 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _itemRebuildMenuItem;
         private System.Windows.Forms.ContextMenuStrip _folderContextMenu;
         private System.Windows.Forms.ToolStripMenuItem _folderAddItemMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _folderDeleteMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _folderRebuildMenuItem;
     }
 }
 
