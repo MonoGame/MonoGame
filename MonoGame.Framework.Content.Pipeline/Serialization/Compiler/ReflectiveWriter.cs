@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
-    class ReflectiveWriter : ContentTypeWriter
+    class ReflectiveWriter<T> : ContentTypeWriter
     {
         private PropertyInfo[] _properties;
         private FieldInfo[] _fields;
@@ -21,8 +21,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         private string _runtimeType;
 
         
-        public ReflectiveWriter(Type targetType)
-            : base(targetType)
+        public ReflectiveWriter()
+            : base(typeof(T))
         {
         }
 

@@ -126,7 +126,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                result = new ReflectiveWriter(type);
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
 
 
