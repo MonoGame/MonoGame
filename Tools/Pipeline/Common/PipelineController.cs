@@ -432,12 +432,16 @@ namespace MonoGame.Tools.Pipeline
             ProjectDiry = true;                  
         }
 
-        public void Exclude(ContentItem item)
+        public void Exclude(IEnumerable<ContentItem> items)
         {
-            _project.ContentItems.Remove(item);
-
             _view.BeginTreeUpdate();
-            _view.RemoveTreeItem(item);
+
+            foreach (var item in items)
+            {
+                _project.ContentItems.Remove(item);
+                _view.RemoveTreeItem(item);
+            }
+
             _view.EndTreeUpdate();
 
             ProjectDiry = true;

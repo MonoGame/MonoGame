@@ -264,8 +264,20 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
             var node = _treeView.AllNodes().Find(f => f.Tag == item);
-            if (node != null)
-                _treeView.Nodes.Remove(node);
+            if (node == null)
+                return;
+
+            var parent = node.Parent;
+            node.Remove();
+
+            // Clean up the parent nodes without children
+            // and be sure not to delete the root node.
+            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
+            {
+                var parentParent = parent.Parent;
+                parent.Remove();
+                parent = parentParent;
+            }
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -537,18 +549,10 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = node.Tag as ContentItem;
                 if (item != null && !items.Contains(item))
-                {
                     items.Add(item);                    
-                }
-
-                if (!(node.Tag is PipelineProject))
-                    _treeView.Nodes.Remove(node);
             }
 
-            foreach (var item in items)
-            {
-                _controller.Exclude(item);
-            }            
+            _controller.Exclude(items);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
