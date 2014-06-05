@@ -23,7 +23,7 @@ namespace MonoGame.Tools.Pipeline
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;
+        private const int ProjectIcon = 3;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -48,6 +48,7 @@ namespace MonoGame.Tools.Pipeline
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.font.png")));
             
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
@@ -92,10 +93,12 @@ namespace MonoGame.Tools.Pipeline
                     if (node.Tag is ContentItem)
                     {
                         _treeAddItemMenuItem.Visible = false;
+                        _treeNewItemMenuItem.Visible = false;
                     }
                     else
                     {
                         _treeAddItemMenuItem.Visible = true;
+                        _treeNewItemMenuItem.Visible = true;
                     }
 
                     _treeContextMenu.Show(_treeView, p);
@@ -383,12 +386,7 @@ namespace MonoGame.Tools.Pipeline
         public void OutputClear()
         {
             _outputWindow.Clear();
-        }
-
-        private void NewMenuItemClick(object sender, System.EventArgs e)
-        {
-            _controller.NewProject();
-        }
+        }        
 
         private void ExitMenuItemClick(object sender, System.EventArgs e)
         {
@@ -570,6 +568,17 @@ namespace MonoGame.Tools.Pipeline
             var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
             var item = node.Tag as IProjectItem;
             _controller.Include(item.Location);
+        }
+
+        private void NewItemMenuItemClick(object sender, System.EventArgs e)
+        {
+            var dlg = new NewContentDialog(_controller.Templates);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                var template = dlg.SelectedTemplate;
+                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+                _controller.NewItem(dlg.ContentName, location, template);
+            }
         }
     }
 }

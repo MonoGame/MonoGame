@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -19,6 +22,13 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
+        private readonly List<ContentItemTemplate> _templateItems;
+
+        public IEnumerable<ContentItemTemplate> Templates
+        {
+            get { return _templateItems; }
+        }
+
         public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
@@ -26,6 +36,9 @@ namespace MonoGame.Tools.Pipeline
             _project = project;
             _project.Controller = this;
             ProjectOpen = false;
+
+            _templateItems = new List<ContentItemTemplate>();
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");            
         }
 
         public bool LaunchDebugger { get; set; }
@@ -449,8 +462,40 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }            
-    
+        }
+
+        public void NewItem(string name, string location, ContentItemTemplate template)
+        {
+            var ext = Path.GetExtension(template.TemplateFile);
+            var filename = Path.ChangeExtension(name, ext);
+            var fullpath = Path.Combine(location, filename);
+
+            if (File.Exists(fullpath))
+            {
+                _view.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
+                return;
+            }
+
+            File.Copy(template.TemplateFile, fullpath);
+
+            var parser = new PipelineProjectParser(this, _project);
+            _view.BeginTreeUpdate();
+
+            if (parser.AddContent(fullpath, true))
+            {
+                var item = _project.ContentItems.Last();
+                item.Controller = this;
+                item.ImporterName = template.ImporterName;
+                item.ProcessorName = template.ProcessorName;
+                item.ResolveTypes();
+                _view.AddTreeItem(item);
+                _view.SelectTreeItem(item);
+            }
+
+            _view.EndTreeUpdate();
+            ProjectDiry = true;
+        }
+
         private void ResolveTypes()
         {
             PipelineTypes.Load(_project);
@@ -459,7 +504,35 @@ namespace MonoGame.Tools.Pipeline
                 i.Controller = this;
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
-            }        
+            }
+
+            LoadTemplates(_project.Location);
+        }
+
+        private void LoadTemplates(string path)
+        {                
+            var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
+            foreach (var f in files)
+            {
+                var lines = File.ReadAllLines(f);
+                if (lines.Length != 5)
+                    throw new Exception("Invalid template");
+
+                var item = new ContentItemTemplate()
+                    {
+                        Label = lines[0],
+                        Icon = lines[1],
+                        ImporterName = lines[2],
+                        ProcessorName = lines[3],
+                        TemplateFile = lines[4],
+                    };
+                
+                if (_templateItems.Any(i => i.Label == item.Label))
+                    continue;
+
+                item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
+                _templateItems.Add(item);
+            }
         }
     }
 }
