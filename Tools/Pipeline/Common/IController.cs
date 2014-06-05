@@ -95,6 +95,6 @@ namespace MonoGame.Tools.Pipeline
 
         void Exclude(ContentItem item);
 
-        void NewItem(string location, ContentItemTemplate template);
+        void NewItem(string name, string location, ContentItemTemplate template);
     }
 }

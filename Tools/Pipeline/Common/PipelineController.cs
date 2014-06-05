@@ -19,7 +19,7 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
-        private List<ContentItemTemplate> _templateItems;
+        private readonly List<ContentItemTemplate> _templateItems;
 
         public IEnumerable<ContentItemTemplate> Templates
         {
@@ -466,12 +466,15 @@ namespace MonoGame.Tools.Pipeline
             ProjectDiry = true;
         }
 
-        public void NewItem(string location, ContentItemTemplate template)
+        public void NewItem(string name, string location, ContentItemTemplate template)
         {
-            var fullpath = Path.Combine(location, Path.GetFileName(template.TemplateFile));
+            var ext = Path.GetExtension(template.TemplateFile);
+            var filename = Path.ChangeExtension(name, ext);
+            var fullpath = Path.Combine(location, filename);
+
             if (File.Exists(fullpath))
             {
-                _view.ShowError("Error", string.Format("File '{0}' already exists.", fullpath));
+                _view.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
                 return;
             }
 

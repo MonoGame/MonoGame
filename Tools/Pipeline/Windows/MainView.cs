@@ -563,11 +563,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 var template = dlg.SelectedTemplate;
                 var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-                _controller.NewItem(location, template);
+                _controller.NewItem(dlg.ContentName, location, template);
             }
-            //var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
-            //var item = node.Tag as IProjectItem;
-            //_controller.New(item.Location);
         }
     }
 }
