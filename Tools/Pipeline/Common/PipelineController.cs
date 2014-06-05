@@ -21,6 +21,11 @@ namespace MonoGame.Tools.Pipeline
 
         private List<ContentItemTemplate> _templateItems;
 
+        public IEnumerable<ContentItemTemplate> Templates
+        {
+            get { return _templateItems; }
+        }
+
         public PipelineController(IView view, PipelineProject project)
         {
             _view = view;
@@ -33,8 +38,8 @@ namespace MonoGame.Tools.Pipeline
             var spriteFont = new ContentItemTemplate()
                 {
                     Label = "Sprite Font",
-                    ProcessorName = "SpriteFontDescriptionProcessor",
-                    ImporterName = "SpriteFontDescriptionImporter",
+                    ProcessorName = "FontDescriptionProcessor",
+                    ImporterName = "FontDescriptionImporter",
                     TemplateFile = "Templates/SpriteFont.spritefont",
                 };
             _templateItems.Add(spriteFont);
@@ -425,12 +430,6 @@ namespace MonoGame.Tools.Pipeline
             return AskSaveProject();
         }
 
-        public List<ContentItemTemplate> TemplateItems
-        {
-            get { return _templateItems; }
-            set { _templateItems = value; }
-        }
-
         public void Include(string initialDirectory)
         {                        
             List<string> files;
@@ -465,8 +464,37 @@ namespace MonoGame.Tools.Pipeline
             _view.EndTreeUpdate();
 
             ProjectDiry = true;
-        }                    
-    
+        }
+
+        public void NewItem(string location, ContentItemTemplate template)
+        {
+            var fullpath = Path.Combine(location, Path.GetFileName(template.TemplateFile));
+            if (File.Exists(fullpath))
+            {
+                _view.ShowError("Error", string.Format("File '{0}' already exists.", fullpath));
+                return;
+            }
+
+            File.Copy(template.TemplateFile, fullpath);
+
+            var parser = new PipelineProjectParser(this, _project);
+            _view.BeginTreeUpdate();
+
+            if (parser.AddContent(fullpath, true))
+            {
+                var item = _project.ContentItems.Last();
+                item.Controller = this;
+                item.ImporterName = template.ImporterName;
+                item.ProcessorName = template.ProcessorName;
+                item.ResolveTypes();
+                _view.AddTreeItem(item);
+                _view.SelectTreeItem(item);
+            }
+
+            _view.EndTreeUpdate();
+            ProjectDiry = true;
+        }
+
         private void ResolveTypes()
         {
             PipelineTypes.Load(_project);

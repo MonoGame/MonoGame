@@ -1,4 +1,4 @@
-﻿namespace MonoGame.Tools.Pipeline.Windows
+﻿namespace MonoGame.Tools.Pipeline
 {
     partial class NewContentDialog
     {
@@ -30,8 +30,8 @@
         {
             this._listBox = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this._okBtn = new System.Windows.Forms.Button();
             this._cancelBtn = new System.Windows.Forms.Button();
+            this._okBtn = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -39,6 +39,9 @@
             // 
             this._listBox.Dock = System.Windows.Forms.DockStyle.Top;
             this._listBox.FormattingEnabled = true;
+            this._listBox.Items.AddRange(new object[] {
+            "SpriteFont",
+            "SpriteSheet"});
             this._listBox.Location = new System.Drawing.Point(0, 0);
             this._listBox.Name = "_listBox";
             this._listBox.Size = new System.Drawing.Size(284, 225);
@@ -56,16 +59,6 @@
             this.panel1.Size = new System.Drawing.Size(284, 36);
             this.panel1.TabIndex = 1;
             // 
-            // _okBtn
-            // 
-            this._okBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okBtn.Location = new System.Drawing.Point(197, 6);
-            this._okBtn.Name = "_okBtn";
-            this._okBtn.Size = new System.Drawing.Size(75, 23);
-            this._okBtn.TabIndex = 0;
-            this._okBtn.Text = "Ok";
-            this._okBtn.UseVisualStyleBackColor = true;
-            // 
             // _cancelBtn
             // 
             this._cancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -75,6 +68,16 @@
             this._cancelBtn.TabIndex = 1;
             this._cancelBtn.Text = "Cancel";
             this._cancelBtn.UseVisualStyleBackColor = true;
+            // 
+            // _okBtn
+            // 
+            this._okBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this._okBtn.Location = new System.Drawing.Point(197, 6);
+            this._okBtn.Name = "_okBtn";
+            this._okBtn.Size = new System.Drawing.Size(75, 23);
+            this._okBtn.TabIndex = 0;
+            this._okBtn.Text = "Ok";
+            this._okBtn.UseVisualStyleBackColor = true;
             // 
             // NewContentDialog
             // 

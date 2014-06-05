@@ -15,5 +15,10 @@ namespace MonoGame.Tools.Pipeline
         public string ImporterName;
         public string ProcessorName;
         public string TemplateFile;
+
+        public override string ToString()
+        {
+            return Label;
+        }
     }
 }

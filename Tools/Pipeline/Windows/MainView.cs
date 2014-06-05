@@ -22,8 +22,7 @@ namespace MonoGame.Tools.Pipeline
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;
-        private const int FontIcon = 3;
+        private const int ProjectIcon = 3;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
@@ -559,6 +558,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void NewMenuItemClick(object sender, System.EventArgs e)
         {
+            var dlg = new NewContentDialog(_controller.Templates);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                var template = dlg.SelectedTemplate;
+                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+                _controller.NewItem(location, template);
+            }
             //var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
             //var item = node.Tag as IProjectItem;
             //_controller.New(item.Location);

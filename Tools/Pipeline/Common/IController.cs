@@ -3,11 +3,17 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
     interface IController
     {
+        /// <summary>
+        /// Types of content which can be created and added to a project. 
+        /// </summary>
+        IEnumerable<ContentItemTemplate> Templates { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -88,5 +94,7 @@ namespace MonoGame.Tools.Pipeline
         void Include(string initialDirectory);
 
         void Exclude(ContentItem item);
+
+        void NewItem(string location, ContentItemTemplate template);
     }
 }
