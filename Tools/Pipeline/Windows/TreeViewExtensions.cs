@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
             return list;
         }
 
-        private static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
+        public static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
         {
             foreach (var i in nodeCollection)
             {

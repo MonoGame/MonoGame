@@ -29,7 +29,14 @@ namespace MGCB
             Name = "@",
             ValueName = "responseFile",
             Description = "Read a text response file with additional command line options and switches.")]
-        public readonly List<string> ResponseFiles = new List<string>();
+        // This property only exists for documentation.
+        // The actual handling of '/@' is done in the preprocess step.
+        public List<string> ResponseFiles
+        {
+            get { throw new InvalidOperationException(); }
+            set { throw new InvalidOperationException(); }
+        }
+
 
         [CommandLineParameter(
             Name = "outputDir",

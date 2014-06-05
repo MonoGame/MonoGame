@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
@@ -83,8 +84,10 @@ namespace MonoGame.Tools.Pipeline
                 var node = _treeView.GetNodeAt(p);
                 if (node != null)
                 {
-                    // Select the node the user has clicked.
-                    _treeView.SelectedNode = node;
+                    if (!_treeView.SelectedNodes.Contains(node))
+                    {
+                        _treeView.SelectedNode = node;
+                    }
 
                     if (node.Tag is ContentItem)
                         _itemContextMenu.Show(_treeView, p);
@@ -460,8 +463,17 @@ namespace MonoGame.Tools.Pipeline
 
         private void ItemRebuildMenuItemClick(object sender, EventArgs e)
         {
-            var item = _treeView.GetSelectedContentItem();
-            _controller.RebuildItem(item);
+            var items = new List<ContentItem>();
+            var nodes = _treeView.SelectedNodesRecursive;
+
+            foreach (var node in nodes)
+            {
+                var item = node.Tag as ContentItem;
+                if (item != null && !items.Contains(item))
+                    items.Add(item);                
+            }
+
+            _controller.RebuildItems(items);
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
@@ -492,7 +504,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void _mainMenu_MenuActivate(object sender, EventArgs e)
+        private void MainMenuMenuActivate(object sender, EventArgs e)
         {
             UpdateMenus();
         }
@@ -533,14 +545,25 @@ namespace MonoGame.Tools.Pipeline
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)
         {
-            if (_treeView.SelectedNode == null)
-                return;
+            var items = new List<ContentItem>();
+            var nodes = _treeView.SelectedNodesRecursive;
 
-            var item = _treeView.SelectedNode.Tag as ContentItem;
-            if (item == null)
-                return;
+            foreach (var node in nodes)
+            {
+                var item = node.Tag as ContentItem;
+                if (item != null && !items.Contains(item))
+                {
+                    items.Add(item);                    
+                }
 
-            _controller.Exclude(item);
+                if (!(node.Tag is PipelineProject))
+                    _treeView.Nodes.Remove(node);
+            }
+
+            foreach (var item in items)
+            {
+                _controller.Exclude(item);
+            }            
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)

@@ -78,6 +78,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
+    <Compile Include="Windows\MultiSelectTreeview.cs" />
     <Compile Include="Windows\PipelineProjectProxy.cs" />
     <Compile Include="Windows\TreeViewExtensions.cs" />
     <EmbeddedResource Include="Windows\MainView.resx">
