@@ -84,6 +84,9 @@
     <Compile Include="Windows\NewContentDialog.Designer.cs">
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Windows\MultiSelectTreeview.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs" />
     <Compile Include="Windows\TreeViewExtensions.cs" />
     <EmbeddedResource Include="Windows\MainView.resx">

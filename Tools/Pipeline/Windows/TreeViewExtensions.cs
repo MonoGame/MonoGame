@@ -16,7 +16,7 @@ namespace MonoGame.Tools.Pipeline
             return list;
         }
 
-        private static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
+        public static void AddTreeNodesRecursive(TreeNodeCollection nodeCollection, List<TreeNode> results)
         {
             foreach (var i in nodeCollection)
             {
@@ -27,12 +27,16 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public static ContentItem GetSelectedContentItem(this TreeView tree)
+        public static IEnumerable<ContentItem> GetSelectedContentItems(this MultiSelectTreeview tree)
         {
-            if (tree.SelectedNode == null)
-                return null;
+            var found = tree.SelectedNodesRecursive;
 
-            return tree.SelectedNode.Tag as ContentItem;
+            foreach (var node in found)
+            {
+                var item = node.Tag as ContentItem;
+                if (item != null)
+                    yield return item;
+            }
         }
 
     }
