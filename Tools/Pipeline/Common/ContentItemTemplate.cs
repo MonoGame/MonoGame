@@ -2,10 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.ComponentModel;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
-
 namespace MonoGame.Tools.Pipeline
 {
     public class ContentItemTemplate

@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -35,14 +38,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            var spriteFont = new ContentItemTemplate()
-                {
-                    Label = "Sprite Font",
-                    ProcessorName = "FontDescriptionProcessor",
-                    ImporterName = "FontDescriptionImporter",
-                    TemplateFile = "Templates/SpriteFont.spritefont",
-                };
-            _templateItems.Add(spriteFont);
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");            
         }
 
         public bool LaunchDebugger { get; set; }
@@ -506,7 +502,35 @@ namespace MonoGame.Tools.Pipeline
                 i.Controller = this;
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
-            }        
+            }
+
+            LoadTemplates(_project.Location);
+        }
+
+        private void LoadTemplates(string path)
+        {                
+            var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
+            foreach (var f in files)
+            {
+                var lines = File.ReadAllLines(f);
+                if (lines.Length != 5)
+                    throw new Exception("Invalid template");
+
+                var item = new ContentItemTemplate()
+                    {
+                        Label = lines[0],
+                        Icon = lines[1],
+                        ImporterName = lines[2],
+                        ProcessorName = lines[3],
+                        TemplateFile = lines[4],
+                    };
+                
+                if (_templateItems.Any(i => i.Label == item.Label))
+                    continue;
+
+                item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
+                _templateItems.Add(item);
+            }
         }
     }
 }
