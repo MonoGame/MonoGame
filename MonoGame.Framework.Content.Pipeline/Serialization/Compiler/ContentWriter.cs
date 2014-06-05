@@ -242,11 +242,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
+
                 typeWriters.Add(typeWriter);
-
-		        if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
-			        typeWriterMap.Add(typeWriter.GetType(), index);
-
+			    typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
                 // TODO: This is kinda messy.. seems like there could
