@@ -421,6 +421,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeAddItemMenuItem.Name = "_treeAddItemMenuItem";
             this._treeAddItemMenuItem.Size = new System.Drawing.Size(132, 22);
             this._treeAddItemMenuItem.Text = "&Add Item...";
+            this._treeAddItemMenuItem.Click += new System.EventHandler(this.AddMenuItemClick);
             // 
             // _treeDeleteMenuItem
             // 
