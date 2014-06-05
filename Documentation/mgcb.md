@@ -133,6 +133,11 @@ An example response file could look like this:
 /build:Textures\metal.png
 /build:Textures\plastic.png
 ```
+### Launch Debugger
+```
+/launchdebugger
+```
+Allows a debugger to attach to the MGCB executable before content is built.
 ### Define Preprocessor Parameter
 ```
 /define <name>=<value>
