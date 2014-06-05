@@ -228,37 +228,31 @@ namespace MonoGame.Tools.Pipeline
             BuildCommand(commands);
         }
 
-        public void RebuildItem(IProjectItem item)
+        public void RebuildItems(IEnumerable<IProjectItem> items)
         {
             // Make sure we save first!
             if (!AskSaveProject())
                 return;
 
-            // TODO: We can support folders here as well.
+            // Create a unique file within the same folder as
+            // the normal project to store this incremental build.
+            var uniqueName = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
 
-            var contentItem = item as ContentItem;
-            if (contentItem != null)
+            // Write the incremental project file limiting the
+            // content to just the files we want to rebuild.
+            using (var io = File.CreateText(tempPath))
             {
-                // Create a unique file within the same folder as
-                // the normal project to store this incremental build.
-                var uniqueName = Guid.NewGuid().ToString();
-                var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
-
-                // Write the incremental project file limiting the
-                // content to just the files we want to rebuild.
-                using (var io = File.CreateText(tempPath))
-                {
-                    var parser = new PipelineProjectParser(this, _project);
-                    parser.SaveProject(io, (i) => i != item);
-                }
-
-                // Run the build the command.
-                var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-                BuildCommand(commands);
-
-                // Cleanup the temp file once we're done.
-                _buildTask.ContinueWith((e) => File.Delete(tempPath));
+                var parser = new PipelineProjectParser(this, _project);
+                parser.SaveProject(io, (i) => !items.Contains(i));
             }
+
+            // Run the build the command.
+            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            BuildCommand(commands);
+
+            // Cleanup the temp file once we're done.
+            _buildTask.ContinueWith((e) => File.Delete(tempPath));
         }
 
         private void BuildCommand(string commands)
