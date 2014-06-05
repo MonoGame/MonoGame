@@ -14,6 +14,7 @@ namespace MonoGame.Tools.Pipeline
 		private readonly List<TreeNode> _selectedNodes = null;		
 
         [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public IEnumerable<TreeNode> SelectedNodes
 		{
 			get
@@ -34,6 +35,7 @@ namespace MonoGame.Tools.Pipeline
 		}
 
         [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 	    public IEnumerable<TreeNode> SelectedNodesRecursive
 	    {
             get
@@ -63,6 +65,7 @@ namespace MonoGame.Tools.Pipeline
 		private TreeNode _selectedNode;
 
         [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public new TreeNode SelectedNode
 		{
 			get { return _selectedNode; }
