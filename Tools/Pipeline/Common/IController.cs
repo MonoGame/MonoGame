@@ -103,6 +103,8 @@ namespace MonoGame.Tools.Pipeline
 
         #region Undo, Redo
 
+        event PipelineController.CanUndoRedoChanged OnCanUndoRedoChanged;
+
         bool CanRedo { get; }
 
         bool CanUndo { get; }

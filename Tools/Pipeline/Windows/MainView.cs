@@ -67,7 +67,9 @@ namespace MonoGame.Tools.Pipeline
             else
             {
                 if (_propertyGrid.SelectedObject is ContentItem)
+                {                
                     _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
+                }
                 else
                     _controller.OnProjectModified();
             }
@@ -111,13 +113,19 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+            
+            var updateMenus = new Action(UpdateMenus);
+            var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
 
-            // Make sure build and project trigger updates to all the menu items.
-            Action activate = delegate { this.Invoke(new MethodInvoker(UpdateMenus)); };
-            _controller.OnBuildStarted += activate;
-            _controller.OnBuildFinished += activate;
-            _controller.OnProjectLoading += activate;
-            _controller.OnProjectLoaded += activate;
+            _controller.OnBuildStarted += invokeUpdateMenus;
+            _controller.OnBuildFinished += invokeUpdateMenus;
+            _controller.OnProjectLoading += invokeUpdateMenus;
+            _controller.OnProjectLoaded += invokeUpdateMenus;
+
+            var updateUndoRedo = new PipelineController.CanUndoRedoChanged(UpdateUndoRedo);
+            var invokeUpdateUndoRedo = new PipelineController.CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
+
+            _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
         }
 
         public AskResult AskSaveOrCancel()
@@ -536,9 +544,14 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
-
-            _undoMenuItem.Enabled = _controller.CanUndo;
-            _redoMenuItem.Enabled = _controller.CanRedo;
+      
+            UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+        }
+        
+        private void UpdateUndoRedo(bool canUndo, bool canRedo)
+        {
+            _undoMenuItem.Enabled = canUndo;
+            _redoMenuItem.Enabled = canRedo;
         }
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)
