@@ -35,7 +35,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
 
-		internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
