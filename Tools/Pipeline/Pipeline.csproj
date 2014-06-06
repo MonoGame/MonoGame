@@ -50,11 +50,14 @@
     <Compile Include="..\MGCB\CommandLineParser.cs">
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
+    <Compile Include="Common\ActionStack.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
+    <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\PipelineController.Actions.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
