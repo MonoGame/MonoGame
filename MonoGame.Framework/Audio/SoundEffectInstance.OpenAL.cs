@@ -256,13 +256,19 @@ namespace Microsoft.Xna.Framework.Audio
                 AL.Source(sourceId, ALSourcef.Gain, value * SoundEffect.MasterVolume);
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            this.Stop(true);
-            soundBuffer.Reserved -= HandleSoundBufferReserved;
-            soundBuffer.Recycled -= HandleSoundBufferRecycled;
-            soundBuffer.Dispose();
-            soundBuffer = null;
+            if (disposing)
+            {
+                if (soundBuffer != null)
+                {
+                    this.Stop(true);
+                    soundBuffer.Reserved -= HandleSoundBufferReserved;
+                    soundBuffer.Recycled -= HandleSoundBufferRecycled;
+                    soundBuffer.Dispose();
+                    soundBuffer = null;
+                }
+            }
         }
     }
 }

@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null)
+            if (_voice == null || _effect == null)
                 return;
 
             var srcChannelCount = _effect._format.Channels;
@@ -219,10 +219,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPitch(float value)
         {
+            _pitch = value;
+
             if (_voice == null)
                 return;
-
-            _pitch = value;
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.

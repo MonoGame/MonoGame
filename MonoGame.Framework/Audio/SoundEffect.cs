@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// not at that time.  Unmanaged resources should always be released.</remarks>
         void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (!_isDisposed)
             {
                 PlatformDispose(disposing);
                 _isDisposed = true;

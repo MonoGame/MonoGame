@@ -184,9 +184,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// required.  If the disposing parameter is false, Dispose was called by the finalizer and
         /// no managed objects should be touched because we do not know if they are still valid or
         /// not at that time.  Unmanaged resources should always be released.</remarks>
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (!_isDisposed)
             {
                 PlatformDispose(disposing);
                 _isDisposed = true;
