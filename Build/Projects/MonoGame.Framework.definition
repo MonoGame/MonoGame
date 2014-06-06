@@ -687,8 +687,22 @@
 
 
     <!-- Microsoft.Xna.Framework.Media -->
-    <Compile Include="Media\MediaLibrary.cs">
-      <Platforms>Angle,iOS,MacOS,Windows,WindowsGL</Platforms>
+    <Compile Include="Media\Album.cs" />
+    <Compile Include="Media\AlbumCollection.cs" />
+    <Compile Include="Media\Artist.cs" />
+    <Compile Include="Media\Genre.cs" />
+    <Compile Include="Media\MediaLibrary.cs" />
+    <Compile Include="Media\MediaLibrary.Default.cs">
+      <ExcludePlatforms>iOS,Windows8,WindowsPhone</ExcludePlatforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.IOS.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.WinRT.cs">
+      <Platforms>Windows8</Platforms>
+    </Compile>
+    <Compile Include="Media\MediaLibrary.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\MediaManagerState.cs">
       <Platforms>Windows</Platforms>
@@ -707,11 +721,12 @@
       <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya,PSMobile,Web</Platforms>
     </Compile>
     <Compile Include="Media\MediaQueue.cs" />
-    <Compile Include="Media\MediaSource.cs">
-      <Platforms>Angle,iOS,MacOS,Windows,WindowsGL</Platforms>
-    </Compile>
+    <Compile Include="Media\MediaSource.cs" />
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
+    <Compile Include="Media\MusicProperties.cs">
+      <Platforms>Windows8</Platforms>
+    </Compile>
     <Compile Include="Media\PlaylistCollection.cs">
       <ExcludePlatforms>PSMobile</ExcludePlatforms>
     </Compile>
@@ -737,6 +752,12 @@
     </Compile>
     <Compile Include="Media\Song.WMS.cs">
         <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WP.cs">
+      <Platforms>WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Media\Song.WinRT.cs">
+      <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
