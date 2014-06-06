@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (type.IsEnum)
             {
-                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type.GetElementType()));
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type));
                 typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
             else if (type.IsGenericType)
@@ -126,7 +126,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                result = new ReflectiveWriter(type);
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
 
 
