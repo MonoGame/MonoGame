@@ -44,6 +44,10 @@
     <MonoGameContentBuilderExe>$(MSBuildProgramFiles32)\MonoGame\v3.0\MGCB.exe</MonoGameContentBuilderExe>
     <MonoGamePlatform Condition="'$(MonoGamePlatform)' == ''">Windows</MonoGamePlatform>
 
+    <!-- Copy output to specified ContentRootDirectory if using MonoGame.Content.Builder -->
+    <ContentRootDirectory Condition="'$(ContentRootDirectory)' == ''">$(MSBuildProjectName)</ContentRootDirectory>
+    <OutputPath Condition="'$(UsingContentBuilder)' == 'True'">$(OutputPath)$(ContentRootDirectory)\</OutputPath>
+
     <AssemblySearchPaths>
       {CandidateAssemblyFiles};
       $(ReferencePath);
