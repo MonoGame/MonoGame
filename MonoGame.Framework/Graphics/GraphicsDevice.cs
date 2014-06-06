@@ -395,8 +395,8 @@ namespace Microsoft.Xna.Framework.Graphics
             internal set
             {
                 //Check if Profile is supported.
-				//Note: A better aproach would be to recreate the Device with
-				//      the appropriate feature level each time Profile is changed.
+                //Note: A better aproach would be to recreate the Device with
+                //      the appropriate feature level each time Profile is changed.
                 if(value > GraphicsDevice.GetHighestSupportedGraphicsProfile(this))
                     throw new System.NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
