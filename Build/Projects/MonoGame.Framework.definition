@@ -2,7 +2,7 @@
 <Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web">
 
   <ProjectGuids>
- 	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
+	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
 	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>
 	<Platform Name="iOS">DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47</Platform>
 	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
