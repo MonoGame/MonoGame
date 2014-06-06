@@ -14,7 +14,7 @@ using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class PipelineController : IController
+    internal partial class PipelineController : IController
     {
         private readonly IView _view;
         private PipelineProject _project;
@@ -38,7 +38,9 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Environment.CurrentDirectory + "\\Templates");            
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");         
+   
+            _actionStack = new ActionStack();
         }
 
         public bool LaunchDebugger { get; set; }
@@ -104,6 +106,7 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoading();
 
             // Clear existing project data, initialize to a new blank project.
+            _actionStack.Clear();
             _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
@@ -135,6 +138,7 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
+                _actionStack.Clear();
                 _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.ImportProject(projectFilePath);
@@ -176,6 +180,7 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
+                _actionStack.Clear();
                 _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.OpenProject(projectFilePath);
@@ -208,6 +213,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
             ProjectDiry = false;
             _project = null;
+            _actionStack.Clear();
 
             UpdateTree();
         }
@@ -430,71 +436,41 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var parser = new PipelineProjectParser(this, _project);
-            _view.BeginTreeUpdate();
-
-            foreach (var file in files)
-            {
-                if (!parser.AddContent(file, true))
-                    continue;
-
-                var item = _project.ContentItems.Last();
-                item.Controller = this;
-                item.ResolveTypes();
-                _view.AddTreeItem(item);
-                _view.SelectTreeItem(item);
-            }
-
-            _view.EndTreeUpdate();
-            ProjectDiry = true;                  
+            var action = new IncludeAction(this, files);
+            _actionStack.Add(action);  
         }
 
         public void Exclude(IEnumerable<ContentItem> items)
         {
-            _view.BeginTreeUpdate();
-
-            foreach (var item in items)
-            {
-                _project.ContentItems.Remove(item);
-                _view.RemoveTreeItem(item);
-            }
-
-            _view.EndTreeUpdate();
-
-            ProjectDiry = true;
+            var action = new ExcludeAction(this, items);
+            _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
-            var ext = Path.GetExtension(template.TemplateFile);
-            var filename = Path.ChangeExtension(name, ext);
-            var fullpath = Path.Combine(location, filename);
-
-            if (File.Exists(fullpath))
-            {
-                _view.ShowError("Error", string.Format("File already exists: '{0}'.", fullpath));
-                return;
-            }
-
-            File.Copy(template.TemplateFile, fullpath);
-
-            var parser = new PipelineProjectParser(this, _project);
-            _view.BeginTreeUpdate();
-
-            if (parser.AddContent(fullpath, true))
-            {
-                var item = _project.ContentItems.Last();
-                item.Controller = this;
-                item.ImporterName = template.ImporterName;
-                item.ProcessorName = template.ProcessorName;
-                item.ResolveTypes();
-                _view.AddTreeItem(item);
-                _view.SelectTreeItem(item);
-            }
-
-            _view.EndTreeUpdate();
-            ProjectDiry = true;
+            var action = new NewItemAction(this, name, location, template);
+            _actionStack.Add(action);
         }
+
+        #region Undo, Redo
+
+        private readonly ActionStack _actionStack;
+
+        public bool CanUndo { get { return _actionStack.CanUndo; } }
+
+        public bool CanRedo { get { return _actionStack.CanRedo; } }
+
+        public void Undo()
+        {
+            _actionStack.Undo();
+        }
+
+        public void Redo()
+        {
+            _actionStack.Redo();
+        }
+
+        #endregion
 
         private void ResolveTypes()
         {

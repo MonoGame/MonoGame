@@ -536,6 +536,9 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
+
+            _undoMenuItem.Enabled = _controller.CanUndo;
+            _redoMenuItem.Enabled = _controller.CanRedo;
         }
 
         private void DeleteMenuItem_Click(object sender, EventArgs e)
@@ -579,6 +582,16 @@ namespace MonoGame.Tools.Pipeline
                 var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
                 _controller.NewItem(dlg.ContentName, location, template);
             }
+        }
+
+        private void OnRedoClick(object sender, EventArgs e)
+        {
+            _controller.Redo();
+        }
+
+        private void OnUndoClick(object sender, EventArgs e)
+        {
+            _controller.Undo();
         }
     }
 }

@@ -91,10 +91,26 @@ namespace MonoGame.Tools.Pipeline
 
         bool Exit();
 
+        #region ContentItem
+
         void Include(string initialDirectory);
 
         void Exclude(IEnumerable<ContentItem> items);        
 
         void NewItem(string name, string location, ContentItemTemplate template);
+
+        #endregion
+
+        #region Undo, Redo
+
+        bool CanRedo { get; }
+
+        bool CanUndo { get; }
+
+        void Undo();
+
+        void Redo();
+
+        #endregion
     }
 }

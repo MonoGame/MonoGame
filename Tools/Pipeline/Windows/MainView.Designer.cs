@@ -39,7 +39,6 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
-            this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
             this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._outputWindow = new System.Windows.Forms.TextBox();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
@@ -53,8 +52,8 @@ namespace MonoGame.Tools.Pipeline
             this._saveAsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._newItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._addItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,6 +76,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this._treeRebuildMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
             _toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             _toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -127,16 +127,6 @@ namespace MonoGame.Tools.Pipeline
             _splitTreeProps.SplitterDistance = 210;
             _splitTreeProps.TabIndex = 1;
             _splitTreeProps.TabStop = false;
-            // 
-            // _treeView
-            // 
-            this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._treeView.Location = new System.Drawing.Point(0, 0);
-            this._treeView.Name = "_treeView";
-            this._treeView.Size = new System.Drawing.Size(249, 210);
-            this._treeView.TabIndex = 0;
-            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
-            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
             // 
             // _propertyGrid
             // 
@@ -271,8 +261,8 @@ namespace MonoGame.Tools.Pipeline
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.undoToolStripMenuItem,
-            this.redoToolStripMenuItem,
+            this._undoMenuItem,
+            this._redoMenuItem,
             this.toolStripSeparator2,
             this._newItemMenuItem,
             this._addItemMenuItem,
@@ -282,19 +272,23 @@ namespace MonoGame.Tools.Pipeline
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "&Edit";
             // 
-            // undoToolStripMenuItem
+            // _undoMenuItem
             // 
-            this.undoToolStripMenuItem.Enabled = false;
-            this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.undoToolStripMenuItem.Text = "Undo";
+            this._undoMenuItem.Enabled = false;
+            this._undoMenuItem.Name = "_undoMenuItem";
+            this._undoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this._undoMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._undoMenuItem.Text = "Undo";
+            this._undoMenuItem.Click += new System.EventHandler(this.OnUndoClick);
             // 
-            // redoToolStripMenuItem
+            // _redoMenuItem
             // 
-            this.redoToolStripMenuItem.Enabled = false;
-            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.redoToolStripMenuItem.Text = "Redo";
+            this._redoMenuItem.Enabled = false;
+            this._redoMenuItem.Name = "_redoMenuItem";
+            this._redoMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
+            this._redoMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._redoMenuItem.Text = "Redo";
+            this._redoMenuItem.Click += new System.EventHandler(this.OnRedoClick);
             // 
             // toolStripSeparator2
             // 
@@ -463,6 +457,16 @@ namespace MonoGame.Tools.Pipeline
             this._treeRebuildMenuItem.Text = "Rebuild";
             this._treeRebuildMenuItem.Click += new System.EventHandler(this.RebuildItemsMenuItemClick);
             // 
+            // _treeView
+            // 
+            this._treeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._treeView.Location = new System.Drawing.Point(0, 0);
+            this._treeView.Name = "_treeView";
+            this._treeView.Size = new System.Drawing.Size(249, 210);
+            this._treeView.TabIndex = 0;
+            this._treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewAfterSelect);
+            this._treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TreeViewMouseUp);
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -515,8 +519,8 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _closeMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _importMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _undoMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _redoMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem _deleteMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
