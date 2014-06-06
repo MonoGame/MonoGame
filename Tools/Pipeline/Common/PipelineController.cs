@@ -448,7 +448,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
-            var action = new NewItemAction(this, name, location, template);
+            var action = new NewAction(this, name, location, template);
             _actionStack.Add(action);
         }
 
