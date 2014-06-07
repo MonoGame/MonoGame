@@ -31,6 +31,8 @@ namespace MonoGame.Tools.Pipeline
 
         public PipelineController(IView view, PipelineProject project)
         {
+            _actionStack = new ActionStack();
+
             _view = view;
             _view.Attach(this);
             _project = project;
@@ -38,9 +40,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Environment.CurrentDirectory + "\\Templates");         
-   
-            _actionStack = new ActionStack();
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");                        
         }
 
         public bool LaunchDebugger { get; set; }
@@ -437,24 +437,51 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             var action = new IncludeAction(this, files);
+            action.Do();
             _actionStack.Add(action);  
         }
 
         public void Exclude(IEnumerable<ContentItem> items)
         {
             var action = new ExcludeAction(this, items);
+            action.Do();
             _actionStack.Add(action);
         }
 
         public void NewItem(string name, string location, ContentItemTemplate template)
         {
-            var action = new NewItemAction(this, name, location, template);
+            var action = new NewAction(this, name, location, template);
+            action.Do();
             _actionStack.Add(action);
+        }
+
+        public void AddAction(IProjectAction action)
+        {
+            _actionStack.Add(action);
+        }
+
+        public ContentItem GetItem(string sourceFile)
+        {
+            foreach (var i in _project.ContentItems)
+            {                
+                if (string.Equals(i.SourceFile, sourceFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return null;
         }
 
         #region Undo, Redo
 
         private readonly ActionStack _actionStack;
+
+        public event CanUndoRedoChanged OnCanUndoRedoChanged
+        {
+            add { _actionStack.OnCanUndoRedoChanged += value; }
+            remove { _actionStack.OnCanUndoRedoChanged -= value; } 
+        }
 
         public bool CanUndo { get { return _actionStack.CanUndo; } }
 

@@ -3,63 +3,95 @@ using System.Linq;
 
 namespace MonoGame.Tools.Pipeline
 {
-    public interface IProjectAction
+    internal interface IProjectAction
     {
         void Do();
-        void Undo();        
+        void Undo();
     }
 
-    public class ActionStack
-    {
-        private readonly List<IProjectAction> _undoStack;
-        private readonly List<IProjectAction> _redoStack;
+    internal delegate void CanUndoRedoChanged(bool canUndo, bool canRedo);
 
-        public bool CanUndo { get { return _undoStack.Any(); } }
-        public bool CanRedo { get { return _redoStack.Any(); } }
-
-        public ActionStack()
+    partial class PipelineController
+    {                
+        /// <summary>
+        /// Represents a stack of undo/redo-able actions.
+        /// </summary>
+        private class ActionStack
         {
-            _undoStack = new List<IProjectAction>();
-            _redoStack = new List<IProjectAction>();
-        }
+            private readonly List<IProjectAction> _undoStack;
+            private readonly List<IProjectAction> _redoStack;
 
-        public void Add(IProjectAction action)
-        {
-            action.Do();
-            _undoStack.Add(action);
+            public bool CanUndo { get; private set; }
+            public bool CanRedo { get; private set; }
+            
+            public event CanUndoRedoChanged OnCanUndoRedoChanged;
 
-            if (_redoStack.Count > 0)
+            public ActionStack()
+            {
+                _undoStack = new List<IProjectAction>();
+                _redoStack = new List<IProjectAction>();
+            }
+
+            public void Add(IProjectAction action)
+            {
+                _undoStack.Add(action);
+
+                if (_redoStack.Count > 0)
+                    _redoStack.Clear();
+
+                Update();
+            }
+
+            public void Undo()
+            {
+                if (!_undoStack.Any())
+                    return;
+
+                var action = _undoStack.Last();
+                _undoStack.Remove(action);
+
+                action.Undo();
+                _redoStack.Add(action);
+
+                Update();
+            }
+
+            public void Redo()
+            {
+                if (!_redoStack.Any())
+                    return;
+
+                var action = _redoStack.Last();
+                _redoStack.Remove(action);
+
+                action.Do();
+                _undoStack.Add(action);
+
+                Update();
+            }
+
+            public void Clear()
+            {
+                _undoStack.Clear();
                 _redoStack.Clear();
-        }
 
-        public void Undo()
-        {
-            if (!_undoStack.Any())
-                return;
+                Update();
+            }
 
-            var action = _undoStack.Last();
-            _undoStack.Remove(action);
+            private void Update()
+            {
+                var canUndo = _undoStack.Any();
+                var canRedo = _redoStack.Any();
 
-            action.Undo();
-            _redoStack.Add(action);
-        }
+                if (canUndo != CanUndo || canRedo != CanRedo)
+                {
+                    CanUndo = canUndo;
+                    CanRedo = canRedo;
 
-        public void Redo()
-        {
-            if (!_redoStack.Any())
-                return;
-
-            var action = _redoStack.Last();
-            _redoStack.Remove(action);
-
-            action.Do();
-            _undoStack.Add(action);
-        }
-
-        public void Clear()
-        {
-            _undoStack.Clear();
-            _redoStack.Clear();
+                    if (OnCanUndoRedoChanged != null)
+                        OnCanUndoRedoChanged(canUndo, canRedo);
+                }
+            }
         }
     }
 }

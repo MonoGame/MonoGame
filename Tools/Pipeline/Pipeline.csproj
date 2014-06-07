@@ -57,7 +57,9 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
-    <Compile Include="Common\PipelineController.Actions.cs" />
+    <Compile Include="Common\PipelineController.NewAction.cs" />
+    <Compile Include="Common\PipelineController.ExcludeAction.cs" />
+    <Compile Include="Common\PipelineController.IncludeAction.cs" />
     <Compile Include="Common\IController.cs" />
     <Compile Include="Common\IProjectItem.cs" />
     <Compile Include="Common\IProjectObserver.cs" />
@@ -69,6 +71,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\FolderEditing.cs" />
+    <Compile Include="Windows\UpdateAction.cs" />
     <Compile Include="Windows\MainView.cs">
       <SubType>Form</SubType>
     </Compile>

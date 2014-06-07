@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
+    /// <summary>
+    /// Snapshot of a ContentItem's state, used for undo/redo.
+    /// </summary>
     internal class ContentItemState
     {
         public BuildAction BuildAction;
@@ -14,6 +17,9 @@ namespace MonoGame.Tools.Pipeline
         public string ProcessorName;
         public OpaqueDataDictionary ProcessorParams;
 
+        /// <summary>
+        /// Create a ContentItemState storing member values of the passed ContentItem.
+        /// </summary>        
         public static ContentItemState Get(ContentItem item)
         {
             var state = new ContentItemState()
@@ -33,6 +39,9 @@ namespace MonoGame.Tools.Pipeline
             return state;
         }
 
+        /// <summary>
+        /// Set a ContentItem's member values from this state object.
+        /// </summary>
         public void Apply(ContentItem item)
         {
             item.BuildAction = BuildAction;
