@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 using NUnit.Framework;
@@ -180,6 +178,110 @@ namespace MonoGame.Tests.Framework
             var state = _tps.GetState();
             Assert.AreEqual(0, state.Count); //Should miss the touch that happened between
         }
+
+        [Test]
+        [Description("Do multiple touches and check they behave as expected")]
+        public void SimpleMultiTouchTest()
+        {
+            //Start with one touch
+            var pos = new Vector2(100, 50);
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+
+            var state = _tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            var initialTouch1 = state[0];
+            Assert.AreEqual(TouchLocationState.Pressed, initialTouch1.State);
+            Assert.AreEqual(pos, initialTouch1.Position);
+
+
+            //Start a second touch
+            var pos2 = new Vector2(150, 100);
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos2);
+
+            state = _tps.GetState();
+            Assert.AreEqual(2, state.Count);
+
+            //First touch should now be moved, same location
+            var touch1 = state.First(x => x.Id == initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Moved, touch1.State);
+            Assert.AreEqual(pos, touch1.Position);
+
+            //Second touch should be pressed in its position
+            var initialTouch2 = state.First(x => x.Id != initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Pressed, initialTouch2.State);
+            Assert.AreEqual(pos2, initialTouch2.Position);
+
+
+            //Move the second touch
+            var pos3 = new Vector2(150, 150);
+            _tps.AddEvent(2, TouchLocationState.Moved, pos3);
+            
+            state = _tps.GetState();
+            Assert.AreEqual(2, state.Count);
+
+            //touch1 should be the same
+            touch1 = state.First(x => x.Id == initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Moved, touch1.State);
+            Assert.AreEqual(pos, touch1.Position);
+
+            //touch2 should be moved in its new location
+            var touch2 = state.First(x => x.Id == initialTouch2.Id);
+            Assert.AreEqual(TouchLocationState.Moved, touch2.State);
+            Assert.AreEqual(pos3, touch2.Position);
+
+
+            //Release the second touch
+            var pos4 = new Vector2(150, 200);
+            _tps.AddEvent(2, TouchLocationState.Released, pos4);
+
+            state = _tps.GetState();
+            Assert.AreEqual(2, state.Count);
+
+            //touch1 should be the same
+            touch1 = state.First(x => x.Id == initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Moved, touch1.State);
+            Assert.AreEqual(pos, touch1.Position);
+
+            //touch2 should be released in its new location
+            touch2 = state.First(x => x.Id == initialTouch2.Id);
+            Assert.AreEqual(TouchLocationState.Released, touch2.State);
+            Assert.AreEqual(pos4, touch2.Position);
+
+
+            //Move the first touch, second touch shouldn't be there any more
+            var pos5 = new Vector2(100, 200);
+            _tps.AddEvent(1, TouchLocationState.Moved, pos5);
+
+            state = _tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            //touch1 should be moved to the new position
+            touch1 = state.First(x => x.Id == initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Moved, touch1.State);
+            Assert.AreEqual(pos5, touch1.Position);
+
+            //No more touch2
+
+
+            //Release the first touch
+            var pos6 = new Vector2(100, 250);
+            _tps.AddEvent(1, TouchLocationState.Released, pos6);
+
+            state = _tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            //touch1 should be released at the new position
+            touch1 = state.First(x => x.Id == initialTouch1.Id);
+            Assert.AreEqual(TouchLocationState.Released, touch1.State);
+            Assert.AreEqual(pos6, touch1.Position);
+
+
+            //Now we should have no touches
+            state = _tps.GetState();
+            Assert.AreEqual(0, state.Count);
+        }
+
 
         private class MockWindow : GameWindow
         {
