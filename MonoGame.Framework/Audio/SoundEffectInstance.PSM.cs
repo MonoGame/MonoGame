@@ -35,8 +35,8 @@ namespace Microsoft.Xna.Framework.Audio
                     _soundPlayer.Stop();
                     _soundPlayer.Dispose();
                 }
-                if (_audioPlayer != null)
-                    _audioPlayer.Dispose();
+                if (_audioBuffer != null)
+                    _audioBuffer.Dispose();
             }
             _soundPlayer = null;
             _audioBuffer = null;
