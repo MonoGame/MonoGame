@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
 			{
-				if (GraphicsCapabilities.SupportsPackedDepthStencil)
+                if (GraphicsDevice.GraphicsCapabilities.SupportsPackedDepthStencil)
 				{
 					this.glStencilBuffer = this.glDepthBuffer;
 					GraphicsDevice.Renderbuffer.Bind(GLRenderbuffer, this.glDepthBuffer);
