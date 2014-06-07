@@ -99,11 +99,15 @@ namespace MonoGame.Tools.Pipeline
 
         void NewItem(string name, string location, ContentItemTemplate template);
 
+        void AddAction(IProjectAction action);
+
+        ContentItem GetItem(string sourceFile);
+
         #endregion
 
         #region Undo, Redo
 
-        event PipelineController.CanUndoRedoChanged OnCanUndoRedoChanged;
+        event CanUndoRedoChanged OnCanUndoRedoChanged;
 
         bool CanRedo { get; }
 
@@ -113,6 +117,6 @@ namespace MonoGame.Tools.Pipeline
 
         void Redo();
 
-        #endregion
+        #endregion        
     }
 }

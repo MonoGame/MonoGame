@@ -455,6 +455,24 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Add(action);
         }
 
+        public void AddAction(IProjectAction action)
+        {
+            _actionStack.Add(action);
+        }
+
+        public ContentItem GetItem(string sourceFile)
+        {
+            foreach (var i in _project.ContentItems)
+            {                
+                if (string.Equals(i.SourceFile, sourceFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return null;
+        }
+
         #region Undo, Redo
 
         private readonly ActionStack _actionStack;

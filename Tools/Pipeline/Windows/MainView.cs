@@ -60,15 +60,17 @@ namespace MonoGame.Tools.Pipeline
             Form = this;
         }
 
-        private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs args)
         {
-            if (e.ChangedItem.Label == "References")
+            if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
             else
             {
                 if (_propertyGrid.SelectedObject is ContentItem)
-                {                
-                    _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
+                {
+                    var item = _propertyGrid.SelectedObject as ContentItem;
+                    var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
+                    _controller.AddAction(action);
                 }
                 else
                     _controller.OnProjectModified();
@@ -122,8 +124,8 @@ namespace MonoGame.Tools.Pipeline
             _controller.OnProjectLoading += invokeUpdateMenus;
             _controller.OnProjectLoaded += invokeUpdateMenus;
 
-            var updateUndoRedo = new PipelineController.CanUndoRedoChanged(UpdateUndoRedo);
-            var invokeUpdateUndoRedo = new PipelineController.CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
+            var updateUndoRedo = new CanUndoRedoChanged(UpdateUndoRedo);
+            var invokeUpdateUndoRedo = new CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
 
             _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
         }
@@ -267,6 +269,8 @@ namespace MonoGame.Tools.Pipeline
             node.ImageIndex = ContentItemIcon;
             node.SelectedImageIndex = ContentItemIcon;
 
+            _treeView.SelectedNode = node;
+
             root.Expand();
         }
 
@@ -281,12 +285,26 @@ namespace MonoGame.Tools.Pipeline
             var parent = node.Parent;
             node.Remove();
 
+            {
+                var obj = _propertyGrid.SelectedObject as ContentItem;
+                if (obj != null && obj.SourceFile == item.SourceFile)
+                    _propertyGrid.SelectedObject = null;
+            }
+
             // Clean up the parent nodes without children
             // and be sure not to delete the root node.
             while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
             {
                 var parentParent = parent.Parent;
+
                 parent.Remove();
+
+                {
+                    var obj = _propertyGrid.SelectedObject as ContentItem;
+                    if (obj != null && obj.SourceFile == item.SourceFile)
+                        _propertyGrid.SelectedObject = null;
+                }
+
                 parent = parentParent;
             }
         }
