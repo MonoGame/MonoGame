@@ -242,11 +242,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 int index = typeWriters.Count;
                 typeWriter = compiler.GetTypeWriter(type);
+
                 typeWriters.Add(typeWriter);
-
-		        if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
-			        typeWriterMap.Add(typeWriter.GetType(), index);
-
+			    typeWriterMap.Add(typeWriter.GetType(), index);
                 typeMap.Add(type, typeWriter);
 
                 // TODO: This is kinda messy.. seems like there could
@@ -343,7 +341,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             else
             {
 		    Type objectType = typeof (T);
-		    if (!objectType.IsValueType) {
+            if (!objectType.IsValueType && !typeWriter.TargetType.IsValueType)
+            {
 			    var index = typeWriterMap[typeWriter.GetType ()];
 			    // Because zero means null object, we add one to the index before writing it to the file
 			    Write7BitEncodedInt (index + 1);
