@@ -14,11 +14,15 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainView : Form, IView, IProjectObserver
     {
+        // The project which will be opened as soon as a controller is attached.
+        // Is used when PipelineTool is launched to open a project, provided by the command line.
+        public string OpenProjectPath;
+
         private IController _controller;
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;
+        private bool _treeSort;        
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
@@ -127,7 +131,7 @@ namespace MonoGame.Tools.Pipeline
             var updateUndoRedo = new CanUndoRedoChanged(UpdateUndoRedo);
             var invokeUpdateUndoRedo = new CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
 
-            _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
+            _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;            
         }
 
         public AskResult AskSaveOrCancel()
@@ -425,6 +429,15 @@ namespace MonoGame.Tools.Pipeline
             _controller.CloseProject();
         }
 
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(OpenProjectPath))
+            {
+                _controller.OpenProject(OpenProjectPath);
+                OpenProjectPath = null;
+            }
+        }
+
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)
@@ -623,6 +636,6 @@ namespace MonoGame.Tools.Pipeline
         private void OnUndoClick(object sender, EventArgs e)
         {
             _controller.Undo();
-        }
+        }        
     }
 }
