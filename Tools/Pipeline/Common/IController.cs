@@ -10,6 +10,11 @@ namespace MonoGame.Tools.Pipeline
     interface IController
     {
         /// <summary>
+        /// Types of content which can be created and added to a project. 
+        /// </summary>
+        IEnumerable<ContentItemTemplate> Templates { get; }
+
+        /// <summary>
         /// True if there is a project.
         /// </summary>
         bool ProjectOpen { get; }
@@ -70,6 +75,8 @@ namespace MonoGame.Tools.Pipeline
 
         void OpenProject();
 
+        void OpenProject(string projectFilePath);
+
         void CloseProject();
 
         bool SaveProject(bool saveAs);
@@ -86,8 +93,34 @@ namespace MonoGame.Tools.Pipeline
 
         bool Exit();
 
+        #region ContentItem
+
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(IEnumerable<ContentItem> items);        
+
+        void NewItem(string name, string location, ContentItemTemplate template);
+
+        void AddAction(IProjectAction action);
+
+        ContentItem GetItem(string sourceFile);
+
+        #endregion
+
+        #region Undo, Redo
+
+        event CanUndoRedoChanged OnCanUndoRedoChanged;
+
+        bool CanRedo { get; }
+
+        bool CanUndo { get; }
+
+        void Undo();
+
+        void Redo();
+
+        #endregion        
+
+        string GetFullPath(string filePath);
     }
 }

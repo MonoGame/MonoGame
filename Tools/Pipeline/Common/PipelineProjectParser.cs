@@ -128,7 +128,7 @@ namespace MonoGame.Tools.Pipeline
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Do we have a duplicate?
-            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.OriginalPath, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
             {
                 if (skipDuplicates)
@@ -143,7 +143,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 Controller = _controller,
                 BuildAction = BuildAction.Build,
-                SourceFile = sourceFile,
+                OriginalPath = sourceFile,
                 ImporterName = Importer,
                 ProcessorName = Processor,
                 ProcessorParams = new OpaqueDataDictionary()
@@ -170,7 +170,7 @@ namespace MonoGame.Tools.Pipeline
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _project.ContentItems.FirstOrDefault(e => e.SourceFile.Equals(sourceFile));
+            var previous = _project.ContentItems.FirstOrDefault(e => e.OriginalPath.Equals(sourceFile));
             if (previous != null)
                 _project.ContentItems.Remove(previous);
 
@@ -178,7 +178,7 @@ namespace MonoGame.Tools.Pipeline
             var item = new ContentItem
             {
                 BuildAction = BuildAction.Copy,
-                SourceFile = sourceFile,
+                OriginalPath = sourceFile,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
@@ -203,7 +203,7 @@ namespace MonoGame.Tools.Pipeline
             _project.ContentItems.Clear();
 
             // Store the file name for saving later.
-            _project.FilePath = projectFilePath;
+            _project.OriginalPath = projectFilePath;
 
             var parser = new MGBuildParser(this);
             parser.Title = "Pipeline";
@@ -217,7 +217,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void SaveProject()
         {
-            using (var io = File.CreateText(_project.FilePath))
+            using (var io = File.CreateText(_project.OriginalPath))
                 SaveProject(io, null);
         }
         
@@ -265,12 +265,12 @@ namespace MonoGame.Tools.Pipeline
 
                 // Wrap content item lines with a begin comment line
                 // to make them more cohesive (for version control).                  
-                line = string.Format("#begin {0}", i.SourceFile);
+                line = string.Format("#begin {0}", i.OriginalPath);
                 io.WriteLine(line);
 
                 if (i.BuildAction == BuildAction.Copy)
                 {
-                    line = string.Format(lineFormat, "copy", i.SourceFile);
+                    line = string.Format(lineFormat, "copy", i.OriginalPath);
                     io.WriteLine(line);
                     io.WriteLine();
                 }
@@ -323,7 +323,7 @@ namespace MonoGame.Tools.Pipeline
                         }
                     }
 
-                    line = string.Format(lineFormat, "build", i.SourceFile);
+                    line = string.Format(lineFormat, "build", i.OriginalPath);
                     io.WriteLine(line);
                     io.WriteLine();
                 }
@@ -332,7 +332,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void ImportProject(string projectFilePath)
         {
-            _project.FilePath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
+            _project.OriginalPath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
 
             using (var io = XmlReader.Create(File.OpenText(projectFilePath)))
             {

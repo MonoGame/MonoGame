@@ -145,12 +145,12 @@ namespace Microsoft.Xna.Framework.Audio
 								switch (tableType) {
 								case 0: //Wave
 								{
-									uint trackIndex = soundbankreader.ReadUInt16 ();
-									byte waveBankIndex = soundbankreader.ReadByte ();
+									int trackIndex = soundbankreader.ReadUInt16 ();
+                                    int waveBankIndex = soundbankreader.ReadByte();
                                     soundbankreader.ReadByte (); // weightMin
                                     soundbankreader.ReadByte (); // weightMax
 			
-									cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
+									cueSounds[j] = new XactSound(this, waveBankIndex, trackIndex);
 									break;
 								}
 								case 1:
@@ -164,9 +164,9 @@ namespace Microsoft.Xna.Framework.Audio
 								}
 								case 4: //CompactWave
 								{
-									uint trackIndex = soundbankreader.ReadUInt16 ();
-									byte waveBankIndex = soundbankreader.ReadByte ();
-									cueSounds[j] = new XactSound(this.GetWave(waveBankIndex, trackIndex));
+                                    int trackIndex = soundbankreader.ReadUInt16();
+                                    int waveBankIndex = soundbankreader.ReadByte();
+                                    cueSounds[j] = new XactSound(this, waveBankIndex, trackIndex);
 									break;
 								}
 								default:
@@ -191,9 +191,12 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			loaded = true;
         }
-		
-		internal SoundEffectInstance GetWave(byte waveBankIndex, uint trackIndex) {
-			return waveBanks[waveBankIndex].sounds[trackIndex];
+
+        internal SoundEffectInstance GetSoundEffectInstance(int waveBankIndex, int trackIndex)
+        {
+            var waveBank = waveBanks[waveBankIndex];
+            var sound = waveBank.GetSoundEffect(trackIndex);
+            return sound.GetPooledInstance();
 		}
 		
         /// <summary>
@@ -218,8 +221,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="name">Name of the cue to play.</param>
 		public void PlayCue(string name)
 		{
-			var musicCue = GetCue(name);
-            musicCue.Play();
+			var cue = GetCue(name);
+            cue.Play();
 		}
 		
         /*
@@ -235,7 +238,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		public void Dispose ()
 		{
-			throw new NotImplementedException ();
+            foreach (var cue in cues.Values)
+                cue.Dispose();
 		}
 		#endregion
     }

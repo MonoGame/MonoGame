@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentItemTemplate>
+  <Label>XmlContent</Label>
+  <Icon>XmlContent.png</Icon>
+  <ImporterName>XmlImporter</ImporterName>
+  <ProcessorName>PassthroughProcessor</ProcessorName>
+  <TemplateFile>XmlContent.xml</TemplateFile>
+</ContentItemTemplate>
