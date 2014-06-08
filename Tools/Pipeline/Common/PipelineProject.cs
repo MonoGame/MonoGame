@@ -17,7 +17,7 @@ namespace MonoGame.Tools.Pipeline
     {        
         public IController Controller;      
   
-        public string FilePath { get; set; }
+        public string OriginalPath { get; set; }
 
         public List<ContentItem> ContentItems { get; private set; }                
 
@@ -39,10 +39,10 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (string.IsNullOrEmpty(FilePath))
+                if (string.IsNullOrEmpty(OriginalPath))
                     return "";
 
-                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
+                return System.IO.Path.GetFileNameWithoutExtension(OriginalPath);
             }
         }
 
@@ -50,11 +50,11 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (string.IsNullOrEmpty(FilePath))
+                if (string.IsNullOrEmpty(OriginalPath))
                     return "";
 
-                var idx = FilePath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, FilePath.Length - 1);
-                return FilePath.Remove(idx);
+                var idx = OriginalPath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, OriginalPath.Length - 1);
+                return OriginalPath.Remove(idx);
             }
         }
 

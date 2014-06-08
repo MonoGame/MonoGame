@@ -25,7 +25,7 @@ namespace MonoGame.Tools.Pipeline
             var state = new ContentItemState()
                 {
                     BuildAction = item.BuildAction,
-                    SourceFile = item.SourceFile,
+                    SourceFile = item.OriginalPath,
                     ImporterName = item.ImporterName,
                     ProcessorName = item.ProcessorName,
                     ProcessorParams = new OpaqueDataDictionary(),
@@ -45,7 +45,7 @@ namespace MonoGame.Tools.Pipeline
         public void Apply(ContentItem item)
         {
             item.BuildAction = BuildAction;
-            item.SourceFile = SourceFile;
+            item.OriginalPath = SourceFile;
             item.ImporterName = ImporterName;
             item.ProcessorName = ProcessorName;
             item.ProcessorParams = new OpaqueDataDictionary();

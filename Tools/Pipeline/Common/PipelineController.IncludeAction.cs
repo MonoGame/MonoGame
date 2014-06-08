@@ -36,7 +36,7 @@ namespace MonoGame.Tools.Pipeline
                     item.Controller = _con;
                     item.ResolveTypes();
 
-                    _files[i] = item.SourceFile;
+                    _files[i] = item.OriginalPath;
 
                     _con._view.AddTreeItem(item);
                     _con._view.SelectTreeItem(item);
@@ -55,7 +55,7 @@ namespace MonoGame.Tools.Pipeline
                     for (var i = 0; i < _con._project.ContentItems.Count; i++)
                     {
                         var item = _con._project.ContentItems[i];
-                        if (item.SourceFile == f)
+                        if (item.OriginalPath == f)
                         {
                             _con._project.ContentItems.Remove(item);
                             _con._view.RemoveTreeItem(item);                            
