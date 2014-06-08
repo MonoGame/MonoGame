@@ -173,6 +173,11 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
+            OpenProject(projectFilePath);
+        }
+
+        public void OpenProject(string projectFilePath)
+        {
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -513,7 +518,10 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void LoadTemplates(string path)
-        {                
+        {
+            if (!Directory.Exists(path))
+                return;
+
             var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
             foreach (var f in files)
             {

@@ -14,11 +14,15 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainView : Form, IView, IProjectObserver
     {
+        // The project which will be opened as soon as a controller is attached.
+        // Is used when PipelineTool is launched to open a project, provided by the command line.
+        public string OpenProjectPath;
+
         private IController _controller;
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;
+        private bool _treeSort;        
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
@@ -444,6 +448,15 @@ namespace MonoGame.Tools.Pipeline
         private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             _controller.CloseProject();
+        }
+
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(OpenProjectPath))
+            {
+                _controller.OpenProject(OpenProjectPath);
+                OpenProjectPath = null;
+            }
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)

@@ -505,6 +505,7 @@ namespace MonoGame.Tools.Pipeline
             this.Name = "MainView";
             this.Text = "MonoGame Pipeline";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainView_FormClosing);
+            this.Load += new System.EventHandler(this.MainView_Load);
             _splitTreeProps.Panel1.ResumeLayout(false);
             _splitTreeProps.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(_splitTreeProps)).EndInit();
