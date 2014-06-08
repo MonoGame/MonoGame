@@ -465,6 +465,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[7] = value.M23;
                 fData[8] = value.M33;
             }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+
+                fData[3] = value.M12;
+                fData[4] = value.M22;
+                fData[5] = value.M32;
+            }
 
             StateKey = unchecked(NextStateKey++);
         }
@@ -554,6 +566,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[6] = value.M31;
                 fData[7] = value.M32;
                 fData[8] = value.M33;
+            }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+
+                fData[3] = value.M21;
+                fData[4] = value.M22;
+                fData[5] = value.M23;
             }
 
 			StateKey = unchecked(NextStateKey++);
@@ -653,6 +677,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[6] = value[i].M13;
                     fData[7] = value[i].M23;
                     fData[8] = value[i].M33;
+                }
+            }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Elements[i].Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M21;
+                    fData[2] = value[i].M31;
+
+                    fData[3] = value[i].M12;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M32;
                 }
             }
 
