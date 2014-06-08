@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// <summary>Represents a collection of wave files.</summary>
     public class WaveBank : IDisposable
     {
-        internal SoundEffectInstance[] sounds;
+        internal SoundEffect[] sounds;
         internal string BankName;
 
         struct Segment
@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Audio
                 entry_name[wavebankdata.EntryNameElementSize] = 0;
             }
 
-            sounds = new SoundEffectInstance[wavebankdata.EntryCount];
+            sounds = new SoundEffect[wavebankdata.EntryCount];
 
             for (int current_entry = 0; current_entry < wavebankdata.EntryCount; current_entry++)
             {
@@ -340,9 +340,9 @@ namespace Microsoft.Xna.Framework.Audio
                             _format = waveFormat
                         };
 
-					sounds[current_entry] = sfx.CreateInstance();
+					sounds[current_entry] = sfx;
 #else
-					sounds[current_entry] = new SoundEffectInstance(audiodata, rate, chans);
+                    sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
 #endif                    
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
@@ -394,7 +394,7 @@ namespace Microsoft.Xna.Framework.Audio
                             audioFile.Write(audiodata, 0, audiodata.Length);
                             audioFile.Seek(0, SeekOrigin.Begin);
        
-                            sounds[current_entry] = SoundEffect.FromStream(audioFile).CreateInstance();
+                            sounds[current_entry] = SoundEffect.FromStream(audioFile);
                         }
 #else
 						throw new NotImplementedException();
@@ -416,10 +416,10 @@ namespace Microsoft.Xna.Framework.Audio
                 } else if (codec == MiniFormatTag_ADPCM) {
                     using (MemoryStream dataStream = new MemoryStream(audiodata)) {
                         using (BinaryReader source = new BinaryReader(dataStream)) {
-                            sounds[current_entry] = new SoundEffectInstance(
+                            sounds[current_entry] = new SoundEffect(
                                 MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
                                 rate,
-                                chans
+                                (AudioChannels)chans
                             );
                         }
                     }
@@ -453,8 +453,9 @@ namespace Microsoft.Xna.Framework.Audio
 		#region IDisposable implementation
 		public void Dispose ()
 		{
-			throw new NotImplementedException ();
-		}
+            foreach (var s in sounds)
+                s.Dispose();
+        }
 		#endregion
     }
 }
