@@ -59,8 +59,36 @@ namespace Microsoft.Xna.Framework
         //AndroidGameView also implements ISurfaceHolderCallback and has these methods.
         //That is why these get called even though we never register as a SurfaceHolderCallback
 
+        private bool _isSurfaceChanged = false;
+        private int _prevSurfaceWidth = 0;
+        private int _prevSurfaceHeight = 0;
+
         void ISurfaceHolderCallback.SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
         {
+            if ((int)Android.OS.Build.VERSION.SdkInt >= 19)
+            {
+                if (!_isSurfaceChanged)
+                {
+                    _isSurfaceChanged = true;
+                    _prevSurfaceWidth = width;
+                    _prevSurfaceHeight = height;
+                }
+                else
+                {
+                    // Forcing reinitialization of the view if SurfaceChanged() is called more than once to fix shifted drawing on KitKat.
+                    // See https://github.com/mono/MonoGame/issues/2492.
+                    if (!ScreenReceiver.ScreenLocked && Game.Instance.Platform.IsActive &&
+                        (_prevSurfaceWidth != width || _prevSurfaceHeight != height))
+                    {
+                        _prevSurfaceWidth = width;
+                        _prevSurfaceHeight = height;
+
+                        base.SurfaceDestroyed(holder);
+                        base.SurfaceCreated(holder);
+                    }
+                }
+            }
+
             SurfaceChanged(holder, format, width, height);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceChanged: format = " + format + ", width = " + width + ", height = " + height);
 
@@ -78,6 +106,7 @@ namespace Microsoft.Xna.Framework
         {
             SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
+            _isSurfaceChanged = false;
 
             if (_game.GraphicsDevice != null)
             {
@@ -115,6 +144,12 @@ namespace Microsoft.Xna.Framework
         protected override void OnLoad(EventArgs eventArgs)
         {
             MakeCurrent();
+        }
+
+        public override void Resume()
+        {
+            if (!ScreenReceiver.ScreenLocked && Game.Instance.Platform.IsActive)
+                base.Resume();
         }
 
         protected override void CreateFrameBuffer()
