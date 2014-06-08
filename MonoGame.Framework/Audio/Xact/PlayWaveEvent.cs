@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Audio
         Shuffle
     };
 
-	class EventPlayWave : ClipEvent
+	class PlayWaveEvent : ClipEvent
     {
         private SoundBank _soundBank;
 
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SoundEffectInstance _wav;
 
-        public EventPlayWave(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank, 
+        public PlayWaveEvent(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank, 
                                 int[] waveBanks, int[] tracks, VariationType variation, bool isLooped)
             : base(clip, timeStamp, randomOffset)
         {

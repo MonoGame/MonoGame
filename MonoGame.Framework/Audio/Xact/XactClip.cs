@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Audio
 					clipReader.ReadUInt16 ();
 					clipReader.ReadUInt16 ();
 
-                    _events[i] = new EventPlayWave(
+                    _events[i] = new PlayWaveEvent(
                         this,
                         timeStamp, 
                         randomOffset,
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
 
                     // Finally.
-                    _events[i] = new EventPlayWave(
+                    _events[i] = new PlayWaveEvent(
                         this,
                         timeStamp,
                         randomOffset,
@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal void SetFade(float fadeInDuration, float fadeOutDuration)
         {
             foreach(var evt in _events)
-                (evt as EventPlayWave).SetFade(fadeInDuration, fadeOutDuration);
+                (evt as PlayWaveEvent).SetFade(fadeInDuration, fadeOutDuration);
         }
 		
 		public void Play()
