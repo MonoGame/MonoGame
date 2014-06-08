@@ -30,8 +30,6 @@ namespace Microsoft.Xna.Framework.Audio
 
 		internal AudioCategory[] Categories { get { return categories; } }
 
-        static internal readonly Random Random = new Random();
-
 		struct Variable {
 			public string name;
 			public float value;

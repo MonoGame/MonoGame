@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 			reader.ReadUInt16 (); //unkn
 
-            var volume = (float)XactSound.ParseDecibel(reader.ReadByte());
+            var volume = XactHelpers.ParseVolumeFromDecibels(reader.ReadByte());
             _volume = new float[1] { volume };
 
 			byte visibilityFlags = reader.ReadByte ();

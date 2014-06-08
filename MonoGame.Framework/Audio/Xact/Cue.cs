@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Audio
                 engine._activeCues.Add(this);
 			
 			//TODO: Probabilities
-            var index = AudioEngine.Random.Next(sounds.Length);
+            var index = XactHelpers.Random.Next(sounds.Length);
             curSound = sounds[index];
 			
 			curSound.Volume = volume;

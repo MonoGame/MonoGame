@@ -22,28 +22,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         SoundBank _soundBank;
 		
-		internal static float ParseDecibel(byte binaryValue)
-		{
-			/* FIXME: This calculation probably came from someone's TI-83.
-			    * I plotted out Codename Naddachance's bytes out, and
-			    * the closest formula I could come up with (hastily)
-			    * was this:
-			    * dBValue = 37.5 * Math.Log10(binaryValue * 2.0) - 96.0
-			    * But of course, volumes are still wrong. So I dunno.
-			    * -flibit
-			    */
-			var decibles = (float)((
-				(-96.0 - 67.7385212334047) /
-				(1 + Math.Pow(
-					binaryValue / 80.1748600297963,
-					0.432254984608615
-				))
-			) + 67.7385212334047);
-
-            return (float)Math.Pow(10, decibles / 20.0);
-		}
-
-
         public XactSound(SoundBank soundBank, int waveBankIndex, int trackIndex)
         {
             complexSound = false;
@@ -64,7 +42,7 @@ namespace Microsoft.Xna.Framework.Audio
 			complexSound = (flags & 1) != 0;
 
             _categoryID = soundReader.ReadUInt16();
-            var volume = ParseDecibel(soundReader.ReadByte());
+            var volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
             var pitch = soundReader.ReadInt16() / 1000.0f;
 			soundReader.ReadByte (); //unkn
             soundReader.ReadUInt16 (); // entryLength

@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Audio
                     break;
 
                 case VariationType.Random:
-                    _wavIndex = AudioEngine.Random.Next() % trackCount;
+                    _wavIndex = XactHelpers.Random.Next() % trackCount;
                     break;
 
                 case VariationType.RandomNoImmediateRepeats:
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
                     var last = _wavIndex;
                     do
                     {
-                        _wavIndex = AudioEngine.Random.Next() % trackCount;
+                        _wavIndex = XactHelpers.Random.Next() % trackCount;
                     }
                     while (last == _wavIndex && trackCount > 1);
                     break;
@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 case VariationType.Shuffle:
                     // TODO: Need some sort of deck implementation.
-                    _wavIndex = AudioEngine.Random.Next() % trackCount;
+                    _wavIndex = XactHelpers.Random.Next() % trackCount;
                     break;
             };
 
