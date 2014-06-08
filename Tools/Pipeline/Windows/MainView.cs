@@ -125,7 +125,7 @@ namespace MonoGame.Tools.Pipeline
             // Even though we support 'Open File' as an action on the root (PipelineProject)
             // double clicking on it toggles whether it is expanded. 
             // So if you want to open it just use the menu.
-            if (args.Node.Tag is ContentItem)
+            if (!(args.Node.Tag is ContentItem))
                 return;
 
             ContextMenu_OpenFile_Click(sender, args);            
