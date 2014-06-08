@@ -15,8 +15,8 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public XactClip (SoundBank soundBank, BinaryReader clipReader, uint clipOffset)
 		{
-			long oldPosition = clipReader.BaseStream.Position;
-			clipReader.BaseStream.Seek (clipOffset, SeekOrigin.Begin);
+			var oldPosition = clipReader.BaseStream.Position;
+			clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
 			
 			byte numEvents = clipReader.ReadByte();
 			_events = new ClipEvent[numEvents];
@@ -38,16 +38,19 @@ namespace Microsoft.Xna.Framework.Audio
 
 				case 1:
                 {
-					clipReader.ReadUInt16 (); //unkn
-					int trackIndex = clipReader.ReadUInt16 ();
+                    // Unknown!
+					clipReader.ReadUInt16();
+
+					int trackIndex = clipReader.ReadUInt16();
                     int waveBankIndex = clipReader.ReadByte();
 					
-					var loopCount = clipReader.ReadByte ();
+					var loopCount = clipReader.ReadByte();
 				    // if loopCount == 255 its an infinite loop
 					// otherwise it loops n times..
-				    // unknown
-					clipReader.ReadUInt16 ();
-					clipReader.ReadUInt16 ();
+				    
+                    // Unknown!
+					clipReader.ReadUInt16();
+					clipReader.ReadUInt16();
 
                     _events[i] = new PlayWaveEvent(
                         this,
@@ -64,29 +67,26 @@ namespace Microsoft.Xna.Framework.Audio
 
                 case 3:
                 {
-                    // Unknown value
+                    // Unknown!
                     clipReader.ReadByte();
 
-                    /* Event Flags
-                     * 0x01 = Break Loop
-                     * 0x02 = Use Speaker Position
-                     * 0x04 = Use Center Speaker
-                     * 0x08 = New Speaker Position On Loop
-                     */
+                    // Event flags
                     clipReader.ReadByte();
 
-                    // Unknown values
+                    // Unknown!
                     clipReader.ReadBytes(5);
 
-                    // Number of WaveBank tracks
+                    // The number of tracks for the variations.
                     int numTracks = clipReader.ReadUInt16();
 
-                    // Variation Playlist Type
+                    // The variation playlist type seems to be 
+                    // stored in the bottom 4bits only.
                     var variationType = clipReader.ReadUInt16() & 0x000F;
 
-                    // Unknown values
+                    // Unknown!
                     clipReader.ReadBytes(4);
 
+                    // Read in the variation playlist.
                     var waveBanks = new int[numTracks];
                     var tracks = new int[numTracks];
                     var weights = new byte[numTracks];
@@ -100,7 +100,6 @@ namespace Microsoft.Xna.Framework.Audio
                         weights[j] = (byte)(maxWeight - minWeight);
                     }
 
-                    // Finally.
                     _events[i] = new PlayWaveEvent(
                         this,
                         timeStamp,
