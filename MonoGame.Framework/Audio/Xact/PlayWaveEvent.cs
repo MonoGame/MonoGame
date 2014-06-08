@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.Stop();
 
             var trackCount = _tracks.Length;
-            Console.WriteLine("_variation=" + _variation);
 
             switch (_variation)
             {
