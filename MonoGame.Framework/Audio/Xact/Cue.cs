@@ -4,7 +4,6 @@
 
 using System;
 
-
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>Manages the playback of a sound or set of sounds.</summary>
