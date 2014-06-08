@@ -319,8 +319,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 					_sounds[current_entry] = sfx;
 #else
-                    sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
-#endif                    
+                    _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
+#endif
                 } else if (codec == MiniForamtTag_WMA) { //WMA or xWMA (or XMA2)
                     byte[] wmaSig = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66, 0xcf, 0x11, 0xa6, 0xd9, 0x0, 0xaa, 0x0, 0x62, 0xce, 0x6c};
                     
@@ -371,7 +371,7 @@ namespace Microsoft.Xna.Framework.Audio
                             audioFile.Write(audiodata, 0, audiodata.Length);
                             audioFile.Seek(0, SeekOrigin.Begin);
        
-                            sounds[current_entry] = SoundEffect.FromStream(audioFile);
+                            _sounds[current_entry] = SoundEffect.FromStream(audioFile);
                         }
 #else
 						throw new NotImplementedException();
@@ -393,7 +393,7 @@ namespace Microsoft.Xna.Framework.Audio
                 } else if (codec == MiniFormatTag_ADPCM) {
                     using (MemoryStream dataStream = new MemoryStream(audiodata)) {
                         using (BinaryReader source = new BinaryReader(dataStream)) {
-                            sounds[current_entry] = new SoundEffect(
+                            _sounds[current_entry] = new SoundEffect(
                                 MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
                                 rate,
                                 (AudioChannels)chans
