@@ -20,13 +20,40 @@ namespace Microsoft.Xna.Framework.Media
 
         }
 
-        private static void PlatformSetIsMuted()
+        private static bool PlatformGetIsMuted()
         {
+            return _isMuted;
+        }
+
+        private static void PlatformSetIsMuted(bool muted)
+        {
+            _isMuted = muted;
+
             if (_queue.Count == 0)
                 return;
 
             var newVolume = _isMuted ? 0.0f : _volume;
             _queue.SetVolume(newVolume);
+        }
+
+        private static bool PlatformGetIsRepeating()
+        {
+            return _isRepeating;
+        }
+
+        private static void PlatformSetIsRepeating(bool repeating)
+        {
+            _isRepeating = repeating;
+        }
+
+        private static bool PlatformGetIsShuffled()
+        {
+            return _isShuffled;
+        }
+
+        private static void PlatformSetIsShuffled(bool shuffled)
+        {
+            _isShuffled = shuffled;
         }
 
         private static TimeSpan PlatformGetPlayPosition()
@@ -35,6 +62,34 @@ namespace Microsoft.Xna.Framework.Media
                 return TimeSpan.Zero;
 
             return _queue.ActiveSong.Position;
+        }
+
+#if IOS
+        private static void PlatformSetPlayPosition(TimeSpan playPosition)
+        {
+            if (_queue.ActiveSong != null)
+                _queue.ActiveSong.Position = playPosition;
+        }
+#endif
+
+        private static MediaState PlatformGetState()
+        {
+            return _state;
+        }
+
+        private static float PlatformGetVolume()
+        {
+            return _volume;
+        }
+
+        private static void PlatformSetVolume(float volume)
+        {
+            _volume = volume;
+
+            if (_queue.ActiveSong == null)
+                return;
+
+            _queue.SetVolume(_isMuted ? 0.0f : _volume);
         }
 
         private static bool PlatformGetGameHasControl()
@@ -62,15 +117,6 @@ namespace Microsoft.Xna.Framework.Media
             // TODO: Fix me!
             return true;
         }
-
-        private static void PlatformSetVolume()
-        {
-            if (_queue.ActiveSong == null)
-                return;
-
-            _queue.SetVolume(_isMuted ? 0.0f : _volume);
-        }
-		
 		#endregion
 
         private static void PlatformPause()

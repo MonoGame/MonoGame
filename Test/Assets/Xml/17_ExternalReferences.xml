@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="ExternalReferences">
+  <Asset Type="MonoGame.Tests.ContentPipeline.ExternalReferences">
     <Texture>
       <Reference>#External1</Reference>
     </Texture>

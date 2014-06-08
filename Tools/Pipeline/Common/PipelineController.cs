@@ -7,11 +7,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class PipelineController : IController
+    internal partial class PipelineController : IController
     {
         private readonly IView _view;
         private PipelineProject _project;
@@ -19,14 +22,28 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
+        private readonly List<ContentItemTemplate> _templateItems;
+
+        public IEnumerable<ContentItemTemplate> Templates
+        {
+            get { return _templateItems; }
+        }
+
         public PipelineController(IView view, PipelineProject project)
         {
+            _actionStack = new ActionStack();
+
             _view = view;
             _view.Attach(this);
             _project = project;
             _project.Controller = this;
             ProjectOpen = false;
+
+            _templateItems = new List<ContentItemTemplate>();
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");                        
         }
+
+        public bool LaunchDebugger { get; set; }
 
         public bool ProjectOpen { get; private set; }
 
@@ -89,11 +106,12 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoading();
 
             // Clear existing project data, initialize to a new blank project.
+            _actionStack.Clear();
             _project = new PipelineProject();            
             PipelineTypes.Load(_project);
 
             // Save the new project.
-            _project.FilePath = projectFilePath;
+            _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
             
             UpdateTree();
@@ -120,6 +138,7 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
+                _actionStack.Clear();
                 _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.ImportProject(projectFilePath);
@@ -154,6 +173,11 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
+            OpenProject(projectFilePath);
+        }
+
+        public void OpenProject(string projectFilePath)
+        {
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -161,6 +185,7 @@ namespace MonoGame.Tools.Pipeline
             try
 #endif
             {
+                _actionStack.Clear();
                 _project = new PipelineProject();
                 var parser = new PipelineProjectParser(this, _project);
                 parser.OpenProject(projectFilePath);
@@ -193,6 +218,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
             ProjectDiry = false;
             _project = null;
+            _actionStack.Clear();
 
             UpdateTree();
         }
@@ -200,13 +226,13 @@ namespace MonoGame.Tools.Pipeline
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
-            if (saveAs || string.IsNullOrEmpty(_project.FilePath))
+            if (saveAs || string.IsNullOrEmpty(_project.OriginalPath))
             {
-                string newFilePath = _project.FilePath;
+                string newFilePath = _project.OriginalPath;
                 if (!_view.AskSaveName(ref newFilePath, null))
                     return false;
 
-                _project.FilePath = newFilePath;
+                _project.OriginalPath = newFilePath;
             }
 
             // Do the save.
@@ -224,41 +250,40 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
+            if (LaunchDebugger)
+                commands += " /launchdebugger";
             BuildCommand(commands);
         }
 
-        public void RebuildItem(IProjectItem item)
+        public void RebuildItems(IEnumerable<IProjectItem> items)
         {
             // Make sure we save first!
             if (!AskSaveProject())
                 return;
 
-            // TODO: We can support folders here as well.
+            // Create a unique file within the same folder as
+            // the normal project to store this incremental build.
+            var uniqueName = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(Path.GetDirectoryName(_project.OriginalPath), uniqueName);
 
-            var contentItem = item as ContentItem;
-            if (contentItem != null)
+            // Write the incremental project file limiting the
+            // content to just the files we want to rebuild.
+            using (var io = File.CreateText(tempPath))
             {
-                // Create a unique file within the same folder as
-                // the normal project to store this incremental build.
-                var uniqueName = Guid.NewGuid().ToString();
-                var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
-
-                // Write the incremental project file limiting the
-                // content to just the files we want to rebuild.
-                using (var io = File.CreateText(tempPath))
-                {
-                    var parser = new PipelineProjectParser(this, _project);
-                    parser.SaveProject(io, (i) => i != item);
-                }
-
-                // Run the build the command.
-                var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
-                BuildCommand(commands);
-
-                // Cleanup the temp file once we're done.
-                _buildTask.ContinueWith((e) => File.Delete(tempPath));
+                var parser = new PipelineProjectParser(this, _project);
+                parser.SaveProject(io, (i) => !items.Contains(i));
             }
+
+            // Run the build the command.
+            var commands = string.Format("/@:\"{0}\" /rebuild /incremental", tempPath);
+            if (LaunchDebugger)
+                commands += " /launchdebugger";
+
+            BuildCommand(commands);
+
+            // Cleanup the temp file once we're done.
+            _buildTask.ContinueWith((e) => File.Delete(tempPath));
         }
 
         private void BuildCommand(string commands)
@@ -293,6 +318,9 @@ namespace MonoGame.Tools.Pipeline
             _view.OutputClear();
 
             var commands = string.Format("/clean /intermediateDir:\"{0}\" /outputDir:\"{1}\"", _project.IntermediateDir, _project.OutputDir);
+            if (LaunchDebugger)
+                commands += " /launchdebugger";
+
             _buildTask = Task.Run(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());          
@@ -301,7 +329,7 @@ namespace MonoGame.Tools.Pipeline
         private void DoBuild(string commands)
         {
             _buildProcess = new Process();
-            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
+            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
             _buildProcess.StartInfo.FileName = "MGCB.exe";
             _buildProcess.StartInfo.Arguments = commands;
             _buildProcess.StartInfo.CreateNoWindow = true;
@@ -376,7 +404,7 @@ namespace MonoGame.Tools.Pipeline
         {
             _view.BeginTreeUpdate();
 
-            if (_project == null || string.IsNullOrEmpty(_project.FilePath))
+            if (_project == null || string.IsNullOrEmpty(_project.OriginalPath))
                 _view.SetTreeRoot(null);
             else
             {
@@ -404,41 +432,78 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public void Include(string initialDirectory)
-        {                        
+        {       
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+
             List<string> files;
             if (!_view.ChooseContentFile(initialDirectory, out files))
                 return;
 
-            var parser = new PipelineProjectParser(this, _project);
-            _view.BeginTreeUpdate();
-
-            foreach (var file in files)
-            {
-                if (!parser.AddContent(file, true))
-                    continue;
-
-                var item = _project.ContentItems.Last();
-                item.Controller = this;
-                item.ResolveTypes();
-                _view.AddTreeItem(item);
-                _view.SelectTreeItem(item);
-            }
-
-            _view.EndTreeUpdate();
-            ProjectDiry = true;                  
+            var action = new IncludeAction(this, files);
+            action.Do();
+            _actionStack.Add(action);  
         }
 
-        public void Exclude(ContentItem item)
+        public void Exclude(IEnumerable<ContentItem> items)
         {
-            _project.ContentItems.Remove(item);
+            var action = new ExcludeAction(this, items);
+            action.Do();
+            _actionStack.Add(action);
+        }
 
-            _view.BeginTreeUpdate();
-            _view.RemoveTreeItem(item);
-            _view.EndTreeUpdate();
+        public void NewItem(string name, string location, ContentItemTemplate template)
+        {
+            var action = new NewAction(this, name, location, template);
+            action.Do();
+            _actionStack.Add(action);
+        }
 
-            ProjectDiry = true;
-        }            
-    
+        public void AddAction(IProjectAction action)
+        {
+            _actionStack.Add(action);
+        }
+
+        public ContentItem GetItem(string sourceFile)
+        {
+            foreach (var i in _project.ContentItems)
+            {                
+                if (string.Equals(i.OriginalPath, sourceFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return null;
+        }
+
+        #region Undo, Redo
+
+        private readonly ActionStack _actionStack;
+
+        public event CanUndoRedoChanged OnCanUndoRedoChanged
+        {
+            add { _actionStack.OnCanUndoRedoChanged += value; }
+            remove { _actionStack.OnCanUndoRedoChanged -= value; } 
+        }
+
+        public bool CanUndo { get { return _actionStack.CanUndo; } }
+
+        public bool CanRedo { get { return _actionStack.CanRedo; } }
+
+        public void Undo()
+        {
+            _actionStack.Undo();
+        }
+
+        public void Redo()
+        {
+            _actionStack.Redo();
+        }
+
+        #endregion
+
         private void ResolveTypes()
         {
             PipelineTypes.Load(_project);
@@ -447,7 +512,53 @@ namespace MonoGame.Tools.Pipeline
                 i.Controller = this;
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
-            }        
+            }
+
+            LoadTemplates(_project.Location);
+        }
+
+        private void LoadTemplates(string path)
+        {
+            if (!Directory.Exists(path))
+                return;
+
+            var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
+            foreach (var f in files)
+            {
+                var lines = File.ReadAllLines(f);
+                if (lines.Length != 5)
+                    throw new Exception("Invalid template");
+
+                var item = new ContentItemTemplate()
+                    {
+                        Label = lines[0],
+                        Icon = lines[1],
+                        ImporterName = lines[2],
+                        ProcessorName = lines[3],
+                        TemplateFile = lines[4],
+                    };
+                
+                if (_templateItems.Any(i => i.Label == item.Label))
+                    continue;
+
+                item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
+                _templateItems.Add(item);
+            }
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            if (_project == null)
+                return filePath;
+
+            filePath = filePath.Replace("/", "\\");
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(2);
+
+            if (Path.IsPathRooted(filePath))
+                return filePath;
+
+            return _project.Location + "\\" + filePath;
         }
     }
 }

@@ -70,12 +70,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _screen = screen;
         }
-#elif ANDROID
-        private View _view;
-        internal GraphicsAdapter(View screen)
-        {
-            _view = screen;
-        }
 #else
         internal GraphicsAdapter()
         {
@@ -105,7 +99,8 @@ namespace Microsoft.Xna.Framework.Graphics
                        60,
                        SurfaceFormat.Color);
 #elif ANDROID
-                return new DisplayMode(_view.Width, _view.Height, 60, SurfaceFormat.Color);
+                View view = ((AndroidGameWindow)Game.Instance.Window).GameView;
+                return new DisplayMode(view.Width, view.Height, 60, SurfaceFormat.Color);
 #elif (WINDOWS && OPENGL) || LINUX
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
@@ -134,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter(UIScreen.MainScreen)});
 #elif ANDROID
-                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter(((AndroidGameWindow)Game.Instance.Window).GameView) });
+                    adapters = new ReadOnlyCollection<GraphicsAdapter>(new GraphicsAdapter[] { new GraphicsAdapter() });
 #else
                     adapters = new ReadOnlyCollection<GraphicsAdapter>(
 						new GraphicsAdapter[] {new GraphicsAdapter()});
