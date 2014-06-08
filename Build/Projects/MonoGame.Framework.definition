@@ -191,7 +191,9 @@
     <Compile Include="Audio\Xact\AudioCategory.cs" />
     <Compile Include="Audio\Xact\AudioEngine.cs" />
     <Compile Include="Audio\Xact\AudioStopOptions.cs" />
+    <Compile Include="Audio\Xact\ClipEvent.cs" />
     <Compile Include="Audio\Xact\Cue.cs" />
+    <Compile Include="Audio\Xact\PlayWaveEvent.cs" />
     <Compile Include="Audio\Xact\SoundBank.cs" />
     <Compile Include="Audio\Xact\WaveBank.cs" />
     <Compile Include="Audio\Xact\XactClip.cs" />

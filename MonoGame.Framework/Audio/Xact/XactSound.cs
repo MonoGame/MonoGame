@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	internal class XactSound
+	class XactSound
 	{
 		bool complexSound;
 		XactClip[] soundClips;

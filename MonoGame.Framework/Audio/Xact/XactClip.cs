@@ -7,203 +7,11 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-	internal class XactClip
+	class XactClip
 	{
-		float volume;
+        private float _volume;
 
-        enum VariationType
-        {
-            Ordered,
-            OrderedFromRandom,
-            Random,
-            RandomNoImmediateRepeats,
-            Shuffle
-        };
-        
-		abstract class ClipEvent
-        {
-            protected float _curTime;
-            public float _timeStamp;
-		    public float _randomOffset;
-
-			public XactClip _clip;
-			
-			public abstract void Play();
-			public abstract void Stop();
-			public abstract void Pause();
-            public abstract void Resume();
-            public abstract void Update(float dt);
-            public abstract void SetFade(float fadeInDuration, float fadeOutDuration);
-            public abstract bool IsReady { get; }
-			public abstract bool Playing { get; }
-			public abstract float Volume { get; set; }
-			public abstract bool IsPaused { get; }
-		}
-		
-		class EventPlayWave : ClipEvent
-        {
-            private SoundBank _soundBank;
-
-            private VariationType _variation;
-
-            private bool _isLooped;
-
-            private float _volume;
-
-            private int [] _tracks;
-            private int [] _waveBanks;
-
-            private int _wavIndex;
-
-            private SoundEffectInstance _wav;
-
-            internal EventPlayWave(SoundBank soundBank, int[] waveBanks, int[] tracks, VariationType variation, bool isLooped)
-            {
-                _soundBank = soundBank;
-                _waveBanks = waveBanks;
-                _tracks = tracks;
-                _wavIndex = 0;
-                _volume = 1.0f;
-                _variation = variation;
-                _isLooped = isLooped;
-            }
-
-			public override void Play() 
-            {
-                if (_wav != null && _wav.State != SoundState.Stopped)
-                    _wav.Stop();
-
-                var trackCount = _tracks.Length;
-                Console.WriteLine("_variation=" + _variation);
-
-                switch (_variation)
-                {
-                    case VariationType.Ordered:
-                        _wavIndex = (_wavIndex + 1) % trackCount;
-                        break;
-
-                    case VariationType.OrderedFromRandom:
-                        _wavIndex = (_wavIndex + 1) % trackCount;
-                        break;
-
-                    case VariationType.Random:
-                        _wavIndex = AudioEngine.Random.Next() % trackCount;
-                        break;
-
-                    case VariationType.RandomNoImmediateRepeats:
-                    {
-                        var last = _wavIndex;
-                        do
-                        {
-                            _wavIndex = AudioEngine.Random.Next() % trackCount;
-                        }
-                        while (last == _wavIndex && trackCount > 1);
-                        break;
-                    }
-
-                    case VariationType.Shuffle:
-                        // TODO: Need some sort of deck implementation.
-                        _wavIndex = AudioEngine.Random.Next() % trackCount;
-                        break;
-                };
-
-                _wav = _soundBank.GetWave(_waveBanks[_wavIndex], _tracks[_wavIndex]);
-               
-                _wav.Volume = _volume;
-                _wav.IsLooped = _isLooped && trackCount == 1;
-                _wav.Play();
-			}
-
-			public override void Stop()
-            {
-                if (_wav != null)
-                {
-                    _wav.Stop();
-                    _wav = null;
-                }
-
-                _curTime = 0.0f;
-			}
-
-			public override void Pause() 
-            {
-                if (_wav != null)
-                    _wav.Pause();
-			}
-
-			public override void Resume()
-			{
-                if (_wav != null && _wav.State == SoundState.Paused)
-                    _wav.Resume();
-			}
-
-			public override bool Playing 
-            {
-				get 
-                {
-                    return _wav != null && _wav.State == SoundState.Playing;
-				}
-			}
-
-			public override bool IsPaused
-			{
-				get
-				{
-                    return _wav != null && _wav.State == SoundState.Paused;
-				}
-			}
-
-			public override float Volume 
-            {
-				get 
-                {
-                    return _volume;
-				}
-
-				set 
-                {
-                    _volume = value;
-                    if (_wav != null)
-                        _wav.Volume = value;
-				}
-			}
-
-            public override void SetFade(float fadeInDuration, float fadeOutDuration)
-            {
-                // TODO
-            }
-
-            public override bool IsReady
-            {
-                get { return _curTime >= _timeStamp; }
-            }
-
-            public override void Update(float dt)
-            {
-                if (_wav != null)
-                {
-                    if (_wav.State == SoundState.Stopped)
-                    {
-                        _wav = null;
-
-                        if (_isLooped && _tracks.Length > 1)
-                            Play();
-                    }
-                }
-
-                if (IsReady)
-                    return;
-
-                _curTime += dt;
-
-                if (!IsReady)
-                    return;
-
-                _clip.Play();
-            }
-		}
-		
-		ClipEvent[] events;
+		private ClipEvent[] _events;
 		
 		public XactClip (SoundBank soundBank, BinaryReader clipReader, uint clipOffset)
 		{
@@ -211,7 +19,7 @@ namespace Microsoft.Xna.Framework.Audio
 			clipReader.BaseStream.Seek (clipOffset, SeekOrigin.Begin);
 			
 			byte numEvents = clipReader.ReadByte();
-			events = new ClipEvent[numEvents];
+			_events = new ClipEvent[numEvents];
 			
 			for (int i=0; i<numEvents; i++) {
 				var eventInfo = clipReader.ReadUInt32();
@@ -240,7 +48,7 @@ namespace Microsoft.Xna.Framework.Audio
 					clipReader.ReadUInt16 ();
 					clipReader.ReadUInt16 ();
 
-                    events[i] = new EventPlayWave(soundBank, new[] { waveBankIndex }, new[] { trackIndex }, VariationType.Ordered, loopCount == 255); 
+                    _events[i] = new EventPlayWave(soundBank, new[] { waveBankIndex }, new[] { trackIndex }, VariationType.Ordered, loopCount == 255); 
 					break;
                 }
 
@@ -283,7 +91,7 @@ namespace Microsoft.Xna.Framework.Audio
                     }
 
                     // Finally.
-                    events[i] = new EventPlayWave(soundBank, waveBanks, tracks, (VariationType)variationType, false);
+                    _events[i] = new EventPlayWave(soundBank, waveBanks, tracks, (VariationType)variationType, false);
                     break;
                 }
 
@@ -303,9 +111,9 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new NotSupportedException("Unknown event " + eventId);
 				}
 
-                events[i]._timeStamp = timeStamp;
-                events[i]._randomOffset = randomOffset;
-				events[i]._clip = this;
+                _events[i]._timeStamp = timeStamp;
+                _events[i]._randomOffset = randomOffset;
+				_events[i]._clip = this;
 			}
 			
 			clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
@@ -313,20 +121,20 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
-            foreach (var evt in events)
+            foreach (var evt in _events)
                 evt.Update(dt);
         }
 
         internal void SetFade(float fadeInDuration, float fadeOutDuration)
         {
-            foreach(var evt in events)
+            foreach(var evt in _events)
                 (evt as EventPlayWave).SetFade(fadeInDuration, fadeOutDuration);
         }
 		
 		public void Play()
         {
 			//TODO: run events
-            foreach (var evt in events)
+            foreach (var evt in _events)
             {
                 if (evt.IsReady)
                     evt.Play();
@@ -335,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
 
 		public void Resume()
 		{
-            foreach (var evt in events)
+            foreach (var evt in _events)
             {
                 if (evt.IsReady)
                     evt.Resume();
@@ -344,13 +152,13 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Stop()
         {
-            foreach (var evt in events)
+            foreach (var evt in _events)
                 evt.Stop();
 		}
 		
 		public void Pause()
         {
-            foreach (var evt in events)
+            foreach (var evt in _events)
                 evt.Pause();
 		}
 		
@@ -358,7 +166,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			get
             {
-                foreach (var evt in events)
+                foreach (var evt in _events)
                 {
                     if (evt.Playing)
                         return true;
@@ -371,11 +179,11 @@ namespace Microsoft.Xna.Framework.Audio
 		public float Volume
         {
 			get {
-				return volume;
+				return _volume;
 			}
 			set {
-				volume = value;
-                foreach(var evt in events)
+				_volume = value;
+                foreach(var evt in _events)
 				    evt.Volume = value;
 			}
 		}
@@ -384,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
         { 
 			get
             {
-                foreach (var evt in events)
+                foreach (var evt in _events)
                 {
                     if (evt.IsPaused)
                         return true;
