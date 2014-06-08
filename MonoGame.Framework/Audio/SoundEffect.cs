@@ -189,6 +189,19 @@ namespace Microsoft.Xna.Framework.Audio
             return true;
         }
 
+        internal SoundEffectInstance GetPooledInstance()
+        {
+            if (!SoundEffectInstancePool.SoundsAvailable)
+                return null;
+
+            var inst = SoundEffectInstancePool.GetInstance();
+            inst.Volume = 1.0f;
+            inst.Pitch = 0.0f;
+            inst.Pan = 0.0f;
+            PlatformSetupInstance(inst);
+            return inst;
+        }
+
         #endregion
 
         #region Public Properties

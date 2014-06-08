@@ -4,7 +4,6 @@
 
 using System;
 
-
 namespace Microsoft.Xna.Framework.Audio
 {
     /// <summary>Manages the playback of a sound or set of sounds.</summary>
@@ -20,7 +19,6 @@ namespace Microsoft.Xna.Framework.Audio
 		XactSound[] sounds;
 		float[] probs;
 		XactSound curSound;
-		Random variationRand;
 		
 		float volume = 1.0f;
 
@@ -28,10 +26,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
 		public bool IsPaused
 		{
-			get {
+			get 
+            {
 				if (curSound != null)
 					return curSound.IsPaused;
-				return true;
+
+				return false;
 			}
 		}
 
@@ -39,10 +39,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
 		public bool IsPlaying
 		{
-			get {
-				if (curSound != null) {
+			get 
+            {
+				if (curSound != null)
 					return curSound.Playing;
-				}
+
 				return false;
 			}
 		}
@@ -50,13 +51,41 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Indicates whether or not the cue is currently stopped.</summary>
 		public bool IsStopped
 		{
-			get {
-				if (curSound != null) {
-					return !curSound.Playing;
-				}
+			get 
+            {
+				if (curSound != null)
+                    return curSound.Stopped;
+
 				return true;
 			}
 		}
+
+        public bool IsStopping
+        {
+            get
+            {
+                // TODO: Implement me!
+                return false;
+            }
+        }
+
+        public bool IsPreparing
+        {
+            get
+            {
+                // TODO: Implement me!
+                return false;
+            }
+        }
+
+        public bool IsPrepared
+        {
+            get
+            {
+                // TODO: Implement me!
+                return false;
+            }
+        }
 
         /// <summary>Gets the friendly name of the cue.</summary>
         /// <remarks>The friendly name is a value set from the designer.</remarks>
@@ -74,8 +103,6 @@ namespace Microsoft.Xna.Framework.Audio
 			
 			probs = new float[1];
 			probs[0] = 1.0f;
-			
-			variationRand = new Random();
 		}
 		
 		internal Cue(AudioEngine engine, string cuename, XactSound[] _sounds, float[] _probs)
@@ -84,37 +111,35 @@ namespace Microsoft.Xna.Framework.Audio
 			name = cuename;
 			sounds = _sounds;
 			probs = _probs;
-			
-			variationRand = new Random();
 		}
 
         /// <summary>Pauses playback.</summary>
 		public void Pause()
 		{
-			if (curSound != null) {
+			if (curSound != null)
 				curSound.Pause();
-			}
 		}
 
         /// <summary>Requests playback of a prepared or preparing Cue.</summary>
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
 		public void Play()
 		{
-            engine._activeCues.Add(this);
+            if (!engine._activeCues.Contains(this))
+                engine._activeCues.Add(this);
 			
 			//TODO: Probabilities
-			curSound = sounds[variationRand.Next (sounds.Length)];
+            var index = XactHelpers.Random.Next(sounds.Length);
+            curSound = sounds[index];
 			
 			curSound.Volume = volume;
-			curSound.Play ();
+			curSound.Play();
 		}
 
         /// <summary>Resumes playback of a paused Cue.</summary>
 		public void Resume()
 		{
-			if (curSound != null) {
-				curSound.Resume ();
-			}
+			if (curSound != null)
+				curSound.Resume();
 		}
 
         /// <summary>Stops playback of a Cue.</summary>
@@ -123,9 +148,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
             engine._activeCues.Remove(this);
 			
-			if (curSound != null) {
+			if (curSound != null)
                 curSound.Stop(options);
-			}
 		}
 		
         /// <summary>
@@ -136,12 +160,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>The friendly name is a value set from the designer.</remarks>
 		public void SetVariable (string name, float value)
 		{
-			if (name == "Volume") {
+			if (name == "Volume") 
+            {
 				volume = value;
-				if (curSound != null) {
+				if (curSound != null)
 					curSound.Volume = value;
-				}
-			} else {
+			} 
+            else
+            {
 				engine.SetGlobalVariable (name, value);
 			}
 		}
@@ -155,11 +181,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
 		public float GetVariable (string name)
 		{
-			if (name == "Volume") {
+			if (name == "Volume")
 				return volume;
-			} else {
-				return engine.GetGlobalVariable (name);
-			}
+
+            return engine.GetGlobalVariable (name);
 		}
 
         /// <summary>Updates the simulated 3D Audio settings calculated between an AudioEmitter and AudioListener.</summary>
@@ -169,7 +194,8 @@ namespace Microsoft.Xna.Framework.Audio
         /// <para>This must be called before Play().</para>
         /// <para>Calling this method automatically converts the sound to monoaural and sets the speaker mix for any sound played by this cue to a value calculated with the listener's and emitter's positions. Any stereo information in the sound will be discarded.</para>
         /// </remarks>
-		public void Apply3D(AudioListener listener, AudioEmitter emitter) {
+		public void Apply3D(AudioListener listener, AudioEmitter emitter) 
+        {
 			
 		}
 
@@ -187,7 +213,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>Immediately releases any unmanaged resources used by this object.</summary>
 		public void Dispose ()
 		{
-			//_sound.Dispose();
 		}
 		#endregion
 	}
