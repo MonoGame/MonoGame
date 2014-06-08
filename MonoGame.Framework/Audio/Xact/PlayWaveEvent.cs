@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Audio
                     break;
             };
 
-            _wav = _soundBank.GetWave(_waveBanks[_wavIndex], _tracks[_wavIndex]);
+            _wav = _soundBank.GetSoundEffectInstance(_waveBanks[_wavIndex], _tracks[_wavIndex]);
                
             _wav.Volume = _volume;
             _wav.IsLooped = _isLooped && trackCount == 1;

@@ -13,8 +13,8 @@ namespace Microsoft.Xna.Framework.Audio
     /// <summary>Represents a collection of wave files.</summary>
     public class WaveBank : IDisposable
     {
-        internal SoundEffect[] sounds;
-        internal string BankName;
+        private SoundEffect[] _sounds;
+        private string _bankName;
 
         struct Segment
         {
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Audio
                 wavebankdata.BankName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(64),0,64).Replace("\0", "");
             }
 
-            BankName = wavebankdata.BankName;
+            _bankName = wavebankdata.BankName;
 
             if (wavebankheader.Version == 1)
             {
@@ -167,7 +167,7 @@ namespace Microsoft.Xna.Framework.Audio
                 entry_name[wavebankdata.EntryNameElementSize] = 0;
             }
 
-            sounds = new SoundEffect[wavebankdata.EntryCount];
+            _sounds = new SoundEffect[wavebankdata.EntryCount];
 
             for (int current_entry = 0; current_entry < wavebankdata.EntryCount; current_entry++)
             {
@@ -317,7 +317,7 @@ namespace Microsoft.Xna.Framework.Audio
                             _format = waveFormat
                         };
 
-					sounds[current_entry] = sfx;
+					_sounds[current_entry] = sfx;
 #else
                     sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans);
 #endif                    
@@ -407,7 +407,7 @@ namespace Microsoft.Xna.Framework.Audio
                 
             }
 			
-			audioEngine.Wavebanks[BankName] = this;
+			audioEngine.Wavebanks[_bankName] = this;
         }
 		
         /// <param name="audioEngine">Instance of the AudioEngine to associate this wave bank with.</param>
@@ -427,10 +427,15 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
+        internal SoundEffect GetSoundEffect(int trackIndex)
+        {
+            return _sounds[trackIndex];
+        }
+
 		#region IDisposable implementation
 		public void Dispose ()
 		{
-            foreach (var s in sounds)
+            foreach (var s in _sounds)
                 s.Dispose();
         }
 		#endregion
