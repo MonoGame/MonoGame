@@ -54,6 +54,7 @@ namespace MonoGame.Tools.Pipeline
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
+            _treeView.NodeMouseDoubleClick += TreeViewOnNodeMouseDoubleClick;
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
@@ -117,6 +118,17 @@ namespace MonoGame.Tools.Pipeline
                     _treeContextMenu.Show(_treeView, p);
                 }
             }
+        }
+
+        private void TreeViewOnNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs args)
+        {
+            // Even though we support 'Open File' as an action on the root (PipelineProject)
+            // double clicking on it toggles whether it is expanded. 
+            // So if you want to open it just use the menu.
+            if (args.Node.Tag is ContentItem)
+                return;
+
+            ContextMenu_OpenFile_Click(sender, args);            
         }
 
         //public event SelectionChanged OnSelectionChanged;
