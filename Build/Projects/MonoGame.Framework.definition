@@ -134,19 +134,15 @@
     
 
     <!-- Microsoft.Xna.Framework.Audio -->
-    <Compile Include="Audio\AudioCategory.cs" />
     <Compile Include="Audio\AudioChannels.cs" />
     <Compile Include="Audio\AudioEmitter.cs" />
-    <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioLoader.cs">
       <Platforms>Linux,WindowsGL,Angle</Platforms>
     </Compile>
-    <Compile Include="Audio\AudioStopOptions.cs" />
     <Compile Include="Audio\AudioUtil.cs">
       <Platforms>Android,Ouya,PSMobile</Platforms>
     </Compile>
-    <Compile Include="Audio\Cue.cs" />
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
@@ -161,7 +157,6 @@
     <Compile Include="Audio\OpenALSupport.cs">
       <Platforms>iOS,MacOS</Platforms>
     </Compile>
-    <Compile Include="Audio\SoundBank.cs" />
     <Compile Include="Audio\SoundEffect.cs" />
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
       <Platforms>Android,Angle,iOS,Ouya,Linux,WindowsGL,MacOS</Platforms>
@@ -190,9 +185,17 @@
     </Compile>
     <Compile Include="Audio\SoundEffectInstancePool.cs" />
     <Compile Include="Audio\SoundState.cs" />
-    <Compile Include="Audio\WaveBank.cs" />
-    <Compile Include="Audio\XactClip.cs" />
-    <Compile Include="Audio\XactSound.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Audio Xact-->
+    <Compile Include="Audio\Xact\AudioCategory.cs" />
+    <Compile Include="Audio\Xact\AudioEngine.cs" />
+    <Compile Include="Audio\Xact\AudioStopOptions.cs" />
+    <Compile Include="Audio\Xact\Cue.cs" />
+    <Compile Include="Audio\Xact\SoundBank.cs" />
+    <Compile Include="Audio\Xact\WaveBank.cs" />
+    <Compile Include="Audio\Xact\XactClip.cs" />
+    <Compile Include="Audio\Xact\XactSound.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content -->
