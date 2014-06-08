@@ -118,5 +118,7 @@ namespace MonoGame.Tools.Pipeline
         void Redo();
 
         #endregion        
+
+        string GetFullPath(string filePath);
     }
 }

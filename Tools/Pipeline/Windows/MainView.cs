@@ -105,6 +105,15 @@ namespace MonoGame.Tools.Pipeline
                         _treeNewItemMenuItem.Visible = true;
                     }
 
+                    if (node.Tag is FolderItem)
+                    {
+                        _treeOpenFileMenuItem.Visible = false;
+                    }
+                    else
+                    {
+                        _treeOpenFileMenuItem.Visible = true;
+                    }
+
                     _treeContextMenu.Show(_treeView, p);
                 }
             }
@@ -287,7 +296,7 @@ namespace MonoGame.Tools.Pipeline
 
             {
                 var obj = _propertyGrid.SelectedObject as ContentItem;
-                if (obj != null && obj.SourceFile == item.SourceFile)
+                if (obj != null && obj.OriginalPath == item.OriginalPath)
                     _propertyGrid.SelectedObject = null;
             }
 
@@ -301,7 +310,7 @@ namespace MonoGame.Tools.Pipeline
 
                 {
                     var obj = _propertyGrid.SelectedObject as ContentItem;
-                    if (obj != null && obj.SourceFile == item.SourceFile)
+                    if (obj != null && obj.OriginalPath == item.OriginalPath)
                         _propertyGrid.SelectedObject = null;
                 }
 
@@ -623,6 +632,29 @@ namespace MonoGame.Tools.Pipeline
         private void OnUndoClick(object sender, EventArgs e)
         {
             _controller.Undo();
+        }
+
+        private void ContextMenu_OpenFile_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath))
+            {
+                Process.Start(filePath);
+            }
+        }
+
+        private void ContextMenu_OpenFileLocation_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath) || Directory.Exists(filePath))
+            {
+                Process.Start("explorer.exe", "/select, " + filePath);
+
+            }
         }
     }
 }
