@@ -21,7 +21,8 @@ namespace Microsoft.Xna.Framework.Audio
 			byte numEvents = clipReader.ReadByte();
 			_events = new ClipEvent[numEvents];
 			
-			for (int i=0; i<numEvents; i++) {
+			for (int i=0; i<numEvents; i++) 
+            {
 				var eventInfo = clipReader.ReadUInt32();
                 var randomOffset = clipReader.ReadUInt16() * 0.001f;
 
@@ -78,7 +79,7 @@ namespace Microsoft.Xna.Framework.Audio
                     clipReader.ReadBytes(5);
 
                     // Number of WaveBank tracks
-                    var numTracks = clipReader.ReadUInt16();
+                    int numTracks = clipReader.ReadUInt16();
 
                     // Variation Playlist Type
                     var variationType = clipReader.ReadUInt16() & 0x000F;
@@ -89,13 +90,13 @@ namespace Microsoft.Xna.Framework.Audio
                     var waveBanks = new int[numTracks];
                     var tracks = new int[numTracks];
                     var weights = new byte[numTracks];
-                    for (ushort j = 0; j < numTracks; j += 1)
+                    for (var j = 0; j < numTracks; j++)
                     {
                         tracks[j] = clipReader.ReadUInt16();
                         waveBanks[j] = clipReader.ReadByte();
 
-                        byte minWeight = clipReader.ReadByte();
-                        byte maxWeight = clipReader.ReadByte();
+                        var minWeight = clipReader.ReadByte();
+                        var maxWeight = clipReader.ReadByte();
                         weights[j] = (byte)(maxWeight - minWeight);
                     }
 
