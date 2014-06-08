@@ -9,22 +9,49 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	abstract class ClipEvent
     {
-        protected float _curTime;
-        public float _timeStamp;
-		public float _randomOffset;
+        private float _curTime;
+        private float _timeStamp;
+        private float _randomOffset;
+        private XactClip _clip;
 
-		public XactClip _clip;
-			
+        public ClipEvent(XactClip clip, float timeStamp, float randomOffset)
+        {
+            _clip = clip;
+            _timeStamp = timeStamp;
+            _randomOffset = randomOffset;
+        }
+
 		public abstract void Play();
-		public abstract void Stop();
+
+        public virtual void Stop()
+        {
+            _curTime = 0.0f;
+        }
+
 		public abstract void Pause();
         public abstract void Resume();
-        public abstract void Update(float dt);
         public abstract void SetFade(float fadeInDuration, float fadeOutDuration);
-        public abstract bool IsReady { get; }
 		public abstract bool Playing { get; }
 		public abstract float Volume { get; set; }
 		public abstract bool IsPaused { get; }
+
+        public bool IsReady
+        {
+            get { return _curTime >= _timeStamp; }
+        }
+
+        public virtual void Update(float dt)
+        {
+            if (IsReady)
+                return;
+
+            _curTime += dt;
+
+            if (!IsReady)
+                return;
+
+            _clip.Play();
+        }
 	}
 }
 

@@ -33,7 +33,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         private SoundEffectInstance _wav;
 
-        internal EventPlayWave(SoundBank soundBank, int[] waveBanks, int[] tracks, VariationType variation, bool isLooped)
+        public EventPlayWave(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank, 
+                                int[] waveBanks, int[] tracks, VariationType variation, bool isLooped)
+            : base(clip, timeStamp, randomOffset)
         {
             _soundBank = soundBank;
             _waveBanks = waveBanks;
@@ -98,7 +100,7 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav = null;
             }
 
-            _curTime = 0.0f;
+            base.Stop();
 		}
 
 		public override void Pause() 
@@ -149,11 +151,6 @@ namespace Microsoft.Xna.Framework.Audio
             // TODO
         }
 
-        public override bool IsReady
-        {
-            get { return _curTime >= _timeStamp; }
-        }
-
         public override void Update(float dt)
         {
             if (_wav != null)
@@ -167,15 +164,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            if (IsReady)
-                return;
-
-            _curTime += dt;
-
-            if (!IsReady)
-                return;
-
-            _clip.Play();
+            base.Update(dt);
         }
 	}
 }

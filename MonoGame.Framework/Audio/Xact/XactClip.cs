@@ -48,7 +48,16 @@ namespace Microsoft.Xna.Framework.Audio
 					clipReader.ReadUInt16 ();
 					clipReader.ReadUInt16 ();
 
-                    _events[i] = new EventPlayWave(soundBank, new[] { waveBankIndex }, new[] { trackIndex }, VariationType.Ordered, loopCount == 255); 
+                    _events[i] = new EventPlayWave(
+                        this,
+                        timeStamp, 
+                        randomOffset,
+                        soundBank, 
+                        new[] { waveBankIndex }, 
+                        new[] { trackIndex }, 
+                        VariationType.Ordered, 
+                        loopCount == 255);
+
 					break;
                 }
 
@@ -91,7 +100,16 @@ namespace Microsoft.Xna.Framework.Audio
                     }
 
                     // Finally.
-                    _events[i] = new EventPlayWave(soundBank, waveBanks, tracks, (VariationType)variationType, false);
+                    _events[i] = new EventPlayWave(
+                        this,
+                        timeStamp,
+                        randomOffset,
+                        soundBank, 
+                        waveBanks, 
+                        tracks, 
+                        (VariationType)variationType, 
+                        false);
+
                     break;
                 }
 
@@ -110,10 +128,6 @@ namespace Microsoft.Xna.Framework.Audio
 				default:
                     throw new NotSupportedException("Unknown event " + eventId);
 				}
-
-                _events[i]._timeStamp = timeStamp;
-                _events[i]._randomOffset = randomOffset;
-				_events[i]._clip = this;
 			}
 			
 			clipReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
