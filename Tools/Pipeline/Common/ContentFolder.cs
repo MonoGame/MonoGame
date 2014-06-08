@@ -17,6 +17,9 @@ namespace MonoGame.Tools.Pipeline
                 Name = Name.Split('/').Last();
         }
 
+        [Browsable(false)]
+        public string OriginalPath { get { return Location; } }
+
         [Category("Common")]
         [Description("The name of this folder.")]
         public string Name { get; private set; }

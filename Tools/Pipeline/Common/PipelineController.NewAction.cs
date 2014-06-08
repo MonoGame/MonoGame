@@ -76,7 +76,7 @@ namespace MonoGame.Tools.Pipeline
                 for (var i = 0; i < _con._project.ContentItems.Count; i++)
                 {
                     var item = _con._project.ContentItems[i];
-                    var path = Path.GetFullPath(_con._project.Location + "\\" + item.SourceFile);
+                    var path = Path.GetFullPath(_con._project.Location + "\\" + item.OriginalPath);
 
                     if (fullpath == path)
                     {
