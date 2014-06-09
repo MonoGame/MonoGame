@@ -353,12 +353,12 @@ namespace MonoGame.Tools.Pipeline
                                 _project.References.Add(hintPath);
                             }
                         }
-                        else if (buildAction.Equals("Content"))
+                        else if (buildAction.Equals("Content") || buildAction.Equals("None"))
                         {
                             string include, copyToOutputDirectory;
                             ReadIncludeContent(io, out include, out copyToOutputDirectory);
 
-                            if (!copyToOutputDirectory.Equals("Never"))
+                            if (string.IsNullOrEmpty(copyToOutputDirectory) || !copyToOutputDirectory.Equals("Never"))
                             {
                                 var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                                 sourceFilePath += "\\" + include;
