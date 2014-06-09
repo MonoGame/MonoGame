@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework
         internal IResumeManager Resumer;
 
         private readonly Game _game;
-        private readonly OrientationListener _orientationListener;
         private Rectangle _clientBounds;
         private DisplayOrientation _supportedOrientations = DisplayOrientation.Default;
         private DisplayOrientation _currentOrientation;
@@ -38,7 +37,6 @@ namespace Microsoft.Xna.Framework
         public AndroidGameWindow(AndroidGameActivity activity, Game game)
         {
             _game = game;
-            _orientationListener = new OrientationListener(Game.Activity, this);
             Initialize(activity);
 
             game.Services.AddService(typeof(View), GameView);
@@ -47,9 +45,6 @@ namespace Microsoft.Xna.Framework
         private void Initialize(Context context)
         {
             _clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
-
-            if (_orientationListener.CanDetectOrientation())
-                _orientationListener.Enable();
 
             GameView = new MonoGameAndroidGameView(context, this, _game);
             GameView.RenderFrame += OnRenderFrame;
