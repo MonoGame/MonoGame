@@ -445,11 +445,6 @@ namespace MonoGame.Tools.Pipeline
                 Application.Exit();
         }
 
-        private void CloseMenuItem_Click(object sender, EventArgs e)
-        {
-            _controller.CloseProject();
-        }
-
         private void MainView_Load(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(OpenProjectPath))
@@ -466,21 +461,36 @@ namespace MonoGame.Tools.Pipeline
                 if (!_controller.Exit())
                     e.Cancel = true;
             }
+        }        
+
+        private void OnNewProjectClick(object sender, EventArgs e)
+        {
+            _controller.NewProject();
         }
 
-        private void SaveMenuItemClick(object sender, System.EventArgs e)
+        private void OnImportProjectClick(object sender, EventArgs e)
+        {
+            _controller.ImportProject();
+        }
+
+        private void OnOpenProjectClick(object sender, System.EventArgs e)
+        {
+            _controller.OpenProject();
+        }
+
+        private void OnCloseProjectClick(object sender, EventArgs e)
+        {
+            _controller.CloseProject();
+        }
+
+        private void OnSaveProjectClick(object sender, System.EventArgs e)
         {
             _controller.SaveProject(false);
         }
 
-        private void SaveAsMenuItemClick(object sender, System.EventArgs e)
+        private void OnSaveAsProjectClick(object sender, System.EventArgs e)
         {
             _controller.SaveProject(true);
-        }
-
-        private void OpenMenuItemClick(object sender, System.EventArgs e)
-        {
-            _controller.OpenProject();
         }
 
         private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
@@ -535,12 +545,7 @@ namespace MonoGame.Tools.Pipeline
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
         {
             _controller.CancelBuild();
-        }
-
-        private void ImportMenuItem_Click(object sender, EventArgs e)
-        {
-            _controller.ImportProject();
-        }
+        }        
 
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
@@ -573,9 +578,9 @@ namespace MonoGame.Tools.Pipeline
 
             // Update the state of all menu items.
 
-            _newMenuItem.Enabled = notBuilding;
-            _openMenuItem.Enabled = notBuilding;
-            _importMenuItem.Enabled = notBuilding;
+            _newProjectMenuItem.Enabled = notBuilding;
+            _openProjectMenuItem.Enabled = notBuilding;
+            _importProjectMenuItem.Enabled = notBuilding;
 
             _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
@@ -606,7 +611,7 @@ namespace MonoGame.Tools.Pipeline
             _redoMenuItem.Enabled = canRedo;
         }
 
-        private void DeleteMenuItem_Click(object sender, EventArgs e)
+        private void OnDeleteItemClick(object sender, EventArgs e)
         {
             var items = new List<ContentItem>();
             var nodes = _treeView.SelectedNodesRecursive;
@@ -631,14 +636,14 @@ namespace MonoGame.Tools.Pipeline
             Process.Start("http://www.monogame.net/about/");
         }
 
-        private void AddMenuItemClick(object sender, EventArgs e)
+        private void OnAddItemClick(object sender, EventArgs e)
         {
             var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
             var item = node.Tag as IProjectItem;
             _controller.Include(item.Location);
         }
 
-        private void NewItemMenuItemClick(object sender, System.EventArgs e)
+        private void OnNewItemClick(object sender, System.EventArgs e)
         {
             var dlg = new NewContentDialog(_controller.Templates);
             if (dlg.ShowDialog(this) == DialogResult.OK)
