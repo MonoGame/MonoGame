@@ -14,6 +14,8 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         IEnumerable<ContentItemTemplate> Templates { get; }
 
+        Selection Selection { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -80,8 +82,6 @@ namespace MonoGame.Tools.Pipeline
         void CloseProject();
 
         bool SaveProject(bool saveAs);
-
-        void OnTreeSelect(IProjectItem item);
         
         void Build(bool rebuild);
 

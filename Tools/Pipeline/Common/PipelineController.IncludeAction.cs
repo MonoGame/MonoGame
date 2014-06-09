@@ -26,6 +26,8 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con._view.BeginTreeUpdate();
 
+                _con.Selection.Clear(_con);
+
                 for (var i = 0; i < _files.Length; i++ )
                 {
                     var f = _files[i];
@@ -38,8 +40,8 @@ namespace MonoGame.Tools.Pipeline
 
                     _files[i] = item.OriginalPath;
 
-                    _con._view.AddTreeItem(item);
-                    _con._view.SelectTreeItem(item);
+                    _con._view.AddTreeItem(item);                    
+                    _con.Selection.Add(item, _con);                    
                 }
 
                 _con._view.EndTreeUpdate();
@@ -58,7 +60,7 @@ namespace MonoGame.Tools.Pipeline
                         if (item.OriginalPath == f)
                         {
                             _con._project.ContentItems.Remove(item);
-                            _con._view.RemoveTreeItem(item);                            
+                            _con.Selection.Remove(item, _con);
                             break;
                         }
                     }
