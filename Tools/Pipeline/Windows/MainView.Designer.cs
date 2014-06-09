@@ -44,11 +44,11 @@ namespace MonoGame.Tools.Pipeline
             this._outputWindow = new System.Windows.Forms.TextBox();
             this._mainMenu = new System.Windows.Forms.MenuStrip();
             this._fileMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this._newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._newProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._openProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._closeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this._importMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._importProjectMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveAsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -198,11 +198,11 @@ namespace MonoGame.Tools.Pipeline
             // _fileMenu
             // 
             this._fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._newMenuItem,
-            this._openMenuItem,
+            this._newProjectMenuItem,
+            this._openProjectMenuItem,
             this._closeMenuItem,
             this.toolStripSeparator3,
-            this._importMenuItem,
+            this._importProjectMenuItem,
             _toolStripSeparator3,
             this._saveMenuItem,
             this._saveAsMenuItem,
@@ -214,27 +214,27 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _newMenuItem
             // 
-            this._newMenuItem.Name = "_newMenuItem";
-            this._newMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this._newProjectMenuItem.Name = "_newMenuItem";
+            this._newProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.N)));
-            this._newMenuItem.Size = new System.Drawing.Size(182, 22);
-            this._newMenuItem.Text = "New...";
-            this._newMenuItem.Click += new System.EventHandler(this.NewItemMenuItemClick);
+            this._newProjectMenuItem.Size = new System.Drawing.Size(182, 22);
+            this._newProjectMenuItem.Text = "New...";
+            this._newProjectMenuItem.Click += new System.EventHandler(this.OnNewProjectClick);
             // 
             // _openMenuItem
             // 
-            this._openMenuItem.Name = "_openMenuItem";
-            this._openMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this._openMenuItem.Size = new System.Drawing.Size(182, 22);
-            this._openMenuItem.Text = "Open...";
-            this._openMenuItem.Click += new System.EventHandler(this.OpenMenuItemClick);
+            this._openProjectMenuItem.Name = "_openMenuItem";
+            this._openProjectMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this._openProjectMenuItem.Size = new System.Drawing.Size(182, 22);
+            this._openProjectMenuItem.Text = "Open...";
+            this._openProjectMenuItem.Click += new System.EventHandler(this.OnOpenProjectClick);
             // 
             // _closeMenuItem
             // 
             this._closeMenuItem.Name = "_closeMenuItem";
             this._closeMenuItem.Size = new System.Drawing.Size(182, 22);
             this._closeMenuItem.Text = "Close";
-            this._closeMenuItem.Click += new System.EventHandler(this.CloseMenuItem_Click);
+            this._closeMenuItem.Click += new System.EventHandler(this.OnCloseProjectClick);
             // 
             // toolStripSeparator3
             // 
@@ -243,10 +243,10 @@ namespace MonoGame.Tools.Pipeline
             // 
             // _importMenuItem
             // 
-            this._importMenuItem.Name = "_importMenuItem";
-            this._importMenuItem.Size = new System.Drawing.Size(182, 22);
-            this._importMenuItem.Text = "Import...";
-            this._importMenuItem.Click += new System.EventHandler(this.ImportMenuItem_Click);
+            this._importProjectMenuItem.Name = "_importMenuItem";
+            this._importProjectMenuItem.Size = new System.Drawing.Size(182, 22);
+            this._importProjectMenuItem.Text = "Import...";
+            this._importProjectMenuItem.Click += new System.EventHandler(this.OnImportProjectClick);
             // 
             // _saveMenuItem
             // 
@@ -254,14 +254,14 @@ namespace MonoGame.Tools.Pipeline
             this._saveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this._saveMenuItem.Size = new System.Drawing.Size(182, 22);
             this._saveMenuItem.Text = "&Save";
-            this._saveMenuItem.Click += new System.EventHandler(this.SaveMenuItemClick);
+            this._saveMenuItem.Click += new System.EventHandler(this.OnSaveProjectClick);
             // 
             // _saveAsMenuItem
             // 
             this._saveAsMenuItem.Name = "_saveAsMenuItem";
             this._saveAsMenuItem.Size = new System.Drawing.Size(182, 22);
             this._saveAsMenuItem.Text = "Save &As...";
-            this._saveAsMenuItem.Click += new System.EventHandler(this.SaveAsMenuItemClick);
+            this._saveAsMenuItem.Click += new System.EventHandler(this.OnSaveAsProjectClick);
             // 
             // _exitMenuItem
             // 
@@ -313,14 +313,14 @@ namespace MonoGame.Tools.Pipeline
             this._newItemMenuItem.Name = "_newItemMenuItem";
             this._newItemMenuItem.Size = new System.Drawing.Size(144, 22);
             this._newItemMenuItem.Text = "&New Item...";
-            this._newItemMenuItem.Click += new System.EventHandler(this.NewItemMenuItemClick);
+            this._newItemMenuItem.Click += new System.EventHandler(this.OnNewItemClick);
             // 
             // _addItemMenuItem
             // 
             this._addItemMenuItem.Name = "_addItemMenuItem";
             this._addItemMenuItem.Size = new System.Drawing.Size(144, 22);
             this._addItemMenuItem.Text = "&Add Item...";
-            this._addItemMenuItem.Click += new System.EventHandler(this.AddMenuItemClick);
+            this._addItemMenuItem.Click += new System.EventHandler(this.OnAddItemClick);
             // 
             // toolStripSeparator1
             // 
@@ -333,7 +333,7 @@ namespace MonoGame.Tools.Pipeline
             this._deleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this._deleteMenuItem.Size = new System.Drawing.Size(144, 22);
             this._deleteMenuItem.Text = "&Delete";
-            this._deleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
+            this._deleteMenuItem.Click += new System.EventHandler(this.OnDeleteItemClick);
             // 
             // _buildMenu
             // 
@@ -444,14 +444,14 @@ namespace MonoGame.Tools.Pipeline
             this._treeNewItemMenuItem.Name = "_treeNewItemMenuItem";
             this._treeNewItemMenuItem.Size = new System.Drawing.Size(173, 22);
             this._treeNewItemMenuItem.Text = "New Item...";
-            this._treeNewItemMenuItem.Click += new System.EventHandler(this.NewItemMenuItemClick);
+            this._treeNewItemMenuItem.Click += new System.EventHandler(this.OnNewItemClick);
             // 
             // _treeAddItemMenuItem
             // 
             this._treeAddItemMenuItem.Name = "_treeAddItemMenuItem";
             this._treeAddItemMenuItem.Size = new System.Drawing.Size(173, 22);
             this._treeAddItemMenuItem.Text = "&Add Item...";
-            this._treeAddItemMenuItem.Click += new System.EventHandler(this.AddMenuItemClick);
+            this._treeAddItemMenuItem.Click += new System.EventHandler(this.OnAddItemClick);
             // 
             // _treeDeleteMenuItem
             // 
@@ -459,7 +459,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeDeleteMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this._treeDeleteMenuItem.Size = new System.Drawing.Size(173, 22);
             this._treeDeleteMenuItem.Text = "&Delete";
-            this._treeDeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
+            this._treeDeleteMenuItem.Click += new System.EventHandler(this.OnDeleteItemClick);
             // 
             // toolStripSeparator4
             // 
@@ -529,8 +529,8 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _fileMenu;
         private MultiSelectTreeview _treeView;
         private System.Windows.Forms.PropertyGrid _propertyGrid;
-        private System.Windows.Forms.ToolStripMenuItem _newMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _openMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _newProjectMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _openProjectMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _exitMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _buildMenu;
@@ -543,7 +543,7 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripMenuItem _saveAsMenuItem;
         private System.Windows.Forms.TextBox _outputWindow;
         private System.Windows.Forms.ToolStripMenuItem _closeMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _importMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _importProjectMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _undoMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _redoMenuItem;
