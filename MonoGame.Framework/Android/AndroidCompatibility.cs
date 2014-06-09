@@ -16,21 +16,10 @@ namespace Microsoft.Xna.Framework
 		/// </summary>
         private static readonly string[] Kindles = new[] { "KFTT", "KFJWI", "KFJWA", "KFSOWI", "KFTHWA", "KFTHWI", "KFAPWA", "KFAPWI" };
 
-        public enum ESVersions
-        {
-            v1_1,
-            v2_0
-        }
-
         static AndroidCompatibility()
         {
-            ScaleImageToPowerOf2 = true;
-            ESVersion = ESVersions.v2_0;
 			FlipLandscape = Kindles.Contains(Build.Model);
         }
-
-        public static bool ScaleImageToPowerOf2 { get; set; }
-        public static ESVersions ESVersion { get; set; }
 
 		public static bool FlipLandscape { get; private set;} 
 

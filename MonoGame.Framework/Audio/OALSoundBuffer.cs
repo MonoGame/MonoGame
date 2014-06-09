@@ -16,18 +16,30 @@ namespace Microsoft.Xna.Framework.Audio
 		int dataSize;
 		int sampleRate;
 		private int _sourceId;
+        bool _isDisposed;
 
 		public OALSoundBuffer ()
 		{
-			ALError alError;
-			
-			alError = AL.GetError ();
-			AL.GenBuffers (1, out openALDataBuffer);
-			alError = AL.GetError ();
-			if (alError != ALError.NoError) {
-				Console.WriteLine ("Failed to generate OpenAL data buffer: ", AL.GetErrorString (alError));
-			}
+            try
+            {
+                var alError = AL.GetError();
+                AL.GenBuffers(1, out openALDataBuffer);
+                alError = AL.GetError();
+                if (alError != ALError.NoError)
+                {
+                    Console.WriteLine("Failed to generate OpenAL data buffer: ", AL.GetErrorString(alError));
+                }
+            }
+            catch (DllNotFoundException e)
+            {
+                throw new NoAudioHardwareException("OpenAL drivers could not be found.", e);
+            }
 		}
+
+        ~OALSoundBuffer()
+        {
+            Dispose(false);
+        }
 
 		public int OpenALDataBuffer {
 			get {
@@ -75,17 +87,29 @@ namespace Microsoft.Xna.Framework.Audio
 
         }
 
-		public void Dispose ()
+		public void Dispose()
 		{
-			CleanUpBuffer ();
+            Dispose(true);
+            GC.SuppressFinalize(this);
 		}
 
-		public void CleanUpBuffer ()
-		{
-			if (AL.IsBuffer (openALDataBuffer)) {
-				AL.DeleteBuffers (1, ref openALDataBuffer);
-			}
-		}
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    // Clean up managed objects
+                }
+                // Release unmanaged resources
+                if (AL.IsBuffer(openALDataBuffer))
+                {
+                    AL.DeleteBuffers(1, ref openALDataBuffer);
+                }
+
+                _isDisposed = true;
+            }
+        }
 
 		public int SourceId
 		{

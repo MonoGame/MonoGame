@@ -111,7 +111,7 @@ namespace MonoGame.Tools.Pipeline
             PipelineTypes.Load(_project);
 
             // Save the new project.
-            _project.FilePath = projectFilePath;
+            _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
             
             UpdateTree();
@@ -173,6 +173,11 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
 
+            OpenProject(projectFilePath);
+        }
+
+        public void OpenProject(string projectFilePath)
+        {
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -221,13 +226,13 @@ namespace MonoGame.Tools.Pipeline
         public bool SaveProject(bool saveAs)
         {
             // Do we need file name?
-            if (saveAs || string.IsNullOrEmpty(_project.FilePath))
+            if (saveAs || string.IsNullOrEmpty(_project.OriginalPath))
             {
-                string newFilePath = _project.FilePath;
+                string newFilePath = _project.OriginalPath;
                 if (!_view.AskSaveName(ref newFilePath, null))
                     return false;
 
-                _project.FilePath = newFilePath;
+                _project.OriginalPath = newFilePath;
             }
 
             // Do the save.
@@ -245,7 +250,7 @@ namespace MonoGame.Tools.Pipeline
 
         public void Build(bool rebuild)
         {
-            var commands = string.Format("/@:\"{0}\" {1}", _project.FilePath, rebuild ? "/rebuild" : string.Empty);
+            var commands = string.Format("/@:\"{0}\" {1}", _project.OriginalPath, rebuild ? "/rebuild" : string.Empty);
             if (LaunchDebugger)
                 commands += " /launchdebugger";
             BuildCommand(commands);
@@ -260,7 +265,7 @@ namespace MonoGame.Tools.Pipeline
             // Create a unique file within the same folder as
             // the normal project to store this incremental build.
             var uniqueName = Guid.NewGuid().ToString();
-            var tempPath = Path.Combine(Path.GetDirectoryName(_project.FilePath), uniqueName);
+            var tempPath = Path.Combine(Path.GetDirectoryName(_project.OriginalPath), uniqueName);
 
             // Write the incremental project file limiting the
             // content to just the files we want to rebuild.
@@ -324,7 +329,7 @@ namespace MonoGame.Tools.Pipeline
         private void DoBuild(string commands)
         {
             _buildProcess = new Process();
-            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.FilePath);
+            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
             _buildProcess.StartInfo.FileName = "MGCB.exe";
             _buildProcess.StartInfo.Arguments = commands;
             _buildProcess.StartInfo.CreateNoWindow = true;
@@ -399,7 +404,7 @@ namespace MonoGame.Tools.Pipeline
         {
             _view.BeginTreeUpdate();
 
-            if (_project == null || string.IsNullOrEmpty(_project.FilePath))
+            if (_project == null || string.IsNullOrEmpty(_project.OriginalPath))
                 _view.SetTreeRoot(null);
             else
             {
@@ -464,7 +469,7 @@ namespace MonoGame.Tools.Pipeline
         {
             foreach (var i in _project.ContentItems)
             {                
-                if (string.Equals(i.SourceFile, sourceFile, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(i.OriginalPath, sourceFile, StringComparison.OrdinalIgnoreCase))
                 {
                     return i;
                 }
@@ -513,7 +518,10 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void LoadTemplates(string path)
-        {                
+        {
+            if (!Directory.Exists(path))
+                return;
+
             var files = Directory.GetFiles(path, "*.template", SearchOption.AllDirectories);
             foreach (var f in files)
             {
@@ -536,6 +544,21 @@ namespace MonoGame.Tools.Pipeline
                 item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
                 _templateItems.Add(item);
             }
+        }
+
+        public string GetFullPath(string filePath)
+        {
+            if (_project == null)
+                return filePath;
+
+            filePath = filePath.Replace("/", "\\");
+            if (filePath.StartsWith("\\"))
+                filePath = filePath.Substring(2);
+
+            if (Path.IsPathRooted(filePath))
+                return filePath;
+
+            return _project.Location + "\\" + filePath;
         }
     }
 }

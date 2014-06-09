@@ -14,11 +14,15 @@ namespace MonoGame.Tools.Pipeline
 {
     partial class MainView : Form, IView, IProjectObserver
     {
+        // The project which will be opened as soon as a controller is attached.
+        // Is used when PipelineTool is launched to open a project, provided by the command line.
+        public string OpenProjectPath;
+
         private IController _controller;
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;
+        private bool _treeSort;        
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
@@ -54,6 +58,7 @@ namespace MonoGame.Tools.Pipeline
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
+            _treeView.NodeMouseDoubleClick += TreeViewOnNodeMouseDoubleClick;
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
@@ -105,9 +110,29 @@ namespace MonoGame.Tools.Pipeline
                         _treeNewItemMenuItem.Visible = true;
                     }
 
+                    if (node.Tag is FolderItem)
+                    {
+                        _treeOpenFileMenuItem.Visible = false;
+                    }
+                    else
+                    {
+                        _treeOpenFileMenuItem.Visible = true;
+                    }
+
                     _treeContextMenu.Show(_treeView, p);
                 }
             }
+        }
+
+        private void TreeViewOnNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs args)
+        {
+            // Even though we support 'Open File' as an action on the root (PipelineProject)
+            // double clicking on it toggles whether it is expanded. 
+            // So if you want to open it just use the menu.
+            if (!(args.Node.Tag is ContentItem))
+                return;
+
+            ContextMenu_OpenFile_Click(sender, args);            
         }
 
         //public event SelectionChanged OnSelectionChanged;
@@ -287,7 +312,7 @@ namespace MonoGame.Tools.Pipeline
 
             {
                 var obj = _propertyGrid.SelectedObject as ContentItem;
-                if (obj != null && obj.SourceFile == item.SourceFile)
+                if (obj != null && obj.OriginalPath == item.OriginalPath)
                     _propertyGrid.SelectedObject = null;
             }
 
@@ -301,7 +326,7 @@ namespace MonoGame.Tools.Pipeline
 
                 {
                     var obj = _propertyGrid.SelectedObject as ContentItem;
-                    if (obj != null && obj.SourceFile == item.SourceFile)
+                    if (obj != null && obj.OriginalPath == item.OriginalPath)
                         _propertyGrid.SelectedObject = null;
                 }
 
@@ -423,6 +448,15 @@ namespace MonoGame.Tools.Pipeline
         private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             _controller.CloseProject();
+        }
+
+        private void MainView_Load(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(OpenProjectPath))
+            {
+                _controller.OpenProject(OpenProjectPath);
+                OpenProjectPath = null;
+            }
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)
@@ -623,6 +657,29 @@ namespace MonoGame.Tools.Pipeline
         private void OnUndoClick(object sender, EventArgs e)
         {
             _controller.Undo();
+        }
+
+        private void ContextMenu_OpenFile_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath))
+            {
+                Process.Start(filePath);
+            }
+        }
+
+        private void ContextMenu_OpenFileLocation_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath) || Directory.Exists(filePath))
+            {
+                Process.Start("explorer.exe", "/select, " + filePath);
+
+            }
         }
     }
 }

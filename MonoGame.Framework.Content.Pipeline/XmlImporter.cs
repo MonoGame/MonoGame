@@ -111,6 +111,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         private bool FindType(string typeName, out string expandedName, out Type foundType)
         {
+            bool isArray = false;            
+            if (typeName.EndsWith("[]"))
+            {
+                isArray = true;
+                typeName = typeName.Replace("[]", "");
+            }
+
+            // TODO:
+            // Deal with List types...
+
             // Shortcut for friendly C# names
             if (_typeAliases.TryGetValue(typeName, out foundType))
             {
@@ -130,6 +140,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             if (foundType == null)
                 foundType = Type.GetType(expandedName, false, true);
+
+            if (foundType != null && isArray)
+            {
+                foundType = foundType.MakeArrayType();                
+            }
 
             return foundType != null;
         }

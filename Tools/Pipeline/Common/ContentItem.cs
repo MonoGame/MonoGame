@@ -17,8 +17,7 @@ namespace MonoGame.Tools.Pipeline
     internal class ContentItem : IProjectItem
     {
         public IController Controller;
-
-        public string SourceFile;
+        
         public string ImporterName;
         public string ProcessorName;
         public OpaqueDataDictionary ProcessorParams;
@@ -29,13 +28,16 @@ namespace MonoGame.Tools.Pipeline
 
         #region IProjectItem
 
+        [Browsable(false)]
+        public string OriginalPath { get; set; }
+
         [Category("Common")]
         [Description("The file name of this item.")]
         public string Name 
         { 
             get
             {
-                return System.IO.Path.GetFileName(SourceFile);
+                return System.IO.Path.GetFileName(OriginalPath);
             }
         }
 
@@ -45,7 +47,7 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                return System.IO.Path.GetDirectoryName(SourceFile);
+                return System.IO.Path.GetDirectoryName(OriginalPath);
             }
         }
 
@@ -142,7 +144,7 @@ namespace MonoGame.Tools.Pipeline
             }
             else
             {
-                _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(SourceFile));
+                _importer = PipelineTypes.FindImporter(ImporterName, System.IO.Path.GetExtension(OriginalPath));
                 if (_importer != null && (string.IsNullOrEmpty(ImporterName) || ImporterName != _importer.TypeName))
                     ImporterName = _importer.TypeName;
 
@@ -190,7 +192,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override string ToString()
         {
-            return System.IO.Path.GetFileName(SourceFile);
+            return System.IO.Path.GetFileName(OriginalPath);
         }
     }
 }

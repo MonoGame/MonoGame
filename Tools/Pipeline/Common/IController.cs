@@ -75,6 +75,8 @@ namespace MonoGame.Tools.Pipeline
 
         void OpenProject();
 
+        void OpenProject(string projectFilePath);
+
         void CloseProject();
 
         bool SaveProject(bool saveAs);
@@ -118,5 +120,7 @@ namespace MonoGame.Tools.Pipeline
         void Redo();
 
         #endregion        
+
+        string GetFullPath(string filePath);
     }
 }

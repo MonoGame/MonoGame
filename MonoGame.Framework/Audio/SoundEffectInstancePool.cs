@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -7,7 +11,7 @@ namespace Microsoft.Xna.Framework.Audio
     internal static class SoundEffectInstancePool
     {
 
-#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || ANDROID || WEB || ANGLE
+#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || WEB || ANGLE
 
         // These platforms are only limited by memory.
         private const int MAX_PLAYING_INSTANCES = int.MaxValue;
@@ -31,11 +35,32 @@ namespace Microsoft.Xna.Framework.Audio
 
         // Reference: http://stackoverflow.com/questions/3894044/maximum-number-of-openal-sound-buffers-on-iphone
         private const int MAX_PLAYING_INSTANCES = 32;
+
+#elif ANDROID
+
+        // No reference. Arbitrary maximum chosen to reduce CPU load.
+        internal const int MAX_PLAYING_INSTANCES = 16;
+
 #endif
 
-        private static readonly List<SoundEffectInstance> _playingInstances = new List<SoundEffectInstance>();
-        private static readonly List<SoundEffectInstance> _pooledInstances = new List<SoundEffectInstance>();
+        private static readonly List<SoundEffectInstance> _playingInstances;
+        private static readonly List<SoundEffectInstance> _pooledInstances;
 
+        static SoundEffectInstancePool()
+        {
+            // Reduce garbage generation by allocating enough capacity for the maximum playing instances
+#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || WEB || ANGLE
+            _playingInstances = new List<SoundEffectInstance>();
+#else
+            _playingInstances = new List<SoundEffectInstance>(MAX_PLAYING_INSTANCES);
+#endif
+            _pooledInstances = new List<SoundEffectInstance>();
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the platform has capacity for more sounds to be played at this time.
+        /// </summary>
+        /// <value><c>true</c> if more sounds can be played; otherwise, <c>false</c>.</value>
         internal static bool SoundsAvailable
         {
             get
@@ -44,46 +69,66 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal static List<SoundEffectInstance> GetAllPlayingSounds()
-        {
-            return new List<SoundEffectInstance>(_playingInstances);
-        }
-
+        /// <summary>
+        /// Add the specified instance to the pool if it is a pooled instance and removes it from the
+        /// list of playing instances.
+        /// </summary>
+        /// <param name="inst">The SoundEffectInstance</param>
         internal static void Add(SoundEffectInstance inst)
         {
-            if (inst._IsPooled)
+            if (inst._isPooled)
+            {
                 _pooledInstances.Add(inst);
+                inst._effect = null;
+            }
 
             _playingInstances.Remove(inst);
         }
 
+        /// <summary>
+        /// Adds the SoundEffectInstance to the list of playing instances.
+        /// </summary>
+        /// <param name="inst">The SoundEffectInstance to add to the playing list.</param>
         internal static void Remove(SoundEffectInstance inst)
         {
             _playingInstances.Add(inst);
         }
 
+        /// <summary>
+        /// Returns a pooled SoundEffectInstance if one is available, or allocates a new
+        /// SoundEffectInstance if the pool is empty.
+        /// </summary>
+        /// <returns>The SoundEffectInstance.</returns>
         internal static SoundEffectInstance GetInstance()
         {
             SoundEffectInstance inst = null;
-            if (_pooledInstances.Count > 0)
+            var count = _pooledInstances.Count;
+            if (count > 0)
             {
-                inst = _pooledInstances[0];
-                _pooledInstances.Remove(inst);
+                // Grab the item at the end of the list so the remove doesn't copy all
+                // the list items down one slot.
+                inst = _pooledInstances[count - 1];
+                _pooledInstances.RemoveAt(count - 1);
 
                 // Reset used instance to the "default" state.
                 inst.Volume = 1.0f;
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
+                inst._effect = null;
             }
             else
                 inst = new SoundEffectInstance();
 
-            inst._IsPooled = true;
+            inst._isPooled = true;
 
             return inst;
         }
 
+        /// <summary>
+        /// Iterates the list of playing instances, returning them to the pool if they
+        /// have stopped playing.
+        /// </summary>
         internal static void Update()
         {
             SoundEffectInstance inst = null;
@@ -92,15 +137,32 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 inst = _playingInstances[x];
 
-                if (inst.State == SoundState.Stopped)
+                if (inst.State == SoundState.Stopped || inst.IsDisposed || inst._effect == null)
                 {
                     Add(inst);
+                    continue;
+                }
+                else if (inst._effect.IsDisposed)
+                {
+                    Add(inst);
+                    // Instances created through SoundEffect.CreateInstance need to be disposed when
+                    // their owner SoundEffect is disposed.
+                    if (!inst._isPooled)
+                        inst.Dispose();
                     continue;
                 }
 
                 x++;
             }
         }
+
+        /// <summary>
+        /// Updates the volumes of all currently playing instances. Used when SoundEffect.MasterVolume is changed.
+        /// </summary>
+        internal static void UpdateVolumes()
+        {
+            foreach (var inst in _playingInstances)
+                inst.Volume = inst.Volume;
+        }
     }
 }
-
