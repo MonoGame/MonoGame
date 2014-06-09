@@ -501,7 +501,7 @@ namespace MonoGame.Tools.Pipeline
 
         private string FormatDivider(string label)
         {
-            const string commentFormat = "\n#----------------------------------------------------------------------------#\n";
+            var commentFormat = Environment.NewLine + "#----------------------------------------------------------------------------#" + Environment.NewLine;
 
             label = " " + label + " ";
             var src = commentFormat.Length / 2 - label.Length / 2;
