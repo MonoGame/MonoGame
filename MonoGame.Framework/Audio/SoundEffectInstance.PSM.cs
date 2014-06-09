@@ -10,7 +10,7 @@ using Sce.PlayStation.Core.Audio;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance : IDisposable
+    public partial class SoundEffectInstance : IDisposable
     {
         private SoundState soundState = SoundState.Stopped;
         
@@ -26,12 +26,21 @@ namespace Microsoft.Xna.Framework.Audio
             _soundPlayer.Volume = SoundEffect.MasterVolume;
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            // When disposing a SoundEffectInstance, the Sound should
-            // just be stopped as it will likely be reused later
-            if (_soundPlayer != null)
-                _soundPlayer.Stop();
+		    if (disposing)
+            {
+                if (_soundPlayer != null)
+                {
+                    _soundPlayer.Stop();
+                    _soundPlayer.Dispose();
+                }
+                if (_audioBuffer != null)
+                    _audioBuffer.Dispose();
+            }
+            _soundPlayer = null;
+            _audioBuffer = null;
+            soundState = SoundState.Stopped;
         }
 
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)

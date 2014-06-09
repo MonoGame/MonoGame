@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private string _name;
         
-        private bool isDisposed = false;
+        private bool _isDisposed = false;
         private TimeSpan _duration = TimeSpan.Zero;
 
         #endregion
@@ -59,6 +59,19 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 
+        #region Finalizer
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/> is reclaimed by garbage collection.
+        /// </summary>
+        ~SoundEffect()
+        {
+            Dispose(false);
+        }
+
+        #endregion
+
         #region Additional SoundEffect/SoundEffectInstance Creation Methods
 
         /// <summary>
@@ -71,7 +84,8 @@ namespace Microsoft.Xna.Framework.Audio
             var inst = new SoundEffectInstance();
             PlatformSetupInstance(inst);
 
-            inst._IsPooled = false;
+            inst._isPooled = false;
+            inst._effect = this;
 
             return inst;
         }
@@ -181,6 +195,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             PlatformSetupInstance(inst);
 
+            inst._effect = this;
             inst.Volume = volume;
             inst.Pitch = pitch;
             inst.Pan = pan;
@@ -312,11 +327,31 @@ namespace Microsoft.Xna.Framework.Audio
         #region IDisposable Members
 
         /// <summary>Indicates whether the object is disposed.</summary>
-        public bool IsDisposed { get { return isDisposed; } }
+        public bool IsDisposed { get { return _isDisposed; } }
 
+        /// <summary>Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/>.</summary>
         public void Dispose()
         {
-            PlatformDispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/>.
+        /// </summary>
+        /// <param name="disposing">If set to <c>true</c>, Dispose was called explicitly.</param>
+        /// <remarks>If the disposing parameter is true, the Dispose method was called explicitly. This
+        /// means that managed objects referenced by this instance should be disposed or released as
+        /// required.  If the disposing parameter is false, Dispose was called by the finalizer and
+        /// no managed objects should be touched because we do not know if they are still valid or
+        /// not at that time.  Unmanaged resources should always be released.</remarks>
+        void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                PlatformDispose(disposing);
+                _isDisposed = true;
+            }
         }
 
         #endregion

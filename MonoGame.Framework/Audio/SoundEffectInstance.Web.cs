@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance : IDisposable
+    public partial class SoundEffectInstance : IDisposable
     {
         internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
         }
     }
