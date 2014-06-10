@@ -35,12 +35,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AdamsLair.WinForms">
-      <HintPath>packages\AdamsLair.WinForms.1.0.0.1\lib\net40-Client\AdamsLair.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="PopupControl">
-      <HintPath>packages\AdamsLair.WinForms.PopupControl.1.0.0.0\lib\net40\PopupControl.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -120,7 +114,6 @@
     <EmbeddedResource Include="Windows\NewContentDialog.resx">
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
