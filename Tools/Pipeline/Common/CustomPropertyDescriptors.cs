@@ -33,7 +33,7 @@ namespace MonoGame.Tools.Pipeline
             for (var i = 1; i < _targets.Length; i++)
             {
                 var v = _property.GetValue(_targets[i]);
-                if (v != val)
+                if (!v.Equals(val))
                     return null;
             }
 
