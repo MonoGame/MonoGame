@@ -108,17 +108,21 @@ namespace MonoGame.Tools.Pipeline
         {
             if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
-            else
+
+            // TODO: This is the multi-select case which needs to be handled somehow to support undo.
+            if (args.OldValue == null)
+                return;
+
+            var obj = _propertyGrid.SelectedObject;
+
+            if (obj is ContentItem)
             {
-                if (_propertyGrid.SelectedObject is ContentItem)
-                {
-                    var item = _propertyGrid.SelectedObject as ContentItem;
-                    var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                    _controller.AddAction(action);
-                }
-                else
-                    _controller.OnProjectModified();
+                var item = obj as ContentItem;
+                var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
+                _controller.AddAction(action);
             }
+            else
+                _controller.OnProjectModified();
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)

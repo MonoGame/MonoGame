@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -17,11 +18,24 @@ namespace MonoGame.Tools.Pipeline
     {
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            // True means show a combobox.
-            if (GetStandardValues(context).Count > 0)
-                return true;
+            if (context.Instance is Array)
+            {
+                var array = context.Instance as Array;
+                foreach (var obj in array)
+                {
+                    var item = obj as ContentItem;
+                    if (item.BuildAction == BuildAction.Copy)
+                        return false;
+                }
+            }
+            else
+            {
+                var contentItem = (context.Instance as ContentItem);
+                if (contentItem.BuildAction == BuildAction.Copy)
+                    return false;
+            }                
                         
-            return false;
+            return true;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
@@ -31,35 +45,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            var contentItem = (ContentItem)context.Instance;
-            var processors = new List<ProcessorTypeDescription>();
-
-            if (contentItem.BuildAction == BuildAction.Copy)
-            {
-                // Copy items do not have processors.
-                return new StandardValuesCollection(processors);
-            }
-            else
-            {
-                var importer = contentItem.Importer;
-
-                // If the importer is invalid then we do not know its real outputtype
-                // so just show all processors.
-                if (importer == PipelineTypes.MissingImporter)
-                {
-                    return new StandardValuesCollection(PipelineTypes.Processors);
-                }
-                
-                foreach (var p in PipelineTypes.Processors)
-                {
-                    if (importer.OutputType.IsAssignableFrom(p.InputType))
-                    {
-                        processors.Add(p);
-                    }
-                }
-
-                return new StandardValuesCollection(processors);
-            }            
+            return PipelineTypes.ProcessorsStandardValuesCollection;            
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -113,37 +99,63 @@ namespace MonoGame.Tools.Pipeline
             var props = new PropertyDescriptorCollection(null);
 
             var processor = value as ProcessorTypeDescription;
-            var contentItem = context.Instance as ContentItem;
 
-            if (value == PipelineTypes.MissingProcessor)
-            {            
-                props.Add(new ReadonlyPropertyDescriptor("Name", typeof (string), typeof (ProcessorTypeDescription), contentItem.ProcessorName));
+            if (context.Instance is Array)
+            {
+                var array = context.Instance as object[];
 
-                foreach (var p in contentItem.ProcessorParams)
+                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
+                    props.Add(new MultiTargetPropertyDescriptor(prop.Name, prop.PropertyType, prop.ComponentType, prop, array));
+
+                var paramArray = array.Select(e => ((ContentItem)e).ProcessorParams).ToArray();
+
+                foreach (var p in processor.Properties)
                 {
-                    var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Key,
-                                                                                 p.Value.GetType(),
-                                                                                 typeof (ProcessorTypeDescription),
-                                                                                 contentItem.ProcessorParams);
-                    
-
-                    props.Add(desc);
+                    var prop = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name,
+                                                                                 p.Type,
+                                                                                 null);
+                    var prop2 = new MultiTargetPropertyDescriptor(prop.Name,
+                                                             prop.PropertyType,
+                                                             prop.ComponentType,
+                                                             prop,
+                                                             paramArray);
+                    props.Add(prop2);
                 }
             }
             else
             {
-                // Emit regular properties.
-                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
-                    props.Add(prop);
+                var contentItem = context.Instance as ContentItem;
 
-                // Emit processor parameters.
-                foreach (var p in processor.Properties)
+                if (value == PipelineTypes.MissingProcessor)
                 {
-                    var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name,
-                                                                                 p.Type,
-                                                                                 typeof (ProcessorTypeDescription),
-                                                                                 contentItem.ProcessorParams);
-                    props.Add(desc);
+
+                    props.Add(new ReadonlyPropertyDescriptor("Name", typeof (string), typeof (ProcessorTypeDescription), contentItem.ProcessorName));
+
+                    foreach (var p in contentItem.ProcessorParams)
+                    {
+                        var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Key,
+                                                                                     p.Value.GetType(),
+                                                                                     contentItem.ProcessorParams);
+
+
+                        props.Add(desc);
+                    }
+                }
+                else
+                {
+                    // Emit regular properties.
+                    foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(value, attributes, true))
+                        props.Add(prop);
+
+                    // Emit processor parameters.
+                    foreach (var p in processor.Properties)
+                    {
+                        var desc = new OpaqueDataDictionaryElementPropertyDescriptor(p.Name,
+                                                                                     p.Type,
+                                                                                     contentItem.ProcessorParams);
+
+                        props.Add(desc);
+                    }
                 }
             }
 
@@ -152,17 +164,41 @@ namespace MonoGame.Tools.Pipeline
 
         public override bool GetPropertiesSupported(ITypeDescriptorContext context)
         {
-            var contentItem = context.Instance as ContentItem;
-            if (contentItem.BuildAction == BuildAction.Copy)
+            if (!GetStandardValuesSupported(context))
                 return false;
 
-            if (contentItem.Processor.Properties.Any())
-                return true;
+            if (context.Instance is Array)
+            {
+                var array = (context.Instance as Array);
+                var first = array.GetValue(0) as ContentItem;
 
-            if (contentItem.Processor == PipelineTypes.MissingProcessor)
-                return true;
+                if (!first.Processor.Properties.Any())
+                    return false;
+
+                if (first.Processor == PipelineTypes.MissingProcessor)
+                    return false;
+
+                for (var i = 1; i < array.Length; i++)
+                {
+                    var item = array.GetValue(i) as ContentItem;
+                    if (item.Processor != first.Processor)
+                        return false;
+
+                    if (!item.Processor.Properties.Any())
+                        return false;                    
+                }
+            }
+            else
+            {
+                var item = context.Instance as ContentItem;
+                if (item.BuildAction == BuildAction.Copy)
+                    return false;
+
+                if (!item.Processor.Properties.Any())
+                    return false;          
+            }
             
-            return false;
+            return true;
         }
     }
 }
