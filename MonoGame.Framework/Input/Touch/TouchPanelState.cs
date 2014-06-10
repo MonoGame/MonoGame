@@ -103,8 +103,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal void Update(GameTime gameTime)
         {
             _currentTimestamp = gameTime.TotalGameTime;
-
-            //TODO: Gesture recognition
+            UpdateGestures(false);
         }
 
 
@@ -385,7 +384,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         private const float TapJitterTolerance = 35.0f;
 
-        private static readonly TimeSpan _maxTicksToProcessHold = TimeSpan.FromMilliseconds(1024);
+        internal static readonly TimeSpan TimeRequiredForHold = TimeSpan.FromMilliseconds(1024);
 
         /// <summary>
         /// The pinch touch locations.
@@ -594,7 +593,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
 
             var elapsed = _currentTimestamp - touch.PressTimestamp;
-            if (elapsed < _maxTicksToProcessHold)
+            if (elapsed < TimeRequiredForHold)
                 return;
 
             _holdDisabled = true;
@@ -650,7 +649,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // If we pressed and held too long then don't 
             // generate a tap event for it.
             var elapsed = _currentTimestamp - touch.PressTimestamp;
-            if (elapsed > _maxTicksToProcessHold)
+            if (elapsed > TimeRequiredForHold)
                 return;
 
             // Store the last tap for 

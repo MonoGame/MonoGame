@@ -117,5 +117,36 @@ namespace MonoGame.Tests.Framework
 
             Assert.False(_tps.IsGestureAvailable);
         }
+
+        [Test]
+        public void BasicHold()
+        {
+            _tps.EnabledGestures = GestureType.Hold;
+            var pos = new Vector2(100, 150);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+
+            //We shouldn't generate the hold until the required time has passed
+            GameTime gt;
+            int frame = 1;
+            do
+            {
+                Assert.False(_tps.IsGestureAvailable);
+
+                frame++;
+                gt = GameTimeForFrame(frame);
+                _tps.Update(gt);
+            } while (gt.TotalGameTime < TouchPanelState.TimeRequiredForHold);
+
+            //The last Update should have generated a hold
+            Assert.True(_tps.IsGestureAvailable);
+
+            var gesture = _tps.ReadGesture();
+            Assert.AreEqual(GestureType.Hold, gesture.GestureType);
+            Assert.AreEqual(pos, gesture.Position);
+
+            Assert.False(_tps.IsGestureAvailable);
+        }
     }
 }
