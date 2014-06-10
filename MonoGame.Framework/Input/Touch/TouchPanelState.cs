@@ -61,6 +61,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private int _nextTouchId = 2;
 
         /// <summary>
+        /// The current timestamp that we use for setting the timestamp of new TouchLocations
+        /// </summary>
+        private TimeSpan _currentTimestamp;
+
+        /// <summary>
         /// The mapping between platform specific touch ids
         /// and the touch ids we assign to touch locations.
         /// </summary>
@@ -91,6 +96,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
             Capabilities.Initialize();
             return Capabilities;
         }
+
+        /// <summary>
+        /// Update the current timestamp and run gesture recognition for this frame if it is enabled
+        /// </summary>
+        internal void Update(GameTime gameTime)
+        {
+            _currentTimestamp = gameTime.TotalGameTime;
+
+            //TODO: Gesture recognition
+        }
+
 
         internal bool Refresh(bool consumeState, List<TouchLocation> state, List<TouchLocation> events)
         {
@@ -227,7 +243,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
-                var evt = new TouchLocation(touchId, state, position * _touchScale);
+                var evt = new TouchLocation(touchId, state, position * _touchScale, _currentTimestamp);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
@@ -577,7 +593,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!GestureIsEnabled(GestureType.Hold) || _holdDisabled)
                 return;
 
-            var elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks) - touch.PressTimestamp;
+            var elapsed = _currentTimestamp - touch.PressTimestamp;
             if (elapsed < _maxTicksToProcessHold)
                 return;
 
@@ -633,7 +649,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // If we pressed and held too long then don't 
             // generate a tap event for it.
-            var elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks) - touch.PressTimestamp;
+            var elapsed = _currentTimestamp - touch.PressTimestamp;
             if (elapsed > _maxTicksToProcessHold)
                 return;
 
