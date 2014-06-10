@@ -30,6 +30,20 @@ namespace MonoGame.Tools.Pipeline
         {
             return TypeName;
         }
+
+        public override int GetHashCode()
+        {
+            return TypeName.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as ImporterTypeDescription;
+            if (other == null)
+                return false;
+
+            return this.TypeName.Equals(other.TypeName);
+        }
     };
 
     public class ProcessorTypeDescription
@@ -156,6 +170,9 @@ namespace MonoGame.Tools.Pipeline
         public static ImporterTypeDescription MissingImporter { get; private set; }
         public static ProcessorTypeDescription MissingProcessor { get; private set; }
 
+        public static TypeConverter.StandardValuesCollection ImportersStandardValuesCollection { get; private set; }
+        public static TypeConverter.StandardValuesCollection ProcessorsStandardValuesCollection { get; private set; }
+
         private static readonly Dictionary<string, string> _oldNameRemap = new Dictionary<string, string>()
             {
                 { "MGMaterialProcessor", "MaterialProcessor" },
@@ -243,6 +260,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             Importers = importerDescriptions;
+            ImportersStandardValuesCollection = new TypeConverter.StandardValuesCollection(Importers);
 
             var processorDescriptions = new ProcessorTypeDescription[_processors.Count];
 
@@ -281,7 +299,8 @@ namespace MonoGame.Tools.Pipeline
                 cur++;
             }
 
-            Processors = processorDescriptions;            
+            Processors = processorDescriptions;
+            ProcessorsStandardValuesCollection = new TypeConverter.StandardValuesCollection(Processors);
         }
 
         public static void Unload()
@@ -291,6 +310,9 @@ namespace MonoGame.Tools.Pipeline
          
             _processors = null;
             Processors = null;
+
+            ImportersStandardValuesCollection = null;
+            ProcessorsStandardValuesCollection = null;
         }        
 
         public static TypeConverter FindConverter(Type type)

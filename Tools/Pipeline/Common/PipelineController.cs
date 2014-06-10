@@ -7,10 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -29,19 +26,7 @@ namespace MonoGame.Tools.Pipeline
             get { return _templateItems; }
         }
 
-        public PipelineController(IView view, PipelineProject project)
-        {
-            _actionStack = new ActionStack();
-
-            _view = view;
-            _view.Attach(this);
-            _project = project;
-            _project.Controller = this;
-            ProjectOpen = false;
-
-            _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Environment.CurrentDirectory + "\\Templates");                        
-        }
+        public Selection Selection { get; private set; }
 
         public bool LaunchDebugger { get; set; }
 
@@ -64,6 +49,21 @@ namespace MonoGame.Tools.Pipeline
         public event Action OnBuildStarted;
 
         public event Action OnBuildFinished;
+
+        public PipelineController(IView view, PipelineProject project)
+        {
+            _actionStack = new ActionStack();
+            Selection = new Selection();
+
+            _view = view;
+            _view.Attach(this);
+            _project = project;
+            _project.Controller = this;
+            ProjectOpen = false;
+
+            _templateItems = new List<ContentItemTemplate>();
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates");
+        }
 
         public void OnProjectModified()
         {            
@@ -102,6 +102,8 @@ namespace MonoGame.Tools.Pipeline
             if (!_view.AskSaveName(ref projectFilePath, "New Project"))
                 return;
 
+            CloseProject();
+
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -130,6 +132,8 @@ namespace MonoGame.Tools.Pipeline
             string projectFilePath;
             if (!_view.AskImportProject(out projectFilePath))
                 return;
+
+            CloseProject();
 
             if (OnProjectLoading != null)
                 OnProjectLoading();
@@ -172,12 +176,14 @@ namespace MonoGame.Tools.Pipeline
             string projectFilePath;
             if (!_view.AskOpenProject(out projectFilePath))
                 return;
-
+            
             OpenProject(projectFilePath);
         }
 
         public void OpenProject(string projectFilePath)
         {
+            CloseProject();
+
             if (OnProjectLoading != null)
                 OnProjectLoading();
 
@@ -220,6 +226,7 @@ namespace MonoGame.Tools.Pipeline
             _project = null;
             _actionStack.Clear();
 
+            Selection.Clear(this);
             UpdateTree();
         }
 
@@ -241,11 +248,6 @@ namespace MonoGame.Tools.Pipeline
             parser.SaveProject();            
 
             return true;
-        }
-
-        public void OnTreeSelect(IProjectItem item)
-        {
-            _view.ShowProperties(item);
         }
 
         public void Build(bool rebuild)
@@ -412,7 +414,7 @@ namespace MonoGame.Tools.Pipeline
 
                 foreach (var item in _project.ContentItems)
                     _view.AddTreeItem(item);
-            }
+            }            
 
             _view.EndTreeUpdate();
         }
@@ -465,11 +467,14 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Add(action);
         }
 
-        public ContentItem GetItem(string sourceFile)
+        public IProjectItem GetItem(string originalPath)
         {
+            if (_project.OriginalPath.Equals(originalPath, StringComparison.OrdinalIgnoreCase))
+                return _project;
+
             foreach (var i in _project.ContentItems)
-            {                
-                if (string.Equals(i.OriginalPath, sourceFile, StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(i.OriginalPath, originalPath, StringComparison.OrdinalIgnoreCase))
                 {
                     return i;
                 }

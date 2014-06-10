@@ -42,6 +42,8 @@ namespace MonoGame.Tools.Pipeline
                 var parser = new PipelineProjectParser(_con, _con._project);
                 _con._view.BeginTreeUpdate();
 
+                _con.Selection.Clear(_con);
+
                 if (parser.AddContent(fullpath, true))
                 {
                     var item = _con._project.ContentItems.Last();
@@ -49,8 +51,9 @@ namespace MonoGame.Tools.Pipeline
                     item.ImporterName = _template.ImporterName;
                     item.ProcessorName = _template.ProcessorName;
                     item.ResolveTypes();
+
                     _con._view.AddTreeItem(item);
-                    _con._view.SelectTreeItem(item);
+                    _con.Selection.Add(item, _con);
                 }
 
                 _con._view.EndTreeUpdate();
@@ -82,6 +85,7 @@ namespace MonoGame.Tools.Pipeline
                     {
                         _con._project.ContentItems.Remove(item);
                         _con._view.RemoveTreeItem(item);
+                        _con.Selection.Remove(item, _con);
                     }
                 }
                     

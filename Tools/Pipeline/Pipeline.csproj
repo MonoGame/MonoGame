@@ -57,6 +57,8 @@
     <Compile Include="Common\ContentItem.Importer.cs" />
     <Compile Include="Common\ContentItemTemplate.cs" />
     <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\ProjectState.cs" />
+    <Compile Include="Common\Selection.cs" />
     <Compile Include="Common\PipelineController.NewAction.cs" />
     <Compile Include="Common\PipelineController.ExcludeAction.cs" />
     <Compile Include="Common\PipelineController.IncludeAction.cs" />
