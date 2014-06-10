@@ -16,6 +16,7 @@ namespace MonoGame.Tests.Framework
     {
         private TouchPanelState _tps;
 
+        private const GestureType AllDrags = GestureType.DragComplete | GestureType.FreeDrag | GestureType.HorizontalDrag | GestureType.VerticalDrag;
         private const GestureType AllGestures =
             GestureType.DoubleTap | GestureType.DragComplete | GestureType.Flick | GestureType.FreeDrag | GestureType.Hold |
             GestureType.HorizontalDrag | GestureType.Pinch | GestureType.PinchComplete | GestureType.Tap | GestureType.VerticalDrag;
@@ -147,6 +148,41 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(pos, gesture.Position);
 
             Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
+        public void BasicHorizontalDrag()
+        {
+            _tps.EnabledGestures = AllDrags;
+            var startPos = new Vector2(200, 200);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
+            _tps.Update(GameTimeForFrame(1));
+
+            //Move it until it should have made a drag
+            int diff = 0;
+            int frame = 1;
+            while (diff * 10 < TouchPanelState.TapJitterTolerance)
+            {
+                Assert.False(_tps.IsGestureAvailable);
+
+                diff ++;
+                frame++;
+
+                _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff * 10, diff));
+                _tps.Update(GameTimeForFrame(frame));
+            }
+
+            //We should have a gesture now
+            Assert.True(_tps.IsGestureAvailable);
+            var gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Should get the correct type at the new touch location, with the given delta
+            Assert.AreEqual(GestureType.HorizontalDrag, gesture.GestureType);
+            Assert.AreEqual(startPos + new Vector2(diff * 10, diff), gesture.Position);
+            Assert.AreEqual(new Vector2(10, 0), gesture.Delta);
         }
     }
 }

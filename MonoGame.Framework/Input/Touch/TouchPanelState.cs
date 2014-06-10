@@ -382,7 +382,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// Maximum distance a touch location can wiggle and 
         /// not be considered to have moved.
         /// </summary>
-        private const float TapJitterTolerance = 35.0f;
+        internal const float TapJitterTolerance = 35.0f;
 
         internal static readonly TimeSpan TimeRequiredForHold = TimeSpan.FromMilliseconds(1024);
 
@@ -678,8 +678,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             // Make sure this is a move event and that we have
             // a previous touch location.
             TouchLocation prevTouch;
-            if (touch.State != TouchLocationState.Moved ||
-                    !touch.TryGetPreviousLocation(out prevTouch))
+            if (touch.State != TouchLocationState.Moved || !touch.TryGetPreviousLocation(out prevTouch))
                 return;
 
             var delta = touch.Position - prevTouch.Position;
@@ -719,8 +718,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
 
             // If the drag could not be classified then no gesture.
-            if (_dragGestureStarted == GestureType.None ||
-                    _dragGestureStarted == GestureType.DragComplete)
+            if (_dragGestureStarted == GestureType.None || _dragGestureStarted == GestureType.DragComplete)
                 return;
 
             _tapDisabled = true;
