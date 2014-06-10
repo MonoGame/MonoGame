@@ -53,7 +53,7 @@ namespace MonoGame.Tools.Pipeline
                     item.ResolveTypes();
 
                     _con._view.AddTreeItem(item);
-                    _con.Selection.Add(item, _con);
+                    _con.Selection.Add(_con, item);
                 }
 
                 _con._view.EndTreeUpdate();
@@ -85,7 +85,7 @@ namespace MonoGame.Tools.Pipeline
                     {
                         _con._project.ContentItems.Remove(item);
                         _con._view.RemoveTreeItem(item);
-                        _con.Selection.Remove(item, _con);
+                        _con.Selection.Remove(_con, item);
                     }
                 }
                     

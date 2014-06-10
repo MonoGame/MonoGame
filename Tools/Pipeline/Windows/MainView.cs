@@ -22,7 +22,11 @@ namespace MonoGame.Tools.Pipeline
         private ImageList _treeIcons;
 
         private bool _treeUpdating;
-        private bool _treeSort;        
+        private bool _treeSort;
+
+        private bool _propertyGridDirty;
+        private Dictionary<string, bool> _propertyGroupExpanded;
+        private string _prevSelectedGridItemLabel;
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
@@ -61,9 +65,15 @@ namespace MonoGame.Tools.Pipeline
             _treeView.NodeMouseDoubleClick += TreeViewOnNodeMouseDoubleClick;
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
+            _propertyGrid.SelectedGridItemChanged += OnPropertyGridSelectedGridItemChanged;
+            _propertyGrid.SelectedObjectsChanged += OnPropertyGridSelectedObjectsChanged;
+
+            // Show processor parameters by default (start with Processor category expanded).            
+            _propertyGroupExpanded = new Dictionary<string, bool>();
+            _propertyGroupExpanded.Add("Processor", true);
 
             Form = this;
-        }
+        }        
 
         public void Attach(IController controller)
         {
@@ -84,7 +94,7 @@ namespace MonoGame.Tools.Pipeline
             _controller.Selection.Modified += OnSelectionModified;
         }
 
-        private void OnSelectionModified(Selection selection, object sender)
+        private void OnSelectionModified(object sender, Selection selection, SelectionModifiedArgs args)
         {
             if (sender == this)
                 return;
@@ -102,6 +112,41 @@ namespace MonoGame.Tools.Pipeline
             }
 
             return null;
+        }
+
+        public void UpdatePropertyGridSelection()
+        {
+            _propertyGridDirty = true;
+
+            // Save which groups are expanded.
+            foreach (var group in _propertyGrid.EnumerateGroups())
+            {
+                if (group.Expandable && !string.IsNullOrEmpty(group.Label))
+                    _propertyGroupExpanded[group.Label] = group.Expanded;
+            }
+
+            // Save the name of the selected/focused property or group.
+            if (_propertyGrid.SelectedGridItem == null || string.IsNullOrEmpty(_propertyGrid.SelectedGridItem.Label))
+                _prevSelectedGridItemLabel = null;
+            else
+                _prevSelectedGridItemLabel = _propertyGrid.SelectedGridItem.Label;
+
+            // Reset selected objects.
+            // Group re-expansion and property re-selection is handled by within an event callback (PropertyGrid.SelectedGridItemChanged).
+            if (!_controller.Selection.Equals(_propertyGrid.SelectedObjects))
+                _propertyGrid.SelectedObjects = _controller.Selection.Cast<object>().ToArray();
+        }
+
+        public void UpdateProperties(IProjectItem item)
+        {
+            foreach (var obj in _controller.Selection)
+            {
+                if (obj.OriginalPath.Equals(item.OriginalPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    UpdatePropertyGridSelection();
+                    break;
+                }
+            }
         }
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs args)
@@ -129,6 +174,43 @@ namespace MonoGame.Tools.Pipeline
 
                 _controller.OnProjectModified();
             }                
+        }
+
+        private void OnPropertyGridSelectedObjectsChanged(object sender, EventArgs e)
+        {                       
+        }
+
+        private void OnPropertyGridSelectedGridItemChanged(object sender, EventArgs e)
+        {
+            if (_propertyGridDirty)
+            {
+                _propertyGridDirty = false;
+
+                foreach (var item in _propertyGrid.EnumerateGroups())
+                {
+                    if (!string.IsNullOrEmpty(item.Label))
+                    {
+                        if (_propertyGroupExpanded.ContainsKey(item.Label))
+                        {
+                            var expand = _propertyGroupExpanded[item.Label];
+                            if (item.Expanded != expand)
+                                item.Expanded = expand;
+                        }
+                    }
+                }
+
+                if (_prevSelectedGridItemLabel != null)
+                {
+                    if (_propertyGrid.SelectedGridItem.Label != _prevSelectedGridItemLabel)
+                    {
+                        foreach (var item in _propertyGrid.EnumerateItems())
+                        {
+                            if (item.Label == _prevSelectedGridItemLabel)
+                                _propertyGrid.SelectedGridItem = item;
+                        }
+                    }
+                }
+            }
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -324,7 +406,7 @@ namespace MonoGame.Tools.Pipeline
             node.SelectedImageIndex = ContentItemIcon;
 
             _treeView.SelectedNode = node;
-
+            
             root.Expand();
         }
 
@@ -406,25 +488,6 @@ namespace MonoGame.Tools.Pipeline
             _treeView.EndUpdate();
 
             _treeUpdating = false;
-        }
-
-        public void ShowProperties(IProjectItem item)
-        {
-            _propertyGrid.SelectedObject = item;
-            _propertyGrid.ExpandAllGridItems();
-        }
-
-        public void UpdateProperties(IProjectItem item)
-        {
-            foreach (var obj in _controller.Selection)
-            {
-                if (obj.OriginalPath.Equals(item.OriginalPath, StringComparison.OrdinalIgnoreCase))
-                {
-                    _propertyGrid.Refresh();
-                    _propertyGrid.ExpandAllGridItems();
-                    break;
-                }
-            }
         }
 
         public void OutputAppend(string text)
@@ -529,14 +592,13 @@ namespace MonoGame.Tools.Pipeline
         private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
         {            
             _controller.Selection.Clear(this);
-            _propertyGrid.SelectedObject = null;
 
             foreach (var node in _treeView.SelectedNodes)
             {
-                _controller.Selection.Add(node.Tag as IProjectItem, this);
+                _controller.Selection.Add(this, node.Tag as IProjectItem);
             }
 
-            _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            UpdatePropertyGridSelection();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
@@ -612,7 +674,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void UpdateMenus()
-        {
+        {            
             var notBuilding = !_controller.ProjectBuilding;
             var projectOpen = _controller.ProjectOpen;
             var projectOpenAndNotBuilding = projectOpen && notBuilding;
