@@ -76,6 +76,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     var absXform = _rootNode.Children[0].AbsoluteTransform;
                     _rootNode = _rootNode.Children[0];
+                    _rootNode.Identity = identity;
                     _rootNode.Transform = absXform;
                 }
 
