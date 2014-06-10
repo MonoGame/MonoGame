@@ -467,11 +467,14 @@ namespace MonoGame.Tools.Pipeline
             _actionStack.Add(action);
         }
 
-        public ContentItem GetItem(string sourceFile)
+        public IProjectItem GetItem(string originalPath)
         {
+            if (_project.OriginalPath.Equals(originalPath, StringComparison.OrdinalIgnoreCase))
+                return _project;
+
             foreach (var i in _project.ContentItems)
-            {                
-                if (string.Equals(i.OriginalPath, sourceFile, StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(i.OriginalPath, originalPath, StringComparison.OrdinalIgnoreCase))
                 {
                     return i;
                 }

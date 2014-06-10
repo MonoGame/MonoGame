@@ -103,7 +103,7 @@ namespace MonoGame.Tools.Pipeline
 
         void AddAction(IProjectAction action);
 
-        ContentItem GetItem(string sourceFile);
+        IProjectItem GetItem(string originalPath);
 
         #endregion
 

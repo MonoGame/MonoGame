@@ -122,7 +122,13 @@ namespace MonoGame.Tools.Pipeline
                 _controller.AddAction(action);
             }
             else
+            {
+                var item = (PipelineProject)_controller.GetItem((obj as PipelineProjectProxy).OriginalPath);
+                var action = new UpdateProjectAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
+                _controller.AddAction(action);
+
                 _controller.OnProjectModified();
+            }                
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -410,10 +416,14 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateProperties(IProjectItem item)
         {
-            if (_propertyGrid.SelectedObject == item)
+            foreach (var obj in _controller.Selection)
             {
-                _propertyGrid.Refresh();
-                _propertyGrid.ExpandAllGridItems();
+                if (obj.OriginalPath.Equals(item.OriginalPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    _propertyGrid.Refresh();
+                    _propertyGrid.ExpandAllGridItems();
+                    break;
+                }
             }
         }
 
