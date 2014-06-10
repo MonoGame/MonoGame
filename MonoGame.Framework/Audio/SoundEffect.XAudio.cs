@@ -165,7 +165,6 @@ namespace Microsoft.Xna.Framework.Audio
             if (Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
-            inst._effect = this;
             inst._voice = voice;
         }
 

@@ -173,7 +173,13 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play()
         {
-            return Play(1.0f, 0.0f, 0.0f);
+            var inst = GetPooledInstance();
+            if (inst == null)
+                return false;
+
+            inst.Play();
+
+            return true;
         }
 
         /// <summary>Gets an internal SoundEffectInstance and plays it with the specified volume, pitch, and panning.</summary>
@@ -188,32 +194,31 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play(float volume, float pitch, float pan)
         {
-            if (!SoundEffectInstancePool.SoundsAvailable)
+            var inst = GetPooledInstance();
+            if (inst == null)
                 return false;
-           
-            var inst = SoundEffectInstancePool.GetInstance();
 
-            PlatformSetupInstance(inst);
-
-            inst._effect = this;
             inst.Volume = volume;
             inst.Pitch = pitch;
             inst.Pan = pan;
+
             inst.Play();
 
             return true;
         }
 
+        /// <summary>
+        /// Returns a sound effect instance from the pool or null if none are available.
+        /// </summary>
         internal SoundEffectInstance GetPooledInstance()
         {
             if (!SoundEffectInstancePool.SoundsAvailable)
                 return null;
 
             var inst = SoundEffectInstancePool.GetInstance();
-            inst.Volume = 1.0f;
-            inst.Pitch = 0.0f;
-            inst.Pan = 0.0f;
+            inst._effect = this;
             PlatformSetupInstance(inst);
+
             return inst;
         }
 
