@@ -151,6 +151,7 @@
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
+    <Compile Include="Processors\VideoProcessor.cs" />
 
     <!-- TwoMGFX-->
     <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">	
@@ -325,6 +326,7 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+    <Compile Include="Serialization\Compiler\VideoWriter.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
@@ -356,6 +358,7 @@
     <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
+    <Compile Include="H264Importer.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />

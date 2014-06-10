@@ -15,7 +15,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     internal class ExternalTool
     {
-        public static void Run(string command, string arguments)
+        public static int Run(string command, string arguments)
+        {
+            string stdout, stderr;
+            var result = Run(command, arguments, out stdout, out stderr);
+            if (result < 0)
+                throw new Exception(string.Format("{0} returned exit code {1}", command, result));
+
+            return result;
+        }
+
+        public static int Run(string command, string arguments, out string stdout, out string stderr)
         {
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
@@ -32,17 +42,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 ErrorDialog = false,
                 FileName = fullPath,
                 UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
             };
 
-            var process = new Process
+            using (var process = new Process())
             {
-                StartInfo = processInfo
-            };
+                process.StartInfo = processInfo;
 
-            process.Start();
-            process.WaitForExit();
-            if (process.ExitCode < 0)
-                throw new Exception(string.Format("{0} returned exit code {1}", processInfo.FileName, process.ExitCode));
+                process.Start();
+
+                stdout = process.StandardOutput.ReadToEnd();
+                stderr = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                return process.ExitCode;
+            }
         }
 
         /// <summary>
