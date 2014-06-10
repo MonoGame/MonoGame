@@ -55,13 +55,67 @@ namespace MonoGame.Tests.Framework
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(1, TouchLocationState.Released, pos);
-            _tps.Update(GameTimeForFrame(2)); //Not sure if this should be necessary
+            _tps.Update(GameTimeForFrame(2));
 
             Assert.True(_tps.IsGestureAvailable);
             var gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
 
             Assert.AreEqual(GestureType.Tap, gesture.GestureType);
             Assert.AreEqual(pos, gesture.Position);
+        }
+
+        [Test]
+        [TestCase(true), TestCase(false)]
+        public void BasicDoubleTapGesture(bool enableTap)
+        {
+            GestureSample gesture;
+
+            _tps.EnabledGestures = GestureType.DoubleTap;
+            if (enableTap)
+                _tps.EnabledGestures |= GestureType.Tap;
+            var pos = new Vector2(100, 150);
+
+            //Do a first tap
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(1));
+
+            Assert.False(_tps.IsGestureAvailable);
+
+            _tps.AddEvent(1, TouchLocationState.Released, pos);
+            _tps.Update(GameTimeForFrame(2));
+
+            //Will make a tap event if tap is enabled
+            if (enableTap)
+            {
+                Assert.True(_tps.IsGestureAvailable);
+                gesture = _tps.ReadGesture();
+                Assert.False(_tps.IsGestureAvailable);
+
+                Assert.AreEqual(GestureType.Tap, gesture.GestureType);
+                Assert.AreEqual(pos, gesture.Position);
+            }
+            else
+            {
+                Assert.False(_tps.IsGestureAvailable);
+            }
+
+            //Now do the second tap in the same location, this will make a double tap on press (but no tap)
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(3));
+
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+
+            Assert.AreEqual(GestureType.DoubleTap, gesture.GestureType);
+            Assert.AreEqual(pos, gesture.Position);
+
+            //This release should make no gestures
+            _tps.AddEvent(2, TouchLocationState.Released, pos);
+            _tps.Update(GameTimeForFrame(4));
+
+            Assert.False(_tps.IsGestureAvailable);
         }
     }
 }
