@@ -115,7 +115,6 @@ namespace Microsoft.Xna.Framework.Audio
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
-                inst._effect = null;
             }
             else
                 inst = new SoundEffectInstance();
