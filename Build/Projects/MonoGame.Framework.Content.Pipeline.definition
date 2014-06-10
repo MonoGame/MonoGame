@@ -369,7 +369,9 @@
     <Compile Include="ProcessorParameterCollection.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
-    <Compile Include="Vector4TypeConverter.cs" />
+	<Compile Include="Vector4TypeConverter.cs" />	
+    <Compile Include="Vector3TypeConverter.cs" />
+	<Compile Include="Vector2TypeConverter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />
     <Compile Include="WmaImporter.cs" />
