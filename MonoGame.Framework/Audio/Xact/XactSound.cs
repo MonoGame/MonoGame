@@ -129,6 +129,13 @@ namespace Microsoft.Xna.Framework.Audio
                 else
                     _wave = _soundBank.GetSoundEffectInstance(_waveBankIndex, _trackIndex);
 
+                if (_wave == null)
+                {
+                    // We couldn't create a sound effect instance, most likely
+                    // because we've reached the sound pool limits.
+                    return;
+                }
+
                 _wave.Play();
 			}
 		}
