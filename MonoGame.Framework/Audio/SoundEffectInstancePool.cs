@@ -48,13 +48,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         static SoundEffectInstancePool()
         {
-            // Reduce garbage generation by allocating enough capacity for the maximum playing instances
-#if WINDOWS || (WINRT && !WINDOWS_PHONE) || LINUX || WEB || ANGLE
-            _playingInstances = new List<SoundEffectInstance>();
-#else
-            _playingInstances = new List<SoundEffectInstance>(MAX_PLAYING_INSTANCES);
-#endif
-            _pooledInstances = new List<SoundEffectInstance>();
+            // Reduce garbage generation by allocating enough capacity for
+            // the maximum playing instances or at least some reasonable value.
+            var maxInstances = MAX_PLAYING_INSTANCES < 1024 ? MAX_PLAYING_INSTANCES : 1024;
+            _playingInstances = new List<SoundEffectInstance>(maxInstances);
+            _pooledInstances = new List<SoundEffectInstance>(maxInstances);
         }
 
         /// <summary>
@@ -115,7 +113,6 @@ namespace Microsoft.Xna.Framework.Audio
                 inst.Pan = 0.0f;
                 inst.Pitch = 0.0f;
                 inst.IsLooped = false;
-                inst._effect = null;
             }
             else
                 inst = new SoundEffectInstance();

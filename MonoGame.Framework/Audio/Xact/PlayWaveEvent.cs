@@ -85,7 +85,13 @@ namespace Microsoft.Xna.Framework.Audio
             };
 
             _wav = _soundBank.GetSoundEffectInstance(_waveBanks[_wavIndex], _tracks[_wavIndex]);
-               
+            if (_wav == null)
+            {
+                // We couldn't create a sound effect instance, most likely
+                // because we've reached the sound pool limits.
+                return;
+            }
+
             _wav.Volume = _volume;
             _wav.IsLooped = _isLooped && trackCount == 1;
             _wav.Play();
