@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -12,6 +13,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     public class VideoContent : ContentItem, IDisposable
     {
+        private readonly string[] _splitComma = new[] { ", " };
+        private readonly string[] _splitColon = new[] { ": " };
+
         bool disposed;
         int bitsPerSecond;
         TimeSpan duration;
@@ -65,13 +69,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             )
         {
             Filename = filename;
-            // TODO: Open video and fill in properties
-            // ...
-            bitsPerSecond = 0;
-            duration = TimeSpan.Zero;
-            framesPerSecond = 0.0f;
-            height = 0;
-            width = 0;
+
+            string stdout, stderr;
+            var result = ExternalTool.Run("ffprobe.exe", string.Format("-i \"{0}\"", Filename), out stdout, out stderr);
+            var lines = stderr.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            // Parse duration and bitrate
+            var durationProps = lines.FirstOrDefault(l => l.Trim().StartsWith("Duration"))
+                                        .Trim()
+                                        .Split(_splitComma, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var prop in durationProps)
+            {
+                var keyVal = prop.Split(_splitColon, StringSplitOptions.RemoveEmptyEntries);
+                if (keyVal[0] == "Duration")
+                {
+                    duration = TimeSpan.Parse(keyVal[1]);
+                }
+                else if (keyVal[0] == "bitrate")
+                {
+                    var valUnit = keyVal[1].Split();
+                    bitsPerSecond = int.Parse(valUnit[0]);
+                    if (valUnit[1] == "kb/s")
+                        bitsPerSecond *= 1024;
+                    else
+                        throw new Exception("Unknown bitrate unit suffix");
+                }
+            }
+
+            // Parse resolution and frame rate
+            var streamLines = lines.Where(l => l.Trim().StartsWith("Stream #")).Select(l => l.Trim());
+            foreach (var streamLine in streamLines)
+            {
+                var props = streamLine.Split(_splitComma, StringSplitOptions.RemoveEmptyEntries);
+                if (props[0].Contains("Video"))
+                {
+                    var res = props[2].Split()[0].Split('x');
+                    width = Int32.Parse(res[0]);
+                    height = Int32.Parse(res[1]);
+
+                    var fps = props[4].Split();
+                    framesPerSecond = float.Parse(fps[0]);
+                }
+            }
         }
 
         ~VideoContent()
