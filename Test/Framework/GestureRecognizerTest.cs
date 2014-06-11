@@ -407,5 +407,62 @@ namespace MonoGame.Tests.Framework
             //And that should be it
             Assert.False(_tps.IsGestureAvailable);
         }
+
+        [Test]
+        public void BasicPinch()
+        {
+            _tps.EnabledGestures = GestureType.Pinch | GestureType.PinchComplete;
+
+            var pos1 = new Vector2(200, 200);
+            var pos2 = new Vector2(400, 200);
+
+            //Place a finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos1);
+            _tps.Update(GameTimeForFrame(1));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Place the other finger down
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos2);
+            _tps.Update(GameTimeForFrame(2));
+
+            //Now we should have a pinch
+            Assert.True(_tps.IsGestureAvailable);
+            var gesture = _tps.ReadGesture();
+
+            Assert.AreEqual(GestureType.Pinch, gesture.GestureType);
+            Assert.AreEqual(pos1, gesture.Position);
+            Assert.AreEqual(pos2, gesture.Position2);
+
+            //If we do nothing, we shouldn't get more pinch events
+            _tps.Update(GameTimeForFrame(3));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //But if we move a finger, we should get an updated pinch
+            pos2 += new Vector2(50, 0);
+            _tps.AddEvent(2, TouchLocationState.Moved, pos2);
+            _tps.Update(GameTimeForFrame(4));
+
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+
+            Assert.AreEqual(GestureType.Pinch, gesture.GestureType);
+            Assert.AreEqual(pos1, gesture.Position);
+            Assert.AreEqual(pos2, gesture.Position2);
+
+            //Now releasing one of the fingers should make a pinch complete event
+            pos1 -= new Vector2(0, 50);
+            _tps.AddEvent(1, TouchLocationState.Released, pos1);
+            _tps.Update(GameTimeForFrame(5));
+
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+
+            Assert.AreEqual(GestureType.PinchComplete, gesture.GestureType);
+            Assert.AreEqual(Vector2.Zero, gesture.Position);
+            Assert.AreEqual(Vector2.Zero, gesture.Position2);
+
+            //We should have no more events
+            Assert.False(_tps.IsGestureAvailable);
+        }
     }
 }
