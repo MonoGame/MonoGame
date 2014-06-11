@@ -310,5 +310,102 @@ namespace MonoGame.Tests.Framework
 
             Assert.AreEqual(new Vector2(5, 0), gesture.Delta);
         }
+
+        [Test]
+        public void BasicFlick()
+        {
+            _tps.EnabledGestures = GestureType.Flick;
+            var startPos = new Vector2(200, 200);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
+            _tps.Update(GameTimeForFrame(1));
+
+            //Move it until it should have made a flick
+            int diff = 0;
+            int frame = 1;
+            while (new Vector2(diff, 0).Length() < TouchPanelState.TapJitterTolerance)
+            {
+                Assert.False(_tps.IsGestureAvailable);
+
+                diff += 30;
+                frame++;
+
+                _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff, 0));
+                _tps.Update(GameTimeForFrame(frame));
+            }
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Now release
+            frame++;
+            _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(diff, 0));
+            _tps.Update(GameTimeForFrame(frame));
+
+            //Now we should have the flick
+            Assert.True(_tps.IsGestureAvailable);
+            var gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+
+            Assert.AreEqual(GestureType.Flick, gesture.GestureType);
+            Assert.AreEqual(Vector2.Zero, gesture.Position);
+            //Could check Delta here, it contains the flick velocity
+        }
+
+        [Test]
+        [Description("If Flick and FreeDrag are enabled, both events should be generated without impacting each other. " +
+                     "There should be a flick and a DragComplete at the end in that order")]
+        public void FlickAndFreeDrag()
+        {
+            _tps.EnabledGestures = GestureType.Flick | GestureType.FreeDrag | GestureType.DragComplete;
+            var startPos = new Vector2(200, 200);
+            GestureSample gesture;
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
+            _tps.Update(GameTimeForFrame(1));
+
+            //Move it until it should have made a flick
+            int diff = 0;
+            int frame = 1;
+            while (frame < 4)
+            {
+                diff += 40;
+                frame++;
+
+                _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff, 0));
+                _tps.Update(GameTimeForFrame(frame));
+
+                //Each drag should make a FreeDrag
+                Assert.True(_tps.IsGestureAvailable);
+                gesture = _tps.ReadGesture();
+                Assert.False(_tps.IsGestureAvailable);
+
+                Assert.AreEqual(GestureType.FreeDrag, gesture.GestureType);
+                Assert.AreEqual(startPos + new Vector2(diff, 0), gesture.Position);
+            }
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Now release
+            frame++;
+            _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(diff, 0));
+            _tps.Update(GameTimeForFrame(frame));
+
+            //Now we should have the flick
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+
+            Assert.AreEqual(GestureType.Flick, gesture.GestureType);
+            Assert.AreEqual(Vector2.Zero, gesture.Position);
+            
+            //And then the DragComplete
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+
+            Assert.AreEqual(GestureType.DragComplete, gesture.GestureType);
+            Assert.AreEqual(Vector2.Zero, gesture.Position);
+
+            //And that should be it
+            Assert.False(_tps.IsGestureAvailable);
+        }
     }
 }
