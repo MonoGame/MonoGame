@@ -151,10 +151,18 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void BasicHorizontalDrag()
+        [TestCase(AllDrags, GestureType.HorizontalDrag), TestCase(GestureType.HorizontalDrag, GestureType.HorizontalDrag)]
+        [TestCase(AllDrags, GestureType.VerticalDrag), TestCase(GestureType.VerticalDrag, GestureType.VerticalDrag)]
+        public void BasicDirectionalDrag(GestureType enabledGestures, GestureType direction)
         {
-            _tps.EnabledGestures = AllDrags;
+            _tps.EnabledGestures = enabledGestures;
             var startPos = new Vector2(200, 200);
+            Vector2 diffVec;
+
+            if (direction == GestureType.HorizontalDrag)
+                diffVec = new Vector2(10, -1);
+            else //Vertical
+                diffVec = new Vector2(1, -10);
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
@@ -170,7 +178,7 @@ namespace MonoGame.Tests.Framework
                 diff ++;
                 frame++;
 
-                _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff * 10, diff));
+                _tps.AddEvent(1, TouchLocationState.Moved, startPos + diff * diffVec);
                 _tps.Update(GameTimeForFrame(frame));
             }
 
@@ -180,9 +188,29 @@ namespace MonoGame.Tests.Framework
             Assert.False(_tps.IsGestureAvailable);
 
             //Should get the correct type at the new touch location, with the given delta
-            Assert.AreEqual(GestureType.HorizontalDrag, gesture.GestureType);
-            Assert.AreEqual(startPos + new Vector2(diff * 10, diff), gesture.Position);
-            Assert.AreEqual(new Vector2(10, 0), gesture.Delta);
+            Assert.AreEqual(direction, gesture.GestureType);
+            Assert.AreEqual(startPos + diff * diffVec, gesture.Position);
+
+            //Delta has only movement in the direction of the drag
+            if (direction == GestureType.HorizontalDrag)
+                Assert.AreEqual(new Vector2(10, 0), gesture.Delta);
+            else //Vertical
+                Assert.AreEqual(new Vector2(0, -10), gesture.Delta);
+
+            //If all gestures are enabled (DragComplete is enabled), releasing our touch will generate a DragComplete gesture
+            if (enabledGestures == AllDrags)
+            {
+                frame++;
+                _tps.AddEvent(1, TouchLocationState.Released, startPos + diff * diffVec);
+                _tps.Update(GameTimeForFrame(frame));
+
+                Assert.True(_tps.IsGestureAvailable);
+                gesture = _tps.ReadGesture();
+                Assert.False(_tps.IsGestureAvailable);
+
+                Assert.AreEqual(GestureType.DragComplete, gesture.GestureType);
+                Assert.AreEqual(Vector2.Zero, gesture.Position); //This is (0,0) in XNA too. It's weird though!
+            }
         }
     }
 }
