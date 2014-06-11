@@ -1107,6 +1107,20 @@
       <Platforms>Web</Platforms>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+			
+	<!-- Microsoft.Xna.Framework.Design -->
+	<Compile Include="Design\VectorConversion.cs">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Compile>
+	<Compile Include="Design\Vector2TypeConverter.cs">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Design\Vector3TypeConverter.cs">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Compile>
+    <Compile Include="Design\Vector4TypeConverter.cs">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Compile>
 	
     <!-- OpenGL Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.ogl.mgfxo">
