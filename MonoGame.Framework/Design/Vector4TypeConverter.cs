@@ -10,9 +10,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 
-namespace Microsoft.Xna.Framework
+namespace Microsoft.Xna.Framework.Design
 {
-    public class Vector2TypeConverter : TypeConverter
+    public class Vector4TypeConverter : TypeConverter
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
@@ -32,8 +32,7 @@ namespace Microsoft.Xna.Framework
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var vec2 = (Vector2) value;
-            var vec4 = new Vector4(vec2.X, vec2.Y, 0.0f, 0.0f);
+            var vec4 = (Vector4) value;
 
             if (destinationType == typeof(float))
                 return vec4.X;
