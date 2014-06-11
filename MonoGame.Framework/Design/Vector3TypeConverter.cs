@@ -16,41 +16,63 @@ namespace Microsoft.Xna.Framework.Design
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(float))
+            if (VectorConversion.CanConvertTo(context, destinationType))
                 return true;
-            if (destinationType == typeof(Vector2))            
+            if (destinationType == typeof(string))
                 return true;
-            if (destinationType == typeof(Vector3))
-                return true;
-            if (destinationType == typeof(Vector4))
-                return true;
-            if (destinationType.GetInterface("IPackedVector") != null)
-                return true;            
-            
+
             return base.CanConvertTo(context, destinationType);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var vec3 = (Vector3) value;
-            var vec4 = new Vector4(vec3.X, vec3.Y, vec3.Z, 0.0f);
+            var vec = (Vector3)value;
 
-            if (destinationType == typeof(float))
-                return vec4.X;
-            if (destinationType == typeof(Vector2))
-                return new Vector2(vec4.X, vec4.Y);
-            if (destinationType == typeof(Vector3))
-                return new Vector3(vec4.X, vec4.Y, vec4.Z);
-            if (destinationType == typeof(Vector4))
-                return new Vector4(vec4.X, vec4.Y, vec4.Z, vec4.W);
-            if (destinationType.GetInterface("IPackedVector") != null)
+            if (VectorConversion.CanConvertTo(context, destinationType))
             {
-                var packedVec = (IPackedVector)Activator.CreateInstance(destinationType);
-                packedVec.PackFromVector4(vec4);
-                return packedVec;
+                var vec4 = new Vector4(vec.X, vec.Y, vec.Z, 0.0f);
+                return VectorConversion.ConvertToFromVector4(context, culture, vec4, destinationType);
+            }
+
+            if (destinationType == typeof(string))
+            {                
+                var terms = new string[3];
+                terms[0] = vec.X.ToString(culture);
+                terms[1] = vec.Y.ToString(culture);
+                terms[2] = vec.Z.ToString(culture);
+
+                return string.Join(culture.NumberFormat.NumberGroupSeparator, terms);
             }
 
             return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            var sourceType = value.GetType();
+            var vec = Vector3.Zero;
+
+            if (sourceType == typeof(string))
+            {
+                var str = (string)value;
+                var words = str.Split(culture.NumberFormat.NumberGroupSeparator.ToCharArray());
+
+                vec.X = float.Parse(words[0]);
+                vec.Y = float.Parse(words[1]);
+                vec.Z = float.Parse(words[2]);
+
+                return vec;
+            }
+
+            return base.ConvertFrom(context, culture, value);
         }
     }
 }

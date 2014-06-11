@@ -1109,6 +1109,9 @@
     </Content>
 			
 	<!-- Microsoft.Xna.Framework.Design -->
+	<Compile Include="Design\VectorConversion.cs">
+      <Platforms>Windows,Linux,MacOS</Platforms>
+    </Compile>
 	<Compile Include="Design\Vector2TypeConverter.cs">
       <Platforms>Windows,Linux,MacOS</Platforms>
     </Compile>
