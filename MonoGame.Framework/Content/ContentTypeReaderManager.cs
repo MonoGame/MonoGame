@@ -26,6 +26,7 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -34,38 +35,40 @@ namespace Microsoft.Xna.Framework.Content
 {
     public sealed class ContentTypeReaderManager
     {
-        ContentReader _reader;
-        ContentTypeReader[] contentReaders;		
+        private static readonly object _locker;
+
+        private static readonly Dictionary<Type, ContentTypeReader> _contentReadersCache;
+
+        private Dictionary<Type, ContentTypeReader> _contentReaders;
+
+		private static readonly string _assemblyName;
 		
-		static string assemblyName;
-		
+
 		static ContentTypeReaderManager()
 		{
-#if WINRT
-            assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
-#else
-			assemblyName = Assembly.GetExecutingAssembly().FullName;
-#endif
-        }
+            _locker = new object();
+            _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
 
-        public ContentTypeReaderManager(ContentReader reader)
-        {
-            _reader = reader;
+#if WINRT
+            _assemblyName = typeof(ContentTypeReaderManager).GetTypeInfo().Assembly.FullName;
+#else
+            _assemblyName = Assembly.GetExecutingAssembly().FullName;
+#endif
         }
 
         public ContentTypeReader GetTypeReader(Type targetType)
         {
-            foreach (ContentTypeReader r in contentReaders)
-            {
-                if (targetType == r.TargetType) return r;
-            }
+            ContentTypeReader reader;
+            if (_contentReaders.TryGetValue(targetType, out reader))
+                return reader;
+
             return null;
         }
 
         // Trick to prevent the linker removing the code, but not actually execute the code
         static bool falseflag = false;
 
-		internal ContentTypeReader[] LoadAssetReaders()
+		internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
 #pragma warning disable 0219, 0649
             // Trick to prevent the linker removing the code, but not actually execute the code
@@ -121,62 +124,89 @@ namespace Microsoft.Xna.Framework.Content
             }
 #pragma warning restore 0219, 0649
 
-            int numberOfReaders;
-			
-            // The first content byte i read tells me the number of content readers in this XNB file
-            numberOfReaders = _reader.Read7BitEncodedInt();
-            contentReaders = new ContentTypeReader[numberOfReaders];
-		
-            // For each reader in the file, we read out the length of the string which contains the type of the reader,
-            // then we read out the string. Finally we instantiate an instance of that reader using reflection
-            for (int i = 0; i < numberOfReaders; i++)
+		    // The first content byte i read tells me the number of content readers in this XNB file
+            var numberOfReaders = reader.Read7BitEncodedInt();
+            var contentReaders = new ContentTypeReader[numberOfReaders];
+            var needsInitialize = new BitArray(numberOfReaders);
+            _contentReaders = new Dictionary<Type, ContentTypeReader>(numberOfReaders);
+
+            // Lock until we're done allocating and initializing any new
+            // content type readers...  this ensures we can load content
+            // from multiple threads and still cache the readers.
+            lock (_locker)
             {
-                // This string tells us what reader we need to decode the following data
-                // string readerTypeString = reader.ReadString();
-				string originalReaderTypeString = _reader.ReadString();
-
-                Func<ContentTypeReader> readerFunc;
-                if (typeCreators.TryGetValue(originalReaderTypeString, out readerFunc))
+                // For each reader in the file, we read out the length of the string which contains the type of the reader,
+                // then we read out the string. Finally we instantiate an instance of that reader using reflection
+                for (var i = 0; i < numberOfReaders; i++)
                 {
-                    contentReaders[i] = readerFunc();
-                }
-                else
-                {
-                    //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+                    // This string tells us what reader we need to decode the following data
+                    // string readerTypeString = reader.ReadString();
+                    string originalReaderTypeString = reader.ReadString();
 
-    				// Need to resolve namespace differences
-    				string readerTypeString = originalReaderTypeString;
-
-    				readerTypeString = PrepareType(readerTypeString);
-
-    				var l_readerType = Type.GetType(readerTypeString);
-                    if (l_readerType != null)
+                    Func<ContentTypeReader> readerFunc;
+                    if (typeCreators.TryGetValue(originalReaderTypeString, out readerFunc))
                     {
-                        try
-                        {
-                            contentReaders[i] = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
-                        }
-                        catch (TargetInvocationException ex)
-                        {
-                            // If you are getting here, the Mono runtime is most likely not able to JIT the type.
-                            // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
-                            throw new InvalidOperationException(
-                                "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
-                                "with the following failed type string: " + originalReaderTypeString, ex);
-                        }
+                        contentReaders[i] = readerFunc();
+                        needsInitialize[i] = true;
                     }
                     else
-                        throw new ContentLoadException(
-                                "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " + 
-                                originalReaderTypeString + " (" + readerTypeString + ")");
+                    {
+                        //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
+
+                        // Need to resolve namespace differences
+                        string readerTypeString = originalReaderTypeString;
+
+                        readerTypeString = PrepareType(readerTypeString);
+
+                        var l_readerType = Type.GetType(readerTypeString);
+                        if (l_readerType != null)
+                        {
+                            ContentTypeReader typeReader;
+                            if (!_contentReadersCache.TryGetValue(l_readerType, out typeReader))
+                            {
+                                try
+                                {
+                                    typeReader = l_readerType.GetDefaultConstructor().Invoke(null) as ContentTypeReader;
+                                }
+                                catch (TargetInvocationException ex)
+                                {
+                                    // If you are getting here, the Mono runtime is most likely not able to JIT the type.
+                                    // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
+                                    throw new InvalidOperationException(
+                                        "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
+                                        "with the following failed type string: " + originalReaderTypeString, ex);
+                                }
+
+                                needsInitialize[i] = true;
+
+                                _contentReadersCache.Add(l_readerType, typeReader);
+                            }
+
+                            contentReaders[i] = typeReader;
+                        }
+                        else
+                            throw new ContentLoadException(
+                                    "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " +
+                                    originalReaderTypeString + " (" + readerTypeString + ")");
+                    }
+
+                    _contentReaders.Add(contentReaders[i].TargetType, contentReaders[i]);
+
+                    // I think the next 4 bytes refer to the "Version" of the type reader,
+                    // although it always seems to be zero
+                    reader.ReadInt32();
                 }
 
-				// I think the next 4 bytes refer to the "Version" of the type reader,
-                // although it always seems to be zero
-                _reader.ReadInt32();
-            }
+                // Initialize any new readers.
+                for (var i = 0; i < contentReaders.Length; i++)
+                {
+                    if (needsInitialize.Get(i))
+                        contentReaders[i].Initialize(this);
+                }
 
-            return contentReaders;
+            } // lock (_locker)
+
+		    return contentReaders;
         }
 		
 		/// <summary>
@@ -208,9 +238,9 @@ namespace Microsoft.Xna.Framework.Content
 				preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
 			// TODO: For WinRT this is most likely broken!
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", assemblyName));
-            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", assemblyName));
-			preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", assemblyName));
+			preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
+            preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
 			
 			return preparedType;
 		}

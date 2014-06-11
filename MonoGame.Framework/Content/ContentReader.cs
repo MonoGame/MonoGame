@@ -28,9 +28,6 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -105,13 +102,8 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void InitializeTypeReaders()
         {
-            typeReaderManager = new ContentTypeReaderManager(this);
-            typeReaders = typeReaderManager.LoadAssetReaders();
-            foreach (ContentTypeReader r in typeReaders)
-            {
-                r.Initialize(typeReaderManager);
-            }
-
+            typeReaderManager = new ContentTypeReaderManager();
+            typeReaders = typeReaderManager.LoadAssetReaders(this);
             sharedResourceCount = Read7BitEncodedInt();
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
         }
