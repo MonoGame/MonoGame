@@ -145,6 +145,40 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        [TestCase(GestureType.None), TestCase(GestureType.FreeDrag | GestureType.DragComplete)]
+        [Description("Hold a finger down, then perform a tap and double tap with another, this should not make any tap gestures")]
+        public void MultiFingerTap(GestureType otherEnabledGestures)
+        {
+            //TODO: This test is based on current behavior. We need to verify that XNA behaves the same
+            //TODO: Need a test for how pinch and tap interact
+
+            _tps.EnabledGestures = otherEnabledGestures | GestureType.Tap | GestureType.DoubleTap;
+            var pos = new Vector2(100, 150);
+
+            //Place a finger down, this finger will never be released
+            _tps.AddEvent(1, TouchLocationState.Pressed, new Vector2(10));
+            _tps.Update(GameTimeForFrame(1));
+
+            //Place a new finger down for a tap
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(2));
+
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Release it, should not make a tap
+            _tps.AddEvent(2, TouchLocationState.Released, pos);
+            _tps.Update(GameTimeForFrame(2));
+
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Press the finger down again, should not make a double tap
+            _tps.AddEvent(3, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(1));
+
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
         [Description("Do 2 taps with a long time between. Should not make a double tap")]
         public void DoubleTapTooSlow()
         {
@@ -407,6 +441,26 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        [Description("Do a short movement within TapJitterTolerance, this should not make a flick even if it is quick")]
+        public void ShortMovementDoesntMakeAFlick()
+        {
+            _tps.EnabledGestures = GestureType.Flick;
+            var startPos = new Vector2(200, 200);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
+            _tps.Update(GameTimeForFrame(1));
+
+            //Then release it at the edge of the detection size
+            _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(TouchPanelState.TapJitterTolerance, 0));
+            _tps.Update(GameTimeForFrame(2));
+
+            //This should not make a flick. If the distance is 1 greater it will.
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+
+        [Test]
         [Description("If Flick and FreeDrag are enabled, both events should be generated without impacting each other. " +
                      "There should be a flick and a DragComplete at the end in that order")]
         public void FlickAndFreeDrag()
@@ -466,6 +520,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void BasicPinch()
         {
+            //TODO: This test is based on current behavior. We need to verify that XNA behaves the same
+
             _tps.EnabledGestures = GestureType.Pinch | GestureType.PinchComplete;
 
             var pos1 = new Vector2(200, 200);
