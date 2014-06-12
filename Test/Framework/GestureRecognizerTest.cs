@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 using NUnit.Framework;
@@ -445,6 +442,30 @@ namespace MonoGame.Tests.Framework
 
             _tps.AddEvent(2, TouchLocationState.Released, startPos);
             _tps.Update(GameTimeForFrame(6));
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
+        [Timeout(100)] //Short Timeout as this test can make an infinite loop
+        [Description("Enable the tap gesture while dragging with no gestures enabled. No gestures should happen")]
+        public void EnableTapWhileDragging()
+        {
+            //Based on https://github.com/mono/MonoGame/pull/1543#issuecomment-15004057
+            
+            var pos = new Vector2(10, 10);
+
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(1));
+
+            //Drag it a bit
+                        _tps.AddEvent(1, TouchLocationState.Moved, pos + new Vector2(40, 0));
+            _tps.Update(GameTimeForFrame(1));
+
+            _tps.EnabledGestures = GestureType.Tap;
+
+            _tps.AddEvent(1, TouchLocationState.Moved, pos + new Vector2(80, 0));
+            _tps.Update(GameTimeForFrame(2));
+
             Assert.False(_tps.IsGestureAvailable);
         }
 
