@@ -490,6 +490,55 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        [Timeout(200)]
+        [Description("Start a drag then disable gestures. Release finger and replace, then re-enable gestures and release. Should not make a DragComplete")]
+        public void DisableGesturesWhileDragging3()
+        {
+            _tps.EnabledGestures = GestureType.FreeDrag | GestureType.DragComplete;
+            var startPos = new Vector2(200, 200);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
+            _tps.Update(GameTimeForFrame(1));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Drag it, should get a drag
+            _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(40, 0));
+            _tps.Update(GameTimeForFrame(2));
+
+            Assert.True(_tps.IsGestureAvailable);
+            var gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+            Assert.AreEqual(GestureType.FreeDrag, gesture.GestureType);
+
+            //Disable gestures
+            _tps.EnabledGestures = GestureType.None;
+
+            _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(80, 0));
+            _tps.Update(GameTimeForFrame(3));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Release the finger, should make no gesture (gestures are disabled)
+            _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(80, 0));
+            _tps.Update(GameTimeForFrame(4));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Press it down again
+            _tps.AddEvent(2, TouchLocationState.Pressed, startPos + new Vector2(80, 0));
+            _tps.Update(GameTimeForFrame(5));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Enable both gestures again
+            _tps.EnabledGestures = GestureType.FreeDrag | GestureType.DragComplete;
+
+            //Release the second touch, should make no gesture
+            _tps.AddEvent(2, TouchLocationState.Released, startPos + new Vector2(80, 0));
+            _tps.Update(GameTimeForFrame(6));
+
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
         [Timeout(100)] //Short Timeout as this test can make an infinite loop
         [Description("Enable the tap gesture while dragging with no gestures enabled. No gestures should happen")]
         public void EnableTapWhileDragging()
