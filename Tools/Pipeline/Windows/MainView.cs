@@ -8,10 +8,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
-{
+{    
     partial class MainView : Form, IView, IProjectObserver
     {
         // The project which will be opened as soon as a controller is attached.
@@ -46,6 +47,8 @@ namespace MonoGame.Tools.Pipeline
                 if (_outputWindow.Font.Name == faces[f])
                     break;               
             }
+
+            _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
 
             _treeIcons = new ImageList();
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
@@ -726,6 +729,33 @@ namespace MonoGame.Tools.Pipeline
                 Process.Start("explorer.exe", "/select, " + filePath);
 
             }
+        }
+
+        // http://stackoverflow.com/a/3955553/168235
+        #region Custom Word-Wrapping (Output Window)
+        
+        const uint EM_SETWORDBREAKPROC = 0x00D0;
+
+        [DllImport("user32.dll")]
+        extern static IntPtr SendMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
+
+        delegate int EditWordBreakProc(IntPtr text, int pos_in_text, int bCharSet, int action);
+
+        event EditWordBreakProc WordWrapCallbackEvent;
+        
+        private int WordWrapCallback(IntPtr text, int pos_in_text, int bCharSet, int action)
+        {
+            return 0;
+        }
+        #endregion
+
+        private void MainView_Shown(object sender, EventArgs e)
+        {
+            WordWrapCallbackEvent = new EditWordBreakProc(WordWrapCallback);
+
+            IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
+
+            SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
         }
     }
 }
