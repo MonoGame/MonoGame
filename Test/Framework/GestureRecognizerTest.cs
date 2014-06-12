@@ -120,6 +120,61 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        [Description("Do 2 quick taps, but make the second tap not near the first. Should not make a double tap")]
+        public void DoubleTapTooFar()
+        {
+            _tps.EnabledGestures = GestureType.DoubleTap;
+            var pos1 = new Vector2(100, 150);
+            var pos2 = new Vector2(100, 150 + TouchPanelState.TapJitterTolerance + 1);
+
+            //Do a first tap
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos1);
+            _tps.Update(GameTimeForFrame(1));
+
+            Assert.False(_tps.IsGestureAvailable);
+
+            _tps.AddEvent(1, TouchLocationState.Released, pos1);
+            _tps.Update(GameTimeForFrame(2));
+
+            //Now do the second tap in a different location
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos2);
+            _tps.Update(GameTimeForFrame(3));
+
+            //Shouldn't make a double tap
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
+        [Description("Do 2 taps with a long time between. Should not make a double tap")]
+        public void DoubleTapTooSlow()
+        {
+            _tps.EnabledGestures = GestureType.DoubleTap;
+            var pos = new Vector2(100, 150);
+
+            //Do a first tap
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(1));
+
+            Assert.False(_tps.IsGestureAvailable);
+
+            _tps.AddEvent(1, TouchLocationState.Released, pos);
+            _tps.Update(GameTimeForFrame(2));
+
+            //Now wait 500ms (we require it within 300ms)
+            for (int frame = 3; frame < 33; frame++)
+            {
+                _tps.Update(GameTimeForFrame(frame));
+                Assert.False(_tps.IsGestureAvailable);
+            }
+
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(33));
+
+            //Shouldn't make a double tap
+            Assert.False(_tps.IsGestureAvailable);
+        }
+
+        [Test]
         public void BasicHold()
         {
             _tps.EnabledGestures = GestureType.Hold;
