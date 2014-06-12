@@ -281,5 +281,45 @@ namespace MonoGame.Tests.Framework
             state = _tps.GetState();
             Assert.AreEqual(0, state.Count);
         }
+
+        [Test]
+        [Description("Internally TouchPanelState uses a queue of TouchLocation updating state. If it gets longer than 100, it throws away the first ones, which is bad")]
+        public void TooManyEventsLosesOldOnes()
+        {
+            //To test this, we will start a touch, read the state.
+            //Then release the touch, start a new touch and move it around lots
+            //Then read the state, the first touch should be released
+
+            //Start a touch
+            var pos = new Vector2(1);
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+
+            var state = _tps.GetState();
+            Assert.AreEqual(1, state.Count);
+
+            var initialTouch = state[0];
+            Assert.AreEqual(TouchLocationState.Pressed, initialTouch.State);
+            Assert.AreEqual(pos, initialTouch.Position);
+
+
+            //Release the touch, make a new one and move it around lots
+            _tps.AddEvent(1, TouchLocationState.Released, pos);
+
+            _tps.AddEvent(2, TouchLocationState.Pressed, new Vector2(2));
+            for (var i = 3; i < 200; i++)
+                _tps.AddEvent(2, TouchLocationState.Moved, new Vector2(i));
+
+            //We should now have the first touch in the release state and the second touch in the pressed state at 199,199
+            state = _tps.GetState();
+            Assert.AreEqual(2, state.Count);
+
+            var newInitialTouch = state.First(x => x.Id == initialTouch.Id);
+            Assert.AreEqual(TouchLocationState.Released, newInitialTouch.State);
+            Assert.AreEqual(pos, newInitialTouch.Position);
+
+            var secondTouch = state.First(x => x.Id != initialTouch.Id);
+            Assert.AreEqual(TouchLocationState.Pressed, secondTouch.State);
+            Assert.AreEqual(new Vector2(199), secondTouch.Position);
+        }
     }
 }
