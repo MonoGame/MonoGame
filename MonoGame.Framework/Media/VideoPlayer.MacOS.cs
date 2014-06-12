@@ -92,9 +92,23 @@ namespace Microsoft.Xna.Framework.Media
             _currentVideo.Volume = _volume;
         }
 
+        private void PlatformSetIsLooping()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            throw new NotImplementedException();
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return _currentVideo.CurrentPosition;
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }
