@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Media
             _currentVideo.Volume = _volume;
         }
 
-        private void PlatformSetIsLooping()
+        private void PlatformSetIsLooped()
         {
             throw new NotImplementedException();
         }
