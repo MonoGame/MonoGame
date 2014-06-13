@@ -210,12 +210,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     ApplyTouch(_touchState, evt);
                 }
 
-                // If we have gestures enabled then start to collect 
-                // events for those too.
-                if (EnabledGestures != GestureType.None && (!isMouse || EnableMouseGestures))
+                //If we have gestures enabled then collect events for those too.
+                //We also have to keep tracking any touches while we know about touches so we don't miss releases even if gesture recognition is disabled
+                if ((EnabledGestures != GestureType.None || _gestureState.Count > 0) && (!isMouse || EnableMouseGestures))
                 {
                     ApplyTouch(_gestureState, evt);
-                    UpdateGestures(true);
+
+                    if (EnabledGestures != GestureType.None)
+                        UpdateGestures(true);
+
                     AgeTouches(_gestureState);
                 }
             }
