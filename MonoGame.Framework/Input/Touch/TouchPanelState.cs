@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
         /// </summary>
-        private TimeSpan _currentTimestamp;
+        static private TimeSpan _currentTimestamp;
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// Update the current timestamp and run gesture recognition for this frame if it is enabled
         /// </summary>
-        internal void Update(GameTime gameTime)
+        internal static void Update(GameTime gameTime)
         {
             _currentTimestamp = gameTime.TotalGameTime;
         }

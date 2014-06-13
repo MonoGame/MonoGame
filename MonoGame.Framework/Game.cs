@@ -76,6 +76,7 @@ using Windows.ApplicationModel.Activation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input.Touch;
 
 
 namespace Microsoft.Xna.Framework
@@ -689,7 +690,7 @@ namespace Microsoft.Xna.Framework
                 SoundEffectInstancePool.Update();
                 
                 //The TouchPanel needs to know the time for when touches arrive
-                Window.TouchPanelState.Update(gameTime);
+                TouchPanelState.Update(gameTime);
 
                 Update(gameTime);
             }
