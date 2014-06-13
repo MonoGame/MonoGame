@@ -634,7 +634,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private void ProcessTap(TouchLocation touch)
         {
-            if (!GestureIsEnabled(GestureType.Tap) || _tapDisabled)
+            if (_tapDisabled)
                 return;
 
             // If the release is too far away from the press 
@@ -650,15 +650,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 return;
 
             // Store the last tap for 
-            // double tap processing.          
+            // double tap processing.
             _lastTap = touch;
 
             // Fire off the tap event immediately.
-            var tap = new GestureSample(
-                GestureType.Tap, touch.Timestamp,
-                touch.Position, Vector2.Zero,
-                Vector2.Zero, Vector2.Zero);
-            GestureList.Enqueue(tap);
+            if (GestureIsEnabled(GestureType.Tap))
+            {
+                var tap = new GestureSample(
+                    GestureType.Tap, touch.Timestamp,
+                    touch.Position, Vector2.Zero,
+                    Vector2.Zero, Vector2.Zero);
+                GestureList.Enqueue(tap);
+            }
         }
 
         private GestureType _dragGestureStarted = GestureType.None;
