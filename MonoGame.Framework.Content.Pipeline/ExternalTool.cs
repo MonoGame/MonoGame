@@ -74,8 +74,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return command;
 
             // We don't have a full path, so try running through the system path to find it.
+            var paths = AppDomain.CurrentDomain.BaseDirectory +
+                Path.PathSeparator +
+                Environment.GetEnvironmentVariable("PATH");
+
             var justTheName = Path.GetFileName(command);
-            var paths = Environment.GetEnvironmentVariable("PATH");
             foreach (var path in paths.Split(Path.PathSeparator))
             {
                 var fullName = Path.Combine(path, justTheName);
