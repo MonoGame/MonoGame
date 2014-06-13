@@ -35,11 +35,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private readonly List<TouchLocation> _gestureState = new List<TouchLocation>();
 
         /// <summary>
-        /// The gesture events to be processed and added to the gesture state.
-        /// </summary>
-        private readonly List<TouchLocation> _gestureEvents = new List<TouchLocation>();
-
-        /// <summary>
         /// The positional scale to apply to touch input.
         /// </summary>
         private Vector2 _touchScale = Vector2.One;
@@ -98,7 +93,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal void Update(GameTime gameTime)
         {
             _currentTimestamp = gameTime.TotalGameTime;
-            UpdateGestures(false);
         }
 
         /// <summary>
@@ -154,85 +148,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     break;
                 }
             }
-        }
-
-        internal bool Refresh(bool consumeState, List<TouchLocation> state, List<TouchLocation> events)
-        {
-            var stateChanged = false;
-
-            // Update the existing touch locations.
-            for (var i = 0; i < state.Count; i++)
-            {
-                // Get the next touch location for update.
-                var touch = state[i];
-
-                // If this location isn't in the move state yet then skip it.
-                if (!consumeState && touch.State != TouchLocationState.Moved)
-                    continue;
-
-                // If the touch state has been consumed then we can
-                // remove old release locations.
-                if (consumeState && touch.State == TouchLocationState.Released)
-                {
-                    state.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-
-                var foundEvent = false;
-
-                // Remove the next pending event with the 
-                // same id and make it the new touch state.
-                for (var j = 0; j < events.Count; j++)
-                {
-                    var newTouch = events[j];
-
-                    // Don't let a release event occur until we're 
-                    // ready to consume state again.
-                    if (!consumeState && newTouch.State == TouchLocationState.Released)
-                        continue;
-
-                    if (newTouch.Id == touch.Id)
-                    {
-                        stateChanged |= touch.UpdateState(newTouch);
-                        foundEvent = true;
-                        events.RemoveAt(j);
-                        j--;
-                        //consume unchanged events
-                        if (!stateChanged)
-                            continue;
-                        break;
-                    }
-                }
-
-                // If a new event was found then store it.
-                if (foundEvent)
-                    state[i] = touch;
-
-                // Else if no event has come in then promote it to
-                // the moved state, but only when we're consuming state.
-                else if (consumeState)
-                    state[i] = touch.AsMovedState();
-            }
-
-            // We add new pressed events last so they are not 
-            // consumed before the touch state is returned.
-            for (var i = 0; i < events.Count; )
-            {
-                var loc = events[i];
-
-                if (loc.State == TouchLocationState.Pressed)
-                {
-                    state.Add(loc);
-                    events.RemoveAt(i);
-                    stateChanged = true;
-                    continue;
-                }
-
-                i++;
-            }
-
-            return stateChanged;
         }
 
         public TouchCollection GetState()
@@ -299,9 +214,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // events for those too.
                 if (EnabledGestures != GestureType.None && (!isMouse || EnableMouseGestures))
                 {
-                    _gestureEvents.Add(evt);
-                    if (_gestureEvents.Count > MaxEvents)
-                        _gestureEvents.RemoveRange(0, _gestureEvents.Count - MaxEvents);
+                    ApplyTouch(_gestureState, evt);
+                    UpdateGestures(true);
+                    AgeTouches(_gestureState);
                 }
             }
 
@@ -326,9 +241,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         internal void ReleaseAllTouches()
         {
-            // Clear any pending events.
-            _gestureEvents.Clear();
-
             var mostToRemove = Math.Max(_touchState.Count, _gestureState.Count);
             if (mostToRemove > 0)
             {
@@ -347,7 +259,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        _gestureEvents.Add(new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
                 }
             }
 
@@ -408,12 +320,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                // Process the pending gesture events.
-                while (_gestureEvents.Count > 0)
-                {
-                    var stateChanged = Refresh(true, _gestureState, _gestureEvents);
-                    UpdateGestures(stateChanged);
-                }
+                // Process the pending gesture events. (May cause hold events)
+                UpdateGestures(false);
 
                 return GestureList.Count > 0;
             }
