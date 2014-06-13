@@ -215,7 +215,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Set the new state.
             _position = touchEvent._position;
-            _state = touchEvent._state;
+            if (touchEvent.State == TouchLocationState.Released)
+                _state = touchEvent._state;
             _pressure = touchEvent._pressure;
 
             // If time has elapsed then update the velocity.
@@ -310,6 +311,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        value1._previousPosition == value2._previousPosition;
         }
 
-       
+
+        internal void AgeState()
+        {
+            Debug.Assert(_state == TouchLocationState.Pressed, "Can only age the state of touches that are in the Pressed State");
+            _state = TouchLocationState.Moved;
+        }
     }
 }
