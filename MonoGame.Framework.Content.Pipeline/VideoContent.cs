@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
 
             string stdout, stderr;
-            var result = ExternalTool.Run("ffprobe.exe", string.Format("-i \"{0}\"", Filename), out stdout, out stderr);
+            var result = ExternalTool.Run("ffprobe", string.Format("-i \"{0}\"", Filename), out stdout, out stderr);
             var lines = stderr.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             // Parse duration and bitrate
