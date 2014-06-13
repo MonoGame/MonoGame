@@ -533,10 +533,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                                                         Vector2.Zero, Vector2.Zero,
                                                         touch.Velocity, Vector2.Zero));
 
-                                // If we got a flick then stop the drag operation
-                                // so that no DragComplete occurs.
-                                _dragGestureStarted = GestureType.None;
-                                break;
+                                //fall through, a drag should still happen even if a flick does
                             }
 
                             // If a drag is active then we need to finalize it.
