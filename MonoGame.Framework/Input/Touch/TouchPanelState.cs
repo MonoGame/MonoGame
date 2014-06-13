@@ -1,24 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#if WINRT
-using Windows.Graphics.Display;
-#if !WINDOWS_PHONE
-using Windows.UI.Xaml;
-#endif
-#endif
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public class TouchPanelState
     {
-        /// <summary>
-        /// The maximum number of events to allow in the touch or gesture event lists.
-        /// </summary>
-        private const int MaxEvents = 100;
-
         /// <summary>
         /// The reserved touchId for all mouse touch points.
         /// </summary>
