@@ -237,6 +237,59 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        [Description("Do a Tap, Double Tap, Hold using 2 taps. Should get gestures for each one")]
+        public void TapDoubleTapHold()
+        {
+            _tps.EnabledGestures = GestureType.Tap | GestureType.DoubleTap | GestureType.Hold;
+
+            var pos = new Vector2(100, 100);
+
+            //Place the finger down
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(1));
+            Assert.False(_tps.IsGestureAvailable);
+
+            //Release it, should make a tap
+            _tps.AddEvent(1, TouchLocationState.Released, pos);
+            _tps.Update(GameTimeForFrame(2));
+            Assert.True(_tps.IsGestureAvailable);
+
+            var gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+            Assert.AreEqual(GestureType.Tap, gesture.GestureType);
+
+            //Place finger again, should make a double tap
+            _tps.AddEvent(2, TouchLocationState.Pressed, pos);
+            _tps.Update(GameTimeForFrame(3));
+            Assert.True(_tps.IsGestureAvailable);
+
+            gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+            Assert.AreEqual(GestureType.DoubleTap, gesture.GestureType);
+
+
+            //Now hold it for a while to make a hold gesture
+            var alreadyPassedTime = GameTimeForFrame(2).TotalGameTime;
+            GameTime gt;
+            int frame = 4;
+            do
+            {
+                Assert.False(_tps.IsGestureAvailable);
+
+                frame++;
+                gt = GameTimeForFrame(frame);
+                _tps.Update(gt);
+            } while (gt.TotalGameTime < (TouchPanelState.TimeRequiredForHold + alreadyPassedTime));
+            
+            //The last Update should have generated a hold
+            Assert.True(_tps.IsGestureAvailable);
+            gesture = _tps.ReadGesture();
+            Assert.False(_tps.IsGestureAvailable);
+
+            Assert.AreEqual(GestureType.Hold, gesture.GestureType);
+        }
+
+        [Test]
         [TestCase(AllDrags, GestureType.HorizontalDrag), TestCase(GestureType.HorizontalDrag, GestureType.HorizontalDrag)]
         [TestCase(AllDrags, GestureType.VerticalDrag), TestCase(GestureType.VerticalDrag, GestureType.VerticalDrag)]
         public void BasicDirectionalDrag(GestureType enabledGestures, GestureType direction)
