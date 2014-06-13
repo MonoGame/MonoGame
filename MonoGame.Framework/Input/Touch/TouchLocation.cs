@@ -137,6 +137,17 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
+            : this(id, state, position, previousState, previousPosition, TimeSpan.FromTicks(DateTime.Now.Ticks))
+        {
+        }
+
+        internal TouchLocation(int id, TouchLocationState state, Vector2 position, TimeSpan timestamp)
+            : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero, timestamp)
+        {
+        }
+
+        internal TouchLocation(int id, TouchLocationState state, Vector2 position,
+            TouchLocationState previousState, Vector2 previousPosition, TimeSpan timestamp)
         {
             _id = id;
             _state = state;
@@ -144,10 +155,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _pressure = 0.0f;
 
             _previousState = previousState;
-            _previousPosition = previousPosition;				
-			_previousPressure = 0.0f;
+            _previousPosition = previousPosition;
+            _previousPressure = 0.0f;
 
-            _timestamp = TimeSpan.FromTicks(DateTime.Now.Ticks);
+            _timestamp = timestamp;
             _velocity = Vector2.Zero;
 
             // If this is a pressed location then store the 
@@ -162,8 +173,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 _pressPosition = Vector2.Zero;
                 _pressTimestamp = TimeSpan.Zero;
             }
-        }		
-		
+        }
+
 		#endregion
 
         /// <summary>
@@ -204,7 +215,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // Set the new state.
             _position = touchEvent._position;
-            _state = touchEvent._state;
+            if (touchEvent.State == TouchLocationState.Released)
+                _state = touchEvent._state;
             _pressure = touchEvent._pressure;
 
             // If time has elapsed then update the velocity.
@@ -299,6 +311,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        value1._previousPosition == value2._previousPosition;
         }
 
-       
+
+        internal void AgeState()
+        {
+            Debug.Assert(_state == TouchLocationState.Pressed, "Can only age the state of touches that are in the Pressed State");
+            _state = TouchLocationState.Moved;
+        }
     }
 }
