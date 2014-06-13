@@ -155,6 +155,7 @@ namespace MonoGame.Tests.Framework
             //Place a finger down, this finger will never be released
             _tps.AddEvent(1, TouchLocationState.Pressed, new Vector2(10));
             _tps.Update(GameTimeForFrame(1));
+            Assert.False(_tps.IsGestureAvailable);
 
             //Place a new finger down for a tap
             _tps.AddEvent(2, TouchLocationState.Pressed, pos);

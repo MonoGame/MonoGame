@@ -565,7 +565,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         private bool ProcessDoubleTap(TouchLocation touch)
         {
-            if (!GestureIsEnabled(GestureType.DoubleTap) || _tapDisabled)
+            if (!GestureIsEnabled(GestureType.DoubleTap) || _tapDisabled || _lastTap.State == TouchLocationState.Invalid)
                 return false;
 
             // If the new tap is too far away from the last then
