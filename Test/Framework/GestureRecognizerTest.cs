@@ -544,7 +544,6 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        [Timeout(200)]
         [Description("Start a drag then disable gestures. Release finger and replace, then re-enable gestures and release. Should not make a DragComplete")]
         public void DisableGesturesWhileDragging3()
         {
@@ -593,7 +592,6 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        [Timeout(100)] //Short Timeout as this test can make an infinite loop
         [Description("Enable the tap gesture while dragging with no gestures enabled. No gestures should happen")]
         public void EnableTapWhileDragging()
         {
