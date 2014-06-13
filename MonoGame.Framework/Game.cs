@@ -688,7 +688,7 @@ namespace Microsoft.Xna.Framework
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
                 
-                //We need to update the TouchPanel for gestures every frame
+                //The TouchPanel needs to know the time for when touches arrive
                 Window.TouchPanelState.Update(gameTime);
 
                 Update(gameTime);
