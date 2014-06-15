@@ -94,7 +94,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.txt' 
   File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
-  File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\libmojoshader_32.dll'
+  File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll'
   File '..\..\ThirdParty\Dependencies\lame_enc.dll'
 
   
