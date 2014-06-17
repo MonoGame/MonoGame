@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -534,7 +534,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
         }
 
-        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null)
+        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, string tweetAddImage = null)
         {
             AssertInitialised();
 
@@ -551,6 +551,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
                 if (!String.IsNullOrEmpty(tweetAddUrl))
                     tweetController.AddUrl(NSUrl.FromString(tweetAddUrl));
+
+                if (!String.IsNullOrEmpty(tweetAddImage))
+                    tweetController.AddImage(UIImage.FromFile(tweetAddImage));
 
                 ShowViewController(tweetController);
             }
