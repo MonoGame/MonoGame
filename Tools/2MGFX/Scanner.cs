@@ -89,7 +89,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Boolean, regex);
             Tokens.Add(TokenType.Boolean);
 
-            regex = new Regex(@"[+-] ?[0-9]?\.?[0-9]+[fF]?", RegexOptions.Compiled);
+            regex = new Regex(@"[+-]? ?[0-9]?\.?[0-9]+[fF]?", RegexOptions.Compiled);
             Patterns.Add(TokenType.Number, regex);
             Tokens.Add(TokenType.Number);
 
