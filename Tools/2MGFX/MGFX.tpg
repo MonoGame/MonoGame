@@ -20,7 +20,7 @@
 [IgnoreCase] PixelShader -> @"PixelShader";
 [IgnoreCase] Register -> @"register";
 [IgnoreCase] Boolean -> @"true|false|0|1";
-Number -> @"[+-] ?[0-9]?\.?[0-9]+[fF]?";
+Number -> @"[+-]? ?[0-9]?\.?[0-9]+[fF]?";
 Identifier -> @"[A-Za-z_][A-Za-z0-9_]*";
 OpenBracket -> @"{";
 CloseBracket -> @"}";

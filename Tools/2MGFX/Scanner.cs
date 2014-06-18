@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -89,7 +90,7 @@ namespace TwoMGFX
             Patterns.Add(TokenType.Boolean, regex);
             Tokens.Add(TokenType.Boolean);
 
-            regex = new Regex(@"[+-] ?[0-9]?\.?[0-9]+[fF]?", RegexOptions.Compiled);
+            regex = new Regex(@"[+-]? ?[0-9]?\.?[0-9]+[fF]?", RegexOptions.Compiled);
             Patterns.Add(TokenType.Number, regex);
             Tokens.Add(TokenType.Number);
 
@@ -531,7 +532,7 @@ namespace TwoMGFX
                         currentFile = fileMatch.Value.Replace("\\\\", "\\");
                     var lineMatch = match.Groups["Line"];
                     if (lineMatch.Success)
-                        currentline = int.Parse(lineMatch.Value);
+                        currentline = int.Parse(lineMatch.Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
                 }
             }
             while (SkipList.Contains(tok.Type));
