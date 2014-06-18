@@ -358,7 +358,7 @@ namespace MonoGame.Tools.Pipeline
                             string include, copyToOutputDirectory;
                             ReadIncludeContent(io, out include, out copyToOutputDirectory);
 
-                            if (string.IsNullOrEmpty(copyToOutputDirectory) || !copyToOutputDirectory.Equals("Never"))
+                            if (!string.IsNullOrEmpty(copyToOutputDirectory) && !copyToOutputDirectory.Equals("Never"))
                             {
                                 var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                                 sourceFilePath += "\\" + include;
