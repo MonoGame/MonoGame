@@ -218,10 +218,17 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
+            
+            // On some platforms, name and slash direction matter.
+            // We store the asset by a lowercase, /-seperating key rather than how the
+            // path to the file was passed to us to avoid
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
+            // different files. This matches stock XNA behavior.
+            var key = assetName.Replace('\\', '/').ToLower();
 
             // Check for a previously loaded asset first
             object asset = null;
-            if (loadedAssets.TryGetValue(assetName, out asset))
+            if (loadedAssets.TryGetValue(key, out asset))
             {
                 if (asset is T)
                 {
@@ -232,7 +239,7 @@ namespace Microsoft.Xna.Framework.Content
             // Load the asset.
             result = ReadAsset<T>(assetName, null);
 
-            loadedAssets[assetName] = result;
+            loadedAssets[key] = result;
             return result;
 		}
 		
