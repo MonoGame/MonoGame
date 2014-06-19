@@ -167,6 +167,9 @@
     <Compile Include="..\..\MonoGame.Framework\Vector4.cs">
       <Link>MonoGame.Framework\Vector4.cs</Link>
     </Compile>
+    <Compile Include="..\..\MonoGame.Framework\\Utilities\Hash.cs">
+      <Link>MonoGame.Framework\Utilities\Hash.cs</Link>
+    </Compile>
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CompilerInclude.cs" />
     <Compile Include="ConstantBufferData.cs" />
