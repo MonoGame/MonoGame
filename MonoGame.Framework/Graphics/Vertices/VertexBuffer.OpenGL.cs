@@ -8,16 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#endif
-#if WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#endif
 #if GLES
 using OpenTK.Graphics.ES20;
 using BufferTarget = OpenTK.Graphics.ES20.All;
 using BufferUsageHint = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

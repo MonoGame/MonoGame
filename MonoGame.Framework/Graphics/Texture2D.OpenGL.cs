@@ -20,15 +20,6 @@ using MonoTouch.Foundation;
 #endif
 
 #if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#endif
-
-#if WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#endif
 
 #if GLES
 using OpenTK.Graphics.ES20;
@@ -40,6 +31,9 @@ using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using PixelStoreParameter = OpenTK.Graphics.ES20.All;
 using ErrorCode = OpenTK.Graphics.ES20.All;
+#else
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
 
 #if ANDROID

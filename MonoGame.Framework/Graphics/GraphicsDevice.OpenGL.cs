@@ -7,22 +7,12 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#endif
-
-#if WINDOWS || LINUX
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
-#endif
-
-#if ANGLE
-using OpenTK.Graphics;
-#endif
 
 #if GLES
+#if ANGLE
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
+#else
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -37,6 +27,11 @@ using FramebufferAttachment = OpenTK.Graphics.ES20.All;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
 using GLPrimitiveType = OpenTK.Graphics.ES20.All;
+#endif
+#elif OPENGL
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 #endif
 
 
