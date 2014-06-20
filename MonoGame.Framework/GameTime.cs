@@ -50,6 +50,11 @@ namespace Microsoft.Xna.Framework
 
         public bool IsRunningSlowly { get; set; }
 
+        /// <summary>
+        /// Gets amount of time between game moments which is usable for update objects movement.
+        /// </summary>
+        public float DeltaTime { get { return (float) ElapsedGameTime.TotalSeconds; } }
+
         public GameTime()
         {
             TotalGameTime = TimeSpan.Zero;
