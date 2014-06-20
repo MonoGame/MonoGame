@@ -449,6 +449,15 @@ namespace Microsoft.Xna.Framework
         private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
+        private int _FPS = 0;
+        private int _FPSCounter = 0;
+        private TimeSpan _FPSDelta = TimeSpan.Zero;
+        private static TimeSpan _oneSecond = TimeSpan.FromSeconds(1.0);
+
+        /// <summary>
+        /// Gets frames per second value of the current <see cref="Game"/> loop.
+        /// </summary>
+        public int FPS { get { return _FPS; } private set { _FPS = value; } }   
 
         public void Tick()
         {
@@ -541,6 +550,21 @@ namespace Microsoft.Xna.Framework
             {
                 DoDraw(_gameTime);
             }
+
+            // Update FPS
+
+            _FPSDelta += _gameTime.ElapsedGameTime;
+
+            if (_FPSDelta >= _oneSecond)
+            {
+                _FPSDelta = TimeSpan.Zero;
+                _FPS = _FPSCounter;
+                _FPSCounter = 0;
+            }
+            else
+            {
+                _FPSCounter++;
+            }   
         }
 
         #endregion
