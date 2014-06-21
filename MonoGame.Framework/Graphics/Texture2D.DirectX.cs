@@ -384,6 +384,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformReload(Stream textureStream)
         {
+#if WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(textureStream);
+                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+
+                // Convert from ARGB to ABGR 
+                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+                this.SetData<int>(bitmap.Pixels);
+            });
+#endif
+#if !WINDOWS_PHONE
+            SharpDX.WIC.BitmapDecoder decoder;
+
+            using (var bitmap = LoadBitmap(textureStream, out decoder))
+            using (decoder)
+            {
+                this._texture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
+            }
+#endif
         }
 	}
 }
