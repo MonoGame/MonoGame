@@ -397,15 +397,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.SetData<int>(bitmap.Pixels);
             });
 #endif
-#if !WINDOWS_PHONE
-            SharpDX.WIC.BitmapDecoder decoder;
-
-            using (var bitmap = LoadBitmap(textureStream, out decoder))
-            using (decoder)
-            {
-                this._texture = CreateTex2DFromBitmap(bitmap, graphicsDevice);
-            }
-#endif
         }
 	}
 }
