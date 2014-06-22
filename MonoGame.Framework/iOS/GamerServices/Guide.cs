@@ -166,6 +166,11 @@ namespace Microsoft.Xna.Framework.GamerServices
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
+        static Guide()
+        {
+            Initialise(Game.Instance);
+        }
+
         internal static void Initialise(Game game)
         {
             var osVersionString = UIDevice.CurrentDevice.SystemVersion;
