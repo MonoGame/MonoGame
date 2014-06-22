@@ -534,7 +534,8 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
         }
 
-        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, string tweetAddImage = null)
+        [CLSCompliant(false)]
+        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, UIImage tweetAddImage = null)
         {
             AssertInitialised();
 
@@ -552,8 +553,8 @@ namespace Microsoft.Xna.Framework.GamerServices
                 if (!String.IsNullOrEmpty(tweetAddUrl))
                     tweetController.AddUrl(NSUrl.FromString(tweetAddUrl));
 
-                if (!String.IsNullOrEmpty(tweetAddImage))
-                    tweetController.AddImage(UIImage.FromFile(tweetAddImage));
+                if (tweetAddImage != null)
+                    tweetController.AddImage(tweetAddImage);
 
                 ShowViewController(tweetController);
             }
@@ -595,7 +596,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         /// </remarks>
         /// <param name="minPlayers">Minimum players to find</param>
         /// <param name="maxPlayers">Maximum players to find</param>
-        /// <param name="playersToInvite">Players to invite/param>
+        /// <param name="playersToInvite">Players to invite</param>
         public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
         {
             AssertInitialised();
