@@ -6,7 +6,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -88,12 +87,23 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal int GetPlayingInstanceCount()
         {
-            return sounds.Count(s => s.Playing);
+            var sum = 0;
+            for (var i = 0; i < sounds.Count; i++)
+            {
+                if (sounds[i].Playing)
+                    sum++;
+            }
+            return sum;
         }
 
         internal XactSound GetOldestInstance()
         {
-            return sounds.FirstOrDefault(s => s.Playing);
+            for (var i = 0; i < sounds.Count; i++)
+            {
+                if (sounds[i].Playing)
+                    return sounds[i];
+            }
+            return null;
         }
 
         /// <summary>

@@ -28,8 +28,6 @@ using SharpDX.DXGI;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    using System.Linq;
-
     public partial class GraphicsDevice
     {
         // Core Direct3D Objects
@@ -593,15 +591,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var multisampleDesc = new SharpDX.DXGI.SampleDescription(1, 0);
             if (PresentationParameters.MultiSampleCount > 1)
             {
-                var maxLevel =
-                    new[] { 1, 2, 4, 8, 16, 32 }.Select(
-                        x =>
-                        new KeyValuePair<int, int>(
-                            x,
-                            _d3dDevice.CheckMultisampleQualityLevels(Format.R32G32B32A32_Typeless, x)))
-                        .Where(x => x.Value > 0)
-                        .DefaultIfEmpty(new KeyValuePair<int, int>(0, 1))
-                        .Max(x => x.Key);
+                //Find the maximum supported level coming down from 32, 16, 8, 4, 2, 1, 0
+                var maxLevel = 32;
+                while (maxLevel > 0)
+                {
+                    if (_d3dDevice.CheckMultisampleQualityLevels(Format.R32G32B32A32_Typeless, maxLevel) > 0)
+                        break;
+                    maxLevel /= 2;
+                }
 
                 var targetLevel = PresentationParameters.MultiSampleCount;
                 if (PresentationParameters.MultiSampleCount > maxLevel)
