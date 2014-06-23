@@ -224,7 +224,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// Returns an enumerator for the <see cref="TouchCollection"/>.
         /// </summary>
         /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
-        public IEnumerator<TouchLocation> GetEnumerator()
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        /// <summary>
+        /// Returns an enumerator for the <see cref="TouchCollection"/>.
+        /// </summary>
+        /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
+        IEnumerator<TouchLocation> IEnumerable<TouchLocation>.GetEnumerator()
         {
             return new Enumerator(this);
         }
@@ -235,7 +244,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Enumerable list of objects.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _collection.GetEnumerator();
+            return new Enumerator(this);
         }
 
         #endregion // IList<TouchLocation>
