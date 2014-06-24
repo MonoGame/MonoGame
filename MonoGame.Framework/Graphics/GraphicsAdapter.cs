@@ -300,6 +300,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
                         }
                     }
+#elif DIRECTX && !WINDOWS_PHONE
+                    var dxgiFactory = new SharpDX.DXGI.Factory1();
+                    var adapter = dxgiFactory.GetAdapter(0);
+                    var output = adapter.Outputs[0];
+                    var displayModes = output.GetDisplayModeList(SharpDX.DXGI.Format.R8G8B8A8_UNorm, 0);
+
+                    modes.Clear();
+                    foreach (var displayMode in displayModes)
+                    {
+                        int refreshRate = (int)Math.Round(displayMode.RefreshRate.Numerator / (float)displayMode.RefreshRate.Denominator);
+                        modes.Add(new DisplayMode(displayMode.Width, displayMode.Height, refreshRate, SurfaceFormat.Color));
+                    }
 #endif
                     supportedDisplayModes = new DisplayModeCollection(modes);
                 }
