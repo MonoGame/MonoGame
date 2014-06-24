@@ -30,6 +30,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.fx">
+      <Link>Effects\Stock\AlphaTestEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\BasicEffect.fx">
+      <Link>Effects\Stock\BasicEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\DualTextureEffect.fx">
+      <Link>Effects\Stock\DualTextureEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\EnvironmentMapEffect.fx">
+      <Link>Effects\Stock\EnvironmentMapEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\SkinnedEffect.fx">
+      <Link>Effects\Stock\SkinnedEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\SpriteEffect.fx">
+      <Link>Effects\Stock\SpriteEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Effects\ParserTest.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="ReferenceImages\Miscellaneous\Clear-1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -415,6 +442,29 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Textures\fun-background.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\Common.fxh">
+      <Link>Effects\Stock\Common.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\Lighting.fxh">
+      <Link>Effects\Stock\Lighting.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\Macros.fxh">
+      <Link>Effects\Stock\Macros.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\MonoGame.Framework\Graphics\Effect\Resources\Structures.fxh">
+      <Link>Effects\Stock\Structures.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Effects\Include.fxh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
