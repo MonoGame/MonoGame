@@ -104,6 +104,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #elif (WINDOWS && OPENGL) || LINUX
 
                 return new DisplayMode(OpenTK.DisplayDevice.Default.Width, OpenTK.DisplayDevice.Default.Height, (int)OpenTK.DisplayDevice.Default.RefreshRate, SurfaceFormat.Color);
+#elif WINDOWS
+                var dc = System.Drawing.Graphics.FromHwnd(IntPtr.Zero).GetHdc();
+                return new DisplayMode(GetDeviceCaps(dc, HORZRES), GetDeviceCaps(dc, VERTRES), GetDeviceCaps(dc, VREFRESH), SurfaceFormat.Color);
 #else
                 return new DisplayMode(800, 600, 60, SurfaceFormat.Color);
 #endif
@@ -332,5 +335,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 return aspect > limit;
             }
         }
+
+#if WINDOWS && !OPENGL
+        [System.Runtime.InteropServices.DllImport("gdi32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+
+        private const int HORZRES = 8;
+        private const int VERTRES = 10;
+        private const int VREFRESH = 116;
+#endif
     }
 }
