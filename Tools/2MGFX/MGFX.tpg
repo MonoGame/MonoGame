@@ -168,9 +168,10 @@ Colors_Green -> Green { return ColorWriteChannels.Green; };
 Colors_Blue -> Blue { return ColorWriteChannels.Blue; };
 Colors_Alpha -> Alpha { return ColorWriteChannels.Alpha; };
 Colors_All -> All { return ColorWriteChannels.All; };
-Colors -> (Colors_Red|Colors_Green|Colors_Blue|Colors_Alpha|Colors_None|Colors_All)
+Colors_Boolean -> Boolean { return ParseTreeTools.ParseBool((string)$Boolean) ?  ColorWriteChannels.All : ColorWriteChannels.None; };
+Colors -> (Colors_Red|Colors_Green|Colors_Blue|Colors_Alpha|Colors_None|Colors_All|Colors_Boolean)
 {
-	return $Colors_Red ?? $Colors_Green ?? $Colors_Blue ?? $Colors_Alpha ?? $Colors_None ?? $Colors_All;
+	return $Colors_Red ?? $Colors_Green ?? $Colors_Blue ?? $Colors_Alpha ?? $Colors_None ?? $Colors_All ?? $Colors_Boolean;
 };
 ColorsMasks -> Colors (Or Colors)? (Or Colors)? (Or Colors)?
 {

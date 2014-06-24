@@ -416,6 +416,25 @@ namespace TwoMGFX
             parent.Token.UpdateRange(node.Token);
         } // NonTerminalSymbol: Colors_All
 
+        private void ParseColors_Boolean(ParseNode parent) // NonTerminalSymbol: Colors_Boolean
+        {
+            Token tok;
+            ParseNode n;
+            ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors_Boolean), "Colors_Boolean");
+            parent.Nodes.Add(node);
+
+            tok = scanner.Scan(TokenType.Boolean); // Terminal Rule: Boolean
+            n = node.CreateNode(tok, tok.ToString() );
+            node.Token.UpdateRange(tok);
+            node.Nodes.Add(n);
+            if (tok.Type != TokenType.Boolean) {
+                tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.Boolean.ToString(), 0x1001, tok));
+                return;
+            }
+
+            parent.Token.UpdateRange(node.Token);
+        } // NonTerminalSymbol: Colors_Boolean
+
         private void ParseColors(ParseNode parent) // NonTerminalSymbol: Colors
         {
             Token tok;
@@ -423,7 +442,7 @@ namespace TwoMGFX
             ParseNode node = parent.CreateNode(scanner.GetToken(TokenType.Colors), "Colors");
             parent.Nodes.Add(node);
 
-            tok = scanner.LookAhead(TokenType.Red, TokenType.Green, TokenType.Blue, TokenType.Alpha, TokenType.None, TokenType.All); // Choice Rule
+            tok = scanner.LookAhead(TokenType.Red, TokenType.Green, TokenType.Blue, TokenType.Alpha, TokenType.None, TokenType.All, TokenType.Boolean); // Choice Rule
             switch (tok.Type)
             { // Choice Rule
                 case TokenType.Red:
@@ -444,8 +463,11 @@ namespace TwoMGFX
                 case TokenType.All:
                     ParseColors_All(node); // NonTerminal Rule: Colors_All
                     break;
+                case TokenType.Boolean:
+                    ParseColors_Boolean(node); // NonTerminal Rule: Colors_Boolean
+                    break;
                 default:
-                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Red, Green, Blue, Alpha, None, or All.", 0x0002, tok));
+                    tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected Red, Green, Blue, Alpha, None, All, or Boolean.", 0x0002, tok));
                     break;
             } // Choice Rule
 

@@ -224,6 +224,9 @@ namespace TwoMGFX
                 case TokenType.Colors_All:
                     Value = EvalColors_All(tree, paramlist);
                     break;
+                case TokenType.Colors_Boolean:
+                    Value = EvalColors_Boolean(tree, paramlist);
+                    break;
                 case TokenType.Colors:
                     Value = EvalColors(tree, paramlist);
                     break;
@@ -510,9 +513,14 @@ namespace TwoMGFX
             return ColorWriteChannels.All;
         }
 
+        protected virtual object EvalColors_Boolean(ParseTree tree, params object[] paramlist)
+        {
+            return ParseTreeTools.ParseBool((string)this.GetValue(tree, TokenType.Boolean, 0)) ?  ColorWriteChannels.All : ColorWriteChannels.None;
+        }
+
         protected virtual object EvalColors(ParseTree tree, params object[] paramlist)
         {
-            return this.GetValue(tree, TokenType.Colors_Red, 0) ?? this.GetValue(tree, TokenType.Colors_Green, 0) ?? this.GetValue(tree, TokenType.Colors_Blue, 0) ?? this.GetValue(tree, TokenType.Colors_Alpha, 0) ?? this.GetValue(tree, TokenType.Colors_None, 0) ?? this.GetValue(tree, TokenType.Colors_All, 0);
+            return this.GetValue(tree, TokenType.Colors_Red, 0) ?? this.GetValue(tree, TokenType.Colors_Green, 0) ?? this.GetValue(tree, TokenType.Colors_Blue, 0) ?? this.GetValue(tree, TokenType.Colors_Alpha, 0) ?? this.GetValue(tree, TokenType.Colors_None, 0) ?? this.GetValue(tree, TokenType.Colors_All, 0) ?? this.GetValue(tree, TokenType.Colors_Boolean, 0);
         }
 
         protected virtual object EvalColorsMasks(ParseTree tree, params object[] paramlist)
