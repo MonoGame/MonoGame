@@ -25,6 +25,7 @@
     <topic id="tools.md" name="Tools" filename="tools.md">
     	<topic id="2mgfx.md" name="2MGFX" filename="2mgfx.md"/>
     	<topic id="mgcb.md" name="MGCB" filename="mgcb.md"/>
+    	<topic id="pipeline.md" name="Pipeline" filename="pipeline.md"/>
     </topic>
     
     <topic id="links.md" name="External Links" filename="links.md"/>
