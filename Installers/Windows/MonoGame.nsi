@@ -17,7 +17,7 @@ SetCompressor /SOLID /FINAL lzma
 Name '${APPNAME} ${INSTALLERVERSION}'
 OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
-MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
+!define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development SDK"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame Team"
@@ -86,7 +86,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; be removed after we kill off the old XNA content 
   ; pipeline support.
 
-  SetOutPath $MSBuildInstallDir
+  SetOutPath ${MSBuildInstallDir}
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
@@ -100,7 +100,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   
   ; Install the MonoGame tools to a single shared folder.
-  SetOutPath $MSBuildInstallDir\Tools
+  SetOutPath ${MSBuildInstallDir}\Tools
   File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
   File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
   File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
@@ -280,7 +280,7 @@ SectionEnd
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$InstallDir\uninstall.exe" "" "$InstallDir\uninstall.exe" 0
-	CreateShortCut "$SMPROGRAMS\${APPNAME}\Pipeline Tool.lnk" "$MSBuildInstallDir\Tools\Pipeline.exe" "" "$MSBuildInstallDir\Tools\Pipeline.exe" 0
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\Pipeline Tool.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconIndex" "0"
@@ -367,7 +367,7 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
-  RMDir /r "$MSBuildInstallDir"
+  RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
