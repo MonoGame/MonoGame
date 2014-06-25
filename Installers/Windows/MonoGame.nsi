@@ -114,17 +114,17 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   ; target from a Windows desktop system.
 
   ; Install Android Assemblies
-  SetOutPath '$InstallDir\Assemblies\Android'
+  SetOutPath '$INSTDIR\Assemblies\Android'
   File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'
   
   ; Install OUYA Assemblies
-  SetOutPath '$InstallDir\Assemblies\OUYA'
+  SetOutPath '$INSTDIR\Assemblies\OUYA'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
   
   ; Install Windows Desktop OpenGL Assemblies
-  SetOutPath '$InstallDir\Assemblies\WindowsGL'
+  SetOutPath '$INSTDIR\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
@@ -134,12 +134,12 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
   ; Install Windows Desktop DirectX Assemblies
-  SetOutPath '$InstallDir\Assemblies\Windows'
+  SetOutPath '$INSTDIR\Assemblies\Windows'
   File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
   
   ; Install Linux Assemblies
-  SetOutPath '$InstallDir\Assemblies\Linux'
+  SetOutPath '$INSTDIR\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
@@ -150,24 +150,24 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
 
   ; Install Windows 8 Store Assemblies
-  SetOutPath '$InstallDir\Assemblies\Windows8'
+  SetOutPath '$INSTDIR\Assemblies\Windows8'
   File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.xml'
 
   ; Install Windows Phone ARM Assemblies
-  SetOutPath '$InstallDir\Assemblies\WindowsPhone\ARM'
+  SetOutPath '$INSTDIR\Assemblies\WindowsPhone\ARM'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
 
   ; Install Windows Phone x86 Assemblies
-  SetOutPath '$InstallDir\Assemblies\WindowsPhone\x86'
+  SetOutPath '$INSTDIR\Assemblies\WindowsPhone\x86'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
 
   ; Intall iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
   InstalliOSAssemblies:
-  SetOutPath '$InstallDir\Assemblies\iOS'
+  SetOutPath '$INSTDIR\Assemblies\iOS'
   File /nonfatal 'iOS\*.dll'
   ;File /nonfatal 'iOS\*.xml'  
   SkipiOSAssemblies:
@@ -206,7 +206,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'UninstallString' '$INSTDIR\uninstall.exe'
 
 
-  SetOutPath '$InstallDir'
+  SetOutPath '$INSTDIR'
   File '..\monogame.ico'
 
   ; Uninstaller
@@ -279,19 +279,19 @@ SectionEnd
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
-	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$InstallDir\uninstall.exe" "" "$InstallDir\uninstall.exe" 0
+	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Pipeline Tool.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconIndex" "0"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "URL" "http://www.monogame.net/documentation"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconIndex" "0"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "URL" "http://community.monogame.net/"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconIndex" "0"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "URL" "https://github.com/mono/MonoGame/issues"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconIndex" "0"
 
 SectionEnd
