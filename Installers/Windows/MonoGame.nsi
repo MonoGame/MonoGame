@@ -281,9 +281,18 @@ Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$InstallDir\uninstall.exe" "" "$InstallDir\uninstall.exe" 0
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Pipeline Tool.lnk" "$MSBuildInstallDir\Tools\Pipeline.exe" "" "$MSBuildInstallDir\Tools\Pipeline.exe" 0
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "URL" "http://www.monogame.net"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
-	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Web Site.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "URL" "http://www.monogame.net/documentation"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Documentation.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "URL" "http://community.monogame.net/"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Support.url" "InternetShortcut" "IconIndex" "0"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "URL" "https://github.com/mono/MonoGame/issues"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconFile" "$InstallDir\monogame.ico"
+	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Bug Reports.url" "InternetShortcut" "IconIndex" "0"
 
 SectionEnd
 
