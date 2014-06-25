@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
                 // to it else we'll get events for overlapping XAML controls.
                 inputElement.PointerPressed += UIElement_PointerPressed;
                 inputElement.PointerReleased += UIElement_PointerReleased;
+                inputElement.PointerCanceled += UIElement_PointerReleased;
                 inputElement.PointerMoved += UIElement_PointerMoved;
                 inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
             }
