@@ -68,6 +68,7 @@ namespace Microsoft.Xna.Framework
                 // to it else we'll get events for overlapping XAML controls.
                 inputElement.PointerPressed += UIElement_PointerPressed;
                 inputElement.PointerReleased += UIElement_PointerReleased;
+                inputElement.PointerCanceled += UIElement_PointerReleased;
                 inputElement.PointerMoved += UIElement_PointerMoved;
                 inputElement.PointerWheelChanged += UIElement_PointerWheelChanged;
             }
@@ -85,6 +86,9 @@ namespace Microsoft.Xna.Framework
 
         private void UIElement_PointerPressed(object sender, PointerRoutedEventArgs args)
         {
+            //Capture this pointer so we continue getting events even if it is dragged off us
+            ((UIElement)sender).CapturePointer(args.Pointer);
+
             var pointerPoint = args.GetCurrentPoint(null);
             PointerPressed(pointerPoint, sender as UIElement, args.Pointer);
             args.Handled = true;
@@ -99,6 +103,8 @@ namespace Microsoft.Xna.Framework
 
         private void UIElement_PointerReleased(object sender, PointerRoutedEventArgs args)
         {
+            ((UIElement)sender).ReleasePointerCapture(args.Pointer);
+
             var pointerPoint = args.GetCurrentPoint(null);
             PointerReleased(pointerPoint, sender as UIElement, args.Pointer);
             args.Handled = true;
