@@ -126,6 +126,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal static void Update()
         {
+#if OPENAL
+            OpenALSoundController.GetInstance.Update();
+#endif
+
             SoundEffectInstance inst = null;
             // Cleanup instances which have finished playing.                    
             for (var x = 0; x < _playingInstances.Count;)
