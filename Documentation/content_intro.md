@@ -5,7 +5,7 @@ MonoGame implements its own content pipeline for transforming your unoptimized a
 This section will cover the following topics:
 
  - What is Game Content
- - The Pipeline Tool
+ - [Using The Pipeline Tool](using_pipeline_tool.md)
  - [Custom Effects](custom_effects.md)
  - Custom Content Types
  
