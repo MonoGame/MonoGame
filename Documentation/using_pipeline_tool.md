@@ -26,7 +26,7 @@ If you are using custom content processors you need to rebuild them for use with
 
 ## Linking Content To Your Game
 
-Once you have build your game content you have a few different ways to add it to your game project.
+Once you have built your content you have a few different ways to add the XNBs to your game project.
 
 ### Manual Copy
 
@@ -56,4 +56,19 @@ Once the files are added you need to select them all and change their build acti
 
 ### Add With Wildcard
 
-TODO!
+The more automatic option is to hand edit your game .csproj and have it include you content using wildcards.  To do this just open the .csproj with any text editor then add the following after any other `<ItemGroup>`:
+
+```
+  <ItemGroup>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+```
+
+Then any files you put in a Content folder within your game project will automatically be included in the build.
+
+
+## Reporting Bugs
+
+The MonoGame content pipeline, MGCB, and the Pipeline tool are all very new in MonoGame.  If you run into any problems with them please ask for help on the [community site](http://community.monogame.net/) or submit a [bug report on GitHub](https://github.com/mono/MonoGame/issues).
