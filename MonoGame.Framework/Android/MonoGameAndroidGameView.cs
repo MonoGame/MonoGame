@@ -134,6 +134,12 @@ namespace Microsoft.Xna.Framework
             // or the lock screen is enabled. Modern devices can preserve the opengl 
             // context along with all the textures and shaders it has attached.
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Lost");
+
+            // DeviceResetting events
+            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            if (_game.GraphicsDevice != null)
+                _game.GraphicsDevice.OnDeviceResetting();
+
             _lostContext = true;
         }
 
@@ -148,7 +154,7 @@ namespace Microsoft.Xna.Framework
 
             base.OnContextSet(e);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Set");
-            // Run the render loop
+
             if (_lostContext)
             {
                 _lostContext = false;
@@ -236,18 +242,6 @@ namespace Microsoft.Xna.Framework
             }
 
             MakeCurrent();
-        }
-
-        protected override void DestroyFrameBuffer()
-        {
-            // DeviceResetting events
-            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if (_game.GraphicsDevice != null)
-                _game.GraphicsDevice.OnDeviceResetting();
-
-            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.DestroyFrameBuffer");
-
-            base.DestroyFrameBuffer();
         }
 
         #endregion
