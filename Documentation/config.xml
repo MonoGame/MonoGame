@@ -14,6 +14,9 @@
   <!-- Topics -->
   <topic id="Welcome" page-id="main" name="MonoGame Documentation" filename="welcome.md">
 
+    <!-- Copy our images to the html/images folder -->
+    <resource>images</resource>
+    
     <topic id="Introduction" name="Introduction" filename="introduction.md"/>
     <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
     <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
