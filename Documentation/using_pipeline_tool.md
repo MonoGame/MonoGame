@@ -27,8 +27,7 @@ Note that currently the Pipeline tool is not setup to support multiple target pl
 
 ## Adding Content Items
 
-With a project setup you can 
-You can add new and existing content items to the project from the Edit menu:
+Once you have a project setup you can then add content to it for building.  You can do this from the "Edit" menu:
 
 <p align="center">
 <img src="images/pipeline_items.png"/>
