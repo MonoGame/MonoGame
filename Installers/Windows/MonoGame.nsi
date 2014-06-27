@@ -143,7 +143,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
-  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
