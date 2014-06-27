@@ -1,32 +1,62 @@
 The [Pipeline Tool](pipeline.md) is used to orginize and define content for use with MonoGame.
 
-## Importing From XNA
+## Create A Project
 
-In addition to creating new projects, the Pipeline Tool supports importing your existing XNA .contentproj files.  You can access this from the the File menu.
+To start a new project just select "New..." from the "File" menu.  This will give you a new empty project to add content to.
+
+If you are starting from an existing XNA project, the Pipeline Tool supports importing your existing .contentproj.  Again you can access this from the the "File" menu:
 
 <p align="center">
 <img src="images/pipeline_import.png"/>
 </p>
 
-This creates a new project, adding all your content and content settings from the XNA project.  If you happened to be using custom processors you may need to edit the assembly references to link to the correct paths.
+This creates a new project, adding all your content and content settings from the XNA project.  If you happened to be using custom processors you may need to edit the assembly references to link to the correct paths which we discuss next.
+
+## Project Settings
+
+You can edit the content project settings directly from the property grid editor after selecting the project node in the tree view:
+
+<p align="center">
+<img src="images/pipeline_project.png"/>
+</p>
+
+This is where you setup the folders for output, the platform to target, the assembly references for custom processors, etc.
+
+Note that currently the Pipeline tool is not setup to support multiple target platforms.  This means you may need to manage mutliple content projects or manually change the target platform between builds.  We are working on adding functionaliy to support multiple platforms and configurations within a single project.
+
 
 ## Adding Content Items
 
- TODO!
+With a project setup you can 
+You can add new and existing content items to the project from the Edit menu:
+
+<p align="center">
+<img src="images/pipeline_items.png"/>
+</p>
+
+Selecting "New Item..." will bring up the New Item dialog which displays a list of new items that can be created:
+
+<p align="center">
+<img src="images/pipeline_newitem.png"/>
+</p>
+
+When you select "Add Item..." you get to select an existing item from disk to add to the content project.
 
 
 ## Custom Content Processors
 
-If you are using custom content processors you need to rebuild them for use with MonoGame.
+Justl ike XNA, the MonoGame content pipeline supports custom content processors.  To use them you need to rebuild them correctly to work against MonoGame.
 
- * Remove all Microsoft.Xna references.
- * Reference the MonoGame.Framework.Content.Pipeline assembly.
- * Build in either "Any Cpu" or "x64" modes.
- 
+The first step is removing all `Microsoft.Xna.Framework.XXX` references and replacing them with references to `MonoGame.Framework` and `MonoGame.Framework.Content.Pipeline`.  This is required as you will no longer be building against Microsoft XNA.
+
+Once you references are working you then need to change your assembly target platform.  MonoGame does not support x86 (aka 32bit) assemblies in the content pipeline.  This is mainly to allow of processing really big content as well as to simplify the number of configurations and native code dependancies.  For this reason you should try to target "Any CPU" with your custom content assembly.
+
+After you have done these fixes you should be able to add these new processors to the content project "References".
+
 
 ## Linking Content To Your Game
 
-Once you have build your game content you have a few different ways to add it to your game project.
+Once you have built your content you have a few different ways to add the XNBs to your game project.
 
 ### Manual Copy
 
@@ -56,4 +86,19 @@ Once the files are added you need to select them all and change their build acti
 
 ### Add With Wildcard
 
-TODO!
+The more automatic option is to hand edit your game .csproj and have it include you content using wildcards.  To do this just open the .csproj with any text editor then add the following after any other `<ItemGroup>`:
+
+```
+  <ItemGroup>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+```
+
+Then any files you put in a Content folder within your game project will automatically be included in the build.
+
+
+## Reporting Bugs
+
+The MonoGame content pipeline, MGCB, and the Pipeline tool are all very new in MonoGame.  If you run into any problems with them please ask for help on the [community site](http://community.monogame.net/) or submit a [bug report on GitHub](https://github.com/mono/MonoGame/issues).
