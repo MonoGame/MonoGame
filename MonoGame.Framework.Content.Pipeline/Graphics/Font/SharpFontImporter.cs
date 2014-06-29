@@ -54,11 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					Glyphs = glyphList;
 
 					// Store the font height.
-					LineSpacing = 0;
-					foreach (var glyph in Glyphs) 
-					{
-						LineSpacing = (glyph.Subrect.Height > LineSpacing) ? glyph.Subrect.Height : LineSpacing;
-					}
+					LineSpacing = face.Size.Metrics.Height >> 6;
 				}
 			} finally {
 				if (face != null)
