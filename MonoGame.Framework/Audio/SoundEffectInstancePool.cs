@@ -36,8 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 #elif ANDROID
 
-        // No reference. Arbitrary maximum chosen to reduce CPU load.
-        internal const int MAX_PLAYING_INSTANCES = 16;
+        // Set to the same as OpenAL on iOS
+        internal const int MAX_PLAYING_INSTANCES = 32;
 
 #endif
 

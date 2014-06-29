@@ -30,7 +30,14 @@ namespace Microsoft.Xna.Framework.Audio
         private AlcError _lastOpenALError;
         private int[] allSourcesArray;
         private const int MAX_NUMBER_OF_SOURCES = 32;
+#if MONOMAC || IOS
         private const double PREFERRED_MIX_RATE = 44100;
+#endif
+#if ANDROID
+        private const int DEFAULT_FREQUENCY = 48000;
+        private const int DEFAULT_UPDATE_SIZE = 512;
+        private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
+#endif
         private List<int> availableSourcesCollection;
         private List<OALSoundBuffer> inUseSourcesCollection;
         private List<OALSoundBuffer> playingSourcesCollection;
@@ -121,31 +128,30 @@ namespace Microsoft.Xna.Framework.Audio
                 See http://stackoverflow.com/questions/14842803/low-latency-audio-playback-on-android
                 */
 
-                int frequency = 48000;
-                int updateSize = 512;
-                int updateBuffers = 2;
+                int frequency = DEFAULT_FREQUENCY;
+                int updateSize = DEFAULT_UPDATE_SIZE;
+                int updateBuffers = DEFAULT_UPDATE_BUFFER_COUNT;
                 if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.JellyBeanMr1)
                 {
-                    if (Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency))
-                    {
-                        Android.Util.Log.Debug("OAL", "Supports low latency audio playback.");
-                        var audioManager = Game.Activity.GetSystemService(Context.AudioService) as AudioManager;
-                        if (audioManager != null)
-                        {
-                            var result = audioManager.GetProperty(AudioManager.PropertyOutputSampleRate);
-                            if (!string.IsNullOrEmpty(result))
-                                frequency = int.Parse(result, CultureInfo.InvariantCulture);
-                            result = audioManager.GetProperty(AudioManager.PropertyOutputFramesPerBuffer);
-                            if (!string.IsNullOrEmpty(result))
-                                updateSize = int.Parse(result, CultureInfo.InvariantCulture);
-                        }
+                    Android.Util.Log.Debug("OAL", Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency) ? "Supports low latency audio playback." : "Does not support low latency audio playback.");
 
-                        // If 4.4 or higher, then we don't need to double buffer on the application side.
-                        // See http://stackoverflow.com/a/15006327
-                        if ((int)Android.OS.Build.VERSION.SdkInt >= 19)
-                        {
-                            updateBuffers = 1;
-                        }
+                    var audioManager = Game.Activity.GetSystemService(Context.AudioService) as AudioManager;
+                    if (audioManager != null)
+                    {
+                        var result = audioManager.GetProperty(AudioManager.PropertyOutputSampleRate);
+                        if (!string.IsNullOrEmpty(result))
+                            frequency = int.Parse(result, CultureInfo.InvariantCulture);
+                        result = audioManager.GetProperty(AudioManager.PropertyOutputFramesPerBuffer);
+                        if (!string.IsNullOrEmpty(result))
+                            updateSize = int.Parse(result, CultureInfo.InvariantCulture);
+                    }
+
+                    // If 4.4 or higher, then we don't need to double buffer on the application side.
+                    // See http://stackoverflow.com/a/15006327
+                    // Use the explicit value rather than a constant as the 4.2 SDK (the build SDK) does not define a constant for 4.4.
+                    if ((int)Android.OS.Build.VERSION.SdkInt >= 19)
+                    {
+                        updateBuffers = 1;
                     }
                 }
                 else
