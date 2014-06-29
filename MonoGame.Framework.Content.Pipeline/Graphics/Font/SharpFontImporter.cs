@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				glyphBitmap = new Bitmap (gHA, gVA);
 			}
 
-			BitmapUtils.ConvertToGrey(glyphBitmap);
+			BitmapUtils.ConvertAlphaToGrey(glyphBitmap);
 
 			// not sure about this at all
 			var abc = new ABCFloat ();
