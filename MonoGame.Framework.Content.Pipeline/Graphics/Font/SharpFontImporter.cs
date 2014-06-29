@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
-using System.IO;
 using SharpFont;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
