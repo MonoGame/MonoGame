@@ -76,8 +76,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		{
 
 			try {
-				Face face = lib.NewFace (fontName, 0);
-				face.SetCharSize(0, (int)options.Size * 64, 0, 96);
+				const uint dpi = 96;
+				var face = lib.NewFace(fontName, 0);
+				var fixedSize = ((int)options.Size) << 6;
+				face.SetCharSize(0, fixedSize, dpi, dpi);
 
 				if (face.FamilyName == "Microsoft Sans Serif" && options.FontName != "Microsoft Sans Serif")
 					throw new PipelineException(string.Format("Font {0} is not installed on this computer.", options.FontName));
@@ -93,42 +95,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 		}
 
-
-		// Converts a font size from points to pixels. Can't just let GDI+ do this for us,
-		// because we want identical results on every machine regardless of system DPI settings.
-		static float PointsToPixels(float points)
-		{
-			return points * 96 / 72;
-		}
-
-
 		// Rasterizes a single character glyph.
 		static Glyph ImportGlyph(char character, Face face, Brush brush, StringFormat stringFormat, Bitmap bitmap, System.Drawing.Graphics graphics)
 		{
-			string characterString = character.ToString();
-
 			uint glyphIndex = face.GetCharIndex(character);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
 			face.Glyph.RenderGlyph(RenderMode.Normal);
-
-			// Measure the size of this character.
-			var width = (int)face.Glyph.Advance.X >> 6;
-			var height = (int)face.Glyph.Metrics.Height >> 6;
-
-			SizeF size = new SizeF(width, height);
-
-			int characterWidth = (int)Math.Ceiling(size.Width);
-			int characterHeight = (int)Math.Ceiling(size.Height);
-
-			// Pad to make sure we capture any overhangs (negative ABC spacing, etc.)
-			int padWidth = characterWidth;
-			int padHeight = characterHeight / 2;
-
-			int bitmapWidth = characterWidth + padWidth * 2;
-			int bitmapHeight = characterHeight + padHeight * 2;
-
-			if (bitmapWidth > MaxGlyphSize || bitmapHeight > MaxGlyphSize)
-				throw new Exception("Excessively large glyph won't fit in my lazily implemented fixed size temp surface.");
 
 			// Render the character.
 			graphics.Clear(System.Drawing.Color.Black);
@@ -171,16 +143,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			abc.B = face.Glyph.Metrics.Width >> 6;
 			abc.C = (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B);
 
-			// Query its ABC spacing.
-			//float? abc = GetCharacterWidth(character, font, graphics);
-//			if (glyphBitmap == null)
-//				Console.WriteLine("null");
-
-
 			// Construct the output Glyph object.
 			return new Glyph(character, glyphBitmap)
 			{
-				XOffset = -padWidth,
+				XOffset = -(face.Glyph.Advance.X >> 6),
 				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
                 YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
 				CharacterWidths = abc
