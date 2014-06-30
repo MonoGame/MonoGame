@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    delegate void SelectionChanged();
-
     enum AskResult
     {
         Yes,
@@ -17,8 +15,6 @@ namespace MonoGame.Tools.Pipeline
 
     interface IView
     {
-        //event SelectionChanged OnSelectionChanged;
-
         void Attach(IController controller);
 
         AskResult AskSaveOrCancel();
@@ -41,13 +37,9 @@ namespace MonoGame.Tools.Pipeline
 
         void RemoveTreeItem(ContentItem contentItem);
 
-        void SelectTreeItem(IProjectItem item);
-    
         void UpdateTreeItem(IProjectItem item);
 
         void EndTreeUpdate();
-
-        void ShowProperties(IProjectItem item);
 
         void UpdateProperties(IProjectItem item);
 

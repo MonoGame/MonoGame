@@ -165,7 +165,6 @@ namespace Microsoft.Xna.Framework.Audio
             if (Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
-            inst._effect = this;
             inst._voice = voice;
         }
 
@@ -181,10 +180,14 @@ namespace Microsoft.Xna.Framework.Audio
             MasterVoice.SetVolume(_masterVolume, 0);
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            _dataStream.Dispose();
-            isDisposed = true;
+            if (disposing)
+            {
+                if (_dataStream != null)
+                    _dataStream.Dispose();
+            }
+            _dataStream = null;
         }
 
         internal static void PlatformShutdown()
@@ -206,7 +209,6 @@ namespace Microsoft.Xna.Framework.Audio
             _device3DDirty = true;
             _speakers = Speakers.Stereo;
         }
-
     }
 }
 

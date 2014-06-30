@@ -41,13 +41,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 
 #if PSM
 using Sce.PlayStation.Core.Graphics;
+#endif
+#if WINRT
+using System.Reflection;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

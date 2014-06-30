@@ -4,21 +4,49 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Audio;
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
+using MonoTouch.MediaPlayer;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed partial class Song : IEquatable<Song>, IDisposable
+    public sealed partial class Song
     {
+        private Album album;
+        private Artist artist;
+        private Genre genre;
+        private string title;
+        private TimeSpan duration;
+        private MPMediaItem mediaItem;
         private AVAudioPlayer _sound;
+        private NSUrl assetUrl;
+
+        internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
+        {
+            this.album = album;
+            this.artist = artist;
+            this.genre = genre;
+            this.title = title;
+            this.duration = duration;
+            this.mediaItem = mediaItem;
+            this.assetUrl = assetUrl;
+        }
 
         private void PlatformInitialize(string fileName)
         {
-            _sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
+            this.PlatformInitialize(NSUrl.FromFilename(fileName));
+        }
+
+        private void PlatformInitialize(NSUrl url)
+        {
+            _sound = AVAudioPlayer.FromUrl(url);
+            _sound.NumberOfLoops = 0;
             _sound.FinishedPlaying += OnFinishedPlaying;
+        }
+
+        public Song(NSUrl url)
+        {
+            PlatformInitialize(url);
         }
 
         private void PlatformDispose(bool disposing)
@@ -53,8 +81,14 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal void Play()
 		{	
-			if ( _sound == null )
-				return;
+            if (_sound == null)
+            {
+                // MediaLibrary items are lazy loaded
+                if (assetUrl != null)
+                    this.PlatformInitialize (assetUrl);
+                else
+                    return;
+            }
 
             PlatformPlay();
 
@@ -121,9 +155,65 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                // TODO: Implement
-                return new TimeSpan(0);				
+                return TimeSpan.FromSeconds(_sound.CurrentTime);		
             }
+            set
+            {
+                _sound.CurrentTime = value.TotalSeconds;
+            }
+        }
+
+        private Album PlatformGetAlbum()
+        {
+            return this.album;
+        }
+
+        private Artist PlatformGetArtist()
+        {
+            return this.artist;
+        }
+
+        private Genre PlatformGetGenre()
+        {
+            return this.genre;
+        }
+
+        private TimeSpan PlatformGetDuration()
+        {
+            if (this.mediaItem != null)
+                return this.duration;
+
+            return _duration;
+        }
+
+        private bool PlatformIsProtected()
+        {
+            return false;
+        }
+
+        private bool PlatformIsRated()
+        {
+            return false;
+        }
+
+        private string PlatformGetName()
+        {
+            return this.title ?? Path.GetFileNameWithoutExtension(_name);
+        }
+
+        private int PlatformGetPlayCount()
+        {
+            return _playCount;
+        }
+
+        private int PlatformGetRating()
+        {
+            return 0;
+        }
+
+        private int PlatformGetTrackNumber()
+        {
+            return 0;
         }
     }
 }

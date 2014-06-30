@@ -117,6 +117,16 @@ namespace Microsoft.Xna.Framework.Media
             _mediaEngine.CurrentTime = 0.0;
         }
 
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            throw new NotImplementedException();
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return TimeSpan.FromSeconds(_mediaEngine.CurrentTime);
@@ -125,6 +135,10 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformSetVolume()
         {
             _mediaEngine.Volume = _volume;
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

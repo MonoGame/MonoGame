@@ -83,6 +83,56 @@ namespace Microsoft.Xna.Framework.Media
                 return new TimeSpan(0);
             }
         }
+
+        private Album PlatformGetAlbum()
+        {
+            return null;
+        }
+
+        private Artist PlatformGetArtist()
+        {
+            return null;
+        }
+
+        private Genre PlatformGetGenre()
+        {
+            return null;
+        }
+
+        private TimeSpan PlatformGetDuration()
+        {
+            return _duration;
+        }
+
+        private bool PlatformIsProtected()
+        {
+            return false;
+        }
+
+        private bool PlatformIsRated()
+        {
+            return false;
+        }
+
+        private string PlatformGetName()
+        {
+            return Path.GetFileNameWithoutExtension(_name);
+        }
+
+        private int PlatformGetPlayCount()
+        {
+            return _playCount;
+        }
+
+        private int PlatformGetRating()
+        {
+            return 0;
+        }
+
+        private int PlatformGetTrackNumber()
+        {
+            return 0;
+        }
     }
 }
 

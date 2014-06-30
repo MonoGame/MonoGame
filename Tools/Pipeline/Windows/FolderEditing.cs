@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using MonoGame.Tools.Pipeline;
-using MonoGame.Tools.Pipeline.Common;
-using MonoGame.Tools.Pipeline.Properties;
 
 namespace FolderSelect
 {

@@ -28,9 +28,6 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -105,13 +102,8 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void InitializeTypeReaders()
         {
-            typeReaderManager = new ContentTypeReaderManager(this);
-            typeReaders = typeReaderManager.LoadAssetReaders();
-            foreach (ContentTypeReader r in typeReaders)
-            {
-                r.Initialize(typeReaderManager);
-            }
-
+            typeReaderManager = new ContentTypeReaderManager();
+            typeReaders = typeReaderManager.LoadAssetReaders(this);
             sharedResourceCount = Read7BitEncodedInt();
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
         }
@@ -148,17 +140,7 @@ namespace Microsoft.Xna.Framework.Content
 
             if (!String.IsNullOrEmpty(externalReference))
             {
-                externalReference = FileHelpers.NormalizeFilePathSeparators(externalReference);
-
-                // Get a uri for the asset path using the file:// schema and no host
-                var src = new Uri("file:///" + FileHelpers.NormalizeFilePathSeparators(assetName));
-
-                // Add the relative path to the external reference
-                var dst = new Uri(src, externalReference);
-
-                // The uri now contains the path to the external reference within the content manager
-                // Get the local path and skip the first character (the path separator)
-                return contentManager.Load<T>(dst.LocalPath.Substring(1));
+                return contentManager.Load<T>(FileHelpers.ResolveRelativePath(assetName, externalReference));
             }
 
             return default(T);

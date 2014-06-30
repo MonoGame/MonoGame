@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
@@ -165,6 +165,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
+
+        static Guide()
+        {
+            Initialise(Game.Instance);
+        }
 
         internal static void Initialise(Game game)
         {
@@ -534,7 +539,8 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
         }
 
-        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null)
+        [CLSCompliant(false)]
+        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, UIImage tweetAddImage = null)
         {
             AssertInitialised();
 
@@ -551,6 +557,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
                 if (!String.IsNullOrEmpty(tweetAddUrl))
                     tweetController.AddUrl(NSUrl.FromString(tweetAddUrl));
+
+                if (tweetAddImage != null)
+                    tweetController.AddImage(tweetAddImage);
 
                 ShowViewController(tweetController);
             }
@@ -592,7 +601,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         /// </remarks>
         /// <param name="minPlayers">Minimum players to find</param>
         /// <param name="maxPlayers">Maximum players to find</param>
-        /// <param name="playersToInvite">Players to invite/param>
+        /// <param name="playersToInvite">Players to invite</param>
         public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
         {
             AssertInitialised();

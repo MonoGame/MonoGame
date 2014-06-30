@@ -95,11 +95,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(DisplayMode left, DisplayMode right)
         {
-            if (left == null && right == null)
+            if (ReferenceEquals(left, right)) //Same object or both are null
             {
                 return true;
             }
-            if (left == null || right == null)
+            if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
             {
                 return false;
             }
@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Width:{0} Height:{1} Format:{2} RefreshRate{3}}}", new object[] { this.width, this.height, this.Format, this.refreshRate });
+            return string.Format(CultureInfo.CurrentCulture, "{{Width:{0} Height:{1} Format:{2} RefreshRate:{3}}}", new object[] { this.width, this.height, this.Format, this.refreshRate });
         }
 
         #endregion Public Methods

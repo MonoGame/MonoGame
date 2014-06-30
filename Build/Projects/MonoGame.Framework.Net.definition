@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
+<Project Name="MonoGame.Framework.Net" Path="MonoGame.Framework" Type="Library" Platforms="Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone">
 
   <ProjectGuids>
 	<Platform Name="Android">713EE5CA-C850-42AD-AC67-B6546AC8BFFB</Platform>
-	<Platform Name="Angle">090037AF-0C67-4007-87E7-1DED7AE41FC6</Platform>
 	<Platform Name="iOS">D4838656-8545-4DC5-8822-D4AD313E17AC</Platform>
 	<Platform Name="Linux">1B738549-0449-4504-B978-7BFC347E3F3C</Platform>
 	<Platform Name="MacOS">1294038B-66C2-4359-AFE9-EA06A758CA94</Platform>
@@ -22,20 +21,22 @@
 
     <!-- See FrameworkReferences.definition for the platform specific references -->
     <Reference Include="FrameworkReferences.Net" />
-	<Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework">
+      <Alias Platform="WindowsPhone">MonoGameXnaFramework</Alias>
+    </Reference>
+
   </References>
 
   <Properties>
     
     <NoWarn>1591,0436</NoWarn>
 
-    <RootNamespace>Microsoft.Xna.Framework.Net</RootNamespace>
-	<RemoveXnaAssembliesOnWP8>True</RemoveXnaAssembliesOnWP8>
+    <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
+	<RemoveXnaAssembliesOnWP8>False</RemoveXnaAssembliesOnWP8>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
       <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;NET</Platform>
-      <Platform Name="Angle">TRACE;ANGLE;GLES;OPENGL;OPENAL;NET</Platform>
       <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL;NET</Platform>
       <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL;NET</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL;NET</Platform>
@@ -54,19 +55,45 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     
     <!-- Microsoft.Xna.Framework.GamerServices -->
-    <Compile Include="GamerServices\AchievementCollection.cs"/>
-    <Compile Include="GamerServices\Achievement.cs"/>
-    <Compile Include="GamerServices\FriendCollection.cs"/>
-    <Compile Include="GamerServices\FriendGamer.cs"/>
-    <Compile Include="GamerServices\GamerCollection.cs"/>
-    <Compile Include="GamerServices\Gamer.cs"/>
-    <Compile Include="GamerServices\GamerDefaults.cs"/>
-    <Compile Include="GamerServices\GamerPresence.cs"/>
-    <Compile Include="GamerServices\GamerPresenceMode.cs"/>
-    <Compile Include="GamerServices\GamerPrivileges.cs"/>
-    <Compile Include="GamerServices\GamerPrivilegeSetting.cs"/>
-    <Compile Include="GamerServices\GamerProfile.cs"/>
-    <Compile Include="GamerServices\GamerZone.cs"/>
+    <Compile Include="GamerServices\AchievementCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\Achievement.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\FriendCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\FriendGamer.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\Gamer.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerDefaults.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerPresence.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerPresenceMode.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivileges.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerPrivilegeSetting.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerProfile.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
+    <Compile Include="GamerServices\GamerZone.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
     <Compile Include="GamerServices\LeaderboardEntry.cs"/>
     <Compile Include="GamerServices\LeaderboardIdentity.cs"/>
     <Compile Include="GamerServices\LeaderboardKey.cs"/>
@@ -74,15 +101,17 @@
     <Compile Include="GamerServices\LeaderboardWriter.cs"/>
     <Compile Include="GamerServices\MessageBoxIcon.cs" />
     <Compile Include="GamerServices\PropertyDictionary.cs"/>
-    <Compile Include="GamerServices\SignedInGamerCollection.cs"/>
+    <Compile Include="GamerServices\SignedInGamerCollection.cs">
+      <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
+    </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>MacOS,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesDispatcher.cs">
-      <Platforms>Angle,MacOS,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>MacOS,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesComponent.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
+      <Platforms>Android,iOS,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL</Platforms>
     </Compile>
  
 
@@ -277,13 +306,13 @@
 
     <!-- Windows Desktop Platform -->
     <Compile Include="Windows\GamerServices\Guide.cs">
-      <Platforms>Angle,Windows8,Windows,WindowsGL</Platforms>
+      <Platforms>Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Windows\GamerServices\MonoGameGamerServicesHelper.cs">
-      <Platforms>Angle,Windows,WindowsGL</Platforms>
+      <Platforms>Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Windows\GamerServices\SignedInGamer.cs">
-      <Platforms>Angle,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Windows,WindowsGL</Platforms>
     </Compile>
 
  

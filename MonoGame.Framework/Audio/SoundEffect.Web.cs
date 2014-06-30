@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace MonoGame.Tools.Pipeline.Common
+namespace MonoGame.Tools.Pipeline
 {
     internal static class Util
     {

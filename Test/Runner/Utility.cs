@@ -97,7 +97,8 @@ namespace MonoGame.Tests {
 		private static readonly string TextureFolder = Path.Combine (AssetFolder, "Textures");
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
 		private static readonly string ModelFolder = Path.Combine (AssetFolder, "Models");
-		private const string CapturedFrameFolder = "CapturedFrames";
+        private static readonly string XmlFolder = Path.Combine(AssetFolder, "Xml");
+        private const string CapturedFrameFolder = "CapturedFrames";
 		private const string CapturedFrameDiffFolder = "Diffs";
 
 		public static string Asset (params string [] pathParts)
@@ -124,6 +125,11 @@ namespace MonoGame.Tests {
 		{
 			return Combine (ModelFolder, pathParths);
 		}
+
+        public static string Xml(params string[] pathParths)
+        {
+            return Combine(XmlFolder, pathParths);
+        }
 
 		public static string ReferenceImage (params string [] pathParts)
 		{

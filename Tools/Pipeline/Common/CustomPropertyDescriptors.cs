@@ -9,35 +9,83 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 namespace MonoGame.Tools.Pipeline
 {
     /// <summary>
+    /// PropertyDescriptor for delegating get/set calls to more than one component (object).
+    /// </summary>
+    public class MultiTargetPropertyDescriptor : PropertyDescriptor
+    {
+        private readonly Type _propertyType;
+        private readonly Type _componentType;        
+        private readonly object[] _targets;
+        private readonly PropertyDescriptor _property;
+
+        public MultiTargetPropertyDescriptor(string propertyName, Type propertyType, Type componentType, PropertyDescriptor property, object[] targets)
+            : base(propertyName, new Attribute[] { })
+        {
+            _propertyType = propertyType;
+            _componentType = componentType;
+            _targets = targets;
+            _property = property;
+        }
+
+        public override object GetValue(object component)
+        {
+            var val = _property.GetValue(_targets[0]);
+            for (var i = 1; i < _targets.Length; i++)
+            {
+                var v = _property.GetValue(_targets[i]);
+                if (!v.Equals(val))
+                    return null;
+            }
+
+            return val;                
+        }
+
+        public override void SetValue(object component, object value)
+        {
+            for (var i = 0; i < _targets.Length; i++)
+                _property.SetValue(_targets[i], value);         
+        }
+
+        public override bool CanResetValue(object component) { return true; }
+        public override Type ComponentType { get { return _componentType; } }
+        public override bool IsReadOnly { get { return false; } }
+        public override Type PropertyType { get { return _propertyType; } }
+        public override void ResetValue(object component) { SetValue(component, null); }
+        public override bool ShouldSerializeValue(object component) { return true; }            
+    }
+
+    /// <summary>
     /// PropertyDescriptor for a named item within an OpaqueDataDictionary.
     /// </summary>
     public class OpaqueDataDictionaryElementPropertyDescriptor : PropertyDescriptor
     {
         private readonly Type _propertyType;
         private readonly Type _componentType;
-        private readonly string _propertyName;        
-        private readonly OpaqueDataDictionary _data;
+        private readonly string _propertyName;
+        private readonly OpaqueDataDictionary _target;
 
-        public OpaqueDataDictionaryElementPropertyDescriptor(string propertyName, Type propertyType, Type componentType, OpaqueDataDictionary data)
+        public OpaqueDataDictionaryElementPropertyDescriptor(string propertyName, Type propertyType, OpaqueDataDictionary target)
             : base(propertyName, new Attribute[] { })
         {
             _propertyType = propertyType;
             _propertyName = propertyName;
-            _componentType = componentType;
-            _data = data;
+            _componentType = typeof(OpaqueDataDictionary);
+            _target = target;
         }
 
         public override object GetValue(object component)
         {
-            if (!_data.ContainsKey(_propertyName))
+            var data = _target ?? (component as OpaqueDataDictionary);
+            if (!data.ContainsKey(_propertyName))
                 return string.Empty;
 
-            return _data[_propertyName];
+            return data[_propertyName];            
         }
 
         public override void SetValue(object component, object value)
         {
-            _data[_propertyName] = value;
+            var data = _target ?? (component as OpaqueDataDictionary);
+            data[_propertyName] = value;
         }
 
         public override bool CanResetValue(object component) { return true; }

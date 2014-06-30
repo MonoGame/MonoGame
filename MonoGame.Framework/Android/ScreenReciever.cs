@@ -14,8 +14,7 @@ namespace Microsoft.Xna.Framework
 			Android.Util.Log.Info("MonoGame", intent.Action.ToString());
 			if(intent.Action == Intent.ActionScreenOff)
 			{
-				ScreenReceiver.ScreenLocked = true;
-				MediaPlayer.IsMuted = true;
+                OnLocked();
 			}
 			else if(intent.Action == Intent.ActionScreenOn)
 			{
@@ -26,18 +25,27 @@ namespace Microsoft.Xna.Framework
                 // http://stackoverflow.com/questions/4260794/how-to-tell-if-device-is-sleeping
                 KeyguardManager keyguard = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
                 if (!keyguard.InKeyguardRestrictedInputMode())
-                {
-                    ScreenReceiver.ScreenLocked = false;
-                    MediaPlayer.IsMuted = false;
-                }
+                    OnUnlocked();
 			}
 			else if(intent.Action == Intent.ActionUserPresent)
 			{
                 // This intent is broadcast when the user unlocks the phone
-				ScreenReceiver.ScreenLocked = false;
-				MediaPlayer.IsMuted = false;
-			}
+                OnUnlocked();
+            }
 		}
-	}
+
+        private void OnLocked()
+        {
+            ScreenReceiver.ScreenLocked = true;
+            MediaPlayer.IsMuted = true;
+        }
+
+        private void OnUnlocked()
+        {
+            ScreenReceiver.ScreenLocked = false;
+            MediaPlayer.IsMuted = false;
+            ((AndroidGameWindow)Game.Instance.Window).GameView.Resume();
+        }
+    }
 }
 

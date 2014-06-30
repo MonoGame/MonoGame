@@ -14,13 +14,39 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
 
-#if ANDROID || OPENAL || PSM || WEB
+        /// <summary>
+        /// Gets the Album on which the Song appears.
+        /// </summary>
+        public Album Album
+        {
+            get { return PlatformGetAlbum(); }
+#if WINDOWS_STOREAPP
+            internal set { PlatformSetAlbum(value); }
+#endif
+        }
+
+        /// <summary>
+        /// Gets the Artist of the Song.
+        /// </summary>
+        public Artist Artist
+        {
+            get { return PlatformGetArtist(); }
+        }
+
+        /// <summary>
+        /// Gets the Genre of the Song.
+        /// </summary>
+        public Genre Genre
+        {
+            get { return PlatformGetGenre(); }
+        }
+
+#if ANDROID || OPENAL || PSM || WEB || IOS
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 #if !LINUX
         event FinishedPlayingHandler DonePlaying;
 #endif
 #endif
-
         internal Song(string fileName, int durationMS)
             : this(fileName)
         {
@@ -63,18 +89,10 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
-#if WINDOWS_MEDIA_ENGINE || WINDOWS_PHONE
-
-        private void PlatformDispose(bool disposing)
-        {
-            // NO OP on Win8.
-        }
-
-        private void PlatformInitialize(string fileName)
-        {
-            // NO OP on Win8.
-        }
-#endif
+        public override int GetHashCode ()
+		{
+			return base.GetHashCode ();
+		}
 
         public bool Equals(Song song)
         {
@@ -85,10 +103,6 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 		}
 		
-		public override int GetHashCode ()
-		{
-			return base.GetHashCode ();
-		}
 		
 		public override bool Equals(Object obj)
 		{
@@ -117,58 +131,37 @@ namespace Microsoft.Xna.Framework.Media
 
         public TimeSpan Duration
         {
-            get
-            {
-                return _duration;
-            }
+            get { return PlatformGetDuration(); }
         }	
 
         public bool IsProtected
         {
-            get
-            {
-				return false;
-            }
+            get { return PlatformIsProtected(); }
         }
 
         public bool IsRated
         {
-            get
-            {
-				return false;
-            }
+            get { return PlatformIsRated(); }
         }
 
         public string Name
         {
-            get
-            {
-				return Path.GetFileNameWithoutExtension(_name);
-            }
+            get { return PlatformGetName(); }
         }
 
         public int PlayCount
         {
-            get
-            {
-				return _playCount;
-            }
+            get { return PlatformGetPlayCount(); }
         }
 
         public int Rating
         {
-            get
-            {
-				return 0;
-            }
+            get { return PlatformGetRating(); }
         }
 
         public int TrackNumber
         {
-            get
-            {
-				return 0;
-            }
+            get { return PlatformGetTrackNumber(); }
         }
     }
 }
