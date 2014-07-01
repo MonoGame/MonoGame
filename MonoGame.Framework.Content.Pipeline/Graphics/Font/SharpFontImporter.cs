@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			else 
 			{
 				var gHA = face.Glyph.Metrics.HorizontalAdvance >> 6;
-				var gVA = face.Glyph.Metrics.VerticalAdvance >> 6;
+				var gVA = face.Size.Metrics.Height >> 6;
 
 				gHA = gHA > 0 ? gHA : gVA;
 				gVA = gVA > 0 ? gVA : gHA;
