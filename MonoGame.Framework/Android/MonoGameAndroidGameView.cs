@@ -107,34 +107,6 @@ namespace Microsoft.Xna.Framework
             SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
             _isSurfaceChanged = false;
-
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.Initialize();
-
-                IsResuming = true;
-                if (_gameWindow.Resumer != null)
-                {
-                    _gameWindow.Resumer.LoadContent();
-                }
-
-                // Reload textures on a different thread so the resumer can be drawn
-                System.Threading.Thread bgThread = new System.Threading.Thread(
-                    o =>
-                    {
-                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
-
-                        // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
-
-                        IsResuming = false;
-                    });
-
-                bgThread.Start();
-            }
         }
 
         #endregion
@@ -145,6 +117,48 @@ namespace Microsoft.Xna.Framework
         {
             MakeCurrent();
         }
+
+		protected override void OnContextSet (EventArgs e)
+		{
+			base.OnContextSet (e);
+
+			if (_game.GraphicsDevice != null && IsResuming)
+			{
+				_game.GraphicsDevice.Initialize();
+
+				if (_gameWindow.Resumer != null)
+				{
+					_gameWindow.Resumer.LoadContent();
+				}
+
+				// Reload textures on a different thread so the resumer can be drawn
+				System.Threading.Thread bgThread = new System.Threading.Thread(
+					o =>
+					{
+						Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+						Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+						Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+						// DeviceReset events
+						_game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+						_game.GraphicsDevice.OnDeviceReset();
+
+						IsResuming = false;
+					});
+
+				bgThread.Start();
+			}
+		}
+
+		protected override void OnContextLost (EventArgs e)
+		{
+			base.OnContextLost (e);
+			// DeviceResetting events
+			_game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+			if (_game.GraphicsDevice != null)
+			   _game.GraphicsDevice.OnDeviceResetting();
+			IsResuming = true;
+		}
 
         public override void Resume()
         {
@@ -210,11 +224,6 @@ namespace Microsoft.Xna.Framework
 
         protected override void DestroyFrameBuffer()
         {
-            // DeviceResetting events
-            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if (_game.GraphicsDevice != null)
-                _game.GraphicsDevice.OnDeviceResetting();
-
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.DestroyFrameBuffer");
 
             base.DestroyFrameBuffer();
