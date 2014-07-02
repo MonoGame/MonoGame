@@ -379,6 +379,12 @@
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
 
+    <!-- Utility Classes -->
+    <Compile Include="Utilities\7zip\Compress\LZ\IMatchFinder.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZ\LzBinTree.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZ\LzInWindow.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZMA\LzmaEncoder.cs" />
+    
     <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
       <Platforms>Windows</Platforms>

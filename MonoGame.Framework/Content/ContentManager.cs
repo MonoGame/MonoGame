@@ -58,6 +58,9 @@ namespace Microsoft.Xna.Framework.Content
 {
 	public partial class ContentManager : IDisposable
 	{
+        const byte ContentCompressedLzx = 0x80;
+        const byte ContentCompressedLzma = 0x40;
+
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
@@ -449,7 +452,8 @@ namespace Microsoft.Xna.Framework.Content
             byte version = xnbReader.ReadByte();
             byte flags = xnbReader.ReadByte();
 
-            bool compressed = (flags & 0x80) != 0;
+            bool compressedLzx = (flags & ContentCompressedLzx) != 0;
+            bool compressedLzma = (flags & ContentCompressedLzma) != 0;
             if (version != 5 && version != 4)
             {
                 throw new ContentLoadException("Invalid XNB version");
@@ -459,73 +463,98 @@ namespace Microsoft.Xna.Framework.Content
             int xnbLength = xnbReader.ReadInt32();
 
             ContentReader reader;
-            if (compressed)
+            if (compressedLzx || compressedLzma)
             {
-                //decompress the xnb
-                //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
-                int compressedSize = xnbLength - 14;
+                // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-
                 MemoryStream decompressedStream = new MemoryStream(decompressedSize);
 
-                // default window size for XNB encoded files is 64Kb (need 16 bits to represent it)
-                LzxDecoder dec = new LzxDecoder(16);
-                int decodedBytes = 0;
-                long startPos = stream.Position;
-                long pos = startPos;
+                if (compressedLzx)
+                {
+                    //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
+                    // default window size for XNB encoded files is 64Kb (need 16 bits to represent it)
+                    LzxDecoder dec = new LzxDecoder(16);
+                    int compressedSize = xnbLength - 14;
+                    long startPos = stream.Position;
+                    long pos = startPos;
 
 #if ANDROID
-                // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
-                // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
-                // memory stream.
-                MemoryStream memStream = new MemoryStream();
-                stream.CopyTo(memStream);
-                memStream.Seek(0, SeekOrigin.Begin);
-                stream.Dispose();
-                stream = memStream;
-                // Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
-                pos = 0;
+                    // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
+                    // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
+                    // memory stream.
+                    MemoryStream memStream = new MemoryStream();
+                    stream.CopyTo(memStream);
+                    memStream.Seek(0, SeekOrigin.Begin);
+                    stream.Dispose();
+                    stream = memStream;
+                    // Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
+                    pos = 0;
 #endif
 
-                while (pos - startPos < compressedSize)
-                {
-                    // the compressed stream is seperated into blocks that will decompress
-                    // into 32Kb or some other size if specified.
-                    // normal, 32Kb output blocks will have a short indicating the size
-                    // of the block before the block starts
-                    // blocks that have a defined output will be preceded by a byte of value
-                    // 0xFF (255), then a short indicating the output size and another
-                    // for the block size
-                    // all shorts for these cases are encoded in big endian order
-                    int hi = stream.ReadByte();
-                    int lo = stream.ReadByte();
-                    int block_size = (hi << 8) | lo;
-                    int frame_size = 0x8000; // frame size is 32Kb by default
-                    // does this block define a frame size?
-                    if (hi == 0xFF)
+                    while (pos - startPos < compressedSize)
                     {
-                        hi = lo;
-                        lo = (byte)stream.ReadByte();
-                        frame_size = (hi << 8) | lo;
-                        hi = (byte)stream.ReadByte();
-                        lo = (byte)stream.ReadByte();
-                        block_size = (hi << 8) | lo;
-                        pos += 5;
+                        // the compressed stream is seperated into blocks that will decompress
+                        // into 32Kb or some other size if specified.
+                        // normal, 32Kb output blocks will have a short indicating the size
+                        // of the block before the block starts
+                        // blocks that have a defined output will be preceded by a byte of value
+                        // 0xFF (255), then a short indicating the output size and another
+                        // for the block size
+                        // all shorts for these cases are encoded in big endian order
+                        int hi = stream.ReadByte();
+                        int lo = stream.ReadByte();
+                        int block_size = (hi << 8) | lo;
+                        int frame_size = 0x8000; // frame size is 32Kb by default
+                        // does this block define a frame size?
+                        if (hi == 0xFF)
+                        {
+                            hi = lo;
+                            lo = (byte)stream.ReadByte();
+                            frame_size = (hi << 8) | lo;
+                            hi = (byte)stream.ReadByte();
+                            lo = (byte)stream.ReadByte();
+                            block_size = (hi << 8) | lo;
+                            pos += 5;
+                        }
+                        else
+                            pos += 2;
+
+                        // either says there is nothing to decode
+                        if (block_size == 0 || frame_size == 0)
+                            break;
+
+                        dec.Decompress(stream, block_size, decompressedStream, frame_size);
+                        pos += block_size;
+
+                        // reset the position of the input just incase the bit buffer
+                        // read in some unused bytes
+                        stream.Seek(pos, SeekOrigin.Begin);
                     }
-                    else
-                        pos += 2;
+                }
+                else if (compressedLzma)
+                {
+                    // LZMA is the compression method behind 7-Zip
+                    byte[] properties = new byte[5];
+                    if (stream.Read(properties, 0, 5) == 5)
+                    {
+                        var decoder = new SevenZip.Compression.LZMA.Decoder();
+                        decoder.SetDecoderProperties(properties);
 
-                    // either says there is nothing to decode
-                    if (block_size == 0 || frame_size == 0)
-                        break;
-
-                    dec.Decompress(stream, block_size, decompressedStream, frame_size);
-                    pos += block_size;
-                    decodedBytes += frame_size;
-
-                    // reset the position of the input just incase the bit buffer
-                    // read in some unused bytes
-                    stream.Seek(pos, SeekOrigin.Begin);
+                        long outSize = 0;
+                        bool failed = false;
+                        for (int i = 0; i < 8 && !failed; i++)
+                        {
+                            int v = stream.ReadByte();
+                            if (v < 0)
+                                failed = true;
+                            outSize |= ((long)(byte)v) << (8 * i);
+                        }
+                        if (!failed)
+                        {
+                            long inSize = stream.Length - stream.Position;
+                            decoder.Code(stream, decompressedStream, inSize, outSize, null);
+                        }
+                    }
                 }
 
                 if (decompressedStream.Position != decompressedSize)

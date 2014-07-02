@@ -852,8 +852,16 @@
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\7zip\ICoder.cs" />
+    <Compile Include="Utilities\7zip\Common\CRC.cs" />
+    <Compile Include="Utilities\7zip\Common\InBuffer.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZ\LzOutWindow.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="Utilities\7zip\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="Utilities\7zip\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="Utilities\7zip\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="Utilities\7zip\Compress\RangeCoder\RangeCoderBitTree.cs" />
 
-    
     <!-- Android/OUYA Platform -->
     <Compile Include="Android\AndroidCompatibility.cs">
       <Platforms>Android,Ouya</Platforms>
