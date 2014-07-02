@@ -73,6 +73,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\FolderEditing.cs" />
+    <Compile Include="Windows\PropertyGridExtensions.cs" />
     <Compile Include="Windows\UpdateAction.cs" />
     <Compile Include="Windows\MainView.cs">
       <SubType>Form</SubType>
