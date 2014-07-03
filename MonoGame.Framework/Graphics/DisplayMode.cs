@@ -95,11 +95,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static bool operator ==(DisplayMode left, DisplayMode right)
         {
-            if (left == null && right == null)
+            if (ReferenceEquals(left, right)) //Same object or both are null
             {
                 return true;
             }
-            if (left == null || right == null)
+            if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
             {
                 return false;
             }

@@ -1,11 +1,14 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 
-#if IOS || WINDOWS || LINUX || ANGLE
-using OpenTK.Audio.OpenAL;
-#elif MONOMAC
+#if MONOMAC
 using MonoMac.OpenAL;
+#else
+using OpenTK.Audio.OpenAL;
 #endif
-
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -17,6 +20,7 @@ namespace Microsoft.Xna.Framework.Audio
 		int sampleRate;
 		private int _sourceId;
         bool _isDisposed;
+        internal int _pauseCount;
 
 		public OALSoundBuffer ()
 		{
@@ -85,6 +89,20 @@ namespace Microsoft.Xna.Framework.Audio
             }
             //Console.WriteLine("Duration: " + Duration + " / size: " + size + " bits: " + bits + " channels: " + channels + " rate: " + sampleRate);
 
+        }
+
+        public void Pause()
+        {
+            if (_pauseCount == 0)
+                AL.SourcePause(_sourceId);
+            ++_pauseCount;
+        }
+
+        public void Resume()
+        {
+            --_pauseCount;
+            if (_pauseCount == 0)
+                AL.SourcePlay(_sourceId);
         }
 
 		public void Dispose()

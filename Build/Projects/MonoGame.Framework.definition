@@ -33,12 +33,12 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
-      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL</Platform>
+      <Platform Name="Android">TRACE;ANDROID;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="Angle">TRACE;ANGLE;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="iOS">IOS;GLES;OPENGL;OPENAL</Platform>
       <Platform Name="Linux">TRACE;LINUX;OPENGL;OPENAL</Platform>
       <Platform Name="MacOS">MONOMAC;OPENGL;OPENAL</Platform>
-      <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA</Platform>
+      <Platform Name="Ouya">TRACE;ANDROID;GLES;OPENGL;OUYA;OPENAL</Platform>
       <Platform Name="PSMobile">PSM</Platform>
       <Platform Name="Windows">TRACE;WINDOWS;DIRECTX;WINDOWS_MEDIA_SESSION</Platform>
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
@@ -63,6 +63,19 @@
       <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\armeabi-v7a\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\armeabi\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86\libopenal32.so">
+      <Platforms>Android,Ouya</Platforms>
+      <Link>libs\x86\libopenal32.so</Link>
+    </EmbeddedNativeLibrary>
 
     <!-- Microsoft.Xna.Framework -->
     <Compile Include="BoundingBox.cs" />
@@ -138,10 +151,10 @@
     <Compile Include="Audio\AudioEmitter.cs" />
     <Compile Include="Audio\AudioListener.cs" />
     <Compile Include="Audio\AudioLoader.cs">
-      <Platforms>Linux,WindowsGL,Angle</Platforms>
+      <Platforms>Linux,WindowsGL,Angle,Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Audio\AudioUtil.cs">
-      <Platforms>Android,Ouya,PSMobile</Platforms>
+      <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Audio\InstancePlayLimitException.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
@@ -149,20 +162,17 @@
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
-      <Platforms>Angle,iOS,Linux,MacOS,WindowsGL</Platforms>
+      <Platforms>Angle,iOS,Linux,MacOS,WindowsGL,Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSoundController.cs">
-      <Platforms>Angle,iOS,Linux,MacOS,WindowsGL</Platforms>
+      <Platforms>Angle,iOS,Linux,MacOS,WindowsGL,Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Audio\OpenALSupport.cs">
       <Platforms>iOS,MacOS</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.cs" />
-    <Compile Include="Audio\SoundEffect.Android.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
     <Compile Include="Audio\SoundEffect.OpenAL.cs">
-      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS</Platforms>
+      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS,Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.PSM.cs">
       <Platforms>PSMobile</Platforms>
@@ -174,11 +184,8 @@
       <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.cs" />
-    <Compile Include="Audio\SoundEffectInstance.Android.cs">
-      <Platforms>Android,Ouya</Platforms>
-    </Compile>
     <Compile Include="Audio\SoundEffectInstance.OpenAL.cs">
-      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS</Platforms>
+      <Platforms>Angle,iOS,Linux,WindowsGL,MacOS,Android,Ouya</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.PSM.cs">
       <Platforms>PSMobile</Platforms>
