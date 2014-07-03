@@ -35,7 +35,6 @@
     <call target="buildpsm" />
     <call target="buildweb" />
 
-    <call target="buildtools"/>
     <call target="buildcontentprocessor"/>
 
     <call target="builddocs"/>
@@ -167,17 +166,6 @@
         <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Clean /p:Configuration=Release /p:Platform="x86"' />
         <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone.sln /t:Build /p:Configuration=Release /p:Platform="x86"' />
       </if>
-    </if>
-  </target>
-
-  <target name="buildtools" description="Build Tools" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Tools\2MGFX\2MGFX.sln /t:Build /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Tools\MGCB\MGCB.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Tools\MGCB\MGCB.sln /t:Build /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Tools\Pipeline\Pipeline.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Tools\Pipeline\Pipeline.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 

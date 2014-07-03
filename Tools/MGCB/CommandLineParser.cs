@@ -377,7 +377,7 @@ namespace MGCB
                     else 
                     {
                         var property = member as PropertyInfo;
-                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType));
+                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType), null);
                     }
                 }
 
@@ -429,7 +429,7 @@ namespace MGCB
         IList GetList(MemberInfo member)
         {
             if (member is PropertyInfo)
-                return (IList)(member as PropertyInfo).GetValue(_optionsObject);
+                return (IList)(member as PropertyInfo).GetValue(_optionsObject, null);
 
             if (member is FieldInfo)
                 return (IList)(member as FieldInfo).GetValue(_optionsObject);
