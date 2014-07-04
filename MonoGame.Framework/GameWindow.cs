@@ -93,6 +93,9 @@ namespace Microsoft.Xna.Framework {
         /// which stretches across all screens.
         /// </summary>
         public abstract Point Position { get; set; }
+        
+        protected bool cursorLocked;
+        public abstract bool IsCursorLocked { get; set; }
 #endif
 
 		public abstract DisplayOrientation CurrentOrientation { get; }
