@@ -52,10 +52,11 @@ namespace Microsoft.Xna.Framework
     /// Example usage in Game.Initialise():
     /// 
     /// #if ANDROID
-    ///    this.Window.SetResumer(new ResumeManager(this.Services, 
-    ///                                             spriteBatch, 
-    ///                                             "UI/ResumingTexture",
-    ///                                             1.0f, 0.01f));
+    ///    (this.Window as AndroidGameWindow).SetResumer(new ResumeManager(this.Services, 
+    ///													spriteBatch, 
+    ///													"UI/ResumingTexture",
+    ///													1.0f, 0.01f,
+	///													"UI/progressBar"));
     /// #endif                                         
     /// </summary>
     public class ResumeManager : IResumeManager
@@ -63,22 +64,25 @@ namespace Microsoft.Xna.Framework
         ContentManager content;
         GraphicsDevice device;
         SpriteBatch spriteBatch;
-        string resumeTextureName;
-        Texture2D resumeTexture;
+        string resumeTextureName,progressBarTextureName;
+        Texture2D resumeTexture,progressBarTexture;
         float rotation;
         float scale;
         float rotateSpeed;
+		float currentProgress=0;
 
         public ResumeManager(IServiceProvider services,
                              SpriteBatch spriteBatch,
                              string resumeTextureName,
                              float scale,
-                             float rotateSpeed)
+                             float rotateSpeed,
+                             string progressBarTextureName=null)
         {
             this.content = new ContentManager(services, "Content");
             this.device = ((IGraphicsDeviceService)services.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
             this.spriteBatch = spriteBatch;
             this.resumeTextureName = resumeTextureName;
+			this.progressBarTextureName=progressBarTextureName;
             this.scale = scale;
             this.rotateSpeed = rotateSpeed;
         }
@@ -87,7 +91,15 @@ namespace Microsoft.Xna.Framework
         {
             content.Unload();
             resumeTexture = content.Load<Texture2D>(resumeTextureName);
+			if (!String.IsNullOrEmpty (progressBarTextureName))	progressBarTexture = content.Load<Texture2D>(progressBarTextureName);
+
+			currentProgress=0;
         }
+
+		public virtual void OnProgress(float progress)
+		{
+			currentProgress=progress;
+		}
 
         public virtual void Draw()
         {
@@ -98,6 +110,7 @@ namespace Microsoft.Xna.Framework
             int tw = resumeTexture.Width;
             int th = resumeTexture.Height;
 
+
             // Draw the resume texture in the middle of the screen and make it spin
             spriteBatch.Begin();
             spriteBatch.Draw(resumeTexture,
@@ -105,6 +118,14 @@ namespace Microsoft.Xna.Framework
                             null, Color.White, rotation,
                             new Vector2(tw / 2, th / 2),
                             scale, SpriteEffects.None, 0.0f);
+
+			// Draw the supplied bar (as higher is the percentage, more bar is drawn)
+			if (progressBarTexture!=null)
+			{
+				Rectangle src=new Rectangle (0,0,(int)(currentProgress*progressBarTexture.Width),progressBarTexture.Height);
+				Rectangle dst=new Rectangle (sw/2-progressBarTexture.Width/2,sh/2+96,(int)(currentProgress*progressBarTexture.Width),progressBarTexture.Height);
+				spriteBatch.Draw (progressBarTexture,dst,src,Color.White);
+			}
 
             spriteBatch.End();
         }

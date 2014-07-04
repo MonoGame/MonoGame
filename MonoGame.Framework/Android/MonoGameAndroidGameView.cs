@@ -6,6 +6,7 @@ using System;
 using Android.Content;
 using Android.Media;
 using Android.Views;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -23,6 +24,9 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidGameWindow _gameWindow;
         private readonly Game _game;
         private readonly AndroidTouchEventManager _touchManager;
+
+		private int totalReloadAssetCount;
+		private int currentReloadAssetCount;
 
         public bool IsResuming { get; private set; }
 
@@ -112,23 +116,37 @@ namespace Microsoft.Xna.Framework
             {
                 _game.GraphicsDevice.Initialize();
 
+
+				// setup data for resumer progress notification
+				currentReloadAssetCount=0;
+				totalReloadAssetCount=ContentManager.ComputeTotalAssets();
+				ContentManager.AssetReloadedEvent+=OnAssetReloaded;
+
+
                 IsResuming = true;
                 if (_gameWindow.Resumer != null)
                 {
                     _gameWindow.Resumer.LoadContent();
                 }
 
+
                 // Reload textures on a different thread so the resumer can be drawn
                 System.Threading.Thread bgThread = new System.Threading.Thread(
                     o =>
                     {
                         Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                        ContentManager.ReloadGraphicsContent();
                         Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                         // DeviceReset events
                         _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
                         _game.GraphicsDevice.OnDeviceReset();
+
+
+						if (_gameWindow.Resumer != null)
+						{
+							ContentManager.AssetReloadedEvent-=OnAssetReloaded;
+						}
 
                         IsResuming = false;
                     });
@@ -136,6 +154,18 @@ namespace Microsoft.Xna.Framework
                 bgThread.Start();
             }
         }
+
+
+		void OnAssetReloaded (object sender,EventArgs args)
+		{
+			currentReloadAssetCount++;
+			if (_gameWindow.Resumer!=null)
+			{
+				float progressAmount=0;
+				if (totalReloadAssetCount>0) progressAmount=currentReloadAssetCount/(float)totalReloadAssetCount;
+				_gameWindow.Resumer.OnProgress (progressAmount);
+			}
+		}
 
         #endregion
 

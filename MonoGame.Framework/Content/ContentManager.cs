@@ -68,6 +68,8 @@ namespace Microsoft.Xna.Framework.Content
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
+		internal static event EventHandler<EventArgs> AssetReloadedEvent;
+
 	static List<char> targetPlatformIdentifiers = new List<char>()
         {
             'w', // Windows
@@ -121,6 +123,29 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+
+
+		internal static int ComputeTotalAssets ()
+		{
+			int assetCount=0;
+
+			lock (ContentManagerLock)
+			{
+				// count all assets inside every content manager
+				for (int i = ContentManagers.Count - 1; i >= 0; --i)
+				{
+					var contentRef = ContentManagers[i];
+					if (contentRef.IsAlive)
+					{
+                        var contentManager = (ContentManager)contentRef.Target;
+                        if (contentManager != null) assetCount+=contentManager.loadedAssets.Count;
+					}
+				}
+			}
+
+			return assetCount;
+		}
+
         internal static void ReloadGraphicsContent()
         {
             lock (ContentManagerLock)
@@ -141,6 +166,7 @@ namespace Microsoft.Xna.Framework.Content
                         ContentManagers.RemoveAt(i);
                     }
                 }
+
             }
         }
 
@@ -576,6 +602,8 @@ namespace Microsoft.Xna.Framework.Content
 #endif
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
                 genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
+
+				if (AssetReloadedEvent!=null) AssetReloadedEvent (this,EventArgs.Empty);
             }
         }
 
