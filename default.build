@@ -44,8 +44,6 @@
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
 
-    <call target="buildtests"/>
-
     <nant buildfile="Installers/default.build" target="build" />
   </target>
 
@@ -180,13 +178,6 @@
     <if test="${os == 'Win32NT'}">
       <delete dir="${project::get-base-directory()}\Documentation\Output" />
       <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml" />
-    </if>
-  </target>
-
-  <target name="buildtests" description="Build Tests" depends="clean">
-    <if test="${os == 'Win32NT'}">
-      <exec program="msbuild " commandline="Test\MonoGame.Tests.Windows.sln /t:Clean /p:Configuration=Release" />
-      <exec program="msbuild " commandline="Test\MonoGame.Tests.Windows.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
