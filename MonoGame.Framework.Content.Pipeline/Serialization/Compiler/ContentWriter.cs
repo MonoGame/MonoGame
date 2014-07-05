@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using LZ4n;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         const byte XnbFormatVersion = 5;
         const byte HiDefContent = 0x01;
         const byte ContentCompressedLzx = 0x80;
-        const byte ContentCompressedLzma = 0x40;
+        const byte ContentCompressedLz4 = 0x40;
 
         ContentCompiler compiler;
         TargetPlatform targetPlatform;
@@ -177,8 +178,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write('B');
             Write(targetPlatformIdentifiers[(int)targetPlatform]);
             Write(XnbFormatVersion);
-            // We cannot use LZX compression, so we use the public domain LZMA compression. Use one of the spare bits in the flags byte to specify LZMA.
-            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : (byte)0) | (compressContent ? ContentCompressedLzma : (byte)0));
+            // We cannot use LZX compression, so we use the public domain LZ4 compression. Use one of the spare bits in the flags byte to specify LZ4.
+            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : (byte)0) | (compressContent ? ContentCompressedLz4 : (byte)0));
             Write(flags);
         }
 
@@ -192,71 +193,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         /// <summary>
-        /// Compresses the input stream and returns a stream containing the compressed data.
-        /// </summary>
-        /// <param name="stream">The stream to compress.</param>
-        /// <returns>A stream containing the compressed data.</returns>
-        Stream CompressStream(Stream stream)
-        {
-            // Use the public domain LZMA compression as it is freely available and comes with a C# implementation.
-            string mf = "bt4";
-            Int32 dictionary = (1 << 21) | (1 << 23);
-            Int32 posStateBits = 2;
-            Int32 litContextBits = 3; // for normal files
-            Int32 litPosBits = 0;
-            Int32 algorithm = 2;
-            Int32 numFastBytes = 128;
-            bool eos = false;
-
-            SevenZip.CoderPropID[] propIDs = 
-				{
-					SevenZip.CoderPropID.DictionarySize,
-					SevenZip.CoderPropID.PosStateBits,
-					SevenZip.CoderPropID.LitContextBits,
-					SevenZip.CoderPropID.LitPosBits,
-					SevenZip.CoderPropID.Algorithm,
-					SevenZip.CoderPropID.NumFastBytes,
-					SevenZip.CoderPropID.MatchFinder,
-					SevenZip.CoderPropID.EndMarker
-				};
-            object[] properties = 
-				{
-					(Int32)(dictionary),
-					(Int32)(posStateBits),
-					(Int32)(litContextBits),
-					(Int32)(litPosBits),
-					(Int32)(algorithm),
-					(Int32)(numFastBytes),
-					mf,
-					eos
-				};
-
-            var outStream = new MemoryStream();
-            var encoder = new SevenZip.Compression.LZMA.Encoder();
-            encoder.SetCoderProperties(propIDs, properties);
-            encoder.WriteCoderProperties(outStream);
-            Int64 fileSize = stream.Length;
-            for (int i = 0; i < 8; i++)
-                outStream.WriteByte((Byte)(fileSize >> (8 * i)));
-            encoder.Code(stream, outStream, -1, -1, null);
-            return outStream;
-        }
-
-        /// <summary>
         /// Compress the stream and write it to the output.
         /// </summary>
         /// <param name="stream">The stream to compress and write to the output.</param>
-        void WriteCompressedStream(Stream stream)
+        void WriteCompressedStream(MemoryStream stream)
         {
             // Compress stream
-            using (var compressedStream = CompressStream(stream))
-            {
-                UInt32 totalSize = (UInt32)(headerStream.Length + compressedStream.Length + sizeof(UInt32) + sizeof(UInt32));
-                Write(totalSize);
-                Write((UInt32)stream.Length);
-                compressedStream.Position = 0;
-                compressedStream.CopyTo(outputStream);
-            }
+            var maxLength = LZ4Codec.MaximumOutputLength((int)stream.Length);
+            var outputArray = new byte[maxLength];
+            int resultLength = LZ4Codec.Encode32HC(stream.GetBuffer(), 0, (int)stream.Length, outputArray, 0, maxLength);
+
+            UInt32 totalSize = (UInt32)(headerStream.Length + resultLength + sizeof(UInt32) + sizeof(UInt32));
+            Write(totalSize);
+            Write((int)stream.Length);
+
+            outputStream.Write(outputArray, 0, resultLength);
         }
 
         /// <summary>

@@ -43,7 +43,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-
+using LZ4n;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Path = System.IO.Path;
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Content
 	public partial class ContentManager : IDisposable
 	{
         const byte ContentCompressedLzx = 0x80;
-        const byte ContentCompressedLzma = 0x40;
+        const byte ContentCompressedLz4 = 0x40;
 
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			try
+			//try
             {
 				//try load it traditionally
 				stream = OpenStream(assetName);
@@ -331,7 +331,7 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException ex)
+            /*catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
 
@@ -356,7 +356,7 @@ namespace Microsoft.Xna.Framework.Content
                     else
                         disposableAssets.Add(result as IDisposable);
                 }
-			}			
+			}			*/
             
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
@@ -453,7 +453,7 @@ namespace Microsoft.Xna.Framework.Content
             byte flags = xnbReader.ReadByte();
 
             bool compressedLzx = (flags & ContentCompressedLzx) != 0;
-            bool compressedLzma = (flags & ContentCompressedLzma) != 0;
+            bool compressedLz4 = (flags & ContentCompressedLz4) != 0;
             if (version != 5 && version != 4)
             {
                 throw new ContentLoadException("Invalid XNB version");
@@ -463,7 +463,7 @@ namespace Microsoft.Xna.Framework.Content
             int xnbLength = xnbReader.ReadInt32();
 
             ContentReader reader;
-            if (compressedLzx || compressedLzma)
+            if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
@@ -531,30 +531,14 @@ namespace Microsoft.Xna.Framework.Content
                         stream.Seek(pos, SeekOrigin.Begin);
                     }
                 }
-                else if (compressedLzma)
+                else if (compressedLz4)
                 {
-                    // LZMA is the compression method behind 7-Zip
-                    byte[] properties = new byte[5];
-                    if (stream.Read(properties, 0, 5) == 5)
-                    {
-                        var decoder = new SevenZip.Compression.LZMA.Decoder();
-                        decoder.SetDecoderProperties(properties);
-
-                        long outSize = 0;
-                        bool failed = false;
-                        for (int i = 0; i < 8 && !failed; i++)
-                        {
-                            int v = stream.ReadByte();
-                            if (v < 0)
-                                failed = true;
-                            outSize |= ((long)(byte)v) << (8 * i);
-                        }
-                        if (!failed)
-                        {
-                            long inSize = stream.Length - stream.Position;
-                            decoder.Code(stream, decompressedStream, inSize, outSize, null);
-                        }
-                    }
+                    int compressedSize = xnbLength - 14;
+                    byte[] temp = new byte[compressedSize];
+                    stream.Read(temp, 0, compressedSize);
+                    decompressedStream.SetLength(decompressedSize);
+                    LZ4Codec.Decode32(temp, 0, compressedSize, decompressedStream.GetBuffer(), 0, decompressedSize, true);
+                    decompressedStream.Position = decompressedSize;
                 }
 
                 if (decompressedStream.Position != decompressedSize)
