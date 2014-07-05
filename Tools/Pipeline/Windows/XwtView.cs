@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Xwt;
+using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
+using System.Text;
+using Xwt;
+using Xwt.Drawing;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -30,8 +32,8 @@ namespace MonoGame.Tools.Pipeline
 
 		protected override bool OnCloseRequested ()
 		{
-			if (!_controller.Exit ())
-				return false;
+            //if (!_controller.Exit ())
+            //    return false;
 
 			return base.OnCloseRequested ();
 		}
@@ -237,6 +239,40 @@ namespace MonoGame.Tools.Pipeline
 		void generateUI ()
 		{
 			createMenu ();
+
+			var mainPaned = new HPaned ();
+
+            var leftPane = new VPaned();
+
+            _treeView = new TreeView()
+            {
+                HeadersVisible = false
+            };
+
+            folderClosedIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png"));
+            settingsIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png"));
+            TreeStore store = new TreeStore(imgCol, nameCol);
+            _treeView.DataSource = store;
+
+            leftPane.Panel1.Content = _treeView;
+            //leftPane.Panel2.Content = _propertyGrid;
+
+            mainPaned.Panel1.Content = leftPane;
+
+            _outputWindow = new OutputTextView();
+
+            // Find an appropriate font for console like output.
+            var faces = new[] { "Consolas", "Lucida Console", "Courier New" };
+            for (var f = 0; f < faces.Length; f++)
+            {
+                _outputWindow.Font = Font.FromName(faces[f]).WithScaledSize(0.9).WithStyle(FontStyle.Normal);
+                if (_outputWindow.Font.Family == faces[f])
+                    break;
+            }
+
+            mainPaned.Panel2.Content = _outputWindow;
+
+            Content = mainPaned;
 		}
 
 		void createMenu ()
@@ -323,6 +359,6 @@ namespace MonoGame.Tools.Pipeline
 
 			MainMenu.Items.Add (helpMenu);
 		}
-	}
+    }
 }
 
