@@ -237,7 +237,6 @@ namespace MonoGame.Tools.Pipeline
 		{
 			// TODO: Implement click event handlers
 			MainMenu = new Menu ();
-			var separator = new SeparatorMenuItem ();
 
 			var fileMenu = new MenuItem () {
 				Label = "_File",
@@ -255,12 +254,12 @@ namespace MonoGame.Tools.Pipeline
 			fileMenu.SubMenu.Items.Add (newMenu);
 			fileMenu.SubMenu.Items.Add (openMenu);
 			fileMenu.SubMenu.Items.Add (closeMenu);
-			fileMenu.SubMenu.Items.Add (separator);
+			fileMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			fileMenu.SubMenu.Items.Add (importMenu);
-			fileMenu.SubMenu.Items.Add (separator);
+			fileMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			fileMenu.SubMenu.Items.Add (saveMenu);
 			fileMenu.SubMenu.Items.Add (saveAsMenu);
-			fileMenu.SubMenu.Items.Add (separator);
+			fileMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			fileMenu.SubMenu.Items.Add (exitMenu);
 
 			MainMenu.Items.Add (fileMenu);
@@ -278,10 +277,10 @@ namespace MonoGame.Tools.Pipeline
 
 			editMenu.SubMenu.Items.Add (undoMenu);
 			editMenu.SubMenu.Items.Add (redoMenu);
-			editMenu.SubMenu.Items.Add (separator);
+			editMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			editMenu.SubMenu.Items.Add (newItemMenu);
 			editMenu.SubMenu.Items.Add (addItemMenu);
-			editMenu.SubMenu.Items.Add (separator);
+			editMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			editMenu.SubMenu.Items.Add (delMenu);
 
 			MainMenu.Items.Add (editMenu);
@@ -299,7 +298,7 @@ namespace MonoGame.Tools.Pipeline
 			buildMenu.SubMenu.Items.Add (buildMenuItem);
 			buildMenu.SubMenu.Items.Add (rebuildMenu);
 			buildMenu.SubMenu.Items.Add (cleanMenu);
-			buildMenu.SubMenu.Items.Add (separator);
+			buildMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			buildMenu.SubMenu.Items.Add (debugMenu);
 
 			MainMenu.Items.Add (buildMenu);
@@ -313,7 +312,7 @@ namespace MonoGame.Tools.Pipeline
 			var aboutMenu = new MenuItem ("_About");
 
 			helpMenu.SubMenu.Items.Add (viewHelpMenu);
-			helpMenu.SubMenu.Items.Add (separator);
+			helpMenu.SubMenu.Items.Add (new SeparatorMenuItem ());
 			helpMenu.SubMenu.Items.Add (aboutMenu);
 
 			MainMenu.Items.Add (helpMenu);
