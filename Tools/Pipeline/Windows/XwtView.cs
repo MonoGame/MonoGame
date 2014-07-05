@@ -36,6 +36,12 @@ namespace MonoGame.Tools.Pipeline
 			return base.OnCloseRequested ();
 		}
 
+		protected override void OnClosed ()
+		{
+			base.OnClosed ();
+			Application.Exit ();
+		}
+
 		protected override void OnShown ()
 		{
 			base.OnShown ();
