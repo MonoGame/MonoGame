@@ -46,7 +46,7 @@ namespace MonoGame.Tools.Pipeline
 			}
 		}
 
-
+		#region IView implements
 		public void Attach (IController controller)
 		{
 			_controller = controller;
@@ -118,16 +118,38 @@ namespace MonoGame.Tools.Pipeline
 
 		public void BeginTreeUpdate ()
 		{
+            Debug.Assert(_treeUpdating == false, "Must finish previous tree update!");
+            _treeUpdating = true;
+            _treeSort = false;
 			throw new NotImplementedException ();
 		}
 
 		public void SetTreeRoot (IProjectItem item)
 		{
-			throw new NotImplementedException ();
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+
+            var store = _treeView.DataSource as TreeStore;
+            store.Clear();
+
+            var project = item as PipelineProject;
+            if (project == null)
+                return;
+
+            store.AddNode().SetValue(nameCol, item.Name).SetValue(imgCol, settingsIcon).SetValue(tag, item);
+			//throw new NotImplementedException ();
 		}
 
 		public void AddTreeItem (IProjectItem item)
 		{
+            Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
+            _treeSort = true;
+
+            var path = item.Location;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            var store = _treeView.DataSource as TreeStore;
+            TreeNavigator root = store.GetFirstNode();
+
 			throw new NotImplementedException ();
 		}
 
@@ -143,7 +165,13 @@ namespace MonoGame.Tools.Pipeline
 
 		public void EndTreeUpdate ()
 		{
-			throw new NotImplementedException ();
+            if (_treeSort)
+            {
+                // Sort tree
+            }
+            _treeSort = false;
+
+            _treeUpdating = false;
 		}
 
 		public void UpdateProperties (IProjectItem item)
@@ -153,18 +181,46 @@ namespace MonoGame.Tools.Pipeline
 
 		public void OutputAppend (string text)
 		{
-			throw new NotImplementedException ();
+            if (text == null)
+                return;
+
+            _outputWindow.Append(text);
 		}
 
 		public void OutputClear ()
 		{
-			throw new NotImplementedException ();
+            _outputWindow.Clear();
 		}
 
 		public bool ChooseContentFile (string initialDirectory, out List<string> files)
 		{
+            var dlg = new OpenFileDialog()
+            {
+                Title = "Open",
+                Multiselect = true,
+                CurrentFolder = initialDirectory
+            };
+            dlg.Filters.Add(new FileDialogFilter("All Files (*.*)", "*.*"));
+
+            bool result = dlg.Run();
+            files = new List<string>(dlg.FileNames);
+            return result;
 			throw new NotImplementedException ();
 		}
+		#endregion
+
+
+        Image folderClosedIcon;
+        Image settingsIcon;
+        DataField<Image> imgCol = new DataField<Image>();
+        DataField<string> nameCol = new DataField<string>();
+        DataField<object> tag = new DataField<object>();
+
+        TreeView _treeView;
+        private bool _treeUpdating;
+        private bool _treeSort;
+
+        OutputTextView _outputWindow;
 
 		/// <summary>
 		/// Generates the UI
