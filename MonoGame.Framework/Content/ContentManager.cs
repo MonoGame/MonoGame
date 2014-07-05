@@ -43,7 +43,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using LZ4n;
+using Lz4;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Path = System.IO.Path;
@@ -533,11 +533,11 @@ namespace Microsoft.Xna.Framework.Content
                 }
                 else if (compressedLz4)
                 {
-                    int compressedSize = xnbLength - 14;
-                    byte[] temp = new byte[compressedSize];
-                    stream.Read(temp, 0, compressedSize);
                     decompressedStream.SetLength(decompressedSize);
-                    LZ4Codec.Decode32(temp, 0, compressedSize, decompressedStream.GetBuffer(), 0, decompressedSize, true);
+                    using (var decoderStream = new Lz4DecoderStream(stream))
+                    {
+                        decoderStream.Read(decompressedStream.GetBuffer(), 0, decompressedSize);
+                    }
                     decompressedStream.Position = decompressedSize;
                 }
 
