@@ -17,6 +17,7 @@ namespace MonoGame.Tools.Pipeline
             MultiLine = true;
             ExpandHorizontal = true;
             ExpandVertical = true;
+			TextAlignment = Alignment.Start;
 
             var faces = new[] { "Consolas", "Lucida Console", "Courier New" };
             for (var f = 0; f < faces.Length; f++)
