@@ -4,7 +4,8 @@
 
 using System;
 using System.Diagnostics;
-using System.Windows.Forms;
+//using System.Windows.Forms;
+using Xwt;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -16,10 +17,14 @@ namespace MonoGame.Tools.Pipeline
         [STAThread]
         static void Main(string [] args)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
 
-            var view = new MainView();
+			Application.Initialize(ToolkitType.Wpf);
+
+			var view = new XwtView();
+			//var view = new MainView();
+
             if (args != null && args.Length > 0)
             {
                 var projectFilePath = string.Join(" ", args);
@@ -28,7 +33,11 @@ namespace MonoGame.Tools.Pipeline
 
             var model = new PipelineProject();
             var controller = new PipelineController(view, model);   
-            Application.Run(view);
+
+            //Application.Run(view);
+
+			view.Show();
+            Application.Run();
         }
     }
 }

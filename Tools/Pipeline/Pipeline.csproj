@@ -45,6 +45,15 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Xwt">
+      <HintPath>..\..\..\xwt\Xwt.WPF\bin\Release\Xwt.dll</HintPath>
+    </Reference>
+    <Reference Include="Xwt.WPF">
+      <HintPath>..\..\..\xwt\Xwt.WPF\bin\Release\Xwt.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Xwt.Gtk">
+      <HintPath>..\..\..\xwt\Xwt.Gtk\bin\Release\Xwt.Gtk.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\MGCB\CommandLineParser.cs">
@@ -125,13 +134,15 @@
     <None Include="Templates\SpriteFont.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Windows\XwtView.cs" />
+    <Compile Include="Windows\OutputTextView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.Windows.csproj">
-      <Project>{b950de10-ac5d-4bd9-b817-51247c4a732d}</Project>
+      <Project>{B950DE10-AC5D-4BD9-B817-51247C4A732D}</Project>
       <Name>MonoGame.Framework.Content.Pipeline.Windows</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
