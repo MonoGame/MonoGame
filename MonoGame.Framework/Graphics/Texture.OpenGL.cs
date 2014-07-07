@@ -6,10 +6,14 @@
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
 using OpenTK.Graphics.ES20;
+using GLPixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
+using PixelInternalFormat = OpenTK.Graphics.ES20.All;
+using PixelType = OpenTK.Graphics.ES20.All;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -19,6 +23,9 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int glTexture = -1;
         internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
+        internal PixelInternalFormat glInternalFormat;
+        internal GLPixelFormat glFormat;
+        internal PixelType glType;
         internal SamplerState glLastSamplerState;
 
         private void PlatformGraphicsDeviceResetting()

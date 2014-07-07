@@ -22,10 +22,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class TextureCube
 	{
-		PixelInternalFormat glInternalFormat;
-		PixelFormat glFormat;
-		PixelType glType;
-
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
             this.glTarget = TextureTarget.TextureCubeMap;

@@ -55,10 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
-		PixelInternalFormat glInternalFormat;
-		GLPixelFormat glFormat;
-		PixelType glType;
-
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             this.glTarget = TextureTarget.Texture2D;
