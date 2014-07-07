@@ -20,14 +20,16 @@ namespace MonoGame.Tools.Pipeline
 
 		FileDialogFilter MonoGameContentProjectFileFilter;
 		FileDialogFilter XnaContentProjectFileFilter;
+        FileDialogFilter AllFilesFilter;
 
 		public XwtView()
 		{
 			GenerateUI();
 
 			// DialogFilters
-			MonoGameContentProjectFileFilter = new FileDialogFilter("MonoGame Content Build Files (*.mgcb)", "*.mgcb");
+			MonoGameContentProjectFileFilter = new FileDialogFilter("MonoGame Content Build Projects (*.mgcb)", "*.mgcb");
 			XnaContentProjectFileFilter = new FileDialogFilter("XNA Content Projects (*.contentproj)", "*.contentproj");
+			AllFilesFilter = new FileDialogFilter("All Files (*.*)", "*.*");
 		}
 
 		protected override bool OnCloseRequested ()
@@ -90,7 +92,8 @@ namespace MonoGame.Tools.Pipeline
 				InitialFileName = Path.GetFileName(filePath)
 			};
 			save.Filters.Add(MonoGameContentProjectFileFilter);
-			var result = save.Run();
+            save.Filters.Add(AllFilesFilter);
+            var result = save.Run();
 
 			filePath = save.FileName;
 
@@ -103,9 +106,10 @@ namespace MonoGame.Tools.Pipeline
 			OpenFileDialog open = new OpenFileDialog();
 			open.Multiselect = false;
 			open.Filters.Add(MonoGameContentProjectFileFilter);
+            open.Filters.Add(AllFilesFilter);
 
 			var result = open.Run();
-			projectFilePath = open.CurrentFolder;
+			projectFilePath = open.FileName;
 
 			return result;
 		}
@@ -115,9 +119,10 @@ namespace MonoGame.Tools.Pipeline
 			OpenFileDialog open = new OpenFileDialog();
 			open.Multiselect = false;
 			open.Filters.Add(XnaContentProjectFileFilter);
+            open.Filters.Add(AllFilesFilter);
 
 			var result = open.Run();
-			projectFilePath = open.CurrentFolder;
+			projectFilePath = open.FileName;
 
 			return result;
 		}
@@ -137,22 +142,20 @@ namespace MonoGame.Tools.Pipeline
 			Debug.Assert(_treeUpdating == false, "Must finish previous tree update!");
 			_treeUpdating = true;
 			_treeSort = false;
-			//throw new NotImplementedException();
 		}
 
 		public void SetTreeRoot (IProjectItem item)
 		{
 			Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
-			var store = _treeView.DataSource as TreeStore;
-			store.Clear();
+            _root = null;
+            _store.Clear();
 
-			var project = item as PipelineProject;
-			if (project == null)
-				return;
+            var project = item as PipelineProject;
+            if (project == null)
+                return;
 
-			store.AddNode().SetValue(nameCol, item.Name).SetValue(imgCol, settingsIcon).SetValue(tag, item);
-			//throw new NotImplementedException ();
+            _root = _store.AddNode().SetValue(nameCol, item.Name).SetValue(imgCol, _projectIcon).SetValue(tag, new PipelineProjectProxy(project));
 		}
 
 		public void AddTreeItem (IProjectItem item)
@@ -160,28 +163,44 @@ namespace MonoGame.Tools.Pipeline
 			Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 			_treeSort = true;
 
-			var path = item.Location;
-			var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+            var path = item.Location;
+            var folders = path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
 
-			var store = _treeView.DataSource as TreeStore;
-			TreeNavigator root = store.GetFirstNode();
-
-			throw new NotImplementedException();
-		}
+            var curPath = string.Empty;
+            var parent = _root;
+            foreach (var folder in folders)
+            {
+                curPath = Path.Combine(curPath, folder);
+                bool valid = parent.MoveToFirst();
+                bool found = false;
+                while (valid && parent.GetValue(nameCol) != folder)
+                    valid = parent.MoveNext();
+                if (!found)
+                {
+                    parent = _store.AddNode(parent.CurrentPosition).SetValue(nameCol, folder).SetValue(imgCol, _folderClosedIcon).SetValue(tag, new FolderItem(curPath));
+                }
+                else
+                {
+                    parent.MoveToChild();
+                }
+            }
+            _store.AddNode(parent.CurrentPosition).SetValue(nameCol, item.Name).SetValue(imgCol, _contentIcon).SetValue(tag, item);
+        }
 
 		public void RemoveTreeItem (ContentItem contentItem)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public void UpdateTreeItem (IProjectItem item)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public void EndTreeUpdate ()
 		{
-			if (_treeSort) {
+			if (_treeSort)
+            {
 				// Sort tree
 			}
 			_treeSort = false;
@@ -191,7 +210,7 @@ namespace MonoGame.Tools.Pipeline
 
 		public void UpdateProperties (IProjectItem item)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public void OutputAppend (string text)
@@ -199,12 +218,12 @@ namespace MonoGame.Tools.Pipeline
 			if (text == null)
 				return;
 
-			_outputWindow.Append(text);
-		}
+            Application.Invoke(() => _outputWindow.Append(text));
+        }
 
 		public void OutputClear ()
 		{
-			_outputWindow.Clear();
+			Application.Invoke(() => _outputWindow.Clear());
 		}
 
 		public bool ChooseContentFile (string initialDirectory, out List<string> files)
@@ -214,7 +233,7 @@ namespace MonoGame.Tools.Pipeline
 				Multiselect = true,
 				CurrentFolder = initialDirectory
 			};
-			dlg.Filters.Add(new FileDialogFilter("All Files (*.*)", "*.*"));
+			dlg.Filters.Add(AllFilesFilter);
 
 			bool result = dlg.Run();
 			files = new List<string>(dlg.FileNames);
@@ -225,13 +244,17 @@ namespace MonoGame.Tools.Pipeline
 		#endregion
 
 
-		Image folderClosedIcon;
-		Image settingsIcon;
+		Image _folderClosedIcon;
+        Image _folderOpenIcon;
+		Image _projectIcon;
+        Image _contentIcon;
 		DataField<Image> imgCol = new DataField<Image>();
 		DataField<string> nameCol = new DataField<string>();
 		DataField<object> tag = new DataField<object>();
 
 		TreeView _treeView;
+        TreeStore _store;
+        TreeNavigator _root;
 		private bool _treeUpdating;
 		private bool _treeSort;
 
@@ -246,8 +269,6 @@ namespace MonoGame.Tools.Pipeline
 		void GenerateUI ()
 		{
 			CreateMenu();
-
-
 			CreateContent();
 		}
 
@@ -280,7 +301,11 @@ namespace MonoGame.Tools.Pipeline
 
 		void CreateMenu ()
 		{
-			// TODO: Implement click event handlers
+            Title = "MonoGame Pipeline";
+            Width = 800;
+            Height = 600;
+            
+            // TODO: Implement click event handlers
 			MainMenu = new Menu();
 
 			var fileMenu = new MenuItem() {
@@ -288,20 +313,20 @@ namespace MonoGame.Tools.Pipeline
 				SubMenu = new Menu()
 			};
 					
-			_newMenuItem = new MenuItem("New...");
+			_newMenuItem = new MenuItem("_New...");
 			_newMenuItem.Clicked += OnNewMenuClicked;
-			_openMenuItem = new MenuItem("Open...");
+			_openMenuItem = new MenuItem("_Open...");
 			_openMenuItem.Clicked += OnOpenMenuClicked;
-			_closeMenuItem = new MenuItem("Close");
+			_closeMenuItem = new MenuItem("_Close");
 			_closeMenuItem.Sensitive = false;
 			_closeMenuItem.Clicked += OnCloseMenuClicked;
-			_importMenuItem = new MenuItem("Import...");
+			_importMenuItem = new MenuItem("_Import...");
 			_importMenuItem.Clicked += OnImportMenuClicked;
-			_saveMenuItem = new MenuItem("Save");
+			_saveMenuItem = new MenuItem("_Save");
 			_saveMenuItem.Clicked += OnSaveMenuClicked;
-			_saveAsMenuItem = new MenuItem("Save as...");
+			_saveAsMenuItem = new MenuItem("Save _As...");
 			_saveAsMenuItem.Clicked += OnSaveAsMenuClicked;
-			_exitMenuItem = new MenuItem("Exit");
+			_exitMenuItem = new MenuItem("E_xit");
 			_exitMenuItem.Clicked += OnExitMenuClicked;
 
 			fileMenu.SubMenu.Items.Add(_newMenuItem);
@@ -322,12 +347,12 @@ namespace MonoGame.Tools.Pipeline
 				SubMenu = new Menu()
 			};
 					
-			_undoMenuItem = new MenuItem("Undo");
+			_undoMenuItem = new MenuItem("_Undo");
 			_undoMenuItem.Clicked += OnUndoMenuClicked;
-			_redoMenuItem = new MenuItem("Redo");
+			_redoMenuItem = new MenuItem("_Redo");
 			_redoMenuItem.Clicked += OnRedoMenuClicked;
 			_newItemMenuItem = new MenuItem("_New Item");
-			_addItemMenuItem = new MenuItem("Add Item");
+			_addItemMenuItem = new MenuItem("_Add Item");
 			_deleteMenuItem = new MenuItem("_Delete");
 
 			editMenu.SubMenu.Items.Add(_undoMenuItem);
@@ -357,7 +382,7 @@ namespace MonoGame.Tools.Pipeline
 				Visible = false
 			};
 			_cancelBuildMenuItem.Clicked += OnCancelMenuClicked;
-			_debugMenuItem = new CheckBoxMenuItem("Debug Mode");
+			_debugMenuItem = new CheckBoxMenuItem("_Debug Mode");
 
 			_buildMenu.SubMenu.Items.Add(_buildMenuItem);
 			_buildMenu.SubMenu.Items.Add(_rebuildMenuItem);
@@ -373,7 +398,7 @@ namespace MonoGame.Tools.Pipeline
 				SubMenu = new Menu()
 			};
 
-			var viewHelpMenu = new MenuItem("View Help");
+			var viewHelpMenu = new MenuItem("_View Help");
 			viewHelpMenu.Clicked += OnViewHelpMenuClicked;
 			var aboutMenu = new MenuItem("_About");
 			aboutMenu.Clicked += OnAboutMenuClicked;
@@ -473,74 +498,87 @@ namespace MonoGame.Tools.Pipeline
 			var projectOpenAndNotBuilding = projectOpen && notBuilding;
 
 			// Update the state of all menu items.
+            Application.Invoke(() =>
+                {
+			        _newMenuItem.Sensitive = notBuilding;
+			        _openMenuItem.Sensitive = notBuilding;
+			        _importMenuItem.Sensitive = notBuilding;
 
-			_newMenuItem.Sensitive = notBuilding;
-			_openMenuItem.Sensitive = notBuilding;
-			_importMenuItem.Sensitive = notBuilding;
+			        _saveMenuItem.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDiry;
+			        _saveAsMenuItem.Sensitive = projectOpenAndNotBuilding;
+			        _closeMenuItem.Sensitive = projectOpenAndNotBuilding;
 
-			_saveMenuItem.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDiry;
-			_saveAsMenuItem.Sensitive = projectOpenAndNotBuilding;
-			_closeMenuItem.Sensitive = projectOpenAndNotBuilding;
+			        _exitMenuItem.Sensitive = notBuilding;
 
-			_exitMenuItem.Sensitive = notBuilding;
+			        _newItemMenuItem.Sensitive = projectOpen;
+			        _addItemMenuItem.Sensitive = projectOpen;
+			        _deleteMenuItem.Sensitive = projectOpen;
 
-			_newItemMenuItem.Sensitive = projectOpen;
-			_addItemMenuItem.Sensitive = projectOpen;
-			_deleteMenuItem.Sensitive = projectOpen;
+			        _buildMenuItem.Sensitive = projectOpenAndNotBuilding;
 
-			_buildMenuItem.Sensitive = projectOpenAndNotBuilding;
+			        //_treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+			        //_rebuildMenuItem.Sensitive = _treeRebuildMenuItem.Enabled;
 
-			//_treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
-			//_rebuildMenuItem.Sensitive = _treeRebuildMenuItem.Enabled;
-
-			_cleanMenuItem.Sensitive = projectOpenAndNotBuilding;
-			if (notBuilding) {
-				_buildMenu.SubMenu.Items.Remove(_cancelSeparatorMenuItem);
-			} else {
-				var items = _buildMenu.SubMenu.Items;
-				if (!items.Contains(_cancelSeparatorMenuItem)) {
-					int index = items.IndexOf(_cancelBuildMenuItem);
-					items.Insert(index, _cancelSeparatorMenuItem);
-				}
-			}
-			_cancelBuildMenuItem.Sensitive = !notBuilding;
-			_cancelBuildMenuItem.Visible = !notBuilding;
+			        _cleanMenuItem.Sensitive = projectOpenAndNotBuilding;
+			        if (notBuilding) {
+				        _buildMenu.SubMenu.Items.Remove(_cancelSeparatorMenuItem);
+			        } else {
+				        var items = _buildMenu.SubMenu.Items;
+				        if (!items.Contains(_cancelSeparatorMenuItem)) {
+					        int index = items.IndexOf(_cancelBuildMenuItem);
+					        items.Insert(index, _cancelSeparatorMenuItem);
+				        }
+			        }
+			        _cancelBuildMenuItem.Sensitive = !notBuilding;
+			        _cancelBuildMenuItem.Visible = !notBuilding;
+                });
 
 			UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
 		}
 
 		private void UpdateUndoRedo(bool canUndo, bool canRedo)
 		{
-			_undoMenuItem.Sensitive = canUndo;
-			_redoMenuItem.Sensitive = canRedo;
+            Application.Invoke(() =>
+                {
+                    _undoMenuItem.Sensitive = canUndo;
+                    _redoMenuItem.Sensitive = canRedo;
+                });
 		}
 
 		void CreateContent ()
 		{
 			var mainPaned = new HPaned();
-			var leftPane = new VPaned();
-			_treeView = new TreeView() {
+            var leftPane = new VPaned();
+
+            _store = new TreeStore(imgCol, nameCol, tag);
+            _treeView = new TreeView(_store)
+            {
 				HeadersVisible = false,
-				WidthRequest = 249,
-				HeightRequest = 210
 			};
-			folderClosedIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png"));
-			settingsIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png"));
-			TreeStore store = new TreeStore(imgCol, nameCol);
-			_treeView.DataSource = store;
-			leftPane.Panel1.Content = _treeView;
-			//leftPane.Panel2.Content = _propertyGrid;
+            _treeView.Columns.Add("Name", imgCol, nameCol);
+            
+            _contentIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png"));
+            _folderClosedIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png"));
+            _folderOpenIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png"));
+            _projectIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png"));
+
+            leftPane.Panel1.Content = _treeView;
+
+            // Placeholder vbox until a property grid is in place
+            leftPane.Panel2.Content = new VBox();
+
 			mainPaned.Panel1.Content = leftPane;
-			_outputWindow = new OutputTextView() {
-				WidthRequest = 531,
-				HeightRequest = 537
-			};
+			_outputWindow = new OutputTextView();
 
 			mainPaned.Panel2.Content = _outputWindow;
 			Content = mainPaned;
+
+            // Make the left pane 1/3 of the width by default
+            mainPaned.Position = Width * 0.33;
+
+            // No padding around the edge of the main window
+            Padding = new WidgetSpacing();
 		}
 	}
-
-
 }
 
