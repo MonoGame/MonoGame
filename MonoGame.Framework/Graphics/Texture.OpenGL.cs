@@ -6,10 +6,9 @@
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX
 using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #elif GLES
 using OpenTK.Graphics.ES20;
-using GLPixelFormat = OpenTK.Graphics.ES20.All;
+using PixelFormat = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using PixelInternalFormat = OpenTK.Graphics.ES20.All;
@@ -24,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal TextureTarget glTarget;
         internal TextureUnit glTextureUnit = TextureUnit.Texture0;
         internal PixelInternalFormat glInternalFormat;
-        internal GLPixelFormat glFormat;
+        internal PixelFormat glFormat;
         internal PixelType glType;
         internal SamplerState glLastSamplerState;
 
