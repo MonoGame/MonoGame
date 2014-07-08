@@ -287,7 +287,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void RenderbufferStorageMultisample(int samples, int internalFormat, int width, int height)
             {
+#if !MONOMAC
                 GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, (RenderbufferStorage)internalFormat, width, height);
+#else
+                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferStorage)internalFormat, width, height);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
 
