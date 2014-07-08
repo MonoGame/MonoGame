@@ -56,5 +56,8 @@ Documentation/Output/
 # Protobuild Generated Files
 MonoGame.Framework.Content.Pipeline/*.csproj
 MonoGame.Framework/*.csproj
+Tools/2MGFX/*.csproj
+Tools/MGCB/*.csproj
+Tools/Pipeline/*.csproj
 /*.sln
 *.speccache

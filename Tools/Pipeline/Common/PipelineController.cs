@@ -301,7 +301,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            _buildTask = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());
         }
@@ -323,7 +323,7 @@ namespace MonoGame.Tools.Pipeline
             if (LaunchDebugger)
                 commands += " /launchdebugger";
 
-            _buildTask = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());          
         }
