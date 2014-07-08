@@ -259,7 +259,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
+#if !MONOMAC
                 this.SupportsBlitFramebuffer = true;
+#else
+                this.SupportsBlitFramebuffer = false;
+#endif
                 this.SupportsInvalidateFramebuffer = false;
             }
 
@@ -335,18 +339,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void GenerateMipmap(int target)
             {
+#if !MONOMAC
                 GL.GenerateMipmap((GenerateMipmapTarget)target);
                 GraphicsExtensions.CheckGLError();
+#endif
             }
 
             internal virtual void BlitFramebuffer(int iColorAttachment, int width, int height)
             {
+#if !MONOMAC
                 GL.ReadBuffer(ReadBufferMode.ColorAttachment0 + iColorAttachment);
                 GraphicsExtensions.CheckGLError();
                 GL.DrawBuffer(DrawBufferMode.ColorAttachment0 + iColorAttachment);
                 GraphicsExtensions.CheckGLError();
                 GL.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
                 GraphicsExtensions.CheckGLError();
+#endif
             }
 
             internal virtual void CheckFramebufferStatus()
@@ -367,6 +375,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#if !MONOMAC
         internal sealed class FramebufferHelperEXT : FramebufferHelper
         {
             internal FramebufferHelperEXT(GraphicsDevice graphicsDevice)
@@ -467,6 +476,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+#endif
 #endif
     }
 }
