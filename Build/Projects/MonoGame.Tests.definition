@@ -132,6 +132,7 @@
     </Compile>
 
     <Content Include="Resources\tests.xsl">
+      <ExcludePlatforms>iOS</ExcludePlatforms>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
