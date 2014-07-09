@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static GuideViewController guideViewController = null; // Only used for iOS 5 and older
 
         private static GestureType prevGestures;
-        private static bool _isInitialised;
+        private static bool _isInitialised = false;
         private static UIWindow _window;
         private static UIViewController _gameViewController;
 
@@ -173,28 +173,31 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         internal static void Initialise(Game game)
         {
-            var osVersionString = UIDevice.CurrentDevice.SystemVersion;
-            if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
+            if (!_isInitialised)
             {
-                var parts = osVersionString.Split(char.Parse("."));
-                osVersionString = parts[0] + "." + parts[1];
+                var osVersionString = UIDevice.CurrentDevice.SystemVersion;
+                if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
+                {
+                    var parts = osVersionString.Split(char.Parse("."));
+                    osVersionString = parts[0] + "." + parts[1];
+                }
+
+                osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
+
+                _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
+                if (_window == null)
+                    throw new InvalidOperationException(
+                        "iOSGamePlatform must add the main UIWindow to Game.Services");
+
+                _gameViewController = (UIViewController)game.Services.GetService(typeof(UIViewController));
+                if (_gameViewController == null)
+                    throw new InvalidOperationException(
+                        "iOSGamePlatform must add the game UIViewController to Game.Services");
+
+                game.Exiting += Game_Exiting;
+
+                _isInitialised = true;
             }
-
-            osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
-
-            _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
-            if (_window == null)
-                throw new InvalidOperationException(
-                    "iOSGamePlatform must add the main UIWindow to Game.Services");
-
-            _gameViewController = (UIViewController)game.Services.GetService(typeof(UIViewController));
-            if (_gameViewController == null)
-                throw new InvalidOperationException(
-                    "iOSGamePlatform must add the game UIViewController to Game.Services");
-
-            game.Exiting += Game_Exiting;
-
-            _isInitialised = true;
         }
 
         private static void Uninitialise(Game game)

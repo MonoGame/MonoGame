@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (gdi.PresentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = gdi.PresentationParameters;
-            SetupGL();
+            Setup();
             GraphicsProfile = gdi.GraphicsProfile;
             Initialize();
         }
@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
-            SetupGL();
+            Setup();
             Initialize();
         }
 
@@ -154,12 +154,12 @@ namespace Microsoft.Xna.Framework.Graphics
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = presentationParameters;
-            SetupGL();
+            Setup();
             GraphicsProfile = graphicsProfile;
             Initialize();
         }
 
-        private void SetupGL() 
+        private void Setup() 
         {
 			// Initialize the main viewport
 			_viewport = new Viewport (0, 0,

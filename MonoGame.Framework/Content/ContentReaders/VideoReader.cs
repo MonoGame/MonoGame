@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override Video Read(ContentReader input, Video existingInstance)
         {
-            string path = input.ReadString();
+            string path = input.ReadObject<string>();
 
             if (!string.IsNullOrEmpty(path))
             {
@@ -36,11 +36,12 @@ namespace Microsoft.Xna.Framework.Content
                 path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
             }
 
-            var durationMS = input.ReadInt32();
-            var width = input.ReadInt32();
-            var height = input.ReadInt32();
-            var framesPerSecond = input.ReadSingle();
-            var soundTrackType = input.ReadInt32();   // 0 = Music, 1 = Dialog, 2 = Music and dialog
+            var durationMS = input.ReadObject<int>();
+            var width = input.ReadObject<int>();
+            var height = input.ReadObject<int>();
+            var framesPerSecond = input.ReadObject<float>();
+            var soundTrackType = input.ReadObject<int>();  // 0 = Music, 1 = Dialog, 2 = Music and dialog
+
             return new Video(path, durationMS)
             {
                 Width = width,

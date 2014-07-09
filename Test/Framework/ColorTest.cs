@@ -55,28 +55,31 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void Lerp()
         {
+            Color color1 = new Color(20, 40, 0, 0);
+            Color color2 = new Color(41, 81, 255, 255);
+
             // Test zero and underflow.
-            Assert.AreEqual(Color.Transparent, Color.Lerp(Color.Transparent, Color.White, 0.0f));
-            Assert.AreEqual(Color.Transparent, Color.Lerp(Color.Transparent, Color.White, 0.001f));
-            Assert.AreEqual(Color.Transparent, Color.Lerp(Color.Transparent, Color.White, -0.001f));
-            Assert.AreEqual(Color.Transparent, Color.Lerp(Color.Transparent, Color.White, -1.0f));
+            Assert.AreEqual(color1, Color.Lerp(color1, color2, 0.0f));
+            Assert.AreEqual(color1, Color.Lerp(color1, color2, 0.001f));
+            Assert.AreEqual(color1, Color.Lerp(color1, color2, -0.001f));
+            Assert.AreEqual(color1, Color.Lerp(color1, color2, -1.0f));
 
             // Test one scale and overflows.
-            Assert.AreEqual(Color.White, Color.Lerp(Color.Transparent, Color.White, 1.0f));
-            Assert.AreEqual(Color.White, Color.Lerp(Color.Transparent, Color.White, 1.001f));
+            Assert.AreEqual(color2, Color.Lerp(color1, color2, 1.0f));
+            Assert.AreEqual(color2, Color.Lerp(color1, color2, 1.001f));
             Assert.AreEqual(new Color(254, 254, 254, 254), Color.Lerp(Color.Transparent, Color.White, 0.999f));
-            Assert.AreEqual(Color.White, Color.Lerp(Color.Transparent, Color.White, 2.0f));
+            Assert.AreEqual(color2, Color.Lerp(color1, color2, 2.0f));
 
             // Test half scale.
-            var half = new Color(127, 127, 127, 127);
-            Assert.AreEqual(half, Color.Lerp(Color.Transparent, Color.White, 0.5f));
-            Assert.AreEqual(half, Color.Lerp(Color.Transparent, Color.White, 0.501f));
-            Assert.AreEqual(half, Color.Lerp(Color.Transparent, Color.White, 0.499f));
+            var half = new Color(30, 60, 127, 127);
+            Assert.AreEqual(half, Color.Lerp(color1, color2, 0.5f));
+            Assert.AreEqual(half, Color.Lerp(color1, color2, 0.501f));
+            Assert.AreEqual(half, Color.Lerp(color1, color2, 0.499f));
 
             // Test backwards lerp.
-            Assert.AreEqual(Color.White, Color.Lerp(Color.White, Color.Transparent, 0.0f));
-            Assert.AreEqual(Color.Transparent, Color.Lerp(Color.White, Color.Transparent, 1.0f));
-            Assert.AreEqual(half, Color.Lerp(Color.White, Color.Transparent, 0.5f));
+            Assert.AreEqual(color2, Color.Lerp(color2, color1, 0.0f));
+            Assert.AreEqual(color1, Color.Lerp(color2, color1, 1.0f));
+            Assert.AreEqual(half, Color.Lerp(color2, color1, 0.5f));
         }
     }
 }

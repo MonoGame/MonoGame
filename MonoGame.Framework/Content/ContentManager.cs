@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
 		private IGraphicsDeviceService graphicsDeviceService;
-        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>();
+        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
 		
@@ -223,11 +223,12 @@ namespace Microsoft.Xna.Framework.Content
             T result = default(T);
             
             // On some platforms, name and slash direction matter.
-            // We store the asset by a lowercase, /-seperating key rather than how the
+            // We store the asset by a /-seperating key rather than how the
             // path to the file was passed to us to avoid
             // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
             // different files. This matches stock XNA behavior.
-            var key = assetName.Replace('\\', '/').ToLower();
+            // The dictionary will ignore case differences
+            var key = assetName.Replace('\\', '/');
 
             // Check for a previously loaded asset first
             object asset = null;
@@ -415,12 +416,8 @@ namespace Microsoft.Xna.Framework.Content
             }
             else if ((typeof(T) == typeof(SoundEffect)))
             {
-#if ANDROID
-                return new SoundEffect(assetName);
-#else
                 using (Stream s = TitleContainer.OpenStream(assetName))
                     return SoundEffect.FromStream(s);
-#endif
             }
 #endif
             else if ((typeof(T) == typeof(Effect)))

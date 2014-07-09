@@ -19,12 +19,12 @@ OutFile '${INSTALLERFILENAME}Installer-${INSTALLERVERSION}.exe'
 InstallDir '$PROGRAMFILES\${APPNAME}\v${VERSION}'
 !define MSBuildInstallDir '$PROGRAMFILES32\MSBuild\${APPNAME}\v${VERSION}'
 VIProductVersion "${VERSION}.${REVISION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} Development SDK"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "MonoGame Team"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APPNAME} SDK"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "The MonoGame Team"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${INSTALLERVERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${INSTALLERVERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "ï¿½ Copyright MonoGame Team 2014"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APPNAME} SDK Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright © The MonoGame Team"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -101,13 +101,13 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
-  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
-  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
-  File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
-  File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.exe'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.dll'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\Templates'
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
 
   ; Install the assemblies for all the platforms we can 
@@ -129,7 +129,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
-  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
@@ -144,7 +143,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
-  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'
@@ -198,11 +196,11 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
 
   End32Bitvs64BitCheck:
   ; Add remote programs
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME}'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayName' '${APPNAME} SDK'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayVersion' '${VERSION}'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'DisplayIcon' '$INSTDIR\monogame.ico'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'InstallLocation' '$INSTDIR\'
-  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'MonoGame'
+  WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'Publisher' 'The MonoGame Team'
   WriteRegStr HKLM 'Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}' 'UninstallString' '$INSTDIR\uninstall.exe'
 
 
@@ -279,7 +277,9 @@ SectionEnd
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
+	SetOutPath "$INSTDIR"
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall MonoGame.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+	SetOutPath "${MSBuildInstallDir}\Tools"
 	CreateShortCut "$SMPROGRAMS\${APPNAME}\MonoGame Pipeline.lnk" "${MSBuildInstallDir}\Tools\Pipeline.exe" "" "${MSBuildInstallDir}\Tools\Pipeline.exe" 0
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "URL" "http://www.monogame.net"
 	WriteINIStr "$SMPROGRAMS\${APPNAME}\MonoGame Website.url" "InternetShortcut" "IconFile" "$INSTDIR\monogame.ico"

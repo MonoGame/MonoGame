@@ -12,22 +12,27 @@
   <output-dir>Output</output-dir>
   
   <!-- Topics -->
-  <topic id="welcome.md" page-id="main" name="MonoGame Documentation" filename="welcome.md">
+  <topic id="Welcome" page-id="main" name="MonoGame Documentation" filename="welcome.md">
 
-    <topic id="introduction.md" name="Introduction" filename="introduction.md"/>
-    <topic id="getting_started.md" name="Getting Started" filename="getting_started.md"/>
-    <topic id="tutorials.md" name="Tutorials" filename="tutorials.md"/>
+    <!-- Copy our images to the html/images folder -->
+    <resource>images</resource>
     
-    <topic id="content_intro.md" name="Adding Art, Sounds, and More" filename="content_intro.md">
-    	<topic id="custom_effects.md" name="Custom Effects" filename="custom_effects.md"/>
+    <topic id="Introduction" name="Introduction" filename="introduction.md"/>
+    <topic id="Getting_Started" name="Getting Started" filename="getting_started.md"/>
+    <topic id="Tutorials" name="Tutorials" filename="tutorials.md"/>
+    
+    <topic id="Adding_Art_Sounds_and_More" name="Adding Art, Sounds, and More" filename="content_intro.md">
+    	<topic id="Using_The_Pipeline_Tool" name="Using The Pipeline Tool" filename="using_pipeline_tool.md"/>
+    	<topic id="Custom_Effects" name="Custom Effects" filename="custom_effects.md"/>
     </topic>
 
-    <topic id="tools.md" name="Tools" filename="tools.md">
-    	<topic id="2mgfx.md" name="2MGFX" filename="2mgfx.md"/>
-    	<topic id="mgcb.md" name="MGCB" filename="mgcb.md"/>
+    <topic id="Tools" name="Tools" filename="tools.md">
+    	<topic id="2MGFX" name="2MGFX" filename="2mgfx.md"/>
+    	<topic id="MGCB" name="MGCB" filename="mgcb.md"/>
+    	<topic id="Pipeline" name="Pipeline" filename="pipeline.md"/>
     </topic>
     
-    <topic id="links.md" name="External Links" filename="links.md"/>
+    <topic id="External_Links" name="External Links" filename="links.md"/>
 
     <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->
     <topic id="X:ClassLibraryReference" page-id="api" name="Class Library Reference" index="100" on-url="true"/>
