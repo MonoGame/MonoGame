@@ -25,6 +25,7 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidTouchEventManager _touchManager;
 
         public bool IsResuming { get; private set; }
+        private bool _lostContext;
 
         public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow, Game game)
             : base(context)
@@ -107,34 +108,6 @@ namespace Microsoft.Xna.Framework
             SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
             _isSurfaceChanged = false;
-
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.Initialize();
-
-                IsResuming = true;
-                if (_gameWindow.Resumer != null)
-                {
-                    _gameWindow.Resumer.LoadContent();
-                }
-
-                // Reload textures on a different thread so the resumer can be drawn
-                System.Threading.Thread bgThread = new System.Threading.Thread(
-                    o =>
-                    {
-                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
-
-                        // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
-
-                        IsResuming = false;
-                    });
-
-                bgThread.Start();
-            }
         }
 
         #endregion
@@ -152,6 +125,69 @@ namespace Microsoft.Xna.Framework
                 base.Resume();
         }
 
+
+        protected override void OnContextLost(EventArgs e)
+        {
+            base.OnContextLost(e);
+            // OnContextLost is called when the underlying OpenGL context is destroyed
+            // this usually happens on older devices when other opengl apps are run 
+            // or the lock screen is enabled. Modern devices can preserve the opengl 
+            // context along with all the textures and shaders it has attached.
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Lost");
+
+            // DeviceResetting events
+            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
+            if (_game.GraphicsDevice != null)
+                _game.GraphicsDevice.OnDeviceResetting();
+
+            _lostContext = true;
+        }
+
+        protected override void OnContextSet(EventArgs e)
+        {
+            // This is called when a Context is created. This will happen in
+            // two ways, first when the activity is first created. Second if 
+            // (and only if) the context is lost 
+            // When an acivity is now paused we correctly preserve the context
+            // rather than destoying it along with the Surface which is what 
+            // used to happen. 
+
+            base.OnContextSet(e);
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Set");
+
+            if (_lostContext)
+            {
+                _lostContext = false;
+
+                if (_game.GraphicsDevice != null)
+                {
+                    _game.GraphicsDevice.Initialize();
+
+                    IsResuming = true;
+                    if (_gameWindow.Resumer != null)
+                    {
+                        _gameWindow.Resumer.LoadContent();
+                    }
+
+                    // Reload textures on a different thread so the resumer can be drawn
+                    System.Threading.Thread bgThread = new System.Threading.Thread(
+                        o =>
+                        {
+                            Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                            Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                            Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+                            // DeviceReset events
+                            _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                            _game.GraphicsDevice.OnDeviceReset();
+
+                            IsResuming = false;
+                        });
+
+                    bgThread.Start();
+                }
+            }
+        }
         protected override void CreateFrameBuffer()
         {
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.CreateFrameBuffer");
@@ -206,18 +242,6 @@ namespace Microsoft.Xna.Framework
             }
 
             MakeCurrent();
-        }
-
-        protected override void DestroyFrameBuffer()
-        {
-            // DeviceResetting events
-            _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
-            if (_game.GraphicsDevice != null)
-                _game.GraphicsDevice.OnDeviceResetting();
-
-            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.DestroyFrameBuffer");
-
-            base.DestroyFrameBuffer();
         }
 
         #endregion
