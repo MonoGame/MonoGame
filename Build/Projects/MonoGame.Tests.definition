@@ -131,8 +131,7 @@
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
 
-    <Content Include="Resources\tests.xsl">
-      <ExcludePlatforms>iOS</ExcludePlatforms>
+    <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
