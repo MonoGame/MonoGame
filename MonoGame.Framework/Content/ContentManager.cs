@@ -305,7 +305,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			
 			Stream stream = null;
-			//try
+			try
             {
 				//try load it traditionally
 				stream = OpenStream(assetName);
@@ -331,7 +331,7 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            /*catch (ContentLoadException ex)
+            catch (ContentLoadException ex)
             {
 				//MonoGame try to load as a non-content file
 
@@ -356,7 +356,7 @@ namespace Microsoft.Xna.Framework.Content
                     else
                         disposableAssets.Add(result as IDisposable);
                 }
-			}			*/
+			}
             
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
@@ -477,19 +477,6 @@ namespace Microsoft.Xna.Framework.Content
                     int compressedSize = xnbLength - 14;
                     long startPos = stream.Position;
                     long pos = startPos;
-
-#if ANDROID
-                    // Android native stream does not support the Position property. LzxDecoder.Decompress also uses
-                    // Seek.  So we read the entirity of the stream into a memory stream and replace stream with the
-                    // memory stream.
-                    MemoryStream memStream = new MemoryStream();
-                    stream.CopyTo(memStream);
-                    memStream.Seek(0, SeekOrigin.Begin);
-                    stream.Dispose();
-                    stream = memStream;
-                    // Position is at the start of the MemoryStream as Stream.CopyTo copies from current position
-                    pos = 0;
-#endif
 
                     while (pos - startPos < compressedSize)
                     {
