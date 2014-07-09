@@ -8,7 +8,7 @@ namespace MonoGame.Tests.Framework
 {
 // TODO: Mac implements its own GameWindow class that cannot 
 // be overloaded in MockWindow...  if you hate this hack, go fix it.
-#if !MACOS
+#if !MONOMAC
 
     [TestFixture]
     internal class TouchPanelTest
@@ -374,5 +374,5 @@ namespace MonoGame.Tests.Framework
         }
     }
 
-#endif // !MACOS
+#endif // !MONOMAC
 }
