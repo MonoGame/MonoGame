@@ -9,6 +9,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
   </References>
 
