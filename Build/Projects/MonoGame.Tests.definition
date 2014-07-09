@@ -21,7 +21,7 @@
     <CustomDefinitions>
       <Platform Name="Linux">TRACE;LINUX</Platform>
       <Platform Name="MacOS">MONOMAC</Platform>
-      <Platform Name="Windows">TRACE;WINDOWS</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
       <Platform Name="iOS">IOS;</Platform>
     </CustomDefinitions>
