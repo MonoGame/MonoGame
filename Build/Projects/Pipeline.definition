@@ -7,17 +7,11 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms">
-        <Platforms>Windows</Platforms>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
-    <Reference Include="..\..\ThirdParty\Dependencies\Xwt\Xwt.dll">
-        <Platforms>MacOS,Linux</Platforms>
-    </Reference>
+
+    <Reference Include="PipelineReferences" />
   </References>
 
   <Properties>

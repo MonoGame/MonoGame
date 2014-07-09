@@ -19,7 +19,7 @@
     <Reference Include="System.Xml.Linq" />
 
 	<!-- Platform specific and special references! -->
-    <Reference Include="PipelineReferences" />
+    <Reference Include="Framework.Content.Pipeline.References" />
 
   </References>
 
