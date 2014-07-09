@@ -2,6 +2,7 @@
 <ExternalProject Name="MonoGame.Tests.References">
 
   <Platform Type="Windows">
+    <Reference Include="System.Drawing" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
@@ -22,6 +23,7 @@
   </Platform>
 
   <Platform Type="WindowsGL">
+    <Reference Include="System.Drawing" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
@@ -42,6 +44,7 @@
   </Platform>
 
   <Platform Type="MacOS">
+    <Reference Include="System.Drawing" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
@@ -62,6 +65,7 @@
   </Platform>
 
   <Platform Type="Linux">
+    <Reference Include="System.Drawing" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
