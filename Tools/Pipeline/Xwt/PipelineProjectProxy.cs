@@ -4,8 +4,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
-using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -21,7 +19,7 @@ namespace MonoGame.Tools.Pipeline
         [Category("Settings")]
         [DisplayName("Output Folder")]
         [Description("The folder where the final build content is placed.")]
-        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string OutputDir
         {
             get { return _project.OutputDir; }
@@ -34,7 +32,7 @@ namespace MonoGame.Tools.Pipeline
         [Category("Settings")]
         [DisplayName("Intermediate Folder")]
         [Description("The folder where intermediate files are placed when building content.")]
-        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string IntermediateDir
         {
             get { return _project.IntermediateDir; }
@@ -45,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
         }
 
         [Category("Settings")]
-        [Editor(typeof (AssemblyReferenceListEditor), typeof (UITypeEditor))]
+        //[Editor(typeof (AssemblyReferenceListEditor), typeof (UITypeEditor))]
         public List<string> References
         {
             get { return _project.References; }

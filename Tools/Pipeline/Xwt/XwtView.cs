@@ -238,14 +238,13 @@ namespace MonoGame.Tools.Pipeline
 			bool result = dlg.Run();
 			files = new List<string>(dlg.FileNames);
 			return result;
-			throw new NotImplementedException();
 		}
 
 		#endregion
 
 
 		Image _folderClosedIcon;
-        Image _folderOpenIcon;
+        //Image _folderOpenIcon;
 		Image _projectIcon;
         Image _contentIcon;
 		DataField<Image> imgCol = new DataField<Image>();
@@ -559,7 +558,7 @@ namespace MonoGame.Tools.Pipeline
             
             _contentIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png"));
             _folderClosedIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png"));
-            _folderOpenIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png"));
+            //_folderOpenIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png"));
             _projectIcon = Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png"));
 
             leftPane.Panel1.Content = _treeView;

@@ -37,8 +37,12 @@ namespace MonoGame.Tools.Pipeline
             Application.Run(view);
 #endif
 #if XWT
-			Application.Initialize(ToolkitType.Wpf);
-
+#if MONOMAC
+            Application.Initialize(ToolkitType.Cocoa);
+#endif
+#if LINUX
+            Application.Initialize(ToolkitType.Gtk);
+#endif
 			var view = new XwtView();
             if (args != null && args.Length > 0)
             {
@@ -47,7 +51,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             var model = new PipelineProject();
-            var controller = new PipelineController(view, model);   
+            new PipelineController(view, model);   
 			view.Show();
             Application.Run();
 #endif
