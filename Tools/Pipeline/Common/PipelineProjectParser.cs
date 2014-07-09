@@ -4,15 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;

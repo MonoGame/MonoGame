@@ -3,11 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.IO;
-using System.Windows.Forms.Design;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
