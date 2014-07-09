@@ -47,7 +47,7 @@ using System.Resources;
 [assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
 
 //Tests projects need access too
-[assembly: InternalsVisibleTo("MonoGame.Tests.Windows")]
+[assembly: InternalsVisibleTo("MonoGameTests")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
