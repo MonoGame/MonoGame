@@ -464,13 +464,14 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // Decompress the xnb
                 int decompressedSize = xnbReader.ReadInt32();
-                MemoryStream decompressedStream = new MemoryStream(decompressedSize);
+                MemoryStream decompressedStream = null;
 
                 if (compressedLzx)
                 {
                     //thanks to ShinAli (https://bitbucket.org/alisci01/xnbdecompressor)
                     // default window size for XNB encoded files is 64Kb (need 16 bits to represent it)
                     LzxDecoder dec = new LzxDecoder(16);
+                    decompressedStream = new MemoryStream(decompressedSize);
                     int compressedSize = xnbLength - 14;
                     long startPos = stream.Position;
                     long pos = startPos;
@@ -514,23 +515,29 @@ namespace Microsoft.Xna.Framework.Content
                         // read in some unused bytes
                         stream.Seek(pos, SeekOrigin.Begin);
                     }
+
+                    if (decompressedStream.Position != decompressedSize)
+                    {
+                        throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
+                    }
+
+                    decompressedStream.Seek(0, SeekOrigin.Begin);
                 }
                 else if (compressedLz4)
                 {
-                    decompressedStream.SetLength(decompressedSize);
+                    // Decompress to a byte[] because Windows 8 doesn't support MemoryStream.GetBuffer()
+                    var buffer = new byte[decompressedSize];
                     using (var decoderStream = new Lz4DecoderStream(stream))
                     {
-                        decoderStream.Read(decompressedStream.GetBuffer(), 0, decompressedSize);
+                        if (decoderStream.Read(buffer, 0, buffer.Length) != decompressedSize)
+                        {
+                            throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
+                        }
                     }
-                    decompressedStream.Position = decompressedSize;
+                    // Creating the MemoryStream with a byte[] shares the buffer so it doesn't allocate any more memory
+                    decompressedStream = new MemoryStream(buffer);
                 }
 
-                if (decompressedStream.Position != decompressedSize)
-                {
-                    throw new ContentLoadException("Decompression of " + originalAssetName + " failed. ");
-                }
-
-                decompressedStream.Seek(0, SeekOrigin.Begin);
                 reader = new ContentReader(this, decompressedStream, this.graphicsDeviceService.GraphicsDevice,
                                                             originalAssetName, version, recordDisposableObject);
             }

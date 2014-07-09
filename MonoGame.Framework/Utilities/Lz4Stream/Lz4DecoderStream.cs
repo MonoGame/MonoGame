@@ -35,9 +35,10 @@ namespace Lz4
 			inBufEnd = DecBufLen;
 		}
 
-		public override void Close()
+        protected override void Dispose(bool disposing)
 		{
-			this.input = null;
+            this.input = null;
+            base.Dispose(disposing);
 		}
 
 		private long inputLength;
