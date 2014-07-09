@@ -16,7 +16,9 @@
     
     <NoWarn>1591,0436</NoWarn>
 
+    <AssemblyName>MonoGameTests</AssemblyName>
     <RootNamespace>MonoGame.Tests</RootNamespace>
+
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
 
     <CustomDefinitions>
