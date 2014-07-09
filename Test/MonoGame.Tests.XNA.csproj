@@ -132,12 +132,6 @@
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assets\MonoGame.Tests.Assets.csproj">
-      <Project>{F759DE08-E160-4BB4-9A09-404D5694A4EC}</Project>
-      <Name>MonoGame.Tests.Assets</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
