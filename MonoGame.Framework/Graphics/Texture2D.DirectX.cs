@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            for (i = row * rowSize; i < elementCount; i++)
+                            for (i = row * rowSize; i < (row + 1) * rowSize; i++)
                                 data[i] = stream.Read<T>();
 
                             if (i >= elementCount)
