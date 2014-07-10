@@ -25,7 +25,8 @@ namespace Microsoft.Xna.Framework
 		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
+            RequestWindowFeature(WindowFeatures.NoTitle);
+            base.OnCreate(savedInstanceState);
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -36,8 +37,6 @@ namespace Microsoft.Xna.Framework
 		    RegisterReceiver(screenReceiver, filter);
 
             _orientationListener = new OrientationListener(this);
-
-            RequestWindowFeature(WindowFeatures.NoTitle);
 
 			Game.Activity = this;
 		}
