@@ -274,7 +274,7 @@ namespace Microsoft.Xna.Framework
                 audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
             }
 
-            return true;
+            return base.OnKeyDown(keyCode, e);
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
@@ -284,7 +284,7 @@ namespace Microsoft.Xna.Framework
                 return true;
 #endif
             Keyboard.KeyUp(keyCode);
-            return true;
+            return base.OnKeyUp(keyCode, e);
         }
 
 #if OUYA
