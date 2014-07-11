@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -38,6 +39,9 @@ namespace MonoGame.Tools.Pipeline
         public MainView()
         {            
             InitializeComponent();
+
+            // Set the application icon this form.
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
