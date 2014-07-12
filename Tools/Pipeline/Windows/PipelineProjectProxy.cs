@@ -76,6 +76,15 @@ namespace MonoGame.Tools.Pipeline
             set { _project.Config = value; }
         }
 
+        [Category("Settings")]
+        [DisplayName("Compress")]
+        [Description("Content files can be compressed for smaller file sizes.")]
+        public bool Compress
+        {
+            get { return _project.Compress; }
+            set { _project.Compress = value; }
+        }
+
         [Category("Statistics")]
         [DisplayName("Total Items")]
         [Description("The total amount of content items in the project.")]
