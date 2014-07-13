@@ -135,9 +135,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             Debug.Assert(serializer.TargetType == type, "Target type mismatch!");
 
-            // Initialize and cache the serializer.
-            serializer.Initialize(this);
+            // We cache the serializer before we initialize it to 
+            // avoid a stack overflow on recursive types.
             _serializers.Add(type, serializer);
+            serializer.Initialize(this);
 
             return serializer;
         }
