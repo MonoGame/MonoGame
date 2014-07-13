@@ -25,15 +25,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             var result = new List<T>();
 
-            // Create the item serializer attribute.
-            var itemFormat = new ContentSerializerAttribute();
-            itemFormat.ElementName = format.CollectionItemName;
-
-            // Read all the items.
-            while (input.MoveToElement(itemFormat.ElementName))
+            var elementSerializer = _itemSerializer as ElementSerializer<T>;
+            if (elementSerializer != null)
+                elementSerializer.Deserialize(input, result);
+            else
             {
-                var value = input.ReadObject<T>(itemFormat, _itemSerializer);
-                result.Add(value);
+                // Create the item serializer attribute.
+                var itemFormat = new ContentSerializerAttribute();
+                itemFormat.ElementName = format.CollectionItemName;
+
+                // Read all the items.
+                while (input.MoveToElement(itemFormat.ElementName))
+                {
+                    var value = input.ReadObject<T>(itemFormat, _itemSerializer);
+                    result.Add(value);
+                }
             }
 
             return result.ToArray();
