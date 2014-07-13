@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
+    [ContentTypeSerializer]
     class ListSerializer<T> : ContentTypeSerializer<List<T>>
     {
         private ContentTypeSerializer _itemSerializer;

@@ -54,6 +54,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private Dictionary<Type, ContentTypeSerializer> _serializers;
 
+        private Dictionary<Type, Type> _genericSerializerTypes;
+
+
         public static T Deserialize<T>(XmlReader input, string referenceRelocationPath)
         {
             var serializer = new IntermediateSerializer();
@@ -88,11 +91,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_serializers == null)
             {
                 _serializers = new Dictionary<Type, ContentTypeSerializer>();
+                _genericSerializerTypes = new Dictionary<Type, Type>();
 
                 var types = ContentTypeSerializerAttribute.GetTypes();
                 foreach (var t in types)
                 {
-                    if (!t.IsGenericType)
+                    if (t.IsGenericType)
+                    {
+                        var genericType = t.BaseType.GetGenericArguments()[0];
+                        _genericSerializerTypes.Add(genericType.GetGenericTypeDefinition(), t);
+                    }
+                    else
                     {
                         var cts = Activator.CreateInstance(t) as ContentTypeSerializer;
                         cts.Initialize(this);
@@ -106,6 +115,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_serializers.TryGetValue(type, out serializer))
                 return serializer;
 
+            Type serializerType;
+
             if (type.IsArray)
             {
                 if (type.GetArrayRank() != 1)
@@ -114,14 +125,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 var arrayType = typeof(ArraySerializer<>).MakeGenericType(new[] { type.GetElementType() });
                 serializer = (ContentTypeSerializer)Activator.CreateInstance(arrayType);
             }
-            else if (type.IsGenericType && typeof(IList).IsAssignableFrom(type))
+            else if (type.IsGenericType && _genericSerializerTypes.TryGetValue(type.GetGenericTypeDefinition(), out serializerType))
             {
-                var serializerType = typeof(ListSerializer<>).MakeGenericType(type.GetGenericArguments());
-                serializer = (ContentTypeSerializer)Activator.CreateInstance(serializerType);                
-            }
-            else if (type.IsGenericType && typeof(IDictionary).IsAssignableFrom(type))
-            {
-                var serializerType = typeof(DictionarySerializer<,>).MakeGenericType(type.GetGenericArguments());
+                serializerType = serializerType.MakeGenericType(type.GetGenericArguments());
                 serializer = (ContentTypeSerializer)Activator.CreateInstance(serializerType);
             }
             else if (type.IsEnum)
