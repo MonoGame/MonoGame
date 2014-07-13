@@ -332,18 +332,25 @@
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
     <Compile Include="Serialization\Intermediate\ArraySerializer.cs" />
     <Compile Include="Serialization\Intermediate\BoolSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ColorSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
-    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
-    <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />
-    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
     <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\RectangleSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
     <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector2Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector3Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector4Serializer.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline -->
