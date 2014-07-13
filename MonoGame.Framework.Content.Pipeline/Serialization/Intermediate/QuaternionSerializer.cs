@@ -2,35 +2,33 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class QuaternionSerializer : ContentTypeSerializer<Quaternion>
+    class QuaternionSerializer : ElementSerializer<Quaternion>
     {
         public QuaternionSerializer() :
-            base("Quaternion")
+            base("Quaternion", 4)
         {
         }
 
-        protected internal override Quaternion Deserialize(IntermediateReader input, ContentSerializerAttribute format, Quaternion existingInstance)
+        protected internal override Quaternion Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Quaternion(XmlConvert.ToSingle(elems[0]),
-                                  XmlConvert.ToSingle(elems[1]),
-                                  XmlConvert.ToSingle(elems[2]),
-                                  XmlConvert.ToSingle(elems[3]));
+            return new Quaternion(  XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]),
+                                    XmlConvert.ToSingle(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Quaternion value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Quaternion value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y) + " " +
-                      XmlConvert.ToString(value.Z) + " " +
-                      XmlConvert.ToString(value.W);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
+            results.Add(XmlConvert.ToString(value.Z));
+            results.Add(XmlConvert.ToString(value.W));
         }
     }
 }

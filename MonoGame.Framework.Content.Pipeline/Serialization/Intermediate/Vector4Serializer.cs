@@ -2,35 +2,33 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class Vector4Serializer : ContentTypeSerializer<Vector4>
+    class Vector4Serializer : ElementSerializer<Vector4>
     {
         public Vector4Serializer() :
-            base("Vector4")
+            base("Vector4", 4)
         {
         }
 
-        protected internal override Vector4 Deserialize(IntermediateReader input, ContentSerializerAttribute format, Vector4 existingInstance)
+        protected internal override Vector4 Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Vector4( XmlConvert.ToSingle(elems[0]),
-                                XmlConvert.ToSingle(elems[1]),
-                                XmlConvert.ToSingle(elems[2]),
-                                XmlConvert.ToSingle(elems[3]));
+            return new Vector4( XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Vector4 value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Vector4 value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y) + " " +
-                      XmlConvert.ToString(value.Z) + " " +
-                      XmlConvert.ToString(value.W);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
+            results.Add(XmlConvert.ToString(value.Z));
+            results.Add(XmlConvert.ToString(value.W));
         }
     }
 }

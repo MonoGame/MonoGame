@@ -2,28 +2,27 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class BoolSerializer : ContentTypeSerializer<bool>
+    class BoolSerializer : ElementSerializer<bool>
     {
         public BoolSerializer() :
-            base("bool")
+            base("bool", 1)
         {
         }
 
-        protected internal override bool Deserialize(IntermediateReader input, ContentSerializerAttribute format, bool existingInstance)
+        protected internal override bool Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            return XmlConvert.ToBoolean(str);
+            return XmlConvert.ToBoolean(inputs[index++]);
         }
 
-        protected internal override void Serialize(IntermediateWriter output, bool value, ContentSerializerAttribute format)
+        protected internal override void Serialize(bool value, List<string> results)
         {
-            var str = XmlConvert.ToString(value);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value));
         }
     }
 }

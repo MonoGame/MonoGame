@@ -2,31 +2,29 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class Vector2Serializer : ContentTypeSerializer<Vector2>
+    class Vector2Serializer : ElementSerializer<Vector2>
     {
         public Vector2Serializer() :
-            base("Vector2")
+            base("Vector2", 2)
         {
         }
 
-        protected internal override Vector2 Deserialize(IntermediateReader input, ContentSerializerAttribute format, Vector2 existingInstance)
+        protected internal override Vector2 Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Vector2( XmlConvert.ToSingle(elems[0]),
-                                XmlConvert.ToSingle(elems[1]));
+            return new Vector2( XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Vector2 value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Vector2 value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
         }
     }
 }

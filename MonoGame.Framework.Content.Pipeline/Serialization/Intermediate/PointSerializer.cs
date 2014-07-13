@@ -2,31 +2,29 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class PointSerializer : ContentTypeSerializer<Point>
+    class PointSerializer : ElementSerializer<Point>
     {
         public PointSerializer() :
-            base("Point")
+            base("Point", 2)
         {
         }
 
-        protected internal override Point Deserialize(IntermediateReader input, ContentSerializerAttribute format, Point existingInstance)
+        protected internal override Point Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Point(   XmlConvert.ToInt32(elems[0]),
-                                XmlConvert.ToInt32(elems[1]));
+            return new Point(   XmlConvert.ToInt32(inputs[index++]),
+                                XmlConvert.ToInt32(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Point value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Point value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
         }
     }
 }

@@ -2,35 +2,33 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class RectangleSerializer : ContentTypeSerializer<Rectangle>
+    class RectangleSerializer : ElementSerializer<Rectangle>
     {
         public RectangleSerializer() :
-            base("Rectangle")
+            base("Rectangle", 4)
         {
         }
 
-        protected internal override Rectangle Deserialize(IntermediateReader input, ContentSerializerAttribute format, Rectangle existingInstance)
+        protected internal override Rectangle Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Rectangle(   XmlConvert.ToInt32(elems[0]),
-                                    XmlConvert.ToInt32(elems[1]),
-                                    XmlConvert.ToInt32(elems[2]),
-                                    XmlConvert.ToInt32(elems[3]));
+            return new Rectangle(   XmlConvert.ToInt32(inputs[index++]),
+                                    XmlConvert.ToInt32(inputs[index++]),
+                                    XmlConvert.ToInt32(inputs[index++]),
+                                    XmlConvert.ToInt32(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Rectangle value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Rectangle value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y) + " " +
-                      XmlConvert.ToString(value.Width) + " " +
-                      XmlConvert.ToString(value.Height);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
+            results.Add(XmlConvert.ToString(value.Width));
+            results.Add(XmlConvert.ToString(value.Height));
         }
     }
 }

@@ -2,34 +2,38 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class ColorSerializer : ContentTypeSerializer<Color>
+    class ColorSerializer : ElementSerializer<Color>
     {
         public ColorSerializer() :
-            base("Color")
+            base("Color", 1)
         {
         }
 
-        protected internal override Color Deserialize(IntermediateReader input, ContentSerializerAttribute format, Color existingInstance)
+        protected internal override Color Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var packed = uint.Parse(str, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            return new Color(   packed << 0,
-                                packed << 8, 
-                                packed << 16,
-                                packed << 24);
+            // NOTE: The value is serialized in BGRA format.
+            var value = uint.Parse(inputs[index++], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            return new Color(   (int)(value >> 16 & 0xFF),
+                                (int)(value >> 8 & 0xFF),
+                                (int)(value >> 0 & 0xFF),
+                                (int)(value >> 24 & 0xFF));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Color value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Color value, List<string> results)
         {
-            var swizzled = value.PackedValue;
-            var str = XmlConvert.ToString(swizzled);
-            output.Xml.WriteString(str);
+            // NOTE: The value is serialized in BGRA format.
+            var packed = (uint)((value.R << 16) |
+                                (value.G << 8) |
+                                (value.B << 0) |
+                                (value.A << 24));
+            results.Add(XmlConvert.ToString(packed));
         }
     }
 }

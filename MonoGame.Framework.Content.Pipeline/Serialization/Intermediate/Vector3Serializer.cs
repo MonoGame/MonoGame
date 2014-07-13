@@ -2,33 +2,31 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class Vector3Serializer : ContentTypeSerializer<Vector3>
+    class Vector3Serializer : ElementSerializer<Vector3>
     {
         public Vector3Serializer() :
-            base("Vector3")
+            base("Vector3", 3)
         {
         }
 
-        protected internal override Vector3 Deserialize(IntermediateReader input, ContentSerializerAttribute format, Vector3 existingInstance)
+        protected internal override Vector3 Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            var elems = str.Split(' ');
-            return new Vector3( XmlConvert.ToSingle(elems[0]),
-                                XmlConvert.ToSingle(elems[1]),
-                                XmlConvert.ToSingle(elems[2]));
+            return new Vector3( XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]),
+                                XmlConvert.ToSingle(inputs[index++]));
         }
 
-        protected internal override void Serialize(IntermediateWriter output, Vector3 value, ContentSerializerAttribute format)
+        protected internal override void Serialize(Vector3 value, List<string> results)
         {
-            var str = XmlConvert.ToString(value.X) + " " +
-                      XmlConvert.ToString(value.Y) + " " +
-                      XmlConvert.ToString(value.Z);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value.X));
+            results.Add(XmlConvert.ToString(value.Y));
+            results.Add(XmlConvert.ToString(value.Z));
         }
     }
 }
