@@ -9,39 +9,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     class ArraySerializer<T> : ContentTypeSerializer<T[]>
     {
-        private ContentTypeSerializer _itemSerializer;
+        private readonly ListSerializer<T> _listSerializer;
 
         public ArraySerializer() :
             base("array")
         {
+            _listSerializer = new ListSerializer<T>();
         }
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
-            _itemSerializer = serializer.GetTypeSerializer(TargetType.GetElementType());
+            _listSerializer.Initialize(serializer);
         }
 
         protected internal override T[] Deserialize(IntermediateReader input, ContentSerializerAttribute format, T[] existingInstance)
         {
-            var result = new List<T>();
-
-            var elementSerializer = _itemSerializer as ElementSerializer<T>;
-            if (elementSerializer != null)
-                elementSerializer.Deserialize(input, result);
-            else
-            {
-                // Create the item serializer attribute.
-                var itemFormat = new ContentSerializerAttribute();
-                itemFormat.ElementName = format.CollectionItemName;
-
-                // Read all the items.
-                while (input.MoveToElement(itemFormat.ElementName))
-                {
-                    var value = input.ReadObject<T>(itemFormat, _itemSerializer);
-                    result.Add(value);
-                }
-            }
-
+            var result = _listSerializer.Deserialize(input, format, null);
             return result.ToArray();
         }
 
