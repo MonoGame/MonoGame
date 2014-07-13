@@ -16,6 +16,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
         }
 
+        public override bool CanDeserializeIntoExistingObject
+        {
+            get { return true; }
+        }
+
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
             _itemSerializer = serializer.GetTypeSerializer(typeof(T));
@@ -23,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override List<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, List<T> existingInstance)
         {
-            var result = new List<T>();
+            var result = existingInstance ?? new List<T>();
 
             var elementSerializer = _itemSerializer as ElementSerializer<T>;
             if (elementSerializer != null)
