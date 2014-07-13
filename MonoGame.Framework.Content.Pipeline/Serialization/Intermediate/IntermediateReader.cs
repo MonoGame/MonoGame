@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
@@ -10,6 +11,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
     public sealed class IntermediateReader
     {
         private readonly string _filePath;
+
+        private readonly Dictionary<string, Action<object>> _resourceFixups;
 
         public XmlReader Xml { get; private set; }
 
@@ -20,6 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Serializer = serializer;
             Xml = xmlReader;
             _filePath = filePath;
+            _resourceFixups = new Dictionary<string, Action<object>>();
         }
 
         public bool MoveToElement(string elementName)
@@ -29,11 +33,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     Xml.Name == elementName;
         }
  
-        public void ReadExternalReference<T>(ExternalReference<T> existingInstance)
-        {
-            throw new NotImplementedException();
-        }
-            
         public T ReadObject<T>(ContentSerializerAttribute format)
         {
             return ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));
@@ -116,7 +115,66 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public void ReadSharedResource<T>(ContentSerializerAttribute format, Action<T> fixup)
         {
-            throw new NotImplementedException();            
+            string str;
+
+            if (format.FlattenContent)
+                str = Xml.ReadContentAsString();
+            else
+            {
+                if (!MoveToElement(format.ElementName))
+                    throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
+
+                str = Xml.ReadElementContentAsString();
+            }
+            
+            // Do we already have one for this?
+            Action<object> prevFixup;
+            if (!_resourceFixups.TryGetValue(str, out prevFixup))
+                _resourceFixups.Add(str, (o) => fixup((T)o));
+            else
+            {
+                _resourceFixups[str] = (o) =>
+                {
+                    prevFixup(o);
+                    fixup((T)o);
+                };
+            }
+        }
+
+        internal void ReadSharedResources()
+        {
+            if (!MoveToElement("Resources"))
+                return;
+
+            var resources = new Dictionary<string, object>();
+            var resourceFormat = new ContentSerializerAttribute { ElementName = "Resource" };
+
+            // Read all the resources.
+            Xml.ReadStartElement();
+            while (MoveToElement("Resource"))
+            {
+                var id = Xml.GetAttribute("ID");
+                var resource = ReadObject<object>(resourceFormat);
+                resources.Add(id, resource);
+            }
+            Xml.ReadEndElement();
+
+            // Execute the fixups.
+            foreach (var fixup in _resourceFixups)
+            {
+                var resouce = resources[fixup.Key];
+                fixup.Value(resouce);
+            }
+        }
+
+        public void ReadExternalReference<T>(ExternalReference<T> existingInstance)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ReadExternalReferences()
+        {
+            //throw new NotImplementedException();
         }
 
         /// <summary>

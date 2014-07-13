@@ -153,7 +153,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (!_elements.TryGetValue(elementName, out info))
                         throw new InvalidContentException(string.Format("Element `{0}` was not found in type `{1}`.", elementName, TargetType));
 
-                    if (info.Setter == null)
+                    if (info.Attribute.SharedResource)
+                    {
+                        Action<object> fixup = (o) => info.Setter(result, o);
+                        input.ReadSharedResource(info.Attribute, fixup);
+                    }
+                    else if (info.Setter == null)
                     {
                         var value = info.Getter(result);
                         input.ReadObject(info.Attribute, info.Serializer, value);

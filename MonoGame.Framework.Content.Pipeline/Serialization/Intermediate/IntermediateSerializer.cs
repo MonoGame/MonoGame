@@ -72,8 +72,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var format = new ContentSerializerAttribute { ElementName = "Asset" };
             var asset = reader.ReadObject<T>(format);
 
-            // TODO: Read the shared resources and external 
-            // references here!
+            // Process the shared resources and external references.
+            reader.ReadSharedResources();
+            reader.ReadExternalReferences();
 
             // Move past the closing XnaContent element.
             input.ReadEndElement();
