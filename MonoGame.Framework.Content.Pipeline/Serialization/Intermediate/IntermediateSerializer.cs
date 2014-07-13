@@ -116,8 +116,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             }
             else if (type.IsGenericType && typeof(IList).IsAssignableFrom(type))
             {
-                var listSerializerType = typeof(ListSerializer<>).MakeGenericType(type.GetGenericArguments());
-                serializer = (ContentTypeSerializer)Activator.CreateInstance(listSerializerType);                
+                var serializerType = typeof(ListSerializer<>).MakeGenericType(type.GetGenericArguments());
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(serializerType);                
+            }
+            else if (type.IsGenericType && typeof(IDictionary).IsAssignableFrom(type))
+            {
+                var serializerType = typeof(DictionarySerializer<,>).MakeGenericType(type.GetGenericArguments());
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(serializerType);
             }
             else if (type.IsEnum)
             {
