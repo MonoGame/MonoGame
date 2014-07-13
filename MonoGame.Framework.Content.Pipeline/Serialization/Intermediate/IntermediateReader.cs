@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
@@ -13,6 +14,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         private readonly string _filePath;
 
         private readonly Dictionary<string, Action<object>> _resourceFixups;
+
+        private readonly Dictionary<string, Action<Type, string>> _externalReferences;
 
         public XmlReader Xml { get; private set; }
 
@@ -24,6 +27,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Xml = xmlReader;
             _filePath = filePath;
             _resourceFixups = new Dictionary<string, Action<object>>();
+            _externalReferences = new Dictionary<string, Action<Type, string>>();
         }
 
         public bool MoveToElement(string elementName)
@@ -169,12 +173,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         public void ReadExternalReference<T>(ExternalReference<T> existingInstance)
         {
-            throw new NotImplementedException();
+            if (!MoveToElement("Reference"))
+                return;
+
+            var str = Xml.ReadElementContentAsString();
+
+            Action<Type, string> fixup = (type, filename) =>
+            {
+                if (type != typeof(T))
+                    throw new InvalidContentException("Invalid external reference type!");
+
+                existingInstance.Filename = filename;
+            };
+            _externalReferences.Add(str, fixup);
         }
 
         internal void ReadExternalReferences()
         {
-            //throw new NotImplementedException();
+            if (!MoveToElement("ExternalReferences"))
+                return;
+
+            var currentDir = Path.GetDirectoryName(_filePath);
+
+            // Read all the external references.
+            Xml.ReadStartElement();
+            while (MoveToElement("ExternalReference"))
+            {
+                Action<Type, string> fixup;
+                var id = Xml.GetAttribute("ID");
+                if (!_externalReferences.TryGetValue(id, out fixup))
+                    throw new InvalidContentException("Unknown external reference id!");
+
+                Xml.MoveToAttribute("TargetType");
+                var targetType = ReadTypeName();
+
+                Xml.MoveToElement();
+                var filename = Xml.ReadElementString();
+                filename = Path.Combine(currentDir, filename);
+
+                // Apply the fixups.
+                fixup(targetType, filename);
+            }
+            Xml.ReadEndElement();
         }
 
         /// <summary>
