@@ -221,14 +221,16 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.IsAssignableFrom<MathTypes>(result);
             var mathTypes = (MathTypes)result;
 
-            Assert.AreEqual(new Vector3(1, 2, 3), mathTypes.Vector);
+            Assert.AreEqual(new Point(1, 2), mathTypes.Point);
             Assert.AreEqual(new Rectangle(1, 2, 3, 4), mathTypes.Rectangle);
+            Assert.AreEqual(new Vector3(1, 2, 3), mathTypes.Vector3);
+            Assert.AreEqual(new Vector4(1, 2, 3, 4), mathTypes.Vector4);
             Assert.AreEqual(new Quaternion(1, 2, 3, 4), mathTypes.Quaternion);
             Assert.AreEqual(Color.CornflowerBlue, mathTypes.Color);
-            Assert.NotNull(mathTypes.VectorArray);
-            Assert.AreEqual(2, mathTypes.VectorArray.Length);
-            Assert.AreEqual(Vector2.Zero, mathTypes.VectorArray[0]);
-            Assert.AreEqual(Vector2.One, mathTypes.VectorArray[1]);
+            Assert.NotNull(mathTypes.Vector2Array);
+            Assert.AreEqual(2, mathTypes.Vector2Array.Length);
+            Assert.AreEqual(Vector2.Zero, mathTypes.Vector2Array[0]);
+            Assert.AreEqual(Vector2.One, mathTypes.Vector2Array[1]);
         }
 
         [Test]

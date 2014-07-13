@@ -148,11 +148,13 @@ namespace MonoGame.Tests.ContentPipeline
     #region MathTypes
     public class MathTypes
     {
-        public Vector3 Vector;
+        public Point Point;
+        public Vector3 Vector3;
+        public Vector4 Vector4;
         public Rectangle Rectangle;
         public Quaternion Quaternion;
         public Color Color;
-        public Vector2[] VectorArray = new Vector2[0];
+        public Vector2[] Vector2Array = new Vector2[0];
     }
     #endregion
 
