@@ -28,6 +28,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             elementWriter = compiler.GetTypeWriter(underlyingType);
         }
 
+        public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        {
+            return "Microsoft.Xna.Framework.Content.EnumReader`1[[" + GetRuntimeType(targetPlatform) + "]]";
+        }
+
         /// <summary>
         /// Writes the value to the output.
         /// </summary>

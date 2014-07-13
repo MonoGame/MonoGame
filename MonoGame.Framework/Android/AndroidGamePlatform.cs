@@ -132,7 +132,6 @@ namespace Microsoft.Xna.Framework
             {
                 IsActive = true;
 				_gameWindow.GameView.Resume();
-				SoundEffectInstance.SoundPool.AutoResume();
 				if(_MediaPlayer_PrevState == MediaState.Playing && Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Resume();
 				if (!_gameWindow.GameView.IsFocused)
@@ -150,7 +149,6 @@ namespace Microsoft.Xna.Framework
 				_MediaPlayer_PrevState = MediaPlayer.State;
 				_gameWindow.GameView.Pause();
 				_gameWindow.GameView.ClearFocus();
-				SoundEffectInstance.SoundPool.AutoPause();
 				if(Game.Activity.AutoPauseAndResumeMediaPlayer)
                 	MediaPlayer.Pause();
             }

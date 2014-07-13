@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -29,14 +30,18 @@ namespace Microsoft.Xna.Framework.Content
         {
             string path = input.ReadObject<string>();
 
-            path = Path.Combine(input.ContentManager.RootDirectory, path);
-            path = TitleContainer.GetFilename(path);
+            if (!string.IsNullOrEmpty(path))
+            {
+                path = FileHelpers.ResolveRelativePath(input.AssetName, path);
+                path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
+            }
 
             var durationMS = input.ReadObject<int>();
             var width = input.ReadObject<int>();
             var height = input.ReadObject<int>();
-            var framesPerSecond = input.ReadObject<Single>();
-            var soundTrackType = input.ReadObject<int>();   // 0 = Music, 1 = Dialog, 2 = Music and dialog
+            var framesPerSecond = input.ReadObject<float>();
+            var soundTrackType = input.ReadObject<int>();  // 0 = Music, 1 = Dialog, 2 = Music and dialog
+
             return new Video(path, durationMS)
             {
                 Width = width,

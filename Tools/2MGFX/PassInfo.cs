@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
 
 namespace TwoMGFX
 {
@@ -35,8 +36,8 @@ namespace TwoMGFX
                 return;
             }
 
-            major = int.Parse(match.Groups["major"].Value);
-            minor = int.Parse(match.Groups["minor"].Value);
+            major = int.Parse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+            minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
 
         public void ValidateShaderModels(ShaderProfile profile)

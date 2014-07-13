@@ -83,7 +83,7 @@ namespace MonoGame.Tests {
 
 			string xmlResultsPath = Path.Combine (directory, "test_results.xml");
 			string transformedResultsPath = Path.Combine (directory, "test_results.html");
-			string xslTransformPath = Path.Combine ("Resources", "tests.xsl");
+			string xslTransformPath = Path.Combine ("Assets", "tests.xsl");
 			string stdoutPath = Path.Combine (directory, "stdout.txt");
 
 			var filters = new List<ITestFilter>();

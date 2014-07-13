@@ -151,6 +151,7 @@
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
+    <Compile Include="Processors\VideoProcessor.cs" />
 
     <!-- TwoMGFX-->
     <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">	
@@ -325,6 +326,7 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+    <Compile Include="Serialization\Compiler\VideoWriter.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
@@ -360,6 +362,7 @@
     <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
+    <Compile Include="H264Importer.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
@@ -373,14 +376,12 @@
     <Compile Include="ProcessorParameterCollection.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
-    <Compile Include="Vector4TypeConverter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />
     <Compile Include="WmaImporter.cs" />
     <Compile Include="WmvImporter.cs" />
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
-
 
     <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
@@ -398,7 +399,7 @@
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\libmojoshader_64.dll">
+    <None Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
       <Platforms>Windows</Platforms>
       <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -413,7 +414,16 @@
       <Link>FreeImage.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffmpeg.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffprobe.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Linux Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
@@ -451,7 +461,16 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg">
+      <Platforms>Linux</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
+      <Platforms>Linux</Platforms>
+      <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Mac Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
@@ -512,6 +531,16 @@
     <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg">
+      <Platforms>MacOS</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe">
+      <Platforms>MacOS</Platforms>
+      <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 

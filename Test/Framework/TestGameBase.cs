@@ -79,7 +79,7 @@ using Microsoft.Xna.Framework;
 
 using MonoGame.Tests.Components;
 
-#if IPHONE
+#if IOS
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 #endif
@@ -176,14 +176,14 @@ namespace MonoGame.Tests {
 				// WM_QUIT that exists.
 				AbsorbQuitMessage ();
 			}
-#elif IPHONE || ANDROID
+#elif IOS || ANDROID
 			RunOnMainThreadAndWait();
 #else
 			base.Run (GameRunBehavior.Synchronous);
 #endif
 		}
 
-#if IPHONE || ANDROID
+#if IOS || ANDROID
 		private void RunOnMainThreadAndWait()
 		{
 			var exitEvent = new ManualResetEvent(false);
@@ -206,7 +206,7 @@ namespace MonoGame.Tests {
 		}
 #endif
 
-#if IPHONE
+#if IOS
 		private void InvokeRunOnMainThread()
 		{
 			Exception ex = null;
@@ -268,6 +268,24 @@ namespace MonoGame.Tests {
 			SafeRaise (DrawWith);
 		}
 
+        protected void DoExit()
+        {
+#if XNA
+            Exit();
+#else
+            // NOTE: We avoid Game.Exit() here as we marked it
+            // obsolute on platforms that disallow exit in 
+            // shipping games.
+            //
+            // We however need it here to halt the app after we
+            // complete running all the unit tests.  So we do the
+            // next best thing can call the interal platform code
+            // directly which produces the same result.
+            Platform.Exit();
+            SuppressDraw();
+#endif
+        }
+
 		private void EvaluateExitCondition ()
 		{
 			if (_isExiting || ExitCondition == null)
@@ -275,7 +293,7 @@ namespace MonoGame.Tests {
 
 			if (ExitCondition (_frameInfo)) {
 				_isExiting = true;
-				Exit ();
+				DoExit();
 			}
 		}
 

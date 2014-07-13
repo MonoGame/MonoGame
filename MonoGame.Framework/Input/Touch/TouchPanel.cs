@@ -38,21 +38,7 @@
 // */
 #endregion License
 
-#region Using clause
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-
-#if WINRT
-using Windows.Graphics.Display;
-#if !WINDOWS_PHONE
-using Windows.UI.Xaml;
-#endif
-#endif
-
-#endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {

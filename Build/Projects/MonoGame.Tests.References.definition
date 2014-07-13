@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="MonoGame.Tests.References">
+
+  <Platform Type="Windows">
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Binary
+      Name="NDesk.Options"
+      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
+    <Binary
+      Name="nunit.core"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
+    <Binary
+      Name="nunit.core.interfaces"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
+    <Binary
+      Name="nunit.framework"
+      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
+    <Binary
+      Name="nunit.util"
+      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
+  </Platform>
+
+  <Platform Type="WindowsGL">
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Binary
+      Name="NDesk.Options"
+      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
+    <Binary
+      Name="nunit.core"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
+    <Binary
+      Name="nunit.core.interfaces"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
+    <Binary
+      Name="nunit.framework"
+      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
+    <Binary
+      Name="nunit.util"
+      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Binary
+      Name="NDesk.Options"
+      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
+    <Binary
+      Name="nunit.core"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
+    <Binary
+      Name="nunit.core.interfaces"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
+    <Binary
+      Name="nunit.framework"
+      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
+    <Binary
+      Name="nunit.util"
+      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Binary
+      Name="NDesk.Options"
+      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
+    <Binary
+      Name="nunit.core"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
+    <Binary
+      Name="nunit.core.interfaces"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
+    <Binary
+      Name="nunit.framework"
+      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
+    <Binary
+      Name="nunit.util"
+      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
+  </Platform>
+
+  <Platform Type="iOS">
+    <Reference Include="monotouch" />
+    
+    <Binary
+      Name="NDesk.Options"
+      Path="ThirdParty/Dependencies/Tests/NDesk.Options.dll" />
+    <Binary
+      Name="nunit.core"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.dll" />
+    <Binary
+      Name="nunit.core.interfaces"
+      Path="ThirdParty/Dependencies/Tests/nunit.core.interfaces.dll" />
+    <Binary
+      Name="nunit.framework"
+      Path="ThirdParty/Dependencies/Tests/nunit.framework.dll" />
+    <Binary
+      Name="nunit.util"
+      Path="ThirdParty/Dependencies/Tests/nunit.util.dll" />
+  </Platform>
+
+</ExternalProject>

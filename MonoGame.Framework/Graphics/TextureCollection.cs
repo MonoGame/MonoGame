@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#if OPENGL
+﻿#if OPENGL
 #if MONOMAC
 using MonoMac.OpenGL;
 #elif WINDOWS || LINUX

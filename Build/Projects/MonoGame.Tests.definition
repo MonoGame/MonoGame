@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux">
+
+  <References>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Tests.References" />
+  </References>
+
+  <Properties>
+    
+    <NoWarn>1591,0436</NoWarn>
+
+    <AssemblyName>MonoGameTests</AssemblyName>
+    <RootNamespace>MonoGame.Tests</RootNamespace>
+
+    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+
+    <CustomDefinitions>
+      <Platform Name="Linux">TRACE;LINUX</Platform>
+      <Platform Name="MacOS">MONOMAC</Platform>
+      <Platform Name="Windows">TRACE;WINDOWS;DIRECTX</Platform>
+      <Platform Name="WindowsGL">TRACE;WINDOWS</Platform>
+      <Platform Name="iOS">IOS;</Platform>
+    </CustomDefinitions>
+
+  </Properties>
+
+  <Files>
+
+    <None Include="ReadMe.md" />
+
+    <Compile Include="Properties\AssemblyInfo.cs" />
+
+    <Compile Include="Runner\Constants.cs" />
+    <Compile Include="Runner\Extensions.cs" />
+    <Compile Include="Runner\FrameInfo.cs" />
+    <Compile Include="Runner\FramePixelData.cs" />
+    <Compile Include="Runner\Interface\AggregateTestFilter.cs" />
+    <Compile Include="Runner\Interface\CommandLineInterface.cs" />
+    <Compile Include="Runner\Interface\RegexTestFilter.cs" />
+    <Compile Include="Runner\Interface\RunOptions.cs" />
+    <Compile Include="Runner\Interface\TestEventListenerBase.cs" />
+    <Compile Include="Runner\Interface\TestFilterAction.cs" />
+    <Compile Include="Runner\PixelArgb.cs" />
+    <Compile Include="Runner\Utility.cs" />
+
+    <Compile Include="Runner\Linux\Program.cs">
+        <Platforms>Linux</Platforms>
+    </Compile>
+    <Compile Include="Runner\MacOS\Program.cs">
+        <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\Windows\Program.cs">
+        <Platforms>Windows,WindowsGL</Platforms>
+    </Compile>
+
+    <Compile Include="Runner\Desktop\FramePixelData.cs">
+        <Platforms>Windows,WindowsGL,MacOS,Linux</Platforms>
+    </Compile>
+
+    <Compile Include="Runner\iOS\Main.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\iOS\AppDelegate.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\iOS\FramePixelData.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <None Include="Runner\iOS\Info.plist" >
+        <Platforms>iOS</Platforms>
+        <Link>Info.plist</Link>
+    </None>
+
+    <Compile Include="Runner\Interface\MobileInterface.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+    <Compile Include="Runner\Interface\FileServer.cs">
+        <Platforms>iOS</Platforms>
+    </Compile>
+
+    <Compile Include="Framework\ColorTest.cs" />
+    <Compile Include="Framework\GestureRecognizerTest.cs" />
+    <Compile Include="Framework\MockWindow.cs" />
+    <Compile Include="Framework\PackedVectorTest.cs" />
+    <Compile Include="Framework\TouchPanelTest.cs" />
+    <Compile Include="Framework\Bounding.cs" />
+    <Compile Include="Framework\MathHelperTest.cs" />
+    <Compile Include="Framework\RayTest.cs" />
+    <Compile Include="Framework\GameTest+Methods.cs" />
+    <Compile Include="Framework\GameTest+Properties.cs" />
+    <Compile Include="Framework\GameTest.cs" />
+    <Compile Include="Framework\TestGameBase.cs" />
+
+    <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
+    <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
+    <Compile Include="Framework\Components\FrameCompareComponent.cs" />
+    <Compile Include="Framework\Components\ImplicitDrawOrderComponent.cs" />
+    <Compile Include="Framework\Components\PixelDeltaFrameComparer.cs" />
+    <Compile Include="Framework\Components\SpaceshipModelDrawComponent.cs" />
+    <Compile Include="Framework\Components\UpdateGuard.cs" />
+    <Compile Include="Framework\Components\VisualTestDrawableGameComponent.cs" />
+    <Compile Include="Framework\Components\VisualTestGameComponent.cs" />
+    <Compile Include="Framework\Components\Colored3DCubeComponent.cs" />
+    <Compile Include="Framework\Components\TexturedQuadComponent.cs" />
+    
+    <Compile Include="Framework\Visual\ScissorRectangleTest.cs" />
+    <Compile Include="Framework\Visual\Texture2DTest.cs" />
+    <Compile Include="Framework\Visual\Texture3DTest.cs" />
+    <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
+    <Compile Include="Framework\Visual\ShaderTest.cs" />
+    <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
+    <Compile Include="Framework\Visual\SpriteFontTest.cs" />
+    <Compile Include="Framework\Visual\ViewportTest.cs" />
+    <Compile Include="Framework\Visual\VisualTestFixtureBase.cs" />
+    <Compile Include="Framework\Visual\VisualTestGame.cs" />
+
+    <Compile Include="ContentPipeline\AssetTestClasses.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\EffectProcessorTests.cs">
+        <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+
+    <Content Include="Assets\tests.xsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\AlphaTestEffect.fx">
+      <Link>Assets\Effects\Stock\AlphaTestEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\BasicEffect.fx">
+      <Link>Assets\Effects\Stock\BasicEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\DualTextureEffect.fx">
+      <Link>Assets\Effects\Stock\DualTextureEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\EnvironmentMapEffect.fx">
+      <Link>Assets\Effects\Stock\EnvironmentMapEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\SkinnedEffect.fx">
+      <Link>Assets\Effects\Stock\SkinnedEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\SpriteEffect.fx">
+      <Link>Assets\Effects\Stock\SpriteEffect.fx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\Common.fxh">
+      <Link>Assets\Effects\Stock\Common.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\Lighting.fxh">
+      <Link>Assets\Effects\Stock\Lighting.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\Macros.fxh">
+      <Link>Assets\Effects\Stock\Macros.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MonoGame.Framework\Graphics\Effect\Resources\Structures.fxh">
+      <Link>Assets\Effects\Stock\Structures.fxh</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Effects\ParserTest.fx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\Include.fxh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Clear-7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\Colored3DCube.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\DrawOrder_falls_back_to_order_of_addition_to_Game-5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-01.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-03.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-05.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-07.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-09.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-11.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-13.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-15.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-17.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\SpaceshipModel-19.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_True_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Miscellaneous\TexturedQuad_lighting_False_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_without_render_target_change.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\ScissorRectangle\Draw_with_render_target_change.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__Bevels__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__BlackOut__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__ColorFlip__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__Grayscale__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__HighContrast__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__Invert__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__NoEffect__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Shader\Shader__RainbowH__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_rotated_0.38f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_rotated_1.41f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.17f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_rotated_2.81f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.5f_0.5f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_stretched_0.75f_2.0f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.25f_0.8f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_stretched_1.5f_1.5f_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_without_blend.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_additive_blend.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__GreenYellow__200_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__Red__120_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_alpha_blending__White__80_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__GreenYellow__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Red__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_filter_color__Teal__.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_0_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_1_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_2_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_3_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_matrix_4_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_10_10_40_40_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_20_30_80_60_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_source_and_dest_rect_30_30_30_50_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_source_rect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipHorizontally_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteBatch\Draw_with_SpriteEffects_FlipVertically_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_ FlipVertically_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipHorizontally_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Draw_with_SpriteEffects_FlipVertically_.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Font_spacing_is_respected.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Hullabaloo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Hullabaloo2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Multiline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Origins_rotated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Origins_scaled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Plain.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Rotated.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\SpriteFont\Scaled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Viewport\Affects_draw_origin.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Viewport\Clips_SpriteBatch_draws.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\ReferenceImages\Viewport\Does_not_clip_device_clear.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-128.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-32.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-64.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-diag-128.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-diag-32.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\lines-diag-64.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\01_TheBasics.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\02_Inheritance.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\03_IncludingPrivateMembers.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\04_ExcludingPublicMembers.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\05_RenamingXmlElements.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\06_NullReferences.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\07_OptionalElements.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\08_AllowNull.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\09_Collections.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\10_CollectionItemName.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\11_Dictionaries.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\12_MathTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\13_PolymorphicTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\14_Namespaces.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\15_FlattenContent.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\16_SharedResources.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Xml\17_ExternalReferences.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Fonts\Default.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\MonoGameIcon.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\Surge.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\Bevels.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\BlackOut.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\ColorFlip.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\Grayscale.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\HighContrast.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\Invert.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\NoEffect.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Effects\RainbowH.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\GlassPane.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\Spaceship.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Models\enemy_0.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="Assets\Fonts\DataFont.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\white-1.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\white-128.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\white-32.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\white-64.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Textures\fun-background.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+  </Files>
+</Project>

@@ -4,10 +4,6 @@
 
 using System;
 
-#if ANDROID
-using Android.Media;
-#endif
-
 #if MONOMAC
 using MonoMac.OpenAL;
 #elif OPENAL
@@ -16,31 +12,16 @@ using OpenTK.Audio.OpenAL;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance : IDisposable
+    public partial class SoundEffectInstance : IDisposable
     {
 		private SoundState soundState = SoundState.Stopped;
 		private bool _looped = false;
 		int sourceId;
 
-#if OPENAL
-
         private OALSoundBuffer soundBuffer;
         private OpenALSoundController controller;
-
         
         bool hasSourceId = false;
-
-#endif
-
-#if ANDROID
-
-        private const int MAX_SIMULTANEOUS_SOUNDS = 10;
-		private static SoundPool s_soundPool = new SoundPool(MAX_SIMULTANEOUS_SOUNDS, Android.Media.Stream.Music, 0);
-        internal static SoundPool SoundPool { get { return s_soundPool; } }
-
-		internal int _soundId = -1;
-
-#endif
 
         #region Initialization
 
@@ -49,21 +30,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
-#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
             InitializeSound();
             BindDataBuffer(
                 buffer,
                 (channels == 2) ? ALFormat.Stereo16 : ALFormat.Mono16,
                 buffer.Length,
                 sampleRate
-            );
-
-#endif
-
-            // No-op on Android
+			    );
         }
-
-#if WINDOWS || LINUX || MONOMAC || IOS || ANGLE
 
         /// <summary>
         /// Preserves the given data buffer by reference and binds its contents to the OALSoundBuffer
@@ -116,26 +90,7 @@ namespace Microsoft.Xna.Framework.Audio
             hasSourceId = true;
         }
 
-#endif // WINDOWS || LINUX || MONOMAC || IOS
-
-#if ANDROID
-
-        /// <summary>
-        /// Converts the XNA volume [0, 1] and pan [-1, 1] to Android SoundPool left and right volume [0, 1].
-        /// <param name="xnaVolume">The volume of the sound in the Microsoft XNA range.</param>
-        /// <param name="xnaPan">The pan of the sound in the Microsoft XNA range.</param>
-        /// <param name="leftVolume">Android SoundPool left volume.</param>
-        /// <param name="rightVolume">Android SoundPool right volume.</param>
-        /// </summary>
-        private static void XnaVolumeAndPanToAndroidVolume(float xnaVolume, float xnaPan, out float leftVolume, out float rightVolume)
-        {
-            float panRatio = (xnaPan + 1.0f) / 2.0f;
-            float volumeTotal = SoundEffect.MasterVolume * xnaVolume;
-            leftVolume = volumeTotal * (1.0f - panRatio);
-            rightVolume = volumeTotal * panRatio;
-        }
-
-#endif // ANDROID
+        #endregion // Initialization
 
         /// <summary>
         /// Converts the XNA [-1, 1] pitch range to OpenAL pitch (0, INF) or Android SoundPool playback rate [0.5, 2].
@@ -159,17 +114,8 @@ namespace Microsoft.Xna.Framework.Audio
             return (float)Math.Pow(2, xnaPitch);
         }
 
-        #endregion // Initialization
-
         private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
         {
-#if ANDROID
-
-			// Appears to be a no-op on Android?
-#endif
-
-#if OPENAL
-
             // get AL's listener position
             float x, y, z;
             AL.GetListener(ALListener3f.Position, out x, out y, out z);
@@ -187,34 +133,19 @@ namespace Microsoft.Xna.Framework.Audio
             // set the position based on relative positon
             AL.Source(sourceId, ALSource3f.Position, finalPos.X, finalPos.Y, finalPos.Z);
             AL.Source(sourceId, ALSource3f.Velocity, finalVel.X, finalVel.Y, finalVel.Z);
-#endif
         }
 
         private void PlatformPause()
         {
-
-#if OPENAL
-
             if (!hasSourceId || soundState != SoundState.Playing)
                 return;
 
             controller.PauseSound(soundBuffer);
-#endif
-
-#if ANDROID
-			if (sourceId == 0)
-				return;
-
-			s_soundPool.Pause(sourceId);
-#endif
             soundState = SoundState.Paused;
-            
         }
 
         private void PlatformPlay()
         {
-#if OPENAL
-
             if (hasSourceId)
                 return;
             
@@ -242,37 +173,11 @@ namespace Microsoft.Xna.Framework.Audio
 
             controller.PlaySound (soundBuffer);
             //Console.WriteLine ("playing: " + sourceId + " : " + soundEffect.Name);
-
-#endif
-
-#if ANDROID
-
-			if (soundState == SoundState.Paused)
-				s_soundPool.Resume(sourceId);
-			else
-			{
-				if (sourceId != 0)
-				{
-					s_soundPool.Stop(sourceId);
-					sourceId = 0;
-				}
-
-                float volumeLeft, volumeRight;
-                XnaVolumeAndPanToAndroidVolume(_volume, _pan, out volumeLeft, out volumeRight);
-
-                float playbackRate = XnaPitchToAlPitch(_pitch);
-
-                sourceId = s_soundPool.Play(_soundId, volumeLeft, volumeRight, 1, _looped ? -1 : 0, playbackRate);
-			}
-#endif
             soundState = SoundState.Playing;
         }
 
         private void PlatformResume()
         {
-
-#if OPENAL
-
             if (!hasSourceId)
             {
                 Play();
@@ -281,63 +186,25 @@ namespace Microsoft.Xna.Framework.Audio
             
             if (soundState == SoundState.Paused)
                 controller.ResumeSound(soundBuffer);
-       
-#endif 
-
-#if ANDROID
-            if (soundState == SoundState.Paused)
-            {
-				if (sourceId == 0)
-					return;
-
-				s_soundPool.Resume(sourceId);
-            }
-#endif
             soundState = SoundState.Playing;
         }
 
         private void PlatformStop(bool immediate)
         {
-
-#if OPENAL
-
             if (hasSourceId)
             {
                 //Console.WriteLine ("stop " + sourceId + " : " + soundEffect.Name);
                 controller.StopSound(soundBuffer);
             }
-
-#endif
-           
-#if ANDROID
-
-            if (sourceId == 0)
-                return;
-
-			s_soundPool.Stop(sourceId);
-			sourceId = 0;
-#endif
             soundState = SoundState.Stopped;
         }
 
         private void PlatformSetIsLooped(bool value)
         {
-
-#if OPENAL
-            
             _looped = value;
             
             if (hasSourceId)
                 AL.Source(sourceId, ALSourceb.Looping, _looped);
-
-            return;
-#endif
-
-#if ANDROID
-            if (sourceId != 0)
-                s_soundPool.SetLoop(sourceId, value ? -1 : 0);
-            _looped = value;
-#endif
         }
 
         private bool PlatformGetIsLooped()
@@ -347,42 +214,18 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
-
-#if OPENAL
             if (hasSourceId)
                 AL.Source(sourceId, ALSource3f.Position, value, 0.0f, 0.1f);
-            return;
-#endif
-
-#if ANDROID
-            if (sourceId != 0)
-            {
-                float leftVolume, rightVolume;
-                XnaVolumeAndPanToAndroidVolume(_volume, value, out leftVolume, out rightVolume);
-                s_soundPool.SetVolume(sourceId, leftVolume, rightVolume);
-            }
-#endif
         }
 
         private void PlatformSetPitch(float value)
         {
-#if OPENAL
             if (hasSourceId)
                 AL.Source (sourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
-            return;
-#endif
-
-#if ANDROID
-            if (sourceId != 0)
-                s_soundPool.SetRate(sourceId, XnaPitchToAlPitch(value));
-#endif
         }
 
         private SoundState PlatformGetState()
         {
-
-#if OPENAL
-
             if (!hasSourceId)
                 return SoundState.Stopped;
             
@@ -405,61 +248,27 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             return soundState;
-#endif
-
-#if ANDROID
-            // Android SoundPool can't tell us when a sound is finished playing.
-            // TODO: Remove this code when OpenAL for Android is implemented
-			if (sourceId != 0 && IsLooped)
-            {
-                // Looping sounds use our stored state
-                return soundState;
-            }
-            else
-            {
-                // Non looping sounds always return Stopped
-                return SoundState.Stopped;
-            }
-#endif
         }
 
         private void PlatformSetVolume(float value)
         {
-#if OPENAL
             if (hasSourceId)
                 AL.Source(sourceId, ALSourcef.Gain, value * SoundEffect.MasterVolume);
-            return;
-#endif
-
-#if ANDROID
-            if (sourceId != 0)
-            {
-                float leftVolume, rightVolume;
-                XnaVolumeAndPanToAndroidVolume(value, _pan, out leftVolume, out rightVolume);
-                s_soundPool.SetVolume(sourceId, leftVolume, rightVolume);
-            }
-#endif
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-#if OPENAL
-
-            this.Stop(true);
-            soundBuffer.Reserved -= HandleSoundBufferReserved;
-            soundBuffer.Recycled -= HandleSoundBufferRecycled;
-            soundBuffer.Dispose();
-            soundBuffer = null;
-
-            return;
-
-#endif
-
-#if ANDROID
-            // When disposing a SoundEffectInstance, the Sound should
-            // just be stopped as it will likely be reused later
-			PlatformStop(true);
-#endif
+            if (disposing)
+            {
+                if (soundBuffer != null)
+                {
+                    this.Stop(true);
+                    soundBuffer.Reserved -= HandleSoundBufferReserved;
+                    soundBuffer.Recycled -= HandleSoundBufferRecycled;
+                    soundBuffer.Dispose();
+                    soundBuffer = null;
+                }
+            }
         }
     }
 }

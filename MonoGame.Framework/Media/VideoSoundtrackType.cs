@@ -10,13 +10,15 @@ namespace Microsoft.Xna.Framework.Media
     public enum VideoSoundtrackType
     {
         /// <summary>
-        /// This video contains only dialog.
-        /// </summary>
-        Dialog,
-        /// <summary>
         /// This video contains only music.
         /// </summary>
         Music,
+
+        /// <summary>
+        /// This video contains only dialog.
+        /// </summary>
+        Dialog,
+
         /// <summary>
         /// This video contains music and dialog.
         /// </summary>

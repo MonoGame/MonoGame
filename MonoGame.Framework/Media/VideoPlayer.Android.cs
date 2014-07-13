@@ -48,6 +48,16 @@ namespace Microsoft.Xna.Framework.Media
             _currentVideo.Player.SetDisplay(null);
         }
 
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            throw new NotImplementedException();
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             throw new NotImplementedException();
@@ -56,6 +66,10 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan PlatformSetVolume()
         {
             throw new NotImplementedException();
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

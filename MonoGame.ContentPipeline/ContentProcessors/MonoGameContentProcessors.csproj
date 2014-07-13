@@ -176,7 +176,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ThirdParty\Dependencies\libmojoshader_32.dll">
+    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll">
       <Link>libmojoshader_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

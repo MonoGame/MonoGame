@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Globalization;
 
 namespace TwoMGFX
 {
 	public static class ParseTreeTools
 	{
         public static float ParseFloat(string value)
-	    {
+        {
             // Remove all whitespace and trailing F or f.
-	        value = value.Replace("f", "");
-            value = value.Replace("F", "");
-	        value = value.Replace(" ", "");
-            return float.Parse(value);
-	    }
+            value = value.Replace(" ", "");
+            value = value.TrimEnd('f', 'F');
+            return float.Parse(value, NumberStyles.Float, CultureInfo.InvariantCulture);
+        }
 
         public static int ParseInt(string value)
         {
+            // We read it as a float and cast it down to
+            // an integer to match Microsoft FX behavior.
             return (int)Math.Floor(ParseFloat(value));
         }
        

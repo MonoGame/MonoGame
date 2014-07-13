@@ -10,12 +10,11 @@ namespace Microsoft.Xna.Framework.Audio
     /// <remarks>
     /// <para>SoundEffectInstances are created through SoundEffect.CreateInstance() and used internally by SoundEffect.Play()</para>
     /// </remarks>
-    public sealed partial class SoundEffectInstance : IDisposable
+    public partial class SoundEffectInstance : IDisposable
     {
-        private bool isDisposed = false;
-
-        internal bool _IsPooled = true;
-
+        private bool _isDisposed = false;
+        internal bool _isPooled = true;
+        internal SoundEffect _effect;
         private float _pan;
         private float _volume;
         private float _pitch;
@@ -80,7 +79,7 @@ namespace Microsoft.Xna.Framework.Audio
         public SoundState State { get { return PlatformGetState(); } }
 
         /// <summary>Indicates whether the object is disposed.</summary>
-        public bool IsDisposed { get { return isDisposed; } }
+        public bool IsDisposed { get { return _isDisposed; } }
 
         internal SoundEffectInstance()
         {
@@ -88,12 +87,20 @@ namespace Microsoft.Xna.Framework.Audio
             _volume = 1.0f;
             _pitch = 0.0f;            
         }
-        
 
         internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
-            : base()
+            : this()
         {
             PlatformInitialize(buffer, sampleRate, channels);
+        }
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/> is reclaimed by garbage collection.
+        /// </summary>
+        ~SoundEffectInstance()
+        {
+            Dispose(false);
         }
 
         /// <summary>Applies 3D positioning to the SoundEffectInstance using a single listener.</summary>
@@ -158,29 +165,32 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>Stopping a sound with the immediate argument set to false will allow it to play any release phases, such as fade, before coming to a stop.</remarks>
         public void Stop(bool immediate)
         {
-            
             PlatformStop(immediate);
-
-            // instances typically call Stop
-            // as they dispose. Prevent this
-            // from being added to the SFXInstancePool
-            if (isDisposed)
-                return;
-
-            // Return this SFXInstance back
-            // to the pool to be used later.
-            SoundEffectInstancePool.Add(this);
         }
 
-        /// <summary>Releases unmanaged resources held by this SoundEffectInstance.</summary>
+        /// <summary>Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/>.</summary>
         public void Dispose()
         {
-            if (isDisposed)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            isDisposed = true;
-
-            PlatformDispose();
+        /// <summary>
+        /// Releases the resources held by this <see cref="Microsoft.Xna.Framework.Audio.SoundEffectInstance"/>.
+        /// </summary>
+        /// <param name="disposing">If set to <c>true</c>, Dispose was called explicitly.</param>
+        /// <remarks>If the disposing parameter is true, the Dispose method was called explicitly. This
+        /// means that managed objects referenced by this instance should be disposed or released as
+        /// required.  If the disposing parameter is false, Dispose was called by the finalizer and
+        /// no managed objects should be touched because we do not know if they are still valid or
+        /// not at that time.  Unmanaged resources should always be released.</remarks>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                PlatformDispose(disposing);
+                _isDisposed = true;
+            }
         }
     }
 }

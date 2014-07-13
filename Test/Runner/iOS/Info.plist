@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>MonoGame.Tests.iOS</string>
+	<string>MonoGameTests</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>

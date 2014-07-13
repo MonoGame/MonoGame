@@ -5,11 +5,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.IO;
 using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tools.Pipeline.Common;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -90,6 +88,12 @@ namespace MonoGame.Tools.Pipeline
         }
 
         #region IPipelineItem
+
+        [Browsable(false)]
+        public string OriginalPath
+        {
+            get { return _project.OriginalPath; }
+        }
 
         [Category("Common")]
         [Description("The name of this project.")]
