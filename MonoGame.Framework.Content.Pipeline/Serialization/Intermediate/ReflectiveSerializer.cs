@@ -4,16 +4,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Xml;
 using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     internal class ReflectiveSerializer : ContentTypeSerializer
     {
+        const BindingFlags _bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
         private struct ElementInfo
         {
             public ContentSerializerAttribute Attribute;
@@ -23,6 +22,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         };
 
         private readonly List<ElementInfo> _elements = new List<ElementInfo>();
+
+        private ContentTypeSerializer _baseSerializer;
 
         private bool GetElementInfo(IntermediateSerializer serializer, MemberInfo member, out ElementInfo info)
         {
@@ -97,7 +98,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
-            var properties = TargetType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            // If we have a base type then we need to deserialize it first.
+            if (TargetType.BaseType != null)
+                _baseSerializer = serializer.GetTypeSerializer(TargetType.BaseType);
+
+            // Cache all our serializable properties.
+            var properties = TargetType.GetProperties(_bindingFlags);
             foreach (var prop in properties)
             {
                 ElementInfo info;
@@ -105,7 +111,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     _elements.Add(info);
             }
 
-            var fields = TargetType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            // Cache all our serializable fields.
+            var fields = TargetType.GetFields(_bindingFlags);
             foreach (var field in fields)
             {
                 ElementInfo info;
@@ -129,6 +136,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 }                
             }
 
+            // First deserialize the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.Deserialize(input, format, result);
+
+            // Now deserialize our own elements.
             foreach (var info in _elements)
             {
                 if (!info.Attribute.FlattenContent)
