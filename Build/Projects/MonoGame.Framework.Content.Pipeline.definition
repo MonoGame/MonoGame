@@ -332,11 +332,14 @@
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
     <Compile Include="Serialization\Intermediate\ArraySerializer.cs" />
     <Compile Include="Serialization\Intermediate\BoolSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\CharSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ColorSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
     <Compile Include="Serialization\Intermediate\DictionarySerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\DoubleSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ElementSerializerT.cs" />    
     <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
     <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
@@ -346,13 +349,19 @@
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
     <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
     <Compile Include="Serialization\Intermediate\RectangleSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\SByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ShortSerializer.cs" />
     <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UIntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ULongSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UShortSerializer.cs" />
     <Compile Include="Serialization\Intermediate\Vector2Serializer.cs" />
     <Compile Include="Serialization\Intermediate\Vector3Serializer.cs" />
     <Compile Include="Serialization\Intermediate\Vector4Serializer.cs" />

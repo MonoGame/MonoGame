@@ -145,6 +145,23 @@ namespace MonoGame.Tests.ContentPipeline
     }
     #endregion
 
+    #region Primitive Types
+    public class PrimitiveTypes
+    {
+        public char Char;
+        public byte Byte;
+        public sbyte SByte;
+        public short Short;
+        public ushort UShort;
+        public int Int;
+        public uint UInt;
+        public long Long;
+        public ulong ULong;
+        public float Float;
+        public double Double;
+    }
+    #endregion
+
     #region MathTypes
     public class MathTypes
     {
