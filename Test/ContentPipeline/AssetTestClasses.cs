@@ -153,6 +153,8 @@ namespace MonoGame.Tests.ContentPipeline
         public Vector3 Vector3;
         public Vector4 Vector4;
         public Quaternion Quaternion;
+        public Plane Plane;
+        public Matrix Matrix;
         public Color Color;
         public Vector2[] Vector2Array = new Vector2[0];
     }

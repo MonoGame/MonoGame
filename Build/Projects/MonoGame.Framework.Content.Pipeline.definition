@@ -346,6 +346,8 @@
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
     <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
     <Compile Include="Serialization\Intermediate\RectangleSerializer.cs" />
