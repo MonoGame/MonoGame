@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
   <Asset Type="MonoGame.Tests.ContentPipeline.MathTypes">
-    <Vector>1 2 3</Vector>
+    <Point>1 2</Point>
     <Rectangle>1 2 3 4</Rectangle>
+    <Vector3>1.0 2.0 3.0</Vector3>
+    <Vector4>1 2 3 4</Vector4>
     <Quaternion>1 2 3 4</Quaternion>
     <Color>FF6495ED</Color>
-    <VectorArray>0 0 1 1</VectorArray>
+    <Vector2Array>0 0 1 1</Vector2Array>
   </Asset>
 </XnaContent>
