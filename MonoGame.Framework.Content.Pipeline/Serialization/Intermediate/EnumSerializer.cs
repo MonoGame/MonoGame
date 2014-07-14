@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             }
             catch (Exception ex)
             {
-                throw new InvalidContentException(string.Format("Invalid enum value `{0}` for type `{1}`", str, TargetType.Name), ex);
+                throw input.NewInvalidContentException(ex, "Invalid enum value '{0}' for type '{1}'", str, TargetType.Name);
             }
         }
 

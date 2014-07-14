@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             var serializer = new IntermediateSerializer();
             var reader = new IntermediateReader(serializer, input, referenceRelocationPath);
-            T asset;
+            var asset = default(T);
 
             try
             {
@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             }
             catch (XmlException xmlException)
             {
-                throw new InvalidContentException("An error occured parsing Xml.", xmlException);
+                throw reader.NewInvalidContentException(xmlException, "An error occured parsing.");
             }
 
             return asset;
