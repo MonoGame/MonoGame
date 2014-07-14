@@ -52,14 +52,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!format.FlattenContent)
             {
                 if (!MoveToElement(format.ElementName))
-                    throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
+                    throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
 
                 // Is the object null?
                 var isNull = Xml.GetAttribute("Null");
                 if (isNull != null && XmlConvert.ToBoolean(isNull))
                 {
                     if (!format.AllowNull)
-                        throw new InvalidContentException(string.Format("Element `{0}` cannot be null.", format.ElementName));
+                        throw NewInvalidContentException(null, "Element '{0}' cannot be null.", format.ElementName);
 
                     Xml.Skip();
                     return default(T);
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             }
 
             if (!MoveToElement(format.ElementName))
-                throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
+                throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
 
             var isEmpty = Xml.IsEmptyElement;
             if (!isEmpty)
@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             else
             {
                 if (!MoveToElement(format.ElementName))
-                    throw new InvalidContentException(string.Format("Element `{0}` was not found in `{1}`.", format.ElementName, _filePath));
+                    throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
 
                 str = Xml.ReadElementContentAsString();
             }
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Action<Type, string> fixup = (type, filename) =>
             {
                 if (type != typeof(T))
-                    throw new InvalidContentException("Invalid external reference type!");
+                    throw NewInvalidContentException(null, "Invalid external reference type");
 
                 existingInstance.Filename = filename;
             };
@@ -205,7 +205,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 Action<Type, string> fixup;
                 var id = Xml.GetAttribute("ID");
                 if (!_externalReferences.TryGetValue(id, out fixup))
-                    throw new InvalidContentException("Unknown external reference id!");
+                    throw NewInvalidContentException(null, "Unknown external reference id '{0}'!", id);
 
                 Xml.MoveToAttribute("TargetType");
                 var targetType = ReadTypeName();
@@ -218,6 +218,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 fixup(targetType, filename);
             }
             Xml.ReadEndElement();
+        }
+
+        internal InvalidContentException NewInvalidContentException(Exception innerException, string message, params object[] args)
+        {
+            var xmlInfo = (IXmlLineInfo)Xml;
+            var lineAndColumn = string.Format("{0},{1}", xmlInfo.LineNumber, xmlInfo.LinePosition);
+            var identity = new ContentIdentity(_filePath, string.Empty, lineAndColumn);
+            return new InvalidContentException(string.Format(message, args), identity, innerException);
         }
 
         /// <summary>
