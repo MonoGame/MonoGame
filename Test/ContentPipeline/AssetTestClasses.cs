@@ -149,9 +149,9 @@ namespace MonoGame.Tests.ContentPipeline
     public class MathTypes
     {
         public Point Point;
+        public Rectangle Rectangle;
         public Vector3 Vector3;
         public Vector4 Vector4;
-        public Rectangle Rectangle;
         public Quaternion Quaternion;
         public Color Color;
         public Vector2[] Vector2Array = new Vector2[0];
