@@ -184,6 +184,12 @@ namespace Microsoft.Xna.Framework
 
                     if (_graphicsDeviceManager != null)
                     {
+                        Effect.FlushCache();
+                        BlendState.ResetStates();
+                        DepthStencilState.ResetStates();
+                        RasterizerState.ResetStates();
+                        SamplerState.ResetStates();
+
                         (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
                         _graphicsDeviceManager = null;
                     }
@@ -200,15 +206,9 @@ namespace Microsoft.Xna.Framework
                         Platform = null;
                     }
 
-                    Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     SoundEffect.PlatformShutdown();
-
-                    BlendState.ResetStates();
-                    DepthStencilState.ResetStates();
-                    RasterizerState.ResetStates();
-                    SamplerState.ResetStates();
                 }
 #if ANDROID
                 Activity = null;
