@@ -226,11 +226,38 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(new Vector3(1, 2, 3), mathTypes.Vector3);
             Assert.AreEqual(new Vector4(1, 2, 3, 4), mathTypes.Vector4);
             Assert.AreEqual(new Quaternion(1, 2, 3, 4), mathTypes.Quaternion);
+            Assert.AreEqual(new Plane(1, 2, 3, 4), mathTypes.Plane);
+            Assert.AreEqual(new Matrix(1, 2, 3, 4, 5 , 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), mathTypes.Matrix);
             Assert.AreEqual(Color.CornflowerBlue, mathTypes.Color);
             Assert.NotNull(mathTypes.Vector2Array);
             Assert.AreEqual(2, mathTypes.Vector2Array.Length);
             Assert.AreEqual(Vector2.Zero, mathTypes.Vector2Array[0]);
             Assert.AreEqual(Vector2.One, mathTypes.Vector2Array[1]);
+        }
+
+        [Test]
+        public void PrimitiveTypes()
+        {
+            object result;
+            var filePath = Paths.Xml("18_PrimitiveTypes.xml");
+            using (var reader = XmlReader.Create(filePath))
+                result = IntermediateSerializer.Deserialize<object>(reader, filePath);
+
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<PrimitiveTypes>(result);
+            var primitiveTypes = (PrimitiveTypes)result;
+
+            Assert.AreEqual('A', primitiveTypes.Char);
+            Assert.AreEqual(127, primitiveTypes.Byte);
+            Assert.AreEqual(-127, primitiveTypes.SByte);
+            Assert.AreEqual(-1000, primitiveTypes.Short);
+            Assert.AreEqual(1000, primitiveTypes.UShort);
+            Assert.AreEqual(-100000, primitiveTypes.Int);
+            Assert.AreEqual(100000, primitiveTypes.UInt);
+            Assert.AreEqual(-10000000, primitiveTypes.Long);
+            Assert.AreEqual(10000000, primitiveTypes.ULong);
+            Assert.AreEqual(1234567.0f, primitiveTypes.Float);
+            Assert.AreEqual(1234567890.0, primitiveTypes.Double);
         }
 
         [Test]

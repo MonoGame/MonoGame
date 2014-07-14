@@ -486,6 +486,9 @@
     <Content Include="Assets\Xml\17_ExternalReferences.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Xml\18_PrimitiveTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
