@@ -61,26 +61,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             var serializer = new IntermediateSerializer();
             var reader = new IntermediateReader(serializer, input, referenceRelocationPath);
-            if (!reader.MoveToElement("XnaContent"))
-                throw new InvalidContentException(string.Format("Could not find XnaContent element in '{0}'.", referenceRelocationPath));
+            T asset;
 
-            // Initialize the namespace lookups from
-            // the attributes on the XnaContent element.
-            serializer.CreateNamespaceLookup(input);
+            try
+            {
+                if (!reader.MoveToElement("XnaContent"))
+                    throw new InvalidContentException(string.Format("Could not find XnaContent element in '{0}'.",
+                                                                    referenceRelocationPath));
 
-            // Move past the XnaContent.
-            input.ReadStartElement();
+                // Initialize the namespace lookups from
+                // the attributes on the XnaContent element.
+                serializer.CreateNamespaceLookup(input);
 
-            // Read the asset.
-            var format = new ContentSerializerAttribute { ElementName = "Asset" };
-            var asset = reader.ReadObject<T>(format);
+                // Move past the XnaContent.
+                input.ReadStartElement();
 
-            // Process the shared resources and external references.
-            reader.ReadSharedResources();
-            reader.ReadExternalReferences();
+                // Read the asset.
+                var format = new ContentSerializerAttribute {ElementName = "Asset"};
+                asset = reader.ReadObject<T>(format);
 
-            // Move past the closing XnaContent element.
-            input.ReadEndElement();
+                // Process the shared resources and external references.
+                reader.ReadSharedResources();
+                reader.ReadExternalReferences();
+
+                // Move past the closing XnaContent element.
+                input.ReadEndElement();
+            }
+            catch (XmlException xmlException)
+            {
+                throw new InvalidContentException("An error occured parsing Xml.", xmlException);
+            }
 
             return asset;
         }
