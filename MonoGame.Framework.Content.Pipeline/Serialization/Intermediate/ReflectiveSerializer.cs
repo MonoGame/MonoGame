@@ -146,7 +146,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (!info.Attribute.FlattenContent)
                 {
                     if (!input.MoveToElement(info.Attribute.ElementName))
-                        continue;
+                    {
+                        // If the the element was optional then we can
+                        // safely skip it and continue.
+                        if (info.Attribute.Optional)
+                            continue;
+                        
+                        // We failed to find a required element.
+                        throw new InvalidContentException(string.Format("The Xml element `{0}` is required!", info.Attribute.ElementName));
+                    }
                 }
 
                 if (info.Attribute.SharedResource)
