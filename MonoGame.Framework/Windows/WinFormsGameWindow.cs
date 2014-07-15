@@ -277,6 +277,12 @@ namespace MonoGame.Framework
             if (KeyState == null)
                 return;
 
+            if ((int)args.Key == 0xff)
+            {
+                // dead key, e.g. a "shift" automatically happens when using Up/Down/Left/Right
+                return;
+            }
+
             XnaKey xnaKey;
 
             switch (args.MakeCode)
