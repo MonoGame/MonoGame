@@ -117,6 +117,9 @@
     <Compile Include="..\..\Tools\2MGFX\SamplerStateInfo.cs">
       <Link>Processors\Effect\SamplerStateInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\Tools\2MGFX\ShaderCompilerException.cs">
+      <Link>Processors\Effect\ShaderCompilerException.cs</Link>
+    </Compile>
     <Compile Include="..\..\Tools\2MGFX\ShaderData.cs">
       <Link>Processors\Effect\ShaderData.cs</Link>
     </Compile>
