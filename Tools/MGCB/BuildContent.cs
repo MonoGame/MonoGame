@@ -268,6 +268,11 @@ namespace MGCB
 
                     ++successCount;
                 }
+                catch (InvalidContentException ex)
+                {
+                    Console.Error.WriteLine("{0}({1}): {2}", ex.ContentIdentity.SourceFilename, ex.ContentIdentity.FragmentIdentifier, ex.Message);
+                    ++errorCount;
+                }
                 catch (PipelineException ex)
                 {
                     Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
