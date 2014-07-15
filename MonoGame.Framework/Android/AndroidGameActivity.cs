@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using Android.App;
 using Android.Content;
@@ -7,7 +11,11 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
+#if OUYA
+    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
+#else
     public class AndroidGameActivity : Activity
+#endif
     {
         internal Game Game { private get; set; }
 
