@@ -4,6 +4,9 @@
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
   <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
+  
+  <!-- Temporary work around so that we don't need to change the targets on the build server -->
+  <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
 
   <target name="checkos" description="check the operating system">
     <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
