@@ -62,6 +62,8 @@ namespace MonoGame.Framework
     {
         internal WinFormsGameForm _form;
 
+        static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
+
         private readonly WinFormsGamePlatform _platform;
 
         private bool _isResizable;
@@ -191,6 +193,8 @@ namespace MonoGame.Framework
             _form.ClientSizeChanged += OnClientSizeChanged;
 
             _form.KeyPress += OnKeyPress;
+
+            _allWindows.Add(this);
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -359,7 +363,10 @@ namespace MonoGame.Framework
             NativeMessage msg;
             while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
             {
-                UpdateMouseState();
+                // Update the mouse state for each window.
+                foreach (var window in _allWindows)
+                    window.UpdateMouseState();
+
                 Game.Tick();
             }
         }
