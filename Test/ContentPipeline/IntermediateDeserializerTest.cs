@@ -274,14 +274,24 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.AreEqual("World", polymorphicTypes.Hello);
             Assert.AreEqual(23, polymorphicTypes.Elf);
-            Assert.NotNull(polymorphicTypes.PolymorphicArray);
-            Assert.AreEqual(3, polymorphicTypes.PolymorphicArray.Length);
-            Assert.IsAssignableFrom<PolymorphicA>(polymorphicTypes.PolymorphicArray[0]);
-            Assert.AreEqual(true, polymorphicTypes.PolymorphicArray[0].Value);
-            Assert.IsAssignableFrom<PolymorphicB>(polymorphicTypes.PolymorphicArray[1]);
-            Assert.AreEqual(true, polymorphicTypes.PolymorphicArray[1].Value);
-            Assert.IsAssignableFrom<PolymorphicC>(polymorphicTypes.PolymorphicArray[2]);
-            Assert.AreEqual(true, polymorphicTypes.PolymorphicArray[2].Value);
+
+            Assert.NotNull(polymorphicTypes.TypedArray);
+            Assert.AreEqual(3, polymorphicTypes.TypedArray.Length);
+            Assert.IsAssignableFrom<PolymorphicA>(polymorphicTypes.TypedArray[0]);
+            Assert.AreEqual(true, polymorphicTypes.TypedArray[0].Value);
+            Assert.IsAssignableFrom<PolymorphicB>(polymorphicTypes.TypedArray[1]);
+            Assert.AreEqual(true, polymorphicTypes.TypedArray[1].Value);
+            Assert.IsAssignableFrom<PolymorphicC>(polymorphicTypes.TypedArray[2]);
+            Assert.AreEqual(true, polymorphicTypes.TypedArray[2].Value);
+
+            Assert.NotNull(polymorphicTypes.UntypedArray);
+            Assert.AreEqual(3, polymorphicTypes.UntypedArray.Length);
+            Assert.IsAssignableFrom<PolymorphicA>(polymorphicTypes.UntypedArray.GetValue(0));
+            Assert.AreEqual(true, ((PolymorphicA)polymorphicTypes.UntypedArray.GetValue(0)).Value);
+            Assert.IsAssignableFrom<PolymorphicB>(polymorphicTypes.UntypedArray.GetValue(1));
+            Assert.AreEqual(true, ((PolymorphicB)polymorphicTypes.UntypedArray.GetValue(1)).Value);
+            Assert.IsAssignableFrom<PolymorphicC>(polymorphicTypes.UntypedArray.GetValue(2));
+            Assert.AreEqual(true, ((PolymorphicC)polymorphicTypes.UntypedArray.GetValue(2)).Value);
         }
 
         [Test]

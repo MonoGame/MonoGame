@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -190,7 +191,8 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public object Hello;
         public object Elf;
-        public PolymorphicA[] PolymorphicArray;
+        public PolymorphicA[] TypedArray;
+        public Array UntypedArray;
     }
     #endregion
 
