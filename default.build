@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="MonoGame Build Script" default="build_code" basedir=".">
+<project name="MonoGame Build Script" default="build" basedir=".">
   <description>Default MonoGame Automated Build script</description>
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
@@ -18,12 +18,14 @@
     <echo message="Detected : ${os}"/>
   </target>
 
+  <target name="build" depends="checkos" />
+
   <target name="clean">
     <delete dir="${project::get-base-directory()}\MonoGame.Framework\obj" />
     <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" />
   </target>
 
-  <target name="build_code" description="Build all the projects." depends="checkos">
+  <target name="build_code" description="Build all the projects." depends="build">
 
     <call target="build_windows"/>
     <call target="build_windows8" />
