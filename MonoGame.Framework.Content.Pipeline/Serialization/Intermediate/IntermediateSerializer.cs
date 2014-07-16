@@ -212,6 +212,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_typeAliases.TryGetValue(typeName, out foundType))
                 return foundType;
 
+            // If this is an array then handle it separately.
+            if (typeName.EndsWith("[]"))
+            {
+                var arrayType = typeName.Substring(0, typeName.Length - 2);
+                foundType = FindType(arrayType);
+                return foundType == null ? null : foundType.MakeArrayType();
+            }
+
             // Expand any namespaces in the asset type
             foreach (var pair in _namespaceLookup)
                 typeName = typeName.Replace(pair.Key, pair.Value);
