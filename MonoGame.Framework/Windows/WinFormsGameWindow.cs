@@ -213,9 +213,8 @@ namespace MonoGame.Framework
 
         private void UpdateMouseState()
         {
-            var pos = Control.MousePosition;
-            var withinClient = _form.ClientRectangle.Contains(pos);
-            var clientPos = _form.PointToClient(pos);
+            var clientPos = _form.PointToClient(Control.MousePosition);
+            var withinClient = _form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
 
             var previousState = MouseState.LeftButton;
