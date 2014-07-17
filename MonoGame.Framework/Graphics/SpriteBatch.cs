@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _blendState.PlatformApplyState(GraphicsDevice);
 #endif
             
-            _batcher.DrawBatch(_sortMode);
+            _batcher.DrawBatch(_sortMode, _effect);
         }
 		
 		void Setup() 
@@ -122,12 +122,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
             _matrixTransform.SetValue(projection);
-            _spritePass.Apply();
 
-			// If the user supplied a custom effect then apply
-            // it now to override the sprite effect.
-            if (_effect != null)
-			    _effect.CurrentTechnique.Passes[0].Apply();
+            if (_effect == null)
+                _spritePass.Apply();
 		}
 		
         void CheckValid(Texture2D texture)
@@ -381,7 +378,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (_sortMode == SpriteSortMode.Immediate)
 			{
-				_batcher.DrawBatch(_sortMode);
+				_batcher.DrawBatch(_sortMode, _effect);
 			}
 		}
 
