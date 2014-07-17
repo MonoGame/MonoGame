@@ -566,6 +566,8 @@ namespace Microsoft.Xna.Framework
         internal void ResetClientBounds()
         {
 #if ANDROID
+            ((AndroidGameWindow)_game.Window).GameView.MakeCurrent();
+
             float preferredAspectRatio = (float)PreferredBackBufferWidth /
                                          (float)PreferredBackBufferHeight;
             float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / 
