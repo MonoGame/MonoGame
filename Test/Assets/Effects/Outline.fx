@@ -1,3 +1,9 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#include "include.fxh"
+
 sampler s0;
 
 float4 OutlineColor = float4(0,0,0,1);
@@ -34,11 +40,11 @@ technique Technique1
 {
     pass Pass1
     {
-        PixelShader = compile ps_2_0 Outline();
+        PixelShader = compile PS_PROFILE Outline();
     }
 
 	pass Pass2
     {
-        PixelShader = compile ps_2_0 Outline();
+        PixelShader = compile PS_PROFILE Outline();
     }
 }
