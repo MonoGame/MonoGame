@@ -286,24 +286,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = end - start;
 
-            // Apply the sprite effect
-            prePass.Apply();
-
-            _device.DrawUserIndexedPrimitives(
-                PrimitiveType.TriangleList,
-                _vertexArray,
-                0,
-                vertexCount,
-                _index,
-                0,
-                (vertexCount / 4) * 2,
-                VertexPositionColorTexture.VertexDeclaration);
-
             // If the effect is not null, then apply each pass and render the geometry
             if (effect != null)
             {
                 foreach (EffectPass pass in effect.CurrentTechnique.Passes)
                 {
+                    prePass.Apply();
                     pass.Apply();
 
                     _device.DrawUserIndexedPrimitives(
@@ -316,6 +304,21 @@ namespace Microsoft.Xna.Framework.Graphics
                         (vertexCount / 4) * 2,
                         VertexPositionColorTexture.VertexDeclaration);
                 }
+            }
+            // if no effect is defined, then simply apply the base pass and render
+            else
+            {
+                prePass.Apply();
+
+                _device.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    _vertexArray,
+                    0,
+                    vertexCount,
+                    _index,
+                    0,
+                    (vertexCount / 4) * 2,
+                    VertexPositionColorTexture.VertexDeclaration);
             }
         }
 	}

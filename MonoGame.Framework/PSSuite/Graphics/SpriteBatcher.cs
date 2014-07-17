@@ -223,12 +223,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var vertexCount = end - start;
-
-            prePass.Apply();
-            _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
-
+            
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
+            prePass.Apply();
                 pass.Apply();
                 _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
             }
