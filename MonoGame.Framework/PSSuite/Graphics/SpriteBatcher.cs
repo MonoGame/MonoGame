@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 bool shouldFlush = item.Texture != tex;
                 if ( shouldFlush )
                 {
-                    DrawVertexArray( startIndex, index );
+                    DrawVertexArray( startIndex, index, prePass, effect );
                     startIndex = index;
                     tex = item.Texture;
                     
@@ -226,7 +226,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
-            prePass.Apply();
+                prePass.Apply();
                 pass.Apply();
                 _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
             }
