@@ -16,7 +16,9 @@ float4 violet = float4(1,.8,1,1);
 
 float step = 1.0/7;
 
-float4 PixelShaderFunction(float2 coords: TEXCOORD0) : COLOR0
+float4 PixelShaderFunction( float4 inPosition : SV_Position,
+			    float4 inColor : COLOR0,
+			    float2 coords : TEXCOORD0 ) : COLOR0
 {
     float4 color = tex2D(s0, coords);
 
