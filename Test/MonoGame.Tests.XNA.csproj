@@ -496,28 +496,28 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Bevels.xnb">
+    <Content Include="Assets\Effects\XNA\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\BlackOut.xnb">
+    <Content Include="Assets\Effects\XNA\BlackOut.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\ColorFlip.xnb">
+    <Content Include="Assets\Effects\XNA\ColorFlip.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Grayscale.xnb">
+    <Content Include="Assets\Effects\XNA\Grayscale.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\HighContrast.xnb">
+    <Content Include="Assets\Effects\XNA\HighContrast.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Invert.xnb">
+    <Content Include="Assets\Effects\XNA\Invert.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\NoEffect.xnb">
+    <Content Include="Assets\Effects\XNA\NoEffect.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\RainbowH.xnb">
+    <Content Include="Assets\Effects\XNA\RainbowH.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Textures\GlassPane.xnb">

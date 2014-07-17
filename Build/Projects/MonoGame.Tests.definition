@@ -499,29 +499,37 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Bevels.xnb">
+    <Content Include="Assets\Effects\DirectX\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\BlackOut.xnb">
+    <Content Include="Assets\Effects\DirectX\BlackOut.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\ColorFlip.xnb">
+    <Content Include="Assets\Effects\DirectX\ColorFlip.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\Grayscale.xnb">
+    <Content Include="Assets\Effects\DirectX\Grayscale.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\HighContrast.xnb">
+    <Content Include="Assets\Effects\DirectX\HighContrast.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\Invert.xnb">
+    <Content Include="Assets\Effects\DirectX\Invert.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\NoEffect.xnb">
+    <Content Include="Assets\Effects\DirectX\NoEffect.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\RainbowH.xnb">
+    <Content Include="Assets\Effects\DirectX\RainbowH.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Textures\GlassPane.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
