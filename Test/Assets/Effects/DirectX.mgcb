@@ -60,12 +60,6 @@
 /processorParam:DebugMode=Auto
 /build:NoEffect.fx
 
-#begin Outline.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Outline.fx
-
 #begin RainbowH.fx
 /importer:EffectImporter
 /processor:EffectProcessor
