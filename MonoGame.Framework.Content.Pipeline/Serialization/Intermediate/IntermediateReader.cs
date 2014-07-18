@@ -69,6 +69,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (Xml.MoveToAttribute("Type"))
                 {
                     var type = ReadTypeName();
+                    if (type == null)
+                        throw NewInvalidContentException(null, "Could not resolve type '{0}'.", Xml.ReadContentAsString());
+                    if (!typeSerializer.TargetType.IsAssignableFrom(type))
+                        throw NewInvalidContentException(null, "Type '{0}' is not assignable to '{1}'.", type.FullName, typeSerializer.TargetType.FullName);
+
                     typeSerializer = Serializer.GetTypeSerializer(type);
                     Xml.MoveToElement();
                 }
@@ -209,6 +214,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 Xml.MoveToAttribute("TargetType");
                 var targetType = ReadTypeName();
+                if (targetType == null)
+                    throw NewInvalidContentException(null, "Could not resolve type '{0}'.", Xml.ReadContentAsString());
 
                 Xml.MoveToElement();
                 var filename = Xml.ReadElementString();

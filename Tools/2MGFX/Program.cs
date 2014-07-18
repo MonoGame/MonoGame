@@ -41,14 +41,33 @@ namespace TwoMGFX
 
             // Create the effect object.
             EffectObject effect;
+            var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = EffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
+
+                if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
+                    Console.Error.WriteLine(shaderErrorsAndWarnings);
+            }
+            catch (ShaderCompilerException)
+            {
+                // Write the compiler errors and warnings and let the user know what happened.
+                Console.Error.WriteLine(shaderErrorsAndWarnings);
+                Console.Error.WriteLine("Failed to compile '{0}'!", options.SourceFile);
+                return 1;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine("Failed to compile '{0}'!", options.SourceFile);
+                // First write all the compiler errors and warnings.
+                if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
+                    Console.Error.WriteLine(shaderErrorsAndWarnings);
+
+                // If we have an exception message then write that.
+                if (!string.IsNullOrEmpty(ex.Message))
+                    Console.Error.WriteLine(ex.Message);
+
+                // Let the user know what happened.
+                Console.Error.WriteLine("Unexpected error compiling '{0}'!", options.SourceFile);
                 return 1;
             }
             

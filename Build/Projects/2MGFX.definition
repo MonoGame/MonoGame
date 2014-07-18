@@ -152,7 +152,8 @@
     <Compile Include="EffectObject.cs" />
     <Compile Include="EffectObject.hlsl.cs" />
     <Compile Include="EffectObject.pssl.cs" />
-    <Compile Include="EffectObject.writer.cs" />
+    <Compile Include="EffectObject.writer.cs" />    
+    <Compile Include="ShaderCompilerException.cs" />
     <Compile Include="ShaderData.cs" />
     <Compile Include="ShaderData.mojo.cs" />
     <Compile Include="ShaderData.pssl.cs" />

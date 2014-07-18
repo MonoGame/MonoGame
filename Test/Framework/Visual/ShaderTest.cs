@@ -68,6 +68,7 @@ non-infringement.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -98,6 +99,12 @@ namespace MonoGame.Tests.Visual {
 
 			// The texture to apply the effect to
 			Texture2D surge = null;
+
+#if XNA
+            effectName = Path.Combine("XNA", effectName);
+#elif WINDOWS
+            effectName = Path.Combine("DirectX", effectName);
+#endif
 
 			Game.LoadContentWith += (sender, e) => {
 				spriteBatch = new SpriteBatch (Game.GraphicsDevice);

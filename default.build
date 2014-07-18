@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
-<project name="MonoGame Build Script" default="build" basedir=".">
+<project name="MonoGame Build Script" default="build_installer" basedir=".">
   <description>Default MonoGame Automated Build script</description>
   <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}" />
   <property name="mdtooldir" value="/Applications/MonoDevelop.app/Contents/MacOS"/>
   <property name="psmtooldir" value="C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin" />
+  
+  <!-- Temporary work around so that we don't need to change the targets on the build server -->
+  <target name="build" depends="build_code,run_tests,build_docs,build_installer" />
 
   <target name="checkos" description="check the operating system">
     <property name="os" value="${operating-system::get-platform(environment::get-operating-system())}"/>
@@ -23,31 +26,23 @@
     <delete dir="${project::get-base-directory()}\MonoGame.Framework.Content.Pipeline\obj" />
   </target>
 
-  <target name="build" description="Build MonoGame Release" depends="checkos">
+  <target name="build_code" description="Build all the projects." depends="checkos">
 
-    <call target="buildwindows"/>
-    <call target="buildlinux"/>
-    <call target="buildandroid" />
-    <call target="buildwindows8" />
-    <call target="buildwindowsphone" />
-    <call target="buildmac" />
-    <call target="buildios" />
-    <call target="buildpsm" />
-    <call target="buildweb" />
+    <call target="build_windows"/>
+    <call target="build_windows8" />
+    <call target="build_windowsphone" />
+    <call target="build_psm" />
+    <call target="build_web" />
+    <call target="build_linux"/>
+    <call target="build_android" />
+    <call target="build_mac" />
+    <call target="build_ios" />
 
-    <call target="buildcontentprocessor"/>
+    <call target="build_contentprocessor"/>
 
-    <call target="builddocs"/>
-
-    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
-    <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
-    <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
-    <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
-
-    <nant buildfile="Installers/default.build" target="build" />
   </target>
 
-  <target name="buildpsm" description="Build Play Station Mobile" depends="clean">
+  <target name="build_psm" description="Build Play Station Mobile" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\SCE\PSM\tools\PsmStudio\bin\mdtool.exe')}">
         <exec program="Protobuild" commandline="-generate PSMobile" />
@@ -57,7 +52,7 @@
     </if>
   </target>
 
-  <target name="buildwindows" description="Build Windows" depends="clean">
+  <target name="build_windows" description="Build Windows" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows.sln /t:Clean /p:Configuration=Release" />
@@ -76,7 +71,7 @@
     </if>
   </target>
 
-  <target name="buildlinux" description="Build Linux" depends="clean">
+  <target name="build_linux" description="Build Linux" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Linux" />
       <exec program="msbuild " commandline="MonoGame.Framework.Linux.sln /t:Clean /p:Configuration=Release" />
@@ -89,7 +84,7 @@
     </if>
   </target>
 
-  <target name="buildweb" description="Build Web JSIL" depends="clean">
+  <target name="build_web" description="Build Web JSIL" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Web">
         <environment>
@@ -106,7 +101,7 @@
     </if>
   </target>
 
-  <target name="buildmac" description="Build MacOS" depends="clean">
+  <target name="build_mac" description="Build MacOS" depends="clean">
     <if test="${os == 'MacOS'}">
       <exec program="mono" commandline="Protobuild.exe -generate MacOS" />
       <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release MonoGame.Framework.MacOS.sln" />
@@ -114,7 +109,7 @@
     </if>
   </target>
 
-  <target name="buildios" description="Build iOS" depends="clean">
+  <target name="build_ios" description="Build iOS" depends="clean">
     <if test="${os == 'MacOS'}">
       <if test="${file::exists('/Developer/MonoTouch/MSBuild/Xamarin.ObjcBinding.CSharp.targets') or file::exists('/Library/Frameworks/Mono.framework/External/xbuild/Xamarin/Xamarin.ObjcBinding.CSharp.targets')}">
         <exec program="mono" commandline="Protobuild.exe -generate iOS" />
@@ -124,7 +119,7 @@
     </if>
   </target>
 
-  <target name="buildandroid" description="Build Android" depends="clean">
+  <target name="build_android" description="Build Android" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('C:\Program Files (x86)\MSBuild\Novell\Novell.MonoDroid.CSharp.targets')}">
         <exec program="Protobuild" commandline="-generate Android" />
@@ -147,7 +142,7 @@
     </if>
   </target>
 
-  <target name="buildwindows8" description="Build Windows 8" depends="clean">
+  <target name="build_windows8" description="Build Windows 8" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="Protobuild" commandline="-generate Windows8" />
       <exec program="msbuild " commandline="MonoGame.Framework.Windows8.sln /t:Clean /p:Configuration=Release" />
@@ -155,7 +150,7 @@
     </if>
   </target>
 
-  <target name="buildwindowsphone" description="Build Windows Phone" depends="clean">
+  <target name="build_windowsphone" description="Build Windows Phone" depends="clean">
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.0\Microsoft.Cpp.WindowsPhone.8.0.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsPhone" />
@@ -167,22 +162,34 @@
     </if>
   </target>
 
-  <target name="buildcontentprocessor" description="Build Content Processor" depends="clean">
+  <target name="build_contentprocessor" description="Build the old content processors" depends="clean">
     <if test="${os == 'Win32NT'}">
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoGame.ContentPipeline\ContentProcessors\MonoGameContentProcessors.sln /t:Build /p:Configuration=Release" />
     </if>
   </target>
 
-  <target name="builddocs" description="Build Documentation">
+  <target name="run_tests" description="Run all the tests" depends="build_code">
+    <if test="${os == 'Win32NT'}">
+    </if>
+  </target>
+
+  <target name="build_docs" description="Build the documentation." depends="build_code,run_tests">
     <if test="${os == 'Win32NT'}">
       <delete dir="${project::get-base-directory()}\Documentation\Output" />
       <exec program="SharpDoc.exe" basedir="ThirdParty\Dependencies\SharpDoc" commandline="-config Documentation\config.xml" />
     </if>
   </target>
 
-  <target name="runtests" description="Run Tests">
-    <if test="${os == 'Win32NT'}">
-    </if>
+  <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
+
+    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
+    <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
+    <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
+    <nant buildfile="IDE/MonoDevelop/default.build" target="build"/>
+
+    <nant buildfile="Installers/default.build" target="build" />
+
   </target>
+
 </project>

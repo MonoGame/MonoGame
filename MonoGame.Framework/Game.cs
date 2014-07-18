@@ -397,6 +397,7 @@ namespace Microsoft.Xna.Framework
             }
 
             BeginRun();
+            _gameTimer = Stopwatch.StartNew();
 
             //Not quite right..
             Tick ();

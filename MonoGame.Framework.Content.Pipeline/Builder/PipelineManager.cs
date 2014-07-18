@@ -531,6 +531,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 throw;
             }
+            catch (InvalidContentException)
+            {
+                throw;
+            }
             catch (Exception inner)
             {
                 throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
