@@ -49,6 +49,9 @@
       Name="Lidgren.Network.Android"
       Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
       Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
+    <Binary
+      Name="Ouya.Console.Api"
+      Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
   </Platform>
 
   <Platform Type="PSMobile">
