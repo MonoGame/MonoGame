@@ -5,12 +5,18 @@
     <Binary
       Name="Xwt"
       Path="ThirdParty\Dependencies\Xwt\Xwt.dll" />
+    <Binary
+      Name="Xwt.Gtk"
+      Path="ThirdParty\Dependencies\Xwt\Xwt.Gtk.dll" />
   </Platform>
 
   <Platform Type="MacOS">
     <Binary
       Name="Xwt"
       Path="ThirdParty\Dependencies\Xwt\Xwt.dll" />
+    <Binary
+      Name="Xwt.Mac"
+      Path="ThirdParty\Dependencies\Xwt\Xwt.Mac.dll" />
   </Platform>
 
   <Platform Type="Windows">
