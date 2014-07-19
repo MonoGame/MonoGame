@@ -300,7 +300,7 @@ namespace Microsoft.Xna.Framework
                 return true;
             }
 
-            return base.OnKeyDown(keyCode, e);
+            return true;
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
@@ -310,7 +310,7 @@ namespace Microsoft.Xna.Framework
                 return true;
 #endif
             Keyboard.KeyUp(keyCode);
-            return base.OnKeyUp(keyCode, e);
+            return true;
         }
 
 #if OUYA
