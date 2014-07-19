@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux,iOS">
 
   <References>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
   </References>
 

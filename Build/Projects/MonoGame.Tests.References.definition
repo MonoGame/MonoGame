@@ -3,7 +3,6 @@
 
   <Platform Type="Windows">
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
       Name="NDesk.Options"
@@ -24,7 +23,6 @@
 
   <Platform Type="WindowsGL">
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
       Name="NDesk.Options"
@@ -45,7 +43,6 @@
 
   <Platform Type="MacOS">
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
       Name="NDesk.Options"
@@ -66,7 +63,6 @@
 
   <Platform Type="Linux">
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoGame.Framework.Content.Pipeline" />
 
     <Binary
       Name="NDesk.Options"
