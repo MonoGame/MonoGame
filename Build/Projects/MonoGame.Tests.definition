@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux,iOS">
+<Project Name="MonoGame.Tests" Path="Test" Type="Console" Platforms="Windows,WindowsGL,MacOS,Linux">
 
   <References>
     <Reference Include="System" />
