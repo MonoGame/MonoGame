@@ -44,6 +44,7 @@ namespace Microsoft.Xna.Framework.Media
             _sound.FinishedPlaying += OnFinishedPlaying;
         }
 
+        [CLSCompliant(false)]
         public Song(NSUrl url)
         {
             PlatformInitialize(url);
