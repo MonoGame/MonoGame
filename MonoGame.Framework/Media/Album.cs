@@ -188,10 +188,10 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
+#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album art image data.
         /// </summary>
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         public Stream GetAlbumArt()
         {
 #if WINDOWS_PHONE
@@ -211,10 +211,10 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
+#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album thumbnail image data.
         /// </summary>
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         public Stream GetThumbnail()
         {
 #if WINDOWS_PHONE
@@ -234,7 +234,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-        /// <summary>
+		/// <summary>
         /// Returns a String representation of this Album.
         /// </summary>
         public override string ToString()
