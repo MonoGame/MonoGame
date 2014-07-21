@@ -199,9 +199,8 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_STOREAPP
             if (this.HasArt)
                 return this.thumbnail.AsStream();
-#endif
-
             return null;
+#endif
         }
 
 #elif IOS
