@@ -169,19 +169,19 @@ namespace Microsoft.Xna.Framework
             // If we are already on the UI thread, just call the action and be done with it
             if (IsOnUIThread())
             {
+#if WINDOWS_PHONE
                 try
                 {
                     action();
                 }
-                catch (UnauthorizedAccessException ex)
+                catch (UnauthorizedAccessException)
                 {
                     // Need to be on a different thread
-#if WINDOWS_PHONE
                     BlockOnContainerThread(Deployment.Current.Dispatcher, action);
-#else
-                    throw (ex);
-#endif
                 }
+#else
+                action();
+#endif
                 return;
             }
 

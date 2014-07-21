@@ -490,6 +490,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if IOS
+        [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, UIImage uiImage)
         {
             return PlatformFromStream(graphicsDevice, uiImage.CGImage);
@@ -506,6 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if IOS || MONOMAC
+        [CLSCompliant(false)]
         public static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
             var width = cgImage.Width;
