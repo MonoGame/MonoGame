@@ -201,6 +201,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// overflow the 16 bit array indices for vertices.
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
+        /// <param name="prePass">The first pass of SpriteEffect</param>
         /// <param name="effect">The effect to apply to the drawn geometry</param>
         public void DrawBatch(SpriteSortMode sortMode, EffectPass prePass, Effect effect = null)
 		{
@@ -278,6 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="start">Start index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
+        /// <param name="prePass">The first pass of SpriteEffect</param>
         /// <param name="effect">The effect to apply to the geometry</param>
         private void FlushVertexArray(int start, int end, EffectPass prePass, Effect effect)
         {
