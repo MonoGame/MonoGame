@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="Pipeline" Path="Tools/Pipeline" Type="GUI" Platforms="Windows,MacOS,Linux">
+<Project Name="Pipeline" Path="Tools/Pipeline" Type="App" Platforms="Windows,MacOS,Linux">
 
   <References>
     <Reference Include="System" />
