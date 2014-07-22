@@ -299,16 +299,16 @@ namespace Microsoft.Xna.Framework
         {
             if (!IsDisposed)
             {
-                if (toolkit != null)
-                {
-                    toolkit.Dispose();
-                    toolkit = null;
-                }
-
                 if (_view != null)
                 {
                     _view.Dispose();
                     _view = null;
+                }
+
+                if (toolkit != null)
+                {
+                    toolkit.Dispose();
+                    toolkit = null;
                 }
             }
 
