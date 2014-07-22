@@ -45,7 +45,15 @@
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>4</WarningLevel>           
+    <AllowedReferenceRelatedFileExtensions>
+      <!-- Prevent default XML files copied to output in RELEASE. 
+           Only *.allowedextension files will be included, which doesn't exist in my case.
+       -->
+      .allowedextension
+    </AllowedReferenceRelatedFileExtensions>
+    <DocumentationFile>
+    </DocumentationFile>    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,7 +74,15 @@
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>4</WarningLevel>           
+    <AllowedReferenceRelatedFileExtensions>
+      <!-- Prevent default XML files copied to output in RELEASE. 
+           Only *.allowedextension files will be included, which doesn't exist in my case.
+       -->
+      .allowedextension
+    </AllowedReferenceRelatedFileExtensions>
+    <DocumentationFile>
+    </DocumentationFile>    
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
