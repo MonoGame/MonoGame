@@ -42,6 +42,11 @@ namespace Microsoft.Xna.Framework.Graphics
 #if WINDOWS || LINUX || ANGLE
         internal IGraphicsContext Context { get; private set; }
 #endif
+#if MONOMAC
+        // In this case, the OpenGL context is constructed and managed by
+        // MonoMacGameView. We need to register that context with OpenTK.
+        IGraphicsContext Context { get; set; }
+#endif
 
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
@@ -181,6 +186,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.BackgroundContext.MakeCurrent(null);
             }
             Context.MakeCurrent(wnd);
+#elif MONOMAC
+            // Register the MonoMac OpenGL context with OpenTK.
+            // This will initialize the OpenTK GL bindings.
+            OpenTK.Toolkit.Init();
+            Context = new GraphicsContext(
+                OpenTK.ContextHandle.Zero, // use current context
+                null);
 #endif
 
             MaxTextureSlots = 16;
