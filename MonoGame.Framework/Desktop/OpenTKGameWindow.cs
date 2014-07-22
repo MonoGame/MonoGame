@@ -338,7 +338,7 @@ namespace Microsoft.Xna.Framework
 
             // mouse
             // TODO review this when opentk 1.1 is released
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || MONOMAC || ANGLE
             Mouse.setWindows(this);
 #else
             Mouse.UpdateMouseInfo(window.Mouse);

@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Content
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || IOS || MONOMAC || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
+#if ANDROID || IOS || (WINDOWS && !OPENGL) || (WINRT && !WINDOWS_PHONE)
                 var hVideoReader = new VideoReader();
 #endif
             }

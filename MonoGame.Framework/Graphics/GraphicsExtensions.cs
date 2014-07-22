@@ -425,7 +425,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || MONOMAC || ANGLE
         /// <summary>
         /// Convert a <see cref="SurfaceFormat"/> to an OpenTK.Graphics.ColorFormat.
         /// This is used for setting up the backbuffer format of the OpenGL context.
