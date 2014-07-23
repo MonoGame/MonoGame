@@ -248,8 +248,11 @@ namespace Microsoft.Xna.Framework
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
-            set 
+            set
             {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+
                 if (_inactiveSleepTime != value)
                 {
                     _inactiveSleepTime = value;
