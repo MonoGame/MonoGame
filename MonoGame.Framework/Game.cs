@@ -282,7 +282,7 @@ namespace Microsoft.Xna.Framework
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "value must be positive and non-zero.");
+                        "The time must be positive and non-zero.", default(Exception));
 
                 if (value != _targetElapsedTime)
                 {
