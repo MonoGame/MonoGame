@@ -85,6 +85,7 @@ namespace Microsoft.Xna.Framework
     {
         private GameComponentCollection _components;
         private GameServiceContainer _services;
+        private ContentManager _content;
         internal GamePlatform Platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
@@ -126,7 +127,7 @@ namespace Microsoft.Xna.Framework
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
-            Content = new ContentManager(_services);
+            _content = new ContentManager(_services);
 
             Platform = GamePlatform.Create(this);
             Platform.Activated += OnActivated;
@@ -174,10 +175,10 @@ namespace Microsoft.Xna.Framework
                     }
                     _components = null;
 
-                    if (Content != null)
+                    if (_content != null)
                     {
-                        Content.Dispose();
-                        Content = null;
+                        _content.Dispose();
+                        _content = null;
                     }
 
                     if (_graphicsDeviceManager != null)
@@ -302,7 +303,17 @@ namespace Microsoft.Xna.Framework
             get { return _services; }
         }
 
-        public ContentManager Content { get; set; }
+        public ContentManager Content
+        {
+            get { return _content; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+
+                _content = value;
+            }
+        }
 
         public GraphicsDevice GraphicsDevice
         {
