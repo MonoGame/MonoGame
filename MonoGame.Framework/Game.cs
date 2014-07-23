@@ -399,7 +399,9 @@ namespace Microsoft.Xna.Framework
         
         public void RunOneFrame()
         {
-            AssertNotDisposed();
+            if (Platform == null)
+                return;
+
             if (!Platform.BeforeRun())
                 return;
 
