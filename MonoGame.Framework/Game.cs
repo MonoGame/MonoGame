@@ -83,8 +83,6 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-        private const float DefaultTargetFramesPerSecond = 60.0f;
-
         private GameComponentCollection _components;
         private GameServiceContainer _services;
         internal GamePlatform Platform;
@@ -113,7 +111,7 @@ namespace Microsoft.Xna.Framework
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
 
-        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks((long)10000000 / (long)DefaultTargetFramesPerSecond);
+        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks(166667); // 60fps
         private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(1);
 
         private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
