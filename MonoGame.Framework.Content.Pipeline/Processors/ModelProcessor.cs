@@ -158,23 +158,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 var vertices = geometry.Vertices;
                 var vertexCount = vertices.VertexCount;
-                var geomBuffer = geometry.Vertices.CreateVertexBuffer();
-                vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
+                if (vertexCount == 0)
+                    parts.Add(new ModelMeshPartContent());
+                else
+                {
+                    var geomBuffer = geometry.Vertices.CreateVertexBuffer();
+                    vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
 
-                var startIndex = indexBuffer.Count;
-                indexBuffer.AddRange(geometry.Indices);
+                    var startIndex = indexBuffer.Count;
+                    indexBuffer.AddRange(geometry.Indices);
 
-                var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
-                partContent.Material = geometry.Material;
-                parts.Add(partContent);
+                    var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+                    parts.Add(partContent);
 
-                // Update mesh bounding box
-                bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
+                    partContent.Material = geometry.Material;
 
-                // Geoms are supposed to all have the same decl, so just steal one of these
-                vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+                    // Update mesh bounding box
+                    bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
 
-                startVertex += vertexCount;
+                    // Geoms are supposed to all have the same decl, so just steal one of these
+                    vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+
+                    startVertex += vertexCount;
+                }
             }
 
             return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
