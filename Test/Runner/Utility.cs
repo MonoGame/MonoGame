@@ -68,15 +68,51 @@ non-infringement.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.IO;
 
 using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests {
+
+    public class MatrixComparer : IEqualityComparer<Matrix>
+    {
+        static public MatrixComparer Epsilon = new MatrixComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        MatrixComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(Matrix x, Matrix y)
+        {
+            return  Math.Abs(x.M11 - y.M11) < _epsilon &&
+                    Math.Abs(x.M12 - y.M12) < _epsilon &&
+                    Math.Abs(x.M13 - y.M13) < _epsilon &&
+                    Math.Abs(x.M14 - y.M14) < _epsilon &&
+                    Math.Abs(x.M21 - y.M21) < _epsilon &&
+                    Math.Abs(x.M22 - y.M22) < _epsilon &&
+                    Math.Abs(x.M23 - y.M23) < _epsilon &&
+                    Math.Abs(x.M24 - y.M24) < _epsilon &&
+                    Math.Abs(x.M31 - y.M31) < _epsilon &&
+                    Math.Abs(x.M32 - y.M32) < _epsilon &&
+                    Math.Abs(x.M33 - y.M33) < _epsilon &&
+                    Math.Abs(x.M34 - y.M34) < _epsilon &&
+                    Math.Abs(x.M41 - y.M41) < _epsilon &&
+                    Math.Abs(x.M42 - y.M42) < _epsilon &&
+                    Math.Abs(x.M43 - y.M43) < _epsilon &&
+                    Math.Abs(x.M44 - y.M44) < _epsilon;
+        }
+
+        public int GetHashCode(Matrix obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 	static class MathUtility {
+
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
 			if (a > b) {
