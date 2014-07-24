@@ -14,7 +14,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class TextureCollection
     {
-        private readonly Texture[] _textures;
+		private readonly Texture[] _textures;
+		private bool _applyToVertexStage;
 
 #if OPENGL
         private readonly TextureTarget[] _targets;
@@ -22,9 +23,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private int _dirty;
 
-        internal TextureCollection(int maxTextures)
+        internal TextureCollection(int maxTextures, bool applyToVertexStage)
         {
             _textures = new Texture[maxTextures];
+			_applyToVertexStage = applyToVertexStage;
             _dirty = int.MaxValue;
 #if OPENGL
             _targets = new TextureTarget[maxTextures];
@@ -47,10 +49,17 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DIRECTX
 
         internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
+		{
+			// NOTE: We make the assumption here that the caller has
+			// locked the d3dContext for us to use.
+			ClearTargets(device, targets, device._d3dContext.VertexShader);
+			ClearTargets(device, targets, device._d3dContext.PixelShader);
+		}
+
+		internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets, SharpDX.Direct3D11.CommonShaderStage shaderStage)
         {
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
-            var pixelShaderStage = device._d3dContext.PixelShader;
 
             // We assume 4 targets to avoid a loop within a loop below.
             var target0 = targets[0].RenderTarget;
@@ -70,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Immediately clear the texture from the device.
                 _dirty &= ~(1 << i);
                 _textures[i] = null;
-                pixelShaderStage.SetShaderResource(i, null);
+                shaderStage.SetShaderResource(i, null);
             }
         }
 
@@ -105,8 +114,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if DIRECTX
             // NOTE: We make the assumption here that the caller has
-            // locked the d3dContext for us to use.
-            var pixelShaderStage = device._d3dContext.PixelShader;
+			// locked the d3dContext for us to use.
+			SharpDX.Direct3D11.CommonShaderStage shaderStage;
+			if (_applyToVertexStage)
+				shaderStage = device._d3dContext.VertexShader;
+			else
+				shaderStage = device._d3dContext.PixelShader;
 #endif
 
             for (var i = 0; i < _textures.Length; i++)
@@ -136,9 +149,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 #elif DIRECTX
                 if (_textures[i] == null || _textures[i].IsDisposed)
-                    pixelShaderStage.SetShaderResource(i, null);
+                    shaderStage.SetShaderResource(i, null);
                 else
-                    pixelShaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+                    shaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
 #elif PSM
                 // FIXME: 1d/3d textures
                 var texture2d = _textures[i] as Texture2D;

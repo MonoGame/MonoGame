@@ -33,11 +33,15 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _indexBufferDirty;
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
-        private int _currentRenderTargetCount;
+		private int _currentRenderTargetCount;
 
-        public TextureCollection Textures { get; private set; }
+		public TextureCollection VertexTextures { get; private set; }
 
-        public SamplerStateCollection SamplerStates { get; private set; }
+		public SamplerStateCollection VertexSamplerStates { get; private set; }
+
+		public TextureCollection Textures { get; private set; }
+
+		public SamplerStateCollection SamplerStates { get; private set; }
 
         // On Intel Integrated graphics, there is a fast hw unit for doing
         // clears to colors where all components are either 0 or 255.
@@ -166,12 +170,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			                         DisplayMode.Width, DisplayMode.Height);
 			_viewport.MaxDepth = 1.0f;
 
-            PlatformSetup();
+			PlatformSetup();
 
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection (MaxTextureSlots);
+			Textures = new TextureCollection(MaxTextureSlots, false);
+			SamplerStates = new SamplerStateCollection(MaxTextureSlots, false);
 
-        }
+#if OPENGL || PSM
+			VertexTextures = null;
+			VertexSamplerStates = null;
+#elif DIRECTX
+			VertexTextures = new TextureCollection(MaxTextureSlots, true);
+			VertexSamplerStates = new SamplerStateCollection(MaxTextureSlots, true);
+#endif
+		}
 
         ~GraphicsDevice()
         {
@@ -191,9 +202,14 @@ namespace Microsoft.Xna.Framework.Graphics
             RasterizerState = RasterizerState.CullCounterClockwise;
 
             // Clear the texture and sampler collections forcing
-            // the state to be reapplied.
+			// the state to be reapplied.
+			if (null != VertexTextures)
+			{
+				VertexTextures.Clear();
+				VertexSamplerStates.Clear();
+			}
             Textures.Clear();
-            SamplerStates.Clear();
+			SamplerStates.Clear();
 
             // Clear constant buffers
             _vertexConstantBuffers.Clear();

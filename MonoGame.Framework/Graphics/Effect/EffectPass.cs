@@ -92,7 +92,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexShader != null)
             {
-                device.VertexShader = _vertexShader;
+				device.VertexShader = _vertexShader;
+
+				// Update the texture parameters.
+				if (null != device.VertexTextures)
+					SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
+				else
+					SetShaderSamplers(_vertexShader, device.Textures, device.SamplerStates);
 
                 // Update the constant buffers.
                 for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
@@ -108,20 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.PixelShader = _pixelShader;
 
                 // Update the texture parameters.
-                foreach (var sampler in _pixelShader.Samplers)
-                {
-                    var param = _effect.Parameters[sampler.parameter];
-                    var texture = param.Data as Texture;
-										
-					// If there is no texture assigned then skip it
-					// and leave whatever set directly on the device.
-					if (texture != null)
-						device.Textures[sampler.textureSlot] = texture;
-
-                    // If there is a sampler state set it.
-                    if (sampler.state != null)
-                        device.SamplerStates[sampler.samplerSlot] = sampler.state;
-                }
+				SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
                 
                 // Update the constant buffers.
                 for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
@@ -160,6 +153,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 _effect.GraphicsDevice._graphics.SetTexture(0, ((Texture2D)_effect.Parameters["Texture0"].Data)._texture2D);
 #endif
         }
+
+		private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
+		{
+			foreach (var sampler in shader.Samplers)
+			{
+				var param = _effect.Parameters[sampler.parameter];
+				var texture = param.Data as Texture;
+
+				// If there is no texture assigned then skip it
+				// and leave whatever set directly on the device.
+				if (texture != null)
+					textures[sampler.textureSlot] = texture;
+
+				// If there is a sampler state set it.
+				if (sampler.state != null)
+					samplerStates[sampler.samplerSlot] = sampler.state;
+			}
+		}
 		
     }
 }

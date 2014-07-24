@@ -9,10 +9,12 @@ namespace Microsoft.Xna.Framework.Graphics
     public sealed partial class SamplerStateCollection
 	{
         private SamplerState[] _samplers;
+		private bool _applyToVertexStage;
 
-		internal SamplerStateCollection( int maxSamplers )
+		internal SamplerStateCollection( int maxSamplers, bool applyToVertexStage )
         {
             _samplers = new SamplerState[maxSamplers];
+			_applyToVertexStage = applyToVertexStage;
 		    Clear();
         }
 		
