@@ -55,6 +55,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
+        public TextureCollection VertexTextures { get; private set; }
+
+        public SamplerStateCollection VertexSamplerStates { get; private set; }
+
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
@@ -204,8 +208,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            Textures = new TextureCollection (MaxTextureSlots);
-			SamplerStates = new SamplerStateCollection(this, MaxTextureSlots);
+            VertexTextures = new TextureCollection(MaxTextureSlots, true);
+            VertexSamplerStates = new SamplerStateCollection(this, MaxTextureSlots, true);
+
+            Textures = new TextureCollection(MaxTextureSlots, false);
+            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
@@ -246,6 +253,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Clear the texture and sampler collections forcing
             // the state to be reapplied.
+            VertexTextures.Clear();
+            VertexSamplerStates.Clear();
             Textures.Clear();
             SamplerStates.Clear();
 

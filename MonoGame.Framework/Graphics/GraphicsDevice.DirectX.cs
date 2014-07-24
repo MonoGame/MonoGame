@@ -965,7 +965,10 @@ namespace Microsoft.Xna.Framework.Graphics
             // Make sure none of the new targets are bound
             // to the device as a texture resource.
             lock (_d3dContext)
+            {
+                VertexTextures.ClearTargets(this, _currentRenderTargetBindings);
                 Textures.ClearTargets(this, _currentRenderTargetBindings);
+            }
 
             for (var i = 0; i < _currentRenderTargetCount; i++)
             {
@@ -1097,6 +1100,8 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexConstantBuffers.SetConstantBuffers(this);
             _pixelConstantBuffers.SetConstantBuffers(this);
 
+            VertexTextures.SetTextures(this);
+            VertexSamplerStates.PlatformSetSamplers(this);
             Textures.SetTextures(this);
             SamplerStates.PlatformSetSamplers(this);
         }
