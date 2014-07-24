@@ -11,6 +11,15 @@ namespace MonoGame.Tests.Framework
     class Bounding
     {
         [Test]
+        public void BoundingSphereTests()
+        {
+            var zeroPoint = BoundingSphere.CreateFromPoints( new[] {Vector3.Zero} );
+            Assert.AreEqual(new BoundingSphere(), zeroPoint);
+
+            Assert.Throws<ArgumentException>(() => BoundingSphere.CreateFromPoints(new Vector3[] {}));
+        }
+
+        [Test]
         public void BoundingBoxContainsBoundingSphere()
         {
             var testSphere = new BoundingSphere(Vector3.Zero, 1);
