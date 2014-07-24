@@ -203,27 +203,56 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
         {
-            var basicMaterial = material as BasicMaterialContent;
+            // If we don't get a material then assign a default one.
             if (material == null)
-                material = basicMaterial = new BasicMaterialContent();
+            {
+                material = new BasicMaterialContent();
+                foreach (var geometry in geometryCollection)
+                    geometry.Material = material;
+            }
+
+            // Test requirements from the assigned material.
+            int textureChannels;
+            if (material is DualTextureMaterialContent)
+            {
+                textureChannels = 2;
+            }
+            else if (material is SkinnedMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is EnvironmentMapMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is AlphaTestMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else
+            {
+                // Just check for a "Texture" which should cover custom Effects
+                // and BasicEffect which can have an optional texture.
+                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
+            }
 
             foreach (var geometry in geometryCollection)
             {
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
-                if (basicMaterial != null)
+                // Verify we have the right number of texture coords.
+                for (var i = 0; i < textureChannels; i++)
                 {
-                    // If the basic material specifies a texture, geometry must have coordinates.
-                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
                             "Geometry references material with texture, but no texture coordinates were found.",
                             _identity);
-
-                    // Enable vertex color if the geometry has the channel to support it.
-                    if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                        basicMaterial.VertexColorEnabled = true;
                 }
+
+                // Enable vertex color if the geometry has the channel to support it.
+                if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                    material.OpaqueData["VertexColorEnabled"] = true;
             }
         }
 
