@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
         private ContentIdentity _identity;
-        private ContentBuildLogger _logger;
 
         #region Fields for default values
 
@@ -96,7 +95,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _identity = input.Identity;
-            _logger = context.Logger;
 
             // Perform the processor transforms.
             if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
