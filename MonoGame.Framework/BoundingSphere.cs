@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework
 
         public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
         {
-            if (points == null)
+            if (points == null )
                 throw new ArgumentNullException("points");
 
             float radius = 0;
@@ -231,7 +231,10 @@ namespace Microsoft.Xna.Framework
                 center += v;    // If we actually knew the number of points, we'd get better accuracy by adding v / num_points.
                 ++num_points;
             }
-            
+
+            if (num_points == 0)
+                throw new ArgumentException("You should have at least one point in points.");
+
             center /= (float)num_points;
 
             // Calculate the radius of the needed sphere (it equals the distance between the center and the point further away).
