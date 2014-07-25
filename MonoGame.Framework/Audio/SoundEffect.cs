@@ -187,6 +187,14 @@ namespace Microsoft.Xna.Framework.Audio
 
             _data = data;
             _sound = new Sound(_data, 1.0f, false);
+#else
+            SoundStream soundStream = new SoundStream(s);
+
+            DataStream dataStream = soundStream.ToDataStream();
+            byte[] buffer = new byte[dataStream.Length];
+            dataStream.Read(buffer, 0, (int)dataStream.Length);
+
+            Initialize(soundStream.Format, buffer, 0, (int)dataStream.Length, 0, (int)dataStream.Length / (2 * soundStream.Format.Channels));
 #endif
         }
 
