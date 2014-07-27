@@ -117,7 +117,14 @@ namespace MonoGame.Framework
 
         public override void BeforeInitialize()
         {
-            _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
+            if (WindowsDeviceConfig.UseForm)
+            {
+                _window.Initialize(Game.graphicsDeviceManager.PreferredBackBufferWidth, Game.graphicsDeviceManager.PreferredBackBufferHeight);
+            }
+            else
+            {
+                _window.Initialize(WindowsDeviceConfig.ControlToUse.Width, WindowsDeviceConfig.ControlToUse.Height);
+            }
 
             base.BeforeInitialize();
 
@@ -169,17 +176,25 @@ namespace MonoGame.Framework
                 return;
             }
 
+            Form f = _window._form as Form;
+
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
                  Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
                  Game.GraphicsDevice.CreateSizeDependentResources(true);
                  Game.GraphicsDevice.ApplyRenderTargets(null);
-                _window._form.WindowState = FormWindowState.Maximized;
+                 if (f != null)
+                 {
+                     f.WindowState = FormWindowState.Maximized;
+                 }
             }
             else
             {
                 _window.IsBorderless = true;
-                _window._form.WindowState = FormWindowState.Maximized;
+                if (f != null)
+                {
+                    f.WindowState = FormWindowState.Maximized;
+                }
             }
 
             _alreadyInWindowedMode = false;
@@ -195,16 +210,25 @@ namespace MonoGame.Framework
                return;
             }
 
+            Form f = _window._form as Form;
+
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
-                _window._form.WindowState = FormWindowState.Normal;
+                if (f != null)
+                {
+                    f.WindowState = FormWindowState.Normal;
+                }
+            
                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
                 Game.GraphicsDevice.CreateSizeDependentResources(true);
                 Game.GraphicsDevice.ApplyRenderTargets(null);
             }
             else
             {
-                _window._form.WindowState = FormWindowState.Normal;
+                if (f != null)
+                {
+                    f.WindowState = FormWindowState.Normal;
+                }
                 _window.IsBorderless = false;
             }
             ResetWindowBounds();

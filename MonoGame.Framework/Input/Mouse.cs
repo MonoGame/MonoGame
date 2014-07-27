@@ -80,9 +80,9 @@ namespace Microsoft.Xna.Framework.Input
 
 #elif (WINDOWS && DIRECTX)
 
-        static System.Windows.Forms.Form Window;
+        static System.Windows.Forms.Control Window;
 
-        internal static void SetWindows(System.Windows.Forms.Form window)
+        internal static void SetWindows(System.Windows.Forms.Control window)
         {
             Window = window;
         }

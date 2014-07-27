@@ -41,7 +41,6 @@ purpose and non-infringement.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -60,11 +59,17 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    class WinFormsGameWindow : GameWindow, IDisposable
+    public static class WindowsDeviceConfig
     {
-        internal WinFormsGameForm _form;
+        public static bool UseForm = true;
+        public static ContainerControl ControlToUse;
+    }
 
-        static private ReaderWriterLockSlim _allWindowsReaderWriterLockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+    class WinFormsGameWindow : GameWindow
+    {
+        internal ContainerControl _form;
+
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
         private readonly WinFormsGamePlatform _platform;
@@ -103,16 +108,21 @@ namespace MonoGame.Framework
             get { return _isResizable; }
             set
             {
+                Form form = _form as Form;
+
                 if (_isResizable != value)
                 {
                     _isResizable = value;
-                    _form.MaximizeBox = _isResizable;
+                    if ( form != null )
+                        form.MaximizeBox = _isResizable;
                 }
                 else
                     return;
                 if (_isBorderless)
                     return;
-                _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
+
+                if (form != null)
+                    form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
             }
         }
 
@@ -121,7 +131,11 @@ namespace MonoGame.Framework
              get { return base.AllowAltF4; }
              set
              {
-                 _form.AllowAltF4 = value;
+                 WinFormsGameForm form = _form as WinFormsGameForm;
+
+                 if ( form != null )
+                    form.AllowAltF4 = value;
+
                  base.AllowAltF4 = value;
              }
         }
@@ -133,8 +147,26 @@ namespace MonoGame.Framework
 
         public override XnaPoint Position
         {
-            get { return new XnaPoint(_form.DesktopLocation.X, _form.DesktopLocation.Y); }
-            set { _form.DesktopLocation = new Point(value.X, value.Y); }
+            get
+            {
+                Form form = _form as Form;
+                if (form != null)
+                {
+                    return new XnaPoint(form.DesktopLocation.X, form.DesktopLocation.Y);
+                }
+                else
+                {
+                    return new XnaPoint(_form.ClientRectangle.Left, _form.ClientRectangle.Top);
+                }
+            }
+            set
+            {
+                Form form = _form as Form;
+                if (form != null)
+                {
+                    form.DesktopLocation = new Point(value.X, value.Y);
+                }
+            }
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -146,14 +178,20 @@ namespace MonoGame.Framework
             get { return _isBorderless; }
             set
             {
-                if (_isBorderless != value)
-                    _isBorderless = value;
-                else
-                    return;
-                if (_isBorderless)
-                    _form.FormBorderStyle = FormBorderStyle.None;
-                else
-                    _form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
+                Form form = _form as Form;
+                if (form != null)
+                {
+                    if (_isBorderless != value)
+                        _isBorderless = value;
+                    else
+                        return;
+                    if (_isBorderless)
+                        if (form != null)
+                            form.FormBorderStyle = FormBorderStyle.None;
+                        else
+                            if (form != null)
+                                form.FormBorderStyle = _isResizable ? FormBorderStyle.Sizable : FormBorderStyle.FixedSingle;
+                }
             }
         }
 
@@ -170,17 +208,37 @@ namespace MonoGame.Framework
             _platform = platform;
             Game = platform.Game;
 
-            _form = new WinFormsGameForm(this);
-            
+            if (WindowsDeviceConfig.UseForm)
+            {
+                _form = new WinFormsGameForm(this);
+            }
+            else
+            {
+                _form = WindowsDeviceConfig.ControlToUse;
+            }
+
+
+            WinFormsGameForm form = _form as WinFormsGameForm;
+
             // When running unit tests this can return null.
             var assembly = Assembly.GetEntryAssembly();
-            if (assembly != null)
-                _form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
+            
             Title = Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
-            _form.MaximizeBox = false;
-            _form.FormBorderStyle = FormBorderStyle.FixedSingle;
-            _form.StartPosition = FormStartPosition.CenterScreen;           
+            //The control may not be a form now ( it might just be a container )
+            if (form != null)
+            {
+                if (assembly != null)
+                {                    
+                    form.Icon = Icon.ExtractAssociatedIcon(assembly.Location);                    
+                }
+                form.MaximizeBox = false;
+                form.FormBorderStyle = FormBorderStyle.FixedSingle;
+                form.StartPosition = FormStartPosition.CenterScreen;
+
+                form.Activated += OnActivated;
+                form.Deactivate += OnDeactivate;
+            }
 
             // Capture mouse events.
             _form.MouseWheel += OnMouseScroll;
@@ -190,65 +248,14 @@ namespace MonoGame.Framework
             // Use RawInput to capture key events.
             Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.None);
             Device.KeyboardInput += OnRawKeyEvent;
-
-            _form.Activated += OnActivated;
-            _form.Deactivate += OnDeactivate;
             _form.ClientSizeChanged += OnClientSizeChanged;
-
             _form.KeyPress += OnKeyPress;
 
-            RegisterToAllWindows();
-        }
-
-        ~WinFormsGameWindow()
-        {
-            Dispose(false);
-        }
-
-        private void RegisterToAllWindows()
-        {
-            _allWindowsReaderWriterLockSlim.EnterWriteLock();
-
-            try
-            {
-                _allWindows.Add(this);
-            }
-            finally
-            {
-                _allWindowsReaderWriterLockSlim.ExitWriteLock();
-            }
-        }
-
-        private void UnregisterFromAllWindows()
-        {
-            _allWindowsReaderWriterLockSlim.EnterWriteLock();
-
-            try
-            {
-                _allWindows.Remove(this);
-            }
-            finally
-            {
-                _allWindowsReaderWriterLockSlim.ExitWriteLock();
-            }
+            _allWindows.Add(this);
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
-#if (WINDOWS && DIRECTX)
-            if (Game.GraphicsDevice != null)
-            {
-                if (Game.graphicsDeviceManager.HardwareModeSwitch)
-                {
-                    if (!_platform.IsActive && Game.GraphicsDevice.PresentationParameters.IsFullScreen)
-                   {
-                       Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
-                       Game.GraphicsDevice.CreateSizeDependentResources(true);
-                        Game.GraphicsDevice.ApplyRenderTargets(null);
-                   }
-                }
-          }
-#endif
             _platform.IsActive = true;
         }
 
@@ -387,11 +394,9 @@ namespace MonoGame.Framework
 
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
-
-#if !(WINDOWS && DIRECTX)
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
-#endif
+
                 if (manager.GraphicsDevice == null)
                     return;
             }
@@ -409,28 +414,18 @@ namespace MonoGame.Framework
 
         internal void RunLoop()
         {
-            // https://bugzilla.novell.com/show_bug.cgi?id=487896
-            // Since there's existing bug from implementation with mono WinForms since 09'
-            // Application.Idle is not working as intended
-            // So we're just going to emulate Application.Run just like Microsoft implementation
-            _form.Show();
-
-            var nativeMsg = new NativeMessage();
-            while (_form != null && _form.IsDisposed == false)
+            Application.Idle += OnIdle;
+            Form form = _form as Form;
+            
+            //If the control is not a form, it will be up to them
+            //to control the game loop.
+            if (form != null)
             {
-                if (PeekMessage(out nativeMsg, IntPtr.Zero, 0, 0, 0))
-                {
-                    Application.DoEvents();
-
-                    if (nativeMsg.msg == WM_QUIT)
-                        break;
-
-                    continue;
-                }
-
-                UpdateWindows();
-                Game.Tick();
+                Application.Run(form);
             }
+
+            Application.Idle -= OnIdle;
+
 
             // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
@@ -451,20 +446,23 @@ namespace MonoGame.Framework
             while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
+        private void OnIdle(object sender, EventArgs eventArgs)
+        {
+            // While there are no pending messages 
+            // to be processed tick the game.
+            NativeMessage msg;
+            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
+            {
+                UpdateWindows();
+                Game.Tick();
+            }
+        }
+
         internal void UpdateWindows()
         {
-            _allWindowsReaderWriterLockSlim.EnterReadLock();
-
-            try
-            {
-                // Update the mouse state for each window.
-                foreach (var window in _allWindows.Where(w => w.Game == Game))
-                    window.UpdateMouseState();
-            }
-            finally
-            {
-                _allWindowsReaderWriterLockSlim.ExitReadLock();
-            }
+            // Update the mouse state for each window.
+            foreach (var window in _allWindows)
+                window.UpdateMouseState();
         }
 
         private const uint WM_QUIT = 0x12;
@@ -493,20 +491,11 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        void Dispose(bool disposing)
-        {
-            if (disposing)
+            if (_form != null)
             {
-                if (_form != null)
-                {
-                    UnregisterFromAllWindows(); 
-                    _form.Dispose();
-                    _form = null;
-                }
+                _allWindows.Remove(this);
+                _form.Dispose();
+                _form = null;
             }
         }
 
