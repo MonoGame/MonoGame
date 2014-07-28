@@ -108,7 +108,7 @@ namespace MonoDevelop.MonoGameContent
 
 				var dict = new Microsoft.Xna.Framework.Content.Pipeline.OpaqueDataDictionary();
 				if (cfg != null) {
-					if (cfg.XnaCompressContent.ToLower() == "true") {
+					if (cfg.XnaCompressContent.ToLowerInvariant() == "true") {
 						// tell the manager to compress the output
 					}
 				}
