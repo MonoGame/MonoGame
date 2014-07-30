@@ -15,15 +15,15 @@ namespace MonoGame.Tests.Framework
     {
         private TouchPanelState _tps;
 
-        private GameTime GameTimeForFrame(int frameNo)
+        private TimeSpan GameTimeForFrame(int frameNo)
         {
-            return new GameTime(TimeSpan.FromSeconds(frameNo / 60D), TimeSpan.FromSeconds(1 / 60D));
+            return TimeSpan.FromSeconds(frameNo / 60D);
         }
 
         [SetUp]
         public void SetUp()
         {
-            TouchPanelState.Update(GameTimeForFrame(0));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(0);
             _tps = new TouchPanelState(new MockWindow());
         }
 
@@ -186,10 +186,10 @@ namespace MonoGame.Tests.Framework
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
             if (moveInBetween) //Moving shouldn't change the behavior
             {
-                TouchPanelState.Update(GameTimeForFrame(++frame));
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(++frame);
                 _tps.AddEvent(1, TouchLocationState.Moved, pos2);
             }
-            TouchPanelState.Update(GameTimeForFrame(++frame));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(++frame);
             _tps.AddEvent(1, TouchLocationState.Released, pos2);
 
             var state = _tps.GetState();
@@ -219,7 +219,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(TouchLocationState.Pressed, touch.State);
 
             if (waitAFrameForNextState)
-                TouchPanelState.Update(GameTimeForFrame(1));
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             state = _tps.GetState();
             Assert.AreEqual(1, state.Count); //Touch should still be there, but as released
@@ -230,7 +230,7 @@ namespace MonoGame.Tests.Framework
 
 
             if (waitAFrameForNextState)
-                TouchPanelState.Update(GameTimeForFrame(1));
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
            
             state = _tps.GetState();
             Assert.AreEqual(0, state.Count); //Touch should be gone now
@@ -249,7 +249,7 @@ namespace MonoGame.Tests.Framework
                 _tps.AddEvent(1, TouchLocationState.Moved, pos2);
             _tps.AddEvent(1, TouchLocationState.Released, pos2);
 
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             var state = _tps.GetState();
             Assert.AreEqual(0, state.Count); //Shouldn't get the touch that happened last frame
         }

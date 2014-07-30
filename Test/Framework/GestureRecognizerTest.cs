@@ -22,9 +22,9 @@ namespace MonoGame.Tests.Framework
             GestureType.DoubleTap | GestureType.DragComplete | GestureType.Flick | GestureType.FreeDrag | GestureType.Hold |
             GestureType.HorizontalDrag | GestureType.Pinch | GestureType.PinchComplete | GestureType.Tap | GestureType.VerticalDrag;
 
-        private GameTime GameTimeForFrame(int frameNo)
+        private TimeSpan GameTimeForFrame(int frameNo)
         {
-            return new GameTime(TimeSpan.FromSeconds(frameNo / 60D), TimeSpan.FromSeconds(1 / 60D));
+            return TimeSpan.FromSeconds(frameNo / 60D);
         }
 
 
@@ -32,7 +32,7 @@ namespace MonoGame.Tests.Framework
         [SetUp]
         public void SetUp()
         {
-            TouchPanelState.Update(GameTimeForFrame(0));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(0);
             _tps = new TouchPanelState(new MockWindow());
         }
 
@@ -41,7 +41,7 @@ namespace MonoGame.Tests.Framework
         {
             _tps.EnabledGestures = AllGestures;
 
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
         }
@@ -53,12 +53,12 @@ namespace MonoGame.Tests.Framework
             var pos = new Vector2(100, 150);
 
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(1, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.True(_tps.IsGestureAvailable);
             var gesture = _tps.ReadGesture();
@@ -81,12 +81,12 @@ namespace MonoGame.Tests.Framework
 
             //Do a first tap
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(1, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             //Will make a tap event if tap is enabled
             if (enableTap)
@@ -105,7 +105,7 @@ namespace MonoGame.Tests.Framework
 
             //Now do the second tap in the same location, this will make a double tap on press (but no tap)
             _tps.AddEvent(2, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(3);
 
             Assert.True(_tps.IsGestureAvailable);
             gesture = _tps.ReadGesture();
@@ -116,7 +116,7 @@ namespace MonoGame.Tests.Framework
 
             //This release should make no gestures
             _tps.AddEvent(2, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(4));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(4);
 
             Assert.False(_tps.IsGestureAvailable);
         }
@@ -131,16 +131,16 @@ namespace MonoGame.Tests.Framework
 
             //Do a first tap
             _tps.AddEvent(1, TouchLocationState.Pressed, pos1);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(1, TouchLocationState.Released, pos1);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             //Now do the second tap in a different location
             _tps.AddEvent(2, TouchLocationState.Pressed, pos2);
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(3);
 
             //Shouldn't make a double tap
             Assert.False(_tps.IsGestureAvailable);
@@ -159,24 +159,24 @@ namespace MonoGame.Tests.Framework
 
             //Place a finger down, this finger will never be released
             _tps.AddEvent(1, TouchLocationState.Pressed, new Vector2(10));
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Place a new finger down for a tap
             _tps.AddEvent(2, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.False(_tps.IsGestureAvailable);
 
             //Release it, should not make a tap
             _tps.AddEvent(2, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.False(_tps.IsGestureAvailable);
 
             //Press the finger down again, should not make a double tap
             _tps.AddEvent(3, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
         }
@@ -190,22 +190,22 @@ namespace MonoGame.Tests.Framework
 
             //Do a first tap
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(1, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             //Now wait 500ms (we require it within 300ms)
             for (int frame = 3; frame < 33; frame++)
             {
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(frame);
                 Assert.False(_tps.IsGestureAvailable);
             }
 
             _tps.AddEvent(2, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(33));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(33);
 
             //Shouldn't make a double tap
             Assert.False(_tps.IsGestureAvailable);
@@ -221,7 +221,7 @@ namespace MonoGame.Tests.Framework
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
 
             //We shouldn't generate the hold until the required time has passed
-            GameTime gt;
+            TimeSpan gt;
             int frame = 1;
             do
             {
@@ -229,8 +229,8 @@ namespace MonoGame.Tests.Framework
 
                 frame++;
                 gt = GameTimeForFrame(frame);
-                TouchPanelState.Update(gt);
-            } while (gt.TotalGameTime < TouchPanelState.TimeRequiredForHold);
+                TouchPanelState.CurrentTimestamp = gt;
+            } while (gt < TouchPanelState.TimeRequiredForHold);
 
             //The last Update should have generated a hold
             Assert.True(_tps.IsGestureAvailable);
@@ -252,12 +252,12 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Release it, should make a tap
             _tps.AddEvent(1, TouchLocationState.Released, pos);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
             Assert.True(_tps.IsGestureAvailable);
 
             var gesture = _tps.ReadGesture();
@@ -266,7 +266,7 @@ namespace MonoGame.Tests.Framework
 
             //Place finger again, should make a double tap
             _tps.AddEvent(2, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(3));
             Assert.True(_tps.IsGestureAvailable);
 
             gesture = _tps.ReadGesture();
@@ -275,8 +275,8 @@ namespace MonoGame.Tests.Framework
 
 
             //Now hold it for a while to make a hold gesture
-            var alreadyPassedTime = GameTimeForFrame(2).TotalGameTime;
-            GameTime gt;
+            var alreadyPassedTime = GameTimeForFrame(2);
+            TimeSpan gt;
             int frame = 4;
             do
             {
@@ -284,8 +284,8 @@ namespace MonoGame.Tests.Framework
 
                 frame++;
                 gt = GameTimeForFrame(frame);
-                TouchPanelState.Update(gt);
-            } while (gt.TotalGameTime < (TouchPanelState.TimeRequiredForHold + alreadyPassedTime));
+                TouchPanelState.CurrentTimestamp = gt;
+            } while (gt < (TouchPanelState.TimeRequiredForHold + alreadyPassedTime));
             
             //The last Update should have generated a hold
             Assert.True(_tps.IsGestureAvailable);
@@ -311,7 +311,7 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Move it until it should have made a drag
             int diff = 0;
@@ -324,7 +324,7 @@ namespace MonoGame.Tests.Framework
                 frame++;
 
                 _tps.AddEvent(1, TouchLocationState.Moved, startPos + diff * diffVec);
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
             }
 
             //We should have a gesture now
@@ -345,7 +345,7 @@ namespace MonoGame.Tests.Framework
             //If all gestures are enabled (DragComplete is enabled), releasing our touch will generate a DragComplete gesture
             frame++;
             _tps.AddEvent(1, TouchLocationState.Released, startPos + diff * diffVec);
-            TouchPanelState.Update(GameTimeForFrame(frame));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
 
             if (enabledGestures == AllDrags)
             {
@@ -372,7 +372,7 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Move it until it should have made a drag
             int diff = 0;
@@ -385,7 +385,7 @@ namespace MonoGame.Tests.Framework
                 frame++;
 
                 _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff));
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
             }
 
             //We should have a gesture now
@@ -402,7 +402,7 @@ namespace MonoGame.Tests.Framework
             //If DragComplete is enabled, releasing our touch will generate a DragComplete gesture
             frame++;
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(diff));
-            TouchPanelState.Update(GameTimeForFrame(frame));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
 
             if ((enabledGestures & GestureType.DragComplete) == GestureType.DragComplete)
             {
@@ -428,7 +428,7 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Move it until it should have made a drag
             int diff = 0;
@@ -441,7 +441,7 @@ namespace MonoGame.Tests.Framework
                 frame++;
 
                 _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff, 0));
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
             }
 
             //We should have a gesture now
@@ -466,12 +466,12 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Drag it, should get a drag
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(40, 0));
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.True(_tps.IsGestureAvailable);
             var gesture = _tps.ReadGesture();
@@ -482,13 +482,13 @@ namespace MonoGame.Tests.Framework
             _tps.EnabledGestures = GestureType.None;
 
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(3));
 
             Assert.False(_tps.IsGestureAvailable);
 
             //Release that touch, should make no gesture
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(4));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(4));
             Assert.False(_tps.IsGestureAvailable);
 
 
@@ -496,11 +496,11 @@ namespace MonoGame.Tests.Framework
             //Should make no gesture
 
             _tps.AddEvent(2, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(5));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(5));
             Assert.False(_tps.IsGestureAvailable);
 
             _tps.AddEvent(2, TouchLocationState.Released, startPos);
-            TouchPanelState.Update(GameTimeForFrame(6));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(6));
             Assert.False(_tps.IsGestureAvailable);
         }
 
@@ -514,12 +514,12 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Drag it, should get a drag
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(40, 0));
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.True(_tps.IsGestureAvailable);
             var gesture = _tps.ReadGesture();
@@ -530,7 +530,7 @@ namespace MonoGame.Tests.Framework
             _tps.EnabledGestures = GestureType.None;
 
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(3));
 
             Assert.False(_tps.IsGestureAvailable);
 
@@ -539,7 +539,7 @@ namespace MonoGame.Tests.Framework
 
             //Release that touch, should make no gesture
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(4));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(4));
 
             Assert.True(_tps.IsGestureAvailable);
             gesture = _tps.ReadGesture();
@@ -557,12 +557,12 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Drag it, should get a drag
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(40, 0));
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.True(_tps.IsGestureAvailable);
             var gesture = _tps.ReadGesture();
@@ -573,17 +573,17 @@ namespace MonoGame.Tests.Framework
             _tps.EnabledGestures = GestureType.None;
 
             _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(3));
             Assert.False(_tps.IsGestureAvailable);
 
             //Release the finger, should make no gesture (gestures are disabled)
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(4));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(4));
             Assert.False(_tps.IsGestureAvailable);
 
             //Press it down again
             _tps.AddEvent(2, TouchLocationState.Pressed, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(5));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(5));
             Assert.False(_tps.IsGestureAvailable);
 
             //Enable both gestures again
@@ -591,7 +591,7 @@ namespace MonoGame.Tests.Framework
 
             //Release the second touch, should make no gesture
             _tps.AddEvent(2, TouchLocationState.Released, startPos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(6));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(6));
 
             Assert.False(_tps.IsGestureAvailable);
         }
@@ -605,16 +605,16 @@ namespace MonoGame.Tests.Framework
             var pos = new Vector2(10, 10);
 
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Drag it a bit
                         _tps.AddEvent(1, TouchLocationState.Moved, pos + new Vector2(40, 0));
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             _tps.EnabledGestures = GestureType.Tap;
 
             _tps.AddEvent(1, TouchLocationState.Moved, pos + new Vector2(80, 0));
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             Assert.False(_tps.IsGestureAvailable);
         }
@@ -627,7 +627,7 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Move it until it should have made a flick
             int diff = 0;
@@ -640,14 +640,14 @@ namespace MonoGame.Tests.Framework
                 frame++;
 
                 _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff, 0));
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
             }
             Assert.False(_tps.IsGestureAvailable);
 
             //Now release
             frame++;
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(diff, 0));
-            TouchPanelState.Update(GameTimeForFrame(frame));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
 
             //Now we should have the flick
             Assert.True(_tps.IsGestureAvailable);
@@ -668,11 +668,11 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Then release it at the edge of the detection size
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(TouchPanelState.TapJitterTolerance, 0));
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             //This should not make a flick. If the distance is 1 greater it will.
             Assert.False(_tps.IsGestureAvailable);
@@ -690,7 +690,7 @@ namespace MonoGame.Tests.Framework
 
             //Place the finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, startPos);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
 
             //Move it until it should have made a flick
             int diff = 0;
@@ -701,7 +701,7 @@ namespace MonoGame.Tests.Framework
                 frame++;
 
                 _tps.AddEvent(1, TouchLocationState.Moved, startPos + new Vector2(diff, 0));
-                TouchPanelState.Update(GameTimeForFrame(frame));
+                TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
 
                 //Each drag should make a FreeDrag
                 Assert.True(_tps.IsGestureAvailable);
@@ -716,7 +716,7 @@ namespace MonoGame.Tests.Framework
             //Now release
             frame++;
             _tps.AddEvent(1, TouchLocationState.Released, startPos + new Vector2(diff, 0));
-            TouchPanelState.Update(GameTimeForFrame(frame));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(frame));
 
             //Now we should have the flick
             Assert.True(_tps.IsGestureAvailable);
@@ -748,12 +748,12 @@ namespace MonoGame.Tests.Framework
 
             //Place a finger down
             _tps.AddEvent(1, TouchLocationState.Pressed, pos1);
-            TouchPanelState.Update(GameTimeForFrame(1));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
             Assert.False(_tps.IsGestureAvailable);
 
             //Place the other finger down
             _tps.AddEvent(2, TouchLocationState.Pressed, pos2);
-            TouchPanelState.Update(GameTimeForFrame(2));
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(2);
 
             //Now we should have a pinch
             Assert.True(_tps.IsGestureAvailable);
@@ -764,13 +764,13 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(pos2, gesture.Position2);
 
             //If we do nothing, we shouldn't get more pinch events
-            TouchPanelState.Update(GameTimeForFrame(3));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(3));
             Assert.False(_tps.IsGestureAvailable);
 
             //But if we move a finger, we should get an updated pinch
             pos2 += new Vector2(50, 0);
             _tps.AddEvent(2, TouchLocationState.Moved, pos2);
-            TouchPanelState.Update(GameTimeForFrame(4));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(4));
 
             Assert.True(_tps.IsGestureAvailable);
             gesture = _tps.ReadGesture();
@@ -782,7 +782,7 @@ namespace MonoGame.Tests.Framework
             //Now releasing one of the fingers should make a pinch complete event
             pos1 -= new Vector2(0, 50);
             _tps.AddEvent(1, TouchLocationState.Released, pos1);
-            TouchPanelState.Update(GameTimeForFrame(5));
+            TouchPanelState.CurrentTimestamp = (GameTimeForFrame(5));
 
             Assert.True(_tps.IsGestureAvailable);
             gesture = _tps.ReadGesture();
