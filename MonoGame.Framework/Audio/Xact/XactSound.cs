@@ -17,6 +17,8 @@ namespace Microsoft.Xna.Framework.Audio
         private int _waveBankIndex;
         private int _trackIndex;
         private SoundEffectInstance _wave;
+        private float _volume;
+        private float _pitch;
 
         private uint _categoryID;
 
@@ -43,8 +45,8 @@ namespace Microsoft.Xna.Framework.Audio
 			_complexSound = (flags & 1) != 0;
 
             _categoryID = soundReader.ReadUInt16();
-            var volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
-            var pitch = soundReader.ReadInt16() / 1000.0f;
+            _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
+            _pitch = soundReader.ReadInt16() / 1000.0f;
 			soundReader.ReadByte (); //unkn
             soundReader.ReadUInt16 (); // entryLength
 			
@@ -136,6 +138,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
+                _wave.Volume = _volume;
                 _wave.Play();
 			}
 		}
