@@ -71,13 +71,8 @@ namespace Microsoft.Xna.Framework.Audio
 			if (_complexSound)
             {
 				_soundClips = new XactClip[numClips];
-				for (int i=0; i<numClips; i++) {
-					soundReader.ReadByte (); //unkn
-					uint clipOffset = soundReader.ReadUInt32 ();
-					soundReader.ReadUInt32 (); //unkn
-					
-					_soundClips[i] = new XactClip(soundBank, soundReader, clipOffset);
-				}
+				for (int i=0; i<numClips; i++) 
+					_soundClips[i] = new XactClip(soundBank, soundReader);
 			}
 
             var category = soundBank.AudioEngine.Categories[_categoryID];

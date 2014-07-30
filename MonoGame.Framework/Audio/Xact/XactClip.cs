@@ -13,12 +13,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 		private ClipEvent[] _events;
 		
-		public XactClip (SoundBank soundBank, BinaryReader clipReader, uint clipOffset)
+		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
+            _volume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
+            var clipOffset = clipReader.ReadUInt32();
+
+            // Unknown!
+            clipReader.ReadUInt32();
+
 			var oldPosition = clipReader.BaseStream.Position;
 			clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
 			
-			byte numEvents = clipReader.ReadByte();
+			var numEvents = clipReader.ReadByte();
 			_events = new ClipEvent[numEvents];
 			
 			for (int i=0; i<numEvents; i++) 
