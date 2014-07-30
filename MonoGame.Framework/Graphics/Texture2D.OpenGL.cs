@@ -490,6 +490,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if IOS
+        [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, UIImage uiImage)
         {
             return PlatformFromStream(graphicsDevice, uiImage.CGImage);
@@ -506,6 +507,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
 #if IOS || MONOMAC
+        [CLSCompliant(false)]
         public static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
         {
             var width = cgImage.Width;
@@ -559,7 +561,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC
+#if MONOMAC || WINDOWS
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -568,12 +570,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-            // TODO: We need to find a simple stand alone
-            // PNG encoder if we want to support this.
+#if MONOMAC || WINDOWS
+            SaveAsImage(stream, width, height, ImageFormat.Png);
+#else
             throw new NotImplementedException();
+#endif
         }
 
-#if MONOMAC
+#if MONOMAC || WINDOWS
 		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)

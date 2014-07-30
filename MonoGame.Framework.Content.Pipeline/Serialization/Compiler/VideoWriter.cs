@@ -9,12 +9,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         protected internal override void Write(ContentWriter output, VideoContent value)
         {
-            output.Write(value.Filename);
-            output.Write((int)value.Duration.TotalMilliseconds);
-            output.Write(value.Width);
-            output.Write(value.Height);
-            output.Write(value.FramesPerSecond);
-            output.Write((int)value.VideoSoundtrackType);
+            output.WriteObject<string>(value.Filename);
+            output.WriteObject<int>((int)value.Duration.TotalMilliseconds);
+            output.WriteObject<int>(value.Width);
+            output.WriteObject<int>(value.Height);
+            output.WriteObject<float>(value.FramesPerSecond);
+            output.WriteObject<int>((int)value.VideoSoundtrackType);
         }
     }
 }

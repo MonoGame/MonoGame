@@ -10,7 +10,7 @@
     <ProjectType>CSharp</ProjectType>
     <SortOrder>40</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>GameName</DefaultName>
+    <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>

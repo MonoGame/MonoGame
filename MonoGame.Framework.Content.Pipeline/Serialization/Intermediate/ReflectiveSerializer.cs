@@ -4,24 +4,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Xml;
 using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     internal class ReflectiveSerializer : ContentTypeSerializer
     {
+        const BindingFlags _bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
         private struct ElementInfo
         {
-            public string Name;
+            public ContentSerializerAttribute Attribute;
             public ContentTypeSerializer Serializer;
             public Action<object, object> Setter;
             public Func<object, object> Getter;
         };
 
-        private readonly Dictionary<string, ElementInfo> _elements = new Dictionary<string, ElementInfo>();
+        private readonly List<ElementInfo> _elements = new List<ElementInfo>();
+
+        private ContentTypeSerializer _baseSerializer;
 
         private bool GetElementInfo(IntermediateSerializer serializer, MemberInfo member, out ElementInfo info)
         {
@@ -34,34 +36,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             var prop = member as PropertyInfo;
             var field = member as FieldInfo;
             
-            // If we can write or read from it we can skip it.
-            if (prop != null && (!prop.CanWrite || !prop.CanRead))
-                return false;
-
-            // Default the to member name as the element name.
-            info.Name = member.Name;
-
             var attrib = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
             if (attrib != null)
             {
-                if (!string.IsNullOrEmpty(attrib.ElementName))
-                    info.Name = attrib.ElementName;
+                // Store the attribute for later use.
+                info.Attribute = attrib.Clone();
+
+                // Default the to member name as the element name.
+                if (string.IsNullOrEmpty(attrib.ElementName))
+                    info.Attribute.ElementName = member.Name;
             }
-            else if (prop != null)
+            else
             {
-                if (!ReflectionHelpers.PropertyIsPublic(prop))
-                    return false;
-            }
-            else if (field != null)
-            {
-                if (!field.IsPublic)
-                    return false;
+                // We don't have a serializer attribute, so we can
+                // only access this member thru a public field/property.
+
+                if (prop != null)
+                {
+                    // If we don't have at least a public getter then this 
+                    // property can't be serialized or deserialized in any way.
+                    if (prop.GetGetMethod() == null)
+                        return false;
+
+                    // If there is no public setter and the property is a system
+                    // type then we have no way for it to be deserialized.
+                    if (prop.GetSetMethod() == null &&
+                        prop.PropertyType.Namespace == "System")
+                        return false;
+                }
+                else if (field != null)
+                {
+                    if (!field.IsPublic)
+                        return false;
+                }
+
+                info.Attribute = new ContentSerializerAttribute();
+                info.Attribute.ElementName = member.Name;
             }
 
             if (prop != null)
             {
                 info.Serializer = serializer.GetTypeSerializer(prop.PropertyType);
-                info.Setter = (o, v) => prop.SetValue(o, v, null);
+                if (prop.CanWrite)
+                    info.Setter = (o, v) => prop.SetValue(o, v, null);
                 info.Getter = (o) => prop.GetValue(o, null);
             }
             else if (field != null)
@@ -81,20 +98,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
-            var properties = TargetType.GetAllProperties();
+            // If we have a base type then we need to deserialize it first.
+            if (TargetType.BaseType != null)
+                _baseSerializer = serializer.GetTypeSerializer(TargetType.BaseType);
+
+            // Cache all our serializable properties.
+            var properties = TargetType.GetProperties(_bindingFlags);
             foreach (var prop in properties)
             {
                 ElementInfo info;
                 if (GetElementInfo(serializer, prop, out info))
-                    _elements.Add(info.Name, info);
+                    _elements.Add(info);
             }
 
-            var fields = TargetType.GetAllFields();
+            // Cache all our serializable fields.
+            var fields = TargetType.GetFields(_bindingFlags);
             foreach (var field in fields)
             {
                 ElementInfo info;
                 if (GetElementInfo(serializer, field, out info))
-                    _elements.Add(info.Name, info);                
+                    _elements.Add(info);                
             }
         }
 
@@ -113,35 +136,42 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 }                
             }
 
-            var reader = input.Xml;
-            var depth = reader.Depth;
+            // First deserialize the base type.
+            if (_baseSerializer != null)
+                _baseSerializer.Deserialize(input, format, result);
 
-            // Read the next node.
-            while (reader.Read())
+            // Now deserialize our own elements.
+            foreach (var info in _elements)
             {
-                // Did we reach the end of this object?
-                if (reader.NodeType == XmlNodeType.EndElement)
-                    break;
-
-                Debug.Assert(reader.Depth == depth, "We are not at the right depth!");
-
-                if (reader.NodeType == XmlNodeType.Element)
+                if (!info.Attribute.FlattenContent)
                 {
-                    var elementName = reader.Name;
-                    reader.ReadStartElement();
-
-                    ElementInfo info;
-                    if (!_elements.TryGetValue(elementName, out info))
-                        throw new InvalidContentException(string.Format("Element `{0}` was not found in type `{1}`.", elementName, TargetType));
-                    var value = info.Serializer.Deserialize(input, format, null);
-                    info.Setter(result, value);
-                    reader.ReadEndElement();
-                    continue;
+                    if (!input.MoveToElement(info.Attribute.ElementName))
+                    {
+                        // If the the element was optional then we can
+                        // safely skip it and continue.
+                        if (info.Attribute.Optional)
+                            continue;
+                        
+                        // We failed to find a required element.
+                        throw new InvalidContentException(string.Format("The Xml element `{0}` is required!", info.Attribute.ElementName));
+                    }
                 }
 
-                // If we got here then we were not interested 
-                // in this node... so skip its children.
-                reader.Skip();
+                if (info.Attribute.SharedResource)
+                {
+                    Action<object> fixup = (o) => info.Setter(result, o);
+                    input.ReadSharedResource(info.Attribute, fixup);
+                }
+                else if (info.Setter == null)
+                {
+                    var value = info.Getter(result);
+                    input.ReadObject(info.Attribute, info.Serializer, value);
+                }
+                else
+                {
+                    var value = input.ReadObject<object>(info.Attribute, info.Serializer);
+                    info.Setter(result, value);
+                }
             }
 
             return result;

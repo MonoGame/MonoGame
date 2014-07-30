@@ -1723,7 +1723,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Interpolated <see cref="Color"/>.</returns>
         public static Color Lerp(Color value1, Color value2, Single amount)
         {
+<<<<<<< HEAD
             return new Color(
+=======
+			amount = MathHelper.Clamp(amount, 0, 1);
+            return new Color(   
+>>>>>>> 9a7908aa4f048a877cbeeb467c60a4a0bf9072bd
                 (int)MathHelper.Lerp(value1.R, value2.R, amount),
                 (int)MathHelper.Lerp(value1.G, value2.G, amount),
                 (int)MathHelper.Lerp(value1.B, value2.B, amount),

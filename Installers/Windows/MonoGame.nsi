@@ -101,13 +101,13 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
-  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.exe'
-  File /r '..\..\Tools\2MGFX\bin\x64\Release\*.dll'
-  File /r '..\..\Tools\MGCB\bin\x64\Release\*.exe'
-  File /r '..\..\Tools\MGCB\bin\x64\Release\*.dll'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.exe'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\*.dll'
-  File /r '..\..\Tools\Pipeline\bin\Windows\Release\Templates'
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\2MGFX\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\MGCB\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.exe'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
+  File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
 
   ; Install the assemblies for all the platforms we can 
@@ -129,7 +129,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
-  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   
@@ -144,7 +143,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
-  File '..\..\ThirdParty\Dependencies\OpenTK_svnversion.txt'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL.dll'
   File '..\..\ThirdParty\GamepadConfig\SDL_Mixer.dll'

@@ -1,12 +1,8 @@
 using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
-using System.Xml;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.IO;
 
 namespace MonoGame.Tests.ContentPipeline
@@ -113,19 +109,19 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        [TestCase("Effects/ParserTest.fx")]
+        [TestCase("Assets/Effects/ParserTest.fx")]
         public void TestParser(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.Windows);
         }
 
         [Test]
-        [TestCase("Effects/Stock/AlphaTestEffect.fx")]
-        [TestCase("Effects/Stock/BasicEffect.fx")]
-        [TestCase("Effects/Stock/DualTextureEffect.fx")]
-        [TestCase("Effects/Stock/EnvironmentMapEffect.fx")]
-        [TestCase("Effects/Stock/SkinnedEffect.fx")]
-        [TestCase("Effects/Stock/SpriteEffect.fx")]
+        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx")]
+        [TestCase("Assets/Effects/Stock/BasicEffect.fx")]
+        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx")]
+        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx")]
+        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx")]
+        [TestCase("Assets/Effects/Stock/SpriteEffect.fx")]
         public void BuildStockEffect(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.Windows);

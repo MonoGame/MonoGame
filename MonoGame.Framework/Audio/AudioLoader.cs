@@ -88,7 +88,7 @@ namespace Microsoft.Xna.Framework.Audio
             
             string data_signature = new string(reader.ReadChars(4));
 
-            while (data_signature.ToLower() != "data")
+            while (data_signature.ToLowerInvariant() != "data")
             {
                 reader.ReadBytes(reader.ReadInt32());
                 data_signature = new string(reader.ReadChars(4));

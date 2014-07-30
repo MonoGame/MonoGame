@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Name="Pipeline" Path="Tools/Pipeline" Type="GUI" Platforms="Windows">
+
+  <References>
+    <Reference Include="System" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
+  </References>
+
+  <Properties>
+    <NoWarn>1591,0436</NoWarn>
+    <RootNamespace>MonoGame.Tools.Pipeline</RootNamespace>
+    <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
+    <CustomDefinitions>
+      <Platform Name="Windows">TRACE;WINDOWS</Platform>
+    </CustomDefinitions>
+  </Properties>
+
+  <Files>
+
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\MGCB\CommandLineParser.cs">
+      <Link>Common\CommandLineParser.cs</Link>
+    </Compile>
+    <None Include="app.config" />
+
+    <Compile Include="Common\ActionStack.cs" />
+    <Compile Include="Common\ContentFolder.cs" />
+    <Compile Include="Common\ContentItem.cs" />
+    <Compile Include="Common\ContentItem.Processor.cs" />
+    <Compile Include="Common\ContentItem.Importer.cs" />
+    <Compile Include="Common\ContentItemTemplate.cs" />
+    <Compile Include="Common\ContentItemState.cs" />
+    <Compile Include="Common\ProjectState.cs" />
+    <Compile Include="Common\Selection.cs" />
+    <Compile Include="Common\PipelineController.NewAction.cs" />
+    <Compile Include="Common\PipelineController.ExcludeAction.cs" />
+    <Compile Include="Common\PipelineController.IncludeAction.cs" />
+    <Compile Include="Common\IController.cs" />
+    <Compile Include="Common\IProjectItem.cs" />
+    <Compile Include="Common\IProjectObserver.cs" />
+    <Compile Include="Common\IView.cs" />
+    <Compile Include="Common\PipelineProjectParser.cs" />
+    <Compile Include="Common\Util.cs" />
+    <Compile Include="Common\StringExtensions.cs" />
+    <Compile Include="Common\CustomPropertyDescriptors.cs" />
+    <Compile Include="Common\PipelineController.cs" />
+    <Compile Include="Common\PipelineProject.cs" />
+    <Compile Include="Common\PipelineTypes.cs" />
+
+
+    <!-- The Windows specfic stuff -->
+    <Compile Include="Windows\FolderEditing.cs" />
+    <Compile Include="Windows\UpdateAction.cs" />
+    <Compile Include="Windows\MainView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\MainView.Designer.cs">
+      <DependentUpon>MainView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\NewContentDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\NewContentDialog.Designer.cs">
+      <DependentUpon>NewContentDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\MultiSelectTreeview.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\AssemblyReferenceEditing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\PipelineProjectProxy.cs" />
+    <Compile Include="Windows\TreeViewExtensions.cs" />
+    <EmbeddedResource Include="Windows\MainView.resx">
+      <DependentUpon>MainView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Windows\NewContentDialog.resx">
+      <DependentUpon>NewContentDialog.cs</DependentUpon>
+    </EmbeddedResource>
+
+
+    <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="Icons\blueprint.png" />
+    <EmbeddedResource Include="Icons\folder_closed.png" />
+    <EmbeddedResource Include="Icons\folder_open.png" />
+    <EmbeddedResource Include="Icons\settings.png" />
+    <EmbeddedResource Include="Icons\font.png" />
+
+
+    <!-- Copy the template resources to the output -->
+    <None Include="Templates\XmlContent.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\XmlContent.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\SpriteFont.spritefont">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\SpriteFont.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+  </Files>
+
+</Project>

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 
 #if MONOMAC
 using MonoMac.OpenGL;
@@ -29,8 +30,16 @@ namespace Microsoft.Xna.Framework.Graphics
         private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 
-    internal void Activate(TextureTarget target, bool useMipmaps = false)
-    {
+        internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
+        {
+            if (GraphicsDevice == null)
+            {
+                // We're now bound to a device... no one should
+                // be changing the state of this object now!
+                GraphicsDevice = device;
+            }
+            Debug.Assert(GraphicsDevice == device, "The state was created for a different device!");
+
             switch (Filter)
       {
       case TextureFilter.Point:

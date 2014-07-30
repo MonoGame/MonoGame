@@ -13,12 +13,18 @@ namespace Microsoft.Xna.Framework.Audio
 
 		private ClipEvent[] _events;
 		
-		public XactClip (SoundBank soundBank, BinaryReader clipReader, uint clipOffset)
+		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
+            _volume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
+            var clipOffset = clipReader.ReadUInt32();
+
+            // Unknown!
+            clipReader.ReadUInt32();
+
 			var oldPosition = clipReader.BaseStream.Position;
 			clipReader.BaseStream.Seek(clipOffset, SeekOrigin.Begin);
 			
-			byte numEvents = clipReader.ReadByte();
+			var numEvents = clipReader.ReadByte();
 			_events = new ClipEvent[numEvents];
 			
 			for (int i=0; i<numEvents; i++) 
@@ -60,7 +66,8 @@ namespace Microsoft.Xna.Framework.Audio
                         new[] { waveBankIndex }, 
                         new[] { trackIndex }, 
                         VariationType.Ordered, 
-                        loopCount == 255);
+                        loopCount,
+                        false);
 
 					break;
                 }
@@ -71,20 +78,27 @@ namespace Microsoft.Xna.Framework.Audio
                     clipReader.ReadByte();
 
                     // Event flags
-                    clipReader.ReadByte();
+                    var eventFlags = clipReader.ReadByte();
+                    var playRelease = (eventFlags & 0x01) == 0x01;
+
+                    var loopCount = clipReader.ReadByte();
 
                     // Unknown!
-                    clipReader.ReadBytes(5);
+                    clipReader.ReadBytes(4);
 
                     // The number of tracks for the variations.
                     int numTracks = clipReader.ReadUInt16();
 
+                    // Not sure what most of this is.
+                    var moreFlags = clipReader.ReadByte();
+                    var newWaveOnLoop = (moreFlags & 0x40) == 0x40;
+                    
                     // The variation playlist type seems to be 
                     // stored in the bottom 4bits only.
-                    var variationType = clipReader.ReadUInt16() & 0x000F;
+                    var variationType = moreFlags & 0x0F;
 
                     // Unknown!
-                    clipReader.ReadBytes(4);
+                    clipReader.ReadBytes(5);
 
                     // Read in the variation playlist.
                     var waveBanks = new int[numTracks];
@@ -107,8 +121,9 @@ namespace Microsoft.Xna.Framework.Audio
                         soundBank, 
                         waveBanks, 
                         tracks, 
-                        (VariationType)variationType, 
-                        false);
+                        (VariationType)variationType,
+                        loopCount,
+                        newWaveOnLoop);
 
                     break;
                 }
