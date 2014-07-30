@@ -74,7 +74,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
         /// <summary>
-        /// Update the current timestamp and run gesture recognition for this frame if it is enabled
+        /// Update the current timestamp
         /// </summary>
         internal static void Update(GameTime gameTime)
         {
@@ -119,8 +119,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 if (existingTouch.Id == touch.Id)
                 {
-                    //If we are moving straight from Pressed to Released, that means we've never been seen, so just get rid of us
-                    if (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released)
+                    //If we are moving straight from Pressed to Released and we've existed for multiple frames, that means we've never been seen, so just get rid of us
+                    if (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released && existingTouch.PressTimestamp != touch.Timestamp)
                     {
                         state.RemoveAt(i);
                     }
@@ -138,6 +138,18 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchCollection GetState()
         {
+            //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
+            for (var i = _touchState.Count - 1; i >= 0; i--)
+            {
+                var touch = _touchState[i];
+
+                //If a touch was pressed and released in a previous frame and the user didn't ask about it then trash it.
+                if (touch.SameFrameReleased && touch.Timestamp < _currentTimestamp && touch.State == TouchLocationState.Pressed)
+                {
+                    _touchState.RemoveAt(i);
+                }
+            }
+
             var result = new TouchCollection(_touchState.ToArray());
             AgeTouches(_touchState);
             return result;
