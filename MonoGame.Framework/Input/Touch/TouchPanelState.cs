@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
         /// </summary>
-        static private TimeSpan _currentTimestamp;
+        internal static TimeSpan CurrentTimestamp { get; set; }
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -71,14 +71,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             Capabilities.Initialize();
             return Capabilities;
-        }
-
-        /// <summary>
-        /// Update the current timestamp
-        /// </summary>
-        internal static void Update(GameTime gameTime)
-        {
-            _currentTimestamp = gameTime.TotalGameTime;
         }
 
         /// <summary>
@@ -144,7 +136,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 var touch = _touchState[i];
 
                 //If a touch was pressed and released in a previous frame and the user didn't ask about it then trash it.
-                if (touch.SameFrameReleased && touch.Timestamp < _currentTimestamp && touch.State == TouchLocationState.Pressed)
+                if (touch.SameFrameReleased && touch.Timestamp < CurrentTimestamp && touch.State == TouchLocationState.Pressed)
                 {
                     _touchState.RemoveAt(i);
                 }
@@ -201,7 +193,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
-                var evt = new TouchLocation(touchId, state, position * _touchScale, _currentTimestamp);
+                var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
@@ -551,7 +543,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!GestureIsEnabled(GestureType.Hold) || _holdDisabled)
                 return;
 
-            var elapsed = _currentTimestamp - touch.PressTimestamp;
+            var elapsed = CurrentTimestamp - touch.PressTimestamp;
             if (elapsed < TimeRequiredForHold)
                 return;
 
@@ -607,7 +599,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // If we pressed and held too long then don't 
             // generate a tap event for it.
-            var elapsed = _currentTimestamp - touch.PressTimestamp;
+            var elapsed = CurrentTimestamp - touch.PressTimestamp;
             if (elapsed > TimeRequiredForHold)
                 return;
 

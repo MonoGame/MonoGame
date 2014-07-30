@@ -707,7 +707,7 @@ namespace Microsoft.Xna.Framework
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
-                TouchPanelState.Update(gameTime);
+                TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
         }
 
