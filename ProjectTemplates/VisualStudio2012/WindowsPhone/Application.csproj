@@ -142,6 +142,12 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
 
+  <Target Name="AfterResolveReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(_ReferenceRelatedPaths)" Condition="'%(Extension)' == '.xml'" />
+    </ItemGroup>
+  </Target>
+
   <Target Name="MonoGame_RemoveXnaAssemblies" AfterTargets="ImplicitlyExpandTargetFramework">
     <Message Text="MonoGame - Removing XNA Assembly references!" Importance="normal"/>
     <ItemGroup>
