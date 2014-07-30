@@ -77,7 +77,7 @@ namespace MonoGame.Tests {
 	partial class GameTest {
 		public static class Methods {
 			[TestFixture]
-			class Run : FixtureBase {
+			public class Run : FixtureBase {
 				[Test]
 				public void Can_only_be_called_once ()
 				{

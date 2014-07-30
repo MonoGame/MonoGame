@@ -22,9 +22,9 @@ namespace TwoMGFX
        
 		public static bool ParseBool(string value)
 		{
-		    if (value.ToLower() == "true" || value == "1")
+		    if (value.ToLowerInvariant() == "true" || value == "1")
 				return true;
-		    if (value.ToLower() == "false" || value == "0")
+		    if (value.ToLowerInvariant() == "false" || value == "0")
 		        return false;
 
 		    throw new Exception("Invalid boolean value '" + value + "'");

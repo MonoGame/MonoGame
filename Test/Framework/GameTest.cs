@@ -84,7 +84,7 @@ using NUnit.Framework.Constraints;
 
 namespace MonoGame.Tests {
 	static partial class GameTest {
-		abstract class FixtureBase {
+		public abstract class FixtureBase {
 			private MockGame _game;
 
 			protected MockGame Game {
@@ -107,7 +107,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
-		class Disposal : FixtureBase {
+		public class Disposal : FixtureBase {
 			[TestCase ("Components")]
 			[TestCase ("Content")]
 			[TestCase ("GraphicsDevice")]
@@ -203,7 +203,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
-		class Behaviors : FixtureBase {
+		public class Behaviors : FixtureBase {
 			[Test, RequiresSTA]
 			public void Nongraphical_run_succeeds ()
 			{
@@ -239,7 +239,7 @@ namespace MonoGame.Tests {
 			}
 		}
 
-		private class MockGame : TestGameBase {
+		public class MockGame : TestGameBase {
 			public MockGame ()
 			{
 				MinUpdateCount = int.MaxValue;
@@ -323,7 +323,7 @@ namespace MonoGame.Tests {
 			}
 		}
 
-		private enum ExitReason {
+		public enum ExitReason {
 			None,
 			MinimumsSatisfied,
 			MaxUpdateSatisfied,

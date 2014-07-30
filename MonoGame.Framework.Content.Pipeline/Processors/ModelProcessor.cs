@@ -98,6 +98,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             _identity = input.Identity;
             _logger = context.Logger;
 
+            // Perform the processor transforms.
+            if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
+            {
+                var rotX = Matrix.CreateRotationX(MathHelper.ToRadians(RotationX));
+                var rotY = Matrix.CreateRotationY(MathHelper.ToRadians(RotationY));
+                var rotZ = Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZ));
+                var scale = Matrix.CreateScale(Scale);
+                MeshHelper.TransformScene(input, rotZ * rotX * rotY * scale);
+            }
+
             // Gather all the nodes in tree traversal order.
             var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
 
