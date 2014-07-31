@@ -39,7 +39,7 @@
         We directly include a few MonoGame.Framework classes just so 
         we can use some enums and state classes from 2MGFX without all
         the extra dependancies of MonoGame.Framework.
-    -->    
+    -->
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs">
       <Link>MonoGame.Framework\BoundingBox.cs</Link>
     </Compile>
