@@ -35,6 +35,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
         private int _currentRenderTargetCount;
 
+        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+
         public TextureCollection Textures { get; private set; }
 
         public SamplerStateCollection SamplerStates { get; private set; }
@@ -127,6 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = gdi.PresentationParameters;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = gdi.GraphicsProfile;
             Initialize();
         }
@@ -136,6 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             Initialize();
         }
 
@@ -155,6 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = presentationParameters;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = graphicsProfile;
             Initialize();
         }
@@ -180,8 +185,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            GraphicsCapabilities.Initialize(this);
-
             PlatformInitialize();
 
             // Force set the default render states.
@@ -393,10 +396,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             internal set
             {
-                //check Profile
+                //Check if Profile is supported.
+                //TODO: [DirectX] Recreate the Device using the new 
+                //      feature level each time the Profile changes.
                 if(value > GraphicsDevice.GetHighestSupportedGraphicsProfile(this))
                     throw new System.NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
+                GraphicsCapabilities.Initialize(this);
             }
         }
 
