@@ -78,6 +78,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs">
+      <Link>Processors\Effect\Hash.cs</Link>
+    </Compile>
     <Compile Include="..\..\Tools\2MGFX\CommandLineParser.cs">
       <Link>Processors\Effect\CommandLineParser.cs</Link>
     </Compile>
