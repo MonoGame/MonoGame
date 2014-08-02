@@ -58,21 +58,33 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Vector2</see> with components <0, 0>.
+        /// </summary>
         public static Vector2 Zero
         {
             get { return zeroVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector2</see> with components <1, 1>.
+        /// </summary>
         public static Vector2 One
         {
             get { return unitVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector2</see> with components <1, 0>.
+        /// </summary>
         public static Vector2 UnitX
         {
             get { return unitXVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector2</see> with components <0, 1>.
+        /// </summary>
         public static Vector2 UnitY
         {
             get { return unitYVector; }
