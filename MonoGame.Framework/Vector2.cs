@@ -112,6 +112,12 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <returns>The result of the vector addition: value1 + value2.</returns>
         public static Vector2 Add(Vector2 value1, Vector2 value2)
         {
             value1.X += value2.X;
@@ -119,6 +125,14 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and
+        /// <paramref name="value2"/>, storing the result of the
+        /// addition in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <param name="result">The Vector2 that the result will be stored in.</param>
         public static void Add(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
             result.X = value1.X + value2.X;
@@ -396,6 +410,12 @@ namespace Microsoft.Xna.Framework
             result.Y = MathHelper.SmoothStep(value1.Y, value2.Y, amount);
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <returns>The result of the vector subtraction: value1 - value2.</returns>
         public static Vector2 Subtract(Vector2 value1, Vector2 value2)
         {
             value1.X -= value2.X;
@@ -403,6 +423,12 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <param name="result">The Vector2 that the result will be stored in.</param>
         public static void Subtract(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
             result.X = value1.X - value2.X;
