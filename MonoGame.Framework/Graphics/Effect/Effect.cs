@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// <summary>
             /// The MonoGame Effect file format header identifier ("MGFX"). 
             /// </summary>
-            public static int MGFXSignature = (BitConverter.IsLittleEndian) ? 0x5846474D: 0x4D474658;
+            public static readonly int MGFXSignature = (BitConverter.IsLittleEndian) ? 0x5846474D: 0x4D474658;
 
             /// <summary>
             /// The current MonoGame Effect file format versions
@@ -125,16 +125,18 @@ namespace Microsoft.Xna.Framework.Graphics
             header.HeaderSize = i;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
-                throw new Exception("The MGFX file is corrupt!");
-            if (header.Version != MGFXHeader.MGFXVersion)
-                throw new Exception("Wrong MGFX file version!");
+                throw new Exception("This does not appear to be a MonoGame MGFX file!");
+            if (header.Version < MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
+            if (header.Version > MGFXHeader.MGFXVersion)
+                throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
 
 #if DIRECTX
             if (header.Profile != 1)
 #else
 			if (header.Profile != 0)
 #endif
-                throw new Exception("The MGFX effect is the wrong profile for this platform!");
+                throw new Exception("This MGFX effect was built for a different platform!");
             
             
             return header;
