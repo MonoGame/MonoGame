@@ -30,8 +30,7 @@ namespace MonoGame.Utilities
         }
         
         /// <summary>
-        /// Compute Hash from a Stream's current position to the end.
-        /// Stream position is restored.
+        /// Compute a hash from the content of a stream and restore the position.
         /// </summary>
         /// <remarks>
         /// Modified FNV Hash in C#
@@ -44,16 +43,19 @@ namespace MonoGame.Utilities
             unchecked
             {
                 const int p = 16777619;
-                int hash = (int)2166136261;
+                var hash = (int)2166136261;
 
-                long prevPosition = stream.Position;
-                byte[] data = new byte[1024];
-                int length = 0;
+                var prevPosition = stream.Position;
+                stream.Position = 0;
+
+                var data = new byte[1024];
+                int length;
                 while((length = stream.Read(data, 0, data.Length)) != 0)
                 {
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                         hash = (hash ^ data[i]) * p;
                 }
+
                 // Restore stream position.
                 stream.Position = prevPosition;
 
