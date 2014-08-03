@@ -194,6 +194,10 @@ namespace Microsoft.Xna.Framework
             return (obj is Rectangle) ? this == ((Rectangle)obj) : false;
         }
 
+        /// <remarks>
+        /// Returns a String representation of this Rectangle in the format:
+        /// X:[x] Y:[y] Width:[width] Height:[height]
+        /// </remarks>
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3}}}", X, Y, Width, Height);
