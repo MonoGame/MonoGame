@@ -80,7 +80,7 @@ namespace MonoGame.Tests {
 
         private readonly float _epsilon;
 
-        MatrixComparer(float epsilon)
+        private MatrixComparer(float epsilon)
         {
             _epsilon = epsilon;
         }
@@ -106,6 +106,31 @@ namespace MonoGame.Tests {
         }
 
         public int GetHashCode(Matrix obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BoundingSphereComparer : IEqualityComparer<BoundingSphere>
+    {
+        static public BoundingSphereComparer Epsilon = new BoundingSphereComparer(0.000001f);
+
+        private readonly float _epsilon;
+
+        private BoundingSphereComparer(float epsilon)
+        {
+            _epsilon = epsilon;
+        }
+
+        public bool Equals(BoundingSphere x, BoundingSphere y)
+        {
+            return  Math.Abs(x.Center.X - y.Center.X) < _epsilon &&
+                    Math.Abs(x.Center.Y - y.Center.Y) < _epsilon &&
+                    Math.Abs(x.Center.Z - y.Center.Z) < _epsilon &&
+                    Math.Abs(x.Radius - y.Radius) < _epsilon;
+        }
+
+        public int GetHashCode(BoundingSphere obj)
         {
             throw new NotImplementedException();
         }
