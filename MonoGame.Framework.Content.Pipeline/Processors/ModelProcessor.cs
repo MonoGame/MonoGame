@@ -206,11 +206,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             // If we don't get a material then assign a default one.
             if (material == null)
-            {
                 material = new BasicMaterialContent();
-                foreach (var geometry in geometryCollection)
-                    geometry.Material = material;
-            }
 
             // Test requirements from the assigned material.
             int textureChannels;
@@ -237,8 +233,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
             }
 
+            // By default we must set the vertex color property
+            // to match XNA behavior.
+            material.OpaqueData["VertexColorEnabled"] = false;
+
+            // If we run into a geometry that requires vertex
+            // color we need a seperate material for it.
+            var colorMaterial = material.Clone();
+            colorMaterial.OpaqueData["VertexColorEnabled"] = true;    
+
             foreach (var geometry in geometryCollection)
             {
+                // Process the geometry.
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
@@ -251,9 +257,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                             _identity);
                 }
 
-                // Enable vertex color if the geometry has the channel to support it.
+                // Do we need to enable vertex color?
                 if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                    material.OpaqueData["VertexColorEnabled"] = true;
+                    geometry.Material = colorMaterial;
+                else
+                    geometry.Material = material;
             }
         }
 
