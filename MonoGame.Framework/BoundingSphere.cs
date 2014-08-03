@@ -221,31 +221,58 @@ namespace Microsoft.Xna.Framework
             if (points == null )
                 throw new ArgumentNullException("points");
 
-            float radius = 0;
-            Vector3 center = new Vector3();
-            // First, we'll find the center of gravity for the point 'cloud'.
-            int num_points = 0; // The number of points (there MUST be a better way to get this instead of counting the number of points one by one?)
-            
-            foreach (Vector3 v in points)
+            // From Real-Time Collision Detection (Page 89)
+
+            var minx = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            var maxx = -minx;
+            var miny = minx;
+            var maxy = -minx;
+            var minz = minx;
+            var maxz = -minx;
+
+            // Find the most extreme points along the principle axis.
+            var numPoints = 0;           
+            foreach (var pt in points)
             {
-                center += v;    // If we actually knew the number of points, we'd get better accuracy by adding v / num_points.
-                ++num_points;
+                ++numPoints;
+
+                if (pt.X < minx.X) 
+                    minx = pt;
+                if (pt.X > maxx.X) 
+                    maxx = pt;
+                if (pt.Y < miny.Y) 
+                    miny = pt;
+                if (pt.Y > maxy.Y) 
+                    maxy = pt;
+                if (pt.Z < minz.Z) 
+                    minz = pt;
+                if (pt.Z > maxz.Z) 
+                    maxz = pt;
             }
 
-            if (num_points == 0)
+            if (numPoints == 0)
                 throw new ArgumentException("You should have at least one point in points.");
 
-            center /= (float)num_points;
+            var sqDistX = Vector3.DistanceSquared(maxx, minx);
+            var sqDistY = Vector3.DistanceSquared(maxy, miny);
+            var sqDistZ = Vector3.DistanceSquared(maxz, minz);
 
-            // Calculate the radius of the needed sphere (it equals the distance between the center and the point further away).
-            foreach (Vector3 v in points)
+            // Pick the pair of most distant points.
+            var min = minx;
+            var max = maxx;
+            if (sqDistY > sqDistX && sqDistY > sqDistZ) 
             {
-                float distance = ((Vector3)(v - center)).Length();
-                
-                if (distance > radius)
-                    radius = distance;
+                max = maxy;
+                min = miny;
             }
-
+            if (sqDistZ > sqDistX && sqDistZ > sqDistY) 
+            {
+                max = maxz;
+                min = minz;
+            }
+            
+            var center = (min + max) * 0.5f;
+            var radius = Vector3.Distance(max, center);
             return new BoundingSphere(center, radius);
         }
 
