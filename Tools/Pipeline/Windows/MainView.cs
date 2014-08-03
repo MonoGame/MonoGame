@@ -75,6 +75,7 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+            _controller.View = this;
 
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
@@ -630,7 +631,7 @@ namespace MonoGame.Tools.Pipeline
             _openProjectMenuItem.Enabled = notBuilding;
             _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 

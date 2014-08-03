@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using Android.App;
 using Android.Content;
@@ -7,7 +11,11 @@ using Android.Views;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
+#if OUYA
+    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
+#else
     public class AndroidGameActivity : Activity
+#endif
     {
         internal Game Game { private get; set; }
 
@@ -25,7 +33,8 @@ namespace Microsoft.Xna.Framework
 		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
+            RequestWindowFeature(WindowFeatures.NoTitle);
+            base.OnCreate(savedInstanceState);
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -37,8 +46,6 @@ namespace Microsoft.Xna.Framework
 
             _orientationListener = new OrientationListener(this);
 
-            RequestWindowFeature(WindowFeatures.NoTitle);
-
 			Game.Activity = this;
 		}
 
@@ -49,11 +56,6 @@ namespace Microsoft.Xna.Framework
 			// we need to refresh the viewport here.
 			base.OnConfigurationChanged (newConfig);
 		}
-
-        public override void OnBackPressed()
-        {
-            this.MoveTaskToBack(true);
-        }
 
         protected override void OnPause()
         {

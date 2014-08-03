@@ -46,13 +46,14 @@ namespace MonoGameContentProcessors.Processors
 
             // Create the effect object.
             EffectObject effect = null;
+            var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = EffectObject.FromShaderInfo(shaderInfo);
+                effect = EffectObject.CompileEffect(shaderInfo, out shaderErrorsAndWarnings);
             }
-            catch (Exception ex)
+            catch (ShaderCompilerException)
             {
-                throw ProcessErrorsAndWarnings(ex.Message, input, context);
+                throw ProcessErrorsAndWarnings(shaderErrorsAndWarnings, input, context);
             }
 
             // Write out the effect to a runtime format.

@@ -111,8 +111,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			return b.Depth.CompareTo(a.Depth);
 		}
-		
-		public void DrawBatch ( SpriteSortMode sortMode )
+
+        public void DrawBatch(SpriteSortMode sortMode, EffectPass prePass, Effect effect = null)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 bool shouldFlush = item.Texture != tex;
                 if ( shouldFlush )
                 {
-                    DrawVertexArray( startIndex, index );
+                    DrawVertexArray( startIndex, index, prePass, effect );
                     startIndex = index;
                     tex = item.Texture;
                     
@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // flush the remaining vertexArray data
-			DrawVertexArray(startIndex, index);
+			DrawVertexArray(startIndex, index, prePass, effect);
 			
 			_batchItemList.Clear();
 		}
@@ -217,13 +217,19 @@ namespace Microsoft.Xna.Framework.Graphics
             _vertexArray = new VertexPositionColorTexture[4 * newCount];
 		}
         
-		void DrawVertexArray ( int start, int end )
+		void DrawVertexArray ( int start, int end, EffectPass prePass, Effect effect = null )
 		{
             if ( start == end )
                 return;
 
             var vertexCount = end - start;
-            _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
+            
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                prePass.Apply();
+                pass.Apply();
+                _device._graphics.DrawArrays(DrawMode.Triangles, start / 2 * 3, vertexCount / 2 * 3);
+            }
 		}
 	}
 }

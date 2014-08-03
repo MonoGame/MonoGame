@@ -63,3 +63,5 @@ Test/*.csproj
 !Test/MonoGame.Test.XNA.csproj
 /*.sln
 *.speccache
+*.ncrunchproject
+*.ncrunchsolution

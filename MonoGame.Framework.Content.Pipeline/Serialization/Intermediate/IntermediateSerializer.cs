@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 
@@ -52,29 +53,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         private Dictionary<Type, ContentTypeSerializer> _serializers;
 
+        private Dictionary<Type, Type> _genericSerializerTypes;
+
+
         public static T Deserialize<T>(XmlReader input, string referenceRelocationPath)
         {
             var serializer = new IntermediateSerializer();
             var reader = new IntermediateReader(serializer, input, referenceRelocationPath);
-            if (!reader.MoveToElement("XnaContent"))
-                throw new InvalidContentException(string.Format("Could not find XnaContent element in '{0}'.", referenceRelocationPath));
+            var asset = default(T);
 
-            // Initialize the namespace lookups from
-            // the attributes on the XnaContent element.
-            serializer.CreateNamespaceLookup(input);
+            try
+            {
+                if (!reader.MoveToElement("XnaContent"))
+                    throw new InvalidContentException(string.Format("Could not find XnaContent element in '{0}'.",
+                                                                    referenceRelocationPath));
 
-            // Move past the XnaContent.
-            input.ReadStartElement();
+                // Initialize the namespace lookups from
+                // the attributes on the XnaContent element.
+                serializer.CreateNamespaceLookup(input);
 
-            // Read the asset.
-            var format = new ContentSerializerAttribute { ElementName = "Asset" };
-            var asset = reader.ReadObject<T>(format);
+                // Move past the XnaContent.
+                input.ReadStartElement();
 
-            // TODO: Read the shared resources and external 
-            // references here!
+                // Read the asset.
+                var format = new ContentSerializerAttribute {ElementName = "Asset"};
+                asset = reader.ReadObject<T>(format);
 
-            // Move past the closing XnaContent element.
-            input.ReadEndElement();
+                // Process the shared resources and external references.
+                reader.ReadSharedResources();
+                reader.ReadExternalReferences();
+
+                // Move past the closing XnaContent element.
+                input.ReadEndElement();
+            }
+            catch (XmlException xmlException)
+            {
+                throw reader.NewInvalidContentException(xmlException, "An error occured parsing.");
+            }
 
             return asset;
         }
@@ -85,11 +100,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (_serializers == null)
             {
                 _serializers = new Dictionary<Type, ContentTypeSerializer>();
+                _genericSerializerTypes = new Dictionary<Type, Type>();
 
                 var types = ContentTypeSerializerAttribute.GetTypes();
                 foreach (var t in types)
                 {
-                    if (!t.IsGenericType)
+                    if (t.IsGenericType)
+                    {
+                        var genericType = t.BaseType.GetGenericArguments()[0];
+                        _genericSerializerTypes.Add(genericType.GetGenericTypeDefinition(), t);
+                    }
+                    else
                     {
                         var cts = Activator.CreateInstance(t) as ContentTypeSerializer;
                         cts.Initialize(this);
@@ -102,16 +123,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             ContentTypeSerializer serializer;
             if (_serializers.TryGetValue(type, out serializer))
                 return serializer;
-           
-            // If we still don't have a serializer then 
-            // fallback to the reflection based serializer.
-            if (serializer == null)
+
+            Type serializerType;
+
+            if (type.IsArray)
             {
+                if (type.GetArrayRank() != 1)
+                    throw new RankException("We only support single dimension arrays.");
+
+                var arrayType = typeof(ArraySerializer<>).MakeGenericType(new[] { type.GetElementType() });
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(arrayType);
+            }
+            else if (type.IsGenericType && _genericSerializerTypes.TryGetValue(type.GetGenericTypeDefinition(), out serializerType))
+            {
+                serializerType = serializerType.MakeGenericType(type.GetGenericArguments());
+                serializer = (ContentTypeSerializer)Activator.CreateInstance(serializerType);
+            }
+            else if (type.IsEnum)
+            {
+                serializer = new EnumSerializer(type);
+            }
+            else
+            {
+                // The reflective serializer is not for primitive types!
+                if (type.IsPrimitive)
+                    throw new NotImplementedException(string.Format("Unhandled primitive type `{0}`!", type.FullName));
+
+                // We still don't have a serializer then we 
+                // fallback to the reflection based serializer.
                 serializer = new ReflectiveSerializer(type);
-                serializer.Initialize(this);
             }
 
+            Debug.Assert(serializer.TargetType == type, "Target type mismatch!");
+
+            // We cache the serializer before we initialize it to 
+            // avoid a stack overflow on recursive types.
             _serializers.Add(type, serializer);
+            serializer.Initialize(this);
+
             return serializer;
         }
 
@@ -162,6 +211,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             // Shortcut for friendly C# names
             if (_typeAliases.TryGetValue(typeName, out foundType))
                 return foundType;
+
+            // If this is an array then handle it separately.
+            if (typeName.EndsWith("[]"))
+            {
+                var arrayType = typeName.Substring(0, typeName.Length - 2);
+                foundType = FindType(arrayType);
+                return foundType == null ? null : foundType.MakeArrayType();
+            }
 
             // Expand any namespaces in the asset type
             foreach (var pair in _namespaceLookup)

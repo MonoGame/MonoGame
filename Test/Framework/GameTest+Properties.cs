@@ -80,11 +80,15 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
-namespace MonoGame.Tests {
-	partial class GameTest {
-		public static class Properties {
+namespace MonoGame.Tests 
+{
+	partial class GameTest 
+    {
+		public static class Properties 
+        {
 			[TestFixture]
-			class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> {
+			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> 
+            {
 				public Components ()
 					: base (g => g.Components)
 				{ }
@@ -100,7 +104,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class Content : ReadWritePropertyFixtureBase<ContentManager> {
+			public class Content : ReadWritePropertyFixtureBase<ContentManager> {
 				public Content ()
 					: base (g => g.Content)
 				{
@@ -132,7 +136,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class GraphicsDevice_ : ReadOnlyPropertyFixtureBase<GraphicsDevice> {
+			public class GraphicsDevice_ : ReadOnlyPropertyFixtureBase<GraphicsDevice> {
 				public GraphicsDevice_ ()
 					: base (g => g.GraphicsDevice)
 				{ }
@@ -179,7 +183,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class InactiveSleepTime : ReadWritePropertyFixtureBase<TimeSpan> {
+			public class InactiveSleepTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public InactiveSleepTime ()
 					: base (g => g.InactiveSleepTime)
 				{
@@ -196,7 +200,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class IsActive : ReadOnlyPropertyFixtureBase<bool> {
+			public class IsActive : ReadOnlyPropertyFixtureBase<bool> {
 				public IsActive ()
 					: base (g => g.IsActive)
 				{
@@ -205,7 +209,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class IsFixedTimeStep : ReadWritePropertyFixtureBase<bool> {
+			public class IsFixedTimeStep : ReadWritePropertyFixtureBase<bool> {
 				public IsFixedTimeStep ()
 					: base (g => g.IsFixedTimeStep)
 				{
@@ -220,7 +224,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class IsMouseVisible : ReadWritePropertyFixtureBase<bool> {
+			public class IsMouseVisible : ReadWritePropertyFixtureBase<bool> {
 				public IsMouseVisible ()
 					: base (g => g.IsMouseVisible)
 				{
@@ -235,7 +239,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class LaunchParameters_ : ReadOnlyPropertyFixtureBase<LaunchParameters> {
+			public class LaunchParameters_ : ReadOnlyPropertyFixtureBase<LaunchParameters> {
 				public LaunchParameters_ ()
 					: base (g => g.LaunchParameters)
 				{ }
@@ -251,7 +255,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class Services : ReadOnlyPropertyFixtureBase<GameServiceContainer> {
+			public class Services : ReadOnlyPropertyFixtureBase<GameServiceContainer> {
 				public Services ()
 					: base (g => g.Services)
 				{ }
@@ -267,7 +271,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class TargetElapsedTime : ReadWritePropertyFixtureBase<TimeSpan> {
+			public class TargetElapsedTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public TargetElapsedTime ()
 					: base (g => g.TargetElapsedTime)
 				{
@@ -283,7 +287,7 @@ namespace MonoGame.Tests {
 			}
 
 			[TestFixture]
-			class Window : ReadOnlyPropertyFixtureBase<GameWindow> {
+			public class Window : ReadOnlyPropertyFixtureBase<GameWindow> {
 				public Window ()
 					: base (g => g.Window)
 				{ }
@@ -305,7 +309,7 @@ namespace MonoGame.Tests {
 				}
 			}
 
-			abstract class PropertyFixtureBase<PropertyT> : FixtureBase {
+			public abstract class PropertyFixtureBase<PropertyT> : FixtureBase {
 				private Func<Game, PropertyT> _getter;
 				protected PropertyFixtureBase (Expression<Func<Game, PropertyT> > propertyExpression)
 				{
@@ -386,7 +390,7 @@ namespace MonoGame.Tests {
 				}
 			}
 
-			abstract class ReadOnlyPropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
+			public abstract class ReadOnlyPropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadOnlyPropertyFixtureBase (
 					Expression<Func<Game, PropertyT> > propertyExpression)
 					: base (propertyExpression)
@@ -402,7 +406,7 @@ namespace MonoGame.Tests {
 				}
 			}
 
-			abstract class ReadWritePropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
+			public abstract class ReadWritePropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadWritePropertyFixtureBase (
 					Expression<Func<Game, PropertyT>> propertyExpression)
 					: base (propertyExpression)

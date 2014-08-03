@@ -181,6 +181,11 @@ namespace MGCB
             _copyItems.Add(sourceFile);
         }
 
+        [CommandLineParameter(
+            Name = "compress",
+            Description = "Compress the XNB files for smaller file sizes.")]
+        public bool CompressContent = false;
+
         public class ContentItem
         {
             public string SourceFile;
@@ -214,6 +219,7 @@ namespace MGCB
             
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
+            _manager.CompressContent = CompressContent;
 
             // Feed all the assembly references to the pipeline manager
             // so it can resolve importers, processors, writers, and types.
@@ -267,6 +273,20 @@ namespace MGCB
                     newContent.SourceFiles.Add(c.SourceFile);
 
                     ++successCount;
+                }
+                catch (InvalidContentException ex)
+                {
+                    var message = string.Empty;
+                    if (!string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                    {
+                        message = ex.ContentIdentity.SourceFilename;
+                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
+                            message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
+                        message += ": ";
+                    }
+                    message += ex.Message;
+                    Console.WriteLine(message);
+                    ++errorCount;
                 }
                 catch (PipelineException ex)
                 {

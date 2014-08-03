@@ -172,8 +172,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 var currentWidth = PresentationParameters.BackBufferWidth;
                 var currentHeight = PresentationParameters.BackBufferHeight;
 
-                if (_depthStencilView == null || (currentWidth != texture2D.Description.Width &&
-                    currentHeight != texture2D.Description.Height))
+                if (_depthStencilView == null || 
+                    currentWidth  != texture2D.Description.Width ||
+                    currentHeight != texture2D.Description.Height)
                 {
                     PresentationParameters.BackBufferWidth = texture2D.Description.Width;
                     PresentationParameters.BackBufferHeight = texture2D.Description.Height;
