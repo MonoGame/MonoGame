@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests {
@@ -72,22 +72,45 @@ namespace MonoGame.Tests {
         }
     }
 
-	static class MathUtility {
+    public static class ArrayUtil
+    {
+        public static T[] ConvertTo<T>(byte[] source) where T : struct
+        {
+            var sizeOfDest = Marshal.SizeOf(typeof(T));
+            var count = source.Length / sizeOfDest;
+            var dest = new T[count];
 
+            var pinned = GCHandle.Alloc(source, GCHandleType.Pinned);
+            var pointer = pinned.AddrOfPinnedObject();
+
+            for (var i = 0; i < count; i++, pointer+=sizeOfDest)
+                dest[i] = (T)Marshal.PtrToStructure(pointer, typeof(T));
+
+            pinned.Free();
+
+            return dest;
+        }
+    }
+
+	static class MathUtility 
+    {
 		public static void MinMax (int a, int b, out int min, out int max)
 		{
-			if (a > b) {
+			if (a > b) 
+            {
 				min = b;
 				max = a;
-			} else {
+			} 
+            else 
+            {
 				min = a;
 				max = b;
 			}
 		}
 	}
 
-	static class Paths {
-
+	static class Paths 
+    {
 		private const string AssetFolder = "Assets";
 		private static readonly string FontFolder = Path.Combine (AssetFolder, "Fonts");
 		private static readonly string ReferenceImageFolder = Path.Combine (AssetFolder, "ReferenceImages");
