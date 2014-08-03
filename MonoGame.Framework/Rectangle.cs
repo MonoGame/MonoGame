@@ -198,16 +198,6 @@ namespace Microsoft.Xna.Framework
         /// Returns a String representation of this Rectangle in the format:
         /// X:[x] Y:[y] Width:[width] Height:[height]
         /// </remarks>
-        /// <example>
-        /// <c>
-        /// Rectangle rect = new Rectangle(10, 20, 30, 40);
-        /// Console.WriteLine(rect.ToString());
-        /// </c>
-        /// <para>
-        /// Will return the text:
-        /// X:10 Y:20 Width:30 Height:40
-        /// </para>
-        /// </example>
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3}}}", X, Y, Width, Height);

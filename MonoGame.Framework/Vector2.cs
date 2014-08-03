@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
         /// <summary>
-        /// Returns a <see>Vector2</see> with components <0, 0>.
+        /// Returns a <see>Vector2</see> with components 0, 0.
         /// </summary>
         public static Vector2 Zero
         {
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Returns a <see>Vector2</see> with components <1, 1>.
+        /// Returns a <see>Vector2</see> with components 1, 1.
         /// </summary>
         public static Vector2 One
         {
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Returns a <see>Vector2</see> with components <1, 0>.
+        /// Returns a <see>Vector2</see> with components 1, 0.
         /// </summary>
         public static Vector2 UnitX
         {
@@ -83,7 +83,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Returns a <see>Vector2</see> with components <0, 1>.
+        /// Returns a <see>Vector2</see> with components 0, 1.
         /// </summary>
         public static Vector2 UnitY
         {
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1">The first vector to add.</param>
         /// <param name="value2">The second vector to add.</param>
-        /// <returns>The result of the vector addition: value1 + value2.</returns>
+        /// <returns>The result of the vector addition.</returns>
         public static Vector2 Add(Vector2 value1, Vector2 value2)
         {
             value1.X += value2.X;
@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1">The first vector to add.</param>
         /// <param name="value2">The second vector to add.</param>
-        /// <param name="result">The Vector2 that the result will be stored in.</param>
+        /// <param name="result">The result of the vector addition.</param>
         public static void Add(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
             result.X = value1.X + value2.X;
@@ -415,7 +415,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1">The vector to be subtracted from.</param>
         /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
-        /// <returns>The result of the vector subtraction: value1 - value2.</returns>
+        /// <returns>The result of the vector subtraction.</returns>
         public static Vector2 Subtract(Vector2 value1, Vector2 value2)
         {
             value1.X -= value2.X;
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value1">The vector to be subtracted from.</param>
         /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
-        /// <param name="result">The Vector2 that the result will be stored in.</param>
+        /// <param name="result">The result of the vector subtraction.</param>
         public static void Subtract(ref Vector2 value1, ref Vector2 value2, out Vector2 result)
         {
             result.X = value1.X - value2.X;
