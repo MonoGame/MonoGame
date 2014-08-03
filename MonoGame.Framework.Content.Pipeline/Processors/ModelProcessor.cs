@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
         private ContentIdentity _identity;
-        private ContentBuildLogger _logger;
 
         #region Fields for default values
 
@@ -96,7 +95,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _identity = input.Identity;
-            _logger = context.Logger;
 
             // Perform the processor transforms.
             if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
@@ -150,7 +148,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         private ModelMeshContent ProcessMesh(MeshContent mesh, ModelBoneContent parent, ContentProcessorContext context)
         {
-            var bounds = new BoundingSphere();
             var parts = new List<ModelMeshPartContent>();
             var vertexBuffer = new VertexBufferContent();
             var indexBuffer = new IndexCollection();
@@ -160,24 +157,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 var vertices = geometry.Vertices;
                 var vertexCount = vertices.VertexCount;
-                var geomBuffer = geometry.Vertices.CreateVertexBuffer();
-                vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
+                ModelMeshPartContent partContent;
+                if (vertexCount == 0)
+                    partContent = new ModelMeshPartContent();
+                else
+                {
+                    var geomBuffer = geometry.Vertices.CreateVertexBuffer();
+                    vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
 
-                var startIndex = indexBuffer.Count;
-                indexBuffer.AddRange(geometry.Indices);
+                    var startIndex = indexBuffer.Count;
+                    indexBuffer.AddRange(geometry.Indices);
 
-                var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+                    partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+
+                    // Geoms are supposed to all have the same decl, so just steal one of these
+                    vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+
+                    startVertex += vertexCount;
+                }
+
                 partContent.Material = geometry.Material;
                 parts.Add(partContent);
-
-                // Update mesh bounding box
-                bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
-
-                // Geoms are supposed to all have the same decl, so just steal one of these
-                vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
-
-                startVertex += vertexCount;
             }
+
+            var bounds = new BoundingSphere();
+            if (mesh.Positions.Count > 0)
+                bounds = BoundingSphere.CreateFromPoints(mesh.Positions);
 
             return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
@@ -199,27 +204,64 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
         {
-            var basicMaterial = material as BasicMaterialContent;
+            // If we don't get a material then assign a default one.
             if (material == null)
-                material = basicMaterial = new BasicMaterialContent();
+                material = new BasicMaterialContent();
+
+            // Test requirements from the assigned material.
+            int textureChannels;
+            if (material is DualTextureMaterialContent)
+            {
+                textureChannels = 2;
+            }
+            else if (material is SkinnedMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is EnvironmentMapMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is AlphaTestMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else
+            {
+                // Just check for a "Texture" which should cover custom Effects
+                // and BasicEffect which can have an optional texture.
+                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
+            }
+
+            // By default we must set the vertex color property
+            // to match XNA behavior.
+            material.OpaqueData["VertexColorEnabled"] = false;
+
+            // If we run into a geometry that requires vertex
+            // color we need a seperate material for it.
+            var colorMaterial = material.Clone();
+            colorMaterial.OpaqueData["VertexColorEnabled"] = true;    
 
             foreach (var geometry in geometryCollection)
             {
+                // Process the geometry.
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
-                if (basicMaterial != null)
+                // Verify we have the right number of texture coords.
+                for (var i = 0; i < textureChannels; i++)
                 {
-                    // If the basic material specifies a texture, geometry must have coordinates.
-                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
                             "Geometry references material with texture, but no texture coordinates were found.",
                             _identity);
-
-                    // Enable vertex color if the geometry has the channel to support it.
-                    if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                        basicMaterial.VertexColorEnabled = true;
                 }
+
+                // Do we need to enable vertex color?
+                if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                    geometry.Material = colorMaterial;
+                else
+                    geometry.Material = material;
             }
         }
 

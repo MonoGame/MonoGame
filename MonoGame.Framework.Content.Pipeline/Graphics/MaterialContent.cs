@@ -49,7 +49,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Reference to a texture from the collection.</returns>
         protected ExternalReference<TextureContent> GetTexture(string key)
         {
-            return _textures[key];
+            ExternalReference<TextureContent> texture;
+            _textures.TryGetValue(key, out texture);
+            return texture;
         }
 
         /// <summary>
@@ -96,6 +98,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 _textures[key] = value;
             else
                 _textures.Remove(key);
+        }
+
+        /// <summary>
+        /// Helper method to make a copy of a material.
+        /// </summary>
+        /// <returns>A clone of the material.</returns>
+        public MaterialContent Clone()
+        {
+            // Construct it via reflection.
+            var clone = (MaterialContent)Activator.CreateInstance(GetType());
+
+            // Give it the same identity as the original material.
+            clone.Name = Name;
+            clone.Identity = Identity;
+
+            // Just copy the opaque data and textures which should
+            // result in the same properties being set if the material
+            // is implemented correctly.
+            foreach (var pair in Textures)
+                clone.Textures.Add(pair.Key, pair.Value);            
+            foreach (var pair in OpaqueData)
+                clone.OpaqueData.Add(pair.Key, pair.Value);
+
+            return clone;
         }
     }
 }

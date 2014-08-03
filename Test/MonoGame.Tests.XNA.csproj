@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="ContentPipeline\AssetTestClasses.cs" />
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs" />
+    <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
     <Compile Include="Framework\ColorTest.cs" />
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
