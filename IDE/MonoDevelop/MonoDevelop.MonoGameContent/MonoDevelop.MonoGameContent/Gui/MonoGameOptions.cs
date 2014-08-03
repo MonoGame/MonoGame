@@ -31,7 +31,7 @@ namespace MonoDevelop.MonoGameContent
 		public void LoadPanelContents (MonoGameContentProjectConfiguration cfg)
 		{
 			cmbPlatforms.Active = (int)Enum.Parse (typeof(TargetPlatform), cfg.MonoGamePlatform);
-			chkCompress.Active = cfg.XnaCompressContent.ToLower() == "true";
+			chkCompress.Active = cfg.XnaCompressContent.ToLowerInvariant() == "true";
 		}
 
 		public void StorePanelContents (MonoGameContentProjectConfiguration cfg)

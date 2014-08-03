@@ -69,6 +69,20 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get { return _name; }
 		}
+
+        public static Song FromUri(string name, Uri uri)
+        {
+            if (!uri.IsAbsoluteUri)
+            {
+                var song = new Song(uri.OriginalString);
+                song._name = name;
+                return song;
+            }
+            else
+            {
+                throw new NotImplementedException("Loading songs from an absolute path is not implemented");
+            }
+        }
 		
 		public void Dispose()
         {
