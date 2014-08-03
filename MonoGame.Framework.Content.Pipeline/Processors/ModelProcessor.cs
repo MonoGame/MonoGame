@@ -148,7 +148,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         private ModelMeshContent ProcessMesh(MeshContent mesh, ModelBoneContent parent, ContentProcessorContext context)
         {
-            var bounds = new BoundingSphere();
             var parts = new List<ModelMeshPartContent>();
             var vertexBuffer = new VertexBufferContent();
             var indexBuffer = new IndexCollection();
@@ -158,8 +157,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 var vertices = geometry.Vertices;
                 var vertexCount = vertices.VertexCount;
+                ModelMeshPartContent partContent;
                 if (vertexCount == 0)
-                    parts.Add(new ModelMeshPartContent());
+                    partContent = new ModelMeshPartContent();
                 else
                 {
                     var geomBuffer = geometry.Vertices.CreateVertexBuffer();
@@ -168,20 +168,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     var startIndex = indexBuffer.Count;
                     indexBuffer.AddRange(geometry.Indices);
 
-                    var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
-                    parts.Add(partContent);
-
-                    partContent.Material = geometry.Material;
-
-                    // Update mesh bounding box
-                    bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
+                    partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
 
                     // Geoms are supposed to all have the same decl, so just steal one of these
                     vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
 
                     startVertex += vertexCount;
                 }
+
+                partContent.Material = geometry.Material;
+                parts.Add(partContent);
             }
+
+            var bounds = new BoundingSphere();
+            if (mesh.Positions.Count > 0)
+                bounds = BoundingSphere.CreateFromPoints(mesh.Positions);
 
             return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
