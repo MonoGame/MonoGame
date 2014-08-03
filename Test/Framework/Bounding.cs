@@ -16,6 +16,15 @@ namespace MonoGame.Tests.Framework
             var zeroPoint = BoundingSphere.CreateFromPoints( new[] {Vector3.Zero} );
             Assert.AreEqual(new BoundingSphere(), zeroPoint);
 
+            var onePoint = BoundingSphere.CreateFromPoints(new[] { Vector3.One });
+            Assert.AreEqual(new BoundingSphere(Vector3.One, 0), onePoint);
+
+            var twoPoint = BoundingSphere.CreateFromPoints(new[] { Vector3.Zero, Vector3.One });
+            Assert.AreEqual(new BoundingSphere(new Vector3(0.5f, 0.5f, 0.5f), 0.8660254f), twoPoint);
+
+            var threePoint = BoundingSphere.CreateFromPoints(new[] { new Vector3(0, 0, 0), new Vector3(-1, 0, 0), new Vector3(1, 1, 1) });
+            Assert.That(new BoundingSphere(new Vector3(0, 0.5f, 0.5f), 1.224745f), Is.EqualTo(threePoint).Using(BoundingSphereComparer.Epsilon));
+
             Assert.Throws<ArgumentException>(() => BoundingSphere.CreateFromPoints(new Vector3[] {}));
         }
 
