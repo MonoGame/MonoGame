@@ -49,7 +49,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Reference to a texture from the collection.</returns>
         protected ExternalReference<TextureContent> GetTexture(string key)
         {
-            return _textures[key];
+            ExternalReference<TextureContent> texture;
+            _textures.TryGetValue(key, out texture);
+            return texture;
         }
 
         /// <summary>
