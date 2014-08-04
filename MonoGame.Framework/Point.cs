@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
         #region Constructors
 
         /// <summary>
-        /// Creates a <see>Point</see> with at the provided coordinates.
+        /// Creates a <see>Point</see> with the provided coordinates.
         /// </summary>
         /// <param name="x">The x coordinate of the <see>Point</see> to create.</param>
         /// <param name="y">The y coordinate of the <see>Point</see> to create.</param>
