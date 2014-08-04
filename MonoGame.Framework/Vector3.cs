@@ -69,26 +69,41 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 0, 0.
+        /// </summary>
         public static Vector3 Zero
         {
             get { return zero; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 1, 1, 1.
+        /// </summary>
         public static Vector3 One
         {
             get { return one; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 1, 0, 0.
+        /// </summary>
         public static Vector3 UnitX
         {
             get { return unitX; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 1, 0.
+        /// </summary>
         public static Vector3 UnitY
         {
             get { return unitY; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 0, 1.
+        /// </summary>
         public static Vector3 UnitZ
         {
             get { return unitZ; }
@@ -158,6 +173,12 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <returns>The result of the vector addition.</returns>
         public static Vector3 Add(Vector3 value1, Vector3 value2)
         {
             value1.X += value2.X;
@@ -166,6 +187,14 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and
+        /// <paramref name="value2"/>, storing the result of the
+        /// addition in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <param name="result">The result of the vector addition.</param>
         public static void Add(ref Vector3 value1, ref Vector3 value2, out Vector3 result)
         {
             result.X = value1.X + value2.X;
@@ -506,6 +535,12 @@ namespace Microsoft.Xna.Framework
             result.Z = MathHelper.SmoothStep(value1.Z, value2.Z, amount);
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <returns>The result of the vector subtraction.</returns>
         public static Vector3 Subtract(Vector3 value1, Vector3 value2)
         {
             value1.X -= value2.X;
@@ -514,6 +549,12 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <param name="result">The result of the vector subtraction.</param>
         public static void Subtract(ref Vector3 value1, ref Vector3 value2, out Vector3 result)
         {
             result.X = value1.X - value2.X;
