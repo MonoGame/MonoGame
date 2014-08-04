@@ -121,6 +121,10 @@ namespace Microsoft.Xna.Framework
             return X ^ Y;
         }
 
+        /// <summary>
+        /// Returns a String representation of this Point in the format:
+        /// X:[x] Y:[y]
+        /// </summary>
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1}}}", X, Y);
