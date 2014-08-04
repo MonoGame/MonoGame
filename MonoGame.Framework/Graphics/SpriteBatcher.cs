@@ -201,9 +201,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// overflow the 16 bit array indices for vertices.
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
-        /// <param name="prePass">The first pass of SpriteEffect</param>
-        /// <param name="effect">The effect to apply to the drawn geometry</param>
-        public void DrawBatch(SpriteSortMode sortMode, EffectPass prePass, Effect effect = null)
+        /// <param name="effect">The custom effect to apply to the drawn geometry</param>
+        public void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -248,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var shouldFlush = !ReferenceEquals(item.Texture, tex);
                     if (shouldFlush)
                     {
-                        FlushVertexArray(startIndex, index, prePass, effect);
+                        FlushVertexArray(startIndex, index, effect);
 
                         tex = item.Texture;
                         startIndex = index = 0;
@@ -266,7 +265,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _freeBatchItemQueue.Enqueue(item);
                 }
                 // flush the remaining vertexArray data
-                FlushVertexArray(startIndex, index, prePass, effect);
+                FlushVertexArray(startIndex, index, effect);
                 // Update our batch count to continue the process of culling down
                 // large batches
                 batchCount -= numBatchesToProcess;
@@ -279,9 +278,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="start">Start index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
-        /// <param name="prePass">The first pass of SpriteEffect</param>
-        /// <param name="effect">The effect to apply to the geometry</param>
-        private void FlushVertexArray(int start, int end, EffectPass prePass, Effect effect)
+        /// <param name="effect">The custom effect to apply to the geometry</param>
+        private void FlushVertexArray(int start, int end, Effect effect)
         {
             if (start == end)
                 return;
@@ -291,9 +289,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the effect is not null, then apply each pass and render the geometry
             if (effect != null)
             {
-                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                var passes = effect.CurrentTechnique.Passes;
+                foreach (var pass in passes)
                 {
-                    prePass.Apply();
                     pass.Apply();
 
                     _device.DrawUserIndexedPrimitives(
@@ -307,11 +305,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         VertexPositionColorTexture.VertexDeclaration);
                 }
             }
-            // if no effect is defined, then simply apply the base pass and render
             else
             {
-                prePass.Apply();
-
+                // If no custom effect is defined, then simply render.
                 _device.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
                     _vertexArray,

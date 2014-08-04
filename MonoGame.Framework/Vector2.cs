@@ -362,6 +362,12 @@ namespace Microsoft.Xna.Framework
             result.Y = value1.Y * value2.Y;
         }
 
+        /// <summary>
+        /// Returns a <see>Vector2</see> pointing in the opposite
+        /// direction of <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The vector to negate.</param>
+        /// <returns>The vector negation of <paramref name="value"/>.</returns>
         public static Vector2 Negate(Vector2 value)
         {
             value.X = -value.X;
@@ -369,6 +375,12 @@ namespace Microsoft.Xna.Framework
             return value;
         }
 
+        /// <summary>
+        /// Stores a <see>Vector2</see> pointing in the opposite
+        /// direction of <paramref name="value"/> in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value">The vector to negate.</param>
+        /// <param name="result">The vector that the negation of <paramref name="value"/> will be stored in.</param>
         public static void Negate(ref Vector2 value, out Vector2 result)
         {
             result.X = -value.X;
