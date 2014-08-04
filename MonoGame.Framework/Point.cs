@@ -50,6 +50,9 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Point</see> with coordinates 0, 0.
+        /// </summary>
         public static Point Zero
         {
             get { return zeroPoint; }
