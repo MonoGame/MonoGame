@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _blendState.PlatformApplyState(GraphicsDevice);
 #endif
             
-            _batcher.DrawBatch(_sortMode, _spritePass, _effect);
+            _batcher.DrawBatch(_sortMode, _effect);
         }
 		
 		void Setup() 
@@ -122,6 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Matrix.Multiply(ref _matrix, ref projection, out projection);
 
             _matrixTransform.SetValue(projection);
+            _spritePass.Apply();
 		}
 		
         void CheckValid(Texture2D texture)
@@ -375,7 +376,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (_sortMode == SpriteSortMode.Immediate)
 			{
-				_batcher.DrawBatch(_sortMode, _spritePass, _effect);
+				_batcher.DrawBatch(_sortMode, _effect);
 			}
 		}
 
