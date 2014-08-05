@@ -76,18 +76,6 @@ namespace MonoGame.Tests.Visual
     [TestFixture]
     class Texture3DTest : VisualTestFixtureBase
     {
-        [SetUp]
-        public override void SetUp()
-        {
-            base.SetUp();
-
-#if XNA
-            // Texture3D is available only in HiDef graphics profile.
-            var graphicsDeviceManager = (GraphicsDeviceManager)Game.Services.GetService(typeof(IGraphicsDeviceManager));
-            graphicsDeviceManager.PreparingDeviceSettings += (sender, args) => { args.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef; };
-#endif
-        }
-
         [TestCase(1, 1, 1)]
         [TestCase(8, 8, 8)]
         [TestCase(31, 7, 13)]
