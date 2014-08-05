@@ -4,10 +4,12 @@
 
 using System;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Rectangle : IEquatable<Rectangle>
     {
         #region Private Fields
@@ -194,6 +196,19 @@ namespace Microsoft.Xna.Framework
         public override bool Equals(object obj)
         {
             return (obj is Rectangle) ? this == ((Rectangle)obj) : false;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.X, "  ",
+                    this.Y, "  ",
+                    this.Width, "  ",
+                    this.Height
+                    );
+            }
         }
 
         /// <remarks>

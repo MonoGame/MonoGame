@@ -3,11 +3,13 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
@@ -238,6 +240,16 @@ namespace Microsoft.Xna.Framework
             return a.Equals(b);
         }
 
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Pos( ", this.Position.DebugDisplayString, " )  \r\n",
+                    "Dir( ", this.Direction.DebugDisplayString, " )"
+                );
+            }
+        }
 
         public override string ToString()
         {

@@ -785,6 +785,23 @@ namespace Microsoft.Xna.Framework
 		    return quaternion2;
         }
 
+        internal string DebugDisplayString
+        {
+            get
+            {
+                if (this == Quaternion.identity)
+                {
+                    return "Identity";
+                }
+
+                return string.Concat(
+                    this.X.ToString(), " ",
+                    this.Y.ToString(), " ",
+                    this.Z.ToString(), " ",
+                    this.W.ToString()
+                );
+            }
+        }
 
         public override string ToString()
         {
