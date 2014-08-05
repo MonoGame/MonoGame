@@ -42,6 +42,7 @@ namespace MonoGame.Tests.Visual
                 Game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, 20, 20);
                 Game.GraphicsDevice.SetRenderTarget(_extraRenderTarget);
                 Game.GraphicsDevice.SetRenderTargets(renderTargets);
+                Game.GraphicsDevice.Clear(new Color(68, 34, 136, 255));
                 DrawTexture();
             };
 
