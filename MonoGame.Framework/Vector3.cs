@@ -575,16 +575,16 @@ namespace Microsoft.Xna.Framework
             result.Z = value1.Z - value2.Z;
         }
 
-        private static string Format = "0.0##";
+        private static string Format = "G";
         private string DebugDisplayString
         {
             get
             {
-                return string.Concat("(",
+                return string.Concat(
                     this.X.ToString(Format), ", ",
                     this.Y.ToString(Format), ", ",
-                    this.Z.ToString(Format), 
-                    ")");
+                    this.Z.ToString(Format)
+                    );
             }
         }
 

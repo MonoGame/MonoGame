@@ -32,7 +32,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    [DebuggerDisplay("DebugDisplayString")]
+    [DebuggerDisplay("{DebugDisplayString}")]
     public struct Quaternion : IEquatable<Quaternion>
     {
         [DataMember]
@@ -810,7 +810,24 @@ namespace Microsoft.Xna.Framework
 		    return quaternion2;
         }
 
+        private static string Format = "G";
+        private string DebugDisplayString
+        {
+            get
+            {
+                if (this == Quaternion.identity)
+                {
+                    return "Identity";
+                }
 
+                return string.Concat(
+                    this.X.ToString(Format), ", ",
+                    this.Y.ToString(Format), ", ",
+                    this.Z.ToString(Format), ", ",
+                    this.W.ToString(Format)
+                    );
+            }
+        }
 
         public override string ToString()
         {
