@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var semanticStr = string.Empty;
                 if (!string.IsNullOrEmpty(Semantic))                
-                    semanticStr = string.Concat(" <", Semantic, ">", Semantic);
+                    semanticStr = string.Concat(" <", Semantic, ">");
 
                 string valueStr;
                 if (Data == null)
