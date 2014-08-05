@@ -29,10 +29,12 @@ using System;
 using System.Text;
 using System.Globalization;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString}")]
     public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
@@ -516,6 +518,18 @@ namespace Microsoft.Xna.Framework
             var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22);
             result.X = x;
             result.Y = y;
+        }
+
+        private static string Format = "0.0##";
+        private string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat("( ", 
+                    this.X.ToString(Format), ", ",
+                    this.Y.ToString(Format),
+                    " )"   );
+            }
         }
 
         public override string ToString()

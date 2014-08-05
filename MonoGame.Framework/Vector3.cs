@@ -34,6 +34,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString}")]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
@@ -572,6 +573,19 @@ namespace Microsoft.Xna.Framework
             result.X = value1.X - value2.X;
             result.Y = value1.Y - value2.Y;
             result.Z = value1.Z - value2.Z;
+        }
+
+        private static string Format = "0.0##";
+        private string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat("( ",
+                    this.X.ToString(Format), ", ",
+                    this.Y.ToString(Format), ", ",
+                    this.Z.ToString(Format), 
+                    " )");
+            }
         }
 
         public override string ToString()
