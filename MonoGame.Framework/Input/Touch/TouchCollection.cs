@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	{
         private TouchLocation[] _collection;
 
-        public static readonly TouchCollection Empty = new TouchCollection(new TouchLocation[] { });
+        internal static readonly TouchCollection Empty = new TouchCollection(new TouchLocation[] { });
         
 		#region Properties
 
