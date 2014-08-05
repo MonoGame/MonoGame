@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var semanticStr = string.Empty;
                 if (!string.IsNullOrEmpty(Semantic))                
-                    semanticStr = string.Format(" <{0}>", Semantic);
+                    semanticStr = string.Concat(" <", Semantic, ">", Semantic);
 
                 string valueStr;
                 if (Data == null)
@@ -151,8 +151,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             break;
                     }
                 }
-
-                return string.Format("[{0} {1}]{2} {3} : {4}", ParameterClass, ParameterType, semanticStr, Name, valueStr);
+                
+                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", valueStr);
             }
         }
 
