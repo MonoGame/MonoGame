@@ -520,15 +520,14 @@ namespace Microsoft.Xna.Framework
             result.Y = y;
         }
 
-        private static string Format = "G";
-        private string DebugDisplayString
+        internal string DebugDisplayString
         {
             get
             {
                 return string.Concat(
-                    this.X.ToString(Format), "  ",
-                    this.Y.ToString(Format)
-                    );
+                    this.X.ToString(), "  ",
+                    this.Y.ToString()
+                );
             }
         }
 

@@ -27,11 +27,13 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Ray : IEquatable<Ray>
     {
         #region Public Fields
@@ -262,6 +264,16 @@ namespace Microsoft.Xna.Framework
             return a.Equals(b);
         }
 
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat( 
+                    this.Position.DebugDisplayString, "  :  ",
+                    this.Direction.DebugDisplayString                    
+                );
+            }
+        }
 
         public override string ToString()
         {

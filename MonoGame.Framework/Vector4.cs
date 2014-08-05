@@ -574,18 +574,16 @@ namespace Microsoft.Xna.Framework
             result.W = w;
         }
 
-
-        private static string Format = "G";
-        private string DebugDisplayString
+        internal string DebugDisplayString
         {
             get
             {
                 return string.Concat(
-                    this.X.ToString(Format), "  ",
-                    this.Y.ToString(Format), "  ",
-                    this.Z.ToString(Format), "  ",
-                    this.W.ToString(Format)
-                    );
+                    this.X.ToString(), "  ",
+                    this.Y.ToString(), "  ",
+                    this.Z.ToString(), "  ",
+                    this.W.ToString()
+                );
             }
         }
 

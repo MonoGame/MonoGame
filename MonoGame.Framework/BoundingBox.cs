@@ -31,11 +31,13 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
 
@@ -532,6 +534,17 @@ namespace Microsoft.Xna.Framework
         public static bool operator !=(BoundingBox a, BoundingBox b)
         {
             return !a.Equals(b);
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.Min.DebugDisplayString, "  :  ",
+                    this.Max.DebugDisplayString
+                    );
+            }
         }
 
         public override string ToString()

@@ -810,8 +810,7 @@ namespace Microsoft.Xna.Framework
 		    return quaternion2;
         }
 
-        private static string Format = "G";
-        private string DebugDisplayString
+        internal string DebugDisplayString
         {
             get
             {
@@ -821,11 +820,11 @@ namespace Microsoft.Xna.Framework
                 }
 
                 return string.Concat(
-                    this.X.ToString(Format), " ",
-                    this.Y.ToString(Format), " ",
-                    this.Z.ToString(Format), " ",
-                    this.W.ToString(Format)
-                    );
+                    this.X.ToString(), " ",
+                    this.Y.ToString(), " ",
+                    this.Z.ToString(), " ",
+                    this.W.ToString()
+                );
             }
         }
 

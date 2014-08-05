@@ -1798,9 +1798,7 @@ namespace Microsoft.Xna.Framework
 		    result.M44 = matrix1.M44 - matrix2.M44;
         }
 
-        private static string Format = "G";
-
-        private string DebugDisplayString
+        internal string DebugDisplayString
         {
             get
             {
@@ -1810,10 +1808,10 @@ namespace Microsoft.Xna.Framework
                 }
 
                 return string.Concat(
-                    this.M11.ToString(Format), "  ", this.M12.ToString(Format), "  ", this.M13.ToString(Format), "  ", this.M14.ToString(Format), "  :  ",
-                    this.M21.ToString(Format), "  ", this.M22.ToString(Format), "  ", this.M23.ToString(Format), "  ", this.M24.ToString(Format), "  :  ",
-                    this.M31.ToString(Format), "  ", this.M32.ToString(Format), "  ", this.M33.ToString(Format), "  ", this.M34.ToString(Format), "  :  ",
-                    this.M41.ToString(Format), "  ", this.M42.ToString(Format), "  ", this.M43.ToString(Format), "  ", this.M44.ToString(Format) );
+                    this.M11.ToString(), "  ", this.M12.ToString(), "  ", this.M13.ToString(), "  ", this.M14.ToString(), "  :  ",
+                    this.M21.ToString(), "  ", this.M22.ToString(), "  ", this.M23.ToString(), "  ", this.M24.ToString(), "  :  ",
+                    this.M31.ToString(), "  ", this.M32.ToString(), "  ", this.M33.ToString(), "  ", this.M34.ToString(), "  :  ",
+                    this.M41.ToString(), "  ", this.M42.ToString(), "  ", this.M43.ToString(), "  ", this.M44.ToString() );
             }
         }
 
