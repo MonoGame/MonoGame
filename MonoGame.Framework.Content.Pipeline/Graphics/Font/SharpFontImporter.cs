@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
 					// Which characters do we want to include?
-					var characters = CharacterRegion.Flatten(options.CharacterRegions);
+                    var characters = options.Characters;
 
 					var glyphList = new List<Glyph>();
 					// Rasterize each character in turn.

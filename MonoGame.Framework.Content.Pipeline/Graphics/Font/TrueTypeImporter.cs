@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				//				}
 
 				// Which characters do we want to include?
-				var characters = CharacterRegion.Flatten(options.CharacterRegions);
+                var characters = options.Characters;
 
 				var glyphList = new List<Glyph>();
 
