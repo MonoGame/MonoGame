@@ -580,12 +580,12 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return string.Concat("( ",
+                return string.Concat("(",
                     this.X.ToString(Format), ", ",
                     this.Y.ToString(Format), ", ",
                     this.Z.ToString(Format), ", W: ",
                     this.W.ToString(Format), 
-                    " )");
+                    ")");
             }
         }
 

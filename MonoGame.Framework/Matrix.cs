@@ -1805,10 +1805,10 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat("[ ",
-                    "M11 [ ", this.M11.ToString(Format), ", ", this.M12.ToString(Format), ", ", this.M13.ToString(Format), ", ", this.M14.ToString(Format), " ] ",
-                    "M21 [ ", this.M21.ToString(Format), ", ", this.M22.ToString(Format), ", ", this.M23.ToString(Format), ", ", this.M24.ToString(Format), " ] ",
-                    "M31 [ ", this.M31.ToString(Format), ", ", this.M32.ToString(Format), ", ", this.M33.ToString(Format), ", ", this.M34.ToString(Format), " ] ",
-                    "M41 [ ", this.M41.ToString(Format), ", ", this.M42.ToString(Format), ", ", this.M43.ToString(Format), ", ", this.M44.ToString(Format), " ] ]");
+                    "M11 [", this.M11.ToString(Format), ", ", this.M12.ToString(Format), ", ", this.M13.ToString(Format), ", ", this.M14.ToString(Format), "] ",
+                    "M21 [", this.M21.ToString(Format), ", ", this.M22.ToString(Format), ", ", this.M23.ToString(Format), ", ", this.M24.ToString(Format), "] ",
+                    "M31 [", this.M31.ToString(Format), ", ", this.M32.ToString(Format), ", ", this.M33.ToString(Format), ", ", this.M34.ToString(Format), "] ",
+                    "M41 [", this.M41.ToString(Format), ", ", this.M42.ToString(Format), ", ", this.M43.ToString(Format), ", ", this.M44.ToString(Format), "] ]");
             }
         }
 

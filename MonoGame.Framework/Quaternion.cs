@@ -26,11 +26,13 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("DebugDisplayString")]
     public struct Quaternion : IEquatable<Quaternion>
     {
         [DataMember]
@@ -807,6 +809,7 @@ namespace Microsoft.Xna.Framework
 		    quaternion2.W = -quaternion.W;
 		    return quaternion2;
         }
+
 
 
         public override string ToString()
