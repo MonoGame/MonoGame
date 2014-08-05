@@ -43,15 +43,27 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        /// <summary>
+        /// The x coordinate of the top-left corner of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int X;
 
+        /// <summary>
+        /// The y coordinate of the top-left corner of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Y;
 
+        /// <summary>
+        /// The width of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Width;
 
+        /// <summary>
+        /// The height of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Height;
 
@@ -59,26 +71,41 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
+        /// <summary>
+        /// Returns a <see>Rectangle</see> with X=0, Y=0, Width=0, and Height=0.
+        /// </summary>
         public static Rectangle Empty
         {
             get { return emptyRectangle; }
         }
 
+        /// <summary>
+        /// Returns the x coordinate of the left edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Left
         {
             get { return this.X; }
         }
 
+        /// <summary>
+        /// Returns the x coordinate of the right edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Right
         {
             get { return (this.X + this.Width); }
         }
 
+        /// <summary>
+        /// Returns the y coordinate of the top edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Top
         {
             get { return this.Y; }
         }
 
+        /// <summary>
+        /// Returns the y coordinate of the bottom edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Bottom
         {
             get { return (this.Y + this.Height); }
@@ -216,7 +243,6 @@ namespace Microsoft.Xna.Framework
                    Top        < value.Bottom;            
         }
 
-
         public void Intersects(ref Rectangle value, out bool result)
         {
             result = value.Left < Right       && 
@@ -231,7 +257,6 @@ namespace Microsoft.Xna.Framework
             Intersect(ref value1, ref value2, out rectangle);
             return rectangle;
         }
-
 
         public static void Intersect(ref Rectangle value1, ref Rectangle value2, out Rectangle result)
         {
