@@ -109,6 +109,16 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Used to request creation of the reference graphics device.
+        /// </summary>
+        /// <remarks>
+        /// This only works on DirectX platforms where a reference graphics
+        /// device is available and must be defined before the graphics device
+        /// is created.  It defaults to false.
+        /// </remarks>
+        public static bool UseReferenceDevice { get; set; }
+
         /*
 		public bool QueryRenderTargetFormat(
 			GraphicsProfile graphicsProfile,
