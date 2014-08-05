@@ -32,7 +32,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    [DebuggerDisplay("{DebugDisplayString}")]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Quaternion : IEquatable<Quaternion>
     {
         [DataMember]
@@ -821,9 +821,9 @@ namespace Microsoft.Xna.Framework
                 }
 
                 return string.Concat(
-                    this.X.ToString(Format), ", ",
-                    this.Y.ToString(Format), ", ",
-                    this.Z.ToString(Format), ", ",
+                    this.X.ToString(Format), " ",
+                    this.Y.ToString(Format), " ",
+                    this.Z.ToString(Format), " ",
                     this.W.ToString(Format)
                     );
             }

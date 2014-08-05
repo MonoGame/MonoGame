@@ -34,7 +34,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    [DebuggerDisplay("{DebugDisplayString}")]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
@@ -581,8 +581,8 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(Format), ", ",
-                    this.Y.ToString(Format), ", ",
+                    this.X.ToString(Format), "  ",
+                    this.Y.ToString(Format), "  ",
                     this.Z.ToString(Format)
                     );
             }

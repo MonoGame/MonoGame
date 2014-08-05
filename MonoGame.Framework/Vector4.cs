@@ -34,7 +34,7 @@ using System.Diagnostics;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
-    [DebuggerDisplay("{DebugDisplayString}")]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields
@@ -581,9 +581,9 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(Format), ", ",
-                    this.Y.ToString(Format), ", ",
-                    this.Z.ToString(Format), ", ",
+                    this.X.ToString(Format), "  ",
+                    this.Y.ToString(Format), "  ",
+                    this.Z.ToString(Format), "  ",
                     this.W.ToString(Format)
                     );
             }
