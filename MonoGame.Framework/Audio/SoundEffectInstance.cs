@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         private bool _isDisposed = false;
         internal bool _isPooled = true;
+        internal bool _isXAct;
         internal SoundEffect _effect;
         private float _pan;
         private float _volume;
