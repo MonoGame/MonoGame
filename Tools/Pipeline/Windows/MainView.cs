@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -38,6 +39,9 @@ namespace MonoGame.Tools.Pipeline
         public MainView()
         {            
             InitializeComponent();
+
+            // Set the application icon this form.
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
@@ -71,6 +75,7 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+            _controller.View = this;
 
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
@@ -626,7 +631,7 @@ namespace MonoGame.Tools.Pipeline
             _openProjectMenuItem.Enabled = notBuilding;
             _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 

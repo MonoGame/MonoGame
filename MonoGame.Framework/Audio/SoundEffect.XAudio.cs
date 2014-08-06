@@ -170,7 +170,31 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformLoadAudioStream(Stream s)
         {
-            throw new NotImplementedException();
+            SoundStream soundStream = new SoundStream(s);
+
+            _format = soundStream.Format;
+            _dataStream = soundStream.ToDataStream();
+
+            _buffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = (int)_dataStream.Length,
+                Flags = BufferFlags.EndOfStream,
+                PlayBegin = 0,
+                PlayLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
+                Context = new IntPtr(42),
+            };
+
+            _loopedBuffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = (int)_dataStream.Length,
+                Flags = BufferFlags.EndOfStream,
+                LoopBegin = 0,
+                LoopLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
+                LoopCount = AudioBuffer.LoopInfinite,
+                Context = new IntPtr(42),
+            }; 
         }
 
         #endregion

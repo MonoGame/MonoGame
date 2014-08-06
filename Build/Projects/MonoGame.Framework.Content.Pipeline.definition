@@ -198,6 +198,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\MarshalHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderCompilerException.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderCompilerException.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.cs</Link>
@@ -330,16 +334,41 @@
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
+    <Compile Include="Serialization\Intermediate\ArraySerializer.cs" />
+    <Compile Include="Serialization\Intermediate\BoolSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\CharSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ColorSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
-    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
-    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\DictionarySerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\DoubleSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\ElementSerializerT.cs" />    
+    <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
     <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
     <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\RectangleSerializer.cs" />
     <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\SByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ShortSerializer.cs" />
     <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UIntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ULongSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UShortSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector2Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector3Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector4Serializer.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline -->
@@ -378,6 +407,14 @@
     <Compile Include="WmvImporter.cs" />
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
+
+	<!-- Utility Classes -->
+    <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32HC.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64HC.Dirty.cs" />
 
     <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">

@@ -25,29 +25,11 @@ namespace Microsoft.Xna.Framework
 
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
-        private bool _exiting = false;
         private AndroidGameWindow _gameWindow;
 
         public override void Exit()
         {
-            //TODO: Fix this
-            try
-            {
-				if (!_exiting)
-				{
-					_exiting = true;
-					AndroidGameActivity.Paused -= Activity_Paused;
-					AndroidGameActivity.Resumed -= Activity_Resumed;
-					Game.DoExiting();
-                    //(SJ) Why is this called here when it's not in any other project
-                    //Net.NetworkSession.Exit();
-               	    Game.Activity.Finish();
-				    _gameWindow.GameView.Close();
-				}
-            }
-            catch
-            {
-            }
+            Game.Activity.MoveTaskToBack(true);
         }
 
         public override void RunLoop()
@@ -168,8 +150,6 @@ namespace Microsoft.Xna.Framework
 		
         public override void Present()
         {
-			if (_exiting)
-                return;
             try
             {
                 var device = Game.GraphicsDevice;

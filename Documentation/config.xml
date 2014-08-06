@@ -32,6 +32,10 @@
     	<topic id="Pipeline" name="Pipeline" filename="pipeline.md"/>
     </topic>
     
+    <topic id="Platform_Specific_Notes" name="Platform-Specific Notes" filename="platform_specific.md">
+    	<topic id="Android" name="Android" filename="android.md"/>
+    </topic>
+    
     <topic id="External_Links" name="External Links" filename="links.md"/>
 
     <!-- Special topic X:ClassLibrary to include generated class library references. No filename to setup as it is generated -->

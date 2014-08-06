@@ -65,6 +65,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </summary>
         public string Config { get; set; }
 
+        /// <summary>
+        /// Gets or sets if the content is compressed.
+        /// </summary>
+        public bool CompressContent { get; set; }
 
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
@@ -531,6 +535,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 throw;
             }
+            catch (InvalidContentException)
+            {
+                throw;
+            }
             catch (Exception inner)
             {
                 throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
@@ -589,7 +597,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compiler.Compile(stream, content, Platform, Profile, false, OutputDirectory, outputFileDir);
+                _compiler.Compile(stream, content, Platform, Profile, CompressContent, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.

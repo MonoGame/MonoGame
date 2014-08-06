@@ -24,7 +24,7 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// True if the project has unsaved changes.
         /// </summary>
-        bool ProjectDiry { get; }
+        bool ProjectDirty { get; }
 
         /// <summary>
         /// True if the project is actively building.
@@ -35,6 +35,11 @@ namespace MonoGame.Tools.Pipeline
         /// Passes /launchdebugger option when launching MGCB.
         /// </summary>
         bool LaunchDebugger { get; set; }
+
+        /// <summary>
+        /// The view this controller is attached to.
+        /// </summary>
+        IView View { get; set; }
 
         /// <summary>
         /// Triggered when the project starts loading.

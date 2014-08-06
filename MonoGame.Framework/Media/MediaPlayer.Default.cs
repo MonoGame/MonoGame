@@ -112,10 +112,10 @@ namespace Microsoft.Xna.Framework.Media
 				return false;
 				
 			return true;
-#endif
-
+#else
             // TODO: Fix me!
             return true;
+#endif
         }
 		#endregion
 

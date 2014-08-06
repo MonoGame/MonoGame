@@ -126,12 +126,12 @@ namespace MonoGame.Tests.Components {
 		/// Compares two frames and returns a similarity value from 0.0f
 		/// to 1.0f.
 		/// </summary>
-		/// <param name="a">A bitmap to compare</param>
-		/// <param name="b">A bitmap to compare</param>
+        /// <param name="image">The image to compare.</param>
+        /// <param name="referenceImage">A ground truth image to compare against.</param>
 		/// <returns>A floating point value from 0.0f to 1.0f that
 		/// represents the similarity of the two frames, according to
 		/// this IFrameComparer implementation.</returns>
-		float Compare (FramePixelData a, FramePixelData b);
+        float Compare(FramePixelData image, FramePixelData referenceImage);
 	}
 
 	class FrameCompareComponent : DrawableGameComponent, IEnumerable<IFrameComparer> {
@@ -344,16 +344,14 @@ namespace MonoGame.Tests.Components {
 							Directory.CreateDirectory (directory);
 					}
 
-					float similarity;
-
-					var framePixelData = new FramePixelData (
+				    var framePixelData = new FramePixelData (
 						workItem.TextureWidth, workItem.TextureHeight, workItem.TextureData);
 					var comparePixelData = LoadOrCreateEmptyFramePixelData (workItem.ReferenceImagePath);
 
-					similarity = CompareFrames (
-						framePixelData,
-						comparePixelData,
-						workItem.FrameComparers);
+					var similarity = CompareFrames (
+					    framePixelData,
+					    comparePixelData,
+					    workItem.FrameComparers);
 
 					if (workItem.FrameOutputPath != null) {
 						try {
@@ -375,7 +373,7 @@ namespace MonoGame.Tests.Components {
 		}
 
 		private static float CompareFrames (
-			FramePixelData a, FramePixelData b,
+			FramePixelData image, FramePixelData referenceImage,
 			Tuple<IFrameComparer, float> [] frameComparers)
 		{
 			float sumOfWeights = 0;
@@ -387,7 +385,7 @@ namespace MonoGame.Tests.Components {
 			foreach (var item in frameComparers) {
 				var comparer = item.Item1;
 				var weight = item.Item2;
-				similarity += comparer.Compare (a, b) * weight / sumOfWeights;
+                similarity += comparer.Compare(image, referenceImage) * weight / sumOfWeights;
 			}
 			return similarity;
 		}

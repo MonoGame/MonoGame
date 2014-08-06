@@ -2,28 +2,27 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class FloatSerializer : ContentTypeSerializer<float>
+    class FloatSerializer : ElementSerializer<float>
     {
         public FloatSerializer() :
-            base("float")
+            base("float", 1)
         {
         }
 
-        protected internal override float Deserialize(IntermediateReader input, ContentSerializerAttribute format, float existingInstance)
+        protected internal override float Deserialize(string[] inputs, ref int index)
         {
-            var str = input.Xml.ReadString();
-            return XmlConvert.ToSingle(str);
+            return XmlConvert.ToSingle(inputs[index++]);
         }
 
-        protected internal override void Serialize(IntermediateWriter output, float value, ContentSerializerAttribute format)
+        protected internal override void Serialize(float value, List<string> results)
         {
-            var str = XmlConvert.ToString(value);
-            output.Xml.WriteString(str);
+            results.Add(XmlConvert.ToString(value));
         }
     }
 }
