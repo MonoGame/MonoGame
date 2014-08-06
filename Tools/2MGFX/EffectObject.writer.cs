@@ -1,5 +1,10 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace TwoMGFX
 {
@@ -7,7 +12,7 @@ namespace TwoMGFX
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 5;
+        private const int Version = 6;
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -23,102 +28,113 @@ namespace TwoMGFX
             var profile = (byte)options.Profile;
             writer.Write(profile);
 
+            // Write the rest to a memory stream.
+            using(MemoryStream memStream = new MemoryStream())
+            using(BinaryWriter memWriter = new BinaryWriter(memStream))
+            {
             // Write all the constant buffers.
-            writer.Write((byte)ConstantBuffers.Count);
+                memWriter.Write((byte)ConstantBuffers.Count);
             foreach (var cbuffer in ConstantBuffers)
-                cbuffer.Write(writer, options);
+                    cbuffer.Write(memWriter, options);
 
             // Write all the shaders.
-            writer.Write((byte)Shaders.Count);
+                memWriter.Write((byte)Shaders.Count);
             foreach (var shader in Shaders)
-                shader.Write(writer, options);
+                    shader.Write(memWriter, options);
 
             // Write the parameters.
-            WriteParameters(writer, Parameters, Parameters.Length);
+                WriteParameters(memWriter, Parameters, Parameters.Length);
 
             // Write the techniques.
-            writer.Write((byte)Techniques.Length);
+                memWriter.Write((byte)Techniques.Length);
             foreach (var technique in Techniques)
             {
-                writer.Write(technique.name);
-                WriteAnnotations(writer, technique.annotation_handles);
+                    memWriter.Write(technique.name);
+                    WriteAnnotations(memWriter, technique.annotation_handles);
 
                 // Write the passes.
-                writer.Write((byte)technique.pass_count);
+                    memWriter.Write((byte)technique.pass_count);
                 for (var p = 0; p < technique.pass_count; p++)
                 {
                     var pass = technique.pass_handles[p];
 
-                    writer.Write(pass.name);
-                    WriteAnnotations(writer, pass.annotation_handles);
+                        memWriter.Write(pass.name);
+                        WriteAnnotations(memWriter, pass.annotation_handles);
 
                     // Write the index for the vertex and pixel shaders.
                     var vertexShader = GetShaderIndex(STATE_CLASS.VERTEXSHADER, pass.states);
                     var pixelShader = GetShaderIndex(STATE_CLASS.PIXELSHADER, pass.states);
-                    writer.Write((byte)vertexShader);
-                    writer.Write((byte)pixelShader);
+                        memWriter.Write((byte)vertexShader);
+                        memWriter.Write((byte)pixelShader);
 
                     // Write the state objects too!
 					if (pass.blendState != null)
 					{
-						writer.Write(true);
-						writer.Write((byte)pass.blendState.AlphaBlendFunction);
-						writer.Write((byte)pass.blendState.AlphaDestinationBlend);
-						writer.Write((byte)pass.blendState.AlphaSourceBlend);
-						writer.Write(pass.blendState.BlendFactor.R);
-						writer.Write(pass.blendState.BlendFactor.G);
-						writer.Write(pass.blendState.BlendFactor.B);
-						writer.Write(pass.blendState.BlendFactor.A);
-						writer.Write((byte)pass.blendState.ColorBlendFunction);
-						writer.Write((byte)pass.blendState.ColorDestinationBlend);
-						writer.Write((byte)pass.blendState.ColorSourceBlend);
-						writer.Write((byte)pass.blendState.ColorWriteChannels);
-						writer.Write((byte)pass.blendState.ColorWriteChannels1);
-						writer.Write((byte)pass.blendState.ColorWriteChannels2);
-						writer.Write((byte)pass.blendState.ColorWriteChannels3);
-						writer.Write(pass.blendState.MultiSampleMask);
+                            memWriter.Write(true);
+                            memWriter.Write((byte)pass.blendState.AlphaBlendFunction);
+                            memWriter.Write((byte)pass.blendState.AlphaDestinationBlend);
+                            memWriter.Write((byte)pass.blendState.AlphaSourceBlend);
+                            memWriter.Write(pass.blendState.BlendFactor.R);
+                            memWriter.Write(pass.blendState.BlendFactor.G);
+                            memWriter.Write(pass.blendState.BlendFactor.B);
+                            memWriter.Write(pass.blendState.BlendFactor.A);
+                            memWriter.Write((byte)pass.blendState.ColorBlendFunction);
+                            memWriter.Write((byte)pass.blendState.ColorDestinationBlend);
+                            memWriter.Write((byte)pass.blendState.ColorSourceBlend);
+                            memWriter.Write((byte)pass.blendState.ColorWriteChannels);
+                            memWriter.Write((byte)pass.blendState.ColorWriteChannels1);
+                            memWriter.Write((byte)pass.blendState.ColorWriteChannels2);
+                            memWriter.Write((byte)pass.blendState.ColorWriteChannels3);
+                            memWriter.Write(pass.blendState.MultiSampleMask);
 					}
 					else
-						writer.Write(false);
+                            memWriter.Write(false);
 
 					if (pass.depthStencilState != null)
 					{
-						writer.Write(true);
-						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilDepthBufferFail);
-						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilFail);
-						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilFunction);
-						writer.Write((byte)pass.depthStencilState.CounterClockwiseStencilPass);
-						writer.Write(pass.depthStencilState.DepthBufferEnable);
-						writer.Write((byte)pass.depthStencilState.DepthBufferFunction);
-						writer.Write(pass.depthStencilState.DepthBufferWriteEnable);
-						writer.Write(pass.depthStencilState.ReferenceStencil);
-						writer.Write((byte)pass.depthStencilState.StencilDepthBufferFail);
-						writer.Write(pass.depthStencilState.StencilEnable);
-						writer.Write((byte)pass.depthStencilState.StencilFail);
-						writer.Write((byte)pass.depthStencilState.StencilFunction);
-						writer.Write(pass.depthStencilState.StencilMask);
-						writer.Write((byte)pass.depthStencilState.StencilPass);
-						writer.Write(pass.depthStencilState.StencilWriteMask);
-						writer.Write(pass.depthStencilState.TwoSidedStencilMode);
+                            memWriter.Write(true);
+                            memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilDepthBufferFail);
+                            memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilFail);
+                            memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilFunction);
+                            memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilPass);
+                            memWriter.Write(pass.depthStencilState.DepthBufferEnable);
+                            memWriter.Write((byte)pass.depthStencilState.DepthBufferFunction);
+                            memWriter.Write(pass.depthStencilState.DepthBufferWriteEnable);
+                            memWriter.Write(pass.depthStencilState.ReferenceStencil);
+                            memWriter.Write((byte)pass.depthStencilState.StencilDepthBufferFail);
+                            memWriter.Write(pass.depthStencilState.StencilEnable);
+                            memWriter.Write((byte)pass.depthStencilState.StencilFail);
+                            memWriter.Write((byte)pass.depthStencilState.StencilFunction);
+                            memWriter.Write(pass.depthStencilState.StencilMask);
+                            memWriter.Write((byte)pass.depthStencilState.StencilPass);
+                            memWriter.Write(pass.depthStencilState.StencilWriteMask);
+                            memWriter.Write(pass.depthStencilState.TwoSidedStencilMode);
 					}
 					else
-						writer.Write(false);
+                            memWriter.Write(false);
 
 					if (pass.rasterizerState != null)
 					{
-						writer.Write(true);
-						writer.Write((byte)pass.rasterizerState.CullMode);
-						writer.Write(pass.rasterizerState.DepthBias);
-						writer.Write((byte)pass.rasterizerState.FillMode);
-						writer.Write(pass.rasterizerState.MultiSampleAntiAlias);
-						writer.Write(pass.rasterizerState.ScissorTestEnable);
-						writer.Write(pass.rasterizerState.SlopeScaleDepthBias);
+                            memWriter.Write(true);
+                            memWriter.Write((byte)pass.rasterizerState.CullMode);
+                            memWriter.Write(pass.rasterizerState.DepthBias);
+                            memWriter.Write((byte)pass.rasterizerState.FillMode);
+                            memWriter.Write(pass.rasterizerState.MultiSampleAntiAlias);
+                            memWriter.Write(pass.rasterizerState.ScissorTestEnable);
+                            memWriter.Write(pass.rasterizerState.SlopeScaleDepthBias);
 					}
 					else
-						writer.Write(false);
-
-
+                            memWriter.Write(false);
+                    }
                 }
+
+                // Calculate a hash code from memory stream
+                // and write it to the header.
+                var effectKey = MonoGame.Utilities.Hash.ComputeHash(memStream);
+                writer.Write((Int32)effectKey);
+
+                //write content from memory stream to final stream.
+                memStream.WriteTo(writer.BaseStream);
             }
         }
 

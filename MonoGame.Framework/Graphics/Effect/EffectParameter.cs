@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [DebuggerDisplay("{ParameterClass} {ParameterType} {Name} : {Semantic}")]
+    [DebuggerDisplay("{DebugDisplayString}")]
 	public class EffectParameter
 	{
         /// <summary>
@@ -93,6 +93,68 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// if the parameter value has been changed.
         /// </summary>
         internal ulong StateKey { get; private set; }
+
+        /// <summary>
+        /// Property referenced by the DebuggerDisplayAttribute.
+        /// </summary>
+        private string DebugDisplayString
+        {
+            get
+            {
+                var semanticStr = string.Empty;
+                if (!string.IsNullOrEmpty(Semantic))                
+                    semanticStr = string.Concat(" <", Semantic, ">");
+
+                string valueStr;
+                if (Data == null)
+                    valueStr = "(null)";
+                else
+                {
+                    switch (ParameterClass)
+                    {
+                        // Object types are stored directly in the Data property.
+                        // Display Data's string value.
+                        case EffectParameterClass.Object:
+                            valueStr = Data.ToString();
+                            break;
+
+                        // Matrix types are stored in a float[16] which we don't really have room for.
+                        // Display "...".
+                        case EffectParameterClass.Matrix:
+                            valueStr = "...";
+                            break;
+
+                        // Scalar types are stored as a float[1].
+                        // Display the first (and only) element's string value.                    
+                        case EffectParameterClass.Scalar:
+                            valueStr = (Data as Array).GetValue(0).ToString();
+                            break;
+
+                        // Vector types are stored as an Array<Type>.
+                        // Display the string value of each array element.
+                        case EffectParameterClass.Vector:
+                            var array = Data as Array;
+                            var arrayStr = new string[array.Length];
+                            var idx = 0;
+                            foreach (var e in array)
+                            {
+                                arrayStr[idx] = array.GetValue(idx).ToString();
+                                idx++;
+                            }
+
+                            valueStr = string.Join(" ", arrayStr);
+                            break;
+
+                        // Handle additional cases here...
+                        default:
+                            valueStr = Data.ToString();
+                            break;
+                    }
+                }
+                
+                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", valueStr);
+            }
+        }
 
 
         public bool GetValueBoolean ()

@@ -198,6 +198,10 @@
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\MarshalHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderCompilerException.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderCompilerException.cs</Link>
+    </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderData.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\ShaderData.cs</Link>
@@ -403,6 +407,14 @@
     <Compile Include="WmvImporter.cs" />
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
+
+	<!-- Utility Classes -->
+    <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32HC.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64HC.Dirty.cs" />
 
     <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">

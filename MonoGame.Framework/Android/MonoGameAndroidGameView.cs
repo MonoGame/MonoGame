@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Media;
 using Android.Views;
@@ -116,7 +117,15 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnLoad(EventArgs eventArgs)
         {
-            MakeCurrent();
+            base.OnLoad(eventArgs);
+            try
+            {
+                MakeCurrent();
+            }
+            catch (Exception e)
+            {
+                throw new NoSuitableGraphicsDeviceException(e.Message, e);
+            }
         }
 
         public override void Resume()
@@ -191,57 +200,72 @@ namespace Microsoft.Xna.Framework
         protected override void CreateFrameBuffer()
         {
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.CreateFrameBuffer");
-            try
+            GLContextVersion = GLContextVersion.Gles2_0;
+
+            int depth = 0;
+            int stencil = 0;
+            switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
             {
-                GLContextVersion = GLContextVersion.Gles2_0;
+                case DepthFormat.Depth16:
+                    depth = 16;
+                    break;
+                case DepthFormat.Depth24:
+                    depth = 24;
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    depth = 24;
+                    stencil = 8;
+                    break;
+                case DepthFormat.None:
+                    break;
+            }
+
+            List<GraphicsMode> modes = new List<GraphicsMode>();
+            if (depth > 0)
+            {
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), depth, stencil, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(0, depth, stencil, 0, 0, false));
+                if (depth > 16)
+                {
+                    modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 16, 0, 0, 0, false));
+                    modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 16, 0, 0, 0, false));
+                    modes.Add(new AndroidGraphicsMode(0, 16, 0, 0, 0, false));
+                }
+            }
+            else
+            {
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 0, 0, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 0, 0, 0, 0, false));
+            }
+            modes.Add(null); // default mode
+            modes.Add(new AndroidGraphicsMode(0, 0, 0, 0, 0, false)); // low mode
+
+            Exception innerException = null;
+            foreach (GraphicsMode mode in modes)
+            {
+                if (mode != null)
+                    Android.Util.Log.Debug("MonoGame", "Creating Color: {0}, Depth: {1}, Stencil: {2}, Accum:{3}", mode.ColorFormat, mode.Depth, mode.Stencil, mode.AccumulatorFormat);
+                else
+                    Android.Util.Log.Debug("MonoGame", "Creating default mode");
+                GraphicsMode = mode;
                 try
                 {
-                    int depth = 0;
-                    int stencil = 0;
-                    switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
-                    {
-                        case DepthFormat.Depth16:
-                            depth = 16;
-                            break;
-                        case DepthFormat.Depth24:
-                            depth = 24;
-                            break;
-                        case DepthFormat.Depth24Stencil8:
-                            depth = 24;
-                            stencil = 8;
-                            break;
-                        case DepthFormat.None: break;
-                    }
-                    Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
-                    GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false);
                     base.CreateFrameBuffer();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
-                    // try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
-                    GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
-                    try
-                    {
-                        base.CreateFrameBuffer();
-                    }
-                    catch (Exception)
-                    {
-                        // ok we are right back to getting the default
-                        GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-                        base.CreateFrameBuffer();
-                    }
+                    innerException = e;
+                    continue;
                 }
                 Android.Util.Log.Debug("MonoGame", "Created format {0}", GraphicsContext.GraphicsMode);
                 All status = GL.CheckFramebufferStatus(All.Framebuffer);
                 Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
-            }
-            catch (Exception)
-            {
-                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
-            }
 
-            MakeCurrent();
+                MakeCurrent();
+                return;
+            }
+            throw new NoSuitableGraphicsDeviceException("Could not create OpenGLES 2.0 frame buffer", innerException);
         }
 
         #endregion
@@ -276,7 +300,7 @@ namespace Microsoft.Xna.Framework
                 return true;
             }
 
-            return base.OnKeyDown(keyCode, e);
+            return true;
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
@@ -286,7 +310,7 @@ namespace Microsoft.Xna.Framework
                 return true;
 #endif
             Keyboard.KeyUp(keyCode);
-            return base.OnKeyUp(keyCode, e);
+            return true;
         }
 
 #if OUYA

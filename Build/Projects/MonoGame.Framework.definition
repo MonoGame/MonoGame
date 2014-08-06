@@ -857,8 +857,8 @@
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
 
-    
     <!-- Android/OUYA Platform -->
     <Compile Include="Android\AndroidCompatibility.cs">
       <Platforms>Android,Ouya</Platforms>
