@@ -30,10 +30,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
-        private static void PlatformSetMasterVolume()
-        {
-        }
-
         private void PlatformDispose(bool disposing)
         {
         }

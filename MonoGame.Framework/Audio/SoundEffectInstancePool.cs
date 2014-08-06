@@ -155,13 +155,19 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        /// <summary>
-        /// Updates the volumes of all currently playing instances. Used when SoundEffect.MasterVolume is changed.
-        /// </summary>
-        internal static void UpdateVolumes()
+        internal static void UpdateMasterVolume()
         {
             foreach (var inst in _playingInstances)
+            {
+                // XAct sounds are not controlled by the SoundEffect
+                // master volume, so we can skip them completely.
+                if (inst._isXAct)
+                    continue;
+
+                // Re-applying the volume to itself will update
+                // the sound with the current master volume.
                 inst.Volume = inst.Volume;
+            }
         }
     }
 }

@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new ArgumentOutOfRangeException();
 
                 _volume = value;
-                PlatformSetVolume(value);
+                    PlatformSetVolume(value * SoundEffect.MasterVolume);
             }
         }
 

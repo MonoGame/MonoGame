@@ -260,8 +260,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 
                 _masterVolume = value;
-
-                PlatformSetMasterVolume();
+                SoundEffectInstancePool.UpdateMasterVolume();
             }
         }
 
