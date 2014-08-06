@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
-                _wave.Volume = _volume;
+                _wave.Volume = _volume * category._volume[0];
                 _wave.Play();
 			}
 		}
@@ -224,9 +224,6 @@ namespace Microsoft.Xna.Framework.Audio
         // scaling isn't applied twice.
         internal void SetVolumeInt(float newVol)
         {
-
-            newVol = MathHelper.Clamp(newVol, 0, 1.0f);
-
             if (_complexSound)
             {
                 foreach (XactClip clip in _soundClips)
@@ -243,26 +240,25 @@ namespace Microsoft.Xna.Framework.Audio
         {
 			get 
             {
-				if (_complexSound)
-					return _soundClips[0].Volume;
-                else
-					return _wave != null ? _wave.Volume : 0.0f;
+                return _volume;
 			}
 
 			set
             {
+                _volume = value;
+
                 var category = _soundBank.AudioEngine.Categories[_categoryID];
-                value = MathHelper.Clamp(value * category._volume[0], 0, 1.0f);
+                var volume = _volume * category._volume[0];
 
                 if (_complexSound)
                 {
                     foreach (XactClip clip in _soundClips)
-                        clip.Volume = value;
+                        clip.Volume = volume;
                 }
                 else
                 {
                     if (_wave != null)
-                        _wave.Volume = value;
+                        _wave.Volume = volume;
                 }
             }
 		}
