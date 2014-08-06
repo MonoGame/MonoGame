@@ -68,10 +68,16 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _volume; }
             set
             {
-                if (value < 0.0f || value > 1.0f)
+                // XAct sound effects don't have volume limits.
+                if (!_isXAct && (value < 0.0f || value > 1.0f))
                     throw new ArgumentOutOfRangeException();
 
                 _volume = value;
+
+                // XAct sound effects are not tied to the SoundEffect master volume.
+                if (_isXAct)
+                    PlatformSetVolume(value);
+                else
                     PlatformSetVolume(value * SoundEffect.MasterVolume);
             }
         }
@@ -144,6 +150,11 @@ namespace Microsoft.Xna.Framework.Audio
                 if (!SoundEffectInstancePool.SoundsAvailable)
                     throw new InstancePlayLimitException();
             }
+            
+            // For non-XAct sounds we need to be sure the latest
+            // master volume level is applied before playback.
+            if (!_isXAct)
+                PlatformSetVolume(_volume * SoundEffect.MasterVolume);
 
             PlatformPlay();
         }
