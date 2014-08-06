@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 #if MONOMAC
+using MonoMac;
 using MonoMac.OpenGL;
 #endif
 
@@ -257,13 +258,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public bool SupportsBlitFramebuffer { get; private set; }
 
+#if MONOMAC
+			[DllImport(Constants.OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleEXT")]
+		    internal extern static void GLRenderbufferStorageMultisampleExt(All target, int samples, All internalformat, int width, int height);
+
+			[DllImport(Constants.OpenGLLibrary, EntryPoint = "glBlitFramebufferEXT")]
+			internal extern static void GLBlitFramebufferExt(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter);
+
+			[DllImport(Constants.OpenGLLibrary, EntryPoint = "glGenerateMipmapEXT")]
+			internal extern static void GLGenerateMipmapExt(GenerateMipmapTarget target);
+#endif
+
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
-#if !MONOMAC
                 this.SupportsBlitFramebuffer = true;
-#else
-                this.SupportsBlitFramebuffer = false;
-#endif
                 this.SupportsInvalidateFramebuffer = false;
             }
 
@@ -290,7 +298,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if !MONOMAC
                 GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, (RenderbufferStorage)internalFormat, width, height);
 #else
-                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferStorage)internalFormat, width, height);
+				GLRenderbufferStorageMultisampleExt(All.Renderbuffer, samples, (All)internalFormat, width, height);
 #endif
                 GraphicsExtensions.CheckGLError();
             }
@@ -345,20 +353,27 @@ namespace Microsoft.Xna.Framework.Graphics
             {
 #if !MONOMAC
                 GL.GenerateMipmap((GenerateMipmapTarget)target);
-                GraphicsExtensions.CheckGLError();
+#else
+				GLGenerateMipmapExt((GenerateMipmapTarget)target);
 #endif
+                GraphicsExtensions.CheckGLError();
+
             }
 
             internal virtual void BlitFramebuffer(int iColorAttachment, int width, int height)
             {
-#if !MONOMAC
+
                 GL.ReadBuffer(ReadBufferMode.ColorAttachment0 + iColorAttachment);
                 GraphicsExtensions.CheckGLError();
                 GL.DrawBuffer(DrawBufferMode.ColorAttachment0 + iColorAttachment);
                 GraphicsExtensions.CheckGLError();
+#if !MONOMAC
                 GL.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-                GraphicsExtensions.CheckGLError();
+#else
+				GLBlitFramebufferExt(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 #endif
+                GraphicsExtensions.CheckGLError();
+
             }
 
             internal virtual void CheckFramebufferStatus()
