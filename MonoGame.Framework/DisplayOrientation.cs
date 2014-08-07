@@ -1,5 +1,5 @@
 // Microsoft Public License (Ms-PL)
-// XnaTouch - Copyright © 2009 The XnaTouch Team
+// XnaTouch - Copyright (C) 2009 The XnaTouch Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
