@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
 
         public override void Exit()
         {
-            Game.Activity.MoveTaskToBack(true);
+            Game.Activity.Finish();
         }
 
         public override void RunLoop()
