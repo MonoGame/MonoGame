@@ -28,6 +28,7 @@ SOFTWARE.
 using System;
 using System.Text;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
@@ -35,6 +36,7 @@ namespace Microsoft.Xna.Framework
     /// Describe a 32-bit packed color.
     /// </summary>
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Color : IEquatable<Color>
     {
         static Color()
@@ -1780,7 +1782,22 @@ namespace Microsoft.Xna.Framework
             get { return _packedValue; }
             set { _packedValue = value; }
         }
-	
+
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.R.ToString(), "  ",
+                    this.G.ToString(), "  ",
+                    this.B.ToString(), "  ",
+                    this.A.ToString()
+                );
+            }
+        }
+
+
 	/// <summary>
         /// Converts the color values of this instance to its equivalent string representation.
         /// </summary>

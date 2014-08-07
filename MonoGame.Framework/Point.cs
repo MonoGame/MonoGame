@@ -25,11 +25,13 @@ SOFTWARE.
 */
 #endregion License
 using System;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Point : IEquatable<Point>
     {
         #region Private Fields
@@ -124,6 +126,17 @@ namespace Microsoft.Xna.Framework
         public override int GetHashCode()
         {
             return X ^ Y;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.X.ToString(), "  ",
+                    this.Y.ToString()
+                );
+            }
         }
 
         /// <summary>

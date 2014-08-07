@@ -32,11 +32,13 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
         #region Private Fields
@@ -301,6 +303,27 @@ namespace Microsoft.Xna.Framework
             throw new NotImplementedException();
         }
         */
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    //"Near:  ",
+                    this.planes[0].DebugDisplayString, "  :  ",
+                    //"Far:  ",
+                    this.planes[1].DebugDisplayString, "  :  ",
+                    //"Left:  ",
+                    this.planes[2].DebugDisplayString, "  :  ",
+                    //"Right:  ",
+                    this.planes[3].DebugDisplayString, "  :  ",
+                    //"Top:  ",
+                    this.planes[4].DebugDisplayString, "  :  ",
+                    //"Bottom:  ",
+                    this.planes[5].DebugDisplayString                    
+                    );
+            }
+        }
 
         public override string ToString()
         {

@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
- 
+
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         #region Public Fields
@@ -369,6 +371,17 @@ namespace Microsoft.Xna.Framework
         public static bool operator != (BoundingSphere a, BoundingSphere b)
         {
             return !a.Equals(b);
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat( 
+                    this.Center.DebugDisplayString, "  :  ",
+                    this.Radius.ToString()
+                    );
+            }
         }
 
         public override string ToString()

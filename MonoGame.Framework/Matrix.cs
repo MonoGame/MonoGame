@@ -26,11 +26,13 @@ SOFTWARE.
 #endregion License
 
 using System;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Matrix : IEquatable<Matrix>
     {
         #region Public Constructors
@@ -1796,6 +1798,22 @@ namespace Microsoft.Xna.Framework
 		    result.M44 = matrix1.M44 - matrix2.M44;
         }
 
+        internal string DebugDisplayString
+        {
+            get
+            {
+                if (this == Identity)
+                {
+                    return "Identity";
+                }
+
+                return string.Concat(
+                    this.M11.ToString(), "  ", this.M12.ToString(), "  ", this.M13.ToString(), "  ", this.M14.ToString(), "  :  ",
+                    this.M21.ToString(), "  ", this.M22.ToString(), "  ", this.M23.ToString(), "  ", this.M24.ToString(), "  :  ",
+                    this.M31.ToString(), "  ", this.M32.ToString(), "  ", this.M33.ToString(), "  ", this.M34.ToString(), "  :  ",
+                    this.M41.ToString(), "  ", this.M42.ToString(), "  ", this.M43.ToString(), "  ", this.M44.ToString() );
+            }
+        }
 
         public override string ToString()
         {

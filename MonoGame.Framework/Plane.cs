@@ -27,6 +27,7 @@ SOFTWARE.
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -57,8 +58,9 @@ namespace Microsoft.Xna.Framework
                                     / Math.Sqrt(plane.Normal.X * plane.Normal.X + plane.Normal.Y * plane.Normal.Y + plane.Normal.Z * plane.Normal.Z));
         }
     }
-	
+
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Plane : IEquatable<Plane>
     {
         #region Public Fields
@@ -235,6 +237,17 @@ namespace Microsoft.Xna.Framework
         public void Intersects(ref BoundingSphere sphere, out PlaneIntersectionType result)
         {
             sphere.Intersects(ref this, out result);
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.Normal.DebugDisplayString, "  ",
+                    this.D.ToString()
+                    );
+            }
         }
 
         public override string ToString()
