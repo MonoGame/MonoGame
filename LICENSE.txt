@@ -1,5 +1,6 @@
 Microsoft Public License (Ms-PL)
 MonoGame - Copyright © 2009-2012 The MonoGame Team
+Portions Copyright © The Mono.Xna Team
 
 All rights reserved.
 
