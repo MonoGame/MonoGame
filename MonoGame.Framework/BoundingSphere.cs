@@ -1,11 +1,10 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MIT License - Copyright © The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
