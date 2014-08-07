@@ -21,6 +21,17 @@ namespace MonoGame.Tools.Pipeline
 
         private readonly List<ContentItemTemplate> _templateItems;
 
+        private static readonly string [] _mgcbSearchPaths = new []       
+        {
+            "",
+#if DEBUG
+            "../../../../../MGCB/bin/Windows/AnyCPU/Debug",
+#else
+            "../../../../../MGCB/bin/Windows/AnyCPU/Release",
+#endif
+            "../MGCB",
+        };
+
         public IEnumerable<ContentItemTemplate> Templates
         {
             get { return _templateItems; }
@@ -32,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ProjectOpen { get; private set; }
 
-        public bool ProjectDiry { get; set; }
+        public bool ProjectDirty { get; set; }
 
         public bool ProjectBuilding 
         {
@@ -41,6 +52,8 @@ namespace MonoGame.Tools.Pipeline
                 return _buildTask != null && !_buildTask.IsCompleted;
             }
         }
+
+        public IView View { get; set; }
 
         public event Action OnProjectLoading;
 
@@ -68,20 +81,20 @@ namespace MonoGame.Tools.Pipeline
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
         }
 
         public void OnReferencesModified()
         {
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             ResolveTypes();
         }
 
         public void OnItemModified(ContentItem contentItem)
         {
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             _view.UpdateProperties(contentItem);
 
             _view.BeginTreeUpdate();
@@ -150,7 +163,7 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();                
                 
                 ProjectOpen = true;
-                ProjectDiry = true;
+                ProjectDirty = true;
             }
 #if SHIPPING
             catch (Exception e)
@@ -198,7 +211,7 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();
 
                 ProjectOpen = true;
-                ProjectDiry = false;
+                ProjectDirty = false;
             }
 #if SHIPPING
             catch (Exception e)
@@ -222,7 +235,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ProjectOpen = false;
-            ProjectDiry = false;
+            ProjectDirty = false;
             _project = null;
             _actionStack.Clear();
 
@@ -243,7 +256,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Do the save.
-            ProjectDiry = false;
+            ProjectDirty = false;
             var parser = new PipelineProjectParser(this, _project);
             parser.SaveProject();            
 
@@ -301,7 +314,7 @@ namespace MonoGame.Tools.Pipeline
 
             _view.OutputClear();
 
-            _buildTask = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());
         }
@@ -323,35 +336,54 @@ namespace MonoGame.Tools.Pipeline
             if (LaunchDebugger)
                 commands += " /launchdebugger";
 
-            _buildTask = Task.Run(() => DoBuild(commands));
+            _buildTask = Task.Factory.StartNew(() => DoBuild(commands));
             if (OnBuildFinished != null)
                 _buildTask.ContinueWith((e) => OnBuildFinished());          
         }
 
+        private string FindMGCB()
+        {
+            foreach (var root in _mgcbSearchPaths)
+            {
+                var mgcbPath = Path.Combine(root, "MGCB.exe");
+                if (File.Exists(mgcbPath))
+                    return mgcbPath;
+            }
+
+            throw new FileNotFoundException("MGCB.exe is not in the search path!");
+        }
+
         private void DoBuild(string commands)
         {
-            _buildProcess = new Process();
-            _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
-            _buildProcess.StartInfo.FileName = "MGCB.exe";
-            _buildProcess.StartInfo.Arguments = commands;
-            _buildProcess.StartInfo.CreateNoWindow = true;
-            _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            _buildProcess.StartInfo.UseShellExecute = false;
-            _buildProcess.StartInfo.RedirectStandardOutput = true;
-            _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
-
-            //string stdError = null;
             try
             {
+                // Prepare the process.
+                _buildProcess = new Process();
+                _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
+                _buildProcess.StartInfo.FileName = FindMGCB();
+                _buildProcess.StartInfo.Arguments = commands;
+                _buildProcess.StartInfo.CreateNoWindow = true;
+                _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                _buildProcess.StartInfo.UseShellExecute = false;
+                _buildProcess.StartInfo.RedirectStandardOutput = true;
+                _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
+
+                // Fire off the process.
                 _buildProcess.Start();
                 _buildProcess.BeginOutputReadLine();
                 _buildProcess.WaitForExit();
             }
             catch (Exception ex)
             {
-                _view.OutputAppend("Build process failed!" + Environment.NewLine);
-                _view.OutputAppend(ex.Message);
-                _view.OutputAppend(ex.StackTrace);
+                // If we got a message assume it has everything the user needs to know.
+                if (!string.IsNullOrEmpty(ex.Message))
+                    _view.OutputAppend("Build failed:  " + ex.Message);
+                else
+                {
+                    // Else we need to get verbose.
+                    _view.OutputAppend("Build failed:" + Environment.NewLine);
+                    _view.OutputAppend(ex.ToString());
+                }
             }
 
             // Clear the process pointer, so that cancel
@@ -385,7 +417,7 @@ namespace MonoGame.Tools.Pipeline
         {
             // If the project is not dirty 
             // then we can simply skip it.
-            if (!ProjectDiry)
+            if (!ProjectDirty)
                 return true;
 
             // Ask the user if they want to save or cancel.

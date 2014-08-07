@@ -190,7 +190,11 @@ namespace Microsoft.Xna.Framework.Media
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    _mediaElement.Volume = _volume;
+                    // Unlike other implementations, MediaElement uses a linear scale for volume
+                    // On WP8 a volume of 0.85 seems to refer to 50% volume according to MSDN
+                    // http://msdn.microsoft.com/EN-US/library/windowsphone/develop/system.windows.controls.mediaelement.volume%28v=vs.105%29.aspx
+                    // Therefore a good approximation could be to use the 4th root of volume
+                    _mediaElement.Volume = Math.Pow(_volume, 1/4d);
                 });
             }
         }

@@ -201,7 +201,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// overflow the 16 bit array indices for vertices.
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
-		public void DrawBatch(SpriteSortMode sortMode)
+        /// <param name="effect">The custom effect to apply to the drawn geometry</param>
+        public void DrawBatch(SpriteSortMode sortMode, Effect effect)
 		{
 			// nothing to do
 			if ( _batchItemList.Count == 0 )
@@ -246,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var shouldFlush = !ReferenceEquals(item.Texture, tex);
                     if (shouldFlush)
                     {
-                        FlushVertexArray(startIndex, index);
+                        FlushVertexArray(startIndex, index, effect);
 
                         tex = item.Texture;
                         startIndex = index = 0;
@@ -264,7 +265,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     _freeBatchItemQueue.Enqueue(item);
                 }
                 // flush the remaining vertexArray data
-                FlushVertexArray(startIndex, index);
+                FlushVertexArray(startIndex, index, effect);
                 // Update our batch count to continue the process of culling down
                 // large batches
                 batchCount -= numBatchesToProcess;
@@ -277,23 +278,47 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="start">Start index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
-		private void FlushVertexArray( int start, int end )
-		{
-            if ( start == end )
+        /// <param name="effect">The custom effect to apply to the geometry</param>
+        private void FlushVertexArray(int start, int end, Effect effect)
+        {
+            if (start == end)
                 return;
 
             var vertexCount = end - start;
 
-            _device.DrawUserIndexedPrimitives(
-                PrimitiveType.TriangleList, 
-                _vertexArray, 
-                0,
-                vertexCount, 
-                _index, 
-                0, 
-                (vertexCount / 4) * 2, 
-                VertexPositionColorTexture.VertexDeclaration);
-		}
+            // If the effect is not null, then apply each pass and render the geometry
+            if (effect != null)
+            {
+                var passes = effect.CurrentTechnique.Passes;
+                foreach (var pass in passes)
+                {
+                    pass.Apply();
+
+                    _device.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        _vertexArray,
+                        0,
+                        vertexCount,
+                        _index,
+                        0,
+                        (vertexCount / 4) * 2,
+                        VertexPositionColorTexture.VertexDeclaration);
+                }
+            }
+            else
+            {
+                // If no custom effect is defined, then simply render.
+                _device.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    _vertexArray,
+                    0,
+                    vertexCount,
+                    _index,
+                    0,
+                    (vertexCount / 4) * 2,
+                    VertexPositionColorTexture.VertexDeclaration);
+            }
+        }
 	}
 }
 

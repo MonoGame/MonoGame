@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using LZ4n;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using System.Collections.Generic;
@@ -18,7 +19,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     {
         const byte XnbFormatVersion = 5;
         const byte HiDefContent = 0x01;
-        const byte ContentCompressed = 0x80;
+        const byte ContentCompressedLzx = 0x80;
+        const byte ContentCompressedLz4 = 0x40;
 
         ContentCompiler compiler;
         TargetPlatform targetPlatform;
@@ -78,9 +80,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         internal ContentWriter(ContentCompiler compiler, Stream output, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)
             : base(output)
         {
-            if (compressContent)
-                throw new NotSupportedException("Content compression is not supported at this time.");
-
             this.compiler = compiler;
             this.targetPlatform = targetPlatform;
             this.targetProfile = targetProfile;
@@ -139,6 +138,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 WriteTypeWriters();
                 bodyStream.Position = 0;
                 bodyStream.CopyTo(contentStream);
+                contentStream.Position = 0;
 
                 // Assemble the separate streams into the output stream
                 this.OutStream = outputStream;
@@ -178,7 +178,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write('B');
             Write(targetPlatformIdentifiers[(int)targetPlatform]);
             Write(XnbFormatVersion);
-            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : (byte)0) | (compressContent ? ContentCompressed : (byte)0));
+            // We cannot use LZX compression, so we use the public domain LZ4 compression. Use one of the spare bits in the flags byte to specify LZ4.
+            byte flags = (byte)((targetProfile == GraphicsProfile.HiDef ? HiDefContent : (byte)0) | (compressContent ? ContentCompressedLz4 : (byte)0));
             Write(flags);
         }
 
@@ -192,30 +193,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         /// <summary>
-        /// Compresses the input stream and returns a stream containing the compressed data.
-        /// </summary>
-        /// <param name="stream">The stream to compress.</param>
-        /// <returns>A stream containing the compressed data.</returns>
-        Stream CompressStream(Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Compress the stream and write it to the output.
         /// </summary>
         /// <param name="stream">The stream to compress and write to the output.</param>
-        void WriteCompressedStream(Stream stream)
+        void WriteCompressedStream(MemoryStream stream)
         {
             // Compress stream
-            using (var compressedStream = CompressStream(stream))
-            {
-                UInt32 totalSize = (UInt32)(headerStream.Length + compressedStream.Length + sizeof(UInt32) + sizeof(UInt32));
-                Write(totalSize);
-                Write((UInt32)stream.Length);
-                compressedStream.Position = 0;
-                compressedStream.CopyTo(outputStream);
-            }
+            var maxLength = LZ4Codec.MaximumOutputLength((int)stream.Length);
+            var outputArray = new byte[maxLength];
+            int resultLength = LZ4Codec.Encode32HC(stream.GetBuffer(), 0, (int)stream.Length, outputArray, 0, maxLength);
+
+            UInt32 totalSize = (UInt32)(headerStream.Length + resultLength + sizeof(UInt32) + sizeof(UInt32));
+            Write(totalSize);
+            Write((int)stream.Length);
+
+            outputStream.Write(outputArray, 0, resultLength);
         }
 
         /// <summary>
@@ -226,7 +218,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             UInt32 totalSize = (UInt32)(headerStream.Length + stream.Length + sizeof(UInt32));
             Write(totalSize);
-            stream.Position = 0;
             stream.CopyTo(outputStream);
         }
 
@@ -410,7 +401,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
         }
 
-	/// <summary>
+        /// <summary>
         /// Writes a Color value.
         /// </summary>
         /// <param name="value">Value of a color using Red, Green, Blue, and Alpha values to write.</param>
@@ -491,18 +482,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.W);
         }
 
+        /// <summary>
+        /// Writes a BoundingSphere value.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
         internal void Write(BoundingSphere value)
         {
             Write(value.Center);
             Write(value.Radius);
         }
 
-	internal void Write (Rectangle value)
-	{
-		Write (value.X);
-		Write (value.Y);
-		Write (value.Width);
-		Write (value.Height);
-	}
+        /// <summary>
+        /// Writes a Rectangle value.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
+        internal void Write(Rectangle value)
+        {
+            Write(value.X);
+            Write(value.Y);
+            Write(value.Width);
+            Write(value.Height);
+        }
     }
 }

@@ -68,6 +68,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
         private TimeSpan _timestamp;
 
         /// <summary>
+        /// True if this touch was pressed and released on the same frame.
+        /// In this case we will keep it around for the user to get by GetState that frame.
+        /// However if they do not call GetState that frame, this touch will be forgotten.
+        /// </summary>
+        internal bool SameFrameReleased;
+
+        /// <summary>
         /// Helper for assigning an invalid touch location.
         /// </summary>
         internal static readonly TouchLocation Invalid = new TouchLocation();
@@ -173,6 +180,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 _pressPosition = Vector2.Zero;
                 _pressTimestamp = TimeSpan.Zero;
             }
+
+            SameFrameReleased = false;
         }
 
 		#endregion
@@ -229,6 +238,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 _velocity += (velocity - _velocity) * 0.45f;
             }
 
+            //Going straight from pressed to released on the same frame
+            if (_previousState == TouchLocationState.Pressed && _state == TouchLocationState.Released && elapsed == TimeSpan.Zero)
+            {
+                //Lie that we are pressed for now
+                SameFrameReleased = true;
+                _state = TouchLocationState.Pressed;
+            }
+
             // Set the new timestamp.
             _timestamp = touchEvent.Timestamp;
 
@@ -276,6 +293,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			    aPreviousLocation._pressPosition = Vector2.Zero;
 			    aPreviousLocation._pressTimestamp = TimeSpan.Zero;
                 aPreviousLocation._velocity = Vector2.Zero;
+                aPreviousLocation.SameFrameReleased = false;
                 return false;
 			}
 
@@ -290,6 +308,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             aPreviousLocation._pressPosition = _pressPosition;
             aPreviousLocation._pressTimestamp = _pressTimestamp;
             aPreviousLocation._velocity = _velocity;
+            aPreviousLocation.SameFrameReleased = SameFrameReleased;
             return true;
         }
 
@@ -315,7 +334,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal void AgeState()
         {
             Debug.Assert(_state == TouchLocationState.Pressed, "Can only age the state of touches that are in the Pressed State");
-            _state = TouchLocationState.Moved;
+            if (SameFrameReleased)
+                _state = TouchLocationState.Released;
+            else
+                _state = TouchLocationState.Moved;
         }
     }
 }

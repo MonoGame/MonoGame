@@ -246,7 +246,7 @@ namespace MonoGame.Tools.Pipeline
             var cur = 0;
             foreach (var item in _importers)
             {
-                var outputType = item.Type.BaseType.GenericTypeArguments[0];
+                var outputType = item.Type.BaseType.GetGenericArguments()[0];
                 var desc = new ImporterTypeDescription()
                     {
                         TypeName = item.Type.Name,
@@ -264,11 +264,13 @@ namespace MonoGame.Tools.Pipeline
 
             var processorDescriptions = new ProcessorTypeDescription[_processors.Count];
 
+            const BindingFlags bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+
             cur = 0;
             foreach (var item in _processors)
             {
                 var obj = Activator.CreateInstance(item.Type);
-                var typeProperties = item.Type.GetRuntimeProperties();
+                var typeProperties = item.Type.GetProperties(bindings);
                 var properties = new List<ProcessorTypeDescription.Property>();
                 foreach (var i in typeProperties)
                 {
@@ -279,7 +281,7 @@ namespace MonoGame.Tools.Pipeline
                         {
                             Name = i.Name,
                             Type = i.PropertyType,
-                            DefaultValue = i.GetValue(obj),
+                            DefaultValue = i.GetValue(obj, null),
                         };
                     properties.Add(p);
                 }

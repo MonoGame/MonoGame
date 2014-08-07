@@ -50,6 +50,9 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Point</see> with coordinates 0, 0.
+        /// </summary>
         public static Point Zero
         {
             get { return zeroPoint; }
@@ -59,6 +62,11 @@ namespace Microsoft.Xna.Framework
 
         #region Constructors
 
+        /// <summary>
+        /// Creates a <see>Point</see> with the provided coordinates.
+        /// </summary>
+        /// <param name="x">The x coordinate of the <see>Point</see> to create.</param>
+        /// <param name="y">The y coordinate of the <see>Point</see> to create.</param>
         public Point(int x, int y)
         {
             this.X = x;
@@ -118,6 +126,10 @@ namespace Microsoft.Xna.Framework
             return X ^ Y;
         }
 
+        /// <summary>
+        /// Returns a String representation of this Point in the format:
+        /// X:[x] Y:[y]
+        /// </summary>
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1}}}", X, Y);

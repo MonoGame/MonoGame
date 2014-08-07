@@ -38,13 +38,9 @@
 // */
 #endregion License
 
-#region Using clause
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-#endregion Using clause
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
@@ -54,8 +50,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
     public struct TouchCollection : IList<TouchLocation>
 	{
         private TouchLocation[] _collection;
-
-        private static readonly TouchLocation[] emptyCollection = new TouchLocation[0];
 
 		#region Properties
 
@@ -72,6 +66,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
         public TouchCollection(TouchLocation[] touches)
         {
+            if (touches == null)
+                throw new ArgumentNullException("touches");
+
             _collection = touches;
         }
 
@@ -83,11 +80,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public bool FindById(int id, out TouchLocation touchLocation)
 		{
-            if (_collection == null)
-            {
-                touchLocation = default(TouchLocation);
-                return false;
-            }
             for (var i = 0; i < _collection.Length; i++)
             {
                 var location = _collection[i];
@@ -119,8 +111,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns></returns>
         public int IndexOf(TouchLocation item)
         {
-            if (_collection == null)
-                return -1;
             for (var i = 0; i < _collection.Length; i++)
             {
                 if (item == _collection[i])
@@ -158,8 +148,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                if (_collection == null)
-                    throw new ArgumentOutOfRangeException("index");
                 return _collection[index];
             }
             set
@@ -192,8 +180,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Returns true if queried item is found, false otherwise.</returns>
         public bool Contains(TouchLocation item)
         {
-            if (_collection == null)
-                return false;
             for (var i = 0; i < _collection.Length; i++)
             {
                 if (item == _collection[i])
@@ -210,8 +196,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="arrayIndex">The starting index of the copy operation.</param>
         public void CopyTo(TouchLocation[] array, int arrayIndex)
         {
-            if (_collection != null)
-                _collection.CopyTo(array, arrayIndex);
+            _collection.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -221,8 +206,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                if (_collection == null)
-                    return 0;
                 return _collection.Length;
             }
         }
@@ -241,13 +224,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// Returns an enumerator for the <see cref="TouchCollection"/>.
         /// </summary>
         /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
-        public IEnumerator<TouchLocation> GetEnumerator()
+        public Enumerator GetEnumerator()
         {
-            if (_collection == null)
-                return emptyCollection.AsEnumerable().GetEnumerator();
-            return _collection.AsEnumerable().GetEnumerator();
+            return new Enumerator(this);
         }
 
+        /// <summary>
+        /// Returns an enumerator for the <see cref="TouchCollection"/>.
+        /// </summary>
+        /// <returns>Enumerable list of <see cref="TouchLocation"/> objects.</returns>
+        IEnumerator<TouchLocation> IEnumerable<TouchLocation>.GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
 
         /// <summary>
         /// Returns an enumerator for the <see cref="TouchCollection"/>.
@@ -255,11 +244,63 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <returns>Enumerable list of objects.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            if (_collection == null)
-                return emptyCollection.GetEnumerator();
-            return _collection.GetEnumerator();
+            return new Enumerator(this);
         }
 
         #endregion // IList<TouchLocation>
+
+        /// <summary>
+        /// Provides the ability to iterate through the TouchLocations in an TouchCollection.
+        /// </summary>
+        public struct Enumerator : IEnumerator<TouchLocation>
+        {
+            private readonly TouchCollection _collection;
+            private int _position;
+
+            internal Enumerator(TouchCollection collection)
+            {
+                _collection = collection;
+                _position = -1;
+            }
+
+            /// <summary>
+            /// Gets the current element in the TouchCollection.
+            /// </summary>
+            public TouchLocation Current { get { return _collection[_position]; } }
+
+            /// <summary>
+            /// Advances the enumerator to the next element of the TouchCollection.
+            /// </summary>
+            public bool MoveNext()
+            {
+                _position++;
+                return (_position < _collection.Count);
+            }
+
+            #region IDisposable
+
+            /// <summary>
+            /// Immediately releases the unmanaged resources used by this object.
+            /// </summary>
+            public void Dispose()
+            {
+            }
+
+            #endregion
+
+            #region IEnumerator Members
+
+            object IEnumerator.Current
+            {
+                get { return _collection[_position]; }
+            }
+
+            public void Reset()
+            {
+                _position = -1;
+            }
+
+            #endregion
+        }
     }
 }

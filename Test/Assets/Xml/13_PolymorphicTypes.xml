@@ -3,7 +3,7 @@
   <Asset Type="MonoGame.Tests.ContentPipeline.PolymorphicTypes">
     <Hello Type="string">World</Hello>
     <Elf Type="int">23</Elf>
-    <PolymorphicArray>
+    <TypedArray>
       <Item>
         <Value>true</Value>
       </Item>
@@ -13,6 +13,17 @@
       <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
         <Value>true</Value>
       </Item>
-    </PolymorphicArray>
+    </TypedArray>
+    <UntypedArray Type="MonoGame.Tests.ContentPipeline.PolymorphicA[]">
+      <Item>
+        <Value>true</Value>
+      </Item>
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicB">
+        <Value>true</Value>
+      </Item>
+      <Item Type="MonoGame.Tests.ContentPipeline.PolymorphicC">
+        <Value>true</Value>
+      </Item>
+    </UntypedArray>
   </Asset>
 </XnaContent>

@@ -62,7 +62,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (ResizeToPowerOfTwo)
             {
                 if (!GraphicsUtil.IsPowerOfTwo(bmp.Width) || !GraphicsUtil.IsPowerOfTwo(bmp.Height))
+                {
                     input.Resize(GraphicsUtil.GetNextPowerOfTwo(bmp.Width), GraphicsUtil.GetNextPowerOfTwo(bmp.Height));
+                    bmp = input.Faces[0][0];
+                }
             }
 
             if (PremultiplyAlpha)

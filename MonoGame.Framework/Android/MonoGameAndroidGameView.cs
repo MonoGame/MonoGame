@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using Android.Content;
 using Android.Media;
 using Android.Views;
@@ -25,6 +26,7 @@ namespace Microsoft.Xna.Framework
         private readonly AndroidTouchEventManager _touchManager;
 
         public bool IsResuming { get; private set; }
+        private bool _lostContext;
 
         public MonoGameAndroidGameView(Context context, AndroidGameWindow androidGameWindow, Game game)
             : base(context)
@@ -107,34 +109,6 @@ namespace Microsoft.Xna.Framework
             SurfaceCreated(holder);
             Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.SurfaceCreated: surfaceFrame = " + holder.SurfaceFrame.ToString());
             _isSurfaceChanged = false;
-
-            if (_game.GraphicsDevice != null)
-            {
-                _game.GraphicsDevice.Initialize();
-
-                IsResuming = true;
-                if (_gameWindow.Resumer != null)
-                {
-                    _gameWindow.Resumer.LoadContent();
-                }
-
-                // Reload textures on a different thread so the resumer can be drawn
-                System.Threading.Thread bgThread = new System.Threading.Thread(
-                    o =>
-                    {
-                        Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
-                        Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                        Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
-
-                        // DeviceReset events
-                        _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
-                        _game.GraphicsDevice.OnDeviceReset();
-
-                        IsResuming = false;
-                    });
-
-                bgThread.Start();
-            }
         }
 
         #endregion
@@ -143,7 +117,15 @@ namespace Microsoft.Xna.Framework
 
         protected override void OnLoad(EventArgs eventArgs)
         {
-            MakeCurrent();
+            base.OnLoad(eventArgs);
+            try
+            {
+                MakeCurrent();
+            }
+            catch (Exception e)
+            {
+                throw new NoSuitableGraphicsDeviceException(e.Message, e);
+            }
         }
 
         public override void Resume()
@@ -152,72 +134,138 @@ namespace Microsoft.Xna.Framework
                 base.Resume();
         }
 
-        protected override void CreateFrameBuffer()
-        {
-            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.CreateFrameBuffer");
-            try
-            {
-                GLContextVersion = GLContextVersion.Gles2_0;
-                try
-                {
-                    int depth = 0;
-                    int stencil = 0;
-                    switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
-                    {
-                        case DepthFormat.Depth16:
-                            depth = 16;
-                            break;
-                        case DepthFormat.Depth24:
-                            depth = 24;
-                            break;
-                        case DepthFormat.Depth24Stencil8:
-                            depth = 24;
-                            stencil = 8;
-                            break;
-                        case DepthFormat.None: break;
-                    }
-                    Android.Util.Log.Debug("MonoGame", string.Format("Creating Color:Default Depth:{0} Stencil:{1}", depth, stencil));
-                    GraphicsMode = new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false);
-                    base.CreateFrameBuffer();
-                }
-                catch (Exception)
-                {
-                    Android.Util.Log.Debug("MonoGame", "Failed to create desired format, falling back to defaults");
-                    // try again using a more basic mode with a 16 bit depth buffer which hopefully the device will support 
-                    GraphicsMode = new AndroidGraphicsMode(new ColorFormat(0, 0, 0, 0), 16, 0, 0, 0, false);
-                    try
-                    {
-                        base.CreateFrameBuffer();
-                    }
-                    catch (Exception)
-                    {
-                        // ok we are right back to getting the default
-                        GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-                        base.CreateFrameBuffer();
-                    }
-                }
-                Android.Util.Log.Debug("MonoGame", "Created format {0}", GraphicsContext.GraphicsMode);
-                All status = GL.CheckFramebufferStatus(All.Framebuffer);
-                Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
-            }
-            catch (Exception)
-            {
-                throw new NotSupportedException("Could not create OpenGLES 2.0 frame buffer");
-            }
 
-            MakeCurrent();
-        }
-
-        protected override void DestroyFrameBuffer()
+        protected override void OnContextLost(EventArgs e)
         {
+            base.OnContextLost(e);
+            // OnContextLost is called when the underlying OpenGL context is destroyed
+            // this usually happens on older devices when other opengl apps are run 
+            // or the lock screen is enabled. Modern devices can preserve the opengl 
+            // context along with all the textures and shaders it has attached.
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Lost");
+
             // DeviceResetting events
             _game.graphicsDeviceManager.OnDeviceResetting(EventArgs.Empty);
             if (_game.GraphicsDevice != null)
                 _game.GraphicsDevice.OnDeviceResetting();
 
-            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.DestroyFrameBuffer");
+            _lostContext = true;
+        }
 
-            base.DestroyFrameBuffer();
+        protected override void OnContextSet(EventArgs e)
+        {
+            // This is called when a Context is created. This will happen in
+            // two ways, first when the activity is first created. Second if 
+            // (and only if) the context is lost 
+            // When an acivity is now paused we correctly preserve the context
+            // rather than destoying it along with the Surface which is what 
+            // used to happen. 
+
+            base.OnContextSet(e);
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView Context Set");
+
+            if (_lostContext)
+            {
+                _lostContext = false;
+
+                if (_game.GraphicsDevice != null)
+                {
+                    _game.GraphicsDevice.Initialize();
+
+                    IsResuming = true;
+                    if (_gameWindow.Resumer != null)
+                    {
+                        _gameWindow.Resumer.LoadContent();
+                    }
+
+                    // Reload textures on a different thread so the resumer can be drawn
+                    System.Threading.Thread bgThread = new System.Threading.Thread(
+                        o =>
+                        {
+                            Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                            Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
+                            Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+
+                            // DeviceReset events
+                            _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);
+                            _game.GraphicsDevice.OnDeviceReset();
+
+                            IsResuming = false;
+                        });
+
+                    bgThread.Start();
+                }
+            }
+        }
+        protected override void CreateFrameBuffer()
+        {
+            Android.Util.Log.Debug("MonoGame", "MonoGameAndroidGameView.CreateFrameBuffer");
+            GLContextVersion = GLContextVersion.Gles2_0;
+
+            int depth = 0;
+            int stencil = 0;
+            switch (_game.graphicsDeviceManager.PreferredDepthStencilFormat)
+            {
+                case DepthFormat.Depth16:
+                    depth = 16;
+                    break;
+                case DepthFormat.Depth24:
+                    depth = 24;
+                    break;
+                case DepthFormat.Depth24Stencil8:
+                    depth = 24;
+                    stencil = 8;
+                    break;
+                case DepthFormat.None:
+                    break;
+            }
+
+            List<GraphicsMode> modes = new List<GraphicsMode>();
+            if (depth > 0)
+            {
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), depth, stencil, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), depth, stencil, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(0, depth, stencil, 0, 0, false));
+                if (depth > 16)
+                {
+                    modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 16, 0, 0, 0, false));
+                    modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 16, 0, 0, 0, false));
+                    modes.Add(new AndroidGraphicsMode(0, 16, 0, 0, 0, false));
+                }
+            }
+            else
+            {
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 0, 0, 0, 0, false));
+                modes.Add(new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 0, 0, 0, 0, false));
+            }
+            modes.Add(null); // default mode
+            modes.Add(new AndroidGraphicsMode(0, 0, 0, 0, 0, false)); // low mode
+
+            Exception innerException = null;
+            foreach (GraphicsMode mode in modes)
+            {
+                if (mode != null)
+                    Android.Util.Log.Debug("MonoGame", "Creating Color: {0}, Depth: {1}, Stencil: {2}, Accum:{3}", mode.ColorFormat, mode.Depth, mode.Stencil, mode.AccumulatorFormat);
+                else
+                    Android.Util.Log.Debug("MonoGame", "Creating default mode");
+                GraphicsMode = mode;
+                try
+                {
+                    base.CreateFrameBuffer();
+                }
+                catch (Exception e)
+                {
+                    innerException = e;
+                    continue;
+                }
+                Android.Util.Log.Debug("MonoGame", "Created format {0}", GraphicsContext.GraphicsMode);
+                All status = GL.CheckFramebufferStatus(All.Framebuffer);
+                Android.Util.Log.Debug("MonoGame", "Framebuffer Status: " + status.ToString());
+
+                MakeCurrent();
+                return;
+            }
+            throw new NoSuitableGraphicsDeviceException("Could not create OpenGLES 2.0 frame buffer", innerException);
         }
 
         #endregion
@@ -240,14 +288,16 @@ namespace Microsoft.Xna.Framework
 
             if (keyCode == Keycode.VolumeUp)
             {
-                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+                AudioManager audioManager = (AudioManager)Context.GetSystemService(Context.AudioService);
                 audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
+                return true;
             }
 
             if (keyCode == Keycode.VolumeDown)
             {
-                AudioManager audioManager = (AudioManager)Game.Activity.GetSystemService(Context.AudioService);
+                AudioManager audioManager = (AudioManager)Context.GetSystemService(Context.AudioService);
                 audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
+                return true;
             }
 
             return true;

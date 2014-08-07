@@ -22,9 +22,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
         {
-            var msg = string.Format(message, messageArgs);
-            var fileName = GetCurrentFilename(contentIdentity);
-            Console.WriteLine("{0}: {1}", fileName, msg);
+            var warning = string.Empty;
+            if (!string.IsNullOrEmpty(contentIdentity.SourceFilename))
+            {
+                warning = contentIdentity.SourceFilename;
+                if (!string.IsNullOrEmpty(contentIdentity.FragmentIdentifier))
+                    warning += "(" + contentIdentity.FragmentIdentifier + ")";
+                warning += ": ";
+            }
+            warning += string.Format(message, messageArgs);
+            Console.WriteLine(warning);
         }
     }
 }

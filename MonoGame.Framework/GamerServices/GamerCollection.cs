@@ -43,7 +43,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 #endregion Using clause
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -64,7 +63,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             // need to add gamers at the correct index based on GamerTag           
             if (base.Items.Count > 0)
             {
-                for (int i = 0; i < base.Items.Count(); i++)
+                for (int i = 0; i < base.Items.Count; i++)
                 {
                     if (item.Gamertag.CompareTo(base.Items[i].Gamertag) > 0)
                     {

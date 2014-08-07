@@ -1,32 +1,6 @@
-﻿#region License
-/*
-MIT License
-Copyright ¬© 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Authors:
-Olivier Dufour (Duff)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -218,31 +192,61 @@ namespace Microsoft.Xna.Framework
 
         public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
         {
-            if (points == null)
+            if (points == null )
                 throw new ArgumentNullException("points");
 
-            float radius = 0;
-            Vector3 center = new Vector3();
-            // First, we'll find the center of gravity for the point 'cloud'.
-            int num_points = 0; // The number of points (there MUST be a better way to get this instead of counting the number of points one by one?)
-            
-            foreach (Vector3 v in points)
+            // From "Real-Time Collision Detection" (Page 89)
+
+            var minx = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            var maxx = -minx;
+            var miny = minx;
+            var maxy = -minx;
+            var minz = minx;
+            var maxz = -minx;
+
+            // Find the most extreme points along the principle axis.
+            var numPoints = 0;           
+            foreach (var pt in points)
             {
-                center += v;    // If we actually knew the number of points, we'd get better accuracy by adding v / num_points.
-                ++num_points;
+                ++numPoints;
+
+                if (pt.X < minx.X) 
+                    minx = pt;
+                if (pt.X > maxx.X) 
+                    maxx = pt;
+                if (pt.Y < miny.Y) 
+                    miny = pt;
+                if (pt.Y > maxy.Y) 
+                    maxy = pt;
+                if (pt.Z < minz.Z) 
+                    minz = pt;
+                if (pt.Z > maxz.Z) 
+                    maxz = pt;
+            }
+
+            if (numPoints == 0)
+                throw new ArgumentException("You should have at least one point in points.");
+
+            var sqDistX = Vector3.DistanceSquared(maxx, minx);
+            var sqDistY = Vector3.DistanceSquared(maxy, miny);
+            var sqDistZ = Vector3.DistanceSquared(maxz, minz);
+
+            // Pick the pair of most distant points.
+            var min = minx;
+            var max = maxx;
+            if (sqDistY > sqDistX && sqDistY > sqDistZ) 
+            {
+                max = maxy;
+                min = miny;
+            }
+            if (sqDistZ > sqDistX && sqDistZ > sqDistY) 
+            {
+                max = maxz;
+                min = minz;
             }
             
-            center /= (float)num_points;
-
-            // Calculate the radius of the needed sphere (it equals the distance between the center and the point further away).
-            foreach (Vector3 v in points)
-            {
-                float distance = ((Vector3)(v - center)).Length();
-                
-                if (distance > radius)
-                    radius = distance;
-            }
-
+            var center = (min + max) * 0.5f;
+            var radius = Vector3.Distance(max, center);
             return new BoundingSphere(center, radius);
         }
 

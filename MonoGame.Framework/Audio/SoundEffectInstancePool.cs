@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
@@ -38,8 +36,8 @@ namespace Microsoft.Xna.Framework.Audio
 
 #elif ANDROID
 
-        // No reference. Arbitrary maximum chosen to reduce CPU load.
-        internal const int MAX_PLAYING_INSTANCES = 16;
+        // Set to the same as OpenAL on iOS
+        internal const int MAX_PLAYING_INSTANCES = 32;
 
 #endif
 
@@ -128,6 +126,10 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         internal static void Update()
         {
+#if OPENAL
+            OpenALSoundController.GetInstance.Update();
+#endif
+
             SoundEffectInstance inst = null;
             // Cleanup instances which have finished playing.                    
             for (var x = 0; x < _playingInstances.Count;)

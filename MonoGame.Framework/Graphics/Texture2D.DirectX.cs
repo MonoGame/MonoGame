@@ -154,7 +154,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            for (i = row * rowSize; i < elementCount; i++)
+                            for (i = row * elementsInRow; i < (row + 1) * elementsInRow; i++)
                                 data[i] = stream.Read<T>();
 
                             if (i >= elementCount)
@@ -384,6 +384,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformReload(Stream textureStream)
         {
+#if WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(textureStream);
+                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+
+                // Convert from ARGB to ABGR 
+                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+                this.SetData<int>(bitmap.Pixels);
+            });
+#endif
         }
 	}
 }

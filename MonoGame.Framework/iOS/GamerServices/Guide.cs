@@ -157,7 +157,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         private static GuideViewController guideViewController = null; // Only used for iOS 5 and older
 
         private static GestureType prevGestures;
-        private static bool _isInitialised;
+        private static bool _isInitialised = false;
         private static UIWindow _window;
         private static UIViewController _gameViewController;
 
@@ -166,30 +166,38 @@ namespace Microsoft.Xna.Framework.GamerServices
         [CLSCompliant(false)]
         public static GKMatch Match { get; private set; }
 
+        static Guide()
+        {
+            Initialise(Game.Instance);
+        }
+
         internal static void Initialise(Game game)
         {
-            var osVersionString = UIDevice.CurrentDevice.SystemVersion;
-            if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
+            if (!_isInitialised)
             {
-                var parts = osVersionString.Split(char.Parse("."));
-                osVersionString = parts[0] + "." + parts[1];
+                var osVersionString = UIDevice.CurrentDevice.SystemVersion;
+                if (osVersionString.Contains(".") && osVersionString.IndexOf(".") != osVersionString.LastIndexOf("."))
+                {
+                    var parts = osVersionString.Split(char.Parse("."));
+                    osVersionString = parts[0] + "." + parts[1];
+                }
+
+                osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
+
+                _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
+                if (_window == null)
+                    throw new InvalidOperationException(
+                        "iOSGamePlatform must add the main UIWindow to Game.Services");
+
+                _gameViewController = (UIViewController)game.Services.GetService(typeof(UIViewController));
+                if (_gameViewController == null)
+                    throw new InvalidOperationException(
+                        "iOSGamePlatform must add the game UIViewController to Game.Services");
+
+                game.Exiting += Game_Exiting;
+
+                _isInitialised = true;
             }
-
-            osVersion = double.Parse(osVersionString, System.Globalization.CultureInfo.InvariantCulture);
-
-            _window = (UIWindow)game.Services.GetService(typeof(UIWindow));
-            if (_window == null)
-                throw new InvalidOperationException(
-                    "iOSGamePlatform must add the main UIWindow to Game.Services");
-
-            _gameViewController = (UIViewController)game.Services.GetService(typeof(UIViewController));
-            if (_gameViewController == null)
-                throw new InvalidOperationException(
-                    "iOSGamePlatform must add the game UIViewController to Game.Services");
-
-            game.Exiting += Game_Exiting;
-
-            _isInitialised = true;
         }
 
         private static void Uninitialise(Game game)
@@ -534,7 +542,8 @@ namespace Microsoft.Xna.Framework.GamerServices
             }
         }
 
-        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, string tweetAddImage = null)
+        [CLSCompliant(false)]
+        public static void ShowTwitter(string tweetInitialText = null, string tweetAddUrl = null, UIImage tweetAddImage = null)
         {
             AssertInitialised();
 
@@ -552,8 +561,8 @@ namespace Microsoft.Xna.Framework.GamerServices
                 if (!String.IsNullOrEmpty(tweetAddUrl))
                     tweetController.AddUrl(NSUrl.FromString(tweetAddUrl));
 
-                if (!String.IsNullOrEmpty(tweetAddImage))
-                    tweetController.AddImage(UIImage.FromFile(tweetAddImage));
+                if (tweetAddImage != null)
+                    tweetController.AddImage(tweetAddImage);
 
                 ShowViewController(tweetController);
             }
@@ -595,7 +604,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         /// </remarks>
         /// <param name="minPlayers">Minimum players to find</param>
         /// <param name="maxPlayers">Maximum players to find</param>
-        /// <param name="playersToInvite">Players to invite/param>
+        /// <param name="playersToInvite">Players to invite</param>
         public static void ShowMatchMaker(int minPlayers, int maxPlayers, string[] playersToInvite)
         {
             AssertInitialised();

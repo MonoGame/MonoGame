@@ -89,6 +89,8 @@ namespace MGCB
 
         public readonly PreprocessorPropertyCollection _properties;
 
+        public event Action<string, object[]> OnError;
+
         public MGBuildParser(object optionsObject)
         {
             _optionsObject = optionsObject;
@@ -377,7 +379,7 @@ namespace MGCB
                     else 
                     {
                         var property = member as PropertyInfo;
-                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType));
+                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType), null);
                     }
                 }
 
@@ -429,7 +431,7 @@ namespace MGCB
         IList GetList(MemberInfo member)
         {
             if (member is PropertyInfo)
-                return (IList)(member as PropertyInfo).GetValue(_optionsObject);
+                return (IList)(member as PropertyInfo).GetValue(_optionsObject, null);
 
             if (member is FieldInfo)
                 return (IList)(member as FieldInfo).GetValue(_optionsObject);
@@ -472,6 +474,12 @@ namespace MGCB
 
         public void ShowError(string message, params object[] args)
         {
+            if (!string.IsNullOrEmpty(message) && OnError != null)
+            {
+                OnError(message, args);
+                return;
+            }
+
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
             if (!string.IsNullOrEmpty(Title))
