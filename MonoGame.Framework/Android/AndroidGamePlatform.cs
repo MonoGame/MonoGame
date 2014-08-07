@@ -23,6 +23,16 @@ namespace Microsoft.Xna.Framework
             Window = _gameWindow;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                AndroidGameActivity.Paused -= Activity_Paused;
+                AndroidGameActivity.Resumed -= Activity_Resumed;
+            }
+            base.Dispose(disposing);
+        }
+
         private bool _initialized;
         public static bool IsPlayingVdeo { get; set; }
         private AndroidGameWindow _gameWindow;
