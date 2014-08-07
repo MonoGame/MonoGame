@@ -329,6 +329,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
             inputOptions.SetMipmapGeneration(generateMipmaps);
+            inputOptions.SetGamma(1.0f, 1.0f);
 
             var outputOptions = new OutputOptions();
             outputOptions.SetOutputHeader(false);
