@@ -25,11 +25,7 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
-        #region Property Defines
-
         private static Point zeroPoint = new Point();
-
-        #endregion Property Defines
 
         /// <summary>
         /// Returns a <see cref="Point"/> with coordinates 0, 0.
