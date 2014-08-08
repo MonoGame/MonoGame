@@ -494,15 +494,6 @@ namespace Microsoft.Xna.Framework
             result.Y = y;
         }
 
-        /// <summary>
-        /// Gets a two-component <see cref="Point"/> representation for this object(fraction loss).
-        /// </summary>
-        /// <returns>A two-component <see cref="Point"/> representation for this object(fraction loss).</returns>
-        public Microsoft.Xna.Framework.Point ToPoint()
-        {
-            return new Microsoft.Xna.Framework.Point((int)X, (int)Y);
-        }
-
         public override string ToString()
         {
 			CultureInfo currentCulture = CultureInfo.CurrentCulture;
