@@ -5,6 +5,7 @@
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
+using SharpDX;
 
 namespace Microsoft.Xna.Framework
 {
@@ -492,6 +493,15 @@ namespace Microsoft.Xna.Framework
             var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22);
             result.X = x;
             result.Y = y;
+        }
+
+        /// <summary>
+        /// Gets a two-component <see cref="Point"/> representation for this object(fraction loss).
+        /// </summary>
+        /// <returns>A two-component <see cref="Point"/> representation for this object(fraction loss).</returns>
+        public Point ToPoint()
+        {
+            return new Point((int)X,(int)Y);
         }
 
         public override string ToString()
