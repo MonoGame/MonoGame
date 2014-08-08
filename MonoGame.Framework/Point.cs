@@ -154,15 +154,6 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets a two-component <see cref="Vector2"/> representation for this object.
-        /// </summary>
-        /// <returns>A two-component <see cref="Vector2"/> representation for this object.</returns>
-        public Vector2 ToVector2()
-        {
-            return new Vector2(X, Y);
-        }
-
-        /// <summary>
         /// Returns a <see cref="String"/> representation of this <see cref="Point"/> in the format:
         /// {X:[x] Y:[y]}
         /// </summary>
@@ -170,6 +161,15 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1}}}", X, Y);
+        }
+
+        /// <summary>
+        /// Gets a two-component <see cref="Vector2"/> representation for this object.
+        /// </summary>
+        /// <returns>A two-component <see cref="Vector2"/> representation for this object.</returns>
+        public Vector2 ToVector2()
+        {
+            return new Vector2(X, Y);
         }
 
         #endregion
