@@ -125,15 +125,6 @@ namespace Microsoft.Xna.Framework
         #region Public methods
 
         /// <summary>
-        /// Gets a two-component <see cref="Vector2"/> representation for this object.
-        /// </summary>
-        /// <returns>A two-component <see cref="Vector2"/> representation for this object.</returns>
-        public Vector2 ToVector2()
-        {
-            return new Vector2(X,Y);
-        }
-
-        /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Point"/>.
         /// </summary>
         /// <param name="other">The <see cref="Point"/> to compare.</param>
@@ -160,6 +151,15 @@ namespace Microsoft.Xna.Framework
         public override int GetHashCode()
         {
             return X ^ Y;
+        }
+
+        /// <summary>
+        /// Gets a two-component <see cref="Vector2"/> representation for this object.
+        /// </summary>
+        /// <returns>A two-component <see cref="Vector2"/> representation for this object.</returns>
+        public Vector2 ToVector2()
+        {
+            return new Vector2(X, Y);
         }
 
         /// <summary>
