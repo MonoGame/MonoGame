@@ -498,9 +498,9 @@ namespace Microsoft.Xna.Framework
         /// Gets a two-component <see cref="Point"/> representation for this object(fraction loss).
         /// </summary>
         /// <returns>A two-component <see cref="Point"/> representation for this object(fraction loss).</returns>
-        public Point ToPoint()
+        public Microsoft.Xna.Framework.Point ToPoint()
         {
-            return new Point((int)X,(int)Y);
+            return new Microsoft.Xna.Framework.Point((int)X, (int)Y);
         }
 
         public override string ToString()
