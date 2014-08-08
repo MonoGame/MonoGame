@@ -503,7 +503,7 @@ namespace MonoGame.Tools.Pipeline
 			        _openMenuItem.Sensitive = notBuilding;
 			        _importMenuItem.Sensitive = notBuilding;
 
-			        _saveMenuItem.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDiry;
+			        _saveMenuItem.Sensitive = projectOpenAndNotBuilding && _controller.ProjectDirty;
 			        _saveAsMenuItem.Sensitive = projectOpenAndNotBuilding;
 			        _closeMenuItem.Sensitive = projectOpenAndNotBuilding;
 
@@ -563,8 +563,7 @@ namespace MonoGame.Tools.Pipeline
 
             leftPane.Panel1.Content = _treeView;
 
-            // Placeholder vbox until a property grid is in place
-            leftPane.Panel2.Content = new VBox();
+            leftPane.Panel2.Content = new PropertyGrid();
 
 			mainPaned.Panel1.Content = leftPane;
 			_outputWindow = new OutputTextView();

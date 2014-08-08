@@ -136,6 +136,9 @@
     <Compile Include="Xwt\OutputTextView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Xwt\PropertyGrid.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="Icons\blueprint.png" />
