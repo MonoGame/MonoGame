@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		public float LineSpacing { get; private set; }
 
+		public int YOffsetMin { get; private set; }
 
 		// Size of the temp surface used for GDI+ rasterization.
 		const int MaxGlyphSize = 1024;
@@ -52,6 +53,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 					// Store the font height.
 					LineSpacing = face.Size.Metrics.Height >> 6;
+
+					// The height used to calculate the Y offset for each character.
+					YOffsetMin = -face.Size.Metrics.Ascender >> 6;
 				}
 			} finally {
 				if (face != null)
@@ -65,7 +69,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
 		// Attempts to instantiate the requested GDI+ font object.
-		Face CreateFontFace(FontDescription options, string fontName)
+		private Face CreateFontFace(FontDescription options, string fontName)
 		{
 
 			try {
