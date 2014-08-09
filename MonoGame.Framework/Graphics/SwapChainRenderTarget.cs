@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </remarks>
     public class SwapChainRenderTarget : RenderTarget2D
     {
-        private readonly SwapChain _swapChain;
+        private SwapChain _swapChain;
 
         public PresentInterval PresentInterval;
 
@@ -168,8 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (disposing)
             {
-                //SharpDX.Utilities.Dispose(ref _swapChain); // A readonly field cannot be passed ref or out
-                _swapChain.Dispose();
+                SharpDX.Utilities.Dispose(ref _swapChain);
             }
 
             base.Dispose(disposing);
