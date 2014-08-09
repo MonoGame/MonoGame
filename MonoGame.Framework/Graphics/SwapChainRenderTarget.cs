@@ -163,6 +163,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                //SharpDX.Utilities.Dispose(ref _swapChain); // A readonly field cannot be passed ref or out
+                _swapChain.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+
     }
 
 #endif // WINDOWS && DIRECTX
