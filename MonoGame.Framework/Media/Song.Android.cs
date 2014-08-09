@@ -48,16 +48,24 @@ namespace Microsoft.Xna.Framework.Media
 
         internal void Play()
         {
+			_name = _name.Replace ("\\", "/");
             // Prepare the player
-            var afd = Game.Activity.Assets.OpenFd(_name);
-            if (afd != null)
-            {
-                _androidPlayer.Reset();
-                _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
-                _androidPlayer.Prepare();
-                _androidPlayer.Looping = MediaPlayer.IsRepeating;
-                _playingSong = this;
-            }
+			if (System.IO.File.Exists (_name)) {
+				_androidPlayer.Reset ();
+				_androidPlayer.SetDataSource (_name);
+				_androidPlayer.Prepare ();
+				_androidPlayer.Looping = MediaPlayer.IsRepeating;
+				_playingSong = this;
+			} else {
+				var afd = Game.Activity.Assets.OpenFd (_name);
+				if (afd != null) {
+					_androidPlayer.Reset ();
+					_androidPlayer.SetDataSource (afd.FileDescriptor, afd.StartOffset, afd.Length);
+					_androidPlayer.Prepare ();
+					_androidPlayer.Looping = MediaPlayer.IsRepeating;
+					_playingSong = this;
+				}
+			}
 
             _androidPlayer.Start();
             _playCount++;
