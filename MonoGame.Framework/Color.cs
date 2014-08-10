@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describe a 32-bit packed color.
+    /// Describes a 32-bit packed color.
     /// </summary>
     [DataContract]
     public struct Color : IEquatable<Color>
@@ -394,10 +394,10 @@ namespace Microsoft.Xna.Framework
             return !(a == b);
         }
 	
-	/// <summary>
-        /// Gets the hash code for <see cref="Color"/> instance.
+	    /// <summary>
+        /// Gets the hash code of this <see cref="Color"/>.
         /// </summary>
-        /// <returns>Hash code of the object.</returns>
+        /// <returns>Hash code of this <see cref="Color"/>.</returns>
         public override int GetHashCode()
         {
             return this._packedValue.GetHashCode();
@@ -1758,10 +1758,11 @@ namespace Microsoft.Xna.Framework
             set { _packedValue = value; }
         }
 	
-	/// <summary>
-        /// Converts the color values of this instance to its equivalent string representation.
-        /// </summary>
-        /// <returns>The string representation of the color value of this instance.</returns>
+    /// <summary>
+    /// Returns a <see cref="String"/> representation of this <see cref="Color"/> in the format:
+    /// {R:[red] G:[green] B:[blue] A:[alpha]}
+    /// </summary>
+    /// <returns><see cref="String"/> representation of this <see cref="Color"/>.</returns>
 	public override string ToString ()
 	{
         StringBuilder sb = new StringBuilder(25);
