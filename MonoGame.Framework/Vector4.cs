@@ -1,34 +1,10 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Text;
 using System.Runtime.Serialization;
-using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework
 {
@@ -66,31 +42,49 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 0, 0, 0, 0.
+        /// </summary>
         public static Vector4 Zero
         {
             get { return zeroVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 1, 1, 1, 1.
+        /// </summary>
         public static Vector4 One
         {
             get { return unitVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 1, 0, 0, 0.
+        /// </summary>
         public static Vector4 UnitX
         {
             get { return unitXVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 0, 1, 0, 0.
+        /// </summary>
         public static Vector4 UnitY
         {
             get { return unitYVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 0, 0, 1, 0.
+        /// </summary>
         public static Vector4 UnitZ
         {
             get { return unitZVector; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector4</see> with components 0, 0, 0, 1.
+        /// </summary>
         public static Vector4 UnitW
         {
             get { return unitWVector; }
@@ -138,6 +132,12 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <returns>The result of the vector addition.</returns>
         public static Vector4 Add(Vector4 value1, Vector4 value2)
         {
             value1.X += value2.X;
@@ -147,6 +147,14 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and
+        /// <paramref name="value2"/>, storing the result of the
+        /// addition in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <param name="result">The result of the vector addition.</param>
         public static void Add(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
             result.X = value1.X + value2.X;
@@ -463,6 +471,12 @@ namespace Microsoft.Xna.Framework
             result.W = MathHelper.SmoothStep(value1.W, value2.W, amount);
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <returns>The result of the vector subtraction.</returns>
         public static Vector4 Subtract(Vector4 value1, Vector4 value2)
         {
             value1.W -= value2.W;
@@ -472,6 +486,12 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <param name="result">The result of the vector subtraction.</param>
         public static void Subtract(ref Vector4 value1, ref Vector4 value2, out Vector4 result)
         {
             result.W = value1.W - value2.W;

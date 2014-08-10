@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
-using System.IO;
 using SharpFont;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -19,6 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		public float LineSpacing { get; private set; }
 
+		public int YOffsetMin { get; private set; }
 
 		// Size of the temp surface used for GDI+ rasterization.
 		const int MaxGlyphSize = 1024;
@@ -41,7 +39,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					graphics.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
 					// Which characters do we want to include?
-					var characters = CharacterRegion.Flatten(options.CharacterRegions);
+                    var characters = options.Characters;
 
 					var glyphList = new List<Glyph>();
 					// Rasterize each character in turn.
@@ -54,11 +52,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					Glyphs = glyphList;
 
 					// Store the font height.
-					LineSpacing = 0;
-					foreach (var glyph in Glyphs) 
-					{
-						LineSpacing = (glyph.Subrect.Height > LineSpacing) ? glyph.Subrect.Height : LineSpacing;
-					}
+					LineSpacing = face.Size.Metrics.Height >> 6;
+
+					// The height used to calculate the Y offset for each character.
+					YOffsetMin = -face.Size.Metrics.Ascender >> 6;
 				}
 			} finally {
 				if (face != null)
@@ -72,12 +69,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
 		// Attempts to instantiate the requested GDI+ font object.
-		Face CreateFontFace(FontDescription options, string fontName)
+		private Face CreateFontFace(FontDescription options, string fontName)
 		{
 
 			try {
-				Face face = lib.NewFace (fontName, 0);
-				face.SetCharSize(0, (int)options.Size * 64, 0, 96);
+				const uint dpi = 96;
+				var face = lib.NewFace(fontName, 0);
+				var fixedSize = ((int)options.Size) << 6;
+				face.SetCharSize(0, fixedSize, dpi, dpi);
 
 				if (face.FamilyName == "Microsoft Sans Serif" && options.FontName != "Microsoft Sans Serif")
 					throw new PipelineException(string.Format("Font {0} is not installed on this computer.", options.FontName));
@@ -93,42 +92,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 		}
 
-
-		// Converts a font size from points to pixels. Can't just let GDI+ do this for us,
-		// because we want identical results on every machine regardless of system DPI settings.
-		static float PointsToPixels(float points)
-		{
-			return points * 96 / 72;
-		}
-
-
 		// Rasterizes a single character glyph.
 		static Glyph ImportGlyph(char character, Face face, Brush brush, StringFormat stringFormat, Bitmap bitmap, System.Drawing.Graphics graphics)
 		{
-			string characterString = character.ToString();
-
 			uint glyphIndex = face.GetCharIndex(character);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
 			face.Glyph.RenderGlyph(RenderMode.Normal);
-
-			// Measure the size of this character.
-			var width = (int)face.Glyph.Advance.X >> 6;
-			var height = (int)face.Glyph.Metrics.Height >> 6;
-
-			SizeF size = new SizeF(width, height);
-
-			int characterWidth = (int)Math.Ceiling(size.Width);
-			int characterHeight = (int)Math.Ceiling(size.Height);
-
-			// Pad to make sure we capture any overhangs (negative ABC spacing, etc.)
-			int padWidth = characterWidth;
-			int padHeight = characterHeight / 2;
-
-			int bitmapWidth = characterWidth + padWidth * 2;
-			int bitmapHeight = characterHeight + padHeight * 2;
-
-			if (bitmapWidth > MaxGlyphSize || bitmapHeight > MaxGlyphSize)
-				throw new Exception("Excessively large glyph won't fit in my lazily implemented fixed size temp surface.");
 
 			// Render the character.
 			graphics.Clear(System.Drawing.Color.Black);
@@ -155,7 +124,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			else 
 			{
 				var gHA = face.Glyph.Metrics.HorizontalAdvance >> 6;
-				var gVA = face.Glyph.Metrics.VerticalAdvance >> 6;
+				var gVA = face.Size.Metrics.Height >> 6;
 
 				gHA = gHA > 0 ? gHA : gVA;
 				gVA = gVA > 0 ? gVA : gHA;
@@ -163,7 +132,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				glyphBitmap = new Bitmap (gHA, gVA);
 			}
 
-			BitmapUtils.ConvertToGrey(glyphBitmap);
+			BitmapUtils.ConvertAlphaToGrey(glyphBitmap);
 
 			// not sure about this at all
 			var abc = new ABCFloat ();
@@ -171,16 +140,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			abc.B = face.Glyph.Metrics.Width >> 6;
 			abc.C = (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B);
 
-			// Query its ABC spacing.
-			//float? abc = GetCharacterWidth(character, font, graphics);
-//			if (glyphBitmap == null)
-//				Console.WriteLine("null");
-
-
 			// Construct the output Glyph object.
 			return new Glyph(character, glyphBitmap)
 			{
-				XOffset = -padWidth,
+				XOffset = -(face.Glyph.Advance.X >> 6),
 				XAdvance = face.Glyph.Metrics.HorizontalAdvance >> 6,
                 YOffset = -(face.Glyph.Metrics.HorizontalBearingY >> 6),
 				CharacterWidths = abc

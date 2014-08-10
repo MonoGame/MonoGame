@@ -45,7 +45,7 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 _con._view.EndTreeUpdate();
-                _con.ProjectDiry = true;
+                _con.ProjectDirty = true;
             }
 
             public void Undo()
@@ -67,7 +67,7 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 _con._view.EndTreeUpdate();
-                _con.ProjectDiry = true;
+                _con.ProjectDirty = true;
             }
         }
     }

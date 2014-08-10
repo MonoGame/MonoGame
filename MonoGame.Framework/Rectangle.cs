@@ -1,33 +1,8 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Globalization;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -43,15 +18,27 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        /// <summary>
+        /// The x coordinate of the top-left corner of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int X;
 
+        /// <summary>
+        /// The y coordinate of the top-left corner of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Y;
 
+        /// <summary>
+        /// The width of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Width;
 
+        /// <summary>
+        /// The height of this <see>Rectangle</see>.
+        /// </summary>
         [DataMember]
         public int Height;
 
@@ -59,26 +46,41 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
+        /// <summary>
+        /// Returns a <see>Rectangle</see> with X=0, Y=0, Width=0, and Height=0.
+        /// </summary>
         public static Rectangle Empty
         {
             get { return emptyRectangle; }
         }
 
+        /// <summary>
+        /// Returns the x coordinate of the left edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Left
         {
             get { return this.X; }
         }
 
+        /// <summary>
+        /// Returns the x coordinate of the right edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Right
         {
             get { return (this.X + this.Width); }
         }
 
+        /// <summary>
+        /// Returns the y coordinate of the top edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Top
         {
             get { return this.Y; }
         }
 
+        /// <summary>
+        /// Returns the y coordinate of the bottom edge of this <see>Rectangle</see>.
+        /// </summary>
         public int Bottom
         {
             get { return (this.Y + this.Height); }
@@ -194,6 +196,10 @@ namespace Microsoft.Xna.Framework
             return (obj is Rectangle) ? this == ((Rectangle)obj) : false;
         }
 
+        /// <remarks>
+        /// Returns a String representation of this Rectangle in the format:
+        /// X:[x] Y:[y] Width:[width] Height:[height]
+        /// </remarks>
         public override string ToString()
         {
             return string.Format("{{X:{0} Y:{1} Width:{2} Height:{3}}}", X, Y, Width, Height);
@@ -212,7 +218,6 @@ namespace Microsoft.Xna.Framework
                    Top        < value.Bottom;            
         }
 
-
         public void Intersects(ref Rectangle value, out bool result)
         {
             result = value.Left < Right       && 
@@ -227,7 +232,6 @@ namespace Microsoft.Xna.Framework
             Intersect(ref value1, ref value2, out rectangle);
             return rectangle;
         }
-
 
         public static void Intersect(ref Rectangle value1, ref Rectangle value2, out Rectangle result)
         {

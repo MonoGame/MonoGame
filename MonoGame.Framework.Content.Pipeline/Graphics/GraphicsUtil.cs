@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Compresses TextureContent in a format appropriate to the platform
         /// </summary>
-        public static void CompressTexture(GraphicsProfile profile, TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha)
+        public static void CompressTexture(GraphicsProfile profile, TextureContent content, ContentProcessorContext context, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
         {
             // TODO: At the moment, only DXT compression from windows machine is supported
             //       Add more here as they become available.
@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TargetPlatform.NativeClient:
                 case TargetPlatform.Xbox360:
 					context.Logger.LogMessage("Using DXT Compression");
-				    CompressDxt(profile, content, generateMipmaps);
+                    CompressDxt(profile, content, generateMipmaps, premultipliedAlpha, sharpAlpha);
 				    break;
                 case TargetPlatform.iOS:
 					context.Logger.LogMessage("Using PVRTC Compression");
@@ -286,7 +286,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipmaps)
+        private static void CompressDxt(GraphicsProfile profile, TextureContent content, bool generateMipmaps, bool premultipliedAlpha, bool sharpAlpha)
         {
             var texData = content.Faces[0][0];
 
@@ -296,13 +296,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     throw new PipelineException("DXT Compressed textures width and height must be powers of two in GraphicsProfile.Reach.");                
             }
 
+            var pixelData = texData.GetPixelData();
+
+            // Test the alpha channel to figure out if we have alpha.
+            var containsAlpha = false;
+            var containsFracAlpha = false;
+            for (var x = 3; x < pixelData.Length; x += 4)
+            {
+                if (pixelData[x] != 0xFF)
+                {
+                    containsAlpha = true;
+
+                    if (pixelData[x] != 0x0)
+                        containsFracAlpha = true;
+                }
+            }
+
             var _dxtCompressor = new Compressor();
             var inputOptions = new InputOptions();
-            inputOptions.SetAlphaMode(AlphaMode.Transparency);
+            if (containsAlpha)           
+                inputOptions.SetAlphaMode(premultipliedAlpha ? AlphaMode.Premultiplied : AlphaMode.Transparency);
+            else
+                inputOptions.SetAlphaMode(AlphaMode.None);
             inputOptions.SetTextureLayout(TextureType.Texture2D, texData.Width, texData.Height, 1);
 
-            var pixelData = texData.GetPixelData();
-            
+           
             // Small hack here. NVTT wants 8bit data in BGRA. Flip the B and R channels
             // again here.
             GraphicsUtil.BGRAtoRGBA(pixelData);
@@ -311,34 +329,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             inputOptions.SetMipmapData(dataPtr, texData.Width, texData.Height, 1, 0, 0);
             inputOptions.SetMipmapGeneration(generateMipmaps);
+            inputOptions.SetGamma(1.0f, 1.0f);
 
-            var containsFracAlpha = ContainsFractionalAlpha(pixelData);
             var outputOptions = new OutputOptions();
             outputOptions.SetOutputHeader(false);
 
-            var outputFormat = containsFracAlpha ? Format.DXT5 : Format.DXT1;
+            var outputFormat = Format.DXT1;
+            if (containsFracAlpha)
+            {
+                if (sharpAlpha)
+                    outputFormat = Format.DXT3;
+                else
+                    outputFormat = Format.DXT5;
+            }
 
             var handler = new DxtDataHandler(content, outputFormat);
             outputOptions.SetOutputHandler(handler.BeginImage, handler.WriteData);
 
             var compressionOptions = new CompressionOptions();
             compressionOptions.SetFormat(outputFormat);
-            compressionOptions.SetQuality(Quality.Fastest);
+            compressionOptions.SetQuality(Quality.Normal);
 
             _dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
 
             dataHandle.Free();
-        }
-        
-        internal static bool ContainsFractionalAlpha(byte[] data)
-        {
-            for (var x = 3; x < data.Length; x += 4)
-            {
-                if (data[x] != 0x0 && data[x] != 0xFF)
-                    return true;
-            }
-
-            return false;
-        }        
+        }       
     }
 }
