@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
@@ -283,7 +284,7 @@ namespace Microsoft.Xna.Framework
                     "Left( ", this.planes[2].DebugDisplayString, " )  \r\n",
                     "Right( ", this.planes[3].DebugDisplayString, " )  \r\n",
                     "Top( ", this.planes[4].DebugDisplayString, " )  \r\n",
-                    "Bottom( ", this.planes[5].DebugDisplayString, " )                    
+                    "Bottom( ", this.planes[5].DebugDisplayString, " )  "                  
                     );
             }
         }
