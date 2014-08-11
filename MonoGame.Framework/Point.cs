@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework
         private static Point zeroPoint = new Point();
 
         /// <summary>
-        /// Returns a <see>Point</see> with coordinates 0, 0.
+        /// Returns a <see cref="Point"/> with coordinates 0, 0.
         /// </summary>
         public static Point Zero
         {
