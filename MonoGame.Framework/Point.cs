@@ -107,8 +107,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Divides the components of a <see cref="Point"/> by the components of another <see cref="Point"/>.
         /// </summary>
-        /// <param name="source">Source <see cref="Point"/> on the left of the mul sign.</param>
-        /// <param name="divisor">Divisor <see cref="Point"/> on the right of the mul sign.</param>
+        /// <param name="source">Source <see cref="Point"/> on the left of the div sign.</param>
+        /// <param name="divisor">Divisor <see cref="Point"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the points.</returns>
         public static Point operator /(Point source, Point divisor)
         {
