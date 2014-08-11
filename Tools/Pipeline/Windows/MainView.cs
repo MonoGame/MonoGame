@@ -545,6 +545,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            _propertyGrid.ExpandAllGridItems();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
@@ -762,5 +763,18 @@ namespace MonoGame.Tools.Pipeline
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
         }
+
+        private void _propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            var notBuilding = !_controller.ProjectBuilding;
+            var projectOpen = _controller.ProjectOpen;
+            var projectOpenAndNotBuilding = projectOpen && notBuilding;
+
+            if (projectOpenAndNotBuilding && e.OldValue != null && e.OldValue != e.ChangedItem.Value )
+            {
+                _controller.OnProjectModified();
+            }
+        }
+
     }
 }

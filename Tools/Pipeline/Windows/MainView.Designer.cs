@@ -150,6 +150,7 @@ namespace MonoGame.Tools.Pipeline
             this._propertyGrid.Name = "_propertyGrid";
             this._propertyGrid.Size = new System.Drawing.Size(249, 323);
             this._propertyGrid.TabIndex = 0;
+            this._propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this._propertyGrid_PropertyValueChanged);
             // 
             // _splitEditorOutput
             // 
