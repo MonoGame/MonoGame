@@ -3,10 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public class BoundingFrustum : IEquatable<BoundingFrustum>
     {
         #region Private Fields
@@ -271,6 +273,21 @@ namespace Microsoft.Xna.Framework
             throw new NotImplementedException();
         }
         */
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Near( ", this.planes[0].DebugDisplayString, " )  \r\n",
+                    "Far( ", this.planes[1].DebugDisplayString, " )  \r\n",
+                    "Left( ", this.planes[2].DebugDisplayString, " )  \r\n",
+                    "Right( ", this.planes[3].DebugDisplayString, " )  \r\n",
+                    "Top( ", this.planes[4].DebugDisplayString, " )  \r\n",
+                    "Bottom( ", this.planes[5].DebugDisplayString, " )  "                  
+                    );
+            }
+        }
 
         public override string ToString()
         {

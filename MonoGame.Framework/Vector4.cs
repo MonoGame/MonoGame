@@ -5,10 +5,12 @@
 using System;
 using System.Text;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector4 : IEquatable<Vector4>
     {
         #region Private Fields
@@ -546,6 +548,19 @@ namespace Microsoft.Xna.Framework
             result.Y = y;
             result.Z = z;
             result.W = w;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.X.ToString(), "  ",
+                    this.Y.ToString(), "  ",
+                    this.Z.ToString(), "  ",
+                    this.W.ToString()
+                );
+            }
         }
 
         public override string ToString()

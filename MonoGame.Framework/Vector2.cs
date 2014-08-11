@@ -3,12 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector2 : IEquatable<Vector2>
     {
         #region Private Fields
@@ -492,6 +494,17 @@ namespace Microsoft.Xna.Framework
             var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22);
             result.X = x;
             result.Y = y;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.X.ToString(), "  ",
+                    this.Y.ToString()
+                );
+            }
         }
 
         public override string ToString()
