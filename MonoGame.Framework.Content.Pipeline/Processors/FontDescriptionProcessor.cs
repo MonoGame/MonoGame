@@ -15,6 +15,7 @@ using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
 #if WINDOWS
 using Microsoft.Win32;
+using System.ComponentModel;
 #endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
@@ -22,6 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
+        [DefaultValue(typeof(TextureProcessorOutputFormat), "DxtCompressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
         public FontDescriptionProcessor()
