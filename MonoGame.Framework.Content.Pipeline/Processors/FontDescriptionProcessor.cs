@@ -22,6 +22,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
+
+        public FontDescriptionProcessor()
+        {
+            this.TextureFormat = TextureProcessorOutputFormat.DxtCompressed;
+        }
 
         public override SpriteFontContent Process(FontDescription input,
             ContentProcessorContext context)
@@ -113,7 +119,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 output.Texture.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap()));
 			    systemBitmap.Dispose();
 
-                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)
+                {
+                    GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
+                }
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
