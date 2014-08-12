@@ -40,7 +40,6 @@ namespace MonoGame.Tools.Pipeline
             System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
             System.Windows.Forms.SplitContainer _splitTreeProps;
             System.Windows.Forms.SplitContainer _splitEditorOutput;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
             this._treeView = new MonoGame.Tools.Pipeline.MultiSelectTreeview();
             this._propertyGrid = new System.Windows.Forms.PropertyGrid();
             this._outputWindow = new System.Windows.Forms.RichTextBox();
@@ -150,7 +149,6 @@ namespace MonoGame.Tools.Pipeline
             this._propertyGrid.Name = "_propertyGrid";
             this._propertyGrid.Size = new System.Drawing.Size(249, 323);
             this._propertyGrid.TabIndex = 0;
-            this._propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this._propertyGrid_PropertyValueChanged);
             // 
             // _splitEditorOutput
             // 

@@ -114,6 +114,10 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs args)
         {
+            var notBuilding = !_controller.ProjectBuilding;
+            var projectOpen = _controller.ProjectOpen;
+            var projectOpenAndNotBuilding = projectOpen && notBuilding;
+
             if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
 
@@ -128,6 +132,11 @@ namespace MonoGame.Tools.Pipeline
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
                 _controller.AddAction(action);
+
+                if (projectOpenAndNotBuilding && args.OldValue != null && args.OldValue != args.ChangedItem.Value)
+                {
+                    _controller.OnProjectModified();
+                }
             }
             else
             {
@@ -762,19 +771,6 @@ namespace MonoGame.Tools.Pipeline
             IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
 
             SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
-        }
-
-        private void _propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-        {
-            var notBuilding = !_controller.ProjectBuilding;
-            var projectOpen = _controller.ProjectOpen;
-            var projectOpenAndNotBuilding = projectOpen && notBuilding;
-
-            if (projectOpenAndNotBuilding && e.OldValue != null && e.OldValue != e.ChangedItem.Value)
-            {
-                _controller.OnProjectModified();
-            }
-
         }
     }
 }
