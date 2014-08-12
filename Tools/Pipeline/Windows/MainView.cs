@@ -127,7 +127,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
             }
             else
             {
@@ -545,6 +546,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            _propertyGrid.ExpandAllGridItems();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
