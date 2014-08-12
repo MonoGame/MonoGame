@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describe a 32-bit packed color.
+    /// Describes a 32-bit packed color.
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{DebugDisplayString,nq}")]
@@ -163,7 +163,9 @@ namespace Microsoft.Xna.Framework
         }
 	// ARGB
         private uint _packedValue;
-	  
+	
+        #region Constructors
+
         private Color(uint packedValue)
         {
             _packedValue = packedValue;
@@ -295,6 +297,20 @@ namespace Microsoft.Xna.Framework
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets packed value of this <see cref="Color"/>.
+        /// </summary>
+        [CLSCompliant(false)]
+        public UInt32 PackedValue
+        {
+            get { return _packedValue; }
+            set { _packedValue = value; }
+        }
+
         /// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
@@ -371,6 +387,26 @@ namespace Microsoft.Xna.Framework
             }
         }
 		
+        #endregion
+
+        #region Internal Properties
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.R.ToString(), "  ",
+                    this.G.ToString(), "  ",
+                    this.B.ToString(), "  ",
+                    this.A.ToString()
+                );
+            }
+        }
+
+        #endregion
+
+        #region Operators
+
 	/// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
         /// </summary>
@@ -395,16 +431,41 @@ namespace Microsoft.Xna.Framework
         {
             return !(a == b);
         }
-	
-	/// <summary>
-        /// Gets the hash code for <see cref="Color"/> instance.
+
+        /// <summary>
+        /// Multiply <see cref="Color"/> by value.
         /// </summary>
-        /// <returns>Hash code of the object.</returns>
+        /// <param name="value">Source <see cref="Color"/>.</param>
+        /// <param name="scale">Multiplicator.</param>
+        /// <returns>Multiplication result.</returns>
+        public static Color operator *(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }		
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Gets the hash code of this <see cref="Color"/>.
+        /// </summary>
+        /// <returns>Hash code of this <see cref="Color"/>.</returns>
         public override int GetHashCode()
         {
             return this._packedValue.GetHashCode();
         }
-	
+
+        /// <summary>
+        /// Compares whether current instance is equal to specified <see cref="Color"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="Color"/> to compare.</param>
+        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        public bool Equals(Color other)
+        {
+            return this.PackedValue == other.PackedValue;
+        }
+
         /// <summary>
         /// Compares whether current instance is equal to specified object.
         /// </summary>
@@ -414,6 +475,99 @@ namespace Microsoft.Xna.Framework
         {
             return ((obj is Color) && this.Equals((Color)obj));
         }
+
+        /// <summary>
+        /// Performs linear interpolation of <see cref="Color"/>.
+        /// </summary>
+        /// <param name="value1">Source <see cref="Color"/>.</param>
+        /// <param name="value2">Destination <see cref="Color"/>.</param>
+        /// <param name="amount">Interpolation factor.</param>
+        /// <returns>Interpolated <see cref="Color"/>.</returns>
+        public static Color Lerp(Color value1, Color value2, Single amount)
+        {
+            amount = MathHelper.Clamp(amount, 0, 1);
+            return new Color(
+                (int)MathHelper.Lerp(value1.R, value2.R, amount),
+                (int)MathHelper.Lerp(value1.G, value2.G, amount),
+                (int)MathHelper.Lerp(value1.B, value2.B, amount),
+                (int)MathHelper.Lerp(value1.A, value2.A, amount));
+        }
+
+        /// <summary>
+        /// Multiply <see cref="Color"/> by value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Color"/>.</param>
+        /// <param name="scale">Multiplicator.</param>
+        /// <returns>Multiplication result.</returns>
+        public static Color Multiply(Color value, float scale)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }
+
+
+
+        /// <summary>
+        /// Converts <see cref="Color"/> to <see cref="Vector3"/>.
+        /// </summary>
+        /// <returns>Converted color.</returns>
+        public Vector3 ToVector3()
+        {
+            return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
+        }
+
+        /// <summary>
+        /// Converts <see cref="Color"/> to <see cref="Vector4"/>.
+        /// </summary>
+        /// <returns>Converted color.</returns>
+        public Vector4 ToVector4()
+        {
+            return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Color"/> in the format:
+        /// {R:[red] G:[green] B:[blue] A:[alpha]}
+        /// </summary>
+        /// <returns><see cref="String"/> representation of this <see cref="Color"/>.</returns>
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(25);
+            sb.Append("{R:");
+            sb.Append(R);
+            sb.Append(" G:");
+            sb.Append(G);
+            sb.Append(" B:");
+            sb.Append(B);
+            sb.Append(" A:");
+            sb.Append(A);
+            sb.Append("}");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(Vector4 vector)
+        {
+            return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="r">Red component value.</param>
+        /// <param name="g">Green component value.</param>
+        /// <param name="b">Blue component value.</param>
+        /// <param name="a">Alpha component value.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(int r, int g, int b, int a)
+        {
+            return new Color((byte)(r * a / 255), (byte)(g * a / 255), (byte)(b * a / 255), a);
+        }
+
+        #endregion
 
         #region Color Bank
         /// <summary>
@@ -1691,144 +1845,6 @@ namespace Microsoft.Xna.Framework
             get;
             private set;
         }
-        #endregion
-
-        /// <summary>
-        /// Performs linear interpolation of <see cref="Color"/>.
-        /// </summary>
-        /// <param name="value1">Source <see cref="Color"/>.</param>
-        /// <param name="value2">Destination <see cref="Color"/>.</param>
-        /// <param name="amount">Interpolation factor.</param>
-        /// <returns>Interpolated <see cref="Color"/>.</returns>
-        public static Color Lerp(Color value1, Color value2, Single amount)
-        {
-			amount = MathHelper.Clamp(amount, 0, 1);
-            return new Color(   
-                (int)MathHelper.Lerp(value1.R, value2.R, amount),
-                (int)MathHelper.Lerp(value1.G, value2.G, amount),
-                (int)MathHelper.Lerp(value1.B, value2.B, amount),
-                (int)MathHelper.Lerp(value1.A, value2.A, amount) );
-        }
-		
-	/// <summary>
-        /// Multiply <see cref="Color"/> by value.
-        /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
-	
-	/// <summary>
-        /// Multiply <see cref="Color"/> by value.
-        /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
-        {
-            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-        }		
-
-	/// <summary>
-        /// Converts <see cref="Color"/> to <see cref="Vector3"/>.
-        /// </summary>
-        /// <returns>Converted color.</returns>
-        public Vector3 ToVector3()
-        {
-            return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
-        }
-	
-	/// <summary>
-        /// Converts <see cref="Color"/> to <see cref="Vector4"/>.
-        /// </summary>
-        /// <returns>Converted color.</returns>
-        public Vector4 ToVector4()
-        {
-            return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
-        }
-	
-	/// <summary>
-        /// Gets or sets packed value of this <see cref="Color"/>.
-        /// </summary>
-        [CLSCompliant(false)]
-        public UInt32 PackedValue
-        {
-            get { return _packedValue; }
-            set { _packedValue = value; }
-        }
-
-
-        internal string DebugDisplayString
-        {
-            get
-            {
-                return string.Concat(
-                    this.R.ToString(), "  ",
-                    this.G.ToString(), "  ",
-                    this.B.ToString(), "  ",
-                    this.A.ToString()
-                );
-            }
-        }
-
-
-	/// <summary>
-        /// Converts the color values of this instance to its equivalent string representation.
-        /// </summary>
-        /// <returns>The string representation of the color value of this instance.</returns>
-	public override string ToString ()
-	{
-        StringBuilder sb = new StringBuilder(25);
-        sb.Append("{R:");
-        sb.Append(R);
-        sb.Append(" G:");
-        sb.Append(G);
-        sb.Append(" B:");
-        sb.Append(B);
-        sb.Append(" A:");
-        sb.Append(A);
-        sb.Append("}");
-        return sb.ToString();
-	}
-	
-	/// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
-        /// </summary>
-        /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
-        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
-        public static Color FromNonPremultiplied(Vector4 vector)
-        {
-            return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
-        }
-	
-	/// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
-        /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value.</param>
-        /// <param name="a">Alpha component value.</param>
-        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
-        public static Color FromNonPremultiplied(int r, int g, int b, int a)
-        {
-            return new Color((byte)(r * a / 255),(byte)(g * a / 255), (byte)(b * a / 255), a);
-        }
-
-        #region IEquatable<Color> Members
-	
-	/// <summary>
-        /// Compares whether current instance is equal to specified <see cref="Color"/>.
-        /// </summary>
-        /// <param name="other">The <see cref="Color"/> to compare.</param>
-        /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public bool Equals(Color other)
-        {
-	    return this.PackedValue == other.PackedValue;
-        }
-
         #endregion
     }
 }
