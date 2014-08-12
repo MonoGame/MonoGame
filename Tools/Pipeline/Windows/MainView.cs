@@ -131,12 +131,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);
-
-                if (projectOpenAndNotBuilding && args.OldValue != null && args.OldValue != args.ChangedItem.Value)
-                {
-                    _controller.OnProjectModified();
-                }
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
             }
             else
             {
