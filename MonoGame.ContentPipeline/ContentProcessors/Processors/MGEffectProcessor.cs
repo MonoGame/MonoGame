@@ -26,7 +26,7 @@ namespace MonoGameContentProcessors.Processors
 
             var options = new Options();
             options.SourceFile = input.Identity.SourceFilename;
-            options.Profile = platform == MonoGamePlatform.Windows8 ? ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
+            options.Profile = ( platform == MonoGamePlatform.Windows8 || platform == MonoGamePlatform.Windows ) ? ShaderProfile.DirectX_11 : ShaderProfile.OpenGL;
             options.Debug = DebugMode == EffectProcessorDebugMode.Debug;
             options.OutputFile = context.OutputFilename;
 
