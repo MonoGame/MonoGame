@@ -231,13 +231,8 @@ namespace Microsoft.Xna.Framework
         /// A <see cref="Point"/> located in the center of this <see cref="Rectangle"/>'s bounds.
         /// </summary>
         /// <remarks>
-        /// The formula to get the center of this rectangle is:
-        /// Center = (Position.X, Position.Y) + (Width / 2, Height / 2)
-        /// If Width or Height is an odd number, integer division will cause
-        /// the half-way point to be rounded down.
-        /// For example, if width=11 and height=13, Center would be
-        /// (Position.X + 5, Position.Y + 6), rather than the correct
-        /// (Position.X + 5.5, Position.Y + 6.5.
+        /// If <see cref="Width"/> or <see cref="Height"/> is an odd number,
+        /// the center point will be rounded down.
         /// </remarks>
 		public Point Center
 		{
