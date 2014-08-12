@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
 					uint formatVersion = soundbankreader.ReadUInt16 ();
 					if (formatVersion != 46) {
 #if DEBUG
-						System.Diagnostics.Debug.WriteLine ("Warning: SoundBank format not supported");
+						System.Diagnostics.Debug.WriteLine("Warning: SoundBank format {0} not supported.", formatVersion);
 #endif
 					}
 					
@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             var waveBank = waveBanks[waveBankIndex];
             var sound = waveBank.GetSoundEffect(trackIndex);
-            return sound.GetPooledInstance();
+            return sound.GetPooledInstance(true);
 		}
 		
         /// <summary>
