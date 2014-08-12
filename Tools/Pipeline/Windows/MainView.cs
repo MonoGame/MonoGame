@@ -114,10 +114,6 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs args)
         {
-            var notBuilding = !_controller.ProjectBuilding;
-            var projectOpen = _controller.ProjectOpen;
-            var projectOpenAndNotBuilding = projectOpen && notBuilding;
-
             if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
 
