@@ -490,7 +490,8 @@ namespace MonoGame.Tools.Pipeline
 
         private void MainView_Load(object sender, EventArgs e)
         {
-            if (History.Default.ProjectHistory.Count > 0)
+            //Priority is given to any command line arguments.
+            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
             {
                 OpenProjectPath = History.Default.ProjectHistory.Last();
             }
