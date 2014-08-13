@@ -198,6 +198,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (context.TargetPlatform)
             {
                 case TargetPlatform.Windows:
+                case TargetPlatform.WindowsGL:
                 case TargetPlatform.WindowsPhone:
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:

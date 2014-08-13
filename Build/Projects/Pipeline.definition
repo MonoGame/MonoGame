@@ -80,6 +80,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\PipelineProjectProxy.cs" />
+    <Compile Include="Windows\SortedEnumTypeConverter.cs" />
     <Compile Include="Windows\TreeViewExtensions.cs" />
     <EmbeddedResource Include="Windows\MainView.resx">
       <DependentUpon>MainView.cs</DependentUpon>
