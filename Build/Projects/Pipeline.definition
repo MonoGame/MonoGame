@@ -25,14 +25,21 @@
   </Properties>
 
   <Files>
-
+    <Compile Include="History.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>History.settings</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\MGCB\CommandLineParser.cs">
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
     <None Include="app.config" />
-
+	<None Include="History.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>History.Designer.cs</LastGenOutput>
+    </None>
     <Compile Include="Common\ActionStack.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />

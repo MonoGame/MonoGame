@@ -487,13 +487,38 @@ namespace MonoGame.Tools.Pipeline
                 Application.Exit();
         }
 
+        /// <summary>
+        /// When the version number changes, history becomes invalid and reset.
+        /// Upgrading will bring the old history back in, clearing the flag keeps
+        /// it from always upgrading itself.
+        /// </summary>
+        private void CheckHistory()
+        {
+            if (History.Default.NeedsUpgrade)
+            {
+                History.Default.Upgrade();
+                History.Default.NeedsUpgrade = false;
+                History.Default.Save();
+            }
+        }
+
         private void MainView_Load(object sender, EventArgs e)
         {
+            CheckHistory();
+
+            var lastProject = History.Default.LastProject;
+
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
                 _controller.OpenProject(OpenProjectPath);
                 OpenProjectPath = null;
             }
+            else if (lastProject != null && File.Exists(lastProject))
+            {
+                _controller.OpenProject(lastProject);
+            }
+
+
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)

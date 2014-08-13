@@ -212,6 +212,8 @@ namespace MonoGame.Tools.Pipeline
 
                 ProjectOpen = true;
                 ProjectDirty = false;
+                History.Default.LastProject = projectFilePath;
+                History.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
