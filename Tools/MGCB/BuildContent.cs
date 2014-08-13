@@ -74,7 +74,7 @@ namespace MGCB
         [CommandLineParameter(
             Name = "platform",
             ValueName = "targetPlatform",
-            Description = "Set the target platform for this build.  Defaults to Windows.")]
+            Description = "Set the target platform for this build.  Defaults to Windows desktop DirectX.")]
         public TargetPlatform Platform = TargetPlatform.Windows;
 
         [CommandLineParameter(

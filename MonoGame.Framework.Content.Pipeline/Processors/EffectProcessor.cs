@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.WindowsStoreApp:
                     options.Profile = ShaderProfile.DirectX_11;
                     break;
+                case TargetPlatform.WindowsGL:
                 case TargetPlatform.iOS:
                 case TargetPlatform.Android:
                 case TargetPlatform.Linux:
