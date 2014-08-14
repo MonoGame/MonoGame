@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -489,6 +490,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void MainView_Load(object sender, EventArgs e)
         {
+            //Priority is given to any command line arguments.
+            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+            {
+                OpenProjectPath = History.Default.ProjectHistory.Last();
+            }
+            
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
                 _controller.OpenProject(OpenProjectPath);

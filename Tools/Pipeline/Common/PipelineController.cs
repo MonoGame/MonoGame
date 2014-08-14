@@ -128,7 +128,9 @@ namespace MonoGame.Tools.Pipeline
             // Save the new project.
             _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
-            
+            History.Default.AddProjectHistory(projectFilePath);
+            History.Default.Save();
+
             UpdateTree();
 
             if (OnProjectLoaded != null)
@@ -164,6 +166,8 @@ namespace MonoGame.Tools.Pipeline
                 
                 ProjectOpen = true;
                 ProjectDirty = true;
+                History.Default.AddProjectHistory(projectFilePath);
+                History.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
@@ -212,6 +216,8 @@ namespace MonoGame.Tools.Pipeline
 
                 ProjectOpen = true;
                 ProjectDirty = false;
+                History.Default.AddProjectHistory(projectFilePath);
+                History.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
