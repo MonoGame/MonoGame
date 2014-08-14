@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.ComponentModel;
+using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors;
 
@@ -181,7 +182,7 @@ namespace MonoGame.Tools.Pipeline
                             // since we do not have a type converter for it.
                             if (converter.CanConvertFrom(srcType))
                             {
-                                var dst = converter.ConvertFrom(src);
+                                var dst = converter.ConvertFrom(null, CultureInfo.InvariantCulture, src);
                                 ProcessorParams[p.Name] = dst;
                             }
                         }
