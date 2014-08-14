@@ -81,7 +81,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				// Optimize.
 				foreach (Glyph glyph in glyphs)
 				{
-                    //glyph.Bitmap.Save("D:\\" + ((int)glyph.Character).ToString() + ".png");
 					GlyphCropper.Crop(glyph);
 				}
 
