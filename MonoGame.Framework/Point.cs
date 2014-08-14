@@ -23,9 +23,15 @@ namespace Microsoft.Xna.Framework
 
         #region Public Fields
 
+        /// <summary>
+        /// The x coordinate of this <see cref="Point"/>.
+        /// </summary>
         [DataMember]
         public int X;
 
+        /// <summary>
+        /// The y coordinate of this <see cref="Point"/>.
+        /// </summary>
         [DataMember]
         public int Y;
 

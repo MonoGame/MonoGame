@@ -150,11 +150,21 @@ namespace Microsoft.Xna.Framework
             return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
         }
 
+        /// <summary>
+        /// Gets whether or not the provided <see cref="Vector2"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The coordinates to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <returns>True if the provided <see cref="Vector2"/> lies inside this <see cref="Rectangle"/>. False otherwise.</returns>
         public bool Contains(Vector2 value)
         {
             return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
         }
 
+        /// <summary>
+        /// Gets whether or not the provided <see cref="Rectangle"/> lies within the bounds of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Rectangle"/> to check for inclusion in this <see cref="Rectangle"/>.</param>
+        /// <returns>True if the provided <see cref="Rectangle"/>'s bounds lie entirely inside this <see cref="Rectangle"/>. False otherwise.</returns>
         public bool Contains(Rectangle value)
         {
             return ((((this.X <= value.X) && ((value.X + value.Width) <= (this.X + this.Width))) && (this.Y <= value.Y)) && ((value.Y + value.Height) <= (this.Y + this.Height)));
@@ -239,11 +249,30 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Checks whether or not this <see cref="Rectangle"/> is equivalent
+        /// to a provided <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="Rectangle"/> to test for equality.</param>
+        /// <returns>
+        /// True if this <see cref="Rectangle"/>'s x coordinate, y coordinate, width, and height
+        /// match the values for the provided <see cref="Rectangle"/>. False otherwise.
+        /// </returns>
         public bool Equals(Rectangle other)
         {
             return this == other;
         }
 
+        /// <summary>
+        /// Checks whether or not this <see cref="Rectangle"/> is equivalent
+        /// to a provided object.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to test for equality.</param>
+        /// <returns>
+        /// True if the provided object is a <see cref="Rectangle"/>, and this
+        /// <see cref="Rectangle"/>'s x coordinate, y coordinate, width, and height
+        /// match the values for the provided <see cref="Rectangle"/>. False otherwise.
+        /// </returns>
         public override bool Equals(object obj)
         {
             return (obj is Rectangle) ? this == ((Rectangle)obj) : false;
