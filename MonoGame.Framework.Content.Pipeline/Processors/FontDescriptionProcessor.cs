@@ -23,12 +23,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
-        [DefaultValue(typeof(TextureProcessorOutputFormat), "DxtCompressed")]
+        [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
         public FontDescriptionProcessor()
         {
-            this.TextureFormat = TextureProcessorOutputFormat.DxtCompressed;
+            this.TextureFormat = TextureProcessorOutputFormat.Compressed;
         }
 
         public override SpriteFontContent Process(FontDescription input,
