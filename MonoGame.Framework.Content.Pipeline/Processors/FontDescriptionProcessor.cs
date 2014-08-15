@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using System.ComponentModel;
 using System.Linq;
 using SharpFont;
 using System.Drawing.Imaging;
@@ -15,7 +16,6 @@ using MonoGame.Framework.Content.Pipeline.Builder;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
 #if WINDOWS
 using Microsoft.Win32;
-using System.ComponentModel;
 #endif
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
