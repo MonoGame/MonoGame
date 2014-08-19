@@ -9,10 +9,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public class Texture2DContent : TextureContent
     {
-        public MipmapChain Mipmaps { get; set; }
+        public MipmapChain Mipmaps
+        {
+            get { return Faces[0]; }
+            set { Faces[0] = value; }
+        }
 
-        public Texture2DContent() : 
-            base(new MipmapChainCollection())
+        public Texture2DContent() :
+            base(new MipmapChainCollection() { new MipmapChain() })
         {
 
         }
