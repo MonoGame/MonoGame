@@ -221,6 +221,11 @@ namespace MGCB
             _manager.Logger = new ConsoleLogger();
             _manager.CompressContent = CompressContent;
 
+            // If the intent is to debug build, break at the original location
+            // of any exception, eg, within the actual importer/processor.
+            if (LaunchDebugger)
+                _manager.RethrowExceptions = false;
+
             // Feed all the assembly references to the pipeline manager
             // so it can resolve importers, processors, writers, and types.
             foreach (var r in References)
