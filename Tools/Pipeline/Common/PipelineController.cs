@@ -244,6 +244,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectDirty = false;
             _project = null;
             _actionStack.Clear();
+            _view.OutputClear();
 
             Selection.Clear(this);
             UpdateTree();
