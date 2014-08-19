@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content
 
 	static List<char> targetPlatformIdentifiers = new List<char>()
         {
-            'w', // Windows
+            'w', // Windows (DirectX)
             'x', // Xbox360
             'm', // WindowsPhone
             'i', // iOS
@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework.Content
             'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
+            'g', // Windows (OpenGL)
         };
 
         private static void AddContentManager(ContentManager contentManager)
