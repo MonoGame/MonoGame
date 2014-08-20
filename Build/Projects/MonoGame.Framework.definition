@@ -572,6 +572,12 @@
     <Compile Include="Graphics\TextureCollection.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
     </Compile>
+    <Compile Include="Graphics\TextureCollection.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\Texture.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
