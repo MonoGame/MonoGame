@@ -95,14 +95,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 			SupportsNonPowerOfTwo = GetNonPowerOfTwo(device);
 
+            SupportsTextureFilterAnisotropic = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
 #if GLES
-			SupportsTextureFilterAnisotropic = device._extensions.Contains("GL_EXT_texture_filter_anisotropic");
 			SupportsDepth24 = device._extensions.Contains("GL_OES_depth24");
 			SupportsPackedDepthStencil = device._extensions.Contains("GL_OES_packed_depth_stencil");
 			SupportsDepthNonLinear = device._extensions.Contains("GL_NV_depth_nonlinear");
             SupportsTextureMaxLevel = device._extensions.Contains("GL_APPLE_texture_max_level");
 #else
-            SupportsTextureFilterAnisotropic = true;
 			SupportsDepth24 = true;
 			SupportsPackedDepthStencil = true;
 			SupportsDepthNonLinear = false;
@@ -139,15 +138,15 @@ namespace Microsoft.Xna.Framework.Graphics
             // Anisotropic filtering
 #if OPENGL
             int anisotropy = 0;
-#if GLES && !ANGLE
             if (SupportsTextureFilterAnisotropic)
             {
+#if GLES && !ANGLE
                 GL.GetInteger(All.MaxTextureMaxAnisotropyExt, ref anisotropy);
-            }
 #else
-            GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
+                GL.GetInteger((GetPName)All.MaxTextureMaxAnisotropyExt, out anisotropy);
 #endif
-            GraphicsExtensions.CheckGLError();
+                GraphicsExtensions.CheckGLError();
+            }
             MaxTextureAnisotropy = anisotropy;
 #endif
         }
