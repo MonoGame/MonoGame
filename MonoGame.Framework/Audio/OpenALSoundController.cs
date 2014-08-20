@@ -11,6 +11,10 @@ using OpenTK.Audio.OpenAL;
 using OpenTK;
 #endif
 
+#if IOS
+using MonoTouch.AVFoundation;
+#endif
+
 #if ANDROID
 using System.Globalization;
 using Android.Content.PM;
@@ -172,6 +176,14 @@ namespace Microsoft.Xna.Framework.Audio
                     AlcUpdateBuffers, updateBuffers,
                     0
                 };
+#elif IOS
+                // Handle interruptions from other OS services (alarms, notifications, etc)
+                var session = AVAudioSession.SharedInstance();
+                session.SetCategory(AVAudioSessionCategory.SoloAmbient);
+                session.BeginInterruption += (sender, e) => Alc.MakeContextCurrent(ContextHandle.Zero);
+                session.EndInterruption += (sender, e) => Alc.MakeContextCurrent(_context);
+
+                int[] attribute = new int[0];
 #else
                 int[] attribute = new int[0];
 #endif
