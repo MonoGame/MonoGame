@@ -133,7 +133,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
-                _wave.Volume = _volume;
+                _wave.Volume = _volume * category._volume[0];
                 _wave.Play();
 			}
 		}
@@ -220,53 +220,39 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-        // Used to set volume from an Audio category, so volume
-        // scaling isn't applied twice.
-        internal void SetVolumeInt(float newVol)
+        internal void UpdateCategoryVolume(float categoryVolume)
         {
-
-            newVol = MathHelper.Clamp(newVol, 0, 1.0f);
+            // The category volume scales our own volume.
+            var volume = _volume * categoryVolume;
 
             if (_complexSound)
             {
                 foreach (XactClip clip in _soundClips)
-                    clip.Volume = newVol;
+                    clip.Volume = volume;
             }
             else
             {
                 if (_wave != null)
-                    _wave.Volume = newVol;
+                    _wave.Volume = volume;
             }
         }
-		
+
 		public float Volume 
         {
 			get 
             {
-				if (_complexSound)
-					return _soundClips[0].Volume;
-                else
-					return _wave != null ? _wave.Volume : 0.0f;
+                return _volume;
 			}
 
 			set
             {
-                var category = _soundBank.AudioEngine.Categories[_categoryID];
-                value = MathHelper.Clamp(value * category._volume[0], 0, 1.0f);
+                _volume = value;
 
-                if (_complexSound)
-                {
-                    foreach (XactClip clip in _soundClips)
-                        clip.Volume = value;
-                }
-                else
-                {
-                    if (_wave != null)
-                        _wave.Volume = value;
-                }
+                var category = _soundBank.AudioEngine.Categories[_categoryID];
+                UpdateCategoryVolume(category._volume[0]);
             }
-		}
-		
+        }
+
 		public bool Playing 
         {
 			get 

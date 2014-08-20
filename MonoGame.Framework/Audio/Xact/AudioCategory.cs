@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Audio
             _volume[0] = volume;
 
 			foreach (var sound in sounds)
-				sound.SetVolumeInt(volume);
+				sound.UpdateCategoryVolume(volume);
 		}
 
         /// <summary>

@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		public float LineSpacing { get; private set; }
 
+		public int YOffsetMin { get; private set; }
 
 		// Size of the temp surface used for GDI+ rasterization.
 		const int MaxGlyphSize = 1024;
@@ -58,6 +59,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 				// Store the font height.
 				LineSpacing = font.GetHeight();
+				YOffsetMin = (int)LineSpacing;
 			}
 		}
 

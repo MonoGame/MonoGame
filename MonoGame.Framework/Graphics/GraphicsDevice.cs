@@ -483,6 +483,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var clearTarget = false;
 
+            PlatformResolveRenderTargets();
+
             // Clear the current bindings.
             Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);
 

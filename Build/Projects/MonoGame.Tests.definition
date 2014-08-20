@@ -87,6 +87,7 @@
     <Compile Include="Framework\GestureRecognizerTest.cs" />
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
+    <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchPanelTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />

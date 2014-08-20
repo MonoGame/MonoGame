@@ -97,7 +97,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			{
 			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
                     TextureFormat == TextureProcessorOutputFormat.Compressed )
-                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha);
+                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha, false);
 			}
 			catch(EntryPointNotFoundException ex) {
 				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());

@@ -47,6 +47,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
         }
 
+        internal void PlatformResolveRenderTargets()
+        {
+            // Resolving MSAA render targets should be done here.
+        }
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             return null;

@@ -26,7 +26,7 @@
   </Properties>
 
   <Files>
-
+    <Compile Include="Common\History.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\MGCB\CommandLineParser.cs">
@@ -92,6 +92,9 @@
       <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Windows\TreeViewExtensions.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\SortedEnumTypeConverter.cs">
       <Platforms>Windows</Platforms>
     </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">

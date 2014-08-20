@@ -99,7 +99,6 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     // Let windows autodetect number of channels and sample rate.
                     MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
-                    MasterVoice.SetVolume(_masterVolume, 0);
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
@@ -198,11 +197,6 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #endregion
-
-        private static void PlatformSetMasterVolume()
-        {
-            MasterVoice.SetVolume(_masterVolume, 0);
-        }
 
         private void PlatformDispose(bool disposing)
         {

@@ -906,6 +906,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
         }
 
+        internal void PlatformResolveRenderTargets()
+        {
+            // Resolving MSAA render targets should be done here.
+        }
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             // Clear the current render targets.

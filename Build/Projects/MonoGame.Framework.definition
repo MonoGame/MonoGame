@@ -352,10 +352,7 @@
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferObject.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.RenderbufferObject.cs">
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">

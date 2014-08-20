@@ -1,17 +1,18 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MIT License - Copyright (C) The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.ComponentModel;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
- 
+
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         #region Public Fields
@@ -369,6 +370,17 @@ namespace Microsoft.Xna.Framework
         public static bool operator != (BoundingSphere a, BoundingSphere b)
         {
             return !a.Equals(b);
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    "Pos( ", this.Center.DebugDisplayString, " )  \r\n",
+                    "Radius( ", this.Radius.ToString(), " )"
+                    );
+            }
         }
 
         public override string ToString()
