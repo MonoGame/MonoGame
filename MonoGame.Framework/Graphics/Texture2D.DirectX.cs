@@ -151,10 +151,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         // We need to copy each row separatly and skip trailing zeros.
                         stream.Seek(startIndex, SeekOrigin.Begin);
 
+                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            for (i = row * rowSize; i < (row + 1) * rowSize; i++)
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
                                 data[i] = stream.Read<T>();
 
                             if (i >= elementCount)
