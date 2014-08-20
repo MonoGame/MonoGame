@@ -179,7 +179,6 @@ namespace Microsoft.Xna.Framework.Audio
 #elif IOS
                 // Handle interruptions from other OS services (alarms, notifications, etc)
                 var session = AVAudioSession.SharedInstance();
-                session.SetCategory(AVAudioSessionCategory.SoloAmbient);
                 session.BeginInterruption += (sender, e) => Alc.MakeContextCurrent(ContextHandle.Zero);
                 session.EndInterruption += (sender, e) => Alc.MakeContextCurrent(_context);
 
