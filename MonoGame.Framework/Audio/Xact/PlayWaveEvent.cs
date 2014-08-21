@@ -28,8 +28,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private readonly int[] _tracks;
         private readonly int[] _waveBanks;
+        
+        private readonly byte[] _weights;
+        private readonly int _totalWeights;
 
         private float _volume;
+
+        private readonly Vector2? _volumeVar;
+        private readonly Vector2? _pitchVar;
 
         private int _wavIndex;
         private int _loopIndex;
@@ -37,13 +43,18 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffectInstance _wav;
 
         public PlayWaveEvent(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank,
-                                int[] waveBanks, int[] tracks, VariationType variation, int loopCount, 
-                                bool newWaveOnLoop)
+                                int[] waveBanks, int[] tracks, byte[] weights, int totalWeights,
+                                VariationType variation, Vector2? volumeVar, Vector2? pitchVar, 
+                                int loopCount, bool newWaveOnLoop)
             : base(clip, timeStamp, randomOffset)
         {
             _soundBank = soundBank;
             _waveBanks = waveBanks;
             _tracks = tracks;
+            _weights = weights;
+            _totalWeights = totalWeights;
+            _volumeVar = volumeVar;
+            _pitchVar = pitchVar;
             _wavIndex = -1;
             _loopIndex = 0;
             _volume = 1.0f;
@@ -78,17 +89,44 @@ namespace Microsoft.Xna.Framework.Audio
                         break;
 
                     case VariationType.Random:
-                        _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        if (_weights == null || trackCount == 1)
+                            _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        else
+                        {
+                            var sum = XactHelpers.Random.Next(_totalWeights);
+                            for (var i=0; i < trackCount; i++)
+                            {
+                                sum -= _weights[i];
+                                if (sum <= 0)
+                                {
+                                    _wavIndex = i;
+                                    break;
+                                }
+                            }
+                        }
                         break;
 
                     case VariationType.RandomNoImmediateRepeats:
                     {
-                        var last = _wavIndex;
-                        do
-                        {
+                        if (_weights == null || trackCount == 1)
                             _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        else
+                        {
+                            var last = _wavIndex;
+                            var sum = XactHelpers.Random.Next(_totalWeights);
+                            for (var i=0; i < trackCount; i++)
+                            {
+                                sum -= _weights[i];
+                                if (sum <= 0)
+                                {
+                                    _wavIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (_wavIndex == last)
+                                _wavIndex = (_wavIndex + 1) % trackCount;
                         }
-                        while (last == _wavIndex && trackCount > 1);
                         break;
                     }
 
@@ -107,7 +145,17 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
             }
 
-            _wav.Volume = _volume;
+            // Set the volume.
+            if (_volumeVar.HasValue)
+                _wav.Volume = _volume + _volumeVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _volumeVar.Value.Y);
+            else
+                _wav.Volume = _volume;
+
+            // Set the pitch.
+            if (_pitchVar.HasValue)
+                _wav.Pitch = _pitchVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _pitchVar.Value.Y);
+            else
+                _wav.Pitch = 0;
 
             // This is a shortcut for infinite looping of a single track.
             _wav.IsLooped = _loopCount == 255 && trackCount == 1;

@@ -95,7 +95,9 @@ namespace Microsoft.Xna.Framework.Audio
 					waveBanks = new WaveBank[numWaveBanks];
 					for (int i=0; i<numWaveBanks; i++) {
 						string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64),0,64).Replace("\0","");
-						waveBanks[i] = audioengine.Wavebanks[bankname];
+						WaveBank bank;
+						if (audioengine.Wavebanks.TryGetValue(bankname, out bank))
+							waveBanks[i] = bank;
 					}
 					
 					//parse cue name table
