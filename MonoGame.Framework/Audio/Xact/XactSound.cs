@@ -133,6 +133,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
+                _wave.Pitch = _pitch;
                 _wave.Volume = _volume * category._volume[0];
                 _wave.Play();
 			}
