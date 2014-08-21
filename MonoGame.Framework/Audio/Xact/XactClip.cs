@@ -45,7 +45,13 @@ namespace Microsoft.Xna.Framework.Audio
 				case 1:
                 {
                     // Unknown!
-					clipReader.ReadUInt16();
+                    clipReader.ReadByte();
+
+                    // Event flags
+                    var eventFlags = clipReader.ReadByte();
+                    var playRelease = (eventFlags & 0x01) == 0x01;
+                    var panEnabled = (eventFlags & 0x02) == 0x02;
+                    var useCenterSpeaker = (eventFlags & 0x04) == 0x04;
 
 					int trackIndex = clipReader.ReadUInt16();
                     int waveBankIndex = clipReader.ReadByte();					
