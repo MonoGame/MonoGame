@@ -7,6 +7,7 @@ using System.IO;
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
 using MonoTouch.MediaPlayer;
+using MonoTouch.CoreMedia;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -18,8 +19,10 @@ namespace Microsoft.Xna.Framework.Media
         private string title;
         private TimeSpan duration;
         private MPMediaItem mediaItem;
-        private AVAudioPlayer _sound;
+        private AVPlayerItem _sound;
+        private AVPlayer _player;
         private NSUrl assetUrl;
+        private NSObject playToEndObserver;
 
         internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
         {
@@ -39,9 +42,9 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformInitialize(NSUrl url)
         {
-            _sound = AVAudioPlayer.FromUrl(url);
-            _sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
+            _sound = AVPlayerItem.FromUrl(url);
+            _player = AVPlayer.FromPlayerItem(_sound);
+            playToEndObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(OnFinishedPlaying);
         }
 
         [CLSCompliant(false)]
@@ -55,18 +58,20 @@ namespace Microsoft.Xna.Framework.Media
             if (_sound == null)
                 return;
                 
-            _sound.FinishedPlaying -= OnFinishedPlaying;
+            playToEndObserver.Dispose ();
+            playToEndObserver = null;
+
             _sound.Dispose();
-            
             _sound = null;
+
+            _player.Dispose();
+            _player = null;
         }
 
-		internal void OnFinishedPlaying (object sender, EventArgs args)
+        internal void OnFinishedPlaying (object sender, NSNotificationEventArgs args)
 		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
+			if (DonePlaying != null)
+			    DonePlaying(sender, args);
 		}
 
 		/// <summary>
@@ -82,7 +87,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal void Play()
 		{	
-            if (_sound == null)
+            if (_player == null)
             {
                 // MediaLibrary items are lazy loaded
                 if (assetUrl != null)
@@ -98,16 +103,15 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPlay()
         {
-            // AVAudioPlayer sound.Stop() does not reset the playback position as XNA does.
-            // Set Play's currentTime to 0 to ensure playback at the start.
-            _sound.CurrentTime = 0.0;
+            // Seek to start to ensure playback at the start.
+            _player.Seek(CMTime.Zero);
             
-            _sound.Play();
+            _player.Play();
         }
 
 		internal void Resume()
 		{
-			if (_sound == null)
+            if (_player == null)
 				return;
 
             PlatformResume();
@@ -115,23 +119,23 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformResume()
         {
-			_sound.Play();
+			_player.Play();
         }
 		
 		internal void Pause()
 		{			            
-			if ( _sound == null )
+            if (_player == null)
 				return;
 			
-			_sound.Pause();
+            _player.Pause();
         }
 		
 		internal void Stop()
 		{
-			if ( _sound == null )
+            if (_player == null)
 				return;
 			
-			_sound.Stop();
+            _player.Pause();
 			_playCount = 0;
 		}
 
@@ -139,16 +143,16 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get
 			{
-				if (_sound != null)
-					return _sound.Volume;
+                if (_player != null)
+                    return _player.Volume;
 				else
 					return 0.0f;
 			}
 			
 			set
 			{
-				if ( _sound != null && _sound.Volume != value )
-					_sound.Volume = value;
+                if ( _player != null && _player.Volume != value )
+                    _player.Volume = value;
 			}			
 		}
 
@@ -156,11 +160,11 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                return TimeSpan.FromSeconds(_sound.CurrentTime);		
+                return TimeSpan.FromSeconds(_player.CurrentTime.Seconds);		
             }
             set
             {
-                _sound.CurrentTime = value.TotalSeconds;
+                _player.Seek(CMTime.FromSeconds(value.TotalSeconds, 1000));
             }
         }
 
@@ -183,6 +187,10 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (this.mediaItem != null)
                 return this.duration;
+
+            if (_sound != null)
+                return TimeSpan.FromSeconds(_sound.Asset.Duration.Seconds);
+
 
             return _duration;
         }
