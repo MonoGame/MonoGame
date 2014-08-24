@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
-            : this(id, state, position, previousState, previousPosition, TimeSpan.FromTicks(DateTime.Now.Ticks))
+            : this(id, state, position, previousState, previousPosition, TimeSpan.Zero)
         {
         }
 
