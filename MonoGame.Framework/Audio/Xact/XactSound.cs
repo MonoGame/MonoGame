@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -304,7 +302,20 @@ namespace Microsoft.Xna.Framework.Audio
                 return _wave != null && _wave.State == SoundState.Paused;
 			}
 		}
-		
-	}
+
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            if (_complexSound)
+            {
+                foreach (var clip in _soundClips)
+                    clip.Apply3D(listener, emitter);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Apply3D(listener, emitter);
+            }
+        }
+    }
 }
 

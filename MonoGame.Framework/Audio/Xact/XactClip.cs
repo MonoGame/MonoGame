@@ -390,6 +390,12 @@ namespace Microsoft.Xna.Framework.Audio
 				return false; 
 			} 
 		}
-	}
+
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            foreach (var evt in _events)
+                evt.Apply3D(listener, emitter);
+        }
+    }
 }
 
