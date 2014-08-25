@@ -112,7 +112,7 @@ namespace Microsoft.Devices.Sensors
                 else if (this.calibrate == true)
                     this.calibrate = false;
 
-                reading.Timestamp = DateTime.Now;
+                reading.Timestamp = DateTime.UtcNow;
                 this.CurrentValue = reading;
             }
         }

@@ -34,12 +34,12 @@ namespace Microsoft.Xna.Framework
 	public static class PerformanceCounter
 	{
 		private static Dictionary<string,PerformanceItem> _list = new Dictionary<string, PerformanceItem>();
-		private static long _startTime = DateTime.Now.Ticks;
+		private static long _startTime = DateTime.UtcNow.Ticks;
 		private static long _endTime;
 		
 		public static void Dump()
 		{
-            _endTime = DateTime.Now.Ticks;
+            _endTime = DateTime.UtcNow.Ticks;
 
             Debug.WriteLine("Performance count results");
             Debug.WriteLine("=========================");
@@ -55,7 +55,7 @@ namespace Microsoft.Xna.Framework
 		
 		public static void Begin()
 		{
-            _startTime = DateTime.Now.Ticks;
+            _startTime = DateTime.UtcNow.Ticks;
 		}
 				
 		public static long ElapsedTime
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework
 			if (_list.ContainsKey(Name))
 			{
 				item = _list[Name];
-                item.PreviousTime = DateTime.Now.Ticks;		
+                item.PreviousTime = DateTime.UtcNow.Ticks;		
 			}
 			else 
 			{
@@ -86,7 +86,7 @@ namespace Microsoft.Xna.Framework
 #else
                 item.Name = "ID: " + Name;
 #endif
-                item.PreviousTime = DateTime.Now.Ticks;
+                item.PreviousTime = DateTime.UtcNow.Ticks;
                 _list.Add(Name,item);
 			}			
 		}
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework
 		public static void EndMensure(string Name)
 		{
 			PerformanceItem item = _list[Name];
-            var elapsedTime = DateTime.Now.Ticks - item.PreviousTime;
+            var elapsedTime = DateTime.UtcNow.Ticks - item.PreviousTime;
 			if (item.MaxTime < elapsedTime) 
 			{
 				item.MaxTime = elapsedTime;
