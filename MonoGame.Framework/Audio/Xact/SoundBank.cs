@@ -20,6 +20,8 @@ namespace Microsoft.Xna.Framework.Audio
         
 		bool loaded = false;
 
+        public bool IsDisposed { get; private set; }
+
 		internal AudioEngine AudioEngine { get { return audioengine; } }
 		
         /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
@@ -240,8 +242,13 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
 		public void Dispose ()
 		{
+            if (IsDisposed)
+                return;
+
             foreach (var cue in cues.Values)
                 cue.Dispose();
+
+            IsDisposed = true;
 		}
 		#endregion
     }
