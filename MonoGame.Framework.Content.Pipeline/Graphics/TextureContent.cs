@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.Remoting.Activation;
 using Microsoft.Xna.Framework.Graphics;
@@ -94,6 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     Bitmap bitmap=new Bitmap(width,height);
                     using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
                     {
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
                         graphics.DrawImage(systemBitmap, 0, 0, width, height);
                     }
 
