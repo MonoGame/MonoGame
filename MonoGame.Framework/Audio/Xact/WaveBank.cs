@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffect[] _sounds;
         private string _bankName;
 
+        public bool IsDisposed { get; private set; }
+
         struct Segment
         {
             public int Offset;
@@ -435,8 +437,13 @@ namespace Microsoft.Xna.Framework.Audio
 		#region IDisposable implementation
 		public void Dispose ()
 		{
+            if (IsDisposed)
+                return;
+
             foreach (var s in _sounds)
                 s.Dispose();
+
+            IsDisposed = true;
         }
 		#endregion
     }
