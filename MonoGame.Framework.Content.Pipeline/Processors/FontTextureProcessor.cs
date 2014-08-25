@@ -107,7 +107,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				output.Kerning.Add (new Vector3 (abc.A, abc.B, abc.C));
 			}
 			
-			output.Texture.Faces.Add (new MipmapChain (systemBitmap.ToXnaBitmap()));
+			output.Texture.Faces.Add (new MipmapChain (systemBitmap.ToXnaBitmap(true)));
             systemBitmap.Dispose();
 
             GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false, false);
