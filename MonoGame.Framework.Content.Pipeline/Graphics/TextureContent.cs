@@ -91,8 +91,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     width /= 2;
                     height /= 2;
 
-                    Console.WriteLine(width+" "+height);
-
                     Bitmap bitmap=new Bitmap(width,height);
                     using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
                     {
