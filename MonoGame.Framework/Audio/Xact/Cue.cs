@@ -196,8 +196,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
 		public void Apply3D(AudioListener listener, AudioEmitter emitter) 
         {
-			
-		}
+            if (curSound != null)
+                curSound.Apply3D(listener, emitter);			
+        }
 
         internal void Update(float dt)
         {

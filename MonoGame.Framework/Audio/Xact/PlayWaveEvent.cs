@@ -246,6 +246,12 @@ namespace Microsoft.Xna.Framework.Audio
 
             base.Update(dt);
         }
-	}
+
+        public override void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            if (_wav != null)
+                _wav.Apply3D(listener, emitter);
+        }
+    }
 }
 

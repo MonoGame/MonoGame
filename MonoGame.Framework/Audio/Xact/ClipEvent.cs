@@ -52,6 +52,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             _clip.Play();
         }
-	}
+
+        public abstract void Apply3D(AudioListener listener, AudioEmitter emitter);
+    }
 }
 
