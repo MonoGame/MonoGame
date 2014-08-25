@@ -130,7 +130,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
-            if(flipColors)BGRAtoRGBA(pixelData);
+            if(flipColors)
+                BGRAtoRGBA(pixelData);
 
             var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
             xnaBitmap.SetPixelData(pixelData);
