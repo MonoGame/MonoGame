@@ -248,7 +248,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, TimeSpan.FromTicks(DateTime.UtcNow.Ticks)));
                 }
 
                 temp.Clear();
@@ -256,7 +256,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, TimeSpan.FromTicks(DateTime.UtcNow.Ticks)));
                 }
             }
 
