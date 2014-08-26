@@ -433,10 +433,8 @@ namespace Microsoft.Xna.Framework
 
         public static void Transform(ref Vector2 position, ref Matrix matrix, out Vector2 result)
         {
-            var x = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
-            var y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
-            result.X = x;
-            result.Y = y;
+            result.X = (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41;
+            result.Y = (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42;
         }
 
         public static Vector2 Transform(Vector2 position, Quaternion quat)
@@ -490,10 +488,8 @@ namespace Microsoft.Xna.Framework
 
         public static void TransformNormal(ref Vector2 normal, ref Matrix matrix, out Vector2 result)
         {
-            var x = (normal.X * matrix.M11) + (normal.Y * matrix.M21);
-            var y = (normal.X * matrix.M12) + (normal.Y * matrix.M22);
-            result.X = x;
-            result.Y = y;
+            result.X = (normal.X * matrix.M11) + (normal.Y * matrix.M21);
+            result.Y = (normal.X * matrix.M12) + (normal.Y * matrix.M22);
         }
 
         internal string DebugDisplayString
