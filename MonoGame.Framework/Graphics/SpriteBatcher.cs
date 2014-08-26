@@ -108,12 +108,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns></returns>
         public SpriteBatchItem CreateBatchItem()
         {
-            SpriteBatchItem item;
-            if (_freeBatchItemQueue.Count > 0)
-                item = _freeBatchItemQueue.Dequeue();
-            else
-                item = new SpriteBatchItem();
+            var item = _freeBatchItemQueue.Count > 0 ? _freeBatchItemQueue.Dequeue() : new SpriteBatchItem();
             _batchItemList.Add(item);
+
             return item;
         }
 

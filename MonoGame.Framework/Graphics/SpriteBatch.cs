@@ -20,9 +20,6 @@ namespace Microsoft.Xna.Framework.Graphics
         readonly EffectPass _spritePass;
 
 		Matrix _matrix;
-		Rectangle _tempRect = new Rectangle (0,0,0,0);
-		Vector2 _texCoordTL = new Vector2 (0,0);
-		Vector2 _texCoordBR = new Vector2 (0,0);
 
 		public SpriteBatch (GraphicsDevice graphicsDevice)
 		{
@@ -323,47 +320,40 @@ namespace Microsoft.Xna.Framework.Graphics
 			float depth,
 			bool autoFlush)
 		{
-			var item = _batcher.CreateBatchItem();
+            int width = texture.Width;
+            int height = texture.Height;
 
-			item.Depth = depth;
-			item.Texture = texture;
+            var tempRect = sourceRectangle.HasValue ? sourceRectangle.Value : new Rectangle(0, 0, width, height);
+            var texCoordTL = new Vector2(tempRect.X / (float)width, tempRect.Y / (float)height);
+            var texCoordBR = new Vector2((tempRect.X + tempRect.Width) / (float)width, (tempRect.Y + tempRect.Height) / (float)height);
 
-			if (sourceRectangle.HasValue) {
-				_tempRect = sourceRectangle.Value;
-			} else {
-				_tempRect.X = 0;
-				_tempRect.Y = 0;
-				_tempRect.Width = texture.Width;
-				_tempRect.Height = texture.Height;				
-			}
-			
-			_texCoordTL.X = _tempRect.X / (float)texture.Width;
-			_texCoordTL.Y = _tempRect.Y / (float)texture.Height;
-			_texCoordBR.X = (_tempRect.X + _tempRect.Width) / (float)texture.Width;
-			_texCoordBR.Y = (_tempRect.Y + _tempRect.Height) / (float)texture.Height;
+            if ((effect & SpriteEffects.FlipVertically) != 0)
+            {
+                var temp = texCoordBR.Y;
+                texCoordBR.Y = texCoordTL.Y;
+                texCoordTL.Y = temp;
+            }
+            if ((effect & SpriteEffects.FlipHorizontally) != 0)
+            {
+                var temp = texCoordBR.X;
+                texCoordBR.X = texCoordTL.X;
+                texCoordTL.X = temp;
+            }
 
-			if ((effect & SpriteEffects.FlipVertically) != 0) {
-                var temp = _texCoordBR.Y;
-				_texCoordBR.Y = _texCoordTL.Y;
-				_texCoordTL.Y = temp;
-			}
-			if ((effect & SpriteEffects.FlipHorizontally) != 0) {
-                var temp = _texCoordBR.X;
-				_texCoordBR.X = _texCoordTL.X;
-				_texCoordTL.X = temp;
-			}
-
-			item.Set (destinationRectangle.X,
-					destinationRectangle.Y, 
-					-origin.X, 
+            var item = _batcher.CreateBatchItem();
+            item.Depth = depth;
+            item.Texture = texture;
+			item.Set(destinationRectangle.X,
+					destinationRectangle.Y,
+					-origin.X,
 					-origin.Y,
 					destinationRectangle.Z,
 					destinationRectangle.W,
-					(float)Math.Sin (rotation), 
-					(float)Math.Cos (rotation), 
-					color, 
-					_texCoordTL, 
-					_texCoordBR);			
+					rotation != 0 ? (float)Math.Sin(rotation) : 0,
+					rotation != 0 ? (float)Math.Cos(rotation) : 1,
+					color,
+					texCoordTL,
+					texCoordBR);
 			
 			if (autoFlush)
 			{
