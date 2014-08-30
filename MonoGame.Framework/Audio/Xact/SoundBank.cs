@@ -12,40 +12,33 @@ namespace Microsoft.Xna.Framework.Audio
     /// <summary>Represents a collection of Cues.</summary>
     public class SoundBank : IDisposable
     {
-        //string name;
-        string filename;
-		AudioEngine audioengine;
-		WaveBank[] waveBanks;
-		Dictionary<string, Cue> cues = new Dictionary<string, Cue>();
+        readonly AudioEngine _audioengine;
+        readonly string[] _waveBankNames;
+        readonly WaveBank[] _waveBanks;
+        readonly Dictionary<string, Cue> _cues = new Dictionary<string, Cue>();
         
-		bool loaded = false;
-
         public bool IsDisposed { get; private set; }
 
-		internal AudioEngine AudioEngine { get { return audioengine; } }
+        internal AudioEngine AudioEngine { get { return _audioengine; } }
 		
         /// <param name="audioEngine">AudioEngine that will be associated with this sound bank.</param>
         /// <param name="fileName">Path to a .xsb SoundBank file.</param>
         public SoundBank(AudioEngine audioEngine, string fileName)
         {
-            filename = FileHelpers.NormalizeFilePathSeparators(fileName);
-			audioengine = audioEngine;
-		}
-		
-		//Defer loading because some programs load soundbanks before wavebanks
-		private void Load ()
-		{	
+            _audioengine = audioEngine;
+            fileName = FileHelpers.NormalizeFilePathSeparators(fileName);
+
 #if !ANDROID
-			using (Stream soundbankstream = TitleContainer.OpenStream(filename))
+            using (var soundbankstream = TitleContainer.OpenStream(fileName))
 			{
 #else
-				using (var fileStream = Game.Activity.Assets.Open(filename))
+            using (var fileStream = Game.Activity.Assets.Open(fileName))
 			{
 				MemoryStream soundbankstream = new MemoryStream();
 				fileStream.CopyTo(soundbankstream);
 				soundbankstream.Position = 0;
 #endif
-				using(BinaryReader soundbankreader = new BinaryReader (soundbankstream))
+                using (var soundbankreader = new BinaryReader(soundbankstream))
 				{
 	            
 					//Parse the SoundBank.
@@ -94,29 +87,31 @@ namespace Microsoft.Xna.Framework.Audio
 
 					//parse wave bank name table
 					soundbankstream.Seek (waveBankNameTableOffset, SeekOrigin.Begin);
-					waveBanks = new WaveBank[numWaveBanks];
-					for (int i=0; i<numWaveBanks; i++) {
-						string bankname = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64),0,64).Replace("\0","");
-						WaveBank bank;
-						if (audioengine.Wavebanks.TryGetValue(bankname, out bank))
-							waveBanks[i] = bank;
-					}
+                    _waveBanks = new WaveBank[numWaveBanks];
+                    _waveBankNames = new string[numWaveBanks];
+					for (int i=0; i<numWaveBanks; i++)
+                        _waveBankNames[i] = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes(64), 0, 64).Replace("\0", "");
 					
 					//parse cue name table
 					soundbankstream.Seek (cueNamesOffset, SeekOrigin.Begin);
 					string[] cueNames = System.Text.Encoding.UTF8.GetString(soundbankreader.ReadBytes((int)cueNameTableLen), 0, (int)cueNameTableLen).Split('\0');
+
+                    // Simple cues
 					soundbankstream.Seek (simpleCuesOffset, SeekOrigin.Begin);
-					for (int i=0; i<numSimpleCues; i++) {
+					for (int i=0; i<numSimpleCues; i++) 
+                    {
                         soundbankreader.ReadByte (); // flags
 						uint soundOffset = soundbankreader.ReadUInt32 ();
 						XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-						Cue cue = new Cue(audioengine, cueNames[i], sound);
+						Cue cue = new Cue(_audioengine, cueNames[i], sound);						
 						
-						cues.Add(cue.Name, cue);
+						_cues.Add(cue.Name, cue);
 					}
 					
+                    // Complex cues
 					soundbankstream.Seek (complexCuesOffset, SeekOrigin.Begin);
-					for (int i=0; i<numComplexCues; i++) {
+					for (int i=0; i<numComplexCues; i++) 
+                    {
 						Cue cue;
 						
 						byte flags = soundbankreader.ReadByte ();
@@ -124,9 +119,9 @@ namespace Microsoft.Xna.Framework.Audio
 							//not sure :/
 							uint soundOffset = soundbankreader.ReadUInt32 ();
 							soundbankreader.ReadUInt32 (); //unkn
-							
+
 							XactSound sound = new XactSound(this, soundbankreader, soundOffset);
-							cue = new Cue(audioengine, cueNames[numSimpleCues+i], sound);
+							cue = new Cue(_audioengine, cueNames[numSimpleCues+i], sound);
 						} else {
 							uint variationTableOffset = soundbankreader.ReadUInt32 ();
                             soundbankreader.ReadUInt32 (); // transitionTableOffset
@@ -180,7 +175,7 @@ namespace Microsoft.Xna.Framework.Audio
 							
 							soundbankstream.Seek (savepos, SeekOrigin.Begin);
 							
-							cue = new Cue(audioengine, cueNames[numSimpleCues+i], cueSounds, probs);
+							cue = new Cue(_audioengine, cueNames[numSimpleCues+i], cueSounds, probs);
 						}
 						
 						//Instance Limit
@@ -188,20 +183,29 @@ namespace Microsoft.Xna.Framework.Audio
 						soundbankreader.ReadByte ();
 						soundbankreader.ReadByte ();
 						
-						cues.Add(cue.Name, cue);
+						_cues.Add(cue.Name, cue);
 					}
 				}
 			}
 			
-			loaded = true;
         }
 
         internal SoundEffectInstance GetSoundEffectInstance(int waveBankIndex, int trackIndex)
         {
-            var waveBank = waveBanks[waveBankIndex];
+            var waveBank = _waveBanks[waveBankIndex];
+
+            // If the wave bank has not been resolved then do so now.
+            if (waveBank == null)
+            {
+                var name = _waveBankNames[waveBankIndex];
+                if (!_audioengine.Wavebanks.TryGetValue(name, out waveBank))
+                    throw new Exception("The wave bank '" + name + "' was not found!");
+                _waveBanks[waveBankIndex] = waveBank;                
+            }
+
             var sound = waveBank.GetSoundEffect(trackIndex);
             return sound.GetPooledInstance(true);
-		}
+        }
 		
         /// <summary>
         /// Returns a pooled Cue object.
@@ -213,10 +217,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public Cue GetCue(string name)
         {
-			if (!loaded) Load ();
-			
-			//Does this have to return /new/ Cue instances?
-			return cues[name];
+            // Note: In XNA this returns a new Cue instance, but that
+            // generates garbage which is one reason to not do it.
+            return _cues[name];
         }
 		
         /// <summary>
@@ -240,16 +243,16 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Immediately releases any unmanaged resources used by this object.
         /// </summary>
-		public void Dispose ()
-		{
+        public void Dispose()
+        {
             if (IsDisposed)
                 return;
 
-            foreach (var cue in cues.Values)
+            foreach (var cue in _cues.Values)
                 cue.Dispose();
 
             IsDisposed = true;
-		}
+        }
 		#endregion
     }
 }
