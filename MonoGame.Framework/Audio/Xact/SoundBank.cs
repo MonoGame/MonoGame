@@ -241,15 +241,24 @@ namespace Microsoft.Xna.Framework.Audio
 			var cue = GetCue(name);
             cue.Play();
 		}
-		
-        /*
-		public void PlayCue (string name, AudioListener listener, AudioEmitter emitter)
-		{
-			throw new NotImplementedException();
-		}
-        */
 
-		#region IDisposable implementation
+        /// <summary>
+        /// Plays a cue with static 3D positional information.
+        /// </summary>
+        /// <remarks>
+        /// Commonly used for short lived effects.  To dynamically change the 3D 
+        /// positional information on a cue over time use <see cref="GetCue"/> and <see cref="Cue.Apply3D"/>.</remarks>
+        /// <param name="name">The name of the cue to play.</param>
+        /// <param name="listener">The listener state.</param>
+        /// <param name="emitter">The cue emitter state.</param>
+        public void PlayCue(string name, AudioListener listener, AudioEmitter emitter)
+        {
+            var cue = GetCue(name);
+            cue.Play();
+            cue.Apply3D(listener, emitter);
+        }
+
+        #region IDisposable implementation
         /// <summary>
         /// Immediately releases any unmanaged resources used by this object.
         /// </summary>
