@@ -102,10 +102,16 @@ namespace Microsoft.Xna.Framework.Audio
                     {
                         soundbankreader.ReadByte (); // flags
 						uint soundOffset = soundbankreader.ReadUInt32 ();
-						XactSound sound = new XactSound(this, soundbankreader, soundOffset);
+
+                        var oldPosition = soundbankreader.BaseStream.Position;
+                        soundbankreader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
+
+						XactSound sound = new XactSound(this, soundbankreader);
 						Cue cue = new Cue(_audioengine, cueNames[i], sound);						
 						
 						_cues.Add(cue.Name, cue);
+
+                        soundbankreader.BaseStream.Seek(oldPosition, SeekOrigin.Begin);
 					}
 					
                     // Complex cues
@@ -120,8 +126,13 @@ namespace Microsoft.Xna.Framework.Audio
 							uint soundOffset = soundbankreader.ReadUInt32 ();
 							soundbankreader.ReadUInt32 (); //unkn
 
-							XactSound sound = new XactSound(this, soundbankreader, soundOffset);
+                            var oldPosition = soundbankreader.BaseStream.Position;
+                            soundbankreader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
+
+							XactSound sound = new XactSound(this, soundbankreader);
 							cue = new Cue(_audioengine, cueNames[numSimpleCues+i], sound);
+
+                            soundbankreader.BaseStream.Seek(oldPosition, SeekOrigin.Begin);
 						} else {
 							uint variationTableOffset = soundbankreader.ReadUInt32 ();
                             soundbankreader.ReadUInt32 (); // transitionTableOffset
@@ -157,8 +168,13 @@ namespace Microsoft.Xna.Framework.Audio
 									uint soundOffset = soundbankreader.ReadUInt32 ();
                                     soundbankreader.ReadByte (); // weightMin
                                     soundbankreader.ReadByte (); // weightMax
-									
-									cueSounds[j] = new XactSound(this, soundbankreader, soundOffset);
+
+                                    var oldPosition = soundbankreader.BaseStream.Position;
+                                    soundbankreader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
+
+									cueSounds[j] = new XactSound(this, soundbankreader);
+
+                                    soundbankreader.BaseStream.Seek(oldPosition, SeekOrigin.Begin);
 									break;
 								}
 								case 4: //CompactWave

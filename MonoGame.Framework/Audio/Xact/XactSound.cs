@@ -32,12 +32,9 @@ namespace Microsoft.Xna.Framework.Audio
             _trackIndex = trackIndex;
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
+		public XactSound(SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
-
-			var oldPosition = soundReader.BaseStream.Position;
-			soundReader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
 			
             var flags = soundReader.ReadByte();
             _complexSound = (flags & 0x1) != 0;
@@ -82,8 +79,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             var category = soundBank.AudioEngine.Categories[_categoryID];
             category.AddSound(this);
-
-			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
