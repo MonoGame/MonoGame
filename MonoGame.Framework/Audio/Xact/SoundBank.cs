@@ -168,8 +168,21 @@ namespace Microsoft.Xna.Framework.Audio
                                     stream.Seek(soundOffset, SeekOrigin.Begin);
                                     cueSounds[j] = new XactSound(this, reader);
                                     stream.Seek(oldPosition, SeekOrigin.Begin);
-
 									break;
+								}
+                                case 3:
+								{
+                                    uint soundOffset = reader.ReadUInt32();
+                                    var weightMin = reader.ReadSingle();
+                                    var weightMax = reader.ReadSingle();
+                                    var varFlags = reader.ReadUInt32();
+                                    var linger =  (varFlags & 0x01) == 0x01;
+
+                                    var oldPosition = stream.Position;
+                                    stream.Seek(soundOffset, SeekOrigin.Begin);
+                                    cueSounds[j] = new XactSound(this, reader);
+                                    stream.Seek(oldPosition, SeekOrigin.Begin);
+                                    break;
 								}
 								case 4: //CompactWave
 								{
