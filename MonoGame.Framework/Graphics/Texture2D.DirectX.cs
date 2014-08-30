@@ -395,6 +395,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
 
                 this.SetData<int>(bitmap.Pixels);
+
+                textureStream.Dispose();
             });
 #endif
         }
