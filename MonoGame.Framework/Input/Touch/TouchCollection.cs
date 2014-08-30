@@ -28,22 +28,22 @@ namespace Microsoft.Xna.Framework.Input.Touch
         public bool IsConnected { get { return TouchPanel.GetCapabilities().IsConnected; } }
 
         private static readonly TouchLocation[] EmptyLocationArray = new TouchLocation[0];
-        internal static readonly TouchCollection Empty = new TouchCollection(EmptyLocationArray);
-
+        internal static readonly TouchCollection Empty = new TouchCollection(new List<TouchLocation>(0));
+        
 		#endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchCollection"/> with a pre-determined set of touch locations.
         /// </summary>
         /// <param name="touches">Array of <see cref="TouchLocation"/> items to initialize with.</param>
-        public TouchCollection(TouchLocation[] touches)
+        public TouchCollection(List<TouchLocation> touches)
         {
             if (touches == null)
                 throw new ArgumentNullException("touches");
 
-            _collection = touches;
+            _collection = touches.ToArray();
         }
-
+        
         /// <summary>
         /// Returns <see cref="TouchLocation"/> specified by ID.
         /// </summary>
