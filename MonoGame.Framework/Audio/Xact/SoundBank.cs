@@ -201,11 +201,12 @@ namespace Microsoft.Xna.Framework.Audio
 							cue = new Cue(_audioengine, cueNames[numSimpleCues+i], cueSounds, probs);
 						}
 						
-						//Instance Limit
-                        reader.ReadUInt32();
-                        reader.ReadByte();
-                        reader.ReadByte();
-						
+						// Instance limiting
+                        var instanceLimit = reader.ReadByte();
+                        var fadeInSec = reader.ReadUInt16() / 1000.0f;
+                        var fadeOutSec = reader.ReadUInt16() / 1000.0f;
+                        var instanceFlags = reader.ReadByte();
+
 						_cues.Add(cue.Name, cue);
 					}
 				}
