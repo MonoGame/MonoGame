@@ -32,15 +32,14 @@ namespace Microsoft.Xna.Framework.Audio
             _trackIndex = trackIndex;
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
+		public XactSound(SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
-
-			var oldPosition = soundReader.BaseStream.Position;
-			soundReader.BaseStream.Seek(soundOffset, SeekOrigin.Begin);
 			
-			var flags = soundReader.ReadByte();
-			_complexSound = (flags & 1) != 0;
+            var flags = soundReader.ReadByte();
+            _complexSound = (flags & 0x1) != 0;
+            var hasRPCs = (flags & 0x0E) != 0;
+            var hasEffects = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
@@ -56,16 +55,21 @@ namespace Microsoft.Xna.Framework.Audio
 				_trackIndex = soundReader.ReadUInt16();
 				_waveBankIndex = soundReader.ReadByte();
 			}
-			
-			if ( (flags & 0x1E) != 0 ) 
-            {
-				var extraDataLen = soundReader.ReadUInt16();
-				//TODO: Parse RPC+DSP stuff
-				
-				// extraDataLen - 2, we need to account for extraDataLen itself!
-				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
+
+			if (hasRPCs)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
 			}
-			
+
+			if (hasEffects)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+			}
+
 			if (_complexSound)
             {
 				_soundClips = new XactClip[numClips];
@@ -75,8 +79,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             var category = soundBank.AudioEngine.Categories[_categoryID];
             category.AddSound(this);
-
-			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
