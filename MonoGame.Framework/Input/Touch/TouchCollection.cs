@@ -141,7 +141,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                if (index >= _count) throw new ArgumentOutOfRangeException("index");
+                if (index < 0 || index >= _count)
+                    throw new ArgumentOutOfRangeException("index");
 
                 switch (index)
                  { 
