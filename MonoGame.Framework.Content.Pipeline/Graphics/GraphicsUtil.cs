@@ -105,10 +105,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             content.Faces.Clear();
-            content.Faces.Add(new MipmapChain(destination.ToXnaBitmap()));
+            content.Faces.Add(new MipmapChain(destination.ToXnaBitmap(false)));//we dont want to flip colors twice
         }
 
-        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap)
+        public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap, bool flipColors)
         {
             // Any bitmap using this function should use 32bpp ARGB pixel format, since we have to
             // swizzle the channels later
@@ -130,7 +130,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Image data from any GDI based function are stored in memory as BGRA/BGR, even if the format says RGBA.
             // Because of this we flip the R and B channels.
 
-            BGRAtoRGBA(pixelData);
+            if(flipColors)
+                BGRAtoRGBA(pixelData);
 
             var xnaBitmap = new PixelBitmapContent<Color>(systemBitmap.Width, systemBitmap.Height);
             xnaBitmap.SetPixelData(pixelData);

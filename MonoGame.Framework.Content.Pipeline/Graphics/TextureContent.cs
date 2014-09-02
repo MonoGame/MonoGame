@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Runtime.Remoting.Activation;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
@@ -79,7 +81,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            throw new NotImplementedException();
+            foreach (MipmapChain face in faces)
+            {
+                BitmapContent faceBitmap = face[0];
+                int width = faceBitmap.Width, height = faceBitmap.Height;
+                Bitmap systemBitmap;
+                while (width > 1 && height > 1)
+                {
+                    systemBitmap = face[face.Count-1].ToSystemBitmap();
+                    width /= 2;
+                    height /= 2;
+
+                    Bitmap bitmap=new Bitmap(width,height);
+                    using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
+                    {
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+                        graphics.DrawImage(systemBitmap, 0, 0, width, height);
+                    }
+
+                    face.Add(bitmap.ToXnaBitmap(false)); //we dont want to flip textures twice
+                    systemBitmap.Dispose();
+                }
+            }
         }
 
         /// <summary>

@@ -113,6 +113,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				TextureFormat = TextureProcessorOutputFormat.Color;
 			}
 
+            if (GenerateMipmaps)
+            {
+                context.Logger.LogMessage("Generating mipmaps.");
+                input.GenerateMipmaps(false);
+            }
+
             return input;
         }
 
