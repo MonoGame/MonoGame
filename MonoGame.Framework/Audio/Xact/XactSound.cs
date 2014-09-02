@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -34,40 +32,44 @@ namespace Microsoft.Xna.Framework.Audio
             _trackIndex = trackIndex;
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
+		public XactSound(SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
-
-			var oldPosition = soundReader.BaseStream.Position;
-			soundReader.BaseStream.Seek (soundOffset, SeekOrigin.Begin);
 			
-			byte flags = soundReader.ReadByte ();
-			_complexSound = (flags & 1) != 0;
+            var flags = soundReader.ReadByte();
+            _complexSound = (flags & 0x1) != 0;
+            var hasRPCs = (flags & 0x0E) != 0;
+            var hasEffects = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
             _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
             _pitch = soundReader.ReadInt16() / 1000.0f;
-			soundReader.ReadByte (); //unkn
-            soundReader.ReadUInt16 (); // entryLength
+			var priority = soundReader.ReadByte();
+            soundReader.ReadUInt16(); // filter stuff?
 			
 			uint numClips = 0;
 			if (_complexSound)
-				numClips = (uint)soundReader.ReadByte ();
+				numClips = soundReader.ReadByte();
 			else 
             {
-				_trackIndex = soundReader.ReadUInt16 ();
-				_waveBankIndex = soundReader.ReadByte ();
+				_trackIndex = soundReader.ReadUInt16();
+				_waveBankIndex = soundReader.ReadByte();
 			}
-			
-			if ( (flags & 0x1E) != 0 ) 
-            {
-				uint extraDataLen = soundReader.ReadUInt16 ();
-				//TODO: Parse RPC+DSP stuff
-				
-				// extraDataLen - 2, we need to account for extraDataLen itself!
-				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
+
+			if (hasRPCs)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
 			}
-			
+
+			if (hasEffects)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+			}
+
 			if (_complexSound)
             {
 				_soundClips = new XactClip[numClips];
@@ -77,8 +79,6 @@ namespace Microsoft.Xna.Framework.Audio
 
             var category = soundBank.AudioEngine.Categories[_categoryID];
             category.AddSound(this);
-
-			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
@@ -133,6 +133,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
+                _wave.Pitch = _pitch;
                 _wave.Volume = _volume * category._volume[0];
                 _wave.Play();
 			}
@@ -303,7 +304,20 @@ namespace Microsoft.Xna.Framework.Audio
                 return _wave != null && _wave.State == SoundState.Paused;
 			}
 		}
-		
-	}
+
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            if (_complexSound)
+            {
+                foreach (var clip in _soundClips)
+                    clip.Apply3D(listener, emitter);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Apply3D(listener, emitter);
+            }
+        }
+    }
 }
 

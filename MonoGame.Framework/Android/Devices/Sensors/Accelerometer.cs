@@ -179,7 +179,7 @@ namespace Microsoft.Devices.Sensors
                             {
                                 const float gravity = Android.Hardware.SensorManager.GravityEarth;
                                 reading.Acceleration = new Vector3(values[0], values[1], values[2]) / gravity;
-                                reading.Timestamp = DateTime.Now;
+                                reading.Timestamp = DateTime.UtcNow;
                             }
                             accelerometer.CurrentValue = reading;
                         }
