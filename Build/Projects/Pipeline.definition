@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="Pipeline" Path="Tools/Pipeline" Type="GUI" Platforms="Windows">
+<Project Name="Pipeline" Path="Tools/Pipeline" Type="App" Platforms="Windows,MacOS,Linux">
 
   <References>
     <Reference Include="System" />
@@ -7,12 +7,11 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+
+    <Reference Include="PipelineReferences" />
   </References>
 
   <Properties>
@@ -21,6 +20,8 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;XWT</Platform>
+      <Platform Name="Linux">TRACE;LINUX;XWT</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -57,57 +58,90 @@
     <Compile Include="Common\PipelineProject.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
 
-
-    <!-- The Windows specfic stuff -->
-    <Compile Include="Windows\FolderEditing.cs" />
     <Compile Include="Windows\UpdateAction.cs" />
+
+    <!-- The Windows specific stuff -->
+    <Compile Include="Windows\FolderEditing.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\MainView.cs">
+      <Platforms>Windows</Platforms>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\MainView.Designer.cs">
+      <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\NewContentDialog.cs">
+      <Platforms>Windows</Platforms>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\NewContentDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\MultiSelectTreeview.cs">
+      <Platforms>Windows</Platforms>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Windows\AssemblyReferenceEditing.cs">
+      <Platforms>Windows</Platforms>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\PipelineProjectProxy.cs" />
-    <Compile Include="Windows\SortedEnumTypeConverter.cs" />
-    <Compile Include="Windows\TreeViewExtensions.cs" />
+    <Compile Include="Windows\PipelineProjectProxy.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\TreeViewExtensions.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
+    <Compile Include="Windows\SortedEnumTypeConverter.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
+      <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
+      <Platforms>Windows</Platforms>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
+      <Platforms>Windows</Platforms>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
+      <Platforms>Windows</Platforms>
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
+      <Platforms>Windows</Platforms>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Windows\NewContentDialog.resx">
+      <Platforms>Windows</Platforms>
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </EmbeddedResource>
 
+    <!-- The Xwt specific stuff -->
+    <Compile Include="Xwt\PipelineProjectProxy.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Xwt\XwtView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Xwt\OutputTextView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Xwt\PropertyGrid.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="Icons\blueprint.png" />
