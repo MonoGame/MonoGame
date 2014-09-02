@@ -34,7 +34,7 @@ namespace MonoGame.Tools.Pipeline
 
 //			if (_propertyObject != null)
 //				PopulatePropertyList();
-			PopulateMockList();
+			//PopulateMockList();
 		}
 
 		public object PropertyObject {			get;			set;		}

@@ -103,7 +103,10 @@ namespace MonoGame.Tools.Pipeline
 
 		public bool AskOpenProject (out string projectFilePath)
 		{
-			OpenFileDialog open = new OpenFileDialog();
+			OpenFileDialog open = new OpenFileDialog()
+                {
+                    Title = "Open MGCB Project"
+                };
 			open.Multiselect = false;
 			open.Filters.Add(MonoGameContentProjectFileFilter);
             open.Filters.Add(AllFilesFilter);
@@ -116,7 +119,10 @@ namespace MonoGame.Tools.Pipeline
 
 		public bool AskImportProject (out string projectFilePath)
 		{
-			OpenFileDialog open = new OpenFileDialog();
+			OpenFileDialog open = new OpenFileDialog()
+                {
+                    Title = "Import XNA Content Project"
+                };
 			open.Multiselect = false;
 			open.Filters.Add(XnaContentProjectFileFilter);
             open.Filters.Add(AllFilesFilter);
@@ -229,7 +235,7 @@ namespace MonoGame.Tools.Pipeline
 		public bool ChooseContentFile (string initialDirectory, out List<string> files)
 		{
 			var dlg = new OpenFileDialog() {
-				Title = "Open",
+				Title = "Add Content Files",
 				Multiselect = true,
 				CurrentFolder = initialDirectory
 			};
@@ -308,24 +314,24 @@ namespace MonoGame.Tools.Pipeline
 			MainMenu = new Menu();
 
 			var fileMenu = new MenuItem() {
-				Label = "_File",
+				Label = "File",
 				SubMenu = new Menu()
 			};
 					
-			_newMenuItem = new MenuItem("_New...");
+			_newMenuItem = new MenuItem("New...");
 			_newMenuItem.Clicked += OnNewMenuClicked;
-			_openMenuItem = new MenuItem("_Open...");
+			_openMenuItem = new MenuItem("Open...");
 			_openMenuItem.Clicked += OnOpenMenuClicked;
-			_closeMenuItem = new MenuItem("_Close");
+			_closeMenuItem = new MenuItem("Close");
 			_closeMenuItem.Sensitive = false;
 			_closeMenuItem.Clicked += OnCloseMenuClicked;
-			_importMenuItem = new MenuItem("_Import...");
+			_importMenuItem = new MenuItem("Import...");
 			_importMenuItem.Clicked += OnImportMenuClicked;
-			_saveMenuItem = new MenuItem("_Save");
+			_saveMenuItem = new MenuItem("Save");
 			_saveMenuItem.Clicked += OnSaveMenuClicked;
-			_saveAsMenuItem = new MenuItem("Save _As...");
+			_saveAsMenuItem = new MenuItem("Save As...");
 			_saveAsMenuItem.Clicked += OnSaveAsMenuClicked;
-			_exitMenuItem = new MenuItem("E_xit");
+			_exitMenuItem = new MenuItem("Exit");
 			_exitMenuItem.Clicked += OnExitMenuClicked;
 
 			fileMenu.SubMenu.Items.Add(_newMenuItem);
@@ -346,13 +352,13 @@ namespace MonoGame.Tools.Pipeline
 				SubMenu = new Menu()
 			};
 					
-			_undoMenuItem = new MenuItem("_Undo");
+			_undoMenuItem = new MenuItem("Undo");
 			_undoMenuItem.Clicked += OnUndoMenuClicked;
-			_redoMenuItem = new MenuItem("_Redo");
+			_redoMenuItem = new MenuItem("Redo");
 			_redoMenuItem.Clicked += OnRedoMenuClicked;
-			_newItemMenuItem = new MenuItem("_New Item");
-			_addItemMenuItem = new MenuItem("_Add Item");
-			_deleteMenuItem = new MenuItem("_Delete");
+			_newItemMenuItem = new MenuItem("New Item");
+			_addItemMenuItem = new MenuItem("Add Item");
+			_deleteMenuItem = new MenuItem("Delete");
 
 			editMenu.SubMenu.Items.Add(_undoMenuItem);
 			editMenu.SubMenu.Items.Add(_redoMenuItem);
@@ -365,15 +371,15 @@ namespace MonoGame.Tools.Pipeline
 			MainMenu.Items.Add(editMenu);
 
 			_buildMenu = new MenuItem() {
-				Label = "_Build",
+				Label = "Build",
 				SubMenu = new Menu()
 			};
 
-			_buildMenuItem = new MenuItem("_Build");
+			_buildMenuItem = new MenuItem("Build");
 			_buildMenuItem.Clicked += OnBuildMenuItemClicked;
-			_rebuildMenuItem = new MenuItem("_Rebuild");
+			_rebuildMenuItem = new MenuItem("Rebuild");
 			_rebuildMenuItem.Clicked += OnRebuildMenuClicked;
-			_cleanMenuItem = new MenuItem("_Clean");
+			_cleanMenuItem = new MenuItem("Clean");
 			_cleanMenuItem.Clicked += OnCleanMenuClicked;
 			_cancelSeparatorMenuItem = new SeparatorMenuItem();
 			_cancelBuildMenuItem = new MenuItem() {
@@ -381,7 +387,7 @@ namespace MonoGame.Tools.Pipeline
 				Visible = false
 			};
 			_cancelBuildMenuItem.Clicked += OnCancelMenuClicked;
-			_debugMenuItem = new CheckBoxMenuItem("_Debug Mode");
+			_debugMenuItem = new CheckBoxMenuItem("Debug Mode");
 
 			_buildMenu.SubMenu.Items.Add(_buildMenuItem);
 			_buildMenu.SubMenu.Items.Add(_rebuildMenuItem);
@@ -393,13 +399,13 @@ namespace MonoGame.Tools.Pipeline
 			MainMenu.Items.Add(_buildMenu);
 
 			var helpMenu = new MenuItem() {
-				Label = "_Help",
+				Label = "Help",
 				SubMenu = new Menu()
 			};
 
-			var viewHelpMenu = new MenuItem("_View Help");
+			var viewHelpMenu = new MenuItem("View Help");
 			viewHelpMenu.Clicked += OnViewHelpMenuClicked;
-			var aboutMenu = new MenuItem("_About");
+			var aboutMenu = new MenuItem("About");
 			aboutMenu.Clicked += OnAboutMenuClicked;
 
 			helpMenu.SubMenu.Items.Add(viewHelpMenu);
