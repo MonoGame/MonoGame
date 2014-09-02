@@ -228,7 +228,7 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            return string.Format("{{Normal:{0} D:{1}}}", Normal, D);
+            return "{{Normal:" + Normal + " D:" + D + "}}";
         }
 
         #endregion

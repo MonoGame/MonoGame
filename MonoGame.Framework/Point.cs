@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Point"/>.</returns>
         public override string ToString()
         {
-            return string.Format("{{X:{0} Y:{1}}}", X, Y);
+            return "{{X:" + X + " Y:" + Y + "}}";
         }
 
         /// <summary>
