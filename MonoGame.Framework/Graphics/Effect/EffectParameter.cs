@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [DebuggerDisplay("{ParameterClass} {ParameterType} {Name} : {Semantic}")]
+    [DebuggerDisplay("{DebugDisplayString}")]
 	public class EffectParameter
 	{
         /// <summary>
@@ -95,6 +93,68 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// if the parameter value has been changed.
         /// </summary>
         internal ulong StateKey { get; private set; }
+
+        /// <summary>
+        /// Property referenced by the DebuggerDisplayAttribute.
+        /// </summary>
+        private string DebugDisplayString
+        {
+            get
+            {
+                var semanticStr = string.Empty;
+                if (!string.IsNullOrEmpty(Semantic))                
+                    semanticStr = string.Concat(" <", Semantic, ">");
+
+                string valueStr;
+                if (Data == null)
+                    valueStr = "(null)";
+                else
+                {
+                    switch (ParameterClass)
+                    {
+                        // Object types are stored directly in the Data property.
+                        // Display Data's string value.
+                        case EffectParameterClass.Object:
+                            valueStr = Data.ToString();
+                            break;
+
+                        // Matrix types are stored in a float[16] which we don't really have room for.
+                        // Display "...".
+                        case EffectParameterClass.Matrix:
+                            valueStr = "...";
+                            break;
+
+                        // Scalar types are stored as a float[1].
+                        // Display the first (and only) element's string value.                    
+                        case EffectParameterClass.Scalar:
+                            valueStr = (Data as Array).GetValue(0).ToString();
+                            break;
+
+                        // Vector types are stored as an Array<Type>.
+                        // Display the string value of each array element.
+                        case EffectParameterClass.Vector:
+                            var array = Data as Array;
+                            var arrayStr = new string[array.Length];
+                            var idx = 0;
+                            foreach (var e in array)
+                            {
+                                arrayStr[idx] = array.GetValue(idx).ToString();
+                                idx++;
+                            }
+
+                            valueStr = string.Join(" ", arrayStr);
+                            break;
+
+                        // Handle additional cases here...
+                        default:
+                            valueStr = Data.ToString();
+                            break;
+                    }
+                }
+                
+                return string.Concat("[", ParameterClass, " ", ParameterType, "]", semanticStr, " ", Name, " : ", valueStr);
+            }
+        }
 
 
         public bool GetValueBoolean ()
@@ -465,6 +525,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[7] = value.M23;
                 fData[8] = value.M33;
             }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M21;
+                fData[2] = value.M31;
+
+                fData[3] = value.M12;
+                fData[4] = value.M22;
+                fData[5] = value.M32;
+            }
 
             StateKey = unchecked(NextStateKey++);
         }
@@ -554,6 +626,18 @@ namespace Microsoft.Xna.Framework.Graphics
                 fData[6] = value.M31;
                 fData[7] = value.M32;
                 fData[8] = value.M33;
+            }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                var fData = (float[])Data;
+
+                fData[0] = value.M11;
+                fData[1] = value.M12;
+                fData[2] = value.M13;
+
+                fData[3] = value.M21;
+                fData[4] = value.M22;
+                fData[5] = value.M23;
             }
 
 			StateKey = unchecked(NextStateKey++);
@@ -653,6 +737,21 @@ namespace Microsoft.Xna.Framework.Graphics
                     fData[6] = value[i].M13;
                     fData[7] = value[i].M23;
                     fData[8] = value[i].M33;
+                }
+            }
+            else if (RowCount == 3 && ColumnCount == 2)
+            {
+                for (var i = 0; i < value.Length; i++)
+                {
+                    var fData = (float[])Elements[i].Data;
+
+                    fData[0] = value[i].M11;
+                    fData[1] = value[i].M21;
+                    fData[2] = value[i].M31;
+
+                    fData[3] = value[i].M12;
+                    fData[4] = value[i].M22;
+                    fData[5] = value[i].M32;
                 }
             }
 

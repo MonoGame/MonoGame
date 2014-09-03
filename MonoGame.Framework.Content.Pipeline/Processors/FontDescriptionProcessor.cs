@@ -75,7 +75,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					throw new Exception(string.Format("Could not load {0}", fontName));
 				}
 				var lineSpacing = 0f;
-				var glyphs = ImportFont(input, out lineSpacing, context, fontName);
+				int yOffsetMin = 0;
+				var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontName);
 
 				// Optimize.
 				foreach (Glyph glyph in glyphs)
@@ -83,33 +84,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 					GlyphCropper.Crop(glyph);
 				}
 
-				Bitmap outputBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
+                var systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs, true, true);
 
-				//outputBitmap.Save ("/Users/Jimmy/Desktop/Cocos2D-XNAImages/fontglyphs.png");
+				//systemBitmap.Save ("fontglyphs.png");
 
 				// Adjust line and character spacing.
 				lineSpacing += input.Spacing;
 				output.VerticalLineSpacing = (int)lineSpacing;
 
-				foreach (Glyph glyph in glyphs)
+				foreach (var glyph in glyphs)
 				{
-					glyph.XAdvance += input.Spacing;
-					if (!output.CharacterMap.Contains(glyph.Character))
-						output.CharacterMap.Add(glyph.Character);
-					output.Glyphs.Add(new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-                    output.Cropping.Add(new Rectangle(0, (int)(glyph.YOffset + glyphs.Select(x => x.YOffset).Max()), glyph.Subrect.Width, glyph.Subrect.Height));
-					ABCFloat abc = glyph.CharacterWidths;
-					output.Kerning.Add(new Vector3(abc.A, abc.B, abc.C));
+                    output.CharacterMap.Add(glyph.Character);
+
+					var texRect = new Rectangle(glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height);
+					output.Glyphs.Add(texRect);
+
+					var cropping = new Rectangle(0, (int)(glyph.YOffset - yOffsetMin), (int)glyph.XAdvance, output.VerticalLineSpacing);
+					output.Cropping.Add(cropping);
+
+					// Set the optional character kerning.
+					if (input.UseKerning)
+						output.Kerning.Add(new Vector3(glyph.CharacterWidths.A, glyph.CharacterWidths.B, glyph.CharacterWidths.C));
+					else
+						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-//				outputBitmap.Save("/Users/Jimmy/Desktop/Cocos2D-XNAImages/test.png");
-				output.Texture._bitmap = outputBitmap;
+                output.Texture.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap(true)));
+			    systemBitmap.Dispose();
 
-				var bitmapContent = new PixelBitmapContent<Color>(outputBitmap.Width, outputBitmap.Height);
-				bitmapContent.SetPixelData(outputBitmap.GetData());
-				output.Texture.Faces.Add(new MipmapChain(bitmapContent));
-
-            	GraphicsUtil.CompressTexture(output.Texture, context, false, false);
+                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
 			}
 			catch(Exception ex) {
 				context.Logger.LogImportantMessage("{0}", ex.ToString());
@@ -118,7 +121,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return output;
         }
 
-		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, ContentProcessorContext context, string fontName)
+		static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
 		{
 			// Which importer knows how to read this source font?
 			IFontImporter importer;
@@ -127,7 +130,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
 			string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
-			context.Logger.LogMessage ("Building Font {0}", fontName);
 
 			//			if (BitmapFileExtensions.Contains(fileExtension))
 			//			{
@@ -149,6 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			importer.Import(options, fontName);
 
 			lineSpacing = importer.LineSpacing;
+			yOffsetMin = importer.YOffsetMin;
 
 			// Get all glyphs
 			var glyphs = new List<Glyph>(importer.Glyphs);

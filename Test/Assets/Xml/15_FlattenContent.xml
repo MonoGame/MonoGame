@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="FlattenContent">
+  <Asset Type="MonoGame.Tests.ContentPipeline.FlattenContent">
     <Name>Shawn</Name>
     <IsEnglish>true</IsEnglish>
     <Boo>Hello</Boo>

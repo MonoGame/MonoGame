@@ -3,16 +3,17 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.IO;
-using System.Windows.Forms.Design;
+using FolderSelect;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tools.Pipeline
 {
+    /// <summary>
+    /// Wraps a PipelineProject object, defining its appearance within the windows specific IView (MainView).
+    /// </summary>
     internal class PipelineProjectProxy : IProjectItem
     {
         private readonly PipelineProject _project;
@@ -20,21 +21,27 @@ namespace MonoGame.Tools.Pipeline
         [Category("Settings")]
         [DisplayName("Output Folder")]
         [Description("The folder where the final build content is placed.")]
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string OutputDir
         {
             get { return _project.OutputDir; }
-            set { _project.OutputDir = value; }
+            set
+            {
+                _project.OutputDir = Util.GetRelativePath(value, _project.Location);
+            }
         }
 
         [Category("Settings")]
         [DisplayName("Intermediate Folder")]
         [Description("The folder where intermediate files are placed when building content.")]
-        [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        [Editor(typeof(FolderSelectEditor), typeof(UITypeEditor))]
         public string IntermediateDir
         {
             get { return _project.IntermediateDir; }
-            set { _project.IntermediateDir = value; }
+            set
+            {       
+                _project.IntermediateDir = Util.GetRelativePath(value, _project.Location);
+            }
         }
 
         [Category("Settings")]
@@ -47,6 +54,7 @@ namespace MonoGame.Tools.Pipeline
 
         [Category("Settings")]
         [Description("The platform to target when building content.")]
+        [TypeConverter(typeof(SortedEnumTypeConverter))]
         public TargetPlatform Platform
         {
             get { return _project.Platform; }
@@ -69,6 +77,15 @@ namespace MonoGame.Tools.Pipeline
             set { _project.Config = value; }
         }
 
+        [Category("Settings")]
+        [DisplayName("Compress")]
+        [Description("Content files can be compressed for smaller file sizes.")]
+        public bool Compress
+        {
+            get { return _project.Compress; }
+            set { _project.Compress = value; }
+        }
+
         [Category("Statistics")]
         [DisplayName("Total Items")]
         [Description("The total amount of content items in the project.")]
@@ -81,6 +98,12 @@ namespace MonoGame.Tools.Pipeline
         }
 
         #region IPipelineItem
+
+        [Browsable(false)]
+        public string OriginalPath
+        {
+            get { return _project.OriginalPath; }
+        }
 
         [Category("Common")]
         [Description("The name of this project.")]

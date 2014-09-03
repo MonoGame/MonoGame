@@ -131,9 +131,23 @@ namespace Microsoft.Xna.Framework.Media
             _volumeController.MasterVolume = _volume;
         }
 
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            _volumeController.Mute = _isMuted;
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return TimeSpan.Zero;
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

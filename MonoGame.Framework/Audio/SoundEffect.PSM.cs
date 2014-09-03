@@ -45,23 +45,14 @@ namespace Microsoft.Xna.Framework.Audio
             inst._soundPlayer = _audioBuffer.CreatePlayer();
         }
 
-        private static void PlatformSetMasterVolume()
+        private void PlatformDispose(bool disposing)
         {
-            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
-
-            // A little gross here, but there's
-            // no if(value == value) check in SFXInstance.Volume
-            // This'll allow the sound's current volume to be recalculated
-            // against SoundEffect.MasterVolume.
-            foreach (var sound in activeSounds)
-                sound.Volume = sound.Volume;
-        }
-
-        private void PlatformDispose()
-        {
-            _audioBuffer.Dispose();
-            
-            isDisposed = true;
+            if (disposing)
+            {
+                if (_audioBuffer != null)
+                    _audioBuffer.Dispose();
+            }
+            _audioBuffer = null;
         }
 
         internal static void PlatformShutdown()

@@ -19,7 +19,7 @@
     <Reference Include="System.Xml.Linq" />
 
 	<!-- Platform specific and special references! -->
-    <Reference Include="PipelineReferences" />
+    <Reference Include="Framework.Content.Pipeline.References" />
 
   </References>
 
@@ -151,6 +151,7 @@
     <Compile Include="Processors\TextureProcessorOutputFormat.cs" />
     <Compile Include="Processors\VertexBufferContent.cs" />
     <Compile Include="Processors\VertexDeclarationContent.cs" />
+    <Compile Include="Processors\VideoProcessor.cs" />
 
     <!-- TwoMGFX-->
     <Compile Include="..\Tools\2MGFX\CommandLineParser.cs">	
@@ -196,6 +197,10 @@
     <Compile Include="..\Tools\2MGFX\MarshalHelper.cs">
       <Platforms>Windows</Platforms>
       <Link>Processors\MGFX\MarshalHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Tools\2MGFX\ShaderCompilerException.cs">
+      <Platforms>Windows</Platforms>
+      <Link>Processors\MGFX\ShaderCompilerException.cs</Link>
     </Compile>
     <Compile Include="..\Tools\2MGFX\ShaderData.cs">
       <Platforms>Windows</Platforms>
@@ -268,7 +273,9 @@
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler -->
+    <Compile Include="Serialization\Compiler\AlphaTestEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ArrayWriter.cs" />
+    <Compile Include="Serialization\Compiler\BasicEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\BooleanWriter.cs" />
     <Compile Include="Serialization\Compiler\BoundingBoxWriter.cs" />
     <Compile Include="Serialization\Compiler\BoundingFrustumWriter.cs" />
@@ -287,8 +294,10 @@
     <Compile Include="Serialization\Compiler\DecimalWriter.cs" />
     <Compile Include="Serialization\Compiler\DictionaryWriter.cs" />
     <Compile Include="Serialization\Compiler\DoubleWriter.cs" />
+    <Compile Include="Serialization\Compiler\DualTextureEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\CompiledEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\EnumWriter.cs" />
+    <Compile Include="Serialization\Compiler\EnvironmentMapEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\ExternalReferenceWriter.cs" />
     <Compile Include="Serialization\Compiler\IndexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\Int16Writer.cs" />
@@ -303,8 +312,10 @@
     <Compile Include="Serialization\Compiler\QuaternionWriter.cs" />
     <Compile Include="Serialization\Compiler\RayWriter.cs" />
     <Compile Include="Serialization\Compiler\RectangleWriter.cs" />
+    <Compile Include="Serialization\Compiler\ReflectiveWriter.cs" />
     <Compile Include="Serialization\Compiler\SByteWriter.cs" />
     <Compile Include="Serialization\Compiler\SingleWriter.cs" />
+    <Compile Include="Serialization\Compiler\SkinnedEffectWriter.cs" />
     <Compile Include="Serialization\Compiler\SongContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
@@ -319,6 +330,45 @@
     <Compile Include="Serialization\Compiler\Vector4Writer.cs" />
     <Compile Include="Serialization\Compiler\VertexBufferWriter.cs" />
     <Compile Include="Serialization\Compiler\VertexDeclarationWriter.cs" />
+    <Compile Include="Serialization\Compiler\VideoWriter.cs" />
+
+
+    <!-- Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate -->
+    <Compile Include="Serialization\Intermediate\ArraySerializer.cs" />
+    <Compile Include="Serialization\Intermediate\BoolSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\CharSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ColorSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerAttribute.cs" />
+    <Compile Include="Serialization\Intermediate\ContentTypeSerializerT.cs" />
+    <Compile Include="Serialization\Intermediate\DictionarySerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\DoubleSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\ElementSerializerT.cs" />    
+    <Compile Include="Serialization\Intermediate\EnumSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\ExternalReferenceSerializer.cs" />    
+    <Compile Include="Serialization\Intermediate\FloatSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateReader.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\IntermediateWriter.cs" />
+    <Compile Include="Serialization\Intermediate\IntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\RectangleSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ReflectiveSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\SByteSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ShortSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\StringSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UIntSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\ULongSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\UShortSerializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector2Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector3Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\Vector4Serializer.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline -->
@@ -337,6 +387,7 @@
     <Compile Include="ExternalTool.cs" />
     <Compile Include="FbxImporter.cs" />
     <Compile Include="FontDescriptionImporter.cs" />
+    <Compile Include="H264Importer.cs" />
     <Compile Include="IContentImporter.cs" />
     <Compile Include="IContentProcessor.cs" />
     <Compile Include="InvalidContentException.cs" />
@@ -350,7 +401,6 @@
     <Compile Include="ProcessorParameterCollection.cs" />
     <Compile Include="TargetPlatform.cs" />
     <Compile Include="TextureImporter.cs" />
-    <Compile Include="Vector4TypeConverter.cs" />
     <Compile Include="VideoContent.cs" />
     <Compile Include="WavImporter.cs" />
     <Compile Include="WmaImporter.cs" />
@@ -358,6 +408,13 @@
     <Compile Include="XImporter.cs" />
     <Compile Include="XmlImporter.cs" />
 
+	<!-- Utility Classes -->
+    <Compile Include="Utilities\LZ4\LZ4Codec.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe32HC.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64.Dirty.cs" />
+    <Compile Include="Utilities\LZ4\LZ4Codec.Unsafe64HC.Dirty.cs" />
 
     <!-- Windows Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Windows\x64\nvtt.dll">
@@ -375,7 +432,7 @@
       <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\ThirdParty\Dependencies\libmojoshader_64.dll">
+    <None Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
       <Platforms>Windows</Platforms>
       <Link>libmojoshader_64.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -390,7 +447,16 @@
       <Link>FreeImage.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffmpeg.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe">
+      <Platforms>Windows</Platforms>
+      <Link>ffprobe.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Linux Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
@@ -428,7 +494,16 @@
       <Link>AssimpNet.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg">
+      <Platforms>Linux</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe">
+      <Platforms>Linux</Platforms>
+      <Link>ffprobe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
     <!-- Mac Additional Binaries -->
     <None Include="..\ThirdParty\Dependencies\NVTT\MacOS\libnvcore.dylib">
@@ -489,6 +564,16 @@
     <None Include="..\ThirdParty\Dependencies\assimp\libassimp.dylib">
       <Platforms>MacOS</Platforms>
       <Link>libassimp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg">
+      <Platforms>MacOS</Platforms>
+      <Link>ffmpeg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe">
+      <Platforms>MacOS</Platforms>
+      <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 

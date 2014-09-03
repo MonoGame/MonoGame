@@ -1,40 +1,19 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Text;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// Describe a 32-bit packed color.
+    /// Describes a 32-bit packed color.
     /// </summary>
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Color : IEquatable<Color>
     {
         static Color()
@@ -315,8 +294,8 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
-        
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -324,15 +303,18 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 16);
+                unchecked
+                {
+                    return (byte) (this._packedValue >> 16);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xff00ffff) | (uint)(value << 16);
+                this._packedValue = (this._packedValue & 0xff00ffff) | ((uint)value << 16);
             }
         }
-	
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the green component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -340,15 +322,18 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 8);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 8);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)(value << 8));
+                this._packedValue = (this._packedValue & 0xffff00ff) | ((uint)value << 8);
             }
         }
-	
-	/// <summary>
+
+        /// <summary>
         /// Gets or sets the red component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -356,7 +341,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue);
+                unchecked
+                {
+                    return (byte) this._packedValue;
+                }
             }
             set
             {
@@ -364,7 +352,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-	/// <summary>
+        /// <summary>
         /// Gets or sets the alpha component of <see cref="Color"/>.
         /// </summary>
         [DataMember]
@@ -372,11 +360,14 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return (byte)(this._packedValue >> 24);
+                unchecked
+                {
+                    return (byte)(this._packedValue >> 24);
+                }
             }
             set
             {
-                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)(value << 24));
+                this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)value << 24);
             }
         }
 		
@@ -404,11 +395,11 @@ namespace Microsoft.Xna.Framework
         {
             return !(a == b);
         }
-	
-	/// <summary>
-        /// Gets the hash code for <see cref="Color"/> instance.
+
+        /// <summary>
+        /// Gets the hash code of this <see cref="Color"/>.
         /// </summary>
-        /// <returns>Hash code of the object.</returns>
+        /// <returns>Hash code of this <see cref="Color"/>.</returns>
         public override int GetHashCode()
         {
             return this._packedValue.GetHashCode();
@@ -1710,7 +1701,8 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount">Interpolation factor.</param>
         /// <returns>Interpolated <see cref="Color"/>.</returns>
         public static Color Lerp(Color value1, Color value2, Single amount)
-        {		
+        {
+			amount = MathHelper.Clamp(amount, 0, 1);
             return new Color(   
                 (int)MathHelper.Lerp(value1.R, value2.R, amount),
                 (int)MathHelper.Lerp(value1.G, value2.G, amount),
@@ -1738,21 +1730,21 @@ namespace Microsoft.Xna.Framework
 	public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-        }		
+        }
 
-	/// <summary>
-        /// Converts <see cref="Color"/> to <see cref="Vector3"/>.
-        /// </summary>
-        /// <returns>Converted color.</returns>
+    /// <summary>
+    /// Gets a three-component <see cref="Vector3"/> representation for this object.
+    /// </summary>
+    /// <returns>A three-component <see cref="Vector3"/> representation for this object.</returns>
         public Vector3 ToVector3()
         {
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
         }
-	
-	/// <summary>
-        /// Converts <see cref="Color"/> to <see cref="Vector4"/>.
+
+        /// <summary>
+        /// Gets a four-component <see cref="Vector4"/> representation for this object.
         /// </summary>
-        /// <returns>Converted color.</returns>
+        /// <returns>A four-component <see cref="Vector4"/> representation for this object.</returns>
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
@@ -1767,11 +1759,27 @@ namespace Microsoft.Xna.Framework
             get { return _packedValue; }
             set { _packedValue = value; }
         }
-	
-	/// <summary>
-        /// Converts the color values of this instance to its equivalent string representation.
+
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.R.ToString(), "  ",
+                    this.G.ToString(), "  ",
+                    this.B.ToString(), "  ",
+                    this.A.ToString()
+                );
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Color"/> in the format:
+        /// {R:[red] G:[green] B:[blue] A:[alpha]}
         /// </summary>
-        /// <returns>The string representation of the color value of this instance.</returns>
+        /// <returns><see cref="String"/> representation of this <see cref="Color"/>.</returns>
 	public override string ToString ()
 	{
         StringBuilder sb = new StringBuilder(25);

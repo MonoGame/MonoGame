@@ -1,26 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Android.App;
 using Android.Content;
-using Android.Hardware;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
-using Android.Widget;
-
-using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
+#if OUYA
+    public class AndroidGameActivity : Ouya.Console.Api.OuyaActivity
+#else
     public class AndroidGameActivity : Activity
+#endif
     {
         internal Game Game { private get; set; }
 
         private ScreenReceiver screenReceiver;
+        private OrientationListener _orientationListener;
 
         public bool AutoPauseAndResumeMediaPlayer = true;
 
@@ -33,7 +33,8 @@ namespace Microsoft.Xna.Framework
 		/// </param>
 		protected override void OnCreate (Bundle savedInstanceState)
 		{
-			base.OnCreate (savedInstanceState);
+            RequestWindowFeature(WindowFeatures.NoTitle);
+            base.OnCreate(savedInstanceState);
 
 			IntentFilter filter = new IntentFilter();
 		    filter.AddAction(Intent.ActionScreenOff);
@@ -43,7 +44,7 @@ namespace Microsoft.Xna.Framework
 		    screenReceiver = new ScreenReceiver();
 		    RegisterReceiver(screenReceiver, filter);
 
-            RequestWindowFeature(WindowFeatures.NoTitle);
+            _orientationListener = new OrientationListener(this);
 
 			Game.Activity = this;
 		}
@@ -62,6 +63,8 @@ namespace Microsoft.Xna.Framework
             if (Paused != null)
                 Paused(this, EventArgs.Empty);
 
+            if (_orientationListener.CanDetectOrientation())
+                _orientationListener.Disable();
         }
 
         public static event EventHandler Resumed;
@@ -78,12 +81,15 @@ namespace Microsoft.Xna.Framework
                     return;
                 ((GraphicsDeviceManager)deviceManager).ForceSetFullScreen();
                 ((AndroidGameWindow)Game.Window).GameView.RequestFocus();
+                if (_orientationListener.CanDetectOrientation())
+                    _orientationListener.Enable();
             }
         }
 
 		protected override void OnDestroy ()
 		{
             UnregisterReceiver(screenReceiver);
+            _orientationListener = null;
             if (Game != null)
                 Game.Dispose();
             Game = null;

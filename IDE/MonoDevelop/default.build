@@ -34,13 +34,13 @@
       <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Win.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Win.sln /t:Build /p:Configuration=Release" />
       <if test="${directory::exists(mdtooldir)}">
-        <exec program="mdtool " basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\MonoDevelop.MonoGameContent.dll"/>
+        <exec program="mdtool " basedir="${mdtooldir}" workingdir="." commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\MonoDevelop.MonoGameContent.dll"/>
         <move file="MonoDevelop.MonoGameContent_3.0.0.mpack" todir="Windows" overwrite="true"/>
       </if>
       <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Linux.sln /t:Clean /p:Configuration=Release" />
       <exec program="msbuild " commandline="MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent.Linux.sln /t:Build /p:Configuration=Release" />
       <if test="${directory::exists(mdtooldir)}">
-        <exec program="mdtool " basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\Release\MonoDevelop.MonoGameContent.dll"/>
+        <exec program="mdtool " basedir="${mdtooldir}" workingdir="." commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\Release\MonoDevelop.MonoGameContent.dll"/>
         <move file="MonoDevelop.MonoGameContent_3.0.0.mpack" todir="Linux" overwrite="true"/>
       </if>
     </if>
@@ -48,13 +48,13 @@
       <exec program="xbuild " commandline="/t:Clean /p:Configuration=Release MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Linux.sln" />
       <exec program="xbuild " commandline="/t:Build /p:Configuration=Release MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Linux.sln" />
       <if test="${directory::exists(mdtooldir)}">
-        <exec program="mdtool " basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\MonoDevelop.MonoGameContent.dll"/>
+        <exec program="mdtool " basedir="${mdtooldir}" workingdir="." commandline="setup pack MonoDevelop.MonoGameContent\MonoDevelop.MonoGameContent\bin\MonoDevelop.MonoGameContent.dll"/>
       </if>
     </if>
     <if test="${os == 'MacOS'}">
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Clean -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="build -t:Build -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
-      <exec program="mdtool" basedir="${mdtooldir}" commandline="setup pack MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent/bin/Release/MonoDevelop.MonoGameContent.dll"/>
+      <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Build -c:Release  MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent.Mac.sln" />
+      <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="setup pack MonoDevelop.MonoGameContent/MonoDevelop.MonoGameContent/bin/Release/MonoDevelop.MonoGameContent.dll"/>
     </if>
   </target>
 

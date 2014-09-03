@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework.Media
         private MediaState _state;
         private Video _currentVideo;
         private float _volume = 1.0f;
+        private bool _isLooped = false;
+        private bool _isMuted = false;
 
         #endregion
 
@@ -22,20 +24,39 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets a value that indicates whether the object is disposed.
         /// </summary>
-        // NOTE:, this always returns false because at the moment,
-        // no implementations of VideoPlayer are using
-        // resources that need to be disposed.
-        public bool IsDisposed { get { return false; } }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
         /// Gets a value that indicates whether the player is playing video in a loop.
         /// </summary>
-        public bool IsLooped { get; set; }
+        public bool IsLooped
+        {
+            get { return _isLooped; }
+            set
+            {
+                if (_isLooped == value)
+                    return;
+
+                _isLooped = value;
+                PlatformSetIsLooped();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the muted setting for the video player.
         /// </summary>
-        public bool IsMuted { get; set; }
+        public bool IsMuted
+        {
+            get { return _isMuted; }
+            set
+            {
+                if (_isMuted == value)
+                    return;
+
+                _isMuted = value;
+                PlatformSetIsMuted();
+            }
+        }
 
         /// <summary>
         /// Gets the play position within the currently playing video.
@@ -193,8 +214,17 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public void Dispose()
         {
-            // Note Currently a no-p,
-            // as no implementations have any disposable resources yet.
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                PlatformDispose(disposing);
+                IsDisposed = true;
+            }
         }
 
         #endregion

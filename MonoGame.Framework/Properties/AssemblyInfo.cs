@@ -44,6 +44,10 @@ using System.Resources;
 // Allow the content pipeline assembly to access 
 // some of our internal helper methods that it needs.
 [assembly: InternalsVisibleTo("MonoGame.Framework.Content.Pipeline")]
+[assembly: InternalsVisibleTo("MonoGame.Framework.Net")]
+
+//Tests projects need access too
+[assembly: InternalsVisibleTo("MonoGameTests")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

@@ -648,9 +648,10 @@ namespace TwoMGFX
         }
 
 
-        static public EffectObject FromShaderInfo(ShaderInfo shaderInfo)
+        static public EffectObject CompileEffect(ShaderInfo shaderInfo, out string errorsAndWarnings)
         {
             var effect = new EffectObject();
+            errorsAndWarnings = string.Empty;
 
             // These are filled out as we process stuff.
             effect.ConstantBuffers = new List<ConstantBufferData>();
@@ -687,13 +688,13 @@ namespace TwoMGFX
                     if (!string.IsNullOrEmpty(pinfo.psFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.psFunction, pinfo.psModel, false, ref errorsAndWarnings);
                     }
 
                     if (!string.IsNullOrEmpty(pinfo.vsFunction))
                     {
                         pass.state_count += 1;
-                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true);
+                        tempstate[pass.state_count - 1] = effect.CreateShader(shaderInfo, pinfo.vsFunction, pinfo.vsModel, true, ref errorsAndWarnings);
                     }
 
                     pass.states = new d3dx_state[pass.state_count];
@@ -791,7 +792,7 @@ namespace TwoMGFX
         }
 
 
-        private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader)
+        private d3dx_state CreateShader(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
         {
             // Compile the shader.
             byte[] bytecode;
@@ -799,10 +800,10 @@ namespace TwoMGFX
             {
                 // For now GLSL is only supported via translation
                 // using MojoShader which works from HLSL bytecode.                
-                bytecode = CompileHLSL(shaderInfo, shaderFunction, shaderProfile);
+                bytecode = CompileHLSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
             }
             else if (shaderInfo.Profile == ShaderProfile.PlayStation4)
-                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile);
+                bytecode = CompilePSSL(shaderInfo, shaderFunction, shaderProfile, ref errorsAndWarnings);
             else
                 throw new NotSupportedException("Unknown shader profile!");
 

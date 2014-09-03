@@ -15,7 +15,7 @@ namespace MonoGame.Framework
         where T : Game, new()
     {
         /// <summary>
-        /// Creates your Game class initializing it to worth within a XAML application window.
+        /// Creates your Game class initializing it to work within a XAML application window.
         /// </summary>
         /// <param name="launchParameters">The command line arguments from launch.</param>
         /// <param name="window">The core window object.</param>

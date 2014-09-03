@@ -3,11 +3,19 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
     interface IController
     {
+        /// <summary>
+        /// Types of content which can be created and added to a project. 
+        /// </summary>
+        IEnumerable<ContentItemTemplate> Templates { get; }
+
+        Selection Selection { get; }
+
         /// <summary>
         /// True if there is a project.
         /// </summary>
@@ -16,12 +24,22 @@ namespace MonoGame.Tools.Pipeline
         /// <summary>
         /// True if the project has unsaved changes.
         /// </summary>
-        bool ProjectDiry { get; }
+        bool ProjectDirty { get; }
 
         /// <summary>
         /// True if the project is actively building.
         /// </summary>
         bool ProjectBuilding { get; }
+
+        /// <summary>
+        /// Passes /launchdebugger option when launching MGCB.
+        /// </summary>
+        bool LaunchDebugger { get; set; }
+
+        /// <summary>
+        /// The view this controller is attached to.
+        /// </summary>
+        IView View { get; set; }
 
         /// <summary>
         /// Triggered when the project starts loading.
@@ -64,13 +82,15 @@ namespace MonoGame.Tools.Pipeline
 
         void OpenProject();
 
+        void OpenProject(string projectFilePath);
+
         void CloseProject();
 
         bool SaveProject(bool saveAs);
-
-        void OnTreeSelect(IProjectItem item);
         
         void Build(bool rebuild);
+
+        void RebuildItems(IEnumerable<IProjectItem> items);
 
         void Clean();
 
@@ -78,8 +98,34 @@ namespace MonoGame.Tools.Pipeline
 
         bool Exit();
 
+        #region ContentItem
+
         void Include(string initialDirectory);
 
-        void Exclude(ContentItem item);        
+        void Exclude(IEnumerable<ContentItem> items);        
+
+        void NewItem(string name, string location, ContentItemTemplate template);
+
+        void AddAction(IProjectAction action);
+
+        IProjectItem GetItem(string originalPath);
+
+        #endregion
+
+        #region Undo, Redo
+
+        event CanUndoRedoChanged OnCanUndoRedoChanged;
+
+        bool CanRedo { get; }
+
+        bool CanUndo { get; }
+
+        void Undo();
+
+        void Redo();
+
+        #endregion        
+
+        string GetFullPath(string filePath);
     }
 }

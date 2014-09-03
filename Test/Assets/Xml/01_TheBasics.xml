@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XnaContent>
-  <Asset Type="TheBasics">
+  <Asset Type="MonoGame.Tests.ContentPipeline.TheBasics">
     <GetSetProperty>Hello World</GetSetProperty>
     <PublicField>1</PublicField>
     <Nested>

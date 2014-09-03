@@ -4,21 +4,53 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Audio;
 using MonoTouch.Foundation;
 using MonoTouch.AVFoundation;
+using MonoTouch.MediaPlayer;
+using MonoTouch.CoreMedia;
 
 namespace Microsoft.Xna.Framework.Media
 {
-    public sealed partial class Song : IEquatable<Song>, IDisposable
+    public sealed partial class Song
     {
-        private AVAudioPlayer _sound;
+        private Album album;
+        private Artist artist;
+        private Genre genre;
+        private string title;
+        private TimeSpan duration;
+        private MPMediaItem mediaItem;
+        private AVPlayerItem _sound;
+        private AVPlayer _player;
+        private NSUrl assetUrl;
+        private NSObject playToEndObserver;
+
+        internal Song(Album album, Artist artist, Genre genre, string title, TimeSpan duration, MPMediaItem mediaItem, NSUrl assetUrl)
+        {
+            this.album = album;
+            this.artist = artist;
+            this.genre = genre;
+            this.title = title;
+            this.duration = duration;
+            this.mediaItem = mediaItem;
+            this.assetUrl = assetUrl;
+        }
 
         private void PlatformInitialize(string fileName)
         {
-            _sound = AVAudioPlayer.FromUrl(NSUrl.FromFilename(fileName));
-			_sound.NumberOfLoops = 0;
-            _sound.FinishedPlaying += OnFinishedPlaying;
+            this.PlatformInitialize(NSUrl.FromFilename(fileName));
+        }
+
+        private void PlatformInitialize(NSUrl url)
+        {
+            _sound = AVPlayerItem.FromUrl(url);
+            _player = AVPlayer.FromPlayerItem(_sound);
+            playToEndObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(OnFinishedPlaying);
+        }
+
+        [CLSCompliant(false)]
+        public Song(NSUrl url)
+        {
+            PlatformInitialize(url);
         }
 
         private void PlatformDispose(bool disposing)
@@ -26,18 +58,20 @@ namespace Microsoft.Xna.Framework.Media
             if (_sound == null)
                 return;
                 
-            _sound.FinishedPlaying -= OnFinishedPlaying;
+            playToEndObserver.Dispose ();
+            playToEndObserver = null;
+
             _sound.Dispose();
-            
             _sound = null;
+
+            _player.Dispose();
+            _player = null;
         }
 
-		internal void OnFinishedPlaying (object sender, EventArgs args)
+        internal void OnFinishedPlaying (object sender, NSNotificationEventArgs args)
 		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
+			if (DonePlaying != null)
+			    DonePlaying(sender, args);
 		}
 
 		/// <summary>
@@ -53,8 +87,14 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal void Play()
 		{	
-			if ( _sound == null )
-				return;
+            if (_player == null)
+            {
+                // MediaLibrary items are lazy loaded
+                if (assetUrl != null)
+                    this.PlatformInitialize (assetUrl);
+                else
+                    return;
+            }
 
             PlatformPlay();
 
@@ -63,16 +103,15 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformPlay()
         {
-            // AVAudioPlayer sound.Stop() does not reset the playback position as XNA does.
-            // Set Play's currentTime to 0 to ensure playback at the start.
-            _sound.CurrentTime = 0.0;
+            // Seek to start to ensure playback at the start.
+            _player.Seek(CMTime.Zero);
             
-            _sound.Play();
+            _player.Play();
         }
 
 		internal void Resume()
 		{
-			if (_sound == null)
+            if (_player == null)
 				return;
 
             PlatformResume();
@@ -80,23 +119,23 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformResume()
         {
-			_sound.Play();
+			_player.Play();
         }
 		
 		internal void Pause()
 		{			            
-			if ( _sound == null )
+            if (_player == null)
 				return;
 			
-			_sound.Pause();
+            _player.Pause();
         }
 		
 		internal void Stop()
 		{
-			if ( _sound == null )
+            if (_player == null)
 				return;
 			
-			_sound.Stop();
+            _player.Pause();
 			_playCount = 0;
 		}
 
@@ -104,16 +143,16 @@ namespace Microsoft.Xna.Framework.Media
 		{
 			get
 			{
-				if (_sound != null)
-					return _sound.Volume;
+                if (_player != null)
+                    return _player.Volume;
 				else
 					return 0.0f;
 			}
 			
 			set
 			{
-				if ( _sound != null && _sound.Volume != value )
-					_sound.Volume = value;
+                if ( _player != null && _player.Volume != value )
+                    _player.Volume = value;
 			}			
 		}
 
@@ -121,9 +160,69 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                // TODO: Implement
-                return new TimeSpan(0);				
+                return TimeSpan.FromSeconds(_player.CurrentTime.Seconds);		
             }
+            set
+            {
+                _player.Seek(CMTime.FromSeconds(value.TotalSeconds, 1000));
+            }
+        }
+
+        private Album PlatformGetAlbum()
+        {
+            return this.album;
+        }
+
+        private Artist PlatformGetArtist()
+        {
+            return this.artist;
+        }
+
+        private Genre PlatformGetGenre()
+        {
+            return this.genre;
+        }
+
+        private TimeSpan PlatformGetDuration()
+        {
+            if (this.mediaItem != null)
+                return this.duration;
+
+            if (_sound != null)
+                return TimeSpan.FromSeconds(_sound.Asset.Duration.Seconds);
+
+
+            return _duration;
+        }
+
+        private bool PlatformIsProtected()
+        {
+            return false;
+        }
+
+        private bool PlatformIsRated()
+        {
+            return false;
+        }
+
+        private string PlatformGetName()
+        {
+            return this.title ?? Path.GetFileNameWithoutExtension(_name);
+        }
+
+        private int PlatformGetPlayCount()
+        {
+            return _playCount;
+        }
+
+        private int PlatformGetRating()
+        {
+            return 0;
+        }
+
+        private int PlatformGetTrackNumber()
+        {
+            return 0;
         }
     }
 }

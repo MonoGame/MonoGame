@@ -13,10 +13,20 @@ namespace Microsoft.Xna.Framework.Media
 		private static int _numSongsInQueuePlayed = 0;
 		private static MediaState _state = MediaState.Stopped;
 		private static float _volume = 1.0f;
-		private static bool _isMuted = false;
+		private static bool _isMuted;
+        private static bool _isRepeating;
+        private static bool _isShuffled;
 		private static readonly MediaQueue _queue = new MediaQueue();
 
+        // Playing music using XNA, we shouldn't fire extra state changed events
+#if WINDOWS_PHONE
+        private static bool playingInternal;
+#else
+        private const bool playingInternal = false;
+#endif
+
 		public static event EventHandler<EventArgs> ActiveSongChanged;
+        public static event EventHandler<EventArgs> MediaStateChanged;
 
         static MediaPlayer()
         {
@@ -29,61 +39,45 @@ namespace Microsoft.Xna.Framework.Media
 		
 		public static bool IsMuted
         {
-            get { return _isMuted; }
-            set
-            {
-				_isMuted = value;
-
-                PlatformSetIsMuted();
-            }
+            get { return PlatformGetIsMuted(); }
+            set { PlatformSetIsMuted(value); }
         }
-
-        private static bool _isRepeating;
 
         public static bool IsRepeating 
         {
-            get
-            {
-                return _isRepeating;
-            }
-
-            set
-            {
-                _isRepeating = value;
-
-                // RAYB: At the moment, is a no-op on most platforms
-#if WINDOWS_MEDIA_ENGINE
-                PlatformSetIsRepeating();
-#endif
-            }
+            get { return PlatformGetIsRepeating(); }
+            set { PlatformSetIsRepeating(value); }
         }
 
-        public static bool IsShuffled { get; set; }
+        public static bool IsShuffled
+        {
+            get { return PlatformGetIsShuffled(); }
+            set { PlatformSetIsShuffled(value); }
+        }
 
         public static bool IsVisualizationEnabled { get { return false; } }
 
         public static TimeSpan PlayPosition
         {
-            get
-            {
-                return PlatformGetPlayPosition();
-            }
+            get { return PlatformGetPlayPosition(); }
+#if IOS
+            set { PlatformSetPlayPosition(value); }
+#endif
         }
 
         public static MediaState State
         {
-            get { return _state; }
+            get { return PlatformGetState(); }
             private set
             {
                 if (_state != value)
                 {
                     _state = value;
-                    if (MediaStateChanged != null)
-                        MediaStateChanged (null, EventArgs.Empty);
+                    if (MediaStateChanged != null && !playingInternal)
+                        MediaStateChanged(null, EventArgs.Empty);
                 }
             }
         }
-        public static event EventHandler<EventArgs> MediaStateChanged;
 
         public static bool GameHasControl
         {
@@ -96,12 +90,12 @@ namespace Microsoft.Xna.Framework.Media
 
         public static float Volume
         {
-            get { return _volume; }
+            get { return PlatformGetVolume(); }
             set
             {
-                _volume = MathHelper.Clamp(value, 0, 1);
+                var volume = MathHelper.Clamp(value, 0, 1);
 
-                PlatformSetVolume();
+                PlatformSetVolume(volume);
             }
         }
 
@@ -122,13 +116,17 @@ namespace Microsoft.Xna.Framework.Media
 		/// Playback starts immediately at the beginning of the song.
 		/// </summary>
         public static void Play(Song song)
-        {                        
+        {
+            var previousSong = _queue.Count > 0 ? _queue[0] : null;
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
 			_queue.ActiveSongIndex = 0;
             
             PlaySong(song);
+
+            if (previousSong != song && ActiveSongChanged != null)
+                ActiveSongChanged.Invoke(null, EventArgs.Empty);
         }
 		
 		public static void Play(SongCollection collection, int index = 0)

@@ -7,33 +7,42 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.IsolatedStorage;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace MonoGame.Tools.Pipeline
-{
+{    
     partial class MainView : Form, IView, IProjectObserver
     {
+        // The project which will be opened as soon as a controller is attached.
+        // Is used when PipelineTool is launched to open a project, provided by the command line.
+        public string OpenProjectPath;
+
         private IController _controller;
         private ImageList _treeIcons;
-        private ContextMenuStrip _contextMenu;
 
         private bool _treeUpdating;
-        private bool _treeSort;
+        private bool _treeSort;        
 
         private const int ContentItemIcon = 0;
         private const int FolderOpenIcon = 1;
         private const int FolderClosedIcon = 2;
-        private const int ProjectIcon = 3;
-        private const string ContextMenuInclude = "Add";
-        private const string ContextMenuExclude = "Remove";
+        private const int ProjectIcon = 3;        
 
         private const string MonoGameContentProjectFileFilter = "MonoGame Content Build Files (*.mgcb)|*.mgcb";
         private const string XnaContentProjectFileFilter = "XNA Content Projects (*.contentproj)|*.contentproj";
 
+        public static MainView Form { get; private set; }
 
         public MainView()
         {            
             InitializeComponent();
+
+            // Set the application icon this form.
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
@@ -44,51 +53,92 @@ namespace MonoGame.Tools.Pipeline
                     break;               
             }
 
+            _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
+
             _treeIcons = new ImageList();
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
             _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
+            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.font.png")));
             
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
             _treeView.BeforeCollapse += TreeViewOnBeforeCollapse;
             _treeView.NodeMouseClick += TreeViewOnNodeMouseClick;
+            _treeView.NodeMouseDoubleClick += TreeViewOnNodeMouseDoubleClick;
 
-            _contextMenu = new ContextMenuStrip();
-            _contextMenu.ItemClicked += OnContextMenuItemClicked;
+            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
-            _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;            
+            Form = this;
         }
 
-        private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        public void Attach(IController controller)
         {
-            if (e.ChangedItem.Label == "References")
+            _controller = controller;
+            _controller.View = this;
+
+            var updateMenus = new Action(UpdateMenus);
+            var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
+
+            _controller.OnBuildStarted += invokeUpdateMenus;
+            _controller.OnBuildFinished += invokeUpdateMenus;
+            _controller.OnProjectLoading += invokeUpdateMenus;
+            _controller.OnProjectLoaded += invokeUpdateMenus;
+
+            var updateUndoRedo = new CanUndoRedoChanged(UpdateUndoRedo);
+            var invokeUpdateUndoRedo = new CanUndoRedoChanged((u, r) => Invoke(updateUndoRedo, u, r));
+
+            _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
+            _controller.Selection.Modified += OnSelectionModified;
+        }
+
+        private void OnSelectionModified(Selection selection, object sender)
+        {
+            if (sender == this)
+                return;
+
+            _treeView.SelectedNodes = _controller.Selection.Select(FindNode);
+        }
+
+        private TreeNode FindNode(IProjectItem projectItem)
+        {
+            foreach (var n in _treeView.AllNodes())
+            {
+                var i = n.Tag as IProjectItem;
+                if (i.OriginalPath == projectItem.OriginalPath)
+                    return n;                
+            }
+
+            return null;
+        }
+
+        private void OnPropertyGridPropertyValueChanged(object s, PropertyValueChangedEventArgs args)
+        {
+            if (args.ChangedItem.Label == "References")
                 _controller.OnReferencesModified();
+
+            // TODO: This is the multi-select case which needs to be handled somehow to support undo.
+            if (args.OldValue == null)
+                return;
+
+            var obj = _propertyGrid.SelectedObject;
+
+            if (obj is ContentItem)
+            {
+                var item = obj as ContentItem;
+                var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
+            }
             else
             {
-                if (_propertyGrid.SelectedObject is ContentItem)
-                    _controller.OnItemModified(_propertyGrid.SelectedObject as ContentItem);
-                else
-                    _controller.OnProjectModified();
-            }
-        }
+                var item = (PipelineProject)_controller.GetItem((obj as PipelineProjectProxy).OriginalPath);
+                var action = new UpdateProjectAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
+                _controller.AddAction(action);
 
-        private void OnContextMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            switch (e.ClickedItem.Text)
-            {
-                case ContextMenuInclude:
-                    {
-                        _controller.Include((e.ClickedItem.Tag as IProjectItem).Location);                        
-                    } break;
-                case ContextMenuExclude:
-                    {
-                        _controller.Exclude(e.ClickedItem.Tag as ContentItem);                        
-                    } break;                
-                default:
-                    throw new Exception(string.Format("Unhandled menu item text={0}", e.ClickedItem.Text));
-            }
+                _controller.OnProjectModified();
+            }                
         }
 
         private void TreeViewOnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -103,43 +153,45 @@ namespace MonoGame.Tools.Pipeline
                 var node = _treeView.GetNodeAt(p);
                 if (node != null)
                 {
-                    // Select the node the user has clicked.
-                    _treeView.SelectedNode = node;
+                    if (!_treeView.SelectedNodes.Contains(node))
+                    {
+                        _treeView.SelectedNode = node;
+                    }
 
                     if (node.Tag is ContentItem)
                     {
-                        _contextMenu.Items.Clear();
-
-                        var item = _contextMenu.Items.Add(ContextMenuExclude);                        
-                        item.Tag = node.Tag;
-
-                        _contextMenu.Show(_treeView, p);
+                        _treeAddItemMenuItem.Visible = false;
+                        _treeNewItemMenuItem.Visible = false;
                     }
                     else
                     {
-                        _contextMenu.Items.Clear();
+                        _treeAddItemMenuItem.Visible = true;
+                        _treeNewItemMenuItem.Visible = true;
+                    }
 
-                        var item = _contextMenu.Items.Add(ContextMenuInclude);
-                        item.Tag = node.Tag;
+                    if (node.Tag is FolderItem)
+                    {
+                        _treeOpenFileMenuItem.Visible = false;
+                    }
+                    else
+                    {
+                        _treeOpenFileMenuItem.Visible = true;
+                    }
 
-                        _contextMenu.Show(_treeView, p); 
-                    }                   
+                    _treeContextMenu.Show(_treeView, p);
                 }
             }
         }
 
-        //public event SelectionChanged OnSelectionChanged;
-
-        public void Attach(IController controller)
+        private void TreeViewOnNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs args)
         {
-            _controller = controller;
+            // Even though we support 'Open File' as an action on the root (PipelineProject)
+            // double clicking on it toggles whether it is expanded. 
+            // So if you want to open it just use the menu.
+            if (!(args.Node.Tag is ContentItem))
+                return;
 
-            // Make sure build and project trigger updates to all the menu items.
-            Action activate = delegate { this.Invoke(new MethodInvoker(UpdateMenus)); };
-            _controller.OnBuildStarted += activate;
-            _controller.OnBuildFinished += activate;
-            _controller.OnProjectLoading += activate;
-            _controller.OnProjectLoaded += activate;
+            ContextMenu_OpenFile_Click(sender, args);            
         }
 
         public AskResult AskSaveOrCancel()
@@ -281,6 +333,8 @@ namespace MonoGame.Tools.Pipeline
             node.ImageIndex = ContentItemIcon;
             node.SelectedImageIndex = ContentItemIcon;
 
+            _treeView.SelectedNode = node;
+
             root.Expand();
         }
 
@@ -289,8 +343,34 @@ namespace MonoGame.Tools.Pipeline
             Debug.Assert(_treeUpdating, "Must call BeginTreeUpdate() first!");
 
             var node = _treeView.AllNodes().Find(f => f.Tag == item);
-            if (node != null)
-                _treeView.Nodes.Remove(node);
+            if (node == null)
+                return;
+
+            var parent = node.Parent;
+            node.Remove();
+
+            {
+                var obj = _propertyGrid.SelectedObject as ContentItem;
+                if (obj != null && obj.OriginalPath == item.OriginalPath)
+                    _propertyGrid.SelectedObject = null;
+            }
+
+            // Clean up the parent nodes without children
+            // and be sure not to delete the root node.
+            while (parent != null && parent.Parent != null && parent.Nodes.Count == 0)
+            {
+                var parentParent = parent.Parent;
+
+                parent.Remove();
+
+                {
+                    var obj = _propertyGrid.SelectedObject as ContentItem;
+                    if (obj != null && obj.OriginalPath == item.OriginalPath)
+                        _propertyGrid.SelectedObject = null;
+                }
+
+                parent = parentParent;
+            }            
         }
 
         public void SelectTreeItem(IProjectItem item)
@@ -346,10 +426,14 @@ namespace MonoGame.Tools.Pipeline
 
         public void UpdateProperties(IProjectItem item)
         {
-            if (_propertyGrid.SelectedObject == item)
+            foreach (var obj in _controller.Selection)
             {
-                _propertyGrid.Refresh();
-                _propertyGrid.ExpandAllGridItems();
+                if (obj.OriginalPath.Equals(item.OriginalPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    _propertyGrid.Refresh();
+                    _propertyGrid.ExpandAllGridItems();
+                    break;
+                }
             }
         }
 
@@ -396,12 +480,7 @@ namespace MonoGame.Tools.Pipeline
         public void OutputClear()
         {
             _outputWindow.Clear();
-        }
-
-        private void NewMenuItemClick(object sender, System.EventArgs e)
-        {
-            _controller.NewProject();
-        }
+        }        
 
         private void ExitMenuItemClick(object sender, System.EventArgs e)
         {
@@ -409,9 +488,19 @@ namespace MonoGame.Tools.Pipeline
                 Application.Exit();
         }
 
-        private void CloseMenuItem_Click(object sender, EventArgs e)
+        private void MainView_Load(object sender, EventArgs e)
         {
-            _controller.CloseProject();
+            //Priority is given to any command line arguments.
+            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+            {
+                OpenProjectPath = History.Default.ProjectHistory.Last();
+            }
+            
+            if (!string.IsNullOrEmpty(OpenProjectPath))
+            {
+                _controller.OpenProject(OpenProjectPath);
+                OpenProjectPath = null;
+            }
         }
 
         private void MainView_FormClosing(object sender, FormClosingEventArgs e)
@@ -421,26 +510,50 @@ namespace MonoGame.Tools.Pipeline
                 if (!_controller.Exit())
                     e.Cancel = true;
             }
-        }
+        }        
 
-        private void SaveMenuItemClick(object sender, System.EventArgs e)
+        private void OnNewProjectClick(object sender, EventArgs e)
         {
-            _controller.SaveProject(false);
+            _controller.NewProject();
         }
 
-        private void SaveAsMenuItemClick(object sender, System.EventArgs e)
+        private void OnImportProjectClick(object sender, EventArgs e)
         {
-            _controller.SaveProject(true);
+            _controller.ImportProject();
         }
 
-        private void OpenMenuItemClick(object sender, System.EventArgs e)
+        private void OnOpenProjectClick(object sender, System.EventArgs e)
         {
             _controller.OpenProject();
         }
 
-        private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
+        private void OnCloseProjectClick(object sender, EventArgs e)
         {
-            _controller.OnTreeSelect(e.Node.Tag as IProjectItem);
+            _controller.CloseProject();
+        }
+
+        private void OnSaveProjectClick(object sender, System.EventArgs e)
+        {
+            _controller.SaveProject(false);
+        }
+
+        private void OnSaveAsProjectClick(object sender, System.EventArgs e)
+        {
+            _controller.SaveProject(true);
+        }
+
+        private void TreeViewAfterSelect(object sender, TreeViewEventArgs e)
+        {            
+            _controller.Selection.Clear(this);
+            _propertyGrid.SelectedObject = null;
+
+            foreach (var node in _treeView.SelectedNodes)
+            {
+                _controller.Selection.Add(node.Tag as IProjectItem, this);
+            }
+
+            _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            _propertyGrid.ExpandAllGridItems();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
@@ -465,28 +578,32 @@ namespace MonoGame.Tools.Pipeline
 
         private void BuildMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Build(false);
         }
 
-        private void RebuilMenuItemClick(object sender, EventArgs e)
+        private void RebuildMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Build(true);
+        }
+
+        private void RebuildItemsMenuItemClick(object sender, EventArgs e)
+        {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
+            _controller.RebuildItems(_treeView.GetSelectedContentItems());
         }
 
         private void CleanMenuItemClick(object sender, EventArgs e)
         {
+            _controller.LaunchDebugger = _debuggerMenuItem.Checked;
             _controller.Clean();
         }
 
         private void CancelBuildMenuItemClick(object sender, EventArgs e)
         {
             _controller.CancelBuild();
-        }
-
-        private void ImportMenuItem_Click(object sender, EventArgs e)
-        {
-            _controller.ImportProject();
-        }
+        }        
 
         private void TreeViewOnBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
@@ -506,7 +623,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void _mainMenu_MenuActivate(object sender, EventArgs e)
+        private void MainMenuMenuActivate(object sender, EventArgs e)
         {
             UpdateMenus();
         }
@@ -519,11 +636,11 @@ namespace MonoGame.Tools.Pipeline
 
             // Update the state of all menu items.
 
-            _newMenuItem.Enabled = notBuilding;
-            _openMenuItem.Enabled = notBuilding;
-            _importMenuItem.Enabled = notBuilding;
+            _newProjectMenuItem.Enabled = notBuilding;
+            _openProjectMenuItem.Enabled = notBuilding;
+            _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 
@@ -534,23 +651,37 @@ namespace MonoGame.Tools.Pipeline
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
+
+            _treeRebuildMenuItem.Enabled = _rebuildMenuItem.Enabled = projectOpenAndNotBuilding;
+            _rebuildMenuItem.Enabled = _treeRebuildMenuItem.Enabled;
+
             _cleanMenuItem.Enabled = projectOpenAndNotBuilding;
-            _rebuilMenuItem.Enabled = projectOpenAndNotBuilding;
             _cancelBuildSeparator.Visible = !notBuilding;
             _cancelBuildMenuItem.Enabled = !notBuilding;
             _cancelBuildMenuItem.Visible = !notBuilding;
+      
+            UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+        }
+        
+        private void UpdateUndoRedo(bool canUndo, bool canRedo)
+        {
+            _undoMenuItem.Enabled = canUndo;
+            _redoMenuItem.Enabled = canRedo;
         }
 
-        private void DeleteMenuItem_Click(object sender, EventArgs e)
+        private void OnDeleteItemClick(object sender, EventArgs e)
         {
-            if (_treeView.SelectedNode == null)
-                return;
+            var items = new List<ContentItem>();
+            var nodes = _treeView.SelectedNodesRecursive;
 
-            var item = _treeView.SelectedNode.Tag as ContentItem;
-            if (item == null)
-                return;
+            foreach (var node in nodes)
+            {
+                var item = node.Tag as ContentItem;
+                if (item != null && !items.Contains(item))
+                    items.Add(item);                    
+            }
 
-            _controller.Exclude(item);
+            _controller.Exclude(items);      
         }
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
@@ -563,11 +694,82 @@ namespace MonoGame.Tools.Pipeline
             Process.Start("http://www.monogame.net/about/");
         }
 
-        private void AddMenuItemClick(object sender, EventArgs e)
+        private void OnAddItemClick(object sender, EventArgs e)
         {
             var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
             var item = node.Tag as IProjectItem;
             _controller.Include(item.Location);
+        }
+
+        private void OnNewItemClick(object sender, System.EventArgs e)
+        {
+            var dlg = new NewContentDialog(_controller.Templates);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                var template = dlg.SelectedTemplate;
+                var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
+                _controller.NewItem(dlg.ContentName, location, template);
+            }
+        }
+
+        private void OnRedoClick(object sender, EventArgs e)
+        {
+            _controller.Redo();
+        }
+
+        private void OnUndoClick(object sender, EventArgs e)
+        {
+            _controller.Undo();
+        }
+
+        private void ContextMenu_OpenFile_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath))
+            {
+                Process.Start(filePath);
+            }
+        }
+
+        private void ContextMenu_OpenFileLocation_Click(object sender, EventArgs e)
+        {
+            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            filePath = _controller.GetFullPath(filePath);
+
+            if (File.Exists(filePath) || Directory.Exists(filePath))
+            {
+                Process.Start("explorer.exe", "/select, " + filePath);
+
+            }
+        }
+
+        // http://stackoverflow.com/a/3955553/168235
+        #region Custom Word-Wrapping (Output Window)
+        
+        const uint EM_SETWORDBREAKPROC = 0x00D0;
+
+        [DllImport("user32.dll")]
+        extern static IntPtr SendMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
+
+        delegate int EditWordBreakProc(IntPtr text, int pos_in_text, int bCharSet, int action);
+
+        event EditWordBreakProc WordWrapCallbackEvent;
+        
+        private int WordWrapCallback(IntPtr text, int pos_in_text, int bCharSet, int action)
+        {
+            return 0;
+        }
+        #endregion
+
+        private void MainView_Shown(object sender, EventArgs e)
+        {
+            WordWrapCallbackEvent = new EditWordBreakProc(WordWrapCallback);
+
+            IntPtr ptr_func = Marshal.GetFunctionPointerForDelegate(WordWrapCallbackEvent);
+
+            SendMessage(_outputWindow.Handle, EM_SETWORDBREAKPROC, IntPtr.Zero, ptr_func);
         }
     }
 }

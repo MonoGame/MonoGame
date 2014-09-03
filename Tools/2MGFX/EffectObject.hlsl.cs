@@ -5,7 +5,7 @@ namespace TwoMGFX
 {
     partial class EffectObject
     {
-        private static byte[] CompileHLSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile)
+        private static byte[] CompileHLSL(ShaderInfo shaderInfo, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
         {
             SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
             try
@@ -32,24 +32,28 @@ namespace TwoMGFX
 
                 // Compile the shader into bytecode.                
                 var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                    shaderInfo.fileContent,
+                    shaderInfo.FileContent,
                     shaderFunction,
                     shaderProfile,
                     shaderFlags,
                     0,
                     null,
                     null,
-                    shaderInfo.fileName);
+                    shaderInfo.FilePath);
+
+                // Store all the errors and warnings to log out later.
+                errorsAndWarnings += result.Message;
 
                 if (result.HasErrors)
-                    throw new Exception(result.Message);
-
+                    throw new ShaderCompilerException();
+                
                 shaderByteCode = result.Bytecode;
                 //var source = shaderByteCode.Disassemble();
             }
-            catch (Exception ex)
+            catch (SharpDX.CompilationException ex)
             {
-                throw ex;
+                errorsAndWarnings += ex.Message;
+                throw new ShaderCompilerException();
             }
 
             // Return a copy of the shader bytecode.

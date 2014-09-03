@@ -25,7 +25,6 @@
 				<Reference type="Gac" refto="System.Core" />
 				<Reference type="Gac" refto="OpenTK" />
 				<Reference type="Gac" refto="MonoGame.Framework.Windows" />
-				<Reference type="Gac" refto="Lidgren.Network.Windows" />
 				<Reference type="Gac" refto="Tao.Sdl.dll" />
 			</References>
 			<Files>

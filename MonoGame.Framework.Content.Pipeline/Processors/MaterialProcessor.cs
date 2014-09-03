@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.ComponentModel;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -110,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If the input to process is of type EffectMaterialContent, this function will be called to request that the EffectContent be built. The EffectProcessor is used to process the EffectContent. Subclasses of MaterialProcessor can override this function to modify the parameters used to build EffectContent. For example, a different version of this function could request a different processor for the EffectContent.</remarks>
         protected virtual ExternalReference<CompiledEffectContent> BuildEffect(ExternalReference<EffectContent> effect, ContentProcessorContext context)
         {
-            throw new NotImplementedException();
+            return context.BuildAsset<EffectContent, CompiledEffectContent>(effect, "EffectProcessor");
         }
 
         /// <summary>
@@ -123,7 +124,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>textureName can be used to determine which processor to use. For example, if a texture is being used as a normal map, the user may not want to use the ModelTextureProcessor on it, which compresses textures.</remarks>
         protected virtual ExternalReference<TextureContent> BuildTexture(string textureName, ExternalReference<TextureContent> texture, ContentProcessorContext context)
         {
-            throw new NotImplementedException();
+            var parameters = new OpaqueDataDictionary();
+            parameters.Add("ColorKeyColor", ColorKeyColor);
+            parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
+            parameters.Add("GenerateMipmaps", GenerateMipmaps);
+            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
+            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
+            parameters.Add("TextureFormat", TextureFormat);
+
+            return context.BuildAsset<TextureContent, TextureContent>(texture, "TextureProcessor", parameters, "TextureImporter", null);
         }
 
         /// <summary>
@@ -135,7 +144,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If the MaterialContent is of type EffectMaterialContent, a build is requested for Effect, and validation will be performed on the OpaqueData to ensure that all parameters are valid input to SetValue or SetValueTranspose. If the MaterialContent is a BasicMaterialContent, no validation will be performed on OpaqueData. Process requests builds for all textures in Textures, unless the MaterialContent is of type BasicMaterialContent, in which case a build will only be requested for DiffuseColor. The textures in Textures will be ignored.</remarks>
         public override MaterialContent Process(MaterialContent input, ContentProcessorContext context)
         {
-            throw new NotImplementedException();
+            // Docs say that if it's a basic effect, only build the diffuse texture.
+            var basic = input as BasicMaterialContent;
+            if (basic != null)
+            {
+                ExternalReference<TextureContent> texture;
+                if (basic.Textures.TryGetValue(BasicMaterialContent.TextureKey, out texture))
+                    basic.Texture = BuildTexture(texture.Filename, texture, context);
+
+                return basic;
+            }
+
+            // Build custom effects
+            var effectMaterial = input as EffectMaterialContent;
+            if (effectMaterial != null)
+            {
+                effectMaterial.CompiledEffect = BuildEffect(effectMaterial.Effect, context);
+                // TODO: Docs say to validate OpaqueData for SetValue/SetValueTranspose
+                // Does that mean to match up with effect param names??
+            }
+
+            // Build all textures
+            foreach (var texture in input.Textures)
+            {
+                var builtTexture = BuildTexture(texture.Value.Filename, texture.Value, context);
+                input.Textures[texture.Key] = builtTexture;
+            }
+
+            return input;
         }
     }
 }

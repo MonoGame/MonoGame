@@ -8,16 +8,14 @@ using System.ComponentModel;
 using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
     [ContentProcessor(DisplayName = "Model - MonoGame")]
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
-        private readonly List<ModelMeshContent> _meshes = new List<ModelMeshContent>();
-
         private ContentIdentity _identity;
-        private ContentBuildLogger _logger;
 
         #region Fields for default values
 
@@ -97,7 +95,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _identity = input.Identity;
-            _logger = context.Logger;
+
+            // Perform the processor transforms.
+            if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
+            {
+                var rotX = Matrix.CreateRotationX(MathHelper.ToRadians(RotationX));
+                var rotY = Matrix.CreateRotationY(MathHelper.ToRadians(RotationY));
+                var rotZ = Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZ));
+                var scale = Matrix.CreateScale(Scale);
+                MeshHelper.TransformScene(input, rotZ * rotX * rotY * scale);
+            }
 
             // Gather all the nodes in tree traversal order.
             var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
@@ -116,59 +123,145 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 ProcessGeometryUsingMaterial(material, geomsWithMaterial, context);
             }
 
-            // Hierarchy
-            var bones = nodes.OfType<BoneContent>().ToList();
-            var modelBones = new List<ModelBoneContent>();
-            for (var i = 0; i < bones.Count; i++)
+            var boneList = new List<ModelBoneContent>();
+            var meshList = new List<ModelMeshContent>();
+            var rootNode = ProcessNode(input, null, boneList, meshList, context);
+
+            return new ModelContent(rootNode, boneList, meshList);
+        }
+
+        private ModelBoneContent ProcessNode(NodeContent node, ModelBoneContent parent, List<ModelBoneContent> boneList, List<ModelMeshContent> meshList, ContentProcessorContext context)
+        {
+            var result = new ModelBoneContent(node.Name, boneList.Count, node.Transform, parent);
+            boneList.Add(result);
+
+            if (node is MeshContent)
+                meshList.Add(ProcessMesh(node as MeshContent, result, context));
+
+            var children = new List<ModelBoneContent>();
+            foreach (var child in node.Children)
+                children.Add(ProcessNode(child, result, boneList, meshList, context));
+            result.Children = new ModelBoneContentCollection(children);
+
+            return result;
+        }
+
+        private ModelMeshContent ProcessMesh(MeshContent mesh, ModelBoneContent parent, ContentProcessorContext context)
+        {
+            var parts = new List<ModelMeshPartContent>();
+            var vertexBuffer = new VertexBufferContent();
+            var indexBuffer = new IndexCollection();
+
+            var startVertex = 0;
+            foreach (var geometry in mesh.Geometry)
             {
-                var bone = bones[i];
+                var vertices = geometry.Vertices;
+                var vertexCount = vertices.VertexCount;
+                ModelMeshPartContent partContent;
+                if (vertexCount == 0)
+                    partContent = new ModelMeshPartContent();
+                else
+                {
+                    var geomBuffer = geometry.Vertices.CreateVertexBuffer();
+                    vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
 
-                // Find the parent
-                var parentIndex = bones.IndexOf(bone.Parent as BoneContent);
-                ModelBoneContent parent = null;
-                if (parentIndex > -1)
-                    parent = modelBones[parentIndex];
+                    var startIndex = indexBuffer.Count;
+                    indexBuffer.AddRange(geometry.Indices);
 
-                modelBones.Add(new ModelBoneContent(bone.Name, i, bone.Transform, parent));
+                    partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+
+                    // Geoms are supposed to all have the same decl, so just steal one of these
+                    vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+
+                    startVertex += vertexCount;
+                }
+
+                partContent.Material = geometry.Material;
+                parts.Add(partContent);
             }
 
-            foreach (var bone in modelBones)
-                bone.Children = new ModelBoneContentCollection(modelBones.FindAll(b => b.Parent == bone));
+            var bounds = new BoundingSphere();
+            if (mesh.Positions.Count > 0)
+                bounds = BoundingSphere.CreateFromPoints(mesh.Positions);
 
-            return new ModelContent(modelBones[0], modelBones, _meshes);
+            return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
 
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
         {
-            // Do nothing for now
-            return material;
+            var parameters = new OpaqueDataDictionary();
+            parameters.Add("ColorKeyColor", ColorKeyColor);
+            parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
+            parameters.Add("GenerateMipmaps", GenerateMipmaps);
+            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
+            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
+            parameters.Add("TextureFormat", TextureFormat);
+
+            return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
         }
 
         protected virtual void ProcessGeometryUsingMaterial(MaterialContent material,
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
         {
+            // If we don't get a material then assign a default one.
             if (material == null)
                 material = new BasicMaterialContent();
 
+            // Test requirements from the assigned material.
+            int textureChannels;
+            if (material is DualTextureMaterialContent)
+            {
+                textureChannels = 2;
+            }
+            else if (material is SkinnedMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is EnvironmentMapMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is AlphaTestMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else
+            {
+                // Just check for a "Texture" which should cover custom Effects
+                // and BasicEffect which can have an optional texture.
+                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
+            }
+
+            // By default we must set the vertex color property
+            // to match XNA behavior.
+            material.OpaqueData["VertexColorEnabled"] = false;
+
+            // If we run into a geometry that requires vertex
+            // color we need a seperate material for it.
+            var colorMaterial = material.Clone();
+            colorMaterial.OpaqueData["VertexColorEnabled"] = true;    
+
             foreach (var geometry in geometryCollection)
             {
+                // Process the geometry.
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
-                ProcessBasicMaterial(material as BasicMaterialContent, geometry);
+                // Verify we have the right number of texture coords.
+                for (var i = 0; i < textureChannels; i++)
+                {
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
+                        throw new InvalidContentException(
+                            "Geometry references material with texture, but no texture coordinates were found.",
+                            _identity);
+                }
 
-                var vertexBuffer = geometry.Vertices.CreateVertexBuffer();
-                var primitiveCount = geometry.Vertices.PositionIndices.Count;
-                var parts = new List<ModelMeshPartContent>
-                    {
-                        new ModelMeshPartContent(vertexBuffer, geometry.Indices, 0, primitiveCount, 0,
-                                                 primitiveCount / 3)
-                    };
-
-                var parent = geometry.Parent;
-                var bounds = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions);
-                _meshes.Add(new ModelMeshContent(parent.Name, geometry.Parent, null, bounds, parts));
+                // Do we need to enable vertex color?
+                if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                    geometry.Material = colorMaterial;
+                else
+                    geometry.Material = material;
             }
         }
 
@@ -183,6 +276,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
             if (channel.Name.StartsWith(VertexChannelNames.Weights()))
                 ProcessWeightsChannel(geometry, vertexChannelIndex);
+
+            // Looks like XNA models usually put a default color channel in..
+            if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                geometry.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, geometry.Vertices.VertexCount));
         }
 
         // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
@@ -196,7 +293,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 boneIndices.Add(flattenedBones[i].Name, i);
 
             var inputWeights = geometry.Vertices.Channels[vertexChannelIndex] as VertexChannel<BoneWeightCollection>;
-            var outputIndices = new Vector4[inputWeights.Count];
+            var outputIndices = new Byte4[inputWeights.Count];
             var outputWeights = new Vector4[inputWeights.Count];
             for (var i = 0; i < inputWeights.Count; i++)
                 ConvertWeights(inputWeights[i], boneIndices, outputIndices, outputWeights, i);
@@ -215,7 +312,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         }
 
         // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
-        private static void ConvertWeights(BoneWeightCollection weights, Dictionary<string, int> boneIndices, Vector4[] outIndices, Vector4[] outWeights, int vertexIndex)
+        private static void ConvertWeights(BoneWeightCollection weights, Dictionary<string, int> boneIndices, Byte4[] outIndices, Vector4[] outWeights, int vertexIndex)
         {
             // we only handle 4 weights per bone
             const int maxWeights = 4;
@@ -250,24 +347,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // output the values
-            outIndices[vertexIndex] = new Vector4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
+            outIndices[vertexIndex] = new Byte4(tempIndices[0], tempIndices[1], tempIndices[2], tempIndices[3]);
             outWeights[vertexIndex] = new Vector4(tempWeights[0], tempWeights[1], tempWeights[2], tempWeights[3]);
-        }
-
-        private void ProcessBasicMaterial(BasicMaterialContent basicMaterial, GeometryContent geometry)
-        {
-            if (basicMaterial == null)
-                return;
-
-            // If the basic material specifies a texture, geometry must have coordinates.
-            if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
-                throw new InvalidContentException(
-                    "Geometry references material with texture, but no texture coordinates were found.",
-                    _identity);
-
-            // Enable vertex color if the geometry has the channel to support it.
-            if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                basicMaterial.VertexColorEnabled = true;
         }
     }
 

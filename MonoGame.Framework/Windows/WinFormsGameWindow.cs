@@ -200,6 +200,11 @@ namespace MonoGame.Framework
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
+            var buttons = Control.MouseButtons;
+            var position = Control.MousePosition;
+            _mouseDownButtonsState = buttons;
+            OnMouseState(null, new MouseEventArgs(buttons, 0, position.X, position.Y, 0));
+
             _platform.IsActive = true;
         }
 
@@ -271,6 +276,12 @@ namespace MonoGame.Framework
         {
             if (KeyState == null)
                 return;
+
+            if ((int)args.Key == 0xff)
+            {
+                // dead key, e.g. a "shift" automatically happens when using Up/Down/Left/Right
+                return;
+            }
 
             XnaKey xnaKey;
 
@@ -348,6 +359,16 @@ namespace MonoGame.Framework
             Application.Idle += OnIdle;
             Application.Run(_form);
             Application.Idle -= OnIdle;
+
+            // We need to remove the last message in the message 
+            // pump as it will keep us from restarting on this 
+            // same thread.
+            //
+            // This is critical for some NUnit runners which
+            // typically will run all the tests on the same
+            // process/thread.
+            NativeMessage msg;
+            PeekMessage(out msg, IntPtr.Zero, 0, 0, 1);
         }
 
         private void OnIdle(object sender, EventArgs eventArgs)

@@ -31,7 +31,10 @@ namespace Microsoft.Xna.Framework.Graphics
             var data = new byte[_parameters.Length];
             for (var i = 0; i < _parameters.Length; i++)
             {
-                data[i] = (byte)(_parameters[i] | _offsets[i]);
+                unchecked
+                {
+                    data[i] = (byte)(_parameters[i] | _offsets[i]);
+                }
             }
 
             HashKey = MonoGame.Utilities.Hash.ComputeHash(data);

@@ -46,7 +46,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content
 {
-	public class ModelReader : ContentTypeReader<Model>
+    internal class ModelReader : ContentTypeReader<Model>
 	{
 //      List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
 //      List<IndexBuffer> indexBuffers = new List<IndexBuffer>();

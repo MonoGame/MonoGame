@@ -99,7 +99,6 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     // Let windows autodetect number of channels and sample rate.
                     MasterVoice = new MasteringVoice(Device, XAudio2.DefaultChannels, XAudio2.DefaultSampleRate, deviceId);
-                    MasterVoice.SetVolume(_masterVolume, 0);
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
@@ -165,26 +164,48 @@ namespace Microsoft.Xna.Framework.Audio
             if (Device != null)
                 voice = new SourceVoice(Device, _format, VoiceFlags.None, XAudio2.MaximumFrequencyRatio);
 
-            inst._effect = this;
             inst._voice = voice;
         }
 
         private void PlatformLoadAudioStream(Stream s)
         {
-            throw new NotImplementedException();
+            SoundStream soundStream = new SoundStream(s);
+
+            _format = soundStream.Format;
+            _dataStream = soundStream.ToDataStream();
+
+            _buffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = (int)_dataStream.Length,
+                Flags = BufferFlags.EndOfStream,
+                PlayBegin = 0,
+                PlayLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
+                Context = new IntPtr(42),
+            };
+
+            _loopedBuffer = new AudioBuffer()
+            {
+                Stream = _dataStream,
+                AudioBytes = (int)_dataStream.Length,
+                Flags = BufferFlags.EndOfStream,
+                LoopBegin = 0,
+                LoopLength = (int)_dataStream.Length / (2 * soundStream.Format.Channels),
+                LoopCount = AudioBuffer.LoopInfinite,
+                Context = new IntPtr(42),
+            }; 
         }
 
         #endregion
 
-        private static void PlatformSetMasterVolume()
+        private void PlatformDispose(bool disposing)
         {
-            MasterVoice.SetVolume(_masterVolume, 0);
-        }
-
-        private void PlatformDispose()
-        {
-            _dataStream.Dispose();
-            isDisposed = true;
+            if (disposing)
+            {
+                if (_dataStream != null)
+                    _dataStream.Dispose();
+            }
+            _dataStream = null;
         }
 
         internal static void PlatformShutdown()
@@ -206,7 +227,6 @@ namespace Microsoft.Xna.Framework.Audio
             _device3DDirty = true;
             _speakers = Speakers.Stereo;
         }
-
     }
 }
 

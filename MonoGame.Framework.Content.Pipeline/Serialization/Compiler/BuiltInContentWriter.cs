@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -12,6 +13,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// <typeparam name="T">The content type being written.</typeparam>
     class BuiltInContentWriter<T> : ContentTypeWriter<T>
     {
+        private List<ContentTypeWriter> _genericTypes;
+
+        protected override void Initialize(ContentCompiler compiler)
+        {
+            base.Initialize(compiler);
+
+            if (TargetType.IsGenericType)
+            {
+                _genericTypes = new List<ContentTypeWriter>();
+                var arguments = TargetType.GetGenericArguments();
+                foreach (var arg in arguments)
+                    _genericTypes.Add(compiler.GetTypeWriter(arg));
+            }
+        }
+
         /// <summary>
         /// Writes the value to the output.
         /// </summary>
@@ -29,27 +45,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             // Change "Writer" in this class name to "Reader" and use the runtime type namespace and assembly
-            string readerClassName = this.GetType().Name.Replace("Writer", "Reader");
+            var readerClassName = this.GetType().Name.Replace("Writer", "Reader");
 
-            // Add generic arguments if they exist
-            var args = this.GetType().GetGenericArguments();
-            if (args.Length > 0)
+            // Add generic arguments if they exist.
+            if (_genericTypes != null)
             {
                 readerClassName += "[";
-                for (int i = 0; i < args.Length; ++i)
+                foreach (var argWriter in _genericTypes)
                 {
-                    var arg = args[i];
                     readerClassName += "[";
-                    readerClassName += arg.AssemblyQualifiedName;        
+                    readerClassName += argWriter.GetRuntimeType(targetPlatform);
                     readerClassName += "]";
-                    if (i < args.Length - 1)
-                        readerClassName += ", ";
+                    readerClassName += ", ";
                 }
+                readerClassName = readerClassName.TrimEnd(',', ' ');
                 readerClassName += "]";
             }
 
-            string readerNamespace = typeof(ContentTypeReader).Namespace;
-            // From looking at XNA-produced XNBs, it appears built-in type readers don't need assembly qualification
+            // From looking at XNA-produced XNBs, it appears built-in
+            // type readers don't need assembly qualification.
+            var readerNamespace = typeof(ContentTypeReader).Namespace;
             return readerNamespace + "." + readerClassName;
         }
     }

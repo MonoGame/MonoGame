@@ -2,12 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.IO;
-using System.Windows.Forms.Design;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +15,7 @@ namespace MonoGame.Tools.Pipeline
     {        
         public IController Controller;      
   
-        public string FilePath { get; set; }
+        public string OriginalPath { get; set; }
 
         public List<ContentItem> ContentItems { get; private set; }                
 
@@ -31,7 +29,9 @@ namespace MonoGame.Tools.Pipeline
 
         public GraphicsProfile Profile { get; set; }
 
-        public string Config { get; set; }     
+        public string Config { get; set; }
+
+        public bool Compress { get; set; }
 
         #region IPipelineItem
 
@@ -39,10 +39,10 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (string.IsNullOrEmpty(FilePath))
+                if (string.IsNullOrEmpty(OriginalPath))
                     return "";
 
-                return System.IO.Path.GetFileNameWithoutExtension(FilePath);
+                return System.IO.Path.GetFileNameWithoutExtension(OriginalPath);
             }
         }
 
@@ -50,11 +50,11 @@ namespace MonoGame.Tools.Pipeline
         {
             get
             {
-                if (string.IsNullOrEmpty(FilePath))
+                if (string.IsNullOrEmpty(OriginalPath))
                     return "";
 
-                var idx = FilePath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, FilePath.Length - 1);
-                return FilePath.Remove(idx);
+                var idx = OriginalPath.LastIndexOfAny(new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar}, OriginalPath.Length - 1);
+                return OriginalPath.Remove(idx);
             }
         }
 

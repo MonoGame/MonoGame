@@ -1,32 +1,8 @@
-#region License
-/*
-MIT License
-Copyright © 2006 The Mono.Xna Team
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-#endregion License
+// MIT License - Copyright (C) The Mono.Xna Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Runtime.Serialization;
@@ -34,6 +10,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Xna.Framework
 {
     [DataContract]
+    [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Vector3 : IEquatable<Vector3>
     {
         #region Private Fields
@@ -69,26 +46,41 @@ namespace Microsoft.Xna.Framework
 
         #region Properties
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 0, 0.
+        /// </summary>
         public static Vector3 Zero
         {
             get { return zero; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 1, 1, 1.
+        /// </summary>
         public static Vector3 One
         {
             get { return one; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 1, 0, 0.
+        /// </summary>
         public static Vector3 UnitX
         {
             get { return unitX; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 1, 0.
+        /// </summary>
         public static Vector3 UnitY
         {
             get { return unitY; }
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> with components 0, 0, 1.
+        /// </summary>
         public static Vector3 UnitZ
         {
             get { return unitZ; }
@@ -158,6 +150,12 @@ namespace Microsoft.Xna.Framework
 
         #region Public Methods
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <returns>The result of the vector addition.</returns>
         public static Vector3 Add(Vector3 value1, Vector3 value2)
         {
             value1.X += value2.X;
@@ -166,6 +164,14 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector addition on <paramref name="value1"/> and
+        /// <paramref name="value2"/>, storing the result of the
+        /// addition in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value1">The first vector to add.</param>
+        /// <param name="value2">The second vector to add.</param>
+        /// <param name="result">The result of the vector addition.</param>
         public static void Add(ref Vector3 value1, ref Vector3 value2, out Vector3 result)
         {
             result.X = value1.X + value2.X;
@@ -429,12 +435,24 @@ namespace Microsoft.Xna.Framework
             result.Z = value1.Z * value2.Z;
         }
 
+        /// <summary>
+        /// Returns a <see>Vector3</see> pointing in the opposite
+        /// direction of <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The vector to negate.</param>
+        /// <returns>The vector negation of <paramref name="value"/>.</returns>
         public static Vector3 Negate(Vector3 value)
         {
             value = new Vector3(-value.X, -value.Y, -value.Z);
             return value;
         }
 
+        /// <summary>
+        /// Stores a <see>Vector3</see> pointing in the opposite
+        /// direction of <paramref name="value"/> in <paramref name="result"/>.
+        /// </summary>
+        /// <param name="value">The vector to negate.</param>
+        /// <param name="result">The vector that the negation of <paramref name="value"/> will be stored in.</param>
         public static void Negate(ref Vector3 value, out Vector3 result)
         {
             result.X = -value.X;
@@ -506,6 +524,12 @@ namespace Microsoft.Xna.Framework
             result.Z = MathHelper.SmoothStep(value1.Z, value2.Z, amount);
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <returns>The result of the vector subtraction.</returns>
         public static Vector3 Subtract(Vector3 value1, Vector3 value2)
         {
             value1.X -= value2.X;
@@ -514,11 +538,29 @@ namespace Microsoft.Xna.Framework
             return value1;
         }
 
+        /// <summary>
+        /// Performs vector subtraction on <paramref name="value1"/> and <paramref name="value2"/>.
+        /// </summary>
+        /// <param name="value1">The vector to be subtracted from.</param>
+        /// <param name="value2">The vector to be subtracted from <paramref name="value1"/>.</param>
+        /// <param name="result">The result of the vector subtraction.</param>
         public static void Subtract(ref Vector3 value1, ref Vector3 value2, out Vector3 result)
         {
             result.X = value1.X - value2.X;
             result.Y = value1.Y - value2.Y;
             result.Z = value1.Z - value2.Z;
+        }
+
+        internal string DebugDisplayString
+        {
+            get
+            {
+                return string.Concat(
+                    this.X.ToString(), "  ",
+                    this.Y.ToString(), "  ",
+                    this.Z.ToString()
+                );
+            }
         }
 
         public override string ToString()
@@ -714,6 +756,21 @@ namespace Microsoft.Xna.Framework
             result.X = x;
             result.Y = y;
             result.Z = z;
+        }
+
+        public static void TransformNormal(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
+        {
+            Debug.Assert(destinationArray.Length >= sourceArray.Length, "The destination array is smaller than the source array.");
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var normal = sourceArray[i];
+                destinationArray[i] =
+                    new Vector3(
+                        (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31),
+                        (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32),
+                        (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33));
+            }
         }
 
         #endregion Public methods

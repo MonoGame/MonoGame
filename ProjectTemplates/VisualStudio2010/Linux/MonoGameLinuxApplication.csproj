@@ -46,9 +46,6 @@
     <Reference Include="MonoGame.Framework">
        <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Lidgren.Network">
-       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\Lidgren.Network.dll</HintPath>
-    </Reference>
     <Reference Include="Tao.Sdl">
        <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Linux\Tao.Sdl.dll</HintPath>
     </Reference>

@@ -55,10 +55,6 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
-		PixelInternalFormat glInternalFormat;
-		GLPixelFormat glFormat;
-		PixelType glType;
-
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
             this.glTarget = TextureTarget.Texture2D;
@@ -412,26 +408,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				var rectangle = RectangleF.Empty;
 				var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
 #endif
-				
-				var width = cgImage.Width;
-				var height = cgImage.Height;
-				
-				var data = new byte[width * height * 4];
-				
-				var colorSpace = CGColorSpace.CreateDeviceRGB();
-				var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
-				bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
-				bitmapContext.Dispose();
-				colorSpace.Dispose();
-				
-                Texture2D texture = null;
-                Threading.BlockOnUIThread(() =>
-                {
-				    texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);			
-    				texture.SetData(data);
-                });
-			
-				return texture;
+
+			    return PlatformFromStream(graphicsDevice, cgImage);
 			}
 #endif
 #if ANDROID
@@ -507,6 +485,49 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+#if IOS
+        [CLSCompliant(false)]
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, UIImage uiImage)
+        {
+            return PlatformFromStream(graphicsDevice, uiImage.CGImage);
+        }
+#endif
+
+#if MONOMAC
+        public static Texture2D FromStream(GraphicsDevice graphicsDevice, NSImage nsImage)
+        {
+            var rectangle = RectangleF.Empty;
+		    var cgImage = nsImage.AsCGImage (ref rectangle, null, null);
+            return PlatformFromStream(graphicsDevice, cgImage);
+        }
+#endif
+
+#if IOS || MONOMAC
+        [CLSCompliant(false)]
+        public static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, CGImage cgImage)
+        {
+            var width = cgImage.Width;
+            var height = cgImage.Height;
+
+            var data = new byte[width * height * 4];
+
+            var colorSpace = CGColorSpace.CreateDeviceRGB();
+            var bitmapContext = new CGBitmapContext(data, width, height, 8, width * 4, colorSpace, CGBitmapFlags.PremultipliedLast);
+            bitmapContext.DrawImage(new RectangleF(0, 0, width, height), cgImage);
+            bitmapContext.Dispose();
+            colorSpace.Dispose();
+
+            Texture2D texture = null;
+            Threading.BlockOnUIThread(() =>
+            {
+                texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
+                texture.SetData(data);
+            });
+
+            return texture;
+        }
+#endif
+
         private void FillTextureFromStream(Stream stream)
         {
 #if ANDROID
@@ -536,7 +557,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC
+#if MONOMAC || WINDOWS
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -545,12 +566,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-            // TODO: We need to find a simple stand alone
-            // PNG encoder if we want to support this.
+#if MONOMAC || WINDOWS
+            SaveAsImage(stream, width, height, ImageFormat.Png);
+#else
             throw new NotImplementedException();
+#endif
         }
 
-#if MONOMAC
+#if MONOMAC || WINDOWS
 		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
@@ -672,7 +695,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindRenderbuffer(All.Renderbuffer, renderBufferID);
             GraphicsExtensions.CheckGLError();
 
-			var glDepthFormat = GraphicsCapabilities.SupportsDepth24 ? All.DepthComponent24Oes : GraphicsCapabilities.SupportsDepthNonLinear ? (OpenTK.Graphics.ES20.All)0x8E2C /*GLDepthComponent16NonLinear */: All.DepthComponent16;
+			var glDepthFormat = GraphicsDevice.GraphicsCapabilities.SupportsDepth24 ? All.DepthComponent24Oes : GraphicsDevice.GraphicsCapabilities.SupportsDepthNonLinear ? (OpenTK.Graphics.ES20.All)0x8E2C /*GLDepthComponent16NonLinear */: All.DepthComponent16;
 			GL.RenderbufferStorage(All.Renderbuffer, glDepthFormat, Width, Height);
             GraphicsExtensions.CheckGLError();
 
@@ -726,6 +749,6 @@ namespace Microsoft.Xna.Framework.Graphics
             return imageInfo;
 		}
 #endif
-	}
+    }
 }
 

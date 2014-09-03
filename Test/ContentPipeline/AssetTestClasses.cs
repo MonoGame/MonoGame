@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -13,15 +14,14 @@ namespace MonoGame.Tests.ContentPipeline
     #region The Basics
     public class TheBasics
     {
-        public int PublicField = 1;
-        protected int ProtectedField = 2;
-        private int PrivateField = 3;
-        internal int InternalField = 4;
+        public int PublicField;
+        protected int ProtectedField;
+        private int PrivateField;
+        internal int InternalField;
 
         public string GetSetProperty
         {
-            get { return "Hello World"; }
-            set { }
+            get; set;
         }
 
         public string GetOnlyProperty
@@ -29,38 +29,49 @@ namespace MonoGame.Tests.ContentPipeline
             get { return "Hello World"; }
         }
 
-        public string SetOnlyProperty
-        {
-            set { }
-        }
+        public string SetOnlyProperty { set; private get; }
 
         public NestedClass Nested = new NestedClass();
     }
 
     public class NestedClass
     {
-        public string Name = "Shawn";
-        public bool IsEnglish = true;
+        public string Name;
+        public bool IsEnglish;
     }
     #endregion
 
     #region Inheritance
     public class InheritanceBase
     {
-        public int elf = 23;
+        public int elf;
     }
 
     public class Inheritance : InheritanceBase
     {
-        public string hello = "world";
+        public string hello;
     }
     #endregion
 
     #region IncludingPrivateMembers
     public class IncludingPrivateMembers
     {
+        public IncludingPrivateMembers()
+        {
+        }
+
+        public IncludingPrivateMembers(int elf)
+        {
+            this.elf = elf;
+        }
+
         [ContentSerializer]
-        private int elf = 23; // will be serialized
+        private int elf; // will be serialized
+
+        public int GetElfValue()
+        {
+            return elf;
+        }
     }
     #endregion
 
@@ -68,7 +79,7 @@ namespace MonoGame.Tests.ContentPipeline
     public class ExcludingPublicMembers
     {
         [ContentSerializerIgnore]
-        public int elf = 23; // will not be serialized
+        public int elf; // will not be serialized
     }
     #endregion
 
@@ -76,17 +87,17 @@ namespace MonoGame.Tests.ContentPipeline
     public class RenamingXmlElements
     {
         [ContentSerializer(ElementName = "ShawnSaysHello")]
-        string hello = "world";
+        public string hello;
 
         [ContentSerializer(ElementName = "ElvesAreCool")]
-        int elf = 23;
+        public int elf;
     }
     #endregion
 
     #region NullReferences
     public class NullReferences
     {
-        public string hello = null;
+        public string hello = "world";
     }
     #endregion
 
@@ -96,10 +107,10 @@ namespace MonoGame.Tests.ContentPipeline
         [ContentSerializer(Optional = true)]
         public string a = null;
 
-        public string b = null;
+        public string b = "b";
 
         [ContentSerializer(Optional = true)]
-        public string c = string.Empty;
+        public string c = "c";
     }
     #endregion
 
@@ -114,9 +125,9 @@ namespace MonoGame.Tests.ContentPipeline
     #region Collections
     public class Collections
     {
-        public string[] StringArray = { "Hello", "World" };
-        public List<string> StringList = new List<string> { "This", "is", "a", "test" };
-        public int[] IntArray = { 1, 2, 3, 23, 42 };
+        public string[] StringArray;
+        public List<string> StringList;
+        public int[] IntArray;
     }
     #endregion
 
@@ -124,7 +135,7 @@ namespace MonoGame.Tests.ContentPipeline
     public class CollectionItemName
     {
         [ContentSerializer(ElementName = "w00t", CollectionItemName = "Flibble")]
-        string[] StringArray = { "Hello", "World" };
+        public string[] StringArray;
     }
     #endregion
 
@@ -132,30 +143,45 @@ namespace MonoGame.Tests.ContentPipeline
     public class Dictionaries
     {
         public Dictionary<int, bool> TestDictionary = new Dictionary<int, bool>();
+    }
+    #endregion
 
-        public Dictionaries()
-        {
-            TestDictionary.Add(23, true);
-            TestDictionary.Add(42, false);
-        }
+    #region Primitive Types
+    public class PrimitiveTypes
+    {
+        public char Char;
+        public byte Byte;
+        public sbyte SByte;
+        public short Short;
+        public ushort UShort;
+        public int Int;
+        public uint UInt;
+        public long Long;
+        public ulong ULong;
+        public float Float;
+        public double Double;
     }
     #endregion
 
     #region MathTypes
     public class MathTypes
     {
-        public Vector3 Vector = new Vector3(1, 2, 3);
-        public Rectangle Rectangle = new Rectangle(1, 2, 3, 4);
-        public Quaternion Quaternion = new Quaternion(1, 2, 3, 4);
-        public Color Color = Color.CornflowerBlue;
-        public Vector2[] VectorArray = new Vector2[] { Vector2.Zero, Vector2.One };
+        public Point Point;
+        public Rectangle Rectangle;
+        public Vector3 Vector3;
+        public Vector4 Vector4;
+        public Quaternion Quaternion;
+        public Plane Plane;
+        public Matrix Matrix;
+        public Color Color;
+        public Vector2[] Vector2Array = new Vector2[0];
     }
     #endregion
 
     #region PolymorphicTypes
     public class PolymorphicA
     {
-        public bool Value = true;
+        public bool Value;
     }
 
     public class PolymorphicB : PolymorphicA { }
@@ -163,23 +189,24 @@ namespace MonoGame.Tests.ContentPipeline
 
     public class PolymorphicTypes
     {
-        public object Hello = "World";
-        public object Elf = 23;
-        public PolymorphicA[] PolymorphicArray = { new PolymorphicA(), new PolymorphicB(), new PolymorphicC() };
+        public object Hello;
+        public object Elf;
+        public PolymorphicA[] TypedArray;
+        public Array UntypedArray;
     }
     #endregion
 
     #region Namespaces
     public class NamespaceHelper
     {
-        public bool Value = true;
+        public bool Value;
     }
 
     public class NamespaceClass
     {
-        public object A = new NamespaceHelper();
-        public object B = Vector2.Zero;
-        public object C = Color.CornflowerBlue;
+        public object A;
+        public object B;
+        public object C;
     }
     #endregion
 
@@ -187,10 +214,10 @@ namespace MonoGame.Tests.ContentPipeline
     public class FlattenContent
     {
         [ContentSerializer(FlattenContent = true)]
-        public NestedClass Nested = new NestedClass();
+        public NestedClass Nested;
 
         [ContentSerializer(FlattenContent = true, CollectionItemName = "Boo")]
-        public string[] Collection = { "Hello", "World" };
+        public string[] Collection;
     }
     #endregion
 
@@ -199,20 +226,6 @@ namespace MonoGame.Tests.ContentPipeline
     {
         [ContentSerializer(SharedResource = true)]
         public Linked Head;
-
-        public SharedResources()
-        {
-            Head = new Linked();
-            Head.Value = 1;
-
-            Head.Next = new Linked();
-            Head.Next.Value = 2;
-
-            Head.Next.Next = new Linked();
-            Head.Next.Next.Value = 3;
-
-            Head.Next.Next.Next = Head;
-        }
     }
 
     public class Linked
@@ -227,8 +240,8 @@ namespace MonoGame.Tests.ContentPipeline
     #region ExternalReferences
     public class ExternalReferences
     {
-        public ExternalReference<Texture2D> Texture = new ExternalReference<Texture2D>("grass.tga");
-        public ExternalReference<Effect> Shader = new ExternalReference<Effect>("foliage.fx");
+        public ExternalReference<Texture2D> Texture;
+        public ExternalReference<Effect> Shader;
     }
     #endregion
 }

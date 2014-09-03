@@ -9,7 +9,6 @@
       <property name="latestArtifactUrl" value="http://build.monogame.net/job/${macbuildjob}/lastSuccessfulBuild/artifact/"/>
 
       <mkdir dir="Windows/iOS" failonerror="false"/>
-      <get src="${latestArtifactUrl}MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/Lidgren.Network.dll" dest="Windows/iOS/Lidgren.Network.dll" failonerror="false"/>
       <get src="${latestArtifactUrl}MonoGame.Framework/bin/iOS/iPhoneSimulator/Release/MonoGame.Framework.dll" dest="Windows/iOS/MonoGame.Framework.dll" failonerror="false"/>
     </if>
   </target>

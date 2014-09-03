@@ -141,16 +141,30 @@ namespace Microsoft.Xna.Framework.Graphics
                     SharpDX.DataStream stream;
                     var databox = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
 
-                    // Some drivers may add pitch to rows.
-                    // We need to copy each row separatly and skip trailing zeros.
-                    var currentIndex = startIndex;
-                    var elementSize = SharpDX.Utilities.SizeOf<T>();
-                    for (var row = 0; row < rows; row++)
+                    var elementSize = _format.GetSize();
+                    var rowSize = elementSize * elementsInRow;
+                    if (rowSize == databox.RowPitch)
+                        stream.ReadRange(data, startIndex, elementCount);
+                    else
                     {
-                        stream.ReadRange(data, currentIndex, elementsInRow);
-                        stream.Seek(databox.RowPitch - (elementSize * elementsInRow), SeekOrigin.Current);
-                        currentIndex += elementsInRow;
+                        // Some drivers may add pitch to rows.
+                        // We need to copy each row separatly and skip trailing zeros.
+                        stream.Seek(startIndex, SeekOrigin.Begin);
+
+                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
+                        for (var row = 0; row < rows; row++)
+                        {
+                            int i;
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                data[i] = stream.Read<T>();
+
+                            if (i >= elementCount)
+                                break;
+
+                            stream.Seek(databox.RowPitch - rowSize, SeekOrigin.Current);
+                        }
                     }
+
                     stream.Dispose();
                 }
         }
@@ -371,6 +385,21 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformReload(Stream textureStream)
         {
+#if WINDOWS_PHONE
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(textureStream);
+                WriteableBitmap bitmap = new WriteableBitmap(bitmapImage);
+
+                // Convert from ARGB to ABGR 
+                ConvertToABGR(bitmap.PixelHeight, bitmap.PixelWidth, bitmap.Pixels);
+
+                this.SetData<int>(bitmap.Pixels);
+
+                textureStream.Dispose();
+            });
+#endif
         }
 	}
 }

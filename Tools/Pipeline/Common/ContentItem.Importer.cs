@@ -18,10 +18,24 @@ namespace MonoGame.Tools.Pipeline
     {                
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            if (GetStandardValues(context).Count > 0)
-                return true;
+            if (context.Instance is Array)
+            {
+                var array = context.Instance as Array;
+                foreach (var obj in array)
+                {
+                    var item = obj as ContentItem;
+                    if (item.BuildAction == BuildAction.Copy)
+                        return false;
+                }
+            }
+            else
+            {
+                var contentItem = (context.Instance as ContentItem);
+                if (contentItem.BuildAction == BuildAction.Copy)
+                    return false;
+            }                
                         
-            return false;
+            return true;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
@@ -30,30 +44,17 @@ namespace MonoGame.Tools.Pipeline
         }
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {
-            var contentItem = (context.Instance as ContentItem);
-            
-            if (contentItem.BuildAction == BuildAction.Copy)
-            {
-                // Copy items do not have importers.
-                return new StandardValuesCollection(new List<ImporterTypeDescription>());
-            }
-
-            // Show all importers as the user best knows the content
-            // type regardless of the file extension.
-            return new StandardValuesCollection(PipelineTypes.Importers);
+        {            
+            return PipelineTypes.ImportersStandardValuesCollection;
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             if (sourceType == typeof (string))
-            {
                 return true;
-            }
 
             return base.CanConvertFrom(context, sourceType);
         }
-
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
@@ -72,7 +73,7 @@ namespace MonoGame.Tools.Pipeline
                 if (string.IsNullOrEmpty(str))
                     return PipelineTypes.NullImporter;
                 else
-                    return PipelineTypes.MissingImporter;  
+                    return PipelineTypes.MissingImporter;
             }
 
             return base.ConvertFrom(context, culture, value);
