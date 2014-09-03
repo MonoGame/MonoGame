@@ -81,6 +81,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
+            ImageAttributes imageAttr = new ImageAttributes();
+            imageAttr.SetWrapMode(WrapMode.TileFlipXY);
+
             foreach (MipmapChain face in faces)
             {
                 BitmapContent faceBitmap = face[0];
@@ -95,8 +98,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     Bitmap bitmap=new Bitmap(width,height);
                     using (var graphics = System.Drawing.Graphics.FromImage(bitmap))
                     {
+                        var destRect = new System.Drawing.Rectangle(0, 0, width, height);
                         graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
-                        graphics.DrawImage(systemBitmap, 0, 0, width, height);
+                        graphics.DrawImage(systemBitmap, destRect, 0, 0, width * 2, height * 2, GraphicsUnit.Pixel, imageAttr);
                     }
 
                     face.Add(bitmap.ToXnaBitmap(false)); //we dont want to flip textures twice
