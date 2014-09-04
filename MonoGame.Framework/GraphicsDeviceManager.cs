@@ -262,7 +262,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -337,7 +337,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
 
-            presentationParameters.IsFullScreen = false;
+            presentationParameters.IsFullScreen = _wantFullScreen;
 #if WINDOWS_PHONE
 
 #elif WINRT
