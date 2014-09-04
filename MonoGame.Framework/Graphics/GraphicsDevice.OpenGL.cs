@@ -706,7 +706,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DEBUG
                 this.framebufferHelper.CheckFramebufferStatus();
 #endif
-                this.glFramebuffers.Add(_currentRenderTargetBindings, glFramebuffer);
+                this.glFramebuffers.Add((RenderTargetBinding[])_currentRenderTargetBindings.Clone(), glFramebuffer);
             }
             else
             {
