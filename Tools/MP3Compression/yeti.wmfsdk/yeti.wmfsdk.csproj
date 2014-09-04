@@ -91,11 +91,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\yeti.mmedia\yeti.mmedia.csproj">
-      <Name>yeti.mmedia</Name>
-      <Project>{315EE7BF-EAE2-42C0-BFC6-CCA9160F3CFE}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -104,6 +99,9 @@
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
+    </Reference>
+    <Reference Include="yeti.mmedia">
+      <HintPath>..\yeti.mmedia\bin\Release\yeti.mmedia.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
