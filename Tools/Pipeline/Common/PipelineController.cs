@@ -73,7 +73,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Environment.CurrentDirectory + "\\Templates");
+			LoadTemplates(Path.Combine(Process.GetCurrentProcess().StartInfo.WorkingDirectory, "Templates"), true);
         }
 
         public void OnProjectModified()
@@ -549,10 +549,10 @@ namespace MonoGame.Tools.Pipeline
                 _view.UpdateProperties(i);
             }
 
-            LoadTemplates(_project.Location);
+            LoadTemplates(_project.Location, false);
         }
 
-        private void LoadTemplates(string path)
+        private void LoadTemplates(string path, bool bThrowExceptionOnInvalidTemplate)
         {
             if (!Directory.Exists(path))
                 return;
@@ -561,8 +561,13 @@ namespace MonoGame.Tools.Pipeline
             foreach (var f in files)
             {
                 var lines = File.ReadAllLines(f);
-                if (lines.Length != 5)
-                    throw new Exception("Invalid template");
+				if (lines.Length != 5)
+				{
+					if (bThrowExceptionOnInvalidTemplate)
+						throw new Exception("Invalid template");
+					else
+						continue;
+				}
 
                 var item = new ContentItemTemplate()
                     {
