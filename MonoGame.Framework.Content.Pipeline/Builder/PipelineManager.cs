@@ -65,9 +65,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </summary>
         public string Config { get; set; }
 
+        /// <summary>
+        /// Gets or sets if the content is compressed.
+        /// </summary>
+        public bool CompressContent { get; set; }
+
+        /// <summary>        
+        /// If true exceptions thrown from within an importer or processor are caught and then 
+        /// thrown from the context. Default value is true.
+        /// </summary>
+        public bool RethrowExceptions { get; set; }
 
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
+            RethrowExceptions = true;
+
             Assemblies = new List<string>();
             Assemblies.Add(null);
             Logger = new PipelineBuildLogger();
@@ -496,18 +508,26 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Try importing the content.
             object importedObject;
-            try
+            if (RethrowExceptions)
+            {
+                try
+                {
+                    var importContext = new PipelineImporterContext(this);
+                    importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
+                }
+                catch (PipelineException)
+                {
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
+                }
+            }
+            else
             {
                 var importContext = new PipelineImporterContext(this);
                 importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
-            }
-            catch (PipelineException)
-            {
-                throw;
-            }
-            catch (Exception inner)
-            {
-                throw new PipelineException(string.Format("Importer '{0}' had unexpected failure!", pipelineEvent.Importer), inner);
             }
 
             // Make sure the input type is valid.
@@ -521,19 +541,32 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             // Process the imported object.
+
             object processedObject;
-            try
+            if (RethrowExceptions)
+            {
+                try
+                {
+                    var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                    processedObject = processor.Process(importedObject, processContext);
+                }
+                catch (PipelineException)
+                {
+                    throw;
+                }
+                catch (InvalidContentException)
+                {
+                    throw;
+                }
+                catch (Exception inner)
+                {
+                    throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
+                }
+            }
+            else
             {
                 var processContext = new PipelineProcessorContext(this, pipelineEvent);
                 processedObject = processor.Process(importedObject, processContext);
-            }
-            catch (PipelineException)
-            {
-                throw;
-            }
-            catch (Exception inner)
-            {
-                throw new PipelineException(string.Format("Processor '{0}' had unexpected failure!", pipelineEvent.Processor), inner);
             }
 
             return processedObject;
@@ -589,7 +622,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Write the XNB.
             using (var stream = new FileStream(pipelineEvent.DestFile, FileMode.Create, FileAccess.Write, FileShare.None))
-                _compiler.Compile(stream, content, Platform, Profile, false, OutputDirectory, outputFileDir);
+                _compiler.Compile(stream, content, Platform, Profile, CompressContent, OutputDirectory, outputFileDir);
 
             // Store the last write time of the output XNB here
             // so we can verify it hasn't been tampered with.

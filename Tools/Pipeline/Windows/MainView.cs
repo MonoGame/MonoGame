@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -38,6 +40,9 @@ namespace MonoGame.Tools.Pipeline
         public MainView()
         {            
             InitializeComponent();
+
+            // Set the application icon this form.
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
@@ -71,6 +76,7 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+            _controller.View = this;
 
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
@@ -122,7 +128,8 @@ namespace MonoGame.Tools.Pipeline
             {
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
-                _controller.AddAction(action);
+                _controller.AddAction(action);                
+                _controller.OnProjectModified();
             }
             else
             {
@@ -483,6 +490,12 @@ namespace MonoGame.Tools.Pipeline
 
         private void MainView_Load(object sender, EventArgs e)
         {
+            //Priority is given to any command line arguments.
+            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+            {
+                OpenProjectPath = History.Default.ProjectHistory.Last();
+            }
+            
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
                 _controller.OpenProject(OpenProjectPath);
@@ -540,6 +553,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            _propertyGrid.ExpandAllGridItems();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
@@ -626,7 +640,7 @@ namespace MonoGame.Tools.Pipeline
             _openProjectMenuItem.Enabled = notBuilding;
             _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 

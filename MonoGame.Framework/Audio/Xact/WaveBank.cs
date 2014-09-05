@@ -16,6 +16,8 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffect[] _sounds;
         private string _bankName;
 
+        public bool IsDisposed { get; private set; }
+
         struct Segment
         {
             public int Offset;
@@ -380,19 +382,17 @@ namespace Microsoft.Xna.Framework.Audio
                         //An xWMA or XMA2 file. Can't be played atm :(
                         throw new NotImplementedException();
                     }
-#if !DIRECTX
-                /* DirectX platforms can use XAudio2 to stream MSADPCM natively.
-                 * This code is cross-platform, but the problem is that it just
-                 * decodes ALL of the wavedata here. For XAudio2 in particular,
-                 * this is probably ludicrous.
-                 *
-                 * You need to write a DIRECTX ADPCM reader that just loads this
-                 * into the SoundEffect. No decoding should be necessary.
-                 * -flibit
-                 */
-                } else if (codec == MiniFormatTag_ADPCM) {
-                    using (MemoryStream dataStream = new MemoryStream(audiodata)) {
-                        using (BinaryReader source = new BinaryReader(dataStream)) {
+                } 
+                else if (codec == MiniFormatTag_ADPCM) 
+                {
+#if DIRECTX
+                    _sounds[current_entry] = new SoundEffect(audiodata, rate, (AudioChannels)chans)
+                    {
+                        _format = new SharpDX.Multimedia.WaveFormatAdpcm(rate, chans, align)
+                    };
+#else
+                    using (var dataStream = new MemoryStream(audiodata)) {
+                        using (var source = new BinaryReader(dataStream)) {
                             _sounds[current_entry] = new SoundEffect(
                                 MSADPCMToPCM.MSADPCM_TO_PCM(source, (short) chans, (short) align),
                                 rate,
@@ -401,7 +401,8 @@ namespace Microsoft.Xna.Framework.Audio
                         }
                     }
 #endif
-                } else {
+                } 
+                else {
                     throw new NotImplementedException();
                 }
                 
@@ -435,8 +436,13 @@ namespace Microsoft.Xna.Framework.Audio
 		#region IDisposable implementation
 		public void Dispose ()
 		{
+            if (IsDisposed)
+                return;
+
             foreach (var s in _sounds)
                 s.Dispose();
+
+            IsDisposed = true;
         }
 		#endregion
     }

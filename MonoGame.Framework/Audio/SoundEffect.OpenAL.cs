@@ -169,15 +169,6 @@ namespace Microsoft.Xna.Framework.Audio
 
         #endregion
 
-        #region Static Members
-
-        private static void PlatformSetMasterVolume()
-        {
-            SoundEffectInstancePool.UpdateVolumes();
-        }
-
-        #endregion
-
         #region IDisposable Members
 
         private void PlatformDispose(bool disposing)

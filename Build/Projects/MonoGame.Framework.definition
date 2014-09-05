@@ -118,6 +118,7 @@
     <Compile Include="LaunchParameters.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Matrix.cs" />
+    <Compile Include="NamespaceDocs.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="PlaneIntersectionType.cs" />
@@ -351,10 +352,7 @@
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferObject.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
-    </Compile>
-    <Compile Include="Graphics\GraphicsDevice.OpenGL.RenderbufferObject.cs">
+    <Compile Include="Graphics\GraphicsDevice.OpenGL.FramebufferHelper.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.PSM.cs">
@@ -568,6 +566,18 @@
         <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
+    <Compile Include="Graphics\TextureCollection.DirectX.cs">
+        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.OpenGL.cs">
+        <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.PSM.cs">
+        <Platforms>PSMobile</Platforms>
+    </Compile>
+    <Compile Include="Graphics\TextureCollection.Web.cs">
+        <Platforms>Web</Platforms>
+    </Compile>
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\Texture.DirectX.cs">
         <Platforms>Windows,Windows8,WindowsPhone</Platforms>
@@ -859,8 +869,8 @@
     <Compile Include="Utilities\ObjectFactoryWithReset.cs" />
     <Compile Include="Utilities\FileHelpers.cs" />
     <Compile Include="Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Utilities\Lz4Stream\Lz4DecoderStream.cs" />
 
-    
     <!-- Android/OUYA Platform -->
     <Compile Include="Android\AndroidCompatibility.cs">
       <Platforms>Android,Ouya</Platforms>

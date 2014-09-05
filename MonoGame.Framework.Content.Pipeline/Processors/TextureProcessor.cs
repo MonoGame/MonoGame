@@ -62,7 +62,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (ResizeToPowerOfTwo)
             {
                 if (!GraphicsUtil.IsPowerOfTwo(bmp.Width) || !GraphicsUtil.IsPowerOfTwo(bmp.Height))
+                {
                     input.Resize(GraphicsUtil.GetNextPowerOfTwo(bmp.Width), GraphicsUtil.GetNextPowerOfTwo(bmp.Height));
+                    bmp = input.Faces[0][0];
+                }
             }
 
             if (PremultiplyAlpha)
@@ -94,7 +97,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			{
 			    if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || 
                     TextureFormat == TextureProcessorOutputFormat.Compressed )
-                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha);
+                	GraphicsUtil.CompressTexture(context.TargetProfile, input, context, GenerateMipmaps, PremultiplyAlpha, false);
 			}
 			catch(EntryPointNotFoundException ex) {
 				context.Logger.LogImportantMessage ("Could not find the entry point to compress the texture", ex.ToString());
@@ -109,6 +112,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				context.Logger.LogImportantMessage ("Could not compress texture {0}", ex.ToString());
 				TextureFormat = TextureProcessorOutputFormat.Color;
 			}
+
+            if (GenerateMipmaps)
+            {
+                context.Logger.LogMessage("Generating mipmaps.");
+                input.GenerateMipmaps(false);
+            }
 
             return input;
         }

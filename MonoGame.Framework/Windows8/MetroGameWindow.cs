@@ -55,7 +55,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Microsoft.Xna.Framework
 {
-    [CLSCompliant(false)]
     partial class MetroGameWindow : GameWindow
     {
         private DisplayOrientation _supportedOrientations;

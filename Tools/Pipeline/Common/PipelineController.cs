@@ -43,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ProjectOpen { get; private set; }
 
-        public bool ProjectDiry { get; set; }
+        public bool ProjectDirty { get; set; }
 
         public bool ProjectBuilding 
         {
@@ -52,6 +52,8 @@ namespace MonoGame.Tools.Pipeline
                 return _buildTask != null && !_buildTask.IsCompleted;
             }
         }
+
+        public IView View { get; set; }
 
         public event Action OnProjectLoading;
 
@@ -79,20 +81,20 @@ namespace MonoGame.Tools.Pipeline
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
         }
 
         public void OnReferencesModified()
         {
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             ResolveTypes();
         }
 
         public void OnItemModified(ContentItem contentItem)
         {
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             _view.UpdateProperties(contentItem);
 
             _view.BeginTreeUpdate();
@@ -126,7 +128,9 @@ namespace MonoGame.Tools.Pipeline
             // Save the new project.
             _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
-            
+            History.Default.AddProjectHistory(projectFilePath);
+            History.Default.Save();
+
             UpdateTree();
 
             if (OnProjectLoaded != null)
@@ -161,7 +165,9 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();                
                 
                 ProjectOpen = true;
-                ProjectDiry = true;
+                ProjectDirty = true;
+                History.Default.AddProjectHistory(projectFilePath);
+                History.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
@@ -209,7 +215,9 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();
 
                 ProjectOpen = true;
-                ProjectDiry = false;
+                ProjectDirty = false;
+                History.Default.AddProjectHistory(projectFilePath);
+                History.Default.Save();
             }
 #if SHIPPING
             catch (Exception e)
@@ -233,9 +241,10 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ProjectOpen = false;
-            ProjectDiry = false;
+            ProjectDirty = false;
             _project = null;
             _actionStack.Clear();
+            _view.OutputClear();
 
             Selection.Clear(this);
             UpdateTree();
@@ -254,7 +263,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Do the save.
-            ProjectDiry = false;
+            ProjectDirty = false;
             var parser = new PipelineProjectParser(this, _project);
             parser.SaveProject();            
 
@@ -415,7 +424,7 @@ namespace MonoGame.Tools.Pipeline
         {
             // If the project is not dirty 
             // then we can simply skip it.
-            if (!ProjectDiry)
+            if (!ProjectDirty)
                 return true;
 
             // Ask the user if they want to save or cancel.

@@ -81,6 +81,12 @@ If not set it will default to HiDef.
 ```
 The optional build configuration name from the build system.  This is sometimes used as a hint in content processors.
 
+### Content Compression
+```
+/compress
+```
+Uses LZ4 compression to compress the contents of the XNB files.  Content build times will increase with this option enabled.  Compression is not recommended for platforms such as Android, Windows Phone 8 and Windows 8 as the app package is already compressed.  This is not compatible with LZX compression used in XNA content.
+
 ### Content Importer Name
 ```
 /importer:<class_name>

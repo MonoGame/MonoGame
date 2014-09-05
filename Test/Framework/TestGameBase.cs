@@ -90,7 +90,9 @@ namespace MonoGame.Tests {
 
 		public TestGameBase ()
 		{
+#if XNA
             Content.RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#endif
 			Services.AddService<IFrameInfoSource> (this);
 			SuppressExtraUpdatesAndDraws = true;
 		}

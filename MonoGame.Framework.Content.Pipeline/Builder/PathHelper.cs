@@ -65,6 +65,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             switch (targetPlatform)
             {
                 case TargetPlatform.Windows:
+                case TargetPlatform.WindowsGL:
                 case TargetPlatform.WindowsPhone8:
                 case TargetPlatform.WindowsStoreApp:
                     return NormalizeWindows(path);

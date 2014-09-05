@@ -6,6 +6,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Framework.Content.Pipeline" />
     <Reference Include="MonoGame.Tests.References" />
   </References>
 
@@ -86,6 +87,7 @@
     <Compile Include="Framework\GestureRecognizerTest.cs" />
     <Compile Include="Framework\MockWindow.cs" />
     <Compile Include="Framework\PackedVectorTest.cs" />
+    <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchPanelTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
@@ -125,6 +127,9 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="ContentPipeline\IntermediateDeserializerTest.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\ModelProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
 
@@ -486,6 +491,9 @@
     <Content Include="Assets\Xml\17_ExternalReferences.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\Xml\18_PrimitiveTypes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <Content Include="Assets\Fonts\Default.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -496,29 +504,37 @@
     <Content Include="Assets\Textures\Surge.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Effects\Bevels.xnb">
+    <Content Include="Assets\Effects\DirectX\Bevels.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\BlackOut.xnb">
+    <Content Include="Assets\Effects\DirectX\BlackOut.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\ColorFlip.xnb">
+    <Content Include="Assets\Effects\DirectX\ColorFlip.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\Grayscale.xnb">
+    <Content Include="Assets\Effects\DirectX\Grayscale.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\HighContrast.xnb">
+    <Content Include="Assets\Effects\DirectX\HighContrast.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\Invert.xnb">
+    <Content Include="Assets\Effects\DirectX\Invert.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\NoEffect.xnb">
+    <Content Include="Assets\Effects\DirectX\NoEffect.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
-    <Content Include="Assets\Effects\RainbowH.xnb">
+    <Content Include="Assets\Effects\DirectX\RainbowH.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Platforms>Windows</Platforms>
     </Content>
     <Content Include="Assets\Textures\GlassPane.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

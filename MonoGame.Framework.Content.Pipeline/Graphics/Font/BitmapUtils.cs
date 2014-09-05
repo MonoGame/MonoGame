@@ -102,15 +102,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 		}
 
-		// Drawing against a transparent black background blends
-		// the 'alpha' pixels against black, leaving a black outline.
-		// Interpolate between black and white
-		// based on it's intensity to covert this 'outline' to
-		// it's grayscale equivalent.
-		public static void ConvertToGrey( Bitmap bitmap)
+		// Converts the alpha channel into a greyscale premultiplied texture.
+		public static void ConvertAlphaToGrey(Bitmap bitmap)
 		{
-			var transBlack = Color.Transparent;
-
 			using (var bitmapData = new PixelAccessor(bitmap, ImageLockMode.ReadWrite))
 			{
 				for (int y = 0; y < bitmap.Height; y++)
@@ -118,14 +112,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 					for (int x = 0; x < bitmap.Width; x++)
 					{
 						System.Drawing.Color color = bitmapData[x, y];
-
-						if (color.ColorsEqual(transBlack))
-						    continue;
-
-					    var alpha = color.A / (255.0f);
-						var col = Color.Lerp(Color.Transparent, Color.White, alpha);
-						color = System.Drawing.Color.FromArgb(color.A, col.R, col.G, col.B);
-						bitmapData [x, y] = color;
+                        bitmapData[x, y] = System.Drawing.Color.FromArgb(color.A, color.A, color.A, color.A);
 					}
 				}
 			}

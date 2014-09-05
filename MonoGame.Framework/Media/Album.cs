@@ -188,10 +188,10 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
+#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album art image data.
         /// </summary>
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         public Stream GetAlbumArt()
         {
 #if WINDOWS_PHONE
@@ -199,22 +199,22 @@ namespace Microsoft.Xna.Framework.Media
 #elif WINDOWS_STOREAPP
             if (this.HasArt)
                 return this.thumbnail.AsStream();
-#endif
-
             return null;
+#endif
         }
 
 #elif IOS
+        [CLSCompliant(false)]
         public UIImage GetAlbumArt()
         {
             return this.thumbnail.ImageWithSize(new SizeF(this.thumbnail.Bounds.Width, this.thumbnail.Bounds.Height));
         }
 #endif
 
+#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album thumbnail image data.
         /// </summary>
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         public Stream GetThumbnail()
         {
 #if WINDOWS_PHONE
@@ -227,13 +227,14 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 #elif IOS
+        [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
             return this.thumbnail.ImageWithSize(new SizeF(100, 100)); // TODO: Check size
         }
 #endif
 
-        /// <summary>
+		/// <summary>
         /// Returns a String representation of this Album.
         /// </summary>
         public override string ToString()

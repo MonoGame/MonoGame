@@ -1,4 +1,8 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -39,7 +43,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <summary>
         /// The current timestamp that we use for setting the timestamp of new TouchLocations
         /// </summary>
-        static private TimeSpan _currentTimestamp;
+        internal static TimeSpan CurrentTimestamp { get; set; }
 
         /// <summary>
         /// The mapping between platform specific touch ids
@@ -71,14 +75,6 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             Capabilities.Initialize();
             return Capabilities;
-        }
-
-        /// <summary>
-        /// Update the current timestamp and run gesture recognition for this frame if it is enabled
-        /// </summary>
-        internal static void Update(GameTime gameTime)
-        {
-            _currentTimestamp = gameTime.TotalGameTime;
         }
 
         /// <summary>
@@ -119,8 +115,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
                 if (existingTouch.Id == touch.Id)
                 {
-                    //If we are moving straight from Pressed to Released, that means we've never been seen, so just get rid of us
-                    if (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released)
+                    //If we are moving straight from Pressed to Released and we've existed for multiple frames, that means we've never been seen, so just get rid of us
+                    if (existingTouch.State == TouchLocationState.Pressed && touch.State == TouchLocationState.Released && existingTouch.PressTimestamp != touch.Timestamp)
                     {
                         state.RemoveAt(i);
                     }
@@ -138,7 +134,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
         public TouchCollection GetState()
         {
-            var result = new TouchCollection(_touchState.ToArray());
+            //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
+            for (var i = _touchState.Count - 1; i >= 0; i--)
+            {
+                var touch = _touchState[i];
+
+                //If a touch was pressed and released in a previous frame and the user didn't ask about it then trash it.
+                if (touch.SameFrameReleased && touch.Timestamp < CurrentTimestamp && touch.State == TouchLocationState.Pressed)
+                {
+                    _touchState.RemoveAt(i);
+                }
+            }
+
+            var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
             AgeTouches(_touchState);
             return result;
         }
@@ -189,7 +197,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
-                var evt = new TouchLocation(touchId, state, position * _touchScale, _currentTimestamp);
+                var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
@@ -233,14 +241,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var mostToRemove = Math.Max(_touchState.Count, _gestureState.Count);
             if (mostToRemove > 0)
             {
-                List<TouchLocation> temp = new List<TouchLocation>(mostToRemove);
+                var temp = new List<TouchLocation>(mostToRemove);
 
                 // Submit a new event for each non-released location.
                 temp.AddRange(_touchState);
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+                        ApplyTouch(_touchState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
                 }
 
                 temp.Clear();
@@ -248,7 +256,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 foreach (var touch in temp)
                 {
                     if (touch.State != TouchLocationState.Released)
-                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position));
+                        ApplyTouch(_gestureState, new TouchLocation(touch.Id, TouchLocationState.Released, touch.Position, CurrentTimestamp));
                 }
             }
 
@@ -539,7 +547,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             if (!GestureIsEnabled(GestureType.Hold) || _holdDisabled)
                 return;
 
-            var elapsed = _currentTimestamp - touch.PressTimestamp;
+            var elapsed = CurrentTimestamp - touch.PressTimestamp;
             if (elapsed < TimeRequiredForHold)
                 return;
 
@@ -595,7 +603,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 
             // If we pressed and held too long then don't 
             // generate a tap event for it.
-            var elapsed = _currentTimestamp - touch.PressTimestamp;
+            var elapsed = CurrentTimestamp - touch.PressTimestamp;
             if (elapsed > TimeRequiredForHold)
                 return;
 
