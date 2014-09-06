@@ -64,11 +64,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 FindMeshes(_scene.RootNode, _scene.RootNode.Transform);
 
-                if (_scene.HasAnimations)
-                {
-                    var skeleton = CreateSkeleton();
-                    CreateAnimation(skeleton);
-                }
+                var skeleton = CreateSkeleton();
+                CreateAnimation(skeleton);
 
                 // If we have a simple hierarchy with no bones and just the one
                 // mesh, we can flatten it out so the mesh is the root node.
@@ -267,17 +264,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // all the way up to the scene root to get the
             // full stack.
             Node skeletonRoot = rootNode;
-            while (rootNode.Parent != sceneRoot)
+            if (rootNode != null)
             {
-                // The FBX path likes to put these extra preserve
-                // pivot nodes in here.
-                if (!rootNode.Name.Contains("$AssimpFbx$"))
-                    skeletonRoot = rootNode;
+                while (rootNode.Parent != sceneRoot)
+                {
+                    // The FBX path likes to put these extra preserve
+                    // pivot nodes in here.
+                    if (!rootNode.Name.Contains("$AssimpFbx$"))
+                        skeletonRoot = rootNode;
 
-                if (!_skeletonNodes.Contains(skeletonRoot.Name))
-                    _skeletonNodes.Add(skeletonRoot.Name);
+                    if (!_skeletonNodes.Contains(skeletonRoot.Name))
+                        _skeletonNodes.Add(skeletonRoot.Name);
 
-                rootNode = rootNode.Parent;
+                    rootNode = rootNode.Parent;
+                }
             }
 
             return skeletonRoot;
@@ -329,7 +329,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         private void CreateAnimation(NodeContent skeleton)
         {
-            if (skeleton != null)
+            if (skeleton != null && _scene.Animations != null)
             {
                 foreach (var animation in _scene.Animations)
                     skeleton.Animations.Add(FixupAnimationName(animation.Name), CreateAnimation(animation));
