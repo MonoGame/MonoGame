@@ -374,7 +374,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (string.IsNullOrEmpty(outputFilepath))
             {
                 var filename = Path.GetFileNameWithoutExtension(sourceFilepath) + ".xnb";
-                var directory = PathHelper.GetRelativePath(ProjectDirectory,
+                string directory;
+                if (Path.IsPathRooted(OutputDirectory))
+                    directory = "";
+                else
+                    directory = PathHelper.GetRelativePath(ProjectDirectory,
                                                            Path.GetDirectoryName(sourceFilepath) +
                                                            Path.DirectorySeparatorChar);
                 outputFilepath = Path.Combine(OutputDirectory, directory, filename);
