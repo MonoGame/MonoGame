@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -38,6 +39,9 @@ namespace MonoGame.Tools.Pipeline
         public MainView()
         {            
             InitializeComponent();
+
+            // Set the application icon this form.
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
             // Find an appropriate font for console like output.
             var faces = new [] { "Consolas", "Lucida Console", "Courier New" };
@@ -71,6 +75,7 @@ namespace MonoGame.Tools.Pipeline
         public void Attach(IController controller)
         {
             _controller = controller;
+            _controller.View = this;
 
             var updateMenus = new Action(UpdateMenus);
             var invokeUpdateMenus = new Action(() => Invoke(updateMenus));
@@ -123,6 +128,7 @@ namespace MonoGame.Tools.Pipeline
                 var item = obj as ContentItem;
                 var action = new UpdateContentItemAction(this, _controller, item, args.ChangedItem.PropertyDescriptor, args.OldValue);
                 _controller.AddAction(action);
+                _controller.OnProjectModified();
             }
             else
             {
@@ -154,11 +160,13 @@ namespace MonoGame.Tools.Pipeline
                     if (node.Tag is ContentItem)
                     {
                         _treeAddItemMenuItem.Visible = false;
+                        _treeAddItemsInFolderMenuItem.Visible = false;
                         _treeNewItemMenuItem.Visible = false;
                     }
                     else
                     {
                         _treeAddItemMenuItem.Visible = true;
+                        _treeAddItemsInFolderMenuItem.Visible = true;
                         _treeNewItemMenuItem.Visible = true;
                     }
 
@@ -381,18 +389,17 @@ namespace MonoGame.Tools.Pipeline
 
             var node = _treeView.AllNodes().Find(e => e.Tag == item);
             if (node != null)
-			{
-				// Do something useful, eg...
-				/* 
-				if (!node.IsValid)
-				{
-	                node.ForeColor = Color.Red;
-				}
-				else
-				{
-					node.ForeColor = Color.Black;
-				}*/
-			}
+            {	
+                /* 
+                if (!node.IsValid)
+                {
+                    node.ForeColor = Color.Red;
+                }
+                else
+                {
+                    node.ForeColor = Color.Black;
+                }*/
+            }
         }
 
         public void EndTreeUpdate()
@@ -470,6 +477,25 @@ namespace MonoGame.Tools.Pipeline
             return true;
         }
 
+        public bool ChooseContentFolder(string initialDirectory, out List<string> files)
+        {
+            var dlg = new FolderBrowserDialog()
+            {
+                SelectedPath = initialDirectory
+            };
+
+            var result = dlg.ShowDialog(this);
+            files = new List<string>();
+
+            if (result != DialogResult.OK)
+                return false;
+
+            var filenames = Directory.GetFiles(dlg.SelectedPath, "*.*", SearchOption.AllDirectories);
+            files.AddRange(filenames);
+
+            return true;
+        }
+
         public void OutputClear()
         {
             _outputWindow.Clear();
@@ -540,6 +566,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             _propertyGrid.SelectedObjects = _controller.Selection.ToArray();
+            _propertyGrid.ExpandAllGridItems();
         }
 
         private void TreeViewMouseUp(object sender, MouseEventArgs e)
@@ -626,7 +653,7 @@ namespace MonoGame.Tools.Pipeline
             _openProjectMenuItem.Enabled = notBuilding;
             _importProjectMenuItem.Enabled = notBuilding;
 
-            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDiry;
+            _saveMenuItem.Enabled = projectOpenAndNotBuilding && _controller.ProjectDirty;
             _saveAsMenuItem.Enabled = projectOpenAndNotBuilding;
             _closeMenuItem.Enabled = projectOpenAndNotBuilding;
 
@@ -634,6 +661,7 @@ namespace MonoGame.Tools.Pipeline
 
             _newItemMenuItem.Enabled = projectOpen;
             _addItemMenuItem.Enabled = projectOpen;
+            _addItemsInFolderMenuItem.Enabled = projectOpen;
             _deleteMenuItem.Enabled = projectOpen;
 
             _buildMenuItem.Enabled = projectOpenAndNotBuilding;
@@ -685,6 +713,13 @@ namespace MonoGame.Tools.Pipeline
             var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
             var item = node.Tag as IProjectItem;
             _controller.Include(item.Location);
+        }
+
+        private void OnAddItemsInFolderClick(object sender, EventArgs e)
+        {
+            var node = _treeView.SelectedNode ?? _treeView.Nodes[0];
+            var item = node.Tag as IProjectItem;
+            _controller.IncludeFilesInFolder(item.Location);
         }
 
         private void OnNewItemClick(object sender, System.EventArgs e)

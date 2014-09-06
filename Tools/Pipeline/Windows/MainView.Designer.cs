@@ -60,6 +60,7 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this._newItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._addItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._addItemsInFolderMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this._deleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._buildMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,6 +77,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._treeNewItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._treeAddItemMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._treeAddItemsInFolderMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._treeDeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this._treeOpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -281,6 +283,7 @@ namespace MonoGame.Tools.Pipeline
             this.toolStripSeparator2,
             this._newItemMenuItem,
             this._addItemMenuItem,
+            this._addItemsInFolderMenuItem,
             this.toolStripSeparator1,
             this._deleteMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
@@ -323,6 +326,13 @@ namespace MonoGame.Tools.Pipeline
             this._addItemMenuItem.Size = new System.Drawing.Size(144, 22);
             this._addItemMenuItem.Text = "&Add Item...";
             this._addItemMenuItem.Click += new System.EventHandler(this.OnAddItemClick);
+            // 
+            // addItemsInFolderToolStripMenuItem
+            // 
+            this._addItemsInFolderMenuItem.Name = "addItemsInFolderToolStripMenuItem";
+            this._addItemsInFolderMenuItem.Size = new System.Drawing.Size(144, 22);
+            this._addItemsInFolderMenuItem.Text = "Add Items In Folder...";
+            this._addItemsInFolderMenuItem.Click += new System.EventHandler(this.OnAddItemsInFolderClick);
             // 
             // toolStripSeparator1
             // 
@@ -431,6 +441,7 @@ namespace MonoGame.Tools.Pipeline
             this._treeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._treeNewItemMenuItem,
             this._treeAddItemMenuItem,
+            this._treeAddItemsInFolderMenuItem,
             this._treeDeleteMenuItem,
             this.toolStripSeparator6,
             this._treeOpenFileMenuItem,
@@ -454,6 +465,13 @@ namespace MonoGame.Tools.Pipeline
             this._treeAddItemMenuItem.Size = new System.Drawing.Size(173, 22);
             this._treeAddItemMenuItem.Text = "&Add Item...";
             this._treeAddItemMenuItem.Click += new System.EventHandler(this.OnAddItemClick);
+            // 
+            // _treeAddItemsInFolderMenuItem
+            // 
+            this._treeAddItemsInFolderMenuItem.Name = "_treeAddItemsInFolderMenuItem";
+            this._treeAddItemsInFolderMenuItem.Size = new System.Drawing.Size(173, 22);
+            this._treeAddItemsInFolderMenuItem.Text = "&Add Items In Folder...";
+            this._treeAddItemsInFolderMenuItem.Click += new System.EventHandler(this.OnAddItemsInFolderClick);
             // 
             // _treeDeleteMenuItem
             // 
@@ -564,10 +582,12 @@ namespace MonoGame.Tools.Pipeline
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem _debuggerMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _treeAddItemMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _treeAddItemsInFolderMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _treeNewItemMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem _treeOpenFileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _treeOpenFileLocationMenuItem;
+        private ToolStripMenuItem _addItemsInFolderMenuItem;
     }
 }
 

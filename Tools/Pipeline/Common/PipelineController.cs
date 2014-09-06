@@ -43,7 +43,7 @@ namespace MonoGame.Tools.Pipeline
 
         public bool ProjectOpen { get; private set; }
 
-        public bool ProjectDiry { get; set; }
+        public bool ProjectDirty { get; set; }
 
         public bool ProjectBuilding 
         {
@@ -52,6 +52,8 @@ namespace MonoGame.Tools.Pipeline
                 return _buildTask != null && !_buildTask.IsCompleted;
             }
         }
+
+        public IView View { get; set; }
 
         public event Action OnProjectLoading;
 
@@ -73,26 +75,26 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-			LoadTemplates(Path.Combine(Process.GetCurrentProcess().StartInfo.WorkingDirectory, "Templates"), true);
+            LoadTemplates(Environment.CurrentDirectory + "\\Templates", false);
         }
 
         public void OnProjectModified()
         {            
             Debug.Assert(ProjectOpen, "OnProjectModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
         }
 
         public void OnReferencesModified()
         {
             Debug.Assert(ProjectOpen, "OnReferencesModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             ResolveTypes();
         }
 
         public void OnItemModified(ContentItem contentItem)
         {
             Debug.Assert(ProjectOpen, "OnItemModified called with no project open?");
-            ProjectDiry = true;
+            ProjectDirty = true;
             _view.UpdateProperties(contentItem);
 
             _view.BeginTreeUpdate();
@@ -161,7 +163,7 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();                
                 
                 ProjectOpen = true;
-                ProjectDiry = true;
+                ProjectDirty = true;
             }
 #if SHIPPING
             catch (Exception e)
@@ -209,7 +211,7 @@ namespace MonoGame.Tools.Pipeline
                 ResolveTypes();
 
                 ProjectOpen = true;
-                ProjectDiry = false;
+                ProjectDirty = false;
             }
 #if SHIPPING
             catch (Exception e)
@@ -233,7 +235,7 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ProjectOpen = false;
-            ProjectDiry = false;
+            ProjectDirty = false;
             _project = null;
             _actionStack.Clear();
 
@@ -254,7 +256,7 @@ namespace MonoGame.Tools.Pipeline
             }
 
             // Do the save.
-            ProjectDiry = false;
+            ProjectDirty = false;
             var parser = new PipelineProjectParser(this, _project);
             parser.SaveProject();            
 
@@ -415,7 +417,7 @@ namespace MonoGame.Tools.Pipeline
         {
             // If the project is not dirty 
             // then we can simply skip it.
-            if (!ProjectDiry)
+            if (!ProjectDirty)
                 return true;
 
             // Ask the user if they want to save or cancel.
@@ -476,6 +478,21 @@ namespace MonoGame.Tools.Pipeline
             var action = new IncludeAction(this, files);
             action.Do();
             _actionStack.Add(action);  
+        }
+
+        public void IncludeFilesInFolder(string initialDirectory)
+        {
+            // Root the path to the project.
+            if (!Path.IsPathRooted(initialDirectory))
+                initialDirectory = Path.Combine(_project.Location, initialDirectory);
+
+            List<string> files;
+            if (!_view.ChooseContentFolder(initialDirectory, out files))
+                return;
+
+            var action = new IncludeAction(this, files);
+            action.Do();
+            _actionStack.Add(action);
         }
 
         public void Exclude(IEnumerable<ContentItem> items)
@@ -552,7 +569,7 @@ namespace MonoGame.Tools.Pipeline
             LoadTemplates(_project.Location, false);
         }
 
-        private void LoadTemplates(string path, bool bThrowExceptionOnInvalidTemplate)
+		private void LoadTemplates(string path, bool bThrowExceptionOnInvalidTemplate)
         {
             if (!Directory.Exists(path))
                 return;
@@ -561,13 +578,13 @@ namespace MonoGame.Tools.Pipeline
             foreach (var f in files)
             {
                 var lines = File.ReadAllLines(f);
-				if (lines.Length != 5)
-				{
-					if (bThrowExceptionOnInvalidTemplate)
-						throw new Exception("Invalid template");
-					else
-						continue;
-				}
+                if (lines.Length != 5)
+                {
+                    if (bThrowExceptionOnInvalidTemplate)
+                        throw new Exception("Invalid template");
+                    else
+                        continue;
+                }
 
                 var item = new ContentItemTemplate()
                     {

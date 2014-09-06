@@ -47,6 +47,8 @@ namespace MonoGame.Tools.Pipeline
 
         void OutputClear();
 
-        bool ChooseContentFile(string initialDirectory, out List<string> files);        
+        bool ChooseContentFile(string initialDirectory, out List<string> files);
+
+        bool ChooseContentFolder(string initialDirectory, out List<string> files);
     }
 }
