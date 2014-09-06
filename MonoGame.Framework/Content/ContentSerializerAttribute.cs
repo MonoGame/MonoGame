@@ -1,117 +1,74 @@
-// #region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright © 2009 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-// #endregion License
-//
-// Author: Kenneth James Pouncey
-//
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 
 namespace Microsoft.Xna.Framework.Content
-{
-	// http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.content.contentserializerattribute.aspx
-	// The class definition on msdn site shows: [AttributeUsageAttribute(384)]
-	// The following code var ff = (AttributeTargets)384; shows that ff is Field | Property
-	//  so that is what we use.
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-	public sealed class ContentSerializerAttribute : Attribute
-	{
+{	
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public sealed class ContentSerializerAttribute : Attribute
+    {
+        private string _collectionItemName;
 
-		private bool allowNull;
-		private string collectionItemName;
-		private string elementName;
-		private bool flattenContent;
-		private bool hasCollectionItemName;
-		private bool optional;
-		private bool sharedResource;
+        /// <summary>
+        /// Creates an instance of the attribute.
+        /// </summary>
+        public ContentSerializerAttribute()
+        {
+            AllowNull = true;
+        }
 
+        public bool AllowNull { get; set; }
 
-		public ContentSerializerAttribute ()
-		{
-		}
+        /// <summary>
+        /// Returns the overriden XML element name or the default "Item".
+        /// </summary>
+        public string CollectionItemName
+        {
+            get
+            {
+                // Return the defaul if unset.
+                if (string.IsNullOrEmpty(_collectionItemName))
+                    return "Item";
 
+                return _collectionItemName;
+            }
+            set
+            {
+                _collectionItemName = value;
+            }
+        }
 
-		public bool AllowNull {
-			get { return this.allowNull; }
-			set { this.allowNull = value; }
-		}
+        public string ElementName { get; set; }
 
-		public string CollectionItemName {
-			get { return this.collectionItemName; }
-			set { this.collectionItemName = value; }
-		}
+        public bool FlattenContent { get; set; }
 
-		public string ElementName {
-			get { return this.elementName; }
-			set { this.elementName = value; }
-		}
+        /// <summary>
+        /// Returns true if the default CollectionItemName value was overridden.
+        /// </summary>
+        public bool HasCollectionItemName
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(_collectionItemName);
+            }
+        }
 
-		public bool FlattenContent {
-			get { return this.flattenContent; }
-			set { this.flattenContent = value; }
-		}
+        public bool Optional { get; set; }
 
-		public bool HasCollectionItemName {
-			get { return this.hasCollectionItemName; }
-		}
+        public bool SharedResource { get; set; }
 
-		public bool Optional {
-			get { return this.optional; }
-			set { this.optional = value; }
-		}
-
-		public bool SharedResource {
-			get { return this.sharedResource; }
-			set { this.sharedResource = value; }
-		}
-
-		public ContentSerializerAttribute Clone ()
-		{
-			ContentSerializerAttribute clone = new ContentSerializerAttribute ();
-			clone.allowNull = this.allowNull;
-			clone.collectionItemName = this.collectionItemName;
-			clone.elementName = this.elementName;
-			clone.flattenContent = this.flattenContent;
-			clone.hasCollectionItemName = this.hasCollectionItemName;
-			clone.optional = this.optional;
-			clone.sharedResource = this.sharedResource;
-			return clone;
-		}
-
-	}
+        public ContentSerializerAttribute Clone()
+        {
+            var clone = new ContentSerializerAttribute ();
+            clone.AllowNull = AllowNull;
+            clone._collectionItemName = _collectionItemName;
+            clone.ElementName = ElementName;
+            clone.FlattenContent = FlattenContent;
+            clone.Optional = Optional;
+            clone.SharedResource = SharedResource;
+            return clone;
+        }
+    }
 } 

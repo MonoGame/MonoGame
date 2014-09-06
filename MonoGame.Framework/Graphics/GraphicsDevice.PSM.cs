@@ -82,6 +82,11 @@ namespace Microsoft.Xna.Framework.Graphics
             _graphics.SetFrameBuffer(_graphics.Screen);
         }
 
+        internal void PlatformResolveRenderTargets()
+        {
+            // Resolving MSAA render targets should be done here.
+        }
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             var renderTarget = (RenderTarget2D)_currentRenderTargetBindings[0].RenderTarget;

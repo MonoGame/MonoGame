@@ -120,7 +120,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 				systemBitmap = bitmap;
 			}
 
-            output.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap()));
+            output.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap(true)));
             systemBitmap.Dispose();
 
             return output;

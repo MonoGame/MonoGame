@@ -33,15 +33,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _indexBufferDirty;
 
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[4];
-		private int _currentRenderTargetCount;
+        private int _currentRenderTargetCount;
 
-		public TextureCollection VertexTextures { get; private set; }
+        internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
 
-		public SamplerStateCollection VertexSamplerStates { get; private set; }
+        public TextureCollection VertexTextures { get; private set; }
 
-		public TextureCollection Textures { get; private set; }
+        public SamplerStateCollection VertexSamplerStates { get; private set; }
 
-		public SamplerStateCollection SamplerStates { get; private set; }
+        public TextureCollection Textures { get; private set; }
+
+        public SamplerStateCollection SamplerStates { get; private set; }
 
         // On Intel Integrated graphics, there is a fast hw unit for doing
         // clears to colors where all components are either 0 or 255.
@@ -131,6 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = gdi.PresentationParameters;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = gdi.GraphicsProfile;
             Initialize();
         }
@@ -140,6 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             Initialize();
         }
 
@@ -159,6 +163,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException("presentationParameters");
             PresentationParameters = presentationParameters;
             Setup();
+            GraphicsCapabilities = new GraphicsCapabilities(this);
             GraphicsProfile = graphicsProfile;
             Initialize();
         }
@@ -191,8 +196,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
-            GraphicsCapabilities.Initialize(this);
-
             PlatformInitialize();
 
             // Force set the default render states.
@@ -409,10 +412,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             internal set
             {
-                //check Profile
-                if(value > GraphicsDevice.GetHighestSupportedGraphicsProfile(this))
-                    throw new System.NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
+                //Check if Profile is supported.
+                //TODO: [DirectX] Recreate the Device using the new 
+                //      feature level each time the Profile changes.
+                if(value > GetHighestSupportedGraphicsProfile(this))
+                    throw new NotSupportedException(String.Format("Could not find a graphics device that supports the {0} profile", value.ToString()));
                 _graphicsProfile = value;
+                GraphicsCapabilities.Initialize(this);
             }
         }
 
@@ -492,6 +498,8 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void ApplyRenderTargets(RenderTargetBinding[] renderTargets)
         {
             var clearTarget = false;
+
+            PlatformResolveRenderTargets();
 
             // Clear the current bindings.
             Array.Clear(_currentRenderTargetBindings, 0, _currentRenderTargetBindings.Length);

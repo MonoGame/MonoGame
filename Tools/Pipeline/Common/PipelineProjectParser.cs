@@ -4,15 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -74,6 +67,28 @@ namespace MonoGame.Tools.Pipeline
             ValueName = "string",
             Description = "The optional build config string from the build system.")]
         public string Config { set { _project.Config = value; } }
+
+        // Allow a MGCB file containing the /rebuild parameter to be imported without error
+        [CommandLineParameter(
+            Name = "rebuild",
+            ValueName = "bool",
+            Description = "Forces a rebuild of the project.")]
+        public bool Rebuild { set { _rebuild = value; } }
+        private bool _rebuild;
+
+        // Allow a MGCB file containing the /clean parameter to be imported without error
+        [CommandLineParameter(
+            Name = "clean",
+            ValueName = "bool",
+            Description = "Removes intermediate and output files.")]
+        public bool Clean { set { _clean = value; } }
+        private bool _clean;
+
+        [CommandLineParameter(
+            Name = "compress",
+            ValueName = "bool",
+            Description = "Content files can be compressed for smaller file sizes.")]
+        public bool Compress { set { _project.Compress = value; } }
 
         [CommandLineParameter(
             Name = "importer",
@@ -207,7 +222,7 @@ namespace MonoGame.Tools.Pipeline
 
             var parser = new MGBuildParser(this);
             parser.Title = "Pipeline";
-
+            parser.OnError += (msg, args) => { _controller.View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)); };
             var commands = new string[]
                 {
                     string.Format("/@:{0}", projectFilePath),
@@ -243,6 +258,9 @@ namespace MonoGame.Tools.Pipeline
             io.WriteLine(line);
 
             line = string.Format(lineFormat, "profile", _project.Profile);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "compress", _project.Compress);
             io.WriteLine(line);
 
             line = FormatDivider("References");

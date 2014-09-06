@@ -68,7 +68,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 				characterRegions.Add(new CharacterRegion((char)Start, (char)End));
 			}
 
-			var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning, characterRegions);
+            var characters = new CharacterCollection();
+            foreach (var r in characterRegions)
+            {
+                foreach (var c in r.Characters)
+                    characters.Add(c);
+            }
+
+			var fontDescription = new FontDescription(fontName, fontSize, spacing, style, useKerning);
+            fontDescription.Characters = characters;
 			fontDescription.DefaultCharacter = defaultCharacter;
 			fontDescription.Identity = new ContentIdentity (filename);
 			return fontDescription;

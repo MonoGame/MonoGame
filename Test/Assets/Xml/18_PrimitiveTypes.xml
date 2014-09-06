@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="MonoGame.Tests.ContentPipeline.PrimitiveTypes">
+    <Char>A</Char>
+    <Byte>127</Byte>
+    <SByte>-127</SByte>
+    <Short>-1000</Short>
+    <UShort>1000</UShort>
+    <Int>-100000</Int>
+    <UInt>100000</UInt>
+    <Long>-10000000</Long>
+    <ULong>10000000</ULong>
+    <Float>1234567.0</Float>
+    <Double>1234567890.0</Double>
+  </Asset>
+</XnaContent>

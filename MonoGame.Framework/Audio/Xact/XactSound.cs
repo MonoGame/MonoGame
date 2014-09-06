@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -17,6 +15,8 @@ namespace Microsoft.Xna.Framework.Audio
         private int _waveBankIndex;
         private int _trackIndex;
         private SoundEffectInstance _wave;
+        private float _volume;
+        private float _pitch;
 
         private uint _categoryID;
 
@@ -32,56 +32,53 @@ namespace Microsoft.Xna.Framework.Audio
             _trackIndex = trackIndex;
         }
 
-		public XactSound(SoundBank soundBank, BinaryReader soundReader, uint soundOffset)
+		public XactSound(SoundBank soundBank, BinaryReader soundReader)
 		{
             _soundBank = soundBank;
-
-			var oldPosition = soundReader.BaseStream.Position;
-			soundReader.BaseStream.Seek (soundOffset, SeekOrigin.Begin);
 			
-			byte flags = soundReader.ReadByte ();
-			_complexSound = (flags & 1) != 0;
+            var flags = soundReader.ReadByte();
+            _complexSound = (flags & 0x1) != 0;
+            var hasRPCs = (flags & 0x0E) != 0;
+            var hasEffects = (flags & 0x10) != 0;
 
             _categoryID = soundReader.ReadUInt16();
-            var volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
-            var pitch = soundReader.ReadInt16() / 1000.0f;
-			soundReader.ReadByte (); //unkn
-            soundReader.ReadUInt16 (); // entryLength
+            _volume = XactHelpers.ParseVolumeFromDecibels(soundReader.ReadByte());
+            _pitch = soundReader.ReadInt16() / 1000.0f;
+			var priority = soundReader.ReadByte();
+            soundReader.ReadUInt16(); // filter stuff?
 			
 			uint numClips = 0;
 			if (_complexSound)
-				numClips = (uint)soundReader.ReadByte ();
+				numClips = soundReader.ReadByte();
 			else 
             {
-				_trackIndex = soundReader.ReadUInt16 ();
-				_waveBankIndex = soundReader.ReadByte ();
+				_trackIndex = soundReader.ReadUInt16();
+				_waveBankIndex = soundReader.ReadByte();
 			}
-			
-			if ( (flags & 0x1E) != 0 ) 
-            {
-				uint extraDataLen = soundReader.ReadUInt16 ();
-				//TODO: Parse RPC+DSP stuff
-				
-				// extraDataLen - 2, we need to account for extraDataLen itself!
-				soundReader.BaseStream.Seek (extraDataLen - 2, SeekOrigin.Current);
+
+			if (hasRPCs)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
 			}
-			
+
+			if (hasEffects)
+			{
+				var current = soundReader.BaseStream.Position;
+				var dataLength = soundReader.ReadUInt16();
+				soundReader.BaseStream.Seek(current + dataLength, SeekOrigin.Begin);
+			}
+
 			if (_complexSound)
             {
 				_soundClips = new XactClip[numClips];
-				for (int i=0; i<numClips; i++) {
-					soundReader.ReadByte (); //unkn
-					uint clipOffset = soundReader.ReadUInt32 ();
-					soundReader.ReadUInt32 (); //unkn
-					
-					_soundClips[i] = new XactClip(soundBank, soundReader, clipOffset);
-				}
+				for (int i=0; i<numClips; i++) 
+					_soundClips[i] = new XactClip(soundBank, soundReader);
 			}
 
             var category = soundBank.AudioEngine.Categories[_categoryID];
             category.AddSound(this);
-
-			soundReader.BaseStream.Seek (oldPosition, SeekOrigin.Begin);
 		}
 
         internal void SetFade(float fadeInTime, float fadeOutTime)
@@ -136,6 +133,8 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 }
 
+                _wave.Pitch = _pitch;
+                _wave.Volume = _volume * category._volume[0];
                 _wave.Play();
 			}
 		}
@@ -222,53 +221,39 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-        // Used to set volume from an Audio category, so volume
-        // scaling isn't applied twice.
-        internal void SetVolumeInt(float newVol)
+        internal void UpdateCategoryVolume(float categoryVolume)
         {
-
-            newVol = MathHelper.Clamp(newVol, 0, 1.0f);
+            // The category volume scales our own volume.
+            var volume = _volume * categoryVolume;
 
             if (_complexSound)
             {
                 foreach (XactClip clip in _soundClips)
-                    clip.Volume = newVol;
+                    clip.Volume = volume;
             }
             else
             {
                 if (_wave != null)
-                    _wave.Volume = newVol;
+                    _wave.Volume = volume;
             }
         }
-		
+
 		public float Volume 
         {
 			get 
             {
-				if (_complexSound)
-					return _soundClips[0].Volume;
-                else
-					return _wave != null ? _wave.Volume : 0.0f;
+                return _volume;
 			}
 
 			set
             {
-                var category = _soundBank.AudioEngine.Categories[_categoryID];
-                value = MathHelper.Clamp(value * category._volume[0], 0, 1.0f);
+                _volume = value;
 
-                if (_complexSound)
-                {
-                    foreach (XactClip clip in _soundClips)
-                        clip.Volume = value;
-                }
-                else
-                {
-                    if (_wave != null)
-                        _wave.Volume = value;
-                }
+                var category = _soundBank.AudioEngine.Categories[_categoryID];
+                UpdateCategoryVolume(category._volume[0]);
             }
-		}
-		
+        }
+
 		public bool Playing 
         {
 			get 
@@ -319,7 +304,20 @@ namespace Microsoft.Xna.Framework.Audio
                 return _wave != null && _wave.State == SoundState.Paused;
 			}
 		}
-		
-	}
+
+        public void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            if (_complexSound)
+            {
+                foreach (var clip in _soundClips)
+                    clip.Apply3D(listener, emitter);
+            }
+            else
+            {
+                if (_wave != null)
+                    _wave.Apply3D(listener, emitter);
+            }
+        }
+    }
 }
 

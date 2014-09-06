@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play()
         {
-            var inst = GetPooledInstance();
+            var inst = GetPooledInstance(false);
             if (inst == null)
                 return false;
 
@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public bool Play(float volume, float pitch, float pan)
         {
-            var inst = GetPooledInstance();
+            var inst = GetPooledInstance(false);
             if (inst == null)
                 return false;
 
@@ -210,12 +210,12 @@ namespace Microsoft.Xna.Framework.Audio
         /// <summary>
         /// Returns a sound effect instance from the pool or null if none are available.
         /// </summary>
-        internal SoundEffectInstance GetPooledInstance()
+        internal SoundEffectInstance GetPooledInstance(bool forXAct)
         {
             if (!SoundEffectInstancePool.SoundsAvailable)
                 return null;
 
-            var inst = SoundEffectInstancePool.GetInstance();
+            var inst = SoundEffectInstancePool.GetInstance(forXAct);
             inst._effect = this;
             PlatformSetupInstance(inst);
 
@@ -260,8 +260,7 @@ namespace Microsoft.Xna.Framework.Audio
                     return;
                 
                 _masterVolume = value;
-
-                PlatformSetMasterVolume();
+                SoundEffectInstancePool.UpdateMasterVolume();
             }
         }
 

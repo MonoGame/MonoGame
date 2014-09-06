@@ -2,12 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.IO;
-using System.Windows.Forms.Design;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,7 +29,9 @@ namespace MonoGame.Tools.Pipeline
 
         public GraphicsProfile Profile { get; set; }
 
-        public string Config { get; set; }     
+        public string Config { get; set; }
+
+        public bool Compress { get; set; }
 
         #region IPipelineItem
 

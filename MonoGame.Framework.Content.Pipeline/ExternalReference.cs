@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ExternalReference<T> : ContentItem
+    public sealed class ExternalReference<T> : ContentItem
     {
         /// <summary>
         /// Gets and sets the file name of an ExternalReference.

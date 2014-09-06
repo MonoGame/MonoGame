@@ -45,11 +45,6 @@ namespace Microsoft.Xna.Framework.Audio
             inst._soundPlayer = _audioBuffer.CreatePlayer();
         }
 
-        private static void PlatformSetMasterVolume()
-        {
-            SoundEffectInstancePool.UpdateVolumes();
-        }
-
         private void PlatformDispose(bool disposing)
         {
             if (disposing)

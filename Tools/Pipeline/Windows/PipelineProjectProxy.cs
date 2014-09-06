@@ -54,6 +54,7 @@ namespace MonoGame.Tools.Pipeline
 
         [Category("Settings")]
         [Description("The platform to target when building content.")]
+        [TypeConverter(typeof(SortedEnumTypeConverter))]
         public TargetPlatform Platform
         {
             get { return _project.Platform; }
@@ -74,6 +75,15 @@ namespace MonoGame.Tools.Pipeline
         {
             get { return _project.Config; }
             set { _project.Config = value; }
+        }
+
+        [Category("Settings")]
+        [DisplayName("Compress")]
+        [Description("Content files can be compressed for smaller file sizes.")]
+        public bool Compress
+        {
+            get { return _project.Compress; }
+            set { _project.Compress = value; }
         }
 
         [Category("Statistics")]

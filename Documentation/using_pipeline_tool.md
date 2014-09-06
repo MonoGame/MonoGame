@@ -1,4 +1,4 @@
-The [Pipeline Tool](pipeline.md) is used to orginize and define content for use with MonoGame.  It is installed as part of the MonoGame SDK Installer or can be build [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
+The [Pipeline Tool](pipeline.md) is used to organize and define content for use with MonoGame.  It is installed as part of the MonoGame SDK Installer or can be build [directly from source](https://github.com/mono/MonoGame/tree/develop/Tools/Pipeline) if needed.
 
 ## Create A Project
 

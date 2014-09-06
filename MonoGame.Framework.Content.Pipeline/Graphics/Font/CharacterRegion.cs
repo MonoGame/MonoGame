@@ -36,22 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				}
 			}
 		}
-
-		// Flattens a list of character regions into a combined list of individual characters.
-		public static IEnumerable<Char> Flatten(IEnumerable<CharacterRegion> regions)
-		{
-			if (Any(regions))
-			{
-				// If we have any regions, flatten them and remove duplicates.
-				return Distinct(SelectMany(regions, region => region.Characters));
-			}
-			else
-			{
-				// If no regions were specified, use the default.
-				return Default.Characters;
-			}
-		}
-
+		
 		// Default to just the base ASCII character set.
 		public static CharacterRegion Default = new CharacterRegion(' ', '~');
 

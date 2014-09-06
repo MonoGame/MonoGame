@@ -19,7 +19,11 @@ namespace Microsoft.Xna.Framework.Media
 		private static readonly MediaQueue _queue = new MediaQueue();
 
         // Playing music using XNA, we shouldn't fire extra state changed events
+#if WINDOWS_PHONE
         private static bool playingInternal;
+#else
+        private const bool playingInternal = false;
+#endif
 
 		public static event EventHandler<EventArgs> ActiveSongChanged;
         public static event EventHandler<EventArgs> MediaStateChanged;
@@ -112,13 +116,17 @@ namespace Microsoft.Xna.Framework.Media
 		/// Playback starts immediately at the beginning of the song.
 		/// </summary>
         public static void Play(Song song)
-        {                        
+        {
+            var previousSong = _queue.Count > 0 ? _queue[0] : null;
             _queue.Clear();
             _numSongsInQueuePlayed = 0;
             _queue.Add(song);
 			_queue.ActiveSongIndex = 0;
             
             PlaySong(song);
+
+            if (previousSong != song && ActiveSongChanged != null)
+                ActiveSongChanged.Invoke(null, EventArgs.Empty);
         }
 		
 		public static void Play(SongCollection collection, int index = 0)

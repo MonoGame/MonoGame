@@ -210,7 +210,7 @@ namespace Microsoft.Devices.Sensors
                         // We need the magnetic declination from true north to calculate the true heading from the magnetic heading.
                         // On Android, this is available through Android.Hardware.GeomagneticField, but this requires your geo position.
                         reading.TrueHeading = reading.MagneticHeading;
-                        reading.Timestamp = DateTime.Now;
+                        reading.Timestamp = DateTime.UtcNow;
                         compass.CurrentValue = reading;
                     }
                 }

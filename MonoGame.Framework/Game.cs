@@ -1,70 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -83,10 +19,9 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-        private const float DefaultTargetFramesPerSecond = 60.0f;
-
         private GameComponentCollection _components;
         private GameServiceContainer _services;
+        private ContentManager _content;
         internal GamePlatform Platform;
 
         private SortingFilteringCollection<IDrawable> _drawables =
@@ -113,8 +48,8 @@ namespace Microsoft.Xna.Framework
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
 
-        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks((long)10000000 / (long)DefaultTargetFramesPerSecond);
-        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(1);
+        private TimeSpan _targetElapsedTime = TimeSpan.FromTicks(166667); // 60fps
+        private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(0.02);
 
         private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
@@ -128,7 +63,7 @@ namespace Microsoft.Xna.Framework
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
             _components = new GameComponentCollection();
-            Content = new ContentManager(_services);
+            _content = new ContentManager(_services);
 
             Platform = GamePlatform.Create(this);
             Platform.Activated += OnActivated;
@@ -176,14 +111,20 @@ namespace Microsoft.Xna.Framework
                     }
                     _components = null;
 
-                    if (Content != null)
+                    if (_content != null)
                     {
-                        Content.Dispose();
-                        Content = null;
+                        _content.Dispose();
+                        _content = null;
                     }
 
                     if (_graphicsDeviceManager != null)
                     {
+                        Effect.FlushCache();
+                        BlendState.ResetStates();
+                        DepthStencilState.ResetStates();
+                        RasterizerState.ResetStates();
+                        SamplerState.ResetStates();
+
                         (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
                         _graphicsDeviceManager = null;
                     }
@@ -200,15 +141,9 @@ namespace Microsoft.Xna.Framework
                         Platform = null;
                     }
 
-                    Effect.FlushCache();
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     SoundEffect.PlatformShutdown();
-
-                    BlendState.ResetStates();
-                    DepthStencilState.ResetStates();
-                    RasterizerState.ResetStates();
-                    SamplerState.ResetStates();
                 }
 #if ANDROID
                 Activity = null;
@@ -250,8 +185,11 @@ namespace Microsoft.Xna.Framework
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
-            set 
+            set
             {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+
                 if (_inactiveSleepTime != value)
                 {
                     _inactiveSleepTime = value;
@@ -281,7 +219,7 @@ namespace Microsoft.Xna.Framework
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "value must be positive and non-zero.");
+                        "The time must be positive and non-zero.", default(Exception));
 
                 if (value != _targetElapsedTime)
                 {
@@ -301,7 +239,17 @@ namespace Microsoft.Xna.Framework
             get { return _services; }
         }
 
-        public ContentManager Content { get; set; }
+        public ContentManager Content
+        {
+            get { return _content; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+
+                _content = value;
+            }
+        }
 
         public GraphicsDevice GraphicsDevice
         {
@@ -387,16 +335,19 @@ namespace Microsoft.Xna.Framework
         
         public void RunOneFrame()
         {
-            AssertNotDisposed();
+            if (Platform == null)
+                return;
+
             if (!Platform.BeforeRun())
                 return;
 
             if (!_initialized) {
                 DoInitialize ();
+                _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();
+            BeginRun();            
 
             //Not quite right..
             Tick ();
@@ -688,13 +639,12 @@ namespace Microsoft.Xna.Framework
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
-                
-                //The TouchPanel needs to know the time for when touches arrive
-                TouchPanelState.Update(gameTime);
 
                 Update(gameTime);
+
+                //The TouchPanel needs to know the time for when touches arrive
+                TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
-                
         }
 
         internal void DoDraw(GameTime gameTime)
