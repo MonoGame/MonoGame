@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal virtual void RenderbufferStorageMultisample(int samples, int internalFormat, int width, int height)
             {
-                if (this.GLRenderbufferStorageMultisample != null)
+                if (samples > 0 && this.GLRenderbufferStorageMultisample != null)
                     GLRenderbufferStorageMultisample(All.Renderbuffer, samples, (All)internalFormat, width, height);
                 else
                     GL.RenderbufferStorage(All.Renderbuffer, (All)internalFormat, width, height);
