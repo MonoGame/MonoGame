@@ -62,6 +62,8 @@ namespace MonoGame.Framework
     {
         internal WinFormsGameForm _form;
 
+        static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
+
         private readonly WinFormsGamePlatform _platform;
 
         private bool _isResizable;
@@ -71,8 +73,6 @@ namespace MonoGame.Framework
         private bool _isMouseHidden;
 
         private bool _isMouseInBounds;
-
-        private MouseButtons _mouseDownButtonsState;
 
         #region Internal Properties
 
@@ -180,10 +180,7 @@ namespace MonoGame.Framework
             _form.StartPosition = FormStartPosition.CenterScreen;           
 
             // Capture mouse events.
-            _form.MouseDown += OnMouseDown;
-            _form.MouseMove += OnMouseState;
-            _form.MouseUp += OnMouseUp;
-            _form.MouseWheel += OnMouseState;
+            _form.MouseWheel += OnMouseScroll;
             _form.MouseEnter += OnMouseEnter;
             _form.MouseLeave += OnMouseLeave;            
 
@@ -196,15 +193,12 @@ namespace MonoGame.Framework
             _form.ClientSizeChanged += OnClientSizeChanged;
 
             _form.KeyPress += OnKeyPress;
+
+            _allWindows.Add(this);
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
         {
-            var buttons = Control.MouseButtons;
-            var position = Control.MousePosition;
-            _mouseDownButtonsState = buttons;
-            OnMouseState(null, new MouseEventArgs(buttons, 0, position.X, position.Y, 0));
-
             _platform.IsActive = true;
         }
 
@@ -216,28 +210,29 @@ namespace MonoGame.Framework
                 KeyState.Clear();
         }
 
-        private void OnMouseDown(object sender, MouseEventArgs mouseEventArgs)
+        private void OnMouseScroll(object sender, MouseEventArgs mouseEventArgs)
         {
-            _mouseDownButtonsState |= mouseEventArgs.Button;
-            OnMouseState(sender, mouseEventArgs);
+            MouseState.ScrollWheelValue += mouseEventArgs.Delta;
         }
 
-        private void OnMouseUp(object sender, MouseEventArgs mouseEventArgs)
+        private void UpdateMouseState()
         {
-            _mouseDownButtonsState &= ~mouseEventArgs.Button;
-            OnMouseState(sender, mouseEventArgs);
-        }
+            var clientPos = _form.PointToClient(Control.MousePosition);
+            var withinClient = _form.ClientRectangle.Contains(clientPos);
+            var buttons = Control.MouseButtons;
 
-        private void OnMouseState(object sender, MouseEventArgs mouseEventArgs)
-        {
             var previousState = MouseState.LeftButton;
 
-            MouseState.X = mouseEventArgs.X;
-            MouseState.Y = mouseEventArgs.Y;
-            MouseState.LeftButton = (_mouseDownButtonsState & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.MiddleButton = (_mouseDownButtonsState & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.RightButton = (_mouseDownButtonsState & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
-            MouseState.ScrollWheelValue += mouseEventArgs.Delta;
+            MouseState.X = clientPos.X;
+            MouseState.Y = clientPos.Y;
+            MouseState.LeftButton = (buttons & MouseButtons.Left) == MouseButtons.Left ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.MiddleButton = (buttons & MouseButtons.Middle) == MouseButtons.Middle ? ButtonState.Pressed : ButtonState.Released;
+            MouseState.RightButton = (buttons & MouseButtons.Right) == MouseButtons.Right ? ButtonState.Pressed : ButtonState.Released;
+
+            // Don't process touch state if we're not active 
+            // and the mouse is within the client area.
+            if (!_platform.IsActive || !withinClient)
+                return;
             
             TouchLocationState? touchState = null;
             if (MouseState.LeftButton == ButtonState.Pressed)
@@ -377,7 +372,13 @@ namespace MonoGame.Framework
             // to be processed tick the game.
             NativeMessage msg;
             while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
+            {
+                // Update the mouse state for each window.
+                foreach (var window in _allWindows)
+                    window.UpdateMouseState();
+
                 Game.Tick();
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
