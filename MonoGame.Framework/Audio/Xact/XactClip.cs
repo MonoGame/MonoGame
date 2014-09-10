@@ -9,6 +9,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	class XactClip
 	{
+        private readonly float _defaultVolume;
         private float _volumeScale;
         private float _volume;
 
@@ -20,7 +21,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
             State = SoundState.Stopped;
 
-            _volume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
+		    var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
+            _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);
             var clipOffset = clipReader.ReadUInt32();
 
             // Unknown!
@@ -298,8 +300,27 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new NotImplementedException("Pitch event");
 
                 case 8:
-                    // Volume Event
-                    throw new NotImplementedException("Volume event");
+                {
+                    // Unknown!
+                    clipReader.ReadBytes(2);
+
+                    // Event flags
+                    var eventFlags = clipReader.ReadByte();
+                    var isAdd = (eventFlags & 0x01) == 0x01;
+
+                    // The replacement or additive volume.
+                    var decibles = clipReader.ReadSingle() / 100.0f;
+                    var volume = XactHelpers.ParseVolumeFromDecibels(decibles + (isAdd ? volumeDb : 0));
+
+                    // Unknown!
+                    clipReader.ReadBytes(9);
+
+                    _events[i] = new VolumeEvent(   this, 
+                                                    timeStamp, 
+                                                    randomOffset, 
+                                                    volume);
+                    break;
+                }
 
                 case 17:
                     // Volume Repeat Event
@@ -361,6 +382,7 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 		    _time = 0.0f;
             _nextEvent = 0;
+		    SetVolume(_defaultVolume);
             State = SoundState.Playing; 
             Update(0);
         }
