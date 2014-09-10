@@ -14,13 +14,13 @@ namespace Microsoft.Xna.Framework.Audio
     /// </remarks>
 	public class Cue : IDisposable
 	{
-		AudioEngine engine;
-		string name;
-		XactSound[] sounds;
-		float[] probs;
-		XactSound curSound;
-		
-		float volume = 1.0f;
+        private readonly AudioEngine _engine;
+        private readonly string _name;
+        private readonly XactSound[] _sounds;
+		private readonly float[] _probs;
+
+        private XactSound _curSound;
+        private float _volume = 1.0f;
 
         /// <summary>Indicates whether or not the cue is currently paused.</summary>
         /// <remarks>IsPlaying and IsPaused both return true if a cue is paused while playing.</remarks>
@@ -28,8 +28,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
             {
-				if (curSound != null)
-					return curSound.IsPaused;
+				if (_curSound != null)
+					return _curSound.IsPaused;
 
 				return false;
 			}
@@ -41,8 +41,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
             {
-				if (curSound != null)
-					return curSound.Playing;
+				if (_curSound != null)
+					return _curSound.Playing;
 
 				return false;
 			}
@@ -53,8 +53,8 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			get 
             {
-				if (curSound != null)
-                    return curSound.Stopped;
+				if (_curSound != null)
+                    return _curSound.Stopped;
 
 				return true;
 			}
@@ -91,65 +91,64 @@ namespace Microsoft.Xna.Framework.Audio
         /// <remarks>The friendly name is a value set from the designer.</remarks>
 		public string Name
 		{
-			get { return name; }
+			get { return _name; }
 		}
 		
-		internal Cue (AudioEngine engine, string cuename, XactSound sound)
+		internal Cue(AudioEngine engine, string cuename, XactSound sound)
 		{
-			this.engine = engine;
-			name = cuename;
-			sounds = new XactSound[1];
-			sounds[0] = sound;
-			
-			probs = new float[1];
-			probs[0] = 1.0f;
+			_engine = engine;
+			_name = cuename;
+			_sounds = new XactSound[1];
+			_sounds[0] = sound;
+			_probs = new float[1];
+			_probs[0] = 1.0f;
 		}
 		
-		internal Cue(AudioEngine engine, string cuename, XactSound[] _sounds, float[] _probs)
+		internal Cue(AudioEngine engine, string cuename, XactSound[] sounds, float[] probs)
 		{
-            this.engine = engine;
-			name = cuename;
-			sounds = _sounds;
-			probs = _probs;
+            _engine = engine;
+			_name = cuename;
+			_sounds = sounds;
+			_probs = probs;
 		}
 
         /// <summary>Pauses playback.</summary>
 		public void Pause()
 		{
-			if (curSound != null)
-				curSound.Pause();
+			if (_curSound != null)
+				_curSound.Pause();
 		}
 
         /// <summary>Requests playback of a prepared or preparing Cue.</summary>
         /// <remarks>Calling Play when the Cue already is playing can result in an InvalidOperationException.</remarks>
 		public void Play()
 		{
-            if (!engine._activeCues.Contains(this))
-                engine._activeCues.Add(this);
+            if (!_engine._activeCues.Contains(this))
+                _engine._activeCues.Add(this);
 			
 			//TODO: Probabilities
-            var index = XactHelpers.Random.Next(sounds.Length);
-            curSound = sounds[index];
+            var index = XactHelpers.Random.Next(_sounds.Length);
+            _curSound = _sounds[index];
 			
-			curSound.Volume = volume;
-			curSound.Play();
+			_curSound.SetCueVolume(_volume);
+			_curSound.Play();
 		}
 
         /// <summary>Resumes playback of a paused Cue.</summary>
 		public void Resume()
 		{
-			if (curSound != null)
-				curSound.Resume();
+			if (_curSound != null)
+				_curSound.Resume();
 		}
 
         /// <summary>Stops playback of a Cue.</summary>
         /// <param name="options">Specifies if the sound should play any pending release phases or transitions before stopping.</param>
 		public void Stop(AudioStopOptions options)
 		{
-            engine._activeCues.Remove(this);
+            _engine._activeCues.Remove(this);
 			
-			if (curSound != null)
-                curSound.Stop(options);
+			if (_curSound != null)
+                _curSound.Stop(options);
 		}
 		
         /// <summary>
@@ -162,13 +161,13 @@ namespace Microsoft.Xna.Framework.Audio
 		{
 			if (name == "Volume") 
             {
-				volume = value;
-				if (curSound != null)
-					curSound.Volume = value;
+				_volume = value;
+				if (_curSound != null)
+                    _curSound.SetCueVolume(_volume);
 			} 
             else
             {
-				engine.SetGlobalVariable (name, value);
+				_engine.SetGlobalVariable (name, value);
 			}
 		}
 
@@ -182,9 +181,9 @@ namespace Microsoft.Xna.Framework.Audio
 		public float GetVariable (string name)
 		{
 			if (name == "Volume")
-				return volume;
+				return _volume;
 
-            return engine.GetGlobalVariable (name);
+            return _engine.GetGlobalVariable (name);
 		}
 
         /// <summary>Updates the simulated 3D Audio settings calculated between an AudioEmitter and AudioListener.</summary>
@@ -196,14 +195,14 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
 		public void Apply3D(AudioListener listener, AudioEmitter emitter) 
         {
-            if (curSound != null)
-                curSound.Apply3D(listener, emitter);			
+            if (_curSound != null)
+                _curSound.Apply3D(listener, emitter);			
         }
 
         internal void Update(float dt)
         {
-            if (curSound != null)
-                curSound.Update(dt);
+            if (_curSound != null)
+                _curSound.Update(dt);
         }
 		
 		
