@@ -4,10 +4,6 @@
 
 using System;
 
-#if IOS
-using MonoTouch.MediaPlayer;
-#endif
-
 namespace Microsoft.Xna.Framework.Media
 {
     public static partial class MediaPlayer
@@ -95,23 +91,7 @@ namespace Microsoft.Xna.Framework.Media
         private static bool PlatformGetGameHasControl()
         {
 #if IOS
-            var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
-				
-			if (musicPlayer == null)
-				return true;
-				
-			// TODO: Research the Interrupted state and see if it's valid to
-			// have control at that time.
-				
-			// Note: This will throw a bunch of warnings/output to the console
-			// if running in the simulator. This is a known issue:
-			// http://forums.macrumors.com/showthread.php?t=689102
-			if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
-				musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
-				musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
-				return false;
-				
-			return true;
+            return !MonoTouch.AVFoundation.AVAudioSession.SharedInstance().OtherAudioPlaying;
 #else
             // TODO: Fix me!
             return true;
