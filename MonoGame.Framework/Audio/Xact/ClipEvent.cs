@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
         public abstract void Resume();
         public abstract void SetFade(float fadeInDuration, float fadeOutDuration);
 		public abstract bool Playing { get; }
-		public abstract float Volume { get; set; }
+        public abstract void SetTrackVolume(float volume);
 		public abstract bool IsPaused { get; }
 
         public bool IsReady

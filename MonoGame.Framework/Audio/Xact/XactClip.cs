@@ -9,6 +9,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	class XactClip
 	{
+        private float _volumeScale;
         private float _volume;
 
 		private readonly ClipEvent[] _events;
@@ -316,8 +317,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void SetFade(float fadeInDuration, float fadeOutDuration)
         {
-            foreach(var evt in _events)
-                (evt as PlayWaveEvent).SetFade(fadeInDuration, fadeOutDuration);
+            foreach (var evt in _events)
+            {
+                if (evt is PlayWaveEvent)
+                    evt.SetFade(fadeInDuration, fadeOutDuration);
+            }
         }
 		
 		public void Play()
@@ -363,19 +367,34 @@ namespace Microsoft.Xna.Framework.Audio
 
 				return false;
 			}
-		}
-		
-		public float Volume
+        }
+
+        /// <summary>
+        /// Set the combined volume scale from the parent objects.
+        /// </summary>
+        /// <param name="volume">The volume scale.</param>
+        public void SetVolumeScale(float volume)
         {
-			get {
-				return _volume;
-			}
-			set {
-				_volume = value;
-                foreach(var evt in _events)
-				    evt.Volume = value;
-			}
-		}
+            _volumeScale = volume;
+		    UpdateVolumes();
+        }
+
+        /// <summary>
+        /// Set the volume for the clip.
+        /// </summary>
+        /// <param name="volume">The volume level.</param>
+        public void SetVolume(float volume)
+        {
+            _volume = volume;
+            UpdateVolumes();
+        }
+
+	    private void UpdateVolumes()
+	    {
+            var volume = _volume * _volumeScale;
+            foreach (var evt in _events)
+                evt.SetTrackVolume(volume);
+	    }
 
 		public bool IsPaused
         { 
