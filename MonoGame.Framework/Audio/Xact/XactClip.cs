@@ -301,6 +301,10 @@ namespace Microsoft.Xna.Framework.Audio
                     // Volume Event
                     throw new NotImplementedException("Volume event");
 
+                case 17:
+                    // Volume Repeat Event
+                    throw new NotImplementedException("Volume repeat event");
+
                 case 9:
                     // Marker Event
                     throw new NotImplementedException("Marker event");
