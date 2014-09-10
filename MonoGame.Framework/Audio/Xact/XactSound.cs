@@ -192,7 +192,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if(sound.Playing)
+                    if (sound.State == SoundState.Playing)
                         sound.Pause();
                 }
 			}
@@ -209,7 +209,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 foreach (var sound in _soundClips)
                 {
-                    if (sound.IsPaused)
+                    if (sound.State == SoundState.Paused)
                         sound.Resume();
                 }
 			}
@@ -251,7 +251,7 @@ namespace Microsoft.Xna.Framework.Audio
 				if (_complexSound)
                 {
                     foreach (var clip in _soundClips)
-						if (clip.Playing)
+                        if (clip.State == SoundState.Playing)
                             return true;
 
                     return false;
@@ -268,10 +268,10 @@ namespace Microsoft.Xna.Framework.Audio
                 if (_complexSound)
                 {
                     foreach (var clip in _soundClips)
-                        if (clip.Playing)
-                            return false;
+                        if (clip.State == SoundState.Stopped)
+                            return true;
 
-                    return true;
+                    return false;
                 }
 
                 return _wave == null || _wave.State == SoundState.Stopped;
@@ -285,7 +285,7 @@ namespace Microsoft.Xna.Framework.Audio
 				if (_complexSound) 
                 {
 					foreach (var clip in _soundClips)
-						if (clip.IsPaused) 
+						if (clip.State == SoundState.Paused) 
                             return true;
 
 					return false;

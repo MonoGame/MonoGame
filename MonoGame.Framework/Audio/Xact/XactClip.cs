@@ -13,9 +13,11 @@ namespace Microsoft.Xna.Framework.Audio
         private float _volume;
 
 		private readonly ClipEvent[] _events;
-		
+
 		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
+            State = SoundState.Stopped;
+
             _volume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
             var clipOffset = clipReader.ReadUInt32();
 
@@ -311,6 +313,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
+            if (State != SoundState.Playing)
+                return;
+
             foreach (var evt in _events)
                 evt.Update(dt);
         }
@@ -325,49 +330,41 @@ namespace Microsoft.Xna.Framework.Audio
         }
 		
 		public void Play()
-        {
-			//TODO: run events
+		{
+            State = SoundState.Playing; 
+			
             foreach (var evt in _events)
             {
                 if (evt.IsReady)
                     evt.Play();
             }
-		}
+        }
 
 		public void Resume()
 		{
             foreach (var evt in _events)
-            {
-                if (evt.IsReady)
-                    evt.Resume();
-            }
+                evt.Resume();
+
+            State = SoundState.Playing;
 		}
 		
 		public void Stop()
         {
             foreach (var evt in _events)
                 evt.Stop();
-		}
+
+            State = SoundState.Stopped;
+        }
 		
 		public void Pause()
         {
-            foreach (var evt in _events)
-                evt.Pause();
-		}
-		
-		public bool Playing
-        {
-			get
-            {
-                foreach (var evt in _events)
-                {
-                    if (evt.Playing)
-                        return true;
-                }
+		    foreach (var evt in _events)
+		        evt.Pause();
 
-				return false;
-			}
+            State = SoundState.Paused;
         }
+
+        public SoundState State { get; private set; }
 
         /// <summary>
         /// Set the combined volume scale from the parent objects.
@@ -395,20 +392,6 @@ namespace Microsoft.Xna.Framework.Audio
             foreach (var evt in _events)
                 evt.SetTrackVolume(volume);
 	    }
-
-		public bool IsPaused
-        { 
-			get
-            {
-                foreach (var evt in _events)
-                {
-                    if (evt.IsPaused)
-                        return true;
-                }
-
-				return false; 
-			} 
-		}
 
         public void Apply3D(AudioListener listener, AudioEmitter emitter)
         {
