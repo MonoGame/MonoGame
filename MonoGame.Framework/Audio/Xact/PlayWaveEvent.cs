@@ -167,8 +167,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav = null;
             }
             _loopIndex = 0;
-
-            base.Stop();
 		}
 
 		public override void Pause() 
@@ -181,22 +179,6 @@ namespace Microsoft.Xna.Framework.Audio
 		{
             if (_wav != null && _wav.State == SoundState.Paused)
                 _wav.Resume();
-		}
-
-		public override bool Playing 
-        {
-			get 
-            {
-                return _wav != null && _wav.State == SoundState.Playing;
-			}
-		}
-
-		public override bool IsPaused
-		{
-			get
-			{
-                return _wav != null && _wav.State == SoundState.Paused;
-			}
 		}
 
         public override void SetTrackVolume(float volume)
@@ -217,7 +199,7 @@ namespace Microsoft.Xna.Framework.Audio
             // TODO
         }
 
-        public override void Update(float dt)
+        public override bool Update(float dt)
         {
             if (_wav != null && _wav.State == SoundState.Stopped)
             {
@@ -239,7 +221,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            base.Update(dt);
+            return _wav != null && _wav.State != SoundState.Stopped;
         }
 
         public override void Apply3D(AudioListener listener, AudioEmitter emitter)

@@ -13,6 +13,8 @@ namespace Microsoft.Xna.Framework.Audio
         private float _volume;
 
 		private readonly ClipEvent[] _events;
+        private float _time;
+        private int _nextEvent;
 
 		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
@@ -316,8 +318,30 @@ namespace Microsoft.Xna.Framework.Audio
             if (State != SoundState.Playing)
                 return;
 
-            foreach (var evt in _events)
-                evt.Update(dt);
+            _time += dt;
+
+            // Play the next event.
+            while (_nextEvent < _events.Length)
+            {
+                var evt = _events[_nextEvent];
+                if (_time < evt.TimeStamp)
+                    break;
+
+                evt.Play();
+                ++_nextEvent;
+            }
+
+            // Update all the active events.
+            var isPlaying = _nextEvent < _events.Length;
+            for (var i = 0; i < _nextEvent; i++)
+            {
+                var evt = _events[i];
+                isPlaying |= evt.Update(dt);
+            }
+
+            // Update the state.
+            if (!isPlaying)
+                State = SoundState.Stopped;
         }
 
         internal void SetFade(float fadeInDuration, float fadeOutDuration)
@@ -331,13 +355,10 @@ namespace Microsoft.Xna.Framework.Audio
 		
 		public void Play()
 		{
+		    _time = 0.0f;
+            _nextEvent = 0;
             State = SoundState.Playing; 
-			
-            foreach (var evt in _events)
-            {
-                if (evt.IsReady)
-                    evt.Play();
-            }
+            Update(0);
         }
 
 		public void Resume()
