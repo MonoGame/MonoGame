@@ -18,11 +18,9 @@ namespace Microsoft.Xna.Framework.Media
         private static bool _isShuffled;
 		private static readonly MediaQueue _queue = new MediaQueue();
 
-        // Playing music using XNA, we shouldn't fire extra state changed events
 #if WINDOWS_PHONE
-        private static bool playingInternal;
-#else
-        private const bool playingInternal = false;
+        // PlayingInternal should default to true to be to work with the user's default playing music
+        private static bool playingInternal = true;
 #endif
 
 		public static event EventHandler<EventArgs> ActiveSongChanged;
@@ -73,8 +71,12 @@ namespace Microsoft.Xna.Framework.Media
                 if (_state != value)
                 {
                     _state = value;
-                    if (MediaStateChanged != null && !playingInternal)
-                        MediaStateChanged(null, EventArgs.Empty);
+                    if (MediaStateChanged != null)
+#if WINDOWS_PHONE
+                        // Playing music using XNA, we shouldn't fire extra state changed events
+                        if (!playingInternal)
+#endif
+                            MediaStateChanged(null, EventArgs.Empty);
                 }
             }
         }
