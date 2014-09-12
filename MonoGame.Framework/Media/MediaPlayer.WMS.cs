@@ -139,7 +139,8 @@ namespace Microsoft.Xna.Framework.Media
 
             // Get the volume interface.
             IntPtr volumeObj;
-
+            int trycount = 0;
+           	tryagain:
             
             try
             {
@@ -147,7 +148,12 @@ namespace Microsoft.Xna.Framework.Media
             }
             catch
             {
-                MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+            	if (trycount >= 5)
+            		MediaFactory.GetService(_session,MRPolicyVolumeService,SimpleAudioVolumeGuid, out volumeObj);
+            	else {
+            		trycount++;
+            		goto tryagain;
+            	}
             }  
           
 
