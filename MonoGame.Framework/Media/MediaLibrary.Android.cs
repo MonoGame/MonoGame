@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Android.Content;
 using Android.Provider;
-using Android.Text.Format;
 using Uri = Android.Net.Uri;
 
 namespace Microsoft.Xna.Framework.Media
@@ -27,29 +27,43 @@ namespace Microsoft.Xna.Framework.Media
                     Dictionary<string, Album> albums = new Dictionary<string, Album>();
                     Dictionary<string, Genre> genres = new Dictionary<string, Genre>();
 
+                    // Note: Grabbing album art using MediaStore.Audio.AlbumColumns.AlbumArt and
+                    // MediaStore.Audio.AudioColumns.AlbumArt is broken
+                    // See: https://code.google.com/p/android/issues/detail?id=1630
+                    // Workaround: http://stackoverflow.com/questions/1954434/cover-art-on-android
+
                     int albumNameColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.Album);
                     int albumArtistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.Artist);
-                    int albumArtColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.AlbumArt);
-                    int genreColumn = musicCursor.GetColumnIndex(MediaStore.Audio.GenresColumns.Name);
+                    int albumIdColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.AlbumId);
+                    int genreColumn = musicCursor.GetColumnIndex(MediaStore.Audio.GenresColumns.Name); // Also broken :(
 
                     int artistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Artist);
                     int titleColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Title);
                     int durationColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Duration);
                     int assetIdColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Id);
 
+                    if (titleColumn == -1 || durationColumn == -1 || assetIdColumn == -1)
+                    {
+                        Debug.WriteLine("Missing essential properties from music library. Returning empty library.");
+                        albumCollection = new AlbumCollection(albumList);
+                        songCollection = new SongCollection(songList);
+                        return;
+                    }
+
                     do
                     {
-                        string albumNameProperty = musicCursor.GetString(albumNameColumn);
-                        string albumArtistProperty = musicCursor.GetString(albumArtistColumn);
-                        string albumArtProperty = musicCursor.GetString(albumArtColumn);
-                        string genreProperty = musicCursor.GetString(genreColumn);
-
-                        string artistProperty = musicCursor.GetString(artistColumn);
+                        string albumNameProperty = albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : "Unknown Album";
+                        string albumArtistProperty = albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : "Unknown Artist";
+                        string genreProperty = genreColumn > -1 ? musicCursor.GetString(genreColumn) : "Unknown Genre";
+                        string artistProperty = artistColumn > -1 ? musicCursor.GetString(artistColumn) : "Unknown Artist";
                         string titleProperty = musicCursor.GetString(titleColumn);
+
                         long durationProperty = musicCursor.GetLong(durationColumn);
                         TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
                         long assetId = musicCursor.GetLong(assetIdColumn);
                         var assetUri = ContentUris.WithAppendedId(MediaStore.Audio.Media.ExternalContentUri, assetId);
+                        long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;
+                        var albumArtUri = albumId > -1 ? ContentUris.WithAppendedId(Uri.Parse("content://media/external/audio/albumart"), albumId) : null;
                         
                         Artist artist;
                         if (!artists.TryGetValue(artistProperty, out artist))
@@ -75,7 +89,7 @@ namespace Microsoft.Xna.Framework.Media
                         Album album;
                         if (!albums.TryGetValue(albumNameProperty, out album))
                         {
-                            album = new Album(new SongCollection(), albumNameProperty, albumArtist, genre, Uri.Parse(albumArtProperty));
+                            album = new Album(new SongCollection(), albumNameProperty, albumArtist, genre, albumArtUri);
                             albums.Add(album.Name, album);
                             albumList.Add(album);
                         }
