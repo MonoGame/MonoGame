@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
             return _queue.ActiveSong.Position;
         }
 
-#if IOS
+#if IOS || ANDROID
         private static void PlatformSetPlayPosition(TimeSpan playPosition)
         {
             if (_queue.ActiveSong != null)

@@ -129,6 +129,10 @@ namespace Microsoft.Xna.Framework.Media
 
                 return TimeSpan.Zero;
             }
+            set
+            {
+                _androidPlayer.SeekTo((int)value.TotalMilliseconds);   
+            }
         }
 
 
