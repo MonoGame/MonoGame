@@ -464,7 +464,9 @@ namespace Microsoft.Xna.Framework.Graphics
         [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Bitmap bitmap)
         {
-            return PlatformFromStream(graphicsDevice, bitmap);
+            var texture = PlatformFromStream(graphicsDevice, bitmap);
+            bitmap.Recycle();
+            return texture;
         }
 #endif
 
