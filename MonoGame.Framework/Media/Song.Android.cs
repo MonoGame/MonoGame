@@ -20,6 +20,12 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan duration;
         private Android.Net.Uri assetUri;
 
+        static Song()
+        {
+            _androidPlayer = new Android.Media.MediaPlayer();
+            _androidPlayer.Completion += AndroidPlayer_Completion;
+        }
+
         internal Song(Album album, Artist artist, Genre genre, string name, TimeSpan duration, Android.Net.Uri assetUri)
         {
             this.album = album;
@@ -32,11 +38,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformInitialize(string fileName)
         {
-            if (_androidPlayer == null)
-            {
-                _androidPlayer = new Android.Media.MediaPlayer();
-                _androidPlayer.Completion += new EventHandler(AndroidPlayer_Completion);
-            }
+            // Nothing to do here
         }
 
         static void AndroidPlayer_Completion(object sender, EventArgs e)
