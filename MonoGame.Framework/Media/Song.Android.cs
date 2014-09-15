@@ -13,6 +13,23 @@ namespace Microsoft.Xna.Framework.Media
         static Android.Media.MediaPlayer _androidPlayer;
         static Song _playingSong;
 
+        private Album album;
+        private Artist artist;
+        private Genre genre;
+        private string name;
+        private TimeSpan duration;
+        private Android.Net.Uri assetUri;
+
+        internal Song(Album album, Artist artist, Genre genre, string name, TimeSpan duration, Android.Net.Uri assetUri)
+        {
+            this.album = album;
+            this.artist = artist;
+            this.genre = genre;
+            this.name = name;
+            this.duration = duration;
+            this.assetUri = assetUri;
+        }
+
         private void PlatformInitialize(string fileName)
         {
             if (_androidPlayer == null)
@@ -49,15 +66,25 @@ namespace Microsoft.Xna.Framework.Media
         internal void Play()
         {
             // Prepare the player
-            var afd = Game.Activity.Assets.OpenFd(_name);
-            if (afd != null)
+            _androidPlayer.Reset();
+
+            if (assetUri != null)
             {
-                _androidPlayer.Reset();
-                _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
-                _androidPlayer.Prepare();
-                _androidPlayer.Looping = MediaPlayer.IsRepeating;
-                _playingSong = this;
+                _androidPlayer.SetDataSource(MediaLibrary.Context, this.assetUri);
             }
+            else
+            {
+                var afd = Game.Activity.Assets.OpenFd(_name);
+                if (afd == null)
+                    return;
+
+                _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+            }
+
+
+            _androidPlayer.Prepare();
+            _androidPlayer.Looping = MediaPlayer.IsRepeating;
+            _playingSong = this;
 
             _androidPlayer.Start();
             _playCount++;
@@ -107,22 +134,22 @@ namespace Microsoft.Xna.Framework.Media
 
         private Album PlatformGetAlbum()
         {
-            return null;
+            return this.album;
         }
 
         private Artist PlatformGetArtist()
         {
-            return null;
+            return this.artist;
         }
 
         private Genre PlatformGetGenre()
         {
-            return null;
+            return this.genre;
         }
 
         private TimeSpan PlatformGetDuration()
         {
-            return _duration;
+            return this.assetUri != null ? this.duration : _duration;
         }
 
         private bool PlatformIsProtected()
@@ -137,7 +164,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private string PlatformGetName()
         {
-            return Path.GetFileNameWithoutExtension(_name);
+            return this.assetUri != null ? this.name : Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()

@@ -21,6 +21,8 @@ namespace Microsoft.Xna.Framework
 
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
+
+            MediaLibrary.Context = Game.Activity;
         }
 
         protected override void Dispose(bool disposing)
