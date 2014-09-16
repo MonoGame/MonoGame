@@ -282,7 +282,7 @@ namespace MGCB
                 catch (InvalidContentException ex)
                 {
                     var message = string.Empty;
-                    if (!string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                    if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
                     {
                         message = ex.ContentIdentity.SourceFilename;
                         if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
