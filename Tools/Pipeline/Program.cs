@@ -25,6 +25,8 @@ namespace MonoGame.Tools.Pipeline
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            History.Default.Load();
+
 			var view = new MainView();
             if (args != null && args.Length > 0)
             {
