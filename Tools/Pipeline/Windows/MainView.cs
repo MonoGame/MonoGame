@@ -71,8 +71,6 @@ namespace MonoGame.Tools.Pipeline
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
             Form = this;
-
-            UpdateRecentProjectList();
         }
 
         public void Attach(IController controller)
