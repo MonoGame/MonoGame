@@ -71,6 +71,8 @@ namespace MonoGame.Tools.Pipeline
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
             Form = this;
+
+            UpdateRecentProjectList();
         }
 
         public void Attach(IController controller)
@@ -192,6 +194,23 @@ namespace MonoGame.Tools.Pipeline
                 return;
 
             ContextMenu_OpenFile_Click(sender, args);            
+        }
+
+        public void UpdateRecentProjectList()
+        {
+            _openRecentMenuItem.DropDownItems.Clear();
+
+            foreach (var project in History.Default.ProjectHistory)
+            {
+                var recentItem = new ToolStripMenuItem(project);
+                recentItem.Click += (sender, args) =>
+                {
+                    _controller.OpenProject(project);
+                };
+
+                _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
+            }
+
         }
 
         public AskResult AskSaveOrCancel()
@@ -661,6 +680,7 @@ namespace MonoGame.Tools.Pipeline
             _cancelBuildMenuItem.Visible = !notBuilding;
       
             UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
+            UpdateRecentProjectList();
         }
         
         private void UpdateUndoRedo(bool canUndo, bool canRedo)
