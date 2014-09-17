@@ -82,7 +82,16 @@ namespace MonoGame.Tools.Pipeline
 
         public void Save()
         {
-            using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Create, _isoStore))
+            //There seems to be a weird bug where sometimes Create will throw a file not found exception,
+            //so we use CreateNew if there is no file, and create if there is.
+            var fileMode = FileMode.CreateNew;
+
+            if (_isoStore.FileExists(ProjectHistoryPath))
+            {
+                fileMode = FileMode.Create;
+            }
+
+            using (IsolatedStorageFileStream isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, fileMode, _isoStore))
             {
                 using (StreamWriter writer = new StreamWriter(isoStream))
                 {
