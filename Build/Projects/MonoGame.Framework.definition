@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,Web">
+<Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,Web">
 
   <ProjectGuids>
   	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
-	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>
-	<Platform Name="iOS">DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47</Platform>
-	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
-	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
-	<Platform Name="Ouya">8BEA875D-66D2-4A5F-B137-83D262A3851D</Platform>
-	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
-	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
-	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
-	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
-	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
+  	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>
+  	<Platform Name="iOS">DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47</Platform>
+  	<Platform Name="Linux">35253CE1-C864-4CD3-8249-4D1319748E8F</Platform>
+  	<Platform Name="MacOS">36C538E6-C32A-4A8D-A39C-566173D7118E</Platform>
+  	<Platform Name="Ouya">8BEA875D-66D2-4A5F-B137-83D262A3851D</Platform>
+  	<Platform Name="PSMobile">EA26E76F-FDFE-4A8C-B5A3-C3B5761E28F9</Platform>
+  	<Platform Name="Windows">7DE47032-A904-4C29-BD22-2D235E8D91BA</Platform>
+  	<Platform Name="Windows8">0518563C-ACCA-4A14-8C5D-DDBE93E2605F</Platform>
+  	<Platform Name="WindowsGL">6D75E618-19CA-4C51-9546-F10965FBC0B8</Platform>
+  	<Platform Name="WindowsPhone">BAA9A6E4-7690-4DE0-9531-DE0EAEEC9739</Platform>
+    <Platform Name="WindowsPhone81">6522B7E9-25A5-4250-B164-42CC2C4ECCAD</Platform>
   </ProjectGuids>
 
   <!-- Common assembly references -->
@@ -44,6 +45,7 @@
       <Platform Name="Windows8">TRACE;NETFX_CORE;WINRT;WINDOWS_STOREAPP;DIRECTX;DIRECTX11_1;WINDOWS_MEDIA_ENGINE</Platform>
       <Platform Name="WindowsGL">TRACE;WINDOWS;OPENGL;OPENAL</Platform>
       <Platform Name="WindowsPhone">TRACE;SILVERLIGHT;WINDOWS_PHONE;WINRT;DIRECTX</Platform>
+      <Platform Name="WindowsPhone81">TRACE;WINRT;WINDOWS_PHONE81;DIRECTX;WINDOWS_STOREAPP</Platform>
       <Platform Name="Web">TRACE;WEB</Platform>
     </CustomDefinitions>
 
