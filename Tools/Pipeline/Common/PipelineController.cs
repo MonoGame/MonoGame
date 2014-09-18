@@ -373,6 +373,7 @@ namespace MonoGame.Tools.Pipeline
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
                 _buildProcess.StartInfo.RedirectStandardOutput = true;
+                _buildProcess.StartInfo.RedirectStandardError = true;
                 _buildProcess.OutputDataReceived += (sender, args) => _view.OutputAppend(args.Data);
 
                 // Fire off the process.
@@ -391,6 +392,10 @@ namespace MonoGame.Tools.Pipeline
                     _view.OutputAppend("Build failed:" + Environment.NewLine);
                     _view.OutputAppend(ex.ToString());
                 }
+            }
+            finally
+            {
+                _view.OutputAppend("\n" + _buildProcess.StandardError.ReadToEnd());
             }
 
             // Clear the process pointer, so that cancel
@@ -576,7 +581,7 @@ namespace MonoGame.Tools.Pipeline
             LoadTemplates(_project.Location, false);
         }
 
-		private void LoadTemplates(string path, bool bThrowExceptionOnInvalidTemplate)
+        private void LoadTemplates(string path, bool bThrowExceptionOnInvalidTemplate)
         {
             if (!Directory.Exists(path))
                 return;
