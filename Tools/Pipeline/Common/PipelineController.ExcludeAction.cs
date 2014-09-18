@@ -58,7 +58,7 @@ namespace MonoGame.Tools.Pipeline
                 {
                     var item = new ContentItem()
                         {
-                            Controller = _con,
+                            Observer = _con,
                         };
                     obj.Apply(item);
                     item.ResolveTypes();

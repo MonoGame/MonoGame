@@ -14,12 +14,12 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class PipelineProjectParser
+    public class PipelineProjectParser
     {
         #region Other Data
 
         private readonly PipelineProject _project;
-        private readonly IController _controller;
+        private readonly IContentItemObserver _observer;
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
         
         private string _processor;
@@ -156,7 +156,7 @@ namespace MonoGame.Tools.Pipeline
             // Create the item for processing later.
             var item = new ContentItem
             {
-                Controller = _controller,
+                Observer = _observer,
                 BuildAction = BuildAction.Build,
                 OriginalPath = sourceFile,
                 ImporterName = Importer,
@@ -207,13 +207,13 @@ namespace MonoGame.Tools.Pipeline
 
         #endregion
 
-        public PipelineProjectParser(IController controller, PipelineProject project)
+        public PipelineProjectParser(IContentItemObserver observer, PipelineProject project)
         {
-            _controller = controller;
+            _observer = observer;
             _project = project;
         }        
 
-        public void OpenProject(string projectFilePath)
+        public void OpenProject(string projectFilePath, MGBuildParser.ErrorCallback errorCallback)
         {
             _project.ContentItems.Clear();
 
@@ -222,7 +222,10 @@ namespace MonoGame.Tools.Pipeline
 
             var parser = new MGBuildParser(this);
             parser.Title = "Pipeline";
-            parser.OnError += (msg, args) => { _controller.View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)); };
+
+            if (errorCallback != null)
+                parser.OnError += errorCallback;
+
             var commands = new string[]
                 {
                     string.Format("/@:{0}", projectFilePath),

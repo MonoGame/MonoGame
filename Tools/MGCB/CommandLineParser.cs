@@ -89,7 +89,8 @@ namespace MGCB
 
         public readonly PreprocessorPropertyCollection _properties;
 
-        public event Action<string, object[]> OnError;
+        public delegate void ErrorCallback(string msg, object[] args);
+        public event ErrorCallback OnError;
 
         public MGBuildParser(object optionsObject)
         {
