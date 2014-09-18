@@ -373,12 +373,16 @@ namespace MonoGame.Framework
             NativeMessage msg;
             while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
             {
-                // Update the mouse state for each window.
-                foreach (var window in _allWindows)
-                    window.UpdateMouseState();
-
+                UpdateWindows();
                 Game.Tick();
             }
+        }
+
+        internal void UpdateWindows()
+        {
+            // Update the mouse state for each window.
+            foreach (var window in _allWindows)
+                window.UpdateMouseState();
         }
 
         [StructLayout(LayoutKind.Sequential)]
