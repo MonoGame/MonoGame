@@ -11,14 +11,14 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private readonly Effect _effect;
 
-		private readonly Shader _pixelShader;
+        private readonly Shader _pixelShader;
         private readonly Shader _vertexShader;
 
         private readonly BlendState _blendState;
         private readonly DepthStencilState _depthStencilState;
         private readonly RasterizerState _rasterizerState;
 
-		public string Name { get; private set; }
+        public string Name { get; private set; }
 
         public EffectAnnotationCollection Annotations { get; private set; }
 
@@ -92,13 +92,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexShader != null)
             {
-				device.VertexShader = _vertexShader;
+                device.VertexShader = _vertexShader;
 
-				// Update the texture parameters.
-				if (null != device.VertexTextures)
-					SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
-				else
-					SetShaderSamplers(_vertexShader, device.Textures, device.SamplerStates);
+                // Update the texture parameters.
+                if (null != device.VertexTextures)
+                    SetShaderSamplers(_vertexShader, device.VertexTextures, device.VertexSamplerStates);
+                else
+                    SetShaderSamplers(_vertexShader, device.Textures, device.SamplerStates);
 
                 // Update the constant buffers.
                 for (var c = 0; c < _vertexShader.CBuffers.Length; c++)
@@ -114,7 +114,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 device.PixelShader = _pixelShader;
 
                 // Update the texture parameters.
-				SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
+                SetShaderSamplers(_pixelShader, device.Textures, device.SamplerStates);
                 
                 // Update the constant buffers.
                 for (var c = 0; c < _pixelShader.CBuffers.Length; c++)
@@ -154,23 +154,23 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
-		private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
-		{
-			foreach (var sampler in shader.Samplers)
-			{
-				var param = _effect.Parameters[sampler.parameter];
-				var texture = param.Data as Texture;
+        private void SetShaderSamplers(Shader shader, TextureCollection textures, SamplerStateCollection samplerStates)
+        {
+            foreach (var sampler in shader.Samplers)
+            {
+                var param = _effect.Parameters[sampler.parameter];
+                var texture = param.Data as Texture;
 
-				// If there is no texture assigned then skip it
-				// and leave whatever set directly on the device.
-				if (texture != null)
-					textures[sampler.textureSlot] = texture;
+                // If there is no texture assigned then skip it
+                // and leave whatever set directly on the device.
+                if (texture != null)
+                    textures[sampler.textureSlot] = texture;
 
-				// If there is a sampler state set it.
-				if (sampler.state != null)
-					samplerStates[sampler.samplerSlot] = sampler.state;
-			}
-		}
-		
+                // If there is a sampler state set it.
+                if (sampler.state != null)
+                    samplerStates[sampler.samplerSlot] = sampler.state;
+            }
+        }
+        
     }
 }
