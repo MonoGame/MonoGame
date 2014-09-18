@@ -7,7 +7,12 @@ using System.Collections.Generic;
 
 namespace MonoGame.Tools.Pipeline
 {
-    interface IController
+    public interface IContentItemObserver
+    {
+        void OnItemModified(ContentItem item);
+    }
+
+    interface IController : IContentItemObserver
     {
         /// <summary>
         /// Types of content which can be created and added to a project. 
@@ -70,11 +75,6 @@ namespace MonoGame.Tools.Pipeline
         /// Notify controller that Project.References has been modified.
         /// </summary>
         void OnReferencesModified();
-
-        /// <summary>
-        /// Notify controller that a property of ContentItem has been modified.
-        /// </summary>        
-        void OnItemModified(ContentItem contentItem);
 
         void NewProject();
 

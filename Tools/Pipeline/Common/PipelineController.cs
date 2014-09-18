@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using MGCB;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -71,7 +72,6 @@ namespace MonoGame.Tools.Pipeline
             _view = view;
             _view.Attach(this);
             _project = project;
-            _project.Controller = this;
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
@@ -210,8 +210,11 @@ namespace MonoGame.Tools.Pipeline
             {
                 _actionStack.Clear();
                 _project = new PipelineProject();
+                
                 var parser = new PipelineProjectParser(this, _project);
-                parser.OpenProject(projectFilePath);
+                var errorCallback = new MGBuildParser.ErrorCallback((msg, args) => View.OutputAppend(string.Format(Path.GetFileName(projectFilePath) + ": " + msg, args)));
+                parser.OpenProject(projectFilePath, errorCallback);
+
                 ResolveTypes();
 
                 ProjectOpen = true;
@@ -553,7 +556,7 @@ namespace MonoGame.Tools.Pipeline
             PipelineTypes.Load(_project);
             foreach (var i in _project.ContentItems)
             {
-                i.Controller = this;
+                i.Observer = this;
                 i.ResolveTypes();
                 _view.UpdateProperties(i);
             }

@@ -47,7 +47,7 @@ namespace MonoGame.Tools.Pipeline
                 if (parser.AddContent(fullpath, true))
                 {
                     var item = _con._project.ContentItems.Last();
-                    item.Controller = _con;
+                    item.Observer = _con;
                     item.ImporterName = _template.ImporterName;
                     item.ProcessorName = _template.ProcessorName;
                     item.ResolveTypes();

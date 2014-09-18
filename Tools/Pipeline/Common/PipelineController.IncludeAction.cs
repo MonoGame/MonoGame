@@ -34,8 +34,8 @@ namespace MonoGame.Tools.Pipeline
                     if (!parser.AddContent(f, true))
                         continue;
 
-                    var item = _con._project.ContentItems.Last();                    
-                    item.Controller = _con;
+                    var item = _con._project.ContentItems.Last();
+                    item.Observer = _con;
                     item.ResolveTypes();
 
                     _files[i] = item.OriginalPath;
