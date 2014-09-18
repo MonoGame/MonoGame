@@ -489,12 +489,17 @@ namespace MonoGame.Tools.Pipeline
         }
 
         private void MainView_Load(object sender, EventArgs e)
-        {
-            //Priority is given to any command line arguments.
-            if (string.IsNullOrEmpty(OpenProjectPath) && History.Default.ProjectHistory.Count > 0)
+        {            
+            // We only load the History.StartupProject if there was not
+            // already a project specified via command line.
+            if (string.IsNullOrEmpty(OpenProjectPath))
             {
-                OpenProjectPath = History.Default.ProjectHistory.Last();
+                var startupProject = History.Default.StartupProject;
+                if (!string.IsNullOrEmpty(startupProject) && File.Exists(startupProject))                
+                    OpenProjectPath = startupProject;                
             }
+
+            History.Default.StartupProject = null;
             
             if (!string.IsNullOrEmpty(OpenProjectPath))
             {
