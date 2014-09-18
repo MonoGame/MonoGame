@@ -66,7 +66,11 @@ namespace MonoGame.Tools.Pipeline
 
         public void Save()
         {
-            using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, FileMode.Create, _isoStore))
+            var mode = FileMode.CreateNew;
+            if (_isoStore.FileExists(ProjectHistoryPath)) 
+                mode = FileMode.Truncate;
+
+            using (var isoStream = new IsolatedStorageFileStream(ProjectHistoryPath, mode, _isoStore))
             {
                 using (var writer = new StreamWriter(isoStream))
                 {
