@@ -19,9 +19,9 @@ namespace Microsoft.Xna.Framework
 			Debug.WriteLine(ToString());
 		}
 		
-		public override string ToString ()
+		public override string ToString()
 		{
-			return string.Format("[{0}({1}%)\t HitCount={2}\t TotalTime={3}ms\t MaxTime={4}ms\t AverageTime={5}ms]", Name,(100*TotalTime)/PerformanceCounter.ElapsedTime,HitCount,TotalTime, MaxTime, TotalTime/HitCount);
+            return "[" + Name + "(" + (100 * TotalTime) / PerformanceCounter.ElapsedTime + "%)\t HitCount=" + HitCount + "\t TotalTime=" + TotalTime + "ms\t MaxTime=" + MaxTime + "ms\t AverageTime=" + TotalTime / HitCount + "ms]";
 		}
 
 		public long PreviousTime {get;set;}
@@ -82,7 +82,7 @@ namespace Microsoft.Xna.Framework
     			var stackFrame = stackTrace.GetFrame(1);
     			MethodBase methodBase = stackFrame.GetMethod();
 
-				item.Name = "ID: " + Name+" In " + methodBase.ReflectedType.ToString()+"::"+methodBase.Name;
+				item.Name = "ID: " + Name+" In " + methodBase.ReflectedType.ToString() + "::" + methodBase.Name;
 #else
                 item.Name = "ID: " + Name;
 #endif

@@ -465,9 +465,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			public override string ToString ()
 			{
-				return string.Format(
-					"CharacterIndex={0}, Glyph={1}, Cropping={2}, Kerning={3},{4},{5}",
-                    Character, BoundsInTexture, Cropping, LeftSideBearing, Width, RightSideBearing);
+                return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;
 			}
 		}
 	}

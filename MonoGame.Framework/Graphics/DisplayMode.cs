@@ -125,7 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Width:{0} Height:{1} Format:{2} RefreshRate:{3}}}", new object[] { this.width, this.height, this.Format, this.refreshRate });
+            return "{{Width:" + this.width + " Height:" + this.height + " Format:" + this.Format + " RefreshRate:" + this.refreshRate + "}}";
         }
 
         #endregion Public Methods

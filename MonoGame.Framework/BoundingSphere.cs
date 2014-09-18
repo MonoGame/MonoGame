@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{{Center:{0} Radius:{1}}}", this.Center.ToString(), this.Radius.ToString());
+            return "{{Center:" + this.Center.ToString() + " Radius:" + this.Radius.ToString() + "}}";
         }
 
         #endregion Public Methods
