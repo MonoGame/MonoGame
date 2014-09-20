@@ -601,7 +601,8 @@ namespace MonoGame.Tools.Pipeline
                 if (_templateItems.Any(i => i.Label == item.Label))
                     continue;
 
-                item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
+                var fpath = Path.GetDirectoryName(f);
+                item.TemplateFile = Path.GetFullPath(Path.Combine(fpath, item.TemplateFile));
 
                 _view.OnTemplateDefined(item);
 
