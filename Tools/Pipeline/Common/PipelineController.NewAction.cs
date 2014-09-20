@@ -29,7 +29,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var ext = Path.GetExtension(_template.TemplateFile);
                 var filename = Path.ChangeExtension(_name, ext);
-                var fullpath = Path.Combine(_location, filename);
+                var fullpath = _con.GetFullPath(Path.Combine(_location, filename));
 
                 if (File.Exists(fullpath))
                 {

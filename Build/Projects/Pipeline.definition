@@ -57,10 +57,14 @@
     <Compile Include="Common\PipelineController.cs" />
     <Compile Include="Common\PipelineProject.cs" />
     <Compile Include="Common\PipelineTypes.cs" />
+    <Compile Include="Common\Extensions.cs" />
 
     <Compile Include="Windows\UpdateAction.cs" />
 
     <!-- The Windows specific stuff -->
+    <Compile Include="Windows\EditorIcons.cs">
+      <Platforms>Windows</Platforms>
+    </Compile>
     <Compile Include="Windows\FolderEditing.cs">
       <Platforms>Windows</Platforms>
     </Compile>
@@ -148,14 +152,19 @@
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />
     <EmbeddedResource Include="Icons\settings.png" />
-    <EmbeddedResource Include="Icons\font.png" />
 
 
     <!-- Copy the template resources to the output -->
+    <None Include="Templates\Xml.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\XmlContent.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Templates\XmlContent.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Templates\Font.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Templates\SpriteFont.spritefont">

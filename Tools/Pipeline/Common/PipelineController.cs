@@ -602,6 +602,9 @@ namespace MonoGame.Tools.Pipeline
                     continue;
 
                 item.TemplateFile = Path.GetFullPath(Path.Combine(path, item.TemplateFile));
+
+                _view.OnTemplateDefined(item);
+
                 _templateItems.Add(item);
             }
         }
