@@ -563,7 +563,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -572,14 +572,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
             SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             throw new NotImplementedException();
 #endif
         }
 
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
 		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)
