@@ -272,7 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper = new FramebufferHelper(this);
             }
-            #if !(GLES || MONOMAC)
+            #if !GLES
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 this.framebufferHelper = new FramebufferHelperEXT(this);
