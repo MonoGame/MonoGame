@@ -27,7 +27,7 @@ namespace MonoGame.Tools.Pipeline
             get { return _project.OutputDir; }
             set
             {
-                _project.OutputDir = Util.GetRelativePath(value, _project.Location);
+                _project.OutputDir = PipelineUtil.GetRelativePath(value, _project.Location);
             }
         }
 
@@ -40,7 +40,7 @@ namespace MonoGame.Tools.Pipeline
             get { return _project.IntermediateDir; }
             set
             {       
-                _project.IntermediateDir = Util.GetRelativePath(value, _project.Location);
+                _project.IntermediateDir = PipelineUtil.GetRelativePath(value, _project.Location);
             }
         }
 

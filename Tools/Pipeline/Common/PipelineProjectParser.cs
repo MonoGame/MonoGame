@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+// ReSharper disable ValueParameterNotUsed
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,12 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
+    public enum ParseResult
+    {
+        Ok,
+        Error,
+    }
+
     public class PipelineProjectParser
     {
         #region Other Data
@@ -23,86 +30,102 @@ namespace MonoGame.Tools.Pipeline
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
         
         private string _processor;
+        private string _importer;
         
         #endregion
 
         #region CommandLineParameters
-        
-        [CommandLineParameter(
-            Name = "outputDir",
-            ValueName = "directoryPath",
-            Description = "The directory where all content is written.")]
-        public string OutputDir { set { _project.OutputDir = value; } }
 
-        [CommandLineParameter(
-            Name = "intermediateDir",
-            ValueName = "directoryPath",
-            Description = "The directory where all intermediate files are written.")]
-        public string IntermediateDir { set { _project.IntermediateDir = value; } }
-
-        [CommandLineParameter(
-            Name = "reference",
-            ValueName = "assemblyNameOrFile",
-            Description = "Adds an assembly reference for resolving content importers, processors, and writers.")]
-        public List<string> References 
+        [CommandLineParameter(Name = "outputDir")]
+        private string OutputDir
         {
-            set { _project.References = value; }
-            get { return _project.References; } 
+            set
+            {
+                _project.OutputDir = value;
+            }
         }
 
-        [CommandLineParameter(
-            Name = "platform",
-            ValueName = "targetPlatform",
-            Description = "Set the target platform for this build.  Defaults to Windows.")]
-        public TargetPlatform Platform { set { _project.Platform = value; } }
-
-        [CommandLineParameter(
-            Name = "profile",
-            ValueName = "graphicsProfile",
-            Description = "Set the target graphics profile for this build.  Defaults to HiDef.")]
-        public GraphicsProfile Profile { set { _project.Profile = value; } }
-
-        [CommandLineParameter(
-            Name = "config",
-            ValueName = "string",
-            Description = "The optional build config string from the build system.")]
-        public string Config { set { _project.Config = value; } }
-
-        // Allow a MGCB file containing the /rebuild parameter to be imported without error
-        [CommandLineParameter(
-            Name = "rebuild",
-            ValueName = "bool",
-            Description = "Forces a rebuild of the project.")]
-        public bool Rebuild { set { _rebuild = value; } }
-        private bool _rebuild;
-
-        // Allow a MGCB file containing the /clean parameter to be imported without error
-        [CommandLineParameter(
-            Name = "clean",
-            ValueName = "bool",
-            Description = "Removes intermediate and output files.")]
-        public bool Clean { set { _clean = value; } }
-        private bool _clean;
-
-        [CommandLineParameter(
-            Name = "compress",
-            ValueName = "bool",
-            Description = "Content files can be compressed for smaller file sizes.")]
-        public bool Compress { set { _project.Compress = value; } }
-
-        [CommandLineParameter(
-            Name = "importer",
-            ValueName = "className",
-            Description = "Defines the class name of the content importer for reading source content.")]
-        public string Importer;
-
-        [CommandLineParameter(
-            Name = "processor",
-            ValueName = "className",
-            Description = "Defines the class name of the content processor for processing imported content.")]
-        public string Processor
+        [CommandLineParameter(Name = "intermediateDir")]
+        private string IntermediateDir
         {
-            get { return _processor; }
+            set
+            {
+                _project.IntermediateDir = value;                 
+            }        
+        }
+
+        [CommandLineParameter(Name = "reference")]
+        private List<string> References 
+        {
+            get { return _project.References; }
+            set
+            {
+                _project.References = value;
+            }            
+        }
+
+        [CommandLineParameter(Name = "platform")]
+        private TargetPlatform Platform
+        {
+            set
+            {
+                _project.Platform = value;                 
+            }
+        }
+
+        [CommandLineParameter(Name = "profile")]
+        private GraphicsProfile Profile
+        {
+            set
+            {
+                _project.Profile = value;
+            }
+        }
+
+        [CommandLineParameter(Name = "config")]
+        private string Config
+        {
+            set
+            {
+                _project.Config = value;                 
+            }
+        }
+
+        // Allow a MGCB file containing the /rebuild parameter to be imported without error.
+        [CommandLineParameter(Name = "rebuild")]
+        private bool Rebuild
+        {
+            set { }
+        }
+
+        // Allow a MGCB file containing the /clean parameter to be imported without error.
+        [CommandLineParameter(Name = "clean")]
+        private bool Clean
+        {
+            set { }
+        }
+
+        [CommandLineParameter(Name = "compress")]
+        private bool Compress
+        {
+            set
+            {
+                _project.Compress = value;                 
+            }
+        }
+
+        [CommandLineParameter(Name = "importer")]
+        private string Importer
+        {
+            set
+            {
+                _importer = value;
+            }
+        }
+
+        [CommandLineParameter(Name = "processor")]
+        private string Processor
+        {            
             set
             {
                 _processor = value;
@@ -110,11 +133,8 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        [CommandLineParameter(
-            Name = "processorParam",
-            ValueName = "name=value",
-            Description = "Defines a parameter name and value to set on a content processor.")]
-        public void AddProcessorParam(string nameAndValue)
+        [CommandLineParameter(Name = "processorParam")]
+        private void AddProcessorParam(string nameAndValue)
         {
             var keyAndValue = nameAndValue.Split('=');
             if (keyAndValue.Length != 2)
@@ -127,58 +147,14 @@ namespace MonoGame.Tools.Pipeline
             _processorParams.Add(keyAndValue[0], keyAndValue[1]);
         }
 
-        [CommandLineParameter(
-            Name = "build",
-            ValueName = "sourceFile",
-            Description = "Build the content source file using the previously set switches and options.")]
-        public void OnBuild(string sourceFile)
+        [CommandLineParameter(Name = "build")]
+        private void OnBuild(string sourceFile)
         {
             AddContent(sourceFile, false);
         }
 
-        public bool AddContent(string sourceFile, bool skipDuplicates)
-        {
-            // Make sure the source file is relative to the project.
-            var projectDir = ProjectDirectory + "\\";
-            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
-
-            // Do we have a duplicate?
-            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.OriginalPath, sourceFile, StringComparison.InvariantCultureIgnoreCase));
-            if (previous != -1)
-            {
-                if (skipDuplicates)
-                    return false;
-
-                // Replace the duplicate.
-                _project.ContentItems.RemoveAt(previous);
-            }
-
-            // Create the item for processing later.
-            var item = new ContentItem
-            {
-                Observer = _observer,
-                BuildAction = BuildAction.Build,
-                OriginalPath = sourceFile,
-                ImporterName = Importer,
-                ProcessorName = Processor,
-                ProcessorParams = new OpaqueDataDictionary()
-            };
-            _project.ContentItems.Add(item);
-
-            // Copy the current processor parameters blind as we
-            // will validate and remove invalid parameters during
-            // the build process later.
-            foreach (var pair in _processorParams)
-                item.ProcessorParams.Add(pair.Key, pair.Value);
-
-            return true;
-        }
-
-        [CommandLineParameter(
-            Name = "copy",
-            ValueName = "sourceFile",
-            Description = "Copy the content source file verbatim to the output directory.")]
-        public void OnCopy(string sourceFile)
+        [CommandLineParameter(Name = "copy")]
+        private void OnCopy(string sourceFile)
         {
             // Make sure the source file is relative to the project.
             var projectDir = ProjectDirectory + "\\";
@@ -211,9 +187,9 @@ namespace MonoGame.Tools.Pipeline
         {
             _observer = observer;
             _project = project;
-        }        
+        }
 
-        public void OpenProject(string projectFilePath, MGBuildParser.ErrorCallback errorCallback)
+        public ParseResult OpenProject(string projectFilePath, MGBuildParser.ErrorCallback errorCallback)
         {
             _project.ContentItems.Clear();
 
@@ -230,7 +206,10 @@ namespace MonoGame.Tools.Pipeline
                 {
                     string.Format("/@:{0}", projectFilePath),
                 };
-            parser.Parse(commands);
+            if (parser.Parse(commands))
+                return ParseResult.Ok;
+
+            return ParseResult.Error;
         }
 
         public void SaveProject()
@@ -351,7 +330,7 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public void ImportProject(string projectFilePath)
+        public ParseResult ImportProject(string projectFilePath)
         {
             _project.OriginalPath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
 
@@ -409,7 +388,90 @@ namespace MonoGame.Tools.Pipeline
                     }
                 }
             }
+
+            return ParseResult.Ok;
         }
+
+        public bool AddContent(string sourceFile, bool skipDuplicates)
+        {
+            // Make sure the source file is relative to the project.
+            var projectDir = ProjectDirectory + "\\";
+            sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
+
+            // Do we have a duplicate?
+            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.OriginalPath, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            if (previous != -1)
+            {
+                if (skipDuplicates)
+                    return false;
+
+                // Replace the duplicate.
+                _project.ContentItems.RemoveAt(previous);
+            }
+
+            // Create the item for processing later.
+            var item = new ContentItem
+            {
+                Observer = _observer,
+                BuildAction = BuildAction.Build,
+                OriginalPath = sourceFile,
+                ImporterName = _importer,
+                ProcessorName = _processor,
+                ProcessorParams = new OpaqueDataDictionary()
+            };
+            _project.ContentItems.Add(item);
+
+            // Copy the current processor parameters blind as we
+            // will validate and remove invalid parameters during
+            // the build process later.
+            foreach (var pair in _processorParams)
+                item.ProcessorParams.Add(pair.Key, pair.Value);
+
+            return true;
+        }
+
+        public static bool OpenProjectContainingItem(string contentItemPath, out PipelineProject project)
+        {
+            const string searchPattern = "*.mgcb";
+
+            var searchItemFullPath = Path.GetFullPath(contentItemPath);
+
+            var path = Path.GetFullPath(Path.GetDirectoryName(searchItemFullPath));
+            var root = Path.GetPathRoot(path);
+
+            while (!root.Equals(path))
+            {
+                // Search for project files in the current directory.
+                var projectFiles = Directory.GetFiles(path, searchPattern, SearchOption.TopDirectoryOnly);
+
+                // Search for the specified content item within the project.
+                foreach (var projectFile in projectFiles)
+                {
+                    var pipelineProject = new PipelineProject();
+                    var parser = new PipelineProjectParser(null, pipelineProject);
+                    if (parser.OpenProject(projectFile, null) == ParseResult.Error)
+                        continue;
+
+                    foreach (var i in pipelineProject.ContentItems)
+                    {
+                        var itemFullPath = PipelineUtil.GetFullPath(i.OriginalPath, pipelineProject.Location);
+                        if (itemFullPath.Equals(searchItemFullPath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            project = pipelineProject;
+                            return true;
+                        }
+                    }
+                }
+
+                // Recurse up to the parent directory.
+                path = Path.GetDirectoryName(path);
+            }
+
+            project = null;
+            return false;
+        }
+
+        #region Private Helpers
 
         private string ProjectDirectory
         {
@@ -530,5 +592,8 @@ namespace MonoGame.Tools.Pipeline
 
             return commentFormat.Substring(0, src) + label + commentFormat.Substring(dst);
         }
+
+        #endregion
     }
 }
+// ReSharper restore ValueParameterNotUsed

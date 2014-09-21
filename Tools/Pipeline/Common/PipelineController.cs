@@ -606,19 +606,12 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        public string GetFullPath(string filePath)
+        public string GetFullPath(string path)
         {
             if (_project == null)
-                return filePath;
+                return path;
 
-            filePath = filePath.Replace("/", "\\");
-            if (filePath.StartsWith("\\"))
-                filePath = filePath.Substring(2);
-
-            if (Path.IsPathRooted(filePath))
-                return filePath;
-
-            return _project.Location + "\\" + filePath;
+            return PipelineUtil.GetFullPath(path, _project.Location);
         }
     }
 }

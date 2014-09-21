@@ -747,23 +747,23 @@ namespace MonoGame.Tools.Pipeline
 
         private void ContextMenu_OpenFile_Click(object sender, EventArgs e)
         {
-            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
-            filePath = _controller.GetFullPath(filePath);
+            var path = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            path = _controller.GetFullPath(path);
 
-            if (File.Exists(filePath))
+            if (File.Exists(path))
             {
-                Process.Start(filePath);
+                Process.Start(path);
             }
         }
 
         private void ContextMenu_OpenFileLocation_Click(object sender, EventArgs e)
         {
-            var filePath = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
-            filePath = _controller.GetFullPath(filePath);
+            var path = (_treeView.SelectedNode.Tag as IProjectItem).OriginalPath;
+            path = _controller.GetFullPath(path);
 
-            if (File.Exists(filePath) || Directory.Exists(filePath))
+            if (File.Exists(path) || Directory.Exists(path))
             {
-                Process.Start("explorer.exe", "/select, " + filePath);
+                Process.Start("explorer.exe", "/select, " + path);
 
             }
         }
