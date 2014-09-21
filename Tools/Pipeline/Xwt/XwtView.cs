@@ -246,6 +246,10 @@ namespace MonoGame.Tools.Pipeline
 			return result;
 		}
 
+        public void OnTemplateDefined(ContentItemTemplate item)
+        {
+        }
+
 		#endregion
 
 
