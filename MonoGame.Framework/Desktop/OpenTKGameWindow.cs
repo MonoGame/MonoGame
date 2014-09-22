@@ -73,6 +73,7 @@ namespace Microsoft.Xna.Framework
         private Rectangle clientBounds;
         private Rectangle targetBounds;
         private bool updateClientBounds;
+        float dpiScale = 1.0f;
         bool disposed;
 
         #region Internal Properties
@@ -229,8 +230,11 @@ namespace Microsoft.Xna.Framework
             if (updateClientBounds)
             {
                 updateClientBounds = false;
-                window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
-                                     targetBounds.Y, targetBounds.Width, targetBounds.Height);
+                window.ClientRectangle = new System.Drawing.Rectangle(
+                    (int)(targetBounds.X * dpiScale),
+                    (int)(targetBounds.Y * dpiScale),
+                    (int)(targetBounds.Width * dpiScale),
+                    (int)(targetBounds.Height * dpiScale));
                 
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
@@ -306,7 +310,23 @@ namespace Microsoft.Xna.Framework
 
             GraphicsContext.ShareContexts = true;
 
-            window = new NativeWindow();
+            const int defaultWidth = 800;
+            const int defaultHeight = 480;
+            window = new NativeWindow(defaultWidth, defaultHeight,
+                MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle(),
+                GameWindowFlags.FixedWindow,
+                GraphicsMode.Default,
+                DisplayDevice.Default);
+
+            // XNA and OpenTK respect the DPI scaling options of the user.
+            // For example, a backbuffer width of 800 points creates a window of
+            // 1600 px when using 200% scale.
+            // OpenTKGameWindow is using INativeWindow.ClientSize to resize,
+            // which is defined in pixels. We need to detect the current DPI
+            // setting and apply that to incoming values, in order to ensure
+            // windows maintain the correct size when resized programmatically.
+            dpiScale = window.ClientSize.Width / (float)defaultWidth;
+
             window.Closing += new EventHandler<CancelEventArgs>(OpenTkGameWindow_Closing);
             window.Resize += OnResize;
             window.KeyDown += new EventHandler<OpenTK.Input.KeyboardKeyEventArgs>(Keyboard_KeyDown);
@@ -325,7 +345,6 @@ namespace Microsoft.Xna.Framework
             var assembly = Assembly.GetEntryAssembly();
             if(assembly != null)
                 window.Icon = Icon.ExtractAssociatedIcon(assembly.Location);
-            Title = MonoGame.Utilities.AssemblyHelper.GetDefaultWindowTitle();
 
             updateClientBounds = false;
             clientBounds = new Rectangle(window.ClientRectangle.X, window.ClientRectangle.Y,
@@ -343,9 +362,6 @@ namespace Microsoft.Xna.Framework
 #else
             Mouse.UpdateMouseInfo(window.Mouse);
 #endif
-
-            // Default no resizing
-            AllowUserResizing = false;
 
             // Default mouse cursor hidden 
             SetMouseVisible(false);
