@@ -11,6 +11,7 @@ namespace MonoGame.Tools.Pipeline
     /// </summary>
     internal class ContentItemState
     {
+        public string AssetName;
         public BuildAction BuildAction;
         public string SourceFile;
         public string ImporterName;
@@ -24,6 +25,7 @@ namespace MonoGame.Tools.Pipeline
         {
             var state = new ContentItemState()
                 {
+                    AssetName = item.AssetName,
                     BuildAction = item.BuildAction,
                     SourceFile = item.OriginalPath,
                     ImporterName = item.ImporterName,
@@ -44,6 +46,7 @@ namespace MonoGame.Tools.Pipeline
         /// </summary>
         public void Apply(ContentItem item)
         {
+            item.AssetName = AssetName;
             item.BuildAction = BuildAction;
             item.OriginalPath = SourceFile;
             item.ImporterName = ImporterName;

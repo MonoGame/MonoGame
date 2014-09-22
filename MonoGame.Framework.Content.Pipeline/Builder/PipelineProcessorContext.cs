@@ -86,14 +86,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                                 OpaqueDataDictionary processorParameters,
                                                                                 string importerName, 
                                                                                 string assetName)
-        {
+        {            
             if (string.IsNullOrEmpty(assetName))
             {
                 var contentPath = PathHelper.GetRelativePath(_manager.ProjectDirectory, sourceAsset.Filename);
                 var filename = Path.GetFileNameWithoutExtension(contentPath);
                 var path = Path.GetDirectoryName(contentPath);
 
-                // TODO: Is this only does for textures or 
+                // TODO: Is this only done for textures or 
                 // for all sub-assets like this?
                 //
                 // TODO: Replace the _0 with a hex 32bit hash of
@@ -104,7 +104,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             // Build the content.
-            var buildEvent = _manager.BuildContent(sourceAsset.Filename, assetName, importerName, processorName, processorParameters);
+            PipelineBuildEvent buildEvent;
+            _manager.BuildContent(sourceAsset.Filename, assetName, importerName, processorName, processorParameters, out buildEvent);
 
             // Record that we built this dependent asset.
             _pipelineEvent.BuildAsset.AddUnique(buildEvent.DestFile);

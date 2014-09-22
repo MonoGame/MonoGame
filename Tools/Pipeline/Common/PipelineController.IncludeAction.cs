@@ -31,7 +31,7 @@ namespace MonoGame.Tools.Pipeline
                 for (var i = 0; i < _files.Length; i++ )
                 {
                     var f = _files[i];
-                    if (!parser.AddContent(f, true))
+                    if (!parser.AddContent(f, null, true))
                         continue;
 
                     var item = _con._project.ContentItems.Last();

@@ -44,7 +44,7 @@ namespace MonoGame.Tools.Pipeline
 
                 _con.Selection.Clear(_con);
 
-                if (parser.AddContent(fullpath, true))
+                if (parser.AddContent(fullpath, null, true))
                 {
                     var item = _con._project.ContentItems.Last();
                     item.Observer = _con;

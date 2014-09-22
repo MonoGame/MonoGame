@@ -36,23 +36,19 @@ namespace MGCB
                 return 0;
             }
 
-            // Launch debugger if requested.
-            if (content.LaunchDebugger)
-                System.Diagnostics.Debugger.Launch();
-
             // Print a startup message.            
             var buildStarted = DateTime.Now;
             if (!content.Quiet)
                 Console.WriteLine("Build started {0}\n", buildStarted);
 
             // Let the content build.
-            int successCount, errorCount;
-            content.Build(out successCount, out errorCount);
+            int successCount, skipCount, errorCount;
+            content.Build(out successCount, out skipCount, out errorCount);
 
             // Print the finishing info.
             if (!content.Quiet)
             {
-                Console.WriteLine("\nBuild {0} succeeded, {1} failed.\n", successCount, errorCount);
+                Console.WriteLine("\nBuild {0} succeeded, {1} skipped, {2} failed.\n", successCount, skipCount, errorCount);
                 Console.WriteLine("Time elapsed {0:hh\\:mm\\:ss\\.ff}.", DateTime.Now - buildStarted);
             }
 

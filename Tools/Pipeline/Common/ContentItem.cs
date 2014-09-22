@@ -18,7 +18,12 @@ namespace MonoGame.Tools.Pipeline
     public class ContentItem : IProjectItem
     {
         public IContentItemObserver Observer;
-        
+
+        [Category("Settings")]
+        [DisplayName("Asset Name")]
+        [Description("The name that will be used to reference this content at runtime.")]
+        public string AssetName { get; set; }
+
         public string ImporterName;
         public string ProcessorName;
         public OpaqueDataDictionary ProcessorParams;
