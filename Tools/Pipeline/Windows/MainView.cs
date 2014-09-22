@@ -56,11 +56,11 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.SelectionHangingIndent = TextRenderer.MeasureText(" ", _outputWindow.Font).Width;            
 
             _treeIcons = new ImageList();
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
-            _treeIcons.Images.Add(Image.FromStream(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.font.png")));
+            var asm = Assembly.GetExecutingAssembly();
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.blueprint.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_open.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.folder_closed.png")));
+            _treeIcons.Images.Add(Image.FromStream(asm.GetManifestResourceStream(@"MonoGame.Tools.Pipeline.Icons.settings.png")));
             
             _treeView.ImageList = _treeIcons;
             _treeView.BeforeExpand += TreeViewOnBeforeExpand;
@@ -91,6 +91,28 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
             _controller.Selection.Modified += OnSelectionModified;
+        }
+
+        public void OnTemplateDefined(ContentItemTemplate template)
+        {
+            // Load icon
+            try
+            {
+                var iconPath = Path.Combine(Path.GetDirectoryName(template.TemplateFile), template.Icon);                
+                var iconName = Path.GetFileNameWithoutExtension(iconPath);
+
+                if (!EditorIcons.Templates.Images.ContainsKey(iconName))
+                {
+                    var iconImage = Image.FromFile(iconPath);
+                    EditorIcons.Templates.Images.Add(iconName, iconImage);
+                }
+
+                template.Icon = iconName;
+            }
+            catch (Exception)
+            {
+                template.Icon = "Default";
+            }
         }
 
         private void OnSelectionModified(Selection selection, object sender)
@@ -726,12 +748,14 @@ namespace MonoGame.Tools.Pipeline
 
         private void OnNewItemClick(object sender, System.EventArgs e)
         {
-            var dlg = new NewContentDialog(_controller.Templates);
+            var dlg = new NewContentDialog(_controller.Templates, EditorIcons.Templates);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                var template = dlg.SelectedTemplate;
+                var template = dlg.Selected;
                 var location = ((_treeView.SelectedNode ?? _treeView.Nodes[0]).Tag as IProjectItem).Location;
-                _controller.NewItem(dlg.ContentName, location, template);
+
+                // Ensure name is unique among files at this location?
+                _controller.NewItem(dlg.NameGiven, location, template);
             }
         }
 
