@@ -50,8 +50,12 @@ namespace MonoDevelop.MonoGameContent
 			{
 				if (file.BuildAction == "Compile") {
 					try {
-						monitor.Log.WriteLine("Cleaning {0}", file.FilePath.FileName);
-						manager.CleanContent(file.FilePath.FullPath, null);
+                        var srcPath = file.FilePath.FullPath;
+                        var dstPath = (string)file.ExtendedProperties["Name"];
+                        manager.ResolveOutputFilepath(srcPath, ref dstPath, true);
+
+                        monitor.Log.WriteLine("Cleaning {0}", dstPath);
+                        manager.CleanContent(dstPath);
 					}
 					catch(Exception ex)
 					{
@@ -115,32 +119,44 @@ namespace MonoDevelop.MonoGameContent
 				foreach(var file in proj.Files)
 				{
 					if (file.BuildAction == "Compile") {
-						try 
-						{
-							dict.Clear();
-							foreach(object key in file.ExtendedProperties.Keys) {
-								string k = key as string;
-								if (k != null && k.StartsWith("ProcessorParameters_")) {
-									if (!dict.ContainsKey(k.Replace("ProcessorParameters_", String.Empty))) {
-										dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
-									} else {
-										dict[k.Replace("ProcessorParameters_", String.Empty)] = file.ExtendedProperties[k];
-									}
-								}
-							}
+                        try
+                        {
+                            dict.Clear();
+                            foreach (object key in file.ExtendedProperties.Keys)
+                            {
+                                string k = key as string;
+                                if (k != null && k.StartsWith("ProcessorParameters_"))
+                                {
+                                    if (!dict.ContainsKey(k.Replace("ProcessorParameters_", String.Empty)))
+                                    {
+                                        dict.Add(k.Replace("ProcessorParameters_", String.Empty), file.ExtendedProperties[k]);
+                                    }
+                                    else
+                                    {
+                                        dict[k.Replace("ProcessorParameters_", String.Empty)] = file.ExtendedProperties[k];
+                                    }
+                                }
+                            }
 
-							// check if the file has changed and rebuild if required.
-							manager.BuildContent(file.FilePath.FullPath, 
-					                     null, 
-							             file.ExtendedProperties.Contains("Importer") ? (string)file.ExtendedProperties["Importer"] : null,
-							             file.ExtendedProperties.Contains("Processor") ? (string)file.ExtendedProperties["Processor"] : null, 
-							             dict);
-						}
-						catch(Exception ex)
-						{
-							monitor.Log.WriteLine(ex.ToString());
-							result.AddError(ex.Message);
-						}
+                            // check if the file has changed and rebuild if required.                            
+
+                            var srcPath = file.FilePath.FullPath;
+                            var dstPath = (string)file.ExtendedProperties["Name"];
+                            manager.ResolveOutputFilepath(srcPath, ref dstPath, true);
+
+                            PipelineBuildEvent buildEvent;
+                            manager.BuildContent(srcPath,
+                                                 dstPath,
+                                                 file.ExtendedProperties.Contains("Importer") ? (string)file.ExtendedProperties["Importer"] : null,
+                                                 file.ExtendedProperties.Contains("Processor") ? (string)file.ExtendedProperties["Processor"] : null,
+                                                 dict,
+                                                 out buildEvent);
+                        }
+                        catch (Exception ex)
+                        {
+                            monitor.Log.WriteLine(ex.ToString());
+                            result.AddError(ex.Message);
+                        }
 
 					}
 				}
