@@ -29,6 +29,16 @@ namespace Microsoft.Xna.Framework.Graphics
         private const TextureParameterName TextureParameterNameTextureMaxLevel = TextureParameterName.TextureMaxLevel;
 #endif
 
+        static partial void PlatformResetStates()
+        {
+            _anisotropicClamp.Value.GraphicsDevice = null;
+            _anisotropicWrap.Value.GraphicsDevice = null;
+            _linearClamp.Value.GraphicsDevice = null;
+            _linearWrap.Value.GraphicsDevice = null;
+            _pointClamp.Value.GraphicsDevice = null;
+            _pointWrap.Value.GraphicsDevice = null;
+        }
+
         internal void Activate(GraphicsDevice device, TextureTarget target, bool useMipmaps = false)
         {
             if (GraphicsDevice == null)

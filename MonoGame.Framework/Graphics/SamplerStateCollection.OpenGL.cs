@@ -24,6 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformClear()
         {
+            for (int i = 0; i < _samplers.Length; i++)
+                _samplers[i].GraphicsDevice = null;
         }
 
         private void PlatformDirty()
