@@ -156,6 +156,9 @@
     </Reference>
   </Platform>
   <Platform Type="WindowsPhone81">
+    <Reference Include="Windows" />
+    <Reference Include="System" />
+    <Reference Include="System.Linq" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
