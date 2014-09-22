@@ -104,10 +104,10 @@
     <Compile Include="GameServiceContainer.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="GameTimer.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="GameTimerEventArgs.cs">
-      <Platforms>Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="GameUpdateRequiredException.cs" />
     <Compile Include="GameWindow.cs">
@@ -135,7 +135,7 @@
     <Compile Include="Rectangle.cs" />
     <Compile Include="ReusableItemList.cs" />
     <Compile Include="SharedGraphicsDeviceManager.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="TextInputEventArgs.cs">
       <Platforms>Angle,Linux,MacOS,Windows,WindowsGL</Platforms>
@@ -181,7 +181,7 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.XAudio.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffect.Web.cs">
       <Platforms>Web</Platforms>
@@ -194,7 +194,7 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.XAudio.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Audio\SoundEffectInstance.Web.cs">
       <Platforms>Web</Platforms>
@@ -273,13 +273,13 @@
     <Compile Include="Content\ContentReaders\StringReader.cs" />
     <Compile Include="Content\ContentReaders\Texture2DReader.cs" />
     <Compile Include="Content\ContentReaders\Texture3DReader.cs">
-      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Angle,Linux,MacOS,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureCubeReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TextureReader.cs">
-      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Content\ContentReaders\TimeSpanReader.cs" />
     <Compile Include="Content\ContentReaders\UInt16Reader.cs" />
@@ -350,7 +350,7 @@
     <Compile Include="Graphics\GraphicsCapabilities.cs" />
     <Compile Include="Graphics\GraphicsDevice.cs" />
     <Compile Include="Graphics\GraphicsDevice.DirectX.cs">
-      <Platforms>Windows8,Windows,WindowsPhone</Platforms>
+      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\GraphicsDevice.OpenGL.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,WindowsGL</Platforms>
@@ -370,7 +370,7 @@
     <Compile Include="Graphics\GraphicsResource.cs" />
     <Compile Include="Graphics\IGraphicsDeviceService.cs" />
     <Compile Include="Graphics\ImageEx.cs">
-      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone</Platforms>
+      <Platforms>Angle,Linux,Windows8,Windows,WindowsGL,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\IRenderTarget.cs" />
     <Compile Include="Graphics\ModelBoneCollection.cs" />
@@ -404,7 +404,7 @@
     <Compile Include="Graphics\PresentInterval.cs" />
     <Compile Include="Graphics\RenderTarget2D.cs" />
     <Compile Include="Graphics\RenderTarget2D.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget2D.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -416,10 +416,10 @@
         <Platforms>Web</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTarget3D.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\RenderTargetBinding.cs" />
     <Compile Include="Graphics\RenderTargetCube.cs" />
@@ -428,7 +428,7 @@
     <Compile Include="Graphics\ResourceDestroyedEventArgs.cs" />
     <Compile Include="Graphics\SamplerStateCollection.cs" />
     <Compile Include="Graphics\SamplerStateCollection.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\SamplerStateCollection.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -443,7 +443,7 @@
     <Compile Include="Graphics\Shader\ConstantBufferCollection.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.cs" />
     <Compile Include="Graphics\Shader\ConstantBuffer.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\ConstantBuffer.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -456,7 +456,7 @@
     </Compile>
     <Compile Include="Graphics\Shader\Shader.cs" />
     <Compile Include="Graphics\Shader\Shader.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Shader\Shader.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -483,7 +483,7 @@
     <Compile Include="Graphics\States\BlendFunction.cs" />
     <Compile Include="Graphics\States\BlendState.cs" />
     <Compile Include="Graphics\States\BlendState.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\States\BlendState.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -499,7 +499,7 @@
     <Compile Include="Graphics\States\DepthFormat.cs" />
     <Compile Include="Graphics\States\DepthStencilState.cs" />
     <Compile Include="Graphics\States\DepthStencilState.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\States\DepthStencilState.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -513,7 +513,7 @@
     <Compile Include="Graphics\States\FillMode.cs" />
     <Compile Include="Graphics\States\RasterizerState.cs" />
     <Compile Include="Graphics\States\RasterizerState.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\States\RasterizerState.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -526,7 +526,7 @@
     </Compile>
     <Compile Include="Graphics\States\SamplerState.cs" />
     <Compile Include="Graphics\States\SamplerState.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\States\SamplerState.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -544,7 +544,7 @@
     </Compile>
     <Compile Include="Graphics\Texture2D.cs" />
     <Compile Include="Graphics\Texture2D.DirectX.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture2D.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -557,7 +557,7 @@
     </Compile>
     <Compile Include="Graphics\Texture3D.cs" />
     <Compile Include="Graphics\Texture3D.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture3D.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -570,7 +570,7 @@
     </Compile>
     <Compile Include="Graphics\TextureCollection.cs" />
     <Compile Include="Graphics\TextureCollection.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCollection.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -583,7 +583,7 @@
     </Compile>
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\Texture.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Texture.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -596,7 +596,7 @@
     </Compile>
     <Compile Include="Graphics\TextureCube.cs" />
     <Compile Include="Graphics\TextureCube.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\TextureCube.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -613,7 +613,7 @@
     <Compile Include="Graphics\Vertices\DynamicVertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.cs" />
     <Compile Include="Graphics\Vertices\IndexBuffer.DirectX.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\IndexBuffer.OpenGL.cs">
       <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -629,7 +629,7 @@
     <Compile Include="Graphics\Vertices\PrimitiveType.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.cs" />
     <Compile Include="Graphics\Vertices\VertexBuffer.DirectX.cs">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexBuffer.OpenGL.cs">
       <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -644,7 +644,7 @@
     <Compile Include="Graphics\Vertices\VertexDeclarationCache.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.cs" />
     <Compile Include="Graphics\Vertices\VertexDeclaration.DirectX.cs">
-        <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+        <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Graphics\Vertices\VertexDeclaration.OpenGL.cs">
         <Platforms>Angle,WindowsGL,Linux,MacOS,iOS,Android,Ouya</Platforms>
@@ -671,7 +671,7 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone</Platforms>
+      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
@@ -725,7 +725,7 @@
     <Compile Include="Media\Genre.cs" />
     <Compile Include="Media\MediaLibrary.cs" />
     <Compile Include="Media\MediaLibrary.Default.cs">
-      <ExcludePlatforms>iOS,Windows8,WindowsPhone,Android,Ouya</ExcludePlatforms>
+      <ExcludePlatforms>iOS,Windows8,WindowsPhone,Android,Ouya,WindowsPhone81</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.Android.cs">
       <Platforms>Android,Ouya</Platforms>
@@ -734,7 +734,7 @@
       <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.WinRT.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Media\MediaLibrary.WP.cs">
       <Platforms>WindowsPhone</Platforms>
@@ -744,7 +744,7 @@
     </Compile>
     <Compile Include="Media\MediaPlayer.cs" />
     <Compile Include="Media\MediaPlayer.WME.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Media\MediaPlayer.WMS.cs">
       <Platforms>Windows</Platforms>
@@ -760,7 +760,7 @@
     <Compile Include="Media\MediaSourceType.cs" />
     <Compile Include="Media\MediaState.cs" />
     <Compile Include="Media\MusicProperties.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Media\PlaylistCollection.cs">
       <ExcludePlatforms>PSMobile</ExcludePlatforms>
@@ -792,7 +792,7 @@
       <Platforms>WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Media\Song.WinRT.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
@@ -817,7 +817,7 @@
         <Platforms>iOS</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.WME.cs">
-        <Platforms>Windows8</Platforms>
+        <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
@@ -863,7 +863,7 @@
     <Compile Include="Storage\StorageContainer.cs" />
     <Compile Include="Storage\StorageDevice.cs" />
     <Compile Include="Storage\StorageDeviceHelper.cs">
-      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web</Platforms>
+      <Platforms>Android,Angle,iOS,Ouya,PSMobile,Windows8,Windows,WindowsGL,WindowsPhone,Web,WindowsPhone81</Platforms>
     </Compile>
 
     
@@ -1050,25 +1050,25 @@
       <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Windows8\InputEvents.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\MetroFrameworkView.cs">
       <Platforms>Windows8</Platforms>
     </Compile>
     <Compile Include="Windows8\MetroGamePlatform.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\MetroGameWindow.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\MetroHelper.cs">
-      <Platforms>Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\SharpDXHelper.cs">
-      <Platforms>Windows8,Windows,WindowsPhone</Platforms>
+      <Platforms>Windows8,Windows,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="Windows8\XamlGame.cs">
-      <Platforms>Windows8</Platforms>
+      <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
 
     <!-- Windows Desktop Platfom -->
@@ -1168,22 +1168,22 @@
 
     <!-- DirectX Stock Effects -->
     <EmbeddedResource Include="Graphics\Effect\Resources\AlphaTestEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\BasicEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\DualTextureEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
     <EmbeddedResource Include="Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo">
-      <Platforms>Windows,Windows8,WindowsPhone</Platforms>
+      <Platforms>Windows,Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </EmbeddedResource>
 
 

@@ -158,7 +158,15 @@
   <Platform Type="WindowsPhone81">
     <Reference Include="Windows" />
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Linq" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.Runtime.WindowsRuntime" />
+    <Reference Include="System.Runtime.InteropServices.WindowsRuntime.dll" />
+    <Reference Include="System.ObjectModel"/>
+    <Reference Include="System.Activities.Presentation.dll" />
+    <Reference Include="System.IO" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />

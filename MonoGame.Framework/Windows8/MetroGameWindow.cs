@@ -61,8 +61,12 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _orientation;
         private CoreWindow _coreWindow;
         private Rectangle _clientBounds;
+#if !WINDOWS_PHONE81
         private ApplicationViewState _currentViewState;
+#endif
         private InputEvents _windowEvents;
+
+
         private Vector2 _backBufferScale;
 
         #region Internal Properties
@@ -143,9 +147,9 @@ namespace Microsoft.Xna.Framework
             _coreWindow.Closed += Window_Closed;
 
             _coreWindow.Activated += Window_FocusChanged;
-
+#if !WINDOWS_PHONE81
             _currentViewState = ApplicationView.Value;
-
+#endif
             var bounds = _coreWindow.Bounds;
             SetClientBounds(bounds.Width, bounds.Height);
 
@@ -209,7 +213,7 @@ namespace Microsoft.Xna.Framework
             var newHeight = (int)((_backBufferScale.Y * _clientBounds.Height) + 0.5f);
             manager.PreferredBackBufferWidth = newWidth;
             manager.PreferredBackBufferHeight = newHeight;
-
+            if(manager.GraphicsDevice!=null)
             manager.GraphicsDevice.Viewport = new Viewport(0, 0, newWidth, newHeight);            
 
             // If we have a valid client bounds then 
@@ -220,7 +224,9 @@ namespace Microsoft.Xna.Framework
             // Set the new view state which will trigger the 
             // Game.ApplicationViewChanged event and signal
             // the client size changed event.
+#if !WINDOWS_PHONE81
             Platform.ViewState = ApplicationView.Value;
+#endif
             OnClientSizeChanged();
         }
 
@@ -335,7 +341,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion
     }
-
+#if !WINDOWS_PHONE81
     [CLSCompliant(false)]
     public class ViewStateChangedEventArgs : EventArgs
     {
@@ -346,5 +352,6 @@ namespace Microsoft.Xna.Framework
             ViewState = newViewstate;
         }
     }
+#endif
 }
 
