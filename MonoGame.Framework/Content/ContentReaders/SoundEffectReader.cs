@@ -109,6 +109,11 @@ namespace Microsoft.Xna.Framework.Content
             else
                 throw new NotSupportedException("Unsupported wave format!");
 
+            if(existingInstance!=null)
+            {
+                return existingInstance;
+            }
+
             return new SoundEffect(data, 0, count, sampleRate, (AudioChannels)channels, loopStart, loopLength)
             {
                 _format = waveFormat,

@@ -31,11 +31,17 @@ namespace Microsoft.Xna.Framework.Content
 
         protected internal override Effect Read(ContentReader input, Effect existingInstance)
         {
-            int count = input.ReadInt32();
+            Effect effect = existingInstance;
             
-            var effect = new Effect(input.GraphicsDevice,input.ReadBytes(count));
-            effect.Name = input.AssetName;
+            var dataCount = (int)input.ReadUInt32();
+            var data = input.ReadBytes(dataCount);
+
+            if (effect == null)
+            {
+                effect = new Effect(input.GraphicsDevice, data);
+            }            
             
+            effect.Name = input.AssetName;            
             return effect;
         }
     }
