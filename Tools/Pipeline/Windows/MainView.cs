@@ -519,7 +519,15 @@ namespace MonoGame.Tools.Pipeline
         public void OutputClear()
         {
             _outputWindow.Clear();
-        }        
+        }
+
+        public Process CreateProcess(string exe, string commands)
+        {
+            var _buildProcess = new Process();
+            _buildProcess.StartInfo.FileName = exe;
+            _buildProcess.StartInfo.Arguments = commands;
+            return _buildProcess;
+        }
 
         private void ExitMenuItemClick(object sender, System.EventArgs e)
         {

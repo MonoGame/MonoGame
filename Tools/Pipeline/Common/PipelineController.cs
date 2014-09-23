@@ -370,7 +370,7 @@ namespace MonoGame.Tools.Pipeline
             {
                 var mgcbPath = Path.Combine(root, "MGCB.exe");
                 if (File.Exists(mgcbPath))
-                    return mgcbPath;
+                    return Path.GetFullPath(mgcbPath);
             }
 
             throw new FileNotFoundException("MGCB.exe is not in the search path!");
@@ -381,10 +381,8 @@ namespace MonoGame.Tools.Pipeline
             try
             {
                 // Prepare the process.
-                _buildProcess = new Process();
+                _buildProcess = _view.CreateProcess(FindMGCB(), commands);
                 _buildProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath);
-                _buildProcess.StartInfo.FileName = FindMGCB();
-                _buildProcess.StartInfo.Arguments = commands;
                 _buildProcess.StartInfo.CreateNoWindow = true;
                 _buildProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 _buildProcess.StartInfo.UseShellExecute = false;
