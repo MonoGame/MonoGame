@@ -158,10 +158,13 @@
       <Platforms>PSMobile</Platforms>
     </Compile>
     <Compile Include="Audio\InstancePlayLimitException.cs" />
+    <Compile Include="Audio\Microphone.cs" />
+    <Compile Include="Audio\MicrophoneState.cs" />
     <Compile Include="Audio\MSADPCMToPCM.cs">
       <Platforms>Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,WindowsGL,Web</Platforms>
     </Compile>
     <Compile Include="Audio\NoAudioHardwareException.cs" />
+    <Compile Include="Audio\NoMicrophoneException.cs" />
     <Compile Include="Audio\OALSoundBuffer.cs">
       <Platforms>Angle,iOS,Linux,MacOS,WindowsGL,Android,Ouya</Platforms>
     </Compile>
