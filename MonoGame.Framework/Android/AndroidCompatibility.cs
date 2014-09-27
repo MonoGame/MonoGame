@@ -21,12 +21,12 @@ namespace Microsoft.Xna.Framework
         private static readonly string[] Kindles = new[] { "KFTT", "KFJWI", "KFJWA", "KFSOWI", "KFTHWA", "KFTHWI", "KFAPWA", "KFAPWI" };
 
         public static bool FlipLandscape { get; private set; }
-        public static Orientation NaturalOrientation { get; private set; }
+        public static Lazy<Orientation> NaturalOrientation { get; private set; }
 
         static AndroidCompatibility()
         {
 			FlipLandscape = Kindles.Contains(Build.Model);
-            NaturalOrientation = GetDeviceNaturalOrientation();
+            NaturalOrientation = new Lazy<Orientation>(GetDeviceNaturalOrientation);
         }
 
         private static Orientation GetDeviceNaturalOrientation()
@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework
         {
             // Orientation is reported by the device in degrees compared to the natural orientation
             // Some tablets have a natural landscape orientation, which we need to account for
-            if (NaturalOrientation == Orientation.Landscape)
+            if (NaturalOrientation.Value == Orientation.Landscape)
                 orientation += 270;
 
             // Round orientation into one of 4 positions, either 0, 90, 180, 270. 
