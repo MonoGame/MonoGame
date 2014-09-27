@@ -167,8 +167,8 @@
     <if test="${os == 'Win32NT'}">
       <if test="${file::exists('c:\Program Files (x86)\MSBuild\Microsoft\WindowsPhone\v8.1\Microsoft.Cpp.WindowsPhone.8.1.targets')}">
         <exec program="Protobuild" commandline="-generate WindowsPhone81" />
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Clean /p:Configuration=Release' />
-        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Build /p:Configuration=Release' />
+        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Clean /p:Configuration=Release /p:Platform="Any CPU"' />
+        <exec program="msbuild " commandline='MonoGame.Framework.WindowsPhone81.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU"' />
       </if>
     </if>
   </target>
