@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework
             // Round orientation into one of 4 positions, either 0, 90, 180, 270. 
             int ort = ((orientation + 45) / 90 * 90) % 360;
 
+            // Surprisingly 90 degree is landscape right, except on Kindle devices
             var disporientation = DisplayOrientation.Unknown;
             switch (ort)
             {
@@ -83,17 +84,20 @@ namespace Microsoft.Xna.Framework
         public static DisplayOrientation GetAbsoluteOrientation()
         {
             var orientation = Game.Activity.WindowManager.DefaultDisplay.Rotation;
+
+            // Landscape degrees (provided by the OrientationListener) are swapped by default
+            // Since we use the code used by OrientationListener, we have to swap manually
             int degrees;
             switch (orientation)
             {
                 case SurfaceOrientation.Rotation90:
-                    degrees = 90;
+                    degrees = 270;
                     break;
                 case SurfaceOrientation.Rotation180:
                     degrees = 180;
                     break;
                 case SurfaceOrientation.Rotation270:
-                    degrees = 270;
+                    degrees = 90;
                     break;
                 default:
                     degrees = 0;
