@@ -62,7 +62,8 @@ namespace MonoGame.Framework
     {
         internal WinFormsGameForm _form;
 
-        static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
+        static private readonly object SyncRoot = new object();
+        static private readonly List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
 
         private readonly WinFormsGamePlatform _platform;
 
@@ -194,7 +195,10 @@ namespace MonoGame.Framework
 
             _form.KeyPress += OnKeyPress;
 
-            _allWindows.Add(this);
+            lock (SyncRoot)
+            {
+                _allWindows.Add(this);
+            }
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -381,8 +385,11 @@ namespace MonoGame.Framework
         internal void UpdateWindows()
         {
             // Update the mouse state for each window.
-            foreach (var window in _allWindows)
-                window.UpdateMouseState();
+            lock (SyncRoot)
+            {
+                foreach (var window in _allWindows)
+                    window.UpdateMouseState();
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -409,10 +416,14 @@ namespace MonoGame.Framework
 
         public void Dispose()
         {
-            if (_form != null)
+            lock (SyncRoot)
             {
-                _form.Dispose();
-                _form = null;
+                if (_form != null)
+                {
+                    _allWindows.Remove(this);
+                    _form.Dispose();
+                    _form = null;
+                }
             }
         }
 
