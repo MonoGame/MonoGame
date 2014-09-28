@@ -62,6 +62,28 @@ namespace Microsoft.Xna.Framework.Media
             return retTex;
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+            if (_clock != null)
+            {
+                ClockState state;
+                _clock.GetState(0, out state);
+
+                switch (state)
+                {
+                    case ClockState.Running:
+                        result = MediaState.Playing;
+                        return;
+
+                    case ClockState.Paused:
+                        result = MediaState.Paused;
+                        return;
+                }
+            }
+
+            result = MediaState.Stopped;
+        }
+
         private void PlatformPause()
         {
             _session.Pause();

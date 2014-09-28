@@ -30,6 +30,10 @@ namespace Microsoft.Xna.Framework.Media
             throw new NotImplementedException();
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+        }
+
         private void PlatformPause()
         {
             throw new NotImplementedException();
