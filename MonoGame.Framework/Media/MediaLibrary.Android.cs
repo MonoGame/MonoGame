@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Media
 {
     public partial class MediaLibrary
     {
-        private static readonly TimeSpan MinumumSongDuration = TimeSpan.FromSeconds(3);
+        private static readonly TimeSpan MinimumSongDuration = TimeSpan.FromSeconds(3);
 
         internal static Context Context { get; set; }
 
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Media
                         TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
 
                         // Exclude sound effects
-                        if (duration < MinumumSongDuration)
+                        if (duration < MinimumSongDuration)
                             continue;
 
                         string albumNameProperty = albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : "Unknown Album";
