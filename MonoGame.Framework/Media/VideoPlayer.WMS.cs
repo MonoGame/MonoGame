@@ -143,7 +143,7 @@ namespace Microsoft.Xna.Framework.Media
 
         private TimeSpan PlatformGetPlayPosition()
         {
-            return TimeSpan.Zero;
+            return TimeSpan.FromTicks(_clock.Time);
         }
 
         private void PlatformDispose(bool disposing)
