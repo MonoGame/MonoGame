@@ -417,6 +417,7 @@ namespace MonoGame.Framework
         {
             if (_form != null)
             {
+                _allWindows.Remove(this);
                 _form.Dispose();
                 _form = null;
             }
