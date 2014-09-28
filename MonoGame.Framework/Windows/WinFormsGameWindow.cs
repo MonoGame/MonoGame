@@ -217,6 +217,12 @@ namespace MonoGame.Framework
 
         private void UpdateMouseState()
         {
+            // If we call the form client functions before the form has
+            // been made visible it will cause the wrong window size to
+            // be applied at startup.
+            if (!_form.Visible)
+                return;
+
             var clientPos = _form.PointToClient(Control.MousePosition);
             var withinClient = _form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
@@ -411,6 +417,7 @@ namespace MonoGame.Framework
         {
             if (_form != null)
             {
+                _allWindows.Remove(this);
                 _form.Dispose();
                 _form = null;
             }
