@@ -15,7 +15,6 @@ using MonoTouch.UIKit;
 using Android.Views;
 #endif
 
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class GraphicsAdapter : IDisposable
@@ -121,14 +120,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Used to request creation of a specific kind of driver
         /// Hardware is preferred most of times for performance. This is the default value.
-        /// ReferenceDevice is useful for testing
-        /// Warp is useful when Hardware acceleration does not work
+        /// ReferenceDevice is useful for testing.
+        /// Warp is useful when Hardware acceleration does not work.
         /// </summary>
         /// <remarks>
         /// These values  only work on DirectX platforms and must be defined before the graphics device
         /// is created.  It defaults to "Hardware".
         /// </remarks>
-        public static D3D_DRIVER_TYPE UseD3DDriverType {get; set;}
+        public static D3D_DRIVER_TYPE UseD3DDriverType { get; set; }
 
         /*
 		public bool QueryRenderTargetFormat(

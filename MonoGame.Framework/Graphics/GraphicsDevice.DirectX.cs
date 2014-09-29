@@ -520,7 +520,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Pass the preferred feature levels based on the
             // target profile that may have been set by the user.
-            //  HiDef cuando > Level_10_0
             var featureLevels = new List<FeatureLevel>();
             if (GraphicsProfile == GraphicsProfile.HiDef)
             {
@@ -529,7 +528,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_10_0);
             }
 
-            // We can´t give featureLevels for granted in GraphicsProfile.Reach
+            // We can not give featureLevels for granted in GraphicsProfile.Reach
             FeatureLevel supportedFeatureLevel = 0;
             try
             {
