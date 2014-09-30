@@ -275,7 +275,7 @@ namespace MGCB
                     continue;
                 }
 
-                if (arg.StartsWith("/@"))
+                if (arg.StartsWith("/@:"))
                 {
                     var file = arg.Substring(3);
                     var commands = File.ReadAllLines(file);
@@ -508,11 +508,18 @@ namespace MGCB
                 foreach (var pair in _optionalOptions)
                 {
                     var field = pair.Value as FieldInfo;
+                    var prop = pair.Value as PropertyInfo;
                     var method = pair.Value as MethodInfo;
                     var param = GetAttribute<CommandLineParameterAttribute>(pair.Value);
 
-                    var hasValue = (field != null && field.FieldType != typeof (bool)) ||
-                                   (method != null && method.GetParameters().Length != 0);
+                    var hasValue = false;
+
+                    if (field != null && field.FieldType != typeof (bool))
+                        hasValue = true;
+                    if (prop != null && prop.PropertyType != typeof (bool))
+                        hasValue = true;
+                    if (method != null && method.GetParameters().Length != 0)
+                        hasValue = true;
 
                     if (hasValue)
                         Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);
