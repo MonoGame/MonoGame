@@ -275,7 +275,7 @@ namespace MGCB
                     continue;
                 }
 
-                if (arg.StartsWith("/@"))
+                if (arg.StartsWith("/@:"))
                 {
                     var file = arg.Substring(3);
                     var commands = File.ReadAllLines(file);
