@@ -534,7 +534,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 supportedFeatureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
             }
-            catch (SharpDX.SharpDXException e)
+            catch (SharpDX.SharpDXException)
             {   
                 // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
             }
@@ -549,11 +549,11 @@ namespace Microsoft.Xna.Framework.Graphics
             var driverType = DriverType.Hardware;   //Default value
             switch (GraphicsAdapter.UseD3DDriverType)
             {
-                case GraphicsAdapter.D3D_DRIVER_TYPE.Reference:
+                case GraphicsAdapter.DriverType.Reference:
                     driverType = DriverType.Reference;
                     break;
 
-                case GraphicsAdapter.D3D_DRIVER_TYPE.Warp:
+                case GraphicsAdapter.DriverType.FastSoftware:
                     driverType = DriverType.Warp;
                     break;
             }
@@ -1264,7 +1264,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
                 }
-                catch (SharpDXException e)
+                catch (SharpDXException)
                 { 
                     featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
                 }
@@ -1274,7 +1274,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsProfile graphicsProfile;
 
-            if (featureLevel >= FeatureLevel.Level_10_0 || GraphicsAdapter.UseD3DDriverType == GraphicsAdapter.D3D_DRIVER_TYPE.Reference)
+            if (featureLevel >= FeatureLevel.Level_10_0 || GraphicsAdapter.UseReferenceDevice)
                 graphicsProfile = GraphicsProfile.HiDef;
             else 
                 graphicsProfile = GraphicsProfile.Reach;
