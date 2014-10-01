@@ -156,16 +156,6 @@
     </Reference>
   </Platform>
   <Platform Type="WindowsPhone81">
-    <Reference Include="Windows" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Linq" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Runtime.WindowsRuntime" />
-    <Reference Include="System.Runtime.InteropServices.WindowsRuntime.dll" />
-    <Reference Include="System.ObjectModel"/>
-    <Reference Include="System.IO" />
     <Binary
       Name="SharpDX"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
@@ -187,9 +177,6 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
-    <Reference Include="Microsoft.Xna.Framework">
-      <Alias Platform="WindowsPhone81">MicrosoftXnaFramework</Alias>
-    </Reference>
   </Platform>
   <Platform Type="Web">
     <Reference Include="JSIL.Meta" />
