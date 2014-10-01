@@ -150,11 +150,18 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         exportedTypes = a.GetExportedTypes();
                     }
                 }
+                catch (BadImageFormatException e)
+                {
+                    Logger.LogWarning(null, null, "Assembly is either corrupt or built using a different " +
+                        "target platform than this process. Reference another target architecture (x86, x64, " +
+                        "AnyCPU, etc.) of this assembly. '{0}': {1}", assemblyPath, e.Message);
+                    // The assembly failed to load... nothing
+                    // we can do but ignore it.
+                    continue;
+                }
                 catch (Exception e)
                 {
                     Logger.LogWarning(null, null, "Failed to load assembly '{0}': {1}", assemblyPath, e.Message);
-                    // The assembly failed to load... nothing
-                    // we can do but ignore it.
                     continue;
                 }
 
