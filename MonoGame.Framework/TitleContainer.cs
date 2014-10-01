@@ -35,13 +35,15 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #if IOS
-			SupportRetina = UIScreen.MainScreen.Scale == 2.0f;
+            SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
+            RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
 #endif
-		}
+        }
 
         static internal string Location { get; private set; }
 #if IOS
         static internal bool SupportRetina { get; private set; }
+        static internal int RetinaScale { get; private set; }
 #endif
 
 #if WINRT
@@ -91,13 +93,16 @@ namespace Microsoft.Xna.Framework
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)
             {
-                // Insert the @2x immediately prior to the extension. If this file exists
-                // and we are on a Retina device, return this file instead.
-                var absolutePath2x = Path.Combine(Path.GetDirectoryName(absolutePath),
-                                                  Path.GetFileNameWithoutExtension(absolutePath)
-                                                  + "@2x" + Path.GetExtension(absolutePath));
-                if (File.Exists(absolutePath2x))
-                    return File.OpenRead(absolutePath2x);
+                for (var scale = RetinaScale; scale >= 2; scale--)
+                {
+                    // Insert the @#x immediately prior to the extension. If this file exists
+                    // and we are on a Retina device, return this file instead.
+                    var absolutePathX = Path.Combine(Path.GetDirectoryName(absolutePath),
+                                                      Path.GetFileNameWithoutExtension(absolutePath)
+                                                      + "@" + scale + "x" + Path.GetExtension(absolutePath));
+                    if (File.Exists(absolutePathX))
+                        return File.OpenRead(absolutePathX);
+                }
             }
             return File.OpenRead(absolutePath);
 #else
