@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _targetElapsedTime = TimeSpan.FromTicks(166667); // 60fps
         private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(0.02);
 
-        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
+        private TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
 
         private bool _suppressDraw;
@@ -190,10 +190,25 @@ namespace Microsoft.Xna.Framework
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
 
-                if (_inactiveSleepTime != value)
-                {
-                    _inactiveSleepTime = value;
-                }
+                _inactiveSleepTime = value;
+            }
+        }
+
+        /// <summary>
+        /// The maximum amount of time we will frameskip over and only perform Update calls with no Draw calls.
+        /// MonoGame extension.
+        /// </summary>
+        public TimeSpan MaxElapsedTime
+        {
+            get { return _maxElapsedTime; }
+            set
+            {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                if (value < _targetElapsedTime)
+                    throw new ArgumentOutOfRangeException("The time must be at least TargetElapsedTime", default(Exception));
+
+                _maxElapsedTime = value;
             }
         }
 
