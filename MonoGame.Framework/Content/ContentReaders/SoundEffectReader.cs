@@ -152,11 +152,17 @@ namespace Microsoft.Xna.Framework.Content
             );
 
             var channels = (header[2] == 2) ? AudioChannels.Stereo : AudioChannels.Mono;
+
+            if(existingInstance!=null)
+            {
+                return existingInstance;
+            }
+
             return new SoundEffect(data, sampleRate, channels)
                 {
                     Name = input.AssetName
                 };
 #endif
-		}
+        }
 	}
 }
