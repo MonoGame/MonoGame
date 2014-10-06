@@ -127,8 +127,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static bool UseReferenceDevice
         {
-            get { return UseD3DDriverType==DriverType.Reference; }
-            set { UseD3DDriverType = value ? DriverType.Reference : DriverType.Hardware; }
+            get { return UseDriverType==DriverType.Reference; }
+            set { UseDriverType = value ? DriverType.Reference : DriverType.Hardware; }
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// These values only work on DirectX platforms and must be defined before the graphics device
         /// is created.
         /// </remarks>
-        public static DriverType UseD3DDriverType { get; set; }
+        public static DriverType UseDriverType { get; set; }
 
         /*
 		public bool QueryRenderTargetFormat(

@@ -547,7 +547,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_9_1);
 
             var driverType = DriverType.Hardware;   //Default value
-            switch (GraphicsAdapter.UseD3DDriverType)
+            switch (GraphicsAdapter.UseDriverType)
             {
                 case GraphicsAdapter.DriverType.Reference:
                     driverType = DriverType.Reference;
