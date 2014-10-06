@@ -88,7 +88,7 @@ namespace MonoGame.Tests.Visual {
 
 			// We do all the tests using the reference device to
 			// avoid driver glitches and get consistant rendering.
-            GraphicsAdapter.UseReferenceDevice = true;
+			GraphicsAdapter.UseReferenceDevice = true;
 
 			Services.AddService<IFrameCaptureSource> (this);
 		}
