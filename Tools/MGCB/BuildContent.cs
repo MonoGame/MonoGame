@@ -226,7 +226,7 @@ namespace MGCB
 
             var intermediatePath = ReplaceSymbols (IntermediateDir);
             if (!Path.IsPathRooted(intermediatePath))
-                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, intermediatePath)));
             
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
