@@ -185,7 +185,7 @@
     <nunit2 if="${os == 'Win32NT'}">
       <formatter type="Xml" usefile="true" extension=".xml" outputdir="Test\bin\Windows\AnyCPU\Release" />
       <test assemblyname="Test\bin\Windows\AnyCPU\Release\MonoGameTests.exe" />
-    </nunit>
+    </nunit2>
   </target>
 
   <target name="build_docs" description="Build the documentation." depends="build_code,run_tests">
