@@ -76,9 +76,9 @@ namespace MonoGame.Tests
 	static class Program
 	{
 		[STAThread]
-		static void Main(string [] args)
+		static int Main(string [] args)
 		{
-			CommandLineInterface.RunMain(args);
+			return CommandLineInterface.RunMain(args);
 		}
 	}
 }
