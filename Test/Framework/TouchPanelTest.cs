@@ -397,7 +397,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector2(199), secondTouch.Position);
         }
 
-        [Test]
+        [Test, Ignore]
         [TestCase(false), TestCase(true)]
         public void ReleaseAllTouchesTest(bool testBetween)
         {
