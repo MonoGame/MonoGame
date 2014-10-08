@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
         }
@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
                         Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
 #endif
                         Platform.Dispose();
@@ -310,7 +310,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
@@ -613,7 +613,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();

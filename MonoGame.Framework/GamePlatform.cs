@@ -105,7 +105,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         private ApplicationViewState _viewState;
         public ApplicationViewState ViewState
         {
@@ -163,7 +163,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Activated;
         public event EventHandler<EventArgs> Deactivated;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         public event EventHandler<ViewStateChangedEventArgs> ViewStateChanged;
 #endif
 

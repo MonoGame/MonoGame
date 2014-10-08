@@ -155,7 +155,29 @@
       <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
     </Reference>
   </Platform>
-
+  <Platform Type="WindowsPhone81">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct2D1.dll" />
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.Direct3D11"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct3D11.dll" />
+    <Binary
+      Name="SharpDX.DXGI"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.MediaFoundation"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.MediaFoundation.dll" />
+    <Binary
+      Name="SharpDX.XAudio2"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
+  </Platform>
   <Platform Type="Web">
     <Reference Include="JSIL.Meta" />
   </Platform>
