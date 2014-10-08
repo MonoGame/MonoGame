@@ -67,13 +67,9 @@ non-infringement
 #endregion License
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml.Xsl;
-
-using NDesk.Options;
-
 using NUnit.Core;
 using NUnit.Util;
 
