@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             // If we don't get a material then assign a default one.
             if (material == null)
-                material = new BasicMaterialContent();
+                material = MaterialProcessor.CreateDefaultMaterial(DefaultEffect);
 
             // Test requirements from the assigned material.
             int textureChannels;
@@ -253,7 +253,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
-                            "Geometry references material with texture, but no texture coordinates were found.",
+                            string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.", 
+                            geometry.Parent.Name,
+                            MaterialProcessor.GetDefaultEffect(material),
+                            i),
                             _identity);
                 }
 
