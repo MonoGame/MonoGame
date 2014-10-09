@@ -67,7 +67,6 @@ non-infringement
 #endregion License
 
 using System;
-
 using NUnit.Framework;
 
 [assembly: RequiresSTA]
@@ -76,9 +75,13 @@ namespace MonoGame.Tests
 	static class Program
 	{
 		[STAThread]
-		static int Main(string [] args)
+		static void Main(string [] args)
 		{
-			return CommandLineInterface.RunMain(args);
+			var exitCode = CommandLineInterface.RunMain(args);
+
+			// We've seen a hang at times if we exit 
+			// normally, so force the process termination.
+			Environment.Exit(exitCode);
 		}
 	}
 }
