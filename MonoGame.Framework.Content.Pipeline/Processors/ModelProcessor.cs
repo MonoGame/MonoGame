@@ -315,7 +315,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             for (var i = 0; i < flattenedBones.Count; i++)
                 boneIndices.Add(flattenedBones[i].Name, i);
 
-            var inputWeights = geometry.Vertices.Channels[vertexChannelIndex] as VertexChannel<BoneWeightCollection>;
+            var vertexChannel = geometry.Vertices.Channels[vertexChannelIndex];
+            var inputWeights = vertexChannel as VertexChannel<BoneWeightCollection>;
+            if (inputWeights == null)
+            {
+                throw new InvalidContentException(
+                    string.Format(
+                        "Vertex channel \"{0}\" is the wrong type. It has element type {1}. Type {2} is expected.",
+                        vertexChannel.Name,
+                        vertexChannel.ElementType.FullName,
+                        "Microsoft.Xna.Framework.Content.Pipeline.Graphics.BoneWeightCollection"),
+                    identity);                          
+            }
             var outputIndices = new Byte4[inputWeights.Count];
             var outputWeights = new Vector4[inputWeights.Count];
             for (var i = 0; i < inputWeights.Count; i++)
