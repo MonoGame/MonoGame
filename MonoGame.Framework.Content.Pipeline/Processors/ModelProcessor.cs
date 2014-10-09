@@ -289,18 +289,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
             if (channel.Name.StartsWith(VertexChannelNames.Weights()))
-                ProcessWeightsChannel(geometry, vertexChannelIndex);
+                ProcessWeightsChannel(geometry, vertexChannelIndex, _identity);
 
             // Looks like XNA models usually put a default color channel in..
             if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
                 geometry.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, geometry.Vertices.VertexCount));
         }
 
-        // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
-        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex)
+        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity identity)
         {
+            // NOTE: Portions of this code is from the XNA CPU Skinning 
+            // sample under Ms-PL, (c) Microsoft Corporation.
+
             // create a map of Name->Index of the bones
             var skeleton = MeshHelper.FindSkeleton(geometry.Parent);
+            if (skeleton == null)
+            {
+                throw new InvalidContentException(
+                    "Skeleton not found. Meshes that contain a Weights vertex channel cannot be processed without access to the skeleton data.",
+                    identity);                     
+            }
+
             var boneIndices = new Dictionary<string, int>();
             var flattenedBones = MeshHelper.FlattenSkeleton(skeleton);
             for (var i = 0; i < flattenedBones.Count; i++)
