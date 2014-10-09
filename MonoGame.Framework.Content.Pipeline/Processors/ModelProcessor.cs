@@ -210,6 +210,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Test requirements from the assigned material.
             int textureChannels;
+            bool vertexWeights = false;
             if (material is DualTextureMaterialContent)
             {
                 textureChannels = 2;
@@ -217,6 +218,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             else if (material is SkinnedMaterialContent)
             {
                 textureChannels = 1;
+                vertexWeights = true;
             }
             else if (material is EnvironmentMapMaterialContent)
             {
@@ -265,6 +267,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     geometry.Material = colorMaterial;
                 else
                     geometry.Material = material;
+
+                // Do we need vertex weights?
+                if (vertexWeights)
+                {
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Weights(0)))
+                        throw new InvalidContentException(
+                            string.Format("The skinned mesh \"{0}\" contains geometry without any vertex weights.", geometry.Parent.Name),
+                            _identity);                    
+                }
             }
         }
 
