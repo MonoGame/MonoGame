@@ -174,6 +174,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 FindMeshes(child, transform);
         }
 
+        private void AddAllSkeletonBones(Node aiNode)
+        {
+            //The skeleton bones list is generated from the bones found in the mesh only
+            //This means its missing any helper bones that are animated but not actually attached to vertices
+            //Now we've found the root of the skeleton we can all all bones
+
+            if (!_boneNames.Contains(aiNode.Name))
+            {
+                _boneNames.Add(aiNode.Name);
+                _objectToBone[aiNode.Name] = Matrix4x4.Identity;
+            }
+
+            if (!_skeletonNodes.Contains(aiNode.Name))
+            {
+                _skeletonNodes.Add(aiNode.Name);
+            }
+
+            foreach (var child in aiNode.Children)
+            {
+                AddAllSkeletonBones(child);
+            }
+        }
+
         private GeometryContent CreateGeometry(MeshContent mesh, Mesh aiMesh)
         {
             var geom = new GeometryContent { Material = _materials[aiMesh.MaterialIndex] };
@@ -280,6 +303,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 rootNode = rootNode.Parent;
             }
 
+            AddAllSkeletonBones(skeletonRoot);
             return skeletonRoot;
         }
 
