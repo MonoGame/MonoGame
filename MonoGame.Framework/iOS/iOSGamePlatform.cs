@@ -91,10 +91,13 @@ namespace Microsoft.Xna.Framework
         private List<NSObject> _applicationObservers;
 		private OpenALSoundController soundControllerInstance = null;
         private CADisplayLink _displayLink;
+		private bool _attachToMainWindow;
 
-        public iOSGamePlatform(Game game) :
+		public iOSGamePlatform(Game game, bool attachToMainWindow) :
             base(game)
         {
+			_attachToMainWindow = attachToMainWindow;
+
             game.Services.AddService(typeof(iOSGamePlatform), this);
 			
 			// Setup our OpenALSoundController to handle our SoundBuffer pools
@@ -108,17 +111,23 @@ namespace Microsoft.Xna.Framework
             UIApplication.SharedApplication.SetStatusBarHidden(true, UIStatusBarAnimation.Fade);
 
             // Create a full-screen window
-            _mainWindow = new UIWindow (UIScreen.MainScreen.Bounds);
-			//_mainWindow.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
-			
-            game.Services.AddService (typeof(UIWindow), _mainWindow);
+			if (_attachToMainWindow)
+			{
+				_mainWindow = new UIWindow(UIScreen.MainScreen.Bounds);
+				//_mainWindow.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+
+				game.Services.AddService (typeof(UIWindow), _mainWindow);
+			}
 
             _viewController = new iOSGameViewController(this);
             game.Services.AddService (typeof(UIViewController), _viewController);
             Window = new iOSGameWindow (_viewController);
 
-            _mainWindow.RootViewController = _viewController;
-            _mainWindow.Add (_viewController.View);
+			if (_attachToMainWindow)
+			{
+				_mainWindow.RootViewController = _viewController;
+				_mainWindow.Add(_viewController.View);
+			}
 
             _viewController.InterfaceOrientationChanged += ViewController_InterfaceOrientationChanged;
 
@@ -200,7 +209,10 @@ namespace Microsoft.Xna.Framework
         public override void StartRunLoop()
         {
             // Show the window
-            _mainWindow.MakeKeyAndVisible();
+			if (_attachToMainWindow)
+			{
+				_mainWindow.MakeKeyAndVisible();
+			}
 
             BeginObservingUIApplication();
 

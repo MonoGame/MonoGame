@@ -55,8 +55,11 @@ namespace Microsoft.Xna.Framework
 
 
         private bool _suppressDraw;
-        
-        public Game()
+
+		public Game () : this (true)
+		{ }
+
+		public Game(bool attachToMainWindow)
         {
             _instance = this;
 
@@ -65,7 +68,7 @@ namespace Microsoft.Xna.Framework
             _components = new GameComponentCollection();
             _content = new ContentManager(_services);
 
-            Platform = GamePlatform.Create(this);
+			Platform = GamePlatform.Create(this, attachToMainWindow);
             Platform.Activated += OnActivated;
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
@@ -214,7 +217,7 @@ namespace Microsoft.Xna.Framework
 
         public bool IsActive
         {
-            get { return Platform.IsActive; }
+			get { return !_isDisposed && Platform.IsActive; }
         }
 
         public bool IsMouseVisible

@@ -24,10 +24,10 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Construction/Destruction
-        public static GamePlatform Create(Game game)
+		public static GamePlatform Create(Game game, bool attachToMainWindow)
         {
 #if IOS
-            return new iOSGamePlatform(game);
+			return new iOSGamePlatform(game, attachToMainWindow);
 #elif MONOMAC
             return new MacGamePlatform(game);
 #elif (WINDOWS && OPENGL) || LINUX || ANGLE
