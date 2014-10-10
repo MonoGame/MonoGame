@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        #region Operators
+                #region Operators
 
         /// <summary>
         /// Inverts values in the specified <see cref="Vector2"/>.
@@ -531,9 +531,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>The hermite spline interpolation vector.</returns>
         public static Vector2 Hermite(Vector2 value1, Vector2 tangent1, Vector2 value2, Vector2 tangent2, float amount)
         {
-            Vector2 result = new Vector2();
-            Hermite(ref value1, ref tangent1, ref value2, ref tangent2, amount, out result);
-            return result;
+            return new Vector2
+            (
+                MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount),
+                MathHelper.Hermite(value1.Y, tangent1.Y, value2.Y, tangent2.Y, amount)
+            );
         }
 
         /// <summary>
@@ -850,8 +852,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector2"/>.</returns>
         public static Vector2 Transform(Vector2 position, Matrix matrix)
         {
-            Transform(ref position, ref matrix, out position);
-            return position;
+            return new Vector2
+            (
+                (position.X * matrix.M11) + (position.Y * matrix.M21) + matrix.M41, 
+                (position.X * matrix.M12) + (position.Y * matrix.M22) + matrix.M42
+            );
         }
 
         /// <summary>
@@ -876,8 +881,12 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed <see cref="Vector2"/>.</returns>
         public static Vector2 Transform(Vector2 value, Quaternion rotation)
         {
-            Transform(ref value, ref rotation, out value);
-            return value;
+            Quaternion v = new Quaternion(value.X, value.Y, 0, 0), i, t;
+            Quaternion.Inverse(ref rotation, out i);
+            Quaternion.Multiply(ref rotation, ref v, out t);
+            Quaternion.Multiply(ref t, ref i, out v);
+            
+            return new Vector2(v.X,v.Y);
         }
 
         /// <summary>
@@ -998,8 +1007,11 @@ namespace Microsoft.Xna.Framework
         /// <returns>Transformed normal.</returns>
         public static Vector2 TransformNormal(Vector2 normal, Matrix matrix)
         {
-            Vector2.TransformNormal(ref normal, ref matrix, out normal);
-            return normal;
+            return new Vector2
+            (
+                (normal.X * matrix.M11) + (normal.Y * matrix.M21),
+                (normal.X * matrix.M12) + (normal.Y * matrix.M22)
+            );
         }
 
         /// <summary>
