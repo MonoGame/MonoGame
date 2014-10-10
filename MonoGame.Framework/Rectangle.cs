@@ -419,10 +419,19 @@ namespace Microsoft.Xna.Framework
         /// Returns a <see cref="String"/> representation of this <see cref="Rectangle"/> in the format:
         /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>] Width:[<see cref="Width"/>] Height:[<see cref="Height"/>]}
         /// </summary>
-        /// <returns><see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
         public override string ToString()
         {
             return "{{X:" + X + " Y:" + Y + " Width:" + Width + " Height:" + Height + "}}";
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Vector4"/> representation of this <see cref="Rectangle"/>.
+        /// </summary>
+        /// <returns>A <see cref="Vector4"/> representation of this <see cref="Rectangle"/>.</returns>
+        public Vector4 ToVector4()
+        {
+            return new Vector4(X, Y, Width, Height);
         }
 
         /// <summary>

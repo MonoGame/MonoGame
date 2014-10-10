@@ -121,6 +121,9 @@
     <Compile Include="..\..\MonoGame.Framework\PlaneIntersectionType.cs">
       <Link>MonoGame.Framework\PlaneIntersectionType.cs</Link>
     </Compile>
+	 <Compile Include="..\..\MonoGame.Framework\Point.cs">
+      <Link>MonoGame.Framework\Point.cs</Link>
+    </Compile>
     <Compile Include="..\..\MonoGame.Framework\Quaternion.cs">
       <Link>MonoGame.Framework\Quaternion.cs</Link>
     </Compile>
