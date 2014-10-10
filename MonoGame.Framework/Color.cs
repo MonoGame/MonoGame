@@ -16,6 +16,11 @@ namespace Microsoft.Xna.Framework
     [DebuggerDisplay("{DebugDisplayString,nq}")]
     public struct Color : IEquatable<Color>
     {
+        // ARGB
+        private uint _packedValue;
+
+        #region Constructors
+
         static Color()
         {
             TransparentBlack = new Color(0);
@@ -161,8 +166,7 @@ namespace Microsoft.Xna.Framework
             Yellow = new Color(0xff00ffff);
             YellowGreen = new Color(0xff32cd9a);
         }
-	// ARGB
-        private uint _packedValue;
+
 	  
         private Color(uint packedValue)
         {
@@ -294,6 +298,8 @@ namespace Microsoft.Xna.Framework
             B = (byte)MathHelper.Clamp(b * 255, Byte.MinValue, Byte.MaxValue);
             A = (byte)MathHelper.Clamp(alpha * 255, Byte.MinValue, Byte.MaxValue);
         }
+
+        #endregion
 
         /// <summary>
         /// Gets or sets the blue component of <see cref="Color"/>.
