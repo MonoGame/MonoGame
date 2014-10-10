@@ -136,7 +136,10 @@ namespace Microsoft.Xna.Framework.Storage
 				_storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
 
             // Create the "device" if need be
-            CreateDirectoryAbsolute(_storagePath);
+            if (!Directory.Exists(_storagePath))
+            {
+                CreateDirectoryAbsolute(_storagePath);
+            }
         }
 		
         /// <summary>
