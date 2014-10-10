@@ -55,9 +55,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString()
+                return string.Concat
+                (
+                    this.X, "  ",
+                    this.Y
                 );
             }
         }
@@ -89,7 +90,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Sum of the points.</returns>
         public static Point operator +(Point value1, Point value2)
         {
-            return new Point(value1.X + value2.X, value1.Y + value2.Y);
+            value1.X += value2.X;
+            value1.Y += value2.Y;
+            return value1;
         }
 
         /// <summary>
@@ -100,7 +103,9 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the subtraction.</returns>
         public static Point operator -(Point value1, Point value2)
         {
-            return new Point(value1.X - value2.X, value1.Y - value2.Y);
+            value1.X -= value2.X;
+            value1.Y -= value2.Y;
+            return value1;
         }
 
         /// <summary>
@@ -111,18 +116,22 @@ namespace Microsoft.Xna.Framework
         /// <returns>Result of the multiplication.</returns>
         public static Point operator *(Point value1, Point value2)
         {
-            return new Point(value1.X * value2.X, value1.Y * value2.Y);
+            value1.X *= value2.X;
+            value1.Y *= value2.Y;
+            return value1;
         }
 
         /// <summary>
         /// Divides the components of a <see cref="Point"/> by the components of another <see cref="Point"/>.
         /// </summary>
-        /// <param name="source">Source <see cref="Point"/> on the left of the div sign.</param>
-        /// <param name="divisor">Divisor <see cref="Point"/> on the right of the div sign.</param>
+        /// <param name="value1">Source <see cref="Point"/> on the left of the div sign.</param>
+        /// <param name="value2">Divisor <see cref="Point"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the points.</returns>
-        public static Point operator /(Point source, Point divisor)
+        public static Point operator /(Point value1, Point value2)
         {
-            return new Point(source.X / divisor.X, source.Y / divisor.Y);
+            value1.X /= value2.X;
+            value1.Y /= value2.Y;
+            return value1;
         }
 
         /// <summary>
@@ -133,7 +142,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator ==(Point a, Point b)
         {
-            return a.Equals(b);
+            return ((a.X == b.X) && (a.Y == b.Y));
         }
 
         /// <summary>
@@ -144,7 +153,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Point a, Point b)
         {
-            return !a.Equals(b);
+            return ((a.X != b.X) || (a.Y != b.Y));
         }
 
         #endregion
@@ -184,16 +193,16 @@ namespace Microsoft.Xna.Framework
         /// Returns a <see cref="String"/> representation of this <see cref="Point"/> in the format:
         /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>]}
         /// </summary>
-        /// <returns><see cref="String"/> representation of this <see cref="Point"/>.</returns>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Point"/>.</returns>
         public override string ToString()
         {
             return "{{X:" + X + " Y:" + Y + "}}";
         }
 
         /// <summary>
-        /// Gets a two-component <see cref="Vector2"/> representation for this object.
+        /// Returns a <see cref="Vector2"/> representation of this <see cref="Point"/>.
         /// </summary>
-        /// <returns>A two-component <see cref="Vector2"/> representation for this object.</returns>
+        /// <returns>A <see cref="Vector2"/> representation of this <see cref="Point"/>.</returns>
         public Vector2 ToVector2()
         {
             return new Vector2(X, Y);
