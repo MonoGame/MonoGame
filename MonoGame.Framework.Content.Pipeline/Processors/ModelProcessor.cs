@@ -271,7 +271,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 // Do we need vertex weights?
                 if (vertexWeights)
                 {
-                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Weights(0)))
+                    var weightsName = VertexChannelNames.EncodeName(VertexElementUsage.BlendWeight, 0);
+                    if (!geometry.Vertices.Channels.Contains(weightsName))
                         throw new InvalidContentException(
                             string.Format("The skinned mesh \"{0}\" contains geometry without any vertex weights.", geometry.Parent.Name),
                             _identity);                    
