@@ -1709,7 +1709,10 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public static bool operator ==(Color a, Color b)
         {
-            return a._packedValue == b._packedValue;
+            return (a.A == b.A &&
+               a.R == b.R &&
+               a.G == b.G &&
+               a.B == b.B);
         }
 
         /// <summary>
@@ -1720,7 +1723,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
         public static bool operator !=(Color a, Color b)
         {
-            return a._packedValue != b._packedValue;
+            return !(a == b);
         }
 
         #endregion
