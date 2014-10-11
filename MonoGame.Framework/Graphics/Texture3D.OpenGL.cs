@@ -6,9 +6,9 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#if GLES
+using OpenTK.Graphics.ES20;
+#elif OPENGL
 using OpenTK.Graphics.OpenGL;
 #endif
 

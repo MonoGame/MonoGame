@@ -4,12 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
-using MonoMac.OpenAL;
-#else
 using OpenTK.Audio.OpenAL;
 using OpenTK;
-#endif
 
 #if ANDROID
 using System.Globalization;

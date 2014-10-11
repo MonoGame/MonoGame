@@ -7,22 +7,12 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#endif
-
-#if WINDOWS || LINUX
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
-#endif
-
-#if ANGLE
-using OpenTK.Graphics;
-#endif
 
 #if GLES
+#if ANGLE
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
+#else
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -38,6 +28,11 @@ using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
 using GLPrimitiveType = OpenTK.Graphics.ES20.All;
 #endif
+#elif OPENGL
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
+#endif
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -46,6 +41,11 @@ namespace Microsoft.Xna.Framework.Graphics
     {
 #if WINDOWS || LINUX || ANGLE
         internal IGraphicsContext Context { get; private set; }
+#endif
+#if MONOMAC
+        // In this case, the OpenGL context is constructed and managed by
+        // MonoMacGameView. We need to register that context with OpenTK.
+        IGraphicsContext Context { get; set; }
 #endif
 
 #if !GLES
@@ -186,6 +186,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 Threading.BackgroundContext.MakeCurrent(null);
             }
             Context.MakeCurrent(wnd);
+#elif MONOMAC
+            // Register the MonoMac OpenGL context with OpenTK.
+            // This will initialize the OpenTK GL bindings.
+            OpenTK.Toolkit.Init();
+            Context = new GraphicsContext(
+                OpenTK.ContextHandle.Zero, // use current context
+                null);
 #endif
 
             MaxTextureSlots = 16;
@@ -265,7 +272,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper = new FramebufferHelper(this);
             }
-            #if !(GLES || MONOMAC)
+            #if !GLES
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 this.framebufferHelper = new FramebufferHelperEXT(this);

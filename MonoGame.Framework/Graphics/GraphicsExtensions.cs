@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-#elif GLES
 #if ANGLE
 using OpenTK.Graphics;
-#endif
+#elif GLES
 using OpenTK.Graphics.ES20;
 using BlendEquationMode = OpenTK.Graphics.ES20.All;
 using BlendingFactorSrc = OpenTK.Graphics.ES20.All;
@@ -24,7 +17,9 @@ using ColorPointerType = OpenTK.Graphics.ES20.All;
 using NormalPointerType = OpenTK.Graphics.ES20.All;
 using TexCoordPointerType = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
-#endif
+#elif OPENGL
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -167,7 +162,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return VertexAttribPointerType.Short;
                 
-#if MONOMAC || WINDOWS || LINUX
+#if OPENGL && !GLES
                case VertexElementFormat.HalfVector2:
                     return VertexAttribPointerType.HalfFloat;
 
@@ -237,7 +232,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return ColorPointerType.UnsignedShort;
 				
-#if MONOMAC
+#if OPENGL && !GLES
                 case VertexElementFormat.HalfVector2:
                     return ColorPointerType.HalfFloat;
 
@@ -283,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return NormalPointerType.Short;
 				
-#if MONOMAC
+#if OPENGL && !GLES
                 case VertexElementFormat.HalfVector2:
                     return NormalPointerType.HalfFloat;
 
@@ -329,7 +324,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case VertexElementFormat.NormalizedShort4:
                     return TexCoordPointerType.Short;
 				
-#if MONOMAC
+#if OPENGL && !GLES
                 case VertexElementFormat.HalfVector2:
                     return TexCoordPointerType.HalfFloat;
 
@@ -382,11 +377,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorSrc.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS || LINUX
 				return (BlendingFactorSrc)All.OneMinusSrcColor;
-#else
-				return BlendingFactorSrc.OneMinusSrcColor;
-#endif
 			case Blend.One:
 				return BlendingFactorSrc.One;
 			case Blend.SourceAlpha:
@@ -394,11 +385,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.SourceAlphaSaturation:
 				return BlendingFactorSrc.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS || LINUX
 				return (BlendingFactorSrc)All.SrcColor;
-#else
-				return BlendingFactorSrc.SrcColor;
-#endif
 			case Blend.Zero:
 				return BlendingFactorSrc.Zero;
 			default:
@@ -421,11 +408,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			case Blend.InverseSourceAlpha:
 				return BlendingFactorDest.OneMinusSrcAlpha;
 			case Blend.InverseSourceColor:
-#if MONOMAC || WINDOWS
 				return (BlendingFactorDest)All.OneMinusSrcColor;
-#else
-				return BlendingFactorDest.OneMinusSrcColor;
-#endif
 			case Blend.One:
 				return BlendingFactorDest.One;
 			case Blend.SourceAlpha:
@@ -433,11 +416,7 @@ namespace Microsoft.Xna.Framework.Graphics
 //			case Blend.SourceAlphaSaturation:
 //				return BlendingFactorDest.SrcAlphaSaturate;
 			case Blend.SourceColor:
-#if MONOMAC || WINDOWS
 				return (BlendingFactorDest)All.SrcColor;
-#else
-				return BlendingFactorDest.SrcColor;
-#endif
 			case Blend.Zero:
 				return BlendingFactorDest.Zero;
 			default:

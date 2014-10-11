@@ -2,16 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-using System;
-using System.Collections.Generic;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
+using System;
+using System.Collections.Generic;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

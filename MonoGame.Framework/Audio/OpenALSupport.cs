@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using OpenTK.Audio.OpenAL;
 
 #if IOS
 using MonoTouch.UIKit;
@@ -7,19 +8,12 @@ using MonoTouch.Foundation;
 using MonoTouch.CoreFoundation;
 using MonoTouch.AudioToolbox;
 using MonoTouch.AudioUnit;
-
-using OpenTK.Audio.OpenAL;
-
 #elif MONOMAC
-
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 using MonoMac.CoreFoundation;
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
-
-using MonoMac.OpenAL;
-
 #endif
 
 namespace Microsoft.Xna.Framework.Audio

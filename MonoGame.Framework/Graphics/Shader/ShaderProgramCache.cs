@@ -3,20 +3,15 @@
 using System;
 using System.Collections.Generic;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GetProgramParameterName = MonoMac.OpenGL.ProgramParameter;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif WINRT
-
-#else
+#if GLES
 using OpenTK.Graphics.ES20;
 #if IOS || ANDROID
 using ActiveUniformType = OpenTK.Graphics.ES20.All;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using GetProgramParameterName = OpenTK.Graphics.ES20.All;
 #endif
+#else
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -69,11 +64,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (GL.IsProgram(pair.Value.Program))
                 {
-#if MONOMAC
-                    GL.DeleteProgram(pair.Value.Program, null);
-#else
                     GL.DeleteProgram(pair.Value.Program);
-#endif
                     GraphicsExtensions.CheckGLError();
                 }
             }
@@ -138,9 +129,6 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
                 GL.DetachShader(program, vertexShader.GetShaderHandle());
                 GL.DetachShader(program, pixelShader.GetShaderHandle());
-#if MONOMAC
-                GL.DeleteProgram(1, ref program);
-#else
                 GL.DeleteProgram(program);
 #endif
                 throw new InvalidOperationException("Unable to link effect program");
@@ -169,5 +157,3 @@ namespace Microsoft.Xna.Framework.Graphics
         }
     }
 }
-
-#endif // OPENGL
