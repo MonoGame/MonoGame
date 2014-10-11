@@ -397,7 +397,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector2(199), secondTouch.Position);
         }
 
-        [Test, Ignore]
+        [Test]
         [TestCase(false), TestCase(true)]
         public void ReleaseAllTouchesTest(bool testBetween)
         {
@@ -431,13 +431,20 @@ namespace MonoGame.Tests.Framework
             //Call ReleaseAllTouches
             _tps.ReleaseAllTouches();
 
-            //All should be in Released state
+            //If we saw the second touch happen then we should see it be released, otherwise it will be in pressed, then in released next time
             state = _tps.GetState();
-            foreach (var touch in state)
-                Assert.AreEqual(TouchLocationState.Released, touch.State);
+            Assert.AreEqual(2, state.Count);
 
-            //If we saw the second touch happen then we should see it be released, otherwise we should only know of the first touch
-            Assert.AreEqual(testBetween ? 2 : 1, state.Count);
+            Assert.AreEqual(testBetween ? TouchLocationState.Released : TouchLocationState.Pressed, state.Single(p => p.Id != initialTouch.Id).State);
+            Assert.AreEqual(TouchLocationState.Released, state.Single(p => p.Id == initialTouch.Id).State);
+
+            if (!testBetween)
+            {
+                state = _tps.GetState();
+                Assert.AreEqual(1, state.Count);
+
+                Assert.AreEqual(TouchLocationState.Released, state[0].State);
+            }
 
             //Then it should be empty
             state = _tps.GetState();
