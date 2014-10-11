@@ -136,10 +136,7 @@ namespace Microsoft.Xna.Framework.Storage
 				_storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
 
             // Create the "device" if need be
-            if (!Directory.Exists(_storagePath))
-            {
-                CreateDirectoryAbsolute(_storagePath);
-            }
+            CreateDirectoryAbsolute(_storagePath);
         }
 		
         /// <summary>
@@ -198,7 +195,10 @@ namespace Microsoft.Xna.Framework.Storage
             var task = folder.CreateFolderAsync(path, CreationCollisionOption.OpenIfExists);
             task.AsTask().Wait();
 #else
-            Directory.CreateDirectory(path);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
 #endif
         }
 
