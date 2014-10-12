@@ -96,6 +96,7 @@
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GameTest.cs" />
     <Compile Include="Framework\TestGameBase.cs" />
+    <Compile Include="Framework\GamePadStateTest.cs" />
 
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />

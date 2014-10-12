@@ -173,5 +173,48 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             return input;
         }
+
+        /// <summary>
+        /// Helper method which returns the material for a default effect.
+        /// </summary>
+        /// <returns>A material.</returns>
+        public static MaterialContent CreateDefaultMaterial(MaterialProcessorDefaultEffect effect)
+        {
+            switch (effect)
+            {
+                case MaterialProcessorDefaultEffect.BasicEffect:
+                    return new BasicMaterialContent();
+                case MaterialProcessorDefaultEffect.SkinnedEffect:
+                    return new SkinnedMaterialContent();
+                case MaterialProcessorDefaultEffect.EnvironmentMapEffect:
+                    return new EnvironmentMapMaterialContent();
+                case MaterialProcessorDefaultEffect.DualTextureEffect:
+                    return new DualTextureMaterialContent();
+                case MaterialProcessorDefaultEffect.AlphaTestEffect:
+                    return new AlphaTestMaterialContent();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Helper method which returns the default effect for a material.
+        /// </summary>
+        /// <returns>The default effect.</returns>
+        public static MaterialProcessorDefaultEffect GetDefaultEffect(MaterialContent content)
+        {
+            if (content is AlphaTestMaterialContent)
+                return MaterialProcessorDefaultEffect.AlphaTestEffect;
+            if (content is BasicMaterialContent)
+                return MaterialProcessorDefaultEffect.BasicEffect;
+            if (content is DualTextureMaterialContent)
+                return MaterialProcessorDefaultEffect.DualTextureEffect;
+            if (content is EnvironmentMapMaterialContent)
+                return MaterialProcessorDefaultEffect.EnvironmentMapEffect;
+            if (content is SkinnedMaterialContent)
+                return MaterialProcessorDefaultEffect.SkinnedEffect;
+
+            throw new ArgumentOutOfRangeException("Unknown material content type!");
+        }
     }
 }
