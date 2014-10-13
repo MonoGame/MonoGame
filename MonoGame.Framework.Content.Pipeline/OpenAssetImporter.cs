@@ -29,10 +29,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private List<string> _boneNames = new List<string>();
         private List<string> _skeletonNodes = new List<string>();
         private Dictionary<string, Matrix4x4> _objectToBone = new Dictionary<string, Matrix4x4>();
+        private Dictionary<string, Matrix4x4> _offsetMatrix = new Dictionary<string, Matrix4x4>();
+
+        public string ImporterName { get; set; }
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            var identity = new ContentIdentity(filename, GetType().Name);
+            var identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
             {
@@ -112,6 +115,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     material.Textures.Add("Transparency", texture);
                 }
 
+                if (sceneMaterial.HasTextureSpecular)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureSpecular.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureSpecular.UVIndex));
+                    material.Textures.Add("Specular", texture);
+                }
+
+                if (sceneMaterial.HasTextureHeight)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureHeight.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureHeight.UVIndex));
+                    material.Textures.Add("Bump", texture);
+                }
+
                 if (sceneMaterial.HasColorDiffuse)
                     material.DiffuseColor = ToXna(sceneMaterial.ColorDiffuse);
 
@@ -157,9 +174,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         if (!_boneNames.Contains(bone.Name))
                             _boneNames.Add(bone.Name);
 
-                        var boneName = bone.Name;
-                        _objectToBone[boneName] = Matrix4x4.Identity;
-                        //_objectToBone[boneName].Inverse();
+                        _offsetMatrix[bone.Name] = bone.OffsetMatrix;
                     }
 
                     var geom = CreateGeometry(mesh, aiMesh);
@@ -334,6 +349,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     node.Transform = ToXna(transform);
                     xnaParent.Children.Add(node);
 
+                    _objectToBone[aiNode.Name] = transform;
+
                     // For the children, this is the new parent.
                     xnaParent = node;
                 }
@@ -370,6 +387,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             foreach (var aiChannel in aiAnimation.NodeAnimationChannels)
             {
+                if (aiChannel.NodeName.Contains("_$AssimpFbx$"))
+                    continue;
+
                 var channel = new AnimationChannel();
 
                 // We can have different numbers of keyframes for each, so find the max index.
@@ -381,25 +401,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     .Union(aiChannel.ScalingKeys.Select(k => k.Time))
                     .Distinct().ToList();
 
-                // The rest of this loop is almost certainly wrong. Don't trust it.
-                // There's some magical combination, ordering, or transposition we have
-                // to figure out to translate FBX->Assimp->XNA.
-                // Possibilities: matrix offset transform, missing a base transform, an extra base transform, etc.
-
-                var toBoneSpace = _objectToBone.ContainsKey(aiChannel.NodeName)
-                    ? _objectToBone[aiChannel.NodeName] * _skeletonRoot.Transform
-                    : _skeletonRoot.Transform;
-
+                var translation = new Vector3D(0, 0, 0);
+                var rotation = new Assimp.Quaternion(1, 0, 0, 0);
+                var scale = new Vector3D(1, 1, 1);
                 foreach (var aiKeyTime in times)
                 {
                     var time = TimeSpan.FromSeconds(aiKeyTime / aiAnimation.TicksPerSecond);
-                    var translation = Matrix4x4.FromTranslation(aiChannel.PositionKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value);
-                    var rotation = new Matrix4x4(aiChannel.RotationKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value.GetMatrix());
-                    var scale = Matrix4x4.FromScaling(aiChannel.ScalingKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value);
-                    var nodeTransform = translation * rotation * scale;
 
-                    var xform = toBoneSpace * nodeTransform * _globalInverseXform;
-                    channel.Add(new AnimationKeyframe(time, ToXna(xform)));
+                    var translateIndex = aiChannel.PositionKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (translateIndex != -1)
+                        translation = aiChannel.PositionKeys[translateIndex].Value;
+
+                    var rotationIndex = aiChannel.RotationKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (rotationIndex != -1)
+                        rotation = aiChannel.RotationKeys[rotationIndex].Value;
+
+                    var scaleIndex = aiChannel.ScalingKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (scaleIndex != -1)
+                        scale = aiChannel.ScalingKeys[scaleIndex].Value;
+
+                    var nodeTransform = Matrix4x4.FromScaling(scale) *
+                                        new Matrix4x4(rotation.GetMatrix()) *
+                                        Matrix4x4.FromTranslation(translation);
+
+                    channel.Add(new AnimationKeyframe(time, ToXna(nodeTransform)));
                 }
 
                 animation.Channels.Add(aiChannel.NodeName, channel);
