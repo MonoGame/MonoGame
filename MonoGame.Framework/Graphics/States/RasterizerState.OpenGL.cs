@@ -4,15 +4,13 @@
 
 using System;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 using EnableCap = OpenTK.Graphics.ES20.All;
 using FrontFaceDirection = OpenTK.Graphics.ES20.All;
 using CullFaceMode = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -54,12 +52,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
 
-#if MONOMAC || WINDOWS || LINUX
+#if OPENGL && !GLES
 			if (FillMode == FillMode.Solid) 
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             else
 				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-#else
+#elif OPENGL && GLES
             if (FillMode != FillMode.Solid)
                 throw new NotImplementedException();
 #endif

@@ -20,15 +20,6 @@ using MonoTouch.Foundation;
 #endif
 
 #if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPixelFormat = MonoMac.OpenGL.PixelFormat;
-#endif
-
-#if WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-#endif
 
 #if GLES
 using OpenTK.Graphics.ES20;
@@ -40,6 +31,9 @@ using PixelInternalFormat = OpenTK.Graphics.ES20.All;
 using PixelType = OpenTK.Graphics.ES20.All;
 using PixelStoreParameter = OpenTK.Graphics.ES20.All;
 using ErrorCode = OpenTK.Graphics.ES20.All;
+#else
+using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 #endif
 
 #if ANDROID
@@ -471,7 +465,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsJpeg(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
 #else
             throw new NotImplementedException();
@@ -480,14 +474,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSaveAsPng(Stream stream, int width, int height)
         {
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
             SaveAsImage(stream, width, height, ImageFormat.Png);
 #else
             throw new NotImplementedException();
 #endif
         }
 
-#if MONOMAC || WINDOWS
+#if WINDOWS || LINUX || MONOMAC || ANGLE
 		private void SaveAsImage(Stream stream, int width, int height, ImageFormat format)
 		{
 			if (stream == null)

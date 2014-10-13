@@ -5,17 +5,15 @@
 using System;
 using System.IO;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
+#if GLES
 using System.Text;
 using OpenTK.Graphics.ES20;
 using ShaderType = OpenTK.Graphics.ES20.All;
 using ShaderParameter = OpenTK.Graphics.ES20.All;
 using TextureUnit = OpenTK.Graphics.ES20.All;
 using TextureTarget = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

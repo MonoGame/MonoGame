@@ -299,16 +299,30 @@ namespace Microsoft.Xna.Framework
         {
             if (!IsDisposed)
             {
-                if (toolkit != null)
+                if (disposing)
                 {
-                    toolkit.Dispose();
-                    toolkit = null;
-                }
+                    if (_view != null)
+                    {
+                        _view.Dispose();
+                        _view = null;
+                    }
 
-                if (_view != null)
+                    if (toolkit != null)
+                    {
+                        toolkit.Dispose();
+                        toolkit = null;
+                    }
+                }
+                else
                 {
-                    _view.Dispose();
-                    _view = null;
+                    // Releasing UI resources from a different thread
+                    // will invariably lead to a crash. We don't know
+                    // the state of the runtime at this point (it may
+                    // be shutting down), so it's not safe to marshal
+                    // resource disposal to the UI thread. Gentlemen,
+                    // we got us a resource leak!
+                    // In other words, the user must always Dispose()
+                    // resources explictly when done.
                 }
             }
 

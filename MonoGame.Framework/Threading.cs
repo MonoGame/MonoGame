@@ -51,7 +51,7 @@ using OpenTK.Graphics.ES11;
 #else
 using OpenTK.Graphics.ES20;
 #endif
-#elif WINDOWS || LINUX || ANGLE
+#elif WINDOWS || LINUX || MONOMAC || ANGLE
 using OpenTK.Graphics;
 using OpenTK.Platform;
 using OpenTK;
@@ -76,7 +76,7 @@ namespace Microsoft.Xna.Framework
         //static Mutex actionsMutex = new Mutex();
 #elif IOS
         public static EAGLContext BackgroundContext;
-#elif WINDOWS || LINUX || ANGLE
+#elif WINDOWS || LINUX || MONOMAC || ANGLE
         public static IGraphicsContext BackgroundContext;
         public static IWindowInfo WindowInfo;
 #endif
@@ -191,7 +191,7 @@ namespace Microsoft.Xna.Framework
                 GL.Flush();
                 GraphicsExtensions.CheckGLError();
             }
-#elif WINDOWS || LINUX || ANGLE
+#elif WINDOWS || LINUX || MONOMAC || ANGLE
             lock (BackgroundContext)
             {
                 // Make the context current on this thread
@@ -208,11 +208,7 @@ namespace Microsoft.Xna.Framework
             BlockOnContainerThread(Deployment.Current.Dispatcher, action);
 #else
             ManualResetEventSlim resetEvent = new ManualResetEventSlim(false);
-#if MONOMAC
-            MonoMac.AppKit.NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-#else
             Add(() =>
-#endif
             {
 #if ANDROID
                 //if (!Game.Instance.Window.GraphicsContext.IsCurrent)

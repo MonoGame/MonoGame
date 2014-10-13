@@ -110,9 +110,7 @@
       <Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
     </Compile>
     <Compile Include="GameUpdateRequiredException.cs" />
-    <Compile Include="GameWindow.cs">
-		<ExcludePlatforms>MacOS</ExcludePlatforms>
-	</Compile>
+    <Compile Include="GameWindow.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IGameComponent.cs" />
     <Compile Include="IGraphicsDeviceManager.cs" />
@@ -291,7 +289,7 @@
     <Compile Include="Content\ContentReaders\VertexBufferReader.cs" />
     <Compile Include="Content\ContentReaders\VertexDeclarationReader.cs"/>
     <Compile Include="Content\ContentReaders\VideoReader.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,MacOS,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Content\ContentSerializerAttribute.cs" />
     <Compile Include="Content\ContentSerializerCollectionItemNameAttribute.cs" />
@@ -796,14 +794,16 @@
     </Compile>
     <Compile Include="Media\VideoSoundtrackType.cs" />
     <Compile Include="Media\Video.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,MacOS,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\Video.IOS.cs">
         <Platforms>iOS</Platforms>
     </Compile>
+<!--
     <Compile Include="Media\Video.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
+-->
     <Compile Include="Media\Video.Android.cs">
         <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -811,7 +811,7 @@
         <Platforms>Windows</Platforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.cs">
-      <ExcludePlatforms>Angle,Linux,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
+      <ExcludePlatforms>Angle,Linux,MacOS,PSMobile,WindowsGL,WindowsPhone,Web</ExcludePlatforms>
     </Compile>
     <Compile Include="Media\VideoPlayer.IOS.cs">
         <Platforms>iOS</Platforms>
@@ -819,9 +819,11 @@
     <Compile Include="Media\VideoPlayer.WME.cs">
         <Platforms>Windows8,WindowsPhone81</Platforms>
     </Compile>
+<!--
     <Compile Include="Media\VideoPlayer.MacOS.cs">
         <Platforms>MacOS</Platforms>
     </Compile>
+-->
     <Compile Include="Media\VideoPlayer.Android.cs">
         <Platforms>Android,Ouya</Platforms>
     </Compile>
@@ -945,10 +947,10 @@
       <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\OpenTKGamePlatform.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
     <Compile Include="Desktop\OpenTKGameWindow.cs">
-      <Platforms>Angle,Linux,WindowsGL</Platforms>
+      <Platforms>Angle,Linux,MacOS,WindowsGL</Platforms>
     </Compile>
 
 
@@ -992,6 +994,7 @@
 
 
     <!-- MacOS Platform -->
+<!--
     <Compile Include="MacOS\GameWindow.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1005,6 +1008,10 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+-->
+    <Compile Include="Windows\Input\KeyboardUtil.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">

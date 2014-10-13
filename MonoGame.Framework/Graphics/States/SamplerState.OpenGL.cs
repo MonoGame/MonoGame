@@ -5,16 +5,14 @@
 using System;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

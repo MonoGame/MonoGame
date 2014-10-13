@@ -7,22 +7,12 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-using GLPrimitiveType = MonoMac.OpenGL.BeginMode;
-#endif
-
-#if WINDOWS || LINUX
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
-#endif
-
-#if ANGLE
-using OpenTK.Graphics;
-#endif
 
 #if GLES
+#if ANGLE
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
+#else
 using OpenTK.Graphics.ES20;
 using BeginMode = OpenTK.Graphics.ES20.All;
 using EnableCap = OpenTK.Graphics.ES20.All;
@@ -38,13 +28,18 @@ using RenderbufferTarget = OpenTK.Graphics.ES20.All;
 using RenderbufferStorage = OpenTK.Graphics.ES20.All;
 using GLPrimitiveType = OpenTK.Graphics.ES20.All;
 #endif
+#elif OPENGL
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+using GLPrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
+#endif
 
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class GraphicsDevice
     {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || MONOMAC || ANGLE
         internal IGraphicsContext Context { get; private set; }
 #endif
 
@@ -116,7 +111,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
-#if WINDOWS || LINUX || ANGLE
+#if WINDOWS || LINUX || MONOMAC || ANGLE
             GraphicsMode mode = GraphicsMode.Default;
             var wnd = (Game.Instance.Window as OpenTKGameWindow).Window.WindowInfo;
 
@@ -265,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper = new FramebufferHelper(this);
             }
-            #if !(GLES || MONOMAC)
+            #if !GLES
             else if (GraphicsCapabilities.SupportsFramebufferObjectEXT)
             {
                 this.framebufferHelper = new FramebufferHelperEXT(this);

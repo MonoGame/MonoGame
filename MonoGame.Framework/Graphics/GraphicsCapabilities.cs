@@ -4,14 +4,10 @@
 
 using System;
 using System.Collections.Generic;
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
-#else
+#elif OPENGL
 using OpenTK.Graphics.OpenGL;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

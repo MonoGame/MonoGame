@@ -2,18 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#elif GLES
+#if GLES
 using OpenTK.Graphics.ES20;
 using TextureTarget = OpenTK.Graphics.ES20.All;
 using TextureMinFilter = OpenTK.Graphics.ES20.All;
 using TextureParameterName = OpenTK.Graphics.ES20.All;
 using GetPName = OpenTK.Graphics.ES20.All;
-#endif
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics

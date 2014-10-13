@@ -4,21 +4,18 @@
 ﻿
 using System;
 using System.IO;
+using OpenTK.Audio.OpenAL;
 
 #if MONOMAC
 using MonoMac.AudioToolbox;
 using MonoMac.AudioUnit;
 using MonoMac.AVFoundation;
 using MonoMac.Foundation;
-using MonoMac.OpenAL;
-#elif OPENAL
-using OpenTK.Audio.OpenAL;
-#if IOS
+#elif IOS
 using MonoTouch.AudioToolbox;
 using MonoTouch.AudioUnit;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Audio

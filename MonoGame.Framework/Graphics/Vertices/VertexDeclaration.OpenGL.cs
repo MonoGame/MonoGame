@@ -5,13 +5,11 @@
 using System;
 using System.Collections.Generic;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
-using OpenTK.Graphics.OpenGL;
-#else
+#if GLES
 using OpenTK.Graphics.ES20;
 using VertexAttribPointerType = OpenTK.Graphics.ES20.All;
+#elif OPENGL
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
