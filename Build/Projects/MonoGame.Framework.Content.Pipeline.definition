@@ -355,6 +355,7 @@
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
     <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />

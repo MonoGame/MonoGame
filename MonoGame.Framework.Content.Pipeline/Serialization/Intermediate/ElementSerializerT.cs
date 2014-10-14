@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
@@ -33,7 +34,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         protected internal void Deserialize(IntermediateReader input, List<T> results)
         {
             var str = input.Xml.ReadString();
-            var elements = str.Split(_seperators, StringSplitOptions.RemoveEmptyEntries);
+            string[] elements;
+            if (typeof (T) == typeof (char))
+                elements = str.Select(e => e.ToString()).ToArray();
+            else
+                elements = str.Split(_seperators, StringSplitOptions.RemoveEmptyEntries);
+            
+                
 
             for (var index = 0; index < elements.Length;)
             {
