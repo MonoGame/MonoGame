@@ -160,6 +160,8 @@ namespace MonoGame.Tests.ContentPipeline
         public ulong ULong;
         public float Float;
         public double Double;
+        public char? NullChar;                        
+        public char? NotNullChar;
     }
     #endregion
 

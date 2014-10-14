@@ -12,5 +12,7 @@
     <ULong>10000000</ULong>
     <Float>1234567.0</Float>
     <Double>1234567890.0</Double>
+    <NullChar Null="true"></NullChar>
+    <NotNullChar>&#32;</NotNullChar>
   </Asset>
 </XnaContent>
