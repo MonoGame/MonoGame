@@ -217,6 +217,12 @@ namespace MonoGame.Framework
 
         private void UpdateMouseState()
         {
+            // If we call the form client functions before the form has
+            // been made visible it will cause the wrong window size to
+            // be applied at startup.
+            if (!_form.Visible)
+                return;
+
             var clientPos = _form.PointToClient(Control.MousePosition);
             var withinClient = _form.ClientRectangle.Contains(clientPos);
             var buttons = Control.MouseButtons;
@@ -355,15 +361,21 @@ namespace MonoGame.Framework
             Application.Run(_form);
             Application.Idle -= OnIdle;
 
-            // We need to remove the last message in the message 
+
+            // We need to remove the WM_QUIT message in the message 
             // pump as it will keep us from restarting on this 
             // same thread.
             //
             // This is critical for some NUnit runners which
             // typically will run all the tests on the same
             // process/thread.
+
             NativeMessage msg;
-            PeekMessage(out msg, IntPtr.Zero, 0, 0, 1);
+            while(PeekMessage(out msg, IntPtr.Zero, 0, 0, 1))
+            {
+                if (msg.msg == WM_QUIT)
+                  break;
+            }
         }
 
         private void OnIdle(object sender, EventArgs eventArgs)
@@ -384,6 +396,8 @@ namespace MonoGame.Framework
             foreach (var window in _allWindows)
                 window.UpdateMouseState();
         }
+
+        private const uint WM_QUIT = 0x12;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NativeMessage
@@ -411,6 +425,7 @@ namespace MonoGame.Framework
         {
             if (_form != null)
             {
+                _allWindows.Remove(this);
                 _form.Dispose();
                 _form = null;
             }

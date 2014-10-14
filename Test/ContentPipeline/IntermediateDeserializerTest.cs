@@ -258,6 +258,8 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(10000000, primitiveTypes.ULong);
             Assert.AreEqual(1234567.0f, primitiveTypes.Float);
             Assert.AreEqual(1234567890.0, primitiveTypes.Double);
+            Assert.AreEqual(null, primitiveTypes.NullChar);
+            Assert.AreEqual(' ', primitiveTypes.NotNullChar);
         }
 
         [Test]

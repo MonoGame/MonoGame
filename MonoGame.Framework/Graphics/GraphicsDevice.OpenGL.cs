@@ -440,11 +440,9 @@ namespace Microsoft.Xna.Framework.Graphics
             Textures.Dirty();
         }
 
-        private class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
+        private class RenderTargetBindingArrayComparer : IEqualityComparer<RenderTargetBinding[]>
         {
-            private static readonly EqualityComparer<T> elementComparer = EqualityComparer<T>.Default;
-
-            public bool Equals(T[] first, T[] second)
+            public bool Equals(RenderTargetBinding[] first, RenderTargetBinding[] second)
             {
                 if (object.ReferenceEquals(first, second))
                     return true;
@@ -456,13 +454,17 @@ namespace Microsoft.Xna.Framework.Graphics
                     return false;
 
                 for (var i = 0; i < first.Length; ++i)
-                    if (!elementComparer.Equals(first[i], second[i]))
+                {
+                    if ((first[i].RenderTarget != second[i].RenderTarget) || (first[i].ArraySlice != second[i].ArraySlice))
+                    {
                         return false;
+                    }
+                }
 
                 return true;
             }
 
-            public int GetHashCode(T[] array)
+            public int GetHashCode(RenderTargetBinding[] array)
             {
                 if (array != null)
                 {
@@ -471,7 +473,9 @@ namespace Microsoft.Xna.Framework.Graphics
                         int hash = 17;
                         foreach (var item in array)
                         {
-                            hash = hash * 23 + elementComparer.GetHashCode(item);
+                            if (item.RenderTarget != null)
+                                hash = hash * 23 + item.RenderTarget.GetHashCode();
+                            hash = hash * 23 + item.ArraySlice.GetHashCode();
                         }
                         return hash;
                     }
@@ -481,9 +485,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         // FBO cache, we create 1 FBO per RenderTargetBinding combination
-        private Dictionary<RenderTargetBinding[], int> glFramebuffers = new Dictionary<RenderTargetBinding[], int>(new ArrayEqualityComparer<RenderTargetBinding>());
+        private Dictionary<RenderTargetBinding[], int> glFramebuffers = new Dictionary<RenderTargetBinding[], int>(new RenderTargetBindingArrayComparer());
         // FBO cache used to resolve MSAA rendertargets, we create 1 FBO per RenderTargetBinding combination
-        private Dictionary<RenderTargetBinding[], int> glResolveFramebuffers = new Dictionary<RenderTargetBinding[], int>(new ArrayEqualityComparer<RenderTargetBinding>());
+        private Dictionary<RenderTargetBinding[], int> glResolveFramebuffers = new Dictionary<RenderTargetBinding[], int>(new RenderTargetBindingArrayComparer());
 
         internal void PlatformCreateRenderTarget(Texture renderTarget, int width, int height, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
         {

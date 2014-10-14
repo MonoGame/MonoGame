@@ -205,17 +205,28 @@ namespace MGCB
             get { return _content.Count > 0 || _copyItems.Count > 0 || Clean; }    
         }
 
+        string ReplaceSymbols(string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(parameter))
+                return parameter;
+            return parameter
+                .Replace("$(Platform)", Platform.ToString())
+                .Replace("$(Configuration)", Config)
+                .Replace("$(Config)", Config)
+                .Replace("$(Profile)", this.Profile.ToString());
+        }
+
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
 
-            var outputPath = OutputDir;
+            var outputPath = ReplaceSymbols (OutputDir);
             if (!Path.IsPathRooted(outputPath))
                 outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
 
-            var intermediatePath = IntermediateDir;
+            var intermediatePath = ReplaceSymbols (IntermediateDir);
             if (!Path.IsPathRooted(intermediatePath))
-                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, intermediatePath)));
             
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();

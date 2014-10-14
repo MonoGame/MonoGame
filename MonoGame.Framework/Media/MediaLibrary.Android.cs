@@ -9,6 +9,8 @@ namespace Microsoft.Xna.Framework.Media
 {
     public partial class MediaLibrary
     {
+        private static readonly TimeSpan MinimumSongDuration = TimeSpan.FromSeconds(3);
+
         internal static Context Context { get; set; }
 
         private static AlbumCollection albumCollection;
@@ -52,14 +54,19 @@ namespace Microsoft.Xna.Framework.Media
 
                     do
                     {
+                        long durationProperty = musicCursor.GetLong(durationColumn);
+                        TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
+
+                        // Exclude sound effects
+                        if (duration < MinimumSongDuration)
+                            continue;
+
                         string albumNameProperty = albumNameColumn > -1 ? musicCursor.GetString(albumNameColumn) : "Unknown Album";
                         string albumArtistProperty = albumArtistColumn > -1 ? musicCursor.GetString(albumArtistColumn) : "Unknown Artist";
                         string genreProperty = genreColumn > -1 ? musicCursor.GetString(genreColumn) : "Unknown Genre";
                         string artistProperty = artistColumn > -1 ? musicCursor.GetString(artistColumn) : "Unknown Artist";
                         string titleProperty = musicCursor.GetString(titleColumn);
 
-                        long durationProperty = musicCursor.GetLong(durationColumn);
-                        TimeSpan duration = TimeSpan.FromMilliseconds(durationProperty);
                         long assetId = musicCursor.GetLong(assetIdColumn);
                         var assetUri = ContentUris.WithAppendedId(MediaStore.Audio.Media.ExternalContentUri, assetId);
                         long albumId = albumIdColumn > -1 ? musicCursor.GetInt(albumIdColumn) : -1;

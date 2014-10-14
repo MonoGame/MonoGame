@@ -295,5 +295,73 @@ namespace MonoGame.Tests.ContentPipeline
                 Assert.IsFalse(material.VertexColorEnabled.Value);
             }
         }
+
+        [Test]
+        public void DefaultEffectTest()
+        {
+            NodeContent input;
+            {
+                input = new NodeContent();
+
+                var mesh = new MeshContent()
+                {
+                    Name = "Mesh1"
+                };
+                mesh.Positions.Add(new Vector3(0, 0, 0));
+                mesh.Positions.Add(new Vector3(1, 0, 0));
+                mesh.Positions.Add(new Vector3(1, 1, 1));
+
+                var geom = new GeometryContent();
+                geom.Vertices.Add(0);
+                geom.Vertices.Add(1);
+                geom.Vertices.Add(2);
+                geom.Indices.Add(0);
+                geom.Indices.Add(1);
+                geom.Indices.Add(2);
+
+                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(0), new[]
+                {
+                    new Vector2(0,0),
+                    new Vector2(1,0),
+                    new Vector2(1,1),
+                });
+
+                var wieghts = new BoneWeightCollection();
+                wieghts.Add(new BoneWeight("bone1", 0.5f));
+                geom.Vertices.Channels.Add(VertexChannelNames.Weights(0), new[]
+                {
+                    wieghts, 
+                    wieghts, 
+                    wieghts
+                });
+
+                mesh.Geometry.Add(geom);
+                input.Children.Add(mesh);
+
+                var bone1 = new BoneContent { Name = "bone1", Transform = Matrix.CreateTranslation(0,1,0) };
+                input.Children.Add(bone1);
+
+                var anim = new AnimationContent()
+                {
+                    Name = "anim1",
+                    Duration = TimeSpan.Zero
+                };
+                input.Animations.Add(anim.Name, anim);
+            }
+
+            var processorContext = new ProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            var processor = new ModelProcessor
+            {
+                DefaultEffect = MaterialProcessorDefaultEffect.SkinnedEffect,                
+            };
+
+            var output = processor.Process(input, processorContext);
+
+            // TODO: Not sure why, but XNA always returns a BasicMaterialContent 
+            // even when we specify SkinnedEffect as the default.  We need to fix
+            // the test first before we can enable the assert here.
+
+            //Assert.IsInstanceOf(typeof(SkinnedMaterialContent), output.Meshes[0].MeshParts[0].Material);
+        }
     }
 }
