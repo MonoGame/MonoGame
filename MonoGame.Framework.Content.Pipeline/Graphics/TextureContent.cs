@@ -5,6 +5,7 @@
 using System;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
@@ -83,9 +84,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var imageAttr = new ImageAttributes();
             imageAttr.SetWrapMode(WrapMode.TileFlipXY);
 
-            foreach (MipmapChain face in faces)
+            // If we already have mipmaps and we're not supposed to overwrite
+            // them then return without any generation.
+            if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
+                return;
+
+            // Generate the mips for each face.
+            foreach (var face in faces)
             {
-                BitmapContent faceBitmap = face[0];
+                // Remove any existing mipmaps.
+                var faceBitmap = face[0];
+                face.Clear();
+                face.Add(faceBitmap);
+
                 int width = faceBitmap.Width, height = faceBitmap.Height;
                 while (width > 1 && height > 1)
                 {
