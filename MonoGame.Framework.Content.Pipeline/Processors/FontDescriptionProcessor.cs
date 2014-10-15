@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 						output.Kerning.Add(new Vector3(0, texRect.Width, 0));
 				}
 
-                output.Texture.Faces.Add(new MipmapChain(systemBitmap.ToXnaBitmap(true)));
+                output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
 			    systemBitmap.Dispose();
 
                 if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)

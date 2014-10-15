@@ -89,6 +89,7 @@
     <Compile Include="ContentPipeline\ModelProcessorTests.cs" />
     <Compile Include="ContentPipeline\TestContentBuildLogger.cs" />
     <Compile Include="ContentPipeline\TestProcessorContext.cs" />
+    <Compile Include="ContentPipeline\TextureContentTests.cs" />
     <Compile Include="ContentPipeline\TextureProcessorTests.cs" />
     <Compile Include="Framework\ColorTest.cs" />
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />

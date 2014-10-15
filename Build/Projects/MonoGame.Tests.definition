@@ -140,6 +140,9 @@
     <Compile Include="ContentPipeline\TestProcessorContext.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\TextureContentTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="ContentPipeline\TextureProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
