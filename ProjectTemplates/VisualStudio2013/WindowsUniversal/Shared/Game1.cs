@@ -15,7 +15,6 @@ namespace $ext_safeprojectname$
         Vector3 at;
 
         float fov;
-        float ar;
         //camera properties
         float zNear;
         float zFar;
