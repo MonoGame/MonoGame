@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Web;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -375,6 +379,59 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
             Assert.NotNull(externalReferences.Shader);
             Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
+        }
+
+        [Test]
+        public void FontDescription()
+        {
+            object result;
+            var filePath = Paths.Xml("19_FontDescription.xml");
+            using (var reader = XmlReader.Create(filePath))            
+                result = IntermediateSerializer.Deserialize<object>(reader, filePath);
+
+            Assert.NotNull(result);            
+            Assert.IsAssignableFrom<ExtendedFontDescription>(result);
+            var fontDesc = (ExtendedFontDescription)result;
+
+            Assert.AreEqual("Foo", fontDesc.FontName);
+            Assert.AreEqual(30.0f, fontDesc.Size);
+            Assert.AreEqual(0.75f, fontDesc.Spacing);
+            Assert.AreEqual(true, fontDesc.UseKerning);
+            Assert.AreEqual(FontDescriptionStyle.Bold, fontDesc.Style);
+            Assert.AreEqual('*', fontDesc.DefaultCharacter);
+            
+            
+            var expectedCharacters = new List<char>();
+            var v = XmlConvert.DecodeName("&#32;");
+            for (var c = HttpUtility.HtmlDecode("&#32;")[0]; c <= HttpUtility.HtmlDecode("&#126;")[0]; c++)
+                expectedCharacters.Add(c);
+
+            expectedCharacters.Add(HttpUtility.HtmlDecode("&#916;")[0]);
+            expectedCharacters.Add(HttpUtility.HtmlDecode("&#176;")[0]);
+
+            var characters = new List<char>(fontDesc.Characters);
+            foreach (var c in expectedCharacters)
+            {
+                Assert.Contains(c, characters);
+                characters.Remove(c);
+            }
+
+            Assert.IsEmpty(characters);
+
+            var expectedStrings = new List<string>()
+                {
+                    "item0",
+                    "item1",
+                    "item2",
+                };
+            var strings = new List<string>(fontDesc.ExtendedListProperty);
+            foreach (var s in expectedStrings)
+            {
+                Assert.Contains(s, strings);
+                strings.Remove(s);
+            }
+
+            Assert.IsEmpty(strings);
         }
     }
 }

@@ -6,6 +6,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
@@ -244,6 +245,24 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public ExternalReference<Texture2D> Texture;
         public ExternalReference<Effect> Shader;
+    }
+    #endregion
+
+    #region FontDescription
+    class ExtendedFontDescription : FontDescription
+    {
+        public ExtendedFontDescription()
+            : base("Arial", 14, 0)
+        {
+        }
+
+        [ContentSerializer(Optional = true, CollectionItemName = "Item")]
+        public List<string> ExtendedListProperty
+        {
+            get { return _list; }
+        }
+
+        private List<string> _list = new List<string>();
     }
     #endregion
 }
