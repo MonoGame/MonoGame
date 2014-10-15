@@ -11,10 +11,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         public MipmapChain Mipmaps { get; set; }
 
-        public Texture2DContent() : 
-            base(new MipmapChainCollection())
+        public Texture2DContent() :
+            base(new MipmapChainCollection { new MipmapChain() })
         {
-            Faces.Add(new MipmapChain());
         }
 
         public override void Validate(GraphicsProfile? targetProf)
