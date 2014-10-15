@@ -134,6 +134,15 @@
     <Compile Include="ContentPipeline\ModelProcessorTests.cs">
         <Platforms>Windows,MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="ContentPipeline\TestContentBuildLogger.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\TestProcessorContext.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="ContentPipeline\TextureProcessorTests.cs">
+        <Platforms>Windows,MacOS,Linux</Platforms>
+    </Compile>
 
     <Content Include="Assets\tests.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
