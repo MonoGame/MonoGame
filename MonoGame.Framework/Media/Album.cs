@@ -200,23 +200,8 @@ namespace Microsoft.Xna.Framework.Media
                 this.thumbnail.Dispose();
 #endif
         }
-
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
-        /// <summary>
-        /// Returns the stream that contains the album art image data.
-        /// </summary>
-        public Stream GetAlbumArt()
-        {
-#if WINDOWS_PHONE
-            return this.album.GetAlbumArt();
-#elif WINDOWS_STOREAPP
-            if (this.HasArt)
-                return this.thumbnail.AsStream();
-            return null;
-#endif
-        }
-
-#elif IOS
+        
+#if IOS
         [CLSCompliant(false)]
         public UIImage GetAlbumArt()
         {
@@ -228,24 +213,25 @@ namespace Microsoft.Xna.Framework.Media
         {
             return MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
         }
-#endif
-
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
+#else
         /// <summary>
-        /// Returns the stream that contains the album thumbnail image data.
+        /// Returns the stream that contains the album art image data.
         /// </summary>
-        public Stream GetThumbnail()
+        public Stream GetAlbumArt()
         {
 #if WINDOWS_PHONE
-            return this.album.GetThumbnail();
+            return this.album.GetAlbumArt();
 #elif WINDOWS_STOREAPP
             if (this.HasArt)
                 return this.thumbnail.AsStream();
-
             return null;
+#else
+            throw new NotImplementedException();
 #endif
         }
-#elif IOS
+#endif
+
+#if IOS
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
@@ -259,6 +245,23 @@ namespace Microsoft.Xna.Framework.Media
             {
                 return Bitmap.CreateScaledBitmap(albumArt, 100, 100, false); // TODO: Check size
             }
+        }
+#else
+        /// <summary>
+        /// Returns the stream that contains the album thumbnail image data.
+        /// </summary>
+        public Stream GetThumbnail()
+        {
+#if WINDOWS_PHONE
+            return this.album.GetThumbnail();
+#elif WINDOWS_STOREAPP
+            if (this.HasArt)
+                return this.thumbnail.AsStream();
+
+            return null;
+#else
+            throw new NotImplementedException();
+#endif
         }
 #endif
 
