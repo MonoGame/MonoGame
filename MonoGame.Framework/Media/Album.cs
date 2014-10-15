@@ -201,7 +201,6 @@ namespace Microsoft.Xna.Framework.Media
 #endif
         }
 
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album art image data.
         /// </summary>
@@ -213,10 +212,12 @@ namespace Microsoft.Xna.Framework.Media
             if (this.HasArt)
                 return this.thumbnail.AsStream();
             return null;
+#else
+            throw new NotImplementedException();
 #endif
         }
 
-#elif IOS
+#if IOS
         [CLSCompliant(false)]
         public UIImage GetAlbumArt()
         {
@@ -230,7 +231,6 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-#if WINDOWS_PHONE || WINDOWS_STOREAPP
         /// <summary>
         /// Returns the stream that contains the album thumbnail image data.
         /// </summary>
@@ -243,9 +243,12 @@ namespace Microsoft.Xna.Framework.Media
                 return this.thumbnail.AsStream();
 
             return null;
+#else
+            throw new NotImplementedException();
 #endif
         }
-#elif IOS
+
+#if IOS
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
