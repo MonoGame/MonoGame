@@ -104,8 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 source.Dispose();
             }
 
-            content.Faces.Clear();
-            content.Faces.Add(new MipmapChain(destination.ToXnaBitmap(false)));//we dont want to flip colors twice
+            content.Faces[0][0] = destination.ToXnaBitmap(false); //we dont want to flip colors twice
         }
 
         public static BitmapContent ToXnaBitmap(this Bitmap systemBitmap, bool flipColors)
