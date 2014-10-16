@@ -11,9 +11,11 @@ namespace Microsoft.Xna.Framework.Utilities
 #if WINRT
         public static char notSeparator = '/';
         public static char separator = '\\';
+        public static char pathSeparator = ';';
 #else
         public static char notSeparator = '\\';
         public static char separator = System.IO.Path.DirectorySeparatorChar;
+        public static char pathSeparator = System.IO.Path.PathSeparator;
 #endif
 
         public static string NormalizeFilePathSeparators(string name)
@@ -36,10 +38,17 @@ namespace Microsoft.Xna.Framework.Utilities
 
             // Add the relative path to relativeFile
             var dst = new Uri(src, relativeFile);
+            
+            // The uri now contains the path to the relativeFile with relative addresses resolved, get the local path
+            string localPath = dst.LocalPath;
+            if (localPath.StartsWith(pathSeparator.ToString()))
+            {
+                // Skip the first character (the path separator)
+                localPath = localPath.Substring(1);
+            }
 
-            // The uri now contains the path to the relativeFile with relative addresses resolved
-            // Get the local path and skip the first character (the path separator)
-            return NormalizeFilePathSeparators(dst.LocalPath.Substring(1));
+            // Convert the directory separator characters to the correct OS-specific ones
+            return NormalizeFilePathSeparators(localPath);
         }
     }
 }
