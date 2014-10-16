@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         public Texture2DContent() :
-            base(new MipmapChainCollection { new MipmapChain() })
+            base(new MipmapChainCollection(1, true))
         {
         }
 
