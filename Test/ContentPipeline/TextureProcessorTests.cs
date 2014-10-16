@@ -112,5 +112,40 @@ namespace MonoGame.Tests.ContentPipeline
                 height = height >> 1;
             }
         }
+
+        [Test]
+        public void ResizePowerOfTwo()
+        {
+            var context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+
+            var processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = false,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = true,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+
+            var face = new PixelBitmapContent<Color>(3, 7);
+            Fill(face, Color.Red);
+            var input = new Texture2DContent();
+            input.Faces[0] = face;
+
+            var output = processor.Process(input, context);
+
+            Assert.NotNull(output);
+            Assert.AreEqual(1, output.Faces.Count);
+            Assert.AreEqual(1, output.Faces[0].Count);
+
+            Assert.IsAssignableFrom<PixelBitmapContent<Color>>(output.Faces[0][0]);
+            var outFace = (PixelBitmapContent<Color>)output.Faces[0][0];
+            Assert.AreEqual(4, outFace.Width);
+            Assert.AreEqual(8, outFace.Height);
+
+            for (var y = 0; y < outFace.Height; y++)
+                for (var x = 0; x < outFace.Width; x++)
+                    Assert.AreEqual(Color.Red, outFace.GetPixel(x, y));
+        }
     }
 }
