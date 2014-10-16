@@ -7,20 +7,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class Texture2DContent : TextureContent
+    public class Texture3DContent : TextureContent
     {
-        public MipmapChain Mipmaps
-        {
-            get { return Faces[0]; }
-            set { Faces[0] = value; }
-        }
-
-        public Texture2DContent() :
-            base(new MipmapChainCollection(1, true))
+        public Texture3DContent() :
+            base(new MipmapChainCollection(0, false))
         {
         }
 
         public override void Validate(GraphicsProfile? targetProf)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
             throw new NotImplementedException();
         }

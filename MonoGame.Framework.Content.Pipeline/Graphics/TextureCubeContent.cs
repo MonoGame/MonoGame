@@ -7,16 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public class Texture2DContent : TextureContent
+    public class TextureCubeContent : TextureContent
     {
-        public MipmapChain Mipmaps
-        {
-            get { return Faces[0]; }
-            set { Faces[0] = value; }
-        }
-
-        public Texture2DContent() :
-            base(new MipmapChainCollection(1, true))
+        public TextureCubeContent() :
+            base(new MipmapChainCollection(6, true))
         {
         }
 
