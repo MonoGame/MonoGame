@@ -334,7 +334,6 @@ namespace Microsoft.Xna.Framework
         {
             // FIXME: Possibly add some more sophisticated behavior here.  It's
             //        also possible that this is not iOSGamePlatform's job.
-            GC.Collect();
         }
 
         #endregion Notification Handling
