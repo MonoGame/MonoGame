@@ -6,22 +6,33 @@ namespace MonoGame.Tests.Framework
 {
     class UtilitiesTest
     {
-        [TestCase(@"C:\Game\Content", @"file.extension", "file", @"C:\Game\Content\file.extension")]
-        [TestCase(@"C:\Game\Content", @"..\file.extension", "file", @"C:\Game\file.extension")]
-        [TestCase(@"C:/Game/Content", @"file.extension", "file", @"C:/Game/Content/file.extension")]
-        [TestCase(@"C:/Game/Content", @"../file.extension", "file", @"C:/Game/file.extension")]
-        [TestCase(@"\application0\Content", @"file.extension", "file", @"\application0\Content\file.extension")]
-        [TestCase(@"\application0\Content", @"..\file.extension", "file", @"\application0\file.extension")]
-        [TestCase(@"/application0/Content", @"file.extension", "file", @"/application0/Content/file.extension")]
-        [TestCase(@"/application0/Content", @"../file.extension", "file", @"\application0\file.extension")]
-        [TestCase(@"Content", @"file.extension", "file", @"\Content\file.extension")]
-        [TestCase(@"Content", @"..\file.extension", "file", @"\file.extension")]
-        [TestCase(@"Content", @"file.extension", "file", @"/Content/file.extension")]
-        [TestCase(@"Content", @"../file.extension", "file", @"/file.extension")]
-        public void ResolveRelativePath(string contentRootDir, string relativePath, string assetName, string matchFullPath)
+        [TestCase(  @"C:\Game\Content\file",            @"file.extension",          @"C:\Game\Content\file.extension")]
+        [TestCase(  @"C:\Game\Content\file",            @"..\file.extension",       @"C:\Game\file.extension")]
+        [TestCase(  @"C:\Game\Content\..\file",         @"file.extension",          @"C:\Game\file.extension")]
+        [TestCase(  @"C:\Game\Content\..\file",         @"..\file.extension",       @"C:\file.extension")]
+        [TestCase(  @"C:/Game/Content/file",            @"file.extension",          @"C:/Game/Content/file.extension")]
+        [TestCase(  @"C:/Game/Content/file",            @"../file.extension",       @"C:/Game/file.extension")]
+        [TestCase(  @"C:/Game/Content/../file",         @"file.extension",          @"C:/Game/file.extension")]
+        [TestCase(  @"C:/Game/Content/../file",         @"../file.extension",       @"C:/file.extension")]
+        [TestCase(  @"\application0\Content\file",      @"file.extension",          @"\application0\Content\file.extension")]
+        [TestCase(  @"\application0\Content\file",      @"..\file.extension",       @"\application0\file.extension")]
+        [TestCase(  @"\application0\Content\..\file",   @"file.extension",          @"\application0\file.extension")]
+        [TestCase(  @"\application0\Content\..\file",   @"..\file.extension",       @"\application0\file.extension")]
+        [TestCase(  @"/application0/Content/file",      @"file.extension",          @"/application0/Content/file.extension")]
+        [TestCase(  @"/application0/Content/file",      @"../file.extension",       @"\application0\file.extension")]
+        [TestCase(  @"/application0/Content/../file",   @"file.extension",          @"/application0/file.extension")]
+        [TestCase(  @"/application0/Content/../file",   @"../file.extension",       @"\application0\file.extension")]
+        [TestCase(  @"Content\file",                    @"file.extension",          @"\Content\file.extension")]
+        [TestCase(  @"Content\file",                    @"..\file.extension",       @"\file.extension")]
+        [TestCase(  @"Content\..\file",                 @"file.extension",          @"\file.extension")]
+        [TestCase(  @"Content\..\file",                 @"..\file.extension",       @"\file.extension")]
+        [TestCase(  @"Content/file",                    @"file.extension",          @"/Content/file.extension")]
+        [TestCase(  @"Content/file",                    @"../file.extension",       @"/file.extension")]
+        [TestCase(  @"Content/../file",                 @"file.extension",          @"/file.extension")]
+        [TestCase(  @"Content/../file",                 @"../file.extension",       @"/file.extension")]
+        public void ResolveRelativePath(
+                    string rootFilePath,                string relativePath,        string matchFullPath)
         {
-            var rootFilePath = Path.Combine(contentRootDir, assetName);
-
             var fullPath = FileHelpers.ResolveRelativePath(rootFilePath, relativePath);
             Assert.NotNull(fullPath);
 
