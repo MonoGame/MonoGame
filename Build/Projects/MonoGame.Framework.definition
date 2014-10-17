@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework" Path="MonoGame.Framework" Type="Library" Platforms="Android,Angle,iOS,Linux,MacOS,Ouya,PSMobile,Windows,Windows8,WindowsGL,WindowsPhone,WindowsPhone81,Web">
 
+  <!--
+    Using Protobuild in your own project?  ProjectGuids are only in use here
+    for backwards compatibility with existing users of MonoGame, and are not
+    required for new projects.
+
+    See https://github.com/hach-que/Protobuild/wiki/Project-GUIDs-in-Protobuild
+  -->
   <ProjectGuids>
   	<Platform Name="Android">BA9476CF-99BA-4D03-92F2-73D2C5E58883</Platform>
   	<Platform Name="Angle">ECF3C8B9-0AAC-4C32-B184-FAE88F6244B5</Platform>

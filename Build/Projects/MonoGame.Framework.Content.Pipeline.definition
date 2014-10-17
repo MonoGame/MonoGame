@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
+  <!--
+    Using Protobuild in your own project?  ProjectGuids are only in use here
+    for backwards compatibility with existing users of MonoGame, and are not
+    required for new projects.
+
+    See https://github.com/hach-que/Protobuild/wiki/Project-GUIDs-in-Protobuild
+  -->
   <ProjectGuids>
 	<Platform Name="Linux">57696462-CE5E-4BC5-80AB-1B959E2420EA</Platform>
 	<Platform Name="MacOS">A6C47073-8FF9-4997-BA3A-BA257CC88CFE</Platform>
