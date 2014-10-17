@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Utilities
 
             // We can get some unwanted leading characters on some
             // platforms which we need to trim off to have a good path.
-            if (localPath.StartsWith(";") || localPath.StartsWith(@"\\"))
+            if (localPath.StartsWith(";") || localPath.StartsWith(@"\\") || localPath.StartsWith("//"))
                 localPath = localPath.Substring(1);
 
             // Convert the directory separator characters to the 
