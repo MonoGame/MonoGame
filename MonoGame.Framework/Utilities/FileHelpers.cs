@@ -51,9 +51,9 @@ namespace Microsoft.Xna.Framework.Utilities
             // relative addresses resolved... get the local path.
             var localPath = dst.LocalPath;
 
-            // We can get some unwanted leading characters on some
-            // platforms which we need to trim off to have a good path.
-            if (localPath.StartsWith(";") || localPath.StartsWith(@"\\") || localPath.StartsWith("//"))
+            // We can get an unwanted extra leading slash on some 
+            // platforms which we need to trim off.
+            if (localPath.StartsWith(@"\\") || localPath.StartsWith("//"))
                 localPath = localPath.Substring(1);
 
             // Convert the directory separator characters to the 
