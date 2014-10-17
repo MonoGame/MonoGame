@@ -43,6 +43,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -370,12 +371,15 @@ namespace MonoGame.Framework
             // typically will run all the tests on the same
             // process/thread.
 
-            NativeMessage msg;
-            while(PeekMessage(out msg, IntPtr.Zero, 0, 0, 1))
+            var msg = new NativeMessage();
+            do
             {
                 if (msg.msg == WM_QUIT)
-                  break;
-            }
+                    break;
+
+                Thread.Sleep(100);
+            } 
+            while (PeekMessage(out msg, IntPtr.Zero, 0, 0, 1));
         }
 
         private void OnIdle(object sender, EventArgs eventArgs)
