@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
-namespace $safeprojectname$
+namespace $ext_safeprojectname$
 {
     /// <summary>
     /// This is the main type for your game
@@ -24,7 +24,7 @@ namespace $safeprojectname$
         DynamicIndexBuffer indexBuffer;
         VertexPositionColor[] cube;
         float cubeRotation = 0.0f;
-        static ushort[] cubeIndices =
+        static ushort []cubeIndices =
     		{
     			0,2,1, // -x
     			1,2,3,
@@ -68,13 +68,13 @@ namespace $safeprojectname$
 
             cube = new VertexPositionColor[8];
             cube[0] = new VertexPositionColor(new Vector3(-0.5f, -0.5f, -0.5f), new Color(0.0f, 0.0f, 0.0f));
-            cube[1] = new VertexPositionColor(new Vector3(-0.5f, -0.5f, 0.5f), new Color(0.0f, 0.0f, 1.0f));
-            cube[2] = new VertexPositionColor(new Vector3(-0.5f, 0.5f, -0.5f), new Color(0.0f, 1.0f, 0.0f));
-            cube[3] = new VertexPositionColor(new Vector3(-0.5f, 0.5f, 0.5f), new Color(0.0f, 1.0f, 1.0f));
-            cube[4] = new VertexPositionColor(new Vector3(0.5f, -0.5f, -0.5f), new Color(1.0f, 0.0f, 0.0f));
-            cube[5] = new VertexPositionColor(new Vector3(0.5f, -0.5f, 0.5f), new Color(1.0f, 0.0f, 1.0f));
-            cube[6] = new VertexPositionColor(new Vector3(0.5f, 0.5f, -0.5f), new Color(1.0f, 1.0f, 0.0f));
-            cube[7] = new VertexPositionColor(new Vector3(0.5f, 0.5f, 0.5f), new Color(1.0f, 1.0f, 1.0f));
+            cube[1] = new VertexPositionColor(new Vector3(-0.5f, -0.5f,  0.5f), new Color(0.0f, 0.0f, 1.0f));
+            cube[2] = new VertexPositionColor(new Vector3(-0.5f,  0.5f, -0.5f), new Color(0.0f, 1.0f, 0.0f));
+            cube[3] = new VertexPositionColor(new Vector3(-0.5f,  0.5f,  0.5f), new Color(0.0f, 1.0f, 1.0f));
+            cube[4] = new VertexPositionColor(new Vector3( 0.5f, -0.5f, -0.5f), new Color(1.0f, 0.0f, 0.0f));
+            cube[5] = new VertexPositionColor(new Vector3( 0.5f, -0.5f,  0.5f), new Color(1.0f, 0.0f, 1.0f));
+            cube[6] = new VertexPositionColor(new Vector3( 0.5f,  0.5f, -0.5f), new Color(1.0f, 1.0f, 0.0f));
+            cube[7] = new VertexPositionColor(new Vector3( 0.5f,  0.5f,  0.5f), new Color(1.0f, 1.0f, 1.0f));
 
             vertexBuffer = new DynamicVertexBuffer(graphics.GraphicsDevice, typeof(VertexPositionColor), 8, BufferUsage.WriteOnly);
             indexBuffer = new DynamicIndexBuffer(graphics.GraphicsDevice, typeof(ushort), 36, BufferUsage.WriteOnly);
@@ -132,7 +132,7 @@ namespace $safeprojectname$
             Matrix View = Matrix.CreateLookAt(eye, at, up);
 
             Matrix Projection = Matrix.CreatePerspectiveFieldOfView(fov, GraphicsDevice.Viewport.AspectRatio, zNear, zFar);
-            cubeRotation += (0.001f) * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            cubeRotation += (0.0025f)*(float)gameTime.ElapsedGameTime.TotalMilliseconds;
             Matrix World = Matrix.CreateRotationY(cubeRotation);
             // TODO: Add your drawing code here
 

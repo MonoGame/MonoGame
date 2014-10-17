@@ -1,17 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
-    <Name>MonoGamePhone</Name>
+    <Name>MonoGame Windows Phone 8.1 Project</Name>
     <Description>Windows Phone 8.1 MonoGame Template</Description>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>MonoGamePhone</DefaultName>
+    <DefaultName>GameName</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-    <Icon>__TemplateIcon.ico</Icon>
+    <Icon>__TemplateIcon.png</Icon>
+    <PreviewImage>__PreviewImage.png</PreviewImage>
+    <TemplateID>MonoGame.WindowsPhone81.CS.WinRT.Game</TemplateID>
+    <TemplateGroupID>WinRT-Managed</TemplateGroupID>
+    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
   </TemplateData>
   <TemplateContent>
     <Project TargetFileName="MonoGamePhone.csproj" File="MonoGamePhone.csproj" ReplaceParameters="true">
