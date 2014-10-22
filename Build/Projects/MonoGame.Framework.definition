@@ -771,7 +771,10 @@
     <Compile Include="Input\ButtonState.cs" />
     <Compile Include="Input\GamePad.cs" />
     <Compile Include="Input\GamePad.Default.cs">
-      <Platforms>Android,WindowsPhone,WindowsPhone81</Platforms>
+      <Platforms>WindowsPhone,WindowsPhone81</Platforms>
+    </Compile>
+	<Compile Include="Input\GamePad.Android.cs">
+      <Platforms>Android</Platforms>
     </Compile>
     <Compile Include="Input\GamePad.IOS.cs">
       <Platforms>iOS</Platforms>
