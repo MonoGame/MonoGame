@@ -75,6 +75,24 @@ namespace Microsoft.Xna.Framework
 #endif
         }
 
+#if IOS
+        public Game(IViewControllerHooks hooks)
+        {
+            _instance = this;
+
+            LaunchParameters = new LaunchParameters();
+            _services = new GameServiceContainer();
+            _components = new GameComponentCollection();
+            _content = new ContentManager(_services);
+            GamePlatform.Hooks = hooks;
+            Platform = GamePlatform.Create(this);
+            Platform.Activated += OnActivated;
+            Platform.Deactivated += OnDeactivated;
+            _services.AddService(typeof(GamePlatform), Platform);
+
+        }
+#endif
+
         ~Game()
         {
             Dispose(false);

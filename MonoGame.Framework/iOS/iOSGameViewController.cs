@@ -14,6 +14,8 @@ namespace Microsoft.Xna.Framework
     {
         iOSGamePlatform _platform;
 
+        public IViewControllerHooks Hooks { get; set; }
+
         public iOSGameViewController(iOSGamePlatform platform)
         {
             if (platform == null)
@@ -21,6 +23,25 @@ namespace Microsoft.Xna.Framework
             _platform = platform;
             SupportedOrientations = DisplayOrientation.Default;
         }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+            if (Hooks != null)
+            {
+                Hooks.ViewDidAppear(animated);
+            }
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+            if (Hooks != null)
+            {
+                Hooks.ViewDidDisappear(animated);
+            }
+        }
+
 
         public event EventHandler<EventArgs> InterfaceOrientationChanged;
 
