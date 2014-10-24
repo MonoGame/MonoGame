@@ -68,6 +68,11 @@ namespace Microsoft.Xna.Framework.Content
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
 		
+        private static HashSet<Type> reloadAssetExcludedTypes = new HashSet<Type>(new[] { 
+                typeof(Microsoft.Xna.Framework.Audio.SoundEffect),        
+   
+            });
+		
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
 
@@ -589,6 +594,10 @@ namespace Microsoft.Xna.Framework.Content
 
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
         {
+            // do not open .XNBs of types that don't need reload
+            if (reloadAssetExcludedTypes.Contains(currentAsset.GetType()))
+                return;
+            
 			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
 			{
