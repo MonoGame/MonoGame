@@ -577,6 +577,10 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
+                // do not open .XNBs of types that don't need reload
+                if (reloadAssetExcludedTypes.Contains(asset.Value.GetType()))
+                    continue;
+
                 // This never executes as asset.Key is never null.  This just forces the 
                 // linker to include the ReloadAsset function when AOT compiled.
                 if (asset.Key == null)
@@ -593,11 +597,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
-        {
-            // do not open .XNBs of types that don't need reload
-            if (reloadAssetExcludedTypes.Contains(currentAsset.GetType()))
-                return;
-            
+        {            
 			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
 			{
