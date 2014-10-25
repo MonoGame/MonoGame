@@ -19,7 +19,9 @@ namespace Microsoft.Xna.Framework
             if (platform == null)
                 throw new ArgumentNullException("platform");
             _platform = platform;
-            SupportedOrientations = DisplayOrientation.Default;
+            SupportedOrientations = 
+                DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight 
+                | DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
         }
 
         public event EventHandler<EventArgs> InterfaceOrientationChanged;
@@ -50,6 +52,10 @@ namespace Microsoft.Xna.Framework
             }
 
             base.View = new iOSGameView(_platform, frame);
+
+            // Need to set resize mask to ensure a view resize (which in iOS 8+ corresponds with a rotation) adjusts
+            // the view and underlying CALayer correctly
+            View.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
         }
 
         public new iOSGameView View
@@ -93,6 +99,47 @@ namespace Microsoft.Xna.Framework
         {
             return _platform.Game.graphicsDeviceManager.IsFullScreen;
         }
+        #endregion
+
+
+        #region iOS 8 or newer
+
+        bool _orientationChanged;
+        UIInterfaceOrientation _prevOrientation;
+
+        public override void ViewWillTransitionToSize(SizeF toSize, IUIViewControllerTransitionCoordinator coordinator)
+        {
+            SizeF oldSize = View.Bounds.Size;
+
+            if (oldSize != toSize)
+            {
+                _orientationChanged = true;
+
+                // At this point, the new orientation hasn't been set
+                _prevOrientation = InterfaceOrientation;
+            }
+
+            base.ViewWillTransitionToSize(toSize, coordinator);
+        } 
+
+        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
+        {
+            if (previousTraitCollection != null)
+            {
+                base.TraitCollectionDidChange(previousTraitCollection);
+
+                // Not every trait change is related to rotation, so avoid unnecessarily updating
+                if(_orientationChanged)
+                {
+                    // In iOS 8+ DidRotate is no longer called after a rotation
+                    // But we need to notify iOSGamePlatform to update back buffer so we explicitly call it 
+                    DidRotate(_prevOrientation);
+
+                    _orientationChanged = false;
+                }
+            }
+        }
+
         #endregion
     }
 }
