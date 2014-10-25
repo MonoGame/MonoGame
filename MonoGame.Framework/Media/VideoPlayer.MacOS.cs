@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class VideoPlayer : IDisposable
     {
         private Game _game;
-        private MacGamePlatform _platform;
+        private GamePlatform _platform;
 
         // TODO Needed to bind OpenGL to Quicktime private QTVisualContextRef  textureContext;
         // TODO Needed to grab frame as a texture private CVOpenGLTextureRef  currentFrame;
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Media
         private void PlatformInitialize()
         {
             _game = Game.Instance;
-            _platform = (MacGamePlatform)_game.Services.GetService(typeof(MacGamePlatform));
+            _platform = (GamePlatform)_game.Services.GetService(typeof(GamePlatform));
         }
 
         private Texture2D PlatformGetTexture()
@@ -59,7 +59,8 @@ namespace Microsoft.Xna.Framework.Media
 
             // TODO when Xamarin implement the relevant functions var theError = QTOpenGLTextureContextCreate( null, null, _game.Window.PixelFormat, _game.Window.OpenGLContext, out textureContext);
 
-            _game.Window.AddSubview(_currentVideo.MovieView);
+#warning DISABLED DURING MONOMAC OPENTK CONVERSION
+//            _game.Window.AddSubview(_currentVideo.MovieView);
 
             NSNotificationCenter.DefaultCenter.AddObserver(new NSString("QTMovieDidEndNotification"), (notification) =>
             {

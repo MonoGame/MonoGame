@@ -143,6 +143,13 @@ namespace Microsoft.Xna.Framework.Content
 #else
 			    if (File.Exists(fileNamePlusExt))
 				    return fileNamePlusExt;
+
+				#if MONOMAC
+				// TODO: I think this logic would be safe for all platforms
+				if(File.Exists(Path.Combine(TitleContainer.Location, fileNamePlusExt)))
+					return fileNamePlusExt;
+				#endif
+
 #endif
             }
 			

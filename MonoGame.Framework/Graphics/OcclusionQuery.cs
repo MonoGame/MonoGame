@@ -3,9 +3,7 @@ using System.Runtime.InteropServices;
 
 
 #if OPENGL
-#if MONOMAC
-using MonoMac.OpenGL;
-#elif WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics.OpenGL;
 #elif ANGLE // Review for iOS and Android, and change to GLES
 using OpenTK.Graphics.ES30;
@@ -77,11 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public bool IsComplete {
 			get {
 				int resultReady = 0;
-#if MONOMAC               
-				GetQueryObjectiv(glQueryId,
-				                 (int)GetQueryObjectParam.QueryResultAvailable,
-				                 out resultReady);
-#elif OPENGL
+#if OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out resultReady);
                 GraphicsExtensions.CheckGLError();
 #elif DIRECTX               
@@ -92,11 +86,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int PixelCount {
 			get {
 				int result = 0;
-#if MONOMAC
-				GetQueryObjectiv(glQueryId,
-				                 (int)GetQueryObjectParam.QueryResult,
-				                 out result);
-#elif OPENGL
+#if OPENGL
                 GL.GetQueryObject(glQueryId, GetQueryObjectParam.QueryResultAvailable, out result);
                 GraphicsExtensions.CheckGLError();
 #elif DIRECTX               
@@ -104,15 +94,6 @@ namespace Microsoft.Xna.Framework.Graphics
                 return result;
 			}
         }
-
-#if MONOMAC
-		//MonoMac doesn't export this. Grr.
-		const string OpenGLLibrary = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
-
-		[System.Security.SuppressUnmanagedCodeSecurity()]
-		[DllImport(OpenGLLibrary, EntryPoint = "glGetQueryObjectiv", ExactSpelling = true)]
-		extern static unsafe void GetQueryObjectiv(int id, int pname, out int @params);
-#endif
     }
 }
 

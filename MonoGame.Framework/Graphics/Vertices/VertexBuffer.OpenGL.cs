@@ -8,10 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-#if MONOMAC
-using MonoMac.OpenGL;
-#endif
-#if WINDOWS || LINUX
+#if WINDOWS || LINUX || MONOMAC
 using OpenTK.Graphics.OpenGL;
 #endif
 #if GLES

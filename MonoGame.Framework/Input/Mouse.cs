@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly MouseState _defaultState = new MouseState();
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if (WINDOWS && OPENGL) || LINUX || ANGLE || MONOMAC
 
         static OpenTK.INativeWindow Window;
 
@@ -86,10 +86,6 @@ namespace Microsoft.Xna.Framework.Input
         {
             Window = window;
         }
-
-#elif MONOMAC
-        internal static GameWindow Window;
-        internal static float ScrollWheelValue;
 #endif
 
         /// <summary>
@@ -99,14 +95,12 @@ namespace Microsoft.Xna.Framework.Input
         { 
             get
             { 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if (WINDOWS && OPENGL) || LINUX || ANGLE || MONOMAC
                 return Window.WindowInfo.Handle;
 #elif WINRT
                 return IntPtr.Zero; // WinRT platform does not create traditionally window, so returns IntPtr.Zero.
 #elif(WINDOWS && DIRECTX)
                 return Window.Handle; 
-#elif MONOMAC
-                return IntPtr.Zero;
 #else
                 return IntPtr.Zero;
 #endif
@@ -127,11 +121,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>Current state of the mouse.</returns>
         public static MouseState GetState(GameWindow window)
         {
-#if MONOMAC
-            //We need to maintain precision...
-            window.MouseState.ScrollWheelValue = (int)ScrollWheelValue;
-
-#elif (WINDOWS && OPENGL) || LINUX || ANGLE
+#if (WINDOWS && OPENGL) || LINUX || ANGLE || MONOMAC
 
             var state = OpenTK.Input.Mouse.GetCursorState();
             var pc = Window.PointToClient(new System.Drawing.Point(state.X, state.Y));
@@ -188,7 +178,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             UpdateStatePosition(x, y);
 
-#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX || ANGLE
+#if (WINDOWS && (OPENGL || DIRECTX)) || LINUX || ANGLE || MONOMAC
             // correcting the coordinate system
             // Only way to set the mouse position !!!
             var pt = Window.PointToScreen(new System.Drawing.Point(x, y));
@@ -196,30 +186,10 @@ namespace Microsoft.Xna.Framework.Input
             var pt = new System.Drawing.Point(0, 0);
 #endif
 
-#if (WINDOWS && OPENGL) || LINUX || ANGLE
+#if (WINDOWS && OPENGL) || LINUX || ANGLE || MONOMAC
             OpenTK.Input.Mouse.SetPosition(pt.X, pt.Y);
 #elif WINDOWS
             SetCursorPos(pt.X, pt.Y);
-#elif MONOMAC
-            var mousePt = NSEvent.CurrentMouseLocation;
-            NSScreen currentScreen = null;
-            foreach (var screen in NSScreen.Screens) {
-                if (screen.Frame.Contains(mousePt)) {
-                    currentScreen = screen;
-                    break;
-                }
-            }
-            
-            var point = new PointF(x, Window.ClientBounds.Height-y);
-            var windowPt = Window.ConvertPointToView(point, null);
-            var screenPt = Window.Window.ConvertBaseToScreen(windowPt);
-            var flippedPt = new PointF(screenPt.X, currentScreen.Frame.Size.Height-screenPt.Y);
-            flippedPt.Y += currentScreen.Frame.Location.Y;
-            
-            
-            CGSetLocalEventsSuppressionInterval(0.0);
-            CGWarpMouseCursorPosition(flippedPt);
-            CGSetLocalEventsSuppressionInterval(0.25);
 #endif
         }
 
@@ -253,13 +223,6 @@ namespace Microsoft.Xna.Framework.Input
             }
 
         }
-
-#elif MONOMAC
-        [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
-        extern static void CGWarpMouseCursorPosition(PointF newCursorPosition);
-        
-        [DllImport (MonoMac.Constants.CoreGraphicsLibrary)]
-        extern static void CGSetLocalEventsSuppressionInterval(double seconds);
 #endif
 
     }
