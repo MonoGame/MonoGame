@@ -63,6 +63,10 @@ namespace Microsoft.Xna.Framework.Content
 		protected internal override Song Read(ContentReader input, Song existingInstance)
 		{
 			var path = input.ReadString();
+			var durationMs = input.ReadObject<int>();
+
+            if (existingInstance != null)
+                return existingInstance;
 			
 			if (!String.IsNullOrEmpty(path))
 			{
@@ -73,7 +77,6 @@ namespace Microsoft.Xna.Framework.Content
                 path = Path.Combine(input.ContentManager.RootDirectoryFullPath, path);
 			}
 			
-			var durationMs = input.ReadObject<int>();
 
             return new Song(path, durationMs); 
 		}
