@@ -67,8 +67,8 @@ namespace Microsoft.Xna.Framework.Content
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
-		
-        private static HashSet<Type> reloadAssetExcludedTypes = new HashSet<Type>(new[] { 
+
+        protected static HashSet<Type> reloadAssetExcludedTypes = new HashSet<Type>(new[] { 
                 typeof(Microsoft.Xna.Framework.Audio.SoundEffect),
                 typeof(Microsoft.Xna.Framework.Media.Song),        
             });
