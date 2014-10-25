@@ -597,7 +597,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
-        {            
+        {        
 			string assetName = originalAssetName;
 			if (string.IsNullOrEmpty(assetName))
 			{
