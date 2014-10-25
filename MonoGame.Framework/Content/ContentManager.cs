@@ -69,8 +69,8 @@ namespace Microsoft.Xna.Framework.Content
         private bool disposed;
 		
         private static HashSet<Type> reloadAssetExcludedTypes = new HashSet<Type>(new[] { 
-                typeof(Microsoft.Xna.Framework.Audio.SoundEffect),        
-   
+                typeof(Microsoft.Xna.Framework.Audio.SoundEffect),
+                typeof(Microsoft.Xna.Framework.Media.Song),        
             });
 		
 		private static object ContentManagerLock = new object();
