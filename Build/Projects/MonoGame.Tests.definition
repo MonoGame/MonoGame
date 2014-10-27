@@ -99,7 +99,8 @@
     <Compile Include="Framework\TestGameBase.cs" />
     <Compile Include="Framework\GamePadStateTest.cs" />
     <Compile Include="Framework\UtilitiesTest.cs" />
-
+	<Compile Include="Framework\Vector2Test.cs" />
+	
     <Compile Include="Framework\Components\DrawFrameNumberComponent.cs" />
     <Compile Include="Framework\Components\FlexibleGameComponent.cs" />
     <Compile Include="Framework\Components\FrameCompareComponent.cs" />
