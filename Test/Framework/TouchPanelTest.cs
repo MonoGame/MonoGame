@@ -15,9 +15,15 @@ namespace MonoGame.Tests.Framework
     {
         private TouchPanelState _tps;
 
+        private TimeSpan GameTimeForFrame(int frameNo)
+        {
+            return TimeSpan.FromSeconds(frameNo / 60D);
+        }
+
         [SetUp]
         public void SetUp()
         {
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(0);
             _tps = new TouchPanelState(new MockWindow());
         }
 
@@ -170,17 +176,82 @@ namespace MonoGame.Tests.Framework
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        [Description("In XNA if you press and release your finger before GetState is called, the touch never shows up")]
+        [Description("In XNA if you press and release your finger over multiple frames where GetState is not called, the touch never shows up")]
         public void TouchBetweenGetStateCallsMakesNoTouch(bool moveInBetween)
         {
             var pos = new Vector2(100, 50);
+            var pos2 = new Vector2(100, 150);
+            int frame = 0;
+
             _tps.AddEvent(1, TouchLocationState.Pressed, pos);
             if (moveInBetween) //Moving shouldn't change the behavior
-                _tps.AddEvent(1, TouchLocationState.Moved, pos);
-            _tps.AddEvent(1, TouchLocationState.Released, pos);
+            {
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(++frame);
+                _tps.AddEvent(1, TouchLocationState.Moved, pos2);
+            }
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(++frame);
+            _tps.AddEvent(1, TouchLocationState.Released, pos2);
 
             var state = _tps.GetState();
             Assert.AreEqual(0, state.Count); //Should miss the touch that happened between
+        }
+
+        [Test]
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        [Description("If you press and release a touch on the same frame we need to show it as pressed that frame and released in the next")]
+        public void SameFrameTouchAndReleaseMakesTouch(bool moveInBetween, bool waitAFrameForNextState)
+        {
+            var pos = new Vector2(100, 50);
+            var pos2 = new Vector2(100, 150);
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            if (moveInBetween) //Moving shouldn't change the behavior
+                _tps.AddEvent(1, TouchLocationState.Moved, pos2);
+            _tps.AddEvent(1, TouchLocationState.Released, pos2);
+
+            var state = _tps.GetState();
+            Assert.AreEqual(1, state.Count); //Should get the touch that happened between
+
+            var touch = state[0];
+            Assert.AreEqual(pos2, touch.Position);
+            Assert.AreEqual(TouchLocationState.Pressed, touch.State);
+
+            if (waitAFrameForNextState)
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
+
+            state = _tps.GetState();
+            Assert.AreEqual(1, state.Count); //Touch should still be there, but as released
+
+            touch = state[0];
+            Assert.AreEqual(pos2, touch.Position);
+            Assert.AreEqual(TouchLocationState.Released, touch.State);
+
+
+            if (waitAFrameForNextState)
+                TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
+           
+            state = _tps.GetState();
+            Assert.AreEqual(0, state.Count); //Touch should be gone now
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        [Description("Press and release our finger on the same frame. Don't call GetState that frame, but do the next. We should not get the touch")]
+        public void SameFrameTouchAndReleaseMissedIfWaitAFrameToGetState(bool moveInBetween)
+        {
+            var pos = new Vector2(100, 50);
+            var pos2 = new Vector2(100, 150);
+            _tps.AddEvent(1, TouchLocationState.Pressed, pos);
+            if (moveInBetween) //Moving shouldn't change the behavior
+                _tps.AddEvent(1, TouchLocationState.Moved, pos2);
+            _tps.AddEvent(1, TouchLocationState.Released, pos2);
+
+            TouchPanelState.CurrentTimestamp = GameTimeForFrame(1);
+            var state = _tps.GetState();
+            Assert.AreEqual(0, state.Count); //Shouldn't get the touch that happened last frame
         }
 
         [Test]
@@ -360,13 +431,20 @@ namespace MonoGame.Tests.Framework
             //Call ReleaseAllTouches
             _tps.ReleaseAllTouches();
 
-            //All should be in Released state
+            //If we saw the second touch happen then we should see it be released, otherwise it will be in pressed, then in released next time
             state = _tps.GetState();
-            foreach (var touch in state)
-                Assert.AreEqual(TouchLocationState.Released, touch.State);
+            Assert.AreEqual(2, state.Count);
 
-            //If we saw the second touch happen then we should see it be released, otherwise we should only know of the first touch
-            Assert.AreEqual(testBetween ? 2 : 1, state.Count);
+            Assert.AreEqual(testBetween ? TouchLocationState.Released : TouchLocationState.Pressed, state.Single(p => p.Id != initialTouch.Id).State);
+            Assert.AreEqual(TouchLocationState.Released, state.Single(p => p.Id == initialTouch.Id).State);
+
+            if (!testBetween)
+            {
+                state = _tps.GetState();
+                Assert.AreEqual(1, state.Count);
+
+                Assert.AreEqual(TouchLocationState.Released, state[0].State);
+            }
 
             //Then it should be empty
             state = _tps.GetState();

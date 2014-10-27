@@ -40,7 +40,7 @@
     <OutputPath Condition="'$(OutputPath)' == ''">bin\$(Platform)\$(Configuration)</OutputPath>
     <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">obj\$(Platform)\$(Configuration)</IntermediateOutputPath>
     
-    <ContentResponseFile>$(IntermediateOutputPath)\mgcontent.txt</ContentResponseFile>	
+    <ContentResponseFile>$(IntermediateOutputPath)\$(MSBuildProjectName).mgcontent.txt</ContentResponseFile>	
     <MonoGameContentBuilderExe>$(MSBuildProgramFiles32)\MonoGame\v3.0\MGCB.exe</MonoGameContentBuilderExe>
     <MonoGamePlatform Condition="'$(MonoGamePlatform)' == ''">Windows</MonoGamePlatform>
 
@@ -90,15 +90,15 @@
   </Target>
   
   <Target Name="Build" DependsOnTargets="MonoGame_WriteContent">
-    <Exec Command="$(MonoGameContentBuilderExe) /@:$(ContentResponseFile) /quiet" EchoOff="true"/>
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;$(ContentResponseFile)&quot; /quiet" EchoOff="true"/>
   </Target>
   
   <Target Name="Rebuild" DependsOnTargets="MonoGame_WriteContent">
-    <Exec Command="$(MonoGameContentBuilderExe) /@:$(ContentResponseFile) /quiet /rebuild" EchoOff="true"/>
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;$(ContentResponseFile)&quot; /quiet /rebuild" EchoOff="true"/>
   </Target>
   
   <Target Name="Clean" DependsOnTargets="MonoGame_WriteResponseFile">
-    <Exec Command="$(MonoGameContentBuilderExe) /@:$(ContentResponseFile) /quiet /clean" EchoOff="true"/>
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;$(ContentResponseFile)&quot; /quiet /clean" EchoOff="true"/>
     <Delete Files="$(ContentResponseFile)"/>
   </Target>
 

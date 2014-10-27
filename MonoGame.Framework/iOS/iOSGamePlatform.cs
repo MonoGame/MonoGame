@@ -224,7 +224,15 @@ namespace Microsoft.Xna.Framework
             Game.Tick ();
 
             if (!IsPlayingVideo)
+            {
+                if (Game.GraphicsDevice != null)
+                {
+                    // GraphicsDevice.Present() takes care of actually 
+                    // disposing resources disposed from a non-ui thread
+                    Game.GraphicsDevice.Present();
+                }
                 _viewController.View.Present ();
+            }
         }
 
         public override bool BeforeDraw(GameTime gameTime)
@@ -266,12 +274,6 @@ namespace Microsoft.Xna.Framework
             var events = new Tuple<NSString, Action<NSNotification>>[]
             {
                 Tuple.Create(
-                    UIApplication.WillEnterForegroundNotification,
-                    new Action<NSNotification>(Application_WillEnterForeground)),
-                Tuple.Create(
-                    UIApplication.DidEnterBackgroundNotification,
-                    new Action<NSNotification>(Application_DidEnterBackground)),
-                Tuple.Create(
                     UIApplication.DidBecomeActiveNotification,
                     new Action<NSNotification>(Application_DidBecomeActive)),
                 Tuple.Create(
@@ -280,9 +282,6 @@ namespace Microsoft.Xna.Framework
                 Tuple.Create(
                     UIApplication.WillTerminateNotification,
                     new Action<NSNotification>(Application_WillTerminate)),
-                Tuple.Create(
-                    UIApplication.DidReceiveMemoryWarningNotification,
-                    new Action<NSNotification>(Application_DidReceiveMemoryWarning))
              };
 
             foreach (var entry in events)
@@ -290,16 +289,6 @@ namespace Microsoft.Xna.Framework
         }
 
         #region Notification Handling
-
-        private void Application_WillEnterForeground(NSNotification notification)
-        {
-			// Already handled in Application_DidBecomeActive. See below for IsActive state change.	
-        }
-
-        private void Application_DidEnterBackground(NSNotification notification)
-        {
-			// Already handled in Application_WillResignActive. See below for IsActive state change.
-        }
 
         private void Application_DidBecomeActive(NSNotification notification)
         {
@@ -319,13 +308,6 @@ namespace Microsoft.Xna.Framework
 			{
 				// TODO MonoGameGame.Terminate();
 			}
-        }
-
-        private void Application_DidReceiveMemoryWarning(NSNotification notification)
-        {
-            // FIXME: Possibly add some more sophisticated behavior here.  It's
-            //        also possible that this is not iOSGamePlatform's job.
-            GC.Collect();
         }
 
         #endregion Notification Handling

@@ -263,12 +263,14 @@ namespace Microsoft.Xna.Framework.Graphics
             featureLevels.Add(FeatureLevel.Level_9_2);
             featureLevels.Add(FeatureLevel.Level_9_1);
 
+            var driverType = GraphicsAdapter.UseReferenceDevice ? DriverType.Reference : DriverType.Hardware;
+
 #if DEBUG
             try 
             {
 #endif
                 // Create the Direct3D device.
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
 
                 // Necessary to enable video playback
@@ -281,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Try again without the debug flag.  This allows debug builds to run
                 // on machines that don't have the debug runtime installed.
                 creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
             }
 #endif
@@ -408,7 +410,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         // Creates a SwapChain from a CoreWindow pointer.
                         var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
                         using (var comWindow = new ComObject(coreWindow))
-                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+#if WINDOWS_PHONE81
+                           _swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, comWindow, ref desc);
+#else
+                           _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+#endif
                     }
                     else
                     {
@@ -416,7 +422,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                         using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
                         {
+#if WINDOWS_PHONE81
+                            _swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, ref desc, null);
+#else
                             _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+#endif
+
                             nativePanel.SwapChain = _swapChain;
                         }
                     }
@@ -529,12 +540,14 @@ namespace Microsoft.Xna.Framework.Graphics
             featureLevels.Add(FeatureLevel.Level_9_2);
             featureLevels.Add(FeatureLevel.Level_9_1);
 
+            var driverType = GraphicsAdapter.UseReferenceDevice ? DriverType.Reference : DriverType.Hardware;
+            
 #if DEBUG
             try 
             {
 #endif
                 // Create the Direct3D device.
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
 #if DEBUG
             }
@@ -543,7 +556,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Try again without the debug flag.  This allows debug builds to run
                 // on machines that don't have the debug runtime installed.
                 creationFlags &= ~SharpDX.Direct3D11.DeviceCreationFlags.Debug;
-                using (var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, creationFlags, featureLevels.ToArray()))
+                using (var defaultDevice = new SharpDX.Direct3D11.Device(driverType, creationFlags, featureLevels.ToArray()))
                     _d3dDevice = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device>();
             }
 #endif
@@ -902,6 +915,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
         }
 
+        internal void PlatformResolveRenderTargets()
+        {
+            // Resolving MSAA render targets should be done here.
+        }
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             // Clear the current render targets.
@@ -1232,7 +1250,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GraphicsProfile graphicsProfile;
 
-            if (featureLevel >= FeatureLevel.Level_10_0)
+            if (featureLevel >= FeatureLevel.Level_10_0 || GraphicsAdapter.UseReferenceDevice)
                 graphicsProfile = GraphicsProfile.HiDef;
             else 
                 graphicsProfile = GraphicsProfile.Reach;

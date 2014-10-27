@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
         private ContentIdentity _identity;
-        private ContentBuildLogger _logger;
 
         #region Fields for default values
 
@@ -96,7 +95,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _identity = input.Identity;
-            _logger = context.Logger;
 
             // Perform the processor transforms.
             if (RotationX != 0.0f || RotationY != 0.0f || RotationZ != 0.0f || Scale != 1.0f)
@@ -150,7 +148,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         private ModelMeshContent ProcessMesh(MeshContent mesh, ModelBoneContent parent, ContentProcessorContext context)
         {
-            var bounds = new BoundingSphere();
             var parts = new List<ModelMeshPartContent>();
             var vertexBuffer = new VertexBufferContent();
             var indexBuffer = new IndexCollection();
@@ -160,24 +157,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 var vertices = geometry.Vertices;
                 var vertexCount = vertices.VertexCount;
-                var geomBuffer = geometry.Vertices.CreateVertexBuffer();
-                vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
+                ModelMeshPartContent partContent;
+                if (vertexCount == 0)
+                    partContent = new ModelMeshPartContent();
+                else
+                {
+                    var geomBuffer = geometry.Vertices.CreateVertexBuffer();
+                    vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, geomBuffer.VertexData);
 
-                var startIndex = indexBuffer.Count;
-                indexBuffer.AddRange(geometry.Indices);
+                    var startIndex = indexBuffer.Count;
+                    indexBuffer.AddRange(geometry.Indices);
 
-                var partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+                    partContent = new ModelMeshPartContent(vertexBuffer, indexBuffer, startVertex, vertexCount, startIndex, geometry.Indices.Count / 3);
+
+                    // Geoms are supposed to all have the same decl, so just steal one of these
+                    vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
+
+                    startVertex += vertexCount;
+                }
+
                 partContent.Material = geometry.Material;
                 parts.Add(partContent);
-
-                // Update mesh bounding box
-                bounds = BoundingSphere.CreateMerged(bounds, BoundingSphere.CreateFromPoints(geometry.Vertices.Positions));
-
-                // Geoms are supposed to all have the same decl, so just steal one of these
-                vertexBuffer.VertexDeclaration = geomBuffer.VertexDeclaration;
-
-                startVertex += vertexCount;
             }
+
+            var bounds = new BoundingSphere();
+            if (mesh.Positions.Count > 0)
+                bounds = BoundingSphere.CreateFromPoints(mesh.Positions);
 
             return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
@@ -199,26 +204,78 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
         {
-            var basicMaterial = material as BasicMaterialContent;
+            // If we don't get a material then assign a default one.
             if (material == null)
-                material = basicMaterial = new BasicMaterialContent();
+                material = MaterialProcessor.CreateDefaultMaterial(DefaultEffect);
+
+            // Test requirements from the assigned material.
+            int textureChannels;
+            bool vertexWeights = false;
+            if (material is DualTextureMaterialContent)
+            {
+                textureChannels = 2;
+            }
+            else if (material is SkinnedMaterialContent)
+            {
+                textureChannels = 1;
+                vertexWeights = true;
+            }
+            else if (material is EnvironmentMapMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else if (material is AlphaTestMaterialContent)
+            {
+                textureChannels = 1;
+            }
+            else
+            {
+                // Just check for a "Texture" which should cover custom Effects
+                // and BasicEffect which can have an optional texture.
+                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
+            }
+
+            // By default we must set the vertex color property
+            // to match XNA behavior.
+            material.OpaqueData["VertexColorEnabled"] = false;
+
+            // If we run into a geometry that requires vertex
+            // color we need a seperate material for it.
+            var colorMaterial = material.Clone();
+            colorMaterial.OpaqueData["VertexColorEnabled"] = true;    
 
             foreach (var geometry in geometryCollection)
             {
+                // Process the geometry.
                 for (var i = 0; i < geometry.Vertices.Channels.Count; i++)
                     ProcessVertexChannel(geometry, i, context);
 
-                if (basicMaterial != null)
+                // Verify we have the right number of texture coords.
+                for (var i = 0; i < textureChannels; i++)
                 {
-                    // If the basic material specifies a texture, geometry must have coordinates.
-                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(0)))
+                    if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
-                            "Geometry references material with texture, but no texture coordinates were found.",
+                            string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.", 
+                            geometry.Parent.Name,
+                            MaterialProcessor.GetDefaultEffect(material),
+                            i),
                             _identity);
+                }
 
-                    // Enable vertex color if the geometry has the channel to support it.
-                    if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
-                        basicMaterial.VertexColorEnabled = true;
+                // Do we need to enable vertex color?
+                if (geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
+                    geometry.Material = colorMaterial;
+                else
+                    geometry.Material = material;
+
+                // Do we need vertex weights?
+                if (vertexWeights)
+                {
+                    var weightsName = VertexChannelNames.EncodeName(VertexElementUsage.BlendWeight, 0);
+                    if (!geometry.Vertices.Channels.Contains(weightsName))
+                        throw new InvalidContentException(
+                            string.Format("The skinned mesh \"{0}\" contains geometry without any vertex weights.", geometry.Parent.Name),
+                            _identity);                    
                 }
             }
         }
@@ -233,24 +290,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Channels[VertexChannelNames.Weights] -> { Byte4 boneIndices, Color boneWeights }
             if (channel.Name.StartsWith(VertexChannelNames.Weights()))
-                ProcessWeightsChannel(geometry, vertexChannelIndex);
+                ProcessWeightsChannel(geometry, vertexChannelIndex, _identity);
 
             // Looks like XNA models usually put a default color channel in..
             if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Color(0)))
                 geometry.Vertices.Channels.Add(VertexChannelNames.Color(0), Enumerable.Repeat(Color.White, geometry.Vertices.VertexCount));
         }
 
-        // From the XNA CPU Skinning Sample under Ms-PL, (c) Microsoft Corporation
-        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex)
+        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity identity)
         {
+            // NOTE: Portions of this code is from the XNA CPU Skinning 
+            // sample under Ms-PL, (c) Microsoft Corporation.
+
             // create a map of Name->Index of the bones
             var skeleton = MeshHelper.FindSkeleton(geometry.Parent);
+            if (skeleton == null)
+            {
+                throw new InvalidContentException(
+                    "Skeleton not found. Meshes that contain a Weights vertex channel cannot be processed without access to the skeleton data.",
+                    identity);                     
+            }
+
             var boneIndices = new Dictionary<string, int>();
             var flattenedBones = MeshHelper.FlattenSkeleton(skeleton);
             for (var i = 0; i < flattenedBones.Count; i++)
                 boneIndices.Add(flattenedBones[i].Name, i);
 
-            var inputWeights = geometry.Vertices.Channels[vertexChannelIndex] as VertexChannel<BoneWeightCollection>;
+            var vertexChannel = geometry.Vertices.Channels[vertexChannelIndex];
+            var inputWeights = vertexChannel as VertexChannel<BoneWeightCollection>;
+            if (inputWeights == null)
+            {
+                throw new InvalidContentException(
+                    string.Format(
+                        "Vertex channel \"{0}\" is the wrong type. It has element type {1}. Type {2} is expected.",
+                        vertexChannel.Name,
+                        vertexChannel.ElementType.FullName,
+                        "Microsoft.Xna.Framework.Content.Pipeline.Graphics.BoneWeightCollection"),
+                    identity);                          
+            }
             var outputIndices = new Byte4[inputWeights.Count];
             var outputWeights = new Vector4[inputWeights.Count];
             for (var i = 0; i < inputWeights.Count; i++)

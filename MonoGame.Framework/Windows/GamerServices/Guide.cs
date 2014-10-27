@@ -445,7 +445,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 		{ 
 			get
 			{
+#if WINDOWS_PHONE
+				return MsXna_Guide.IsVisible;
+#else
 				return isVisible;
+#endif
 			}
 			set
 			{

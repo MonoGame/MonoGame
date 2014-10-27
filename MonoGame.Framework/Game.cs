@@ -1,70 +1,6 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2011 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
@@ -115,7 +51,7 @@ namespace Microsoft.Xna.Framework
         private TimeSpan _targetElapsedTime = TimeSpan.FromTicks(166667); // 60fps
         private TimeSpan _inactiveSleepTime = TimeSpan.FromSeconds(0.02);
 
-        private readonly TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
+        private TimeSpan _maxElapsedTime = TimeSpan.FromMilliseconds(500);
 
 
         private bool _suppressDraw;
@@ -134,7 +70,7 @@ namespace Microsoft.Xna.Framework
             Platform.Deactivated += OnDeactivated;
             _services.AddService(typeof(GamePlatform), Platform);
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
             Platform.ViewStateChanged += Platform_ApplicationViewChanged;
 #endif
         }
@@ -198,7 +134,7 @@ namespace Microsoft.Xna.Framework
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
                         Platform.ViewStateChanged -= Platform_ApplicationViewChanged;
 #endif
                         Platform.Dispose();
@@ -254,10 +190,25 @@ namespace Microsoft.Xna.Framework
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
 
-                if (_inactiveSleepTime != value)
-                {
-                    _inactiveSleepTime = value;
-                }
+                _inactiveSleepTime = value;
+            }
+        }
+
+        /// <summary>
+        /// The maximum amount of time we will frameskip over and only perform Update calls with no Draw calls.
+        /// MonoGame extension.
+        /// </summary>
+        public TimeSpan MaxElapsedTime
+        {
+            get { return _maxElapsedTime; }
+            set
+            {
+                if (value < TimeSpan.Zero)
+                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                if (value < _targetElapsedTime)
+                    throw new ArgumentOutOfRangeException("The time must be at least TargetElapsedTime", default(Exception));
+
+                _maxElapsedTime = value;
             }
         }
 
@@ -359,7 +310,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> Disposed;
         public event EventHandler<EventArgs> Exiting;
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         [CLSCompliant(false)]
         public event EventHandler<ViewStateChangedEventArgs> ApplicationViewChanged;
 #endif
@@ -407,11 +358,11 @@ namespace Microsoft.Xna.Framework
 
             if (!_initialized) {
                 DoInitialize ();
+                _gameTimer = Stopwatch.StartNew();
                 _initialized = true;
             }
 
-            BeginRun();
-            _gameTimer = Stopwatch.StartNew();
+            BeginRun();            
 
             //Not quite right..
             Tick ();
@@ -662,7 +613,7 @@ namespace Microsoft.Xna.Framework
 			DoExiting();
         }
 
-#if WINDOWS_STOREAPP
+#if WINDOWS_STOREAPP && !WINDOWS_PHONE81
         private void Platform_ApplicationViewChanged(object sender, ViewStateChangedEventArgs e)
         {
             AssertNotDisposed();
@@ -703,13 +654,12 @@ namespace Microsoft.Xna.Framework
                 // playing sounds to see if they've stopped,
                 // and return them back to the pool if so.
                 SoundEffectInstancePool.Update();
-                
-                //The TouchPanel needs to know the time for when touches arrive
-                TouchPanelState.Update(gameTime);
 
                 Update(gameTime);
+
+                //The TouchPanel needs to know the time for when touches arrive
+                TouchPanelState.CurrentTimestamp = gameTime.TotalGameTime;
             }
-                
         }
 
         internal void DoDraw(GameTime gameTime)

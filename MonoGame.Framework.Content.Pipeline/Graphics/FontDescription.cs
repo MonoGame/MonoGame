@@ -4,41 +4,102 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    internal class CharacterCollection : ICollection<char>
+    {
+        private List<char> _items;
+
+        public CharacterCollection()
+        {
+            _items = new List<char>();
+        }
+
+        public CharacterCollection(IEnumerable<char> characters)
+        {
+            _items = new List<char>();
+            foreach (var c in characters)
+                Add(c);
+        }
+
+        #region ICollection<char> Members
+
+        public void Add(char item)
+        {
+            if (!_items.Contains(item))
+                _items.Add(item);
+        }
+
+        public void Clear()
+        {
+            _items.Clear();
+        }
+
+        public bool Contains(char item)
+        {
+            return _items.Contains(item);
+        }
+
+        public void CopyTo(char[] array, int arrayIndex)
+        {
+            _items.CopyTo(array, arrayIndex);
+        }
+
+        public int Count
+        {
+            get { return _items.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public bool Remove(char item)
+        {
+            return _items.Remove(item);
+        }
+
+        #endregion
+
+        #region IEnumerable<char> Members
+
+        public IEnumerator<char> GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        #endregion
+    }
+
 	/// <summary>
 	/// Provides information to the FontDescriptionProcessor describing which font to rasterize, which font size to utilize, and which Unicode characters to include in the processor output.
 	/// </summary>
 	public class FontDescription : ContentItem
 	{
-		char? defaultCharacter;
-		string fontName;
-		float size;
-		float spacing;
-		FontDescriptionStyle style;
-		bool useKerning;
-		List<CharacterRegion> characterRegions;
-
-		/// <summary>
-		/// Gets or sets the default character for the font.
-		/// </summary>
-		[ContentSerializerAttribute]
-		public Nullable<char> DefaultCharacter
-		{
-			get
-			{
-				return defaultCharacter;
-			}
-			set
-			{
-				defaultCharacter = value;
-			}
-		}
+        private char? defaultCharacter;
+        private string fontName;
+        private float size;
+        private float spacing;
+        private FontDescriptionStyle style;
+        private bool useKerning;
+	    private CharacterCollection characters = new CharacterCollection(CharacterRegion.Default.Characters());
 
 		/// <summary>
 		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
 		/// </summary>
+        [ContentSerializer(AllowNull = false)]
 		public string FontName
 		{
 			get
@@ -73,6 +134,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <summary>
 		/// Gets or sets the amount of space, in pixels, to insert between letters in a string.
 		/// </summary>
+        [ContentSerializer(Optional = true)]
 		public float Spacing
 		{
 			get
@@ -86,6 +148,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 				spacing = value;
 			}
 		}
+
+        /// <summary>
+        /// Indicates if kerning information is used when drawing characters.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public bool UseKerning
+        {
+            get
+            {
+                return useKerning;
+            }
+            set
+            {
+                useKerning = value;
+            }
+        }
 
 		/// <summary>
 		/// Gets or sets the style of the font, expressed as a combination of one or more FontDescriptionStyle flags.
@@ -102,34 +180,49 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 		}
 
-		/// <summary>
-		/// Indicates if kerning information is used when drawing characters.
-		/// </summary>
-		[ContentSerializerAttribute]
-		public bool UseKerning
-		{
-			get
-			{
-				return useKerning;
-			}
-			set
-			{
-				useKerning = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the default character for the font.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Nullable<char> DefaultCharacter
+        {
+            get
+            {
+                return defaultCharacter;
+            }
+            set
+            {
+                defaultCharacter = value;
+            }
+        }
 
+        [ContentSerializer(CollectionItemName = "CharacterRegion")]
+        internal CharacterRegion[] CharacterRegions
+        {
+            set
+            {
+                for (int index = 0; index < value.Length; ++index)
+                {
+                    CharacterRegion characterRegion = value[index];
+                    if (characterRegion.End < characterRegion.Start)
+                        throw new ArgumentException("CharacterRegion.End must be greater than CharacterRegion.Start");
 
-		/// <summary>
-		/// Gets the collection of characters provided by this FontDescription.
-		/// </summary>
-		[ContentSerializerIgnoreAttribute]
-		public List<CharacterRegion> CharacterRegions
-		{
-			get
-			{
-				return characterRegions;
-			}
-		}
+                    for (var start = characterRegion.Start; start <= characterRegion.End; start++)
+                        Characters.Add(start);
+                }
+            }
+        }
+		
+	    [ContentSerializerIgnore]
+	    public ICollection<char> Characters
+	    {
+	        get { return characters; } 
+            internal set { characters = new CharacterCollection(value); }
+	    }
+
+        internal FontDescription()
+        {
+        }
 
 		/// <summary>
 		/// Initializes a new instance of FontDescription and initializes its members to the specified font, size, and spacing, using FontDescriptionStyle.Regular as the default value for Style.
@@ -150,7 +243,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle)
-			: this(fontName, size, spacing, fontStyle, true)
+            : this(fontName, size, spacing, fontStyle, true)
 		{
 		}
 
@@ -162,35 +255,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
-		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)
+		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)            
 		{
 			// Write to the properties so the validation is run
 			FontName = fontName;
 			Size = size;
 			Spacing = spacing;
 			Style = fontStyle;
-			UseKerning = useKerning;
-			characterRegions = new List<CharacterRegion> () { CharacterRegion.Default };
-		}
-
-		/// <summary>
-		/// Initializes a new instance of FontDescription using the specified values.
-		/// </summary>
-		/// <param name="fontName">The name of the font, such as Times New Roman.</param>
-		/// <param name="size">The size, in points, of the font.</param>
-		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
-		/// <param name="fontStyle">The font style for the font.</param>
-		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
-		/// <param name="charRegions">The characters to include. Defaults to the base ASCII set.</param>
-		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning, List<CharacterRegion> charRegions)
-		{
-			// Write to the properties so the validation is run
-			FontName = fontName;
-			Size = size;
-			Spacing = spacing;
-			Style = fontStyle;
-			UseKerning = useKerning;
-			characterRegions = charRegions;
+			UseKerning = useKerning;			
 		}
 	}
 }

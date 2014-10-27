@@ -436,16 +436,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (transform == Matrix.Identity)
                 return;
 
-            var work = new Stack<NodeContent>(new[] { scene });
+            var work = new Stack<NodeContent>();
+            work.Push(scene);
+
             while (work.Count > 0)
             {
-                var top = work.Pop();
-                var mesh = top as MeshContent;
+                var node = work.Pop();
+                foreach (var child in node.Children)
+                    work.Push(child);                    
+
+                // Transform the mesh content.
+                var mesh = node as MeshContent;
                 if (mesh != null)
                     mesh.TransformContents(ref transform);
-
-                for (var i = top.Children.Count - 1; i >= 0; i--)
-                    work.Push(top.Children[i]);
             }
         }
     }

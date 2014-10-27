@@ -85,7 +85,7 @@ namespace Microsoft.Devices.Sensors
             {
                 this.IsDataValid = true;
                 reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
-                reading.Timestamp = DateTime.Now;
+                reading.Timestamp = DateTime.UtcNow;
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
             }

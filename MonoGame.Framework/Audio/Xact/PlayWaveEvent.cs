@@ -28,8 +28,14 @@ namespace Microsoft.Xna.Framework.Audio
 
         private readonly int[] _tracks;
         private readonly int[] _waveBanks;
+        
+        private readonly byte[] _weights;
+        private readonly int _totalWeights;
 
-        private float _volume;
+        private float _trackVolume;
+
+        private readonly Vector2? _volumeVar;
+        private readonly Vector2? _pitchVar;
 
         private int _wavIndex;
         private int _loopIndex;
@@ -37,16 +43,21 @@ namespace Microsoft.Xna.Framework.Audio
         private SoundEffectInstance _wav;
 
         public PlayWaveEvent(   XactClip clip, float timeStamp, float randomOffset, SoundBank soundBank,
-                                int[] waveBanks, int[] tracks, VariationType variation, int loopCount, 
-                                bool newWaveOnLoop)
+                                int[] waveBanks, int[] tracks, byte[] weights, int totalWeights,
+                                VariationType variation, Vector2? volumeVar, Vector2? pitchVar, 
+                                int loopCount, bool newWaveOnLoop)
             : base(clip, timeStamp, randomOffset)
         {
             _soundBank = soundBank;
             _waveBanks = waveBanks;
             _tracks = tracks;
+            _weights = weights;
+            _totalWeights = totalWeights;
+            _volumeVar = volumeVar;
+            _pitchVar = pitchVar;
             _wavIndex = -1;
             _loopIndex = 0;
-            _volume = 1.0f;
+            _trackVolume = 1.0f;
             _variation = variation;
             _loopCount = loopCount;
             _newWaveOnLoop = newWaveOnLoop;
@@ -78,17 +89,44 @@ namespace Microsoft.Xna.Framework.Audio
                         break;
 
                     case VariationType.Random:
-                        _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        if (_weights == null || trackCount == 1)
+                            _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        else
+                        {
+                            var sum = XactHelpers.Random.Next(_totalWeights);
+                            for (var i=0; i < trackCount; i++)
+                            {
+                                sum -= _weights[i];
+                                if (sum <= 0)
+                                {
+                                    _wavIndex = i;
+                                    break;
+                                }
+                            }
+                        }
                         break;
 
                     case VariationType.RandomNoImmediateRepeats:
                     {
-                        var last = _wavIndex;
-                        do
-                        {
+                        if (_weights == null || trackCount == 1)
                             _wavIndex = XactHelpers.Random.Next() % trackCount;
+                        else
+                        {
+                            var last = _wavIndex;
+                            var sum = XactHelpers.Random.Next(_totalWeights);
+                            for (var i=0; i < trackCount; i++)
+                            {
+                                sum -= _weights[i];
+                                if (sum <= 0)
+                                {
+                                    _wavIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (_wavIndex == last)
+                                _wavIndex = (_wavIndex + 1) % trackCount;
                         }
-                        while (last == _wavIndex && trackCount > 1);
                         break;
                     }
 
@@ -107,7 +145,14 @@ namespace Microsoft.Xna.Framework.Audio
                 return;
             }
 
-            _wav.Volume = _volume;
+            // Set the volume.
+            SetTrackVolume(_trackVolume);
+
+            // Set the pitch.
+            if (_pitchVar.HasValue)
+                _wav.Pitch = _pitchVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _pitchVar.Value.Y);
+            else
+                _wav.Pitch = 0;
 
             // This is a shortcut for infinite looping of a single track.
             _wav.IsLooped = _loopCount == 255 && trackCount == 1;
@@ -122,8 +167,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav = null;
             }
             _loopIndex = 0;
-
-            base.Stop();
 		}
 
 		public override void Pause() 
@@ -138,43 +181,25 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.Resume();
 		}
 
-		public override bool Playing 
+        public override void SetTrackVolume(float volume)
         {
-			get 
-            {
-                return _wav != null && _wav.State == SoundState.Playing;
-			}
-		}
+            _trackVolume = volume;
 
-		public override bool IsPaused
-		{
-			get
-			{
-                return _wav != null && _wav.State == SoundState.Paused;
-			}
-		}
-
-		public override float Volume 
-        {
-			get 
+            if (_wav != null)
             {
-                return _volume;
-			}
-
-			set 
-            {
-                _volume = value;
-                if (_wav != null)
-                    _wav.Volume = value;
-			}
-		}
+                if (_volumeVar.HasValue)
+                    _wav.Volume = _trackVolume * (_volumeVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _volumeVar.Value.Y));
+                else
+                    _wav.Volume = _trackVolume;
+            }
+        }
 
         public override void SetFade(float fadeInDuration, float fadeOutDuration)
         {
             // TODO
         }
 
-        public override void Update(float dt)
+        public override bool Update(float dt)
         {
             if (_wav != null && _wav.State == SoundState.Stopped)
             {
@@ -196,8 +221,14 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            base.Update(dt);
+            return _wav != null && _wav.State != SoundState.Stopped;
         }
-	}
+
+        public override void Apply3D(AudioListener listener, AudioEmitter emitter)
+        {
+            if (_wav != null)
+                _wav.Apply3D(listener, emitter);
+        }
+    }
 }
 

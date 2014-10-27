@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Initializes a new instance of ContentIdentity.
         /// </summary>
         public ContentIdentity()
-            : this(string.Empty, string.Empty, string.Empty)
+            : this(string.Empty, string.Empty, null)
         {
         }
 
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="sourceFilename">The absolute path to the file name of the asset source.</param>
         public ContentIdentity(string sourceFilename)
-            : this(sourceFilename, string.Empty, string.Empty)
+            : this(sourceFilename, string.Empty, null)
         {
         }
 
@@ -50,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="sourceFilename">The absolute path to the file name of the asset source.</param>
         /// <param name="sourceTool">The name of the digital content creation (DCC) tool that created the asset.</param>
         public ContentIdentity(string sourceFilename, string sourceTool)
-            : this(sourceFilename, sourceTool, string.Empty)
+            : this(sourceFilename, sourceTool, null)
         {
         }
 

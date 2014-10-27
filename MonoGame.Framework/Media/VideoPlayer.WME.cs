@@ -85,6 +85,10 @@ namespace Microsoft.Xna.Framework.Media
             return _lastFrame;
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+        }
+
         private void PlatformPause()
         {
             // Calling PlatformGetTexture() manually will save the last frame
