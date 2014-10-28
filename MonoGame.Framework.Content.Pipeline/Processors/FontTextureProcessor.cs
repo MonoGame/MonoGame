@@ -111,6 +111,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
             systemBitmap.Dispose();
 
+            var bmp = output.Texture.Faces[0][0];
+            if (PremultiplyAlpha)
+            {
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length; )
+                {
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
+                    var col = Color.FromNonPremultiplied(r, g, b, a);
+
+                    data[idx + 0] = col.R;
+                    data[idx + 1] = col.G;
+                    data[idx + 2] = col.B;
+                    data[idx + 3] = col.A;
+
+                    idx += 4;
+                }
+
+                bmp.SetPixelData(data);
+            }
+
             if (compressed)
                 GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
 
