@@ -110,7 +110,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
             systemBitmap.Dispose();
 
-            GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false, false);
+            if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)
+                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
 
 			return output;
 		}
