@@ -68,7 +68,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			for(int i=0; i < regions.Count; i++) {
 				var rect = regions[i];
-				rect.Inflate (-1, -1);
 				var newbitmap = new System.Drawing.Bitmap(rect.Width, rect.Height);
 				BitmapUtils.CopyRect (bitmap, rect, newbitmap, new System.Drawing.Rectangle (0,0, rect.Width, rect.Height));
 				glyphs.Add (new Glyph (GetCharacterForIndex (i), newbitmap));
