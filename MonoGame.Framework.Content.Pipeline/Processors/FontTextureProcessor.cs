@@ -70,8 +70,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				var rect = regions[i];
 				var newbitmap = new System.Drawing.Bitmap(rect.Width, rect.Height);
 				BitmapUtils.CopyRect (bitmap, rect, newbitmap, new System.Drawing.Rectangle (0,0, rect.Width, rect.Height));
-				glyphs.Add (new Glyph (GetCharacterForIndex (i), newbitmap));
-				//newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
+				var glyph = new Glyph (GetCharacterForIndex (i), newbitmap);
+			    glyph.CharacterWidths.B = glyph.Bitmap.Width;
+			    glyphs.Add(glyph);
+                //newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
 			}
 			return glyphs ;
 		}
