@@ -90,6 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			int linespacing = 0;
             var glyphs = ExtractGlyphs(systemBitmap, out linespacing);
+		    output.VerticalLineSpacing = linespacing;
 			// Optimize.
 			foreach (Glyph glyph in glyphs) {
 				GlyphCropper.Crop (glyph);
