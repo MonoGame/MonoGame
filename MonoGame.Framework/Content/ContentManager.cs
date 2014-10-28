@@ -67,6 +67,11 @@ namespace Microsoft.Xna.Framework.Content
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
+
+        protected static HashSet<Type> reloadAssetExcludedTypes = new HashSet<Type>(new[] { 
+                typeof(Microsoft.Xna.Framework.Audio.SoundEffect),
+                typeof(Microsoft.Xna.Framework.Media.Song),        
+            });
 		
 		private static object ContentManagerLock = new object();
         private static List<WeakReference> ContentManagers = new List<WeakReference>();
@@ -572,6 +577,10 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
+                // do not open .XNBs of types that don't need reload
+                if (reloadAssetExcludedTypes.Contains(asset.Value.GetType()))
+                    continue;
+
                 // This never executes as asset.Key is never null.  This just forces the 
                 // linker to include the ReloadAsset function when AOT compiled.
                 if (asset.Key == null)
