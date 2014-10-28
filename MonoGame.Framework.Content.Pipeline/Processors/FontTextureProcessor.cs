@@ -95,7 +95,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			}
 
             systemBitmap.Dispose();
-            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), true, true);
+		    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
+            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), compressed, compressed);
 			
 			foreach (Glyph glyph in glyphs) {
 				glyph.XAdvance += linespacing;
@@ -110,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
             systemBitmap.Dispose();
 
-            if (TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed)
+            if (compressed)
                 GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, true, true);
 
 			return output;
