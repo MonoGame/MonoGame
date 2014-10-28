@@ -23,6 +23,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 		public FontTextureProcessor ()
 		{
+		    FirstCharacter = ' ';
+		    PremultiplyAlpha = true;
 		}
 
 		protected virtual char GetCharacterForIndex (int index)
