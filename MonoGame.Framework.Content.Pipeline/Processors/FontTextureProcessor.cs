@@ -68,11 +68,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			for(int i=0; i < regions.Count; i++) {
 				var rect = regions[i];
-				rect.Inflate (-1, -1);
 				var newbitmap = new System.Drawing.Bitmap(rect.Width, rect.Height);
 				BitmapUtils.CopyRect (bitmap, rect, newbitmap, new System.Drawing.Rectangle (0,0, rect.Width, rect.Height));
-				glyphs.Add (new Glyph (GetCharacterForIndex (i), newbitmap));
-				//newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
+				var glyph = new Glyph (GetCharacterForIndex (i), newbitmap);
+			    glyph.CharacterWidths.B = glyph.Bitmap.Width;
+			    glyphs.Add(glyph);
+                //newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
 			}
 			return glyphs ;
 		}
@@ -89,6 +90,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			int linespacing = 0;
             var glyphs = ExtractGlyphs(systemBitmap, out linespacing);
+		    output.VerticalLineSpacing = linespacing;
 			// Optimize.
 			foreach (Glyph glyph in glyphs) {
 				GlyphCropper.Crop (glyph);
@@ -102,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 				if (!output.CharacterMap.Contains (glyph.Character))
 					output.CharacterMap.Add (glyph.Character);
 				output.Glyphs.Add (new Rectangle (glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-				output.Cropping.Add (new Rectangle (0, 0, glyph.Subrect.Width, glyph.Subrect.Height));
+                output.Cropping.Add(new Rectangle((int)glyph.XOffset, (int)glyph.YOffset, (int)glyph.XAdvance, output.VerticalLineSpacing));
 				ABCFloat abc = glyph.CharacterWidths;
 				output.Kerning.Add (new Vector3 (abc.A, abc.B, abc.C));
 			}
