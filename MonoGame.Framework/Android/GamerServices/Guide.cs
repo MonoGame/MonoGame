@@ -270,16 +270,16 @@ namespace Microsoft.Xna.Framework.GamerServices
 			string packageName = Game.Activity.PackageName;
 			try
 			{
-                Intent intent = new Intent(Intent.ActionView);
-                intent.SetData(Android.Net.Uri.Parse("market://details?id=" + packageName));
-                intent.SetFlags(ActivityFlags.NewTask);
-                Game.Activity.StartActivity(intent);
+				Intent intent = new Intent(Intent.ActionView);
+				intent.SetData(Android.Net.Uri.Parse("market://details?id=" + packageName));
+				intent.SetFlags(ActivityFlags.NewTask);
+				Game.Activity.StartActivity(intent);
 			}
 			catch (ActivityNotFoundException)
 			{
-                Intent intent = new Intent(Intent.ActionView);
-                intent.SetData(Android.Net.Uri.Parse("http://play.google.com/store/apps/details?id=" + packageName));
-                intent.SetFlags(ActivityFlags.NewTask);
+				Intent intent = new Intent(Intent.ActionView);
+				intent.SetData(Android.Net.Uri.Parse("http://play.google.com/store/apps/details?id=" + packageName));
+				intent.SetFlags(ActivityFlags.NewTask);
 				Game.Activity.StartActivity(intent);
 			}
 		}
