@@ -112,7 +112,7 @@
       <ExcludePlatforms>WindowsPhone</ExcludePlatforms> 
     </Compile>
     <Compile Include="GamerServices\GuideAlreadyVisibleException.cs">
-      <Platforms>MacOS,Windows,WindowsGL</Platforms>
+      <Platforms>Android,MacOS,Ouya,Windows,WindowsGL</Platforms>
     </Compile>
     <Compile Include="GamerServices\GamerServicesDispatcher.cs">
       <Platforms>MacOS,Windows,WindowsGL</Platforms>
