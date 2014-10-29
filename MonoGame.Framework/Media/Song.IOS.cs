@@ -4,10 +4,10 @@
 
 using System;
 using System.IO;
-using MonoTouch.Foundation;
-using MonoTouch.AVFoundation;
-using MonoTouch.MediaPlayer;
-using MonoTouch.CoreMedia;
+using Foundation;
+using AVFoundation;
+using MediaPlayer;
+using CoreMedia;
 
 namespace Microsoft.Xna.Framework.Media
 {

@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 #elif IOS
-using MonoTouch.UIKit;
+using UIKit;
 #elif ANDROID
 using Android.Views;
 #endif

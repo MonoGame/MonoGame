@@ -12,9 +12,9 @@ using System.IO;
 using Windows.Storage.FileProperties;
 #elif IOS
 using System.Drawing;
-using MonoTouch.CoreGraphics;
-using MonoTouch.MediaPlayer;
-using MonoTouch.UIKit;
+using CoreGraphics;
+using MediaPlayer;
+using UIKit;
 #elif ANDROID
 using Android.Graphics;
 using Android.Provider;
@@ -205,7 +205,7 @@ namespace Microsoft.Xna.Framework.Media
         [CLSCompliant(false)]
         public UIImage GetAlbumArt()
         {
-            return this.thumbnail.ImageWithSize(new SizeF(this.thumbnail.Bounds.Width, this.thumbnail.Bounds.Height));
+			return this.thumbnail.ImageWithSize(new CGSize(this.thumbnail.Bounds.Width, this.thumbnail.Bounds.Height));
         }
 #elif ANDROID
         [CLSCompliant(false)]

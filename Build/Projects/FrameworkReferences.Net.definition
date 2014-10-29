@@ -3,7 +3,7 @@
 
   <Platform Type="iOS">
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
+    <Reference Include="Xamarin.iOS" />
     <Project
       Name="Lidgren.Network.iOS"
       Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
