@@ -449,17 +449,14 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         private static void HideViewController(UIViewController viewController)
         {
-			// viewController.DismissModalViewControllerAnimated(true) not available with iOS 8 SDK
-			/*
             if (osVersion < 6.0d)
             {
 #pragma warning disable 618
                 // Disable DismissModalViewControllerAnimated warning, still need to support iOS 5 and older
-                viewController.DismissModalViewControllerAnimated(true);
+				viewController.DismissModalViewController(true);
 #pragma warning restore 618
             }
             else
-            */
             {
                 // Dismiss view controller for iOS 6+
                 viewController.DismissViewController(true, delegate {});
