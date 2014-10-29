@@ -586,6 +586,20 @@
       <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>FreeImage.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreeimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimageplus.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreeimageplus.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </Files>
 </Project>
