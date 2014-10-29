@@ -276,11 +276,6 @@ namespace Microsoft.Xna.Framework
         {
             GamePad.OnKeyDown(keyCode, e);
 
-#if ANDROID
-            if (keyCode == Keycode.Back)
-                GamePad.Back = true;
-#endif
-
             Keyboard.KeyDown(keyCode);
 
             if (keyCode == Keycode.VolumeUp)

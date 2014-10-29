@@ -14,12 +14,7 @@ namespace Microsoft.Xna.Framework.Input
         public Buttons _buttons;
         public float _leftTrigger, _rightTrigger;
         public Vector2 _leftStick, _rightStick;
-
-        // Workaround for the OnKeyUp and OnKeyDown events for KeyCode.Menu 
-        // both being sent in a single frame. This can be removed if the
-        // OUYA firmware is updated to send these events in different frames. 
         public bool _startButtonPressed;
-
         public readonly GamePadCapabilities _capabilities;
 
         public AndroidGamePad(InputDevice device)
@@ -28,54 +23,36 @@ namespace Microsoft.Xna.Framework.Input
             _deviceId = device.Id;
             _descriptor = device.Descriptor;
             _isConnected = true;
-
             _capabilities = CapabilitiesOfDevice(device);
         }
 
         private static GamePadCapabilities CapabilitiesOfDevice(InputDevice device)
         {
-            //TODO: There is probably a better way to do this. Maybe device.GetMotionRange and device.GetKeyCharacterMap?
-            //Or not http://stackoverflow.com/questions/11686703/android-enumerating-the-buttons-on-a-gamepad
-
+            // Because there are a lot of possible Gamepads on Android
             var capabilities = new GamePadCapabilities();
             capabilities.IsConnected = true;
             capabilities.GamePadType = GamePadType.GamePad;
             capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
-
-            switch (device.Name)
-            {
-                default:
-                    capabilities.HasAButton = true;
-                    capabilities.HasBButton = true;
-                    capabilities.HasXButton = true;
-                    capabilities.HasYButton = true;
-
-                    capabilities.HasLeftXThumbStick = true;
-                    capabilities.HasLeftYThumbStick = true;
-
-                    capabilities.HasDPadDownButton = true;
-                    capabilities.HasDPadLeftButton = true;
-                    capabilities.HasDPadRightButton = true;
-                    capabilities.HasDPadUpButton = true;
-
-                    capabilities.HasStartButton = true;
-                    capabilities.HasBackButton = true;
-                    break;
-            }
+            capabilities.HasAButton = true;
+            capabilities.HasBButton = true;
+            capabilities.HasXButton = true;
+            capabilities.HasYButton = true;
+            capabilities.HasLeftXThumbStick = true;
+            capabilities.HasLeftYThumbStick = true;  
+            capabilities.HasDPadDownButton = true;
+            capabilities.HasDPadLeftButton = true;
+            capabilities.HasDPadRightButton = true;
+            capabilities.HasDPadUpButton = true;
+            capabilities.HasStartButton = true;
+            capabilities.HasBackButton = true;
             return capabilities;
         }
     }
-
-
+        
     static partial class GamePad
     {
-        private const int maxGamepad = 1;
-
-#if OUYA
-        private const maxGamepad = OuyaController.MaxControllers;
-#endif
-        private static readonly AndroidGamePad[] GamePads = new AndroidGamePad[maxGamepad];
-        internal static bool Back = false;
+        private static readonly AndroidGamePad[] GamePads = new AndroidGamePad[4];
+        internal static Buttons _noGamepadButtons;
 
         private static GamePadCapabilities PlatformGetCapabilities(int index)
         {
@@ -100,15 +77,9 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone deadZoneMode)
         {
-            if (index == 0 && Back)
-            {
-                // Consume state
-                Back = false;
-                return new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
-            }
-
             var gamePad = GamePads[index];
             GamePadState state = GamePadState.Default;
+
             if (gamePad != null && gamePad._isConnected)
             {
                 // Check if the device was disconnected
@@ -139,6 +110,16 @@ namespace Microsoft.Xna.Framework.Input
                     new GamePadButtons(gamePad._buttons),
                     new GamePadDPad(gamePad._buttons));
             }
+            else
+            {
+                if (_noGamepadButtons != 0)
+                {
+                    state = new GamePadState(state.ThumbSticks, 
+                        new GamePadTriggers(state.Triggers.Left, state.Triggers.Right), 
+                        new GamePadButtons(_noGamepadButtons), 
+                        new GamePadDPad(ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released));
+                }
+            }
 
             return state;
         }
@@ -152,6 +133,7 @@ namespace Microsoft.Xna.Framework.Input
             var vibrator = gamePad._device.Vibrator;
             if (!vibrator.HasVibrator)
                 return false;
+
             vibrator.Vibrate(500);
             return true;
         }
@@ -160,13 +142,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             if (device == null || (device.Sources & InputSourceType.Gamepad) != InputSourceType.Gamepad)
                 return null;
-
-            // The recommended way to map devices to players numbers is to use OuyaController.GetPlayerNumByDeviceId(), 
-            // however as of ODK 0.0.6 there is a bug where disconnected and reconnected controllers get mapped
-            // to new player numbers. Also, the player number returned does not match the LED on the controller.
-            // Once this is fixed, we could consider using OuyaController.GetPlayerNumByDeviceId()
-            // http://forums.ouya.tv/discussion/819/getplayernumbydeviceid-can-return-1-after-controllers-disconnect-and-reconnect
-
+                
             int firstDisconnectedPadId = -1;
             for (int i = 0; i < GamePads.Length; i++)
             {
@@ -214,9 +190,9 @@ namespace Microsoft.Xna.Framework.Input
             var gamePad = GetGamePad(e.Device);
             if (gamePad == null)
             {
-                if (e.KeyCode == Keycode.Back)
+                if (keyCode == Keycode.Back)
                 {
-                    GamePads[0]._buttons |= Buttons.Back;
+                    _noGamepadButtons |= ButtonForKeyCode(keyCode);
                     return true;
                 }
 
@@ -226,9 +202,8 @@ namespace Microsoft.Xna.Framework.Input
             gamePad._buttons |= ButtonForKeyCode(keyCode);
 
             if (keyCode == Keycode.Menu)
-            {
                 gamePad._startButtonPressed = true;
-            }
+
             return true;
         }
 
@@ -237,11 +212,12 @@ namespace Microsoft.Xna.Framework.Input
             var gamePad = GetGamePad(e.Device);
             if (gamePad == null)
             {
-                if (e.KeyCode == Keycode.Back)
+                if (keyCode == Keycode.Back)
                 {
-                    GamePads[0]._buttons &= ~Buttons.Back;
+                    _noGamepadButtons &= ~ButtonForKeyCode(keyCode);
                     return true;
                 }
+
                 return false;
             }
 
@@ -270,13 +246,13 @@ namespace Microsoft.Xna.Framework.Input
         {
             switch (keyCode)
             {
-                case Keycode.ButtonA: //O
+                case Keycode.ButtonA:
                     return Buttons.A;
-                case Keycode.ButtonX: //U
+                case Keycode.ButtonX:
                     return Buttons.X;
-                case Keycode.ButtonY: //Y
+                case Keycode.ButtonY:
                     return Buttons.Y;
-                case Keycode.ButtonB: //A
+                case Keycode.ButtonB:
                     return Buttons.B;
 
                 case Keycode.ButtonL1:
@@ -301,12 +277,8 @@ namespace Microsoft.Xna.Framework.Input
                     return Buttons.DPadLeft;
                 case Keycode.DpadRight:
                     return Buttons.DPadRight;
-
-                    // Ouya system button sends Keycode.Menu after a delay if no
-                    // double tap or hold is detected. It also sends Keycode.Home just
-                    // before the system menu is opened (but not on dev kit controllers)
-                    // http://forums.ouya.tv/discussion/comment/6076/#Comment_6076
-                case Keycode.Menu:
+                case Keycode.Menu: 
+                    // Home button ?
                 case Keycode.ButtonStart:
                     return Buttons.Start;
                 case Keycode.Home:
