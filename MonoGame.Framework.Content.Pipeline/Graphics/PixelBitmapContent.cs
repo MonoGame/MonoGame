@@ -6,6 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -13,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         internal T[][] _pixelData;
 
-        internal SurfaceFormat _format = SurfaceFormat.Color;
+        internal SurfaceFormat _format;
 
         public PixelBitmapContent(int width, int height)
         {
@@ -24,13 +25,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             for (int y = 0; y < height; y++)
                 _pixelData[y] = new T[width];
+
+            TryGetFormat(out _format);
         }
 
         public override byte[] GetPixelData()
         {
-            if (_format != SurfaceFormat.Color)
-                throw new NotImplementedException();
-
             var formatSize = _format.GetSize();
             var dataSize = Width * Height * formatSize;
             var outputData = new byte[dataSize];
@@ -78,7 +78,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = _format;
+            if (typeof(T) == typeof(Color))
+                format = SurfaceFormat.Color;
+            else if (typeof(T) == typeof(Bgra4444))
+                format = SurfaceFormat.Bgra4444;
+            else if (typeof(T) == typeof(Bgr565))
+                format = SurfaceFormat.Bgr565;
+            else
+            {
+                format = SurfaceFormat.Color;
+                return false;
+            }
+
             return true;
         }
 
