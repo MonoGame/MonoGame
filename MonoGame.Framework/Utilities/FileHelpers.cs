@@ -39,7 +39,8 @@ namespace Microsoft.Xna.Framework.Utilities
             // Uri accepts forward slashes
             filePath = filePath.Replace(BackwardSlash, ForwardSlash);
 
-            if (!filePath.StartsWith(ForwardSlashString))
+            bool hasForwardSlash = filePath.StartsWith(ForwardSlashString);
+            if (!hasForwardSlash)
                 filePath = ForwardSlashString + filePath;
 
             // Get a uri for filePath using the file:// schema and no host.
@@ -50,6 +51,9 @@ namespace Microsoft.Xna.Framework.Utilities
             // The uri now contains the path to the relativeFile with 
             // relative addresses resolved... get the local path.
             var localPath = dst.LocalPath;
+
+            if (!hasForwardSlash && localPath.StartsWith("/"))
+                localPath = localPath.Substring(1);
 
             // Convert the directory separator characters to the 
             // correct platform specific separator.
