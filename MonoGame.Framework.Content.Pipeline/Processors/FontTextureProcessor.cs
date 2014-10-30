@@ -32,9 +32,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			return (char)(((int)FirstCharacter) + index);
 		}
 
-		private List<Glyph> ExtractGlyphs (System.Drawing.Bitmap bitmap, out int linespacing)
+		private List<Glyph> ExtractGlyphs (System.Drawing.Bitmap bitmap)
 		{
-			linespacing = 0;
 			var glyphs = new List<Glyph> (); 
 			var regions = new List<System.Drawing.Rectangle> ();
 			for (int y = 0; y < bitmap.Height; y++) {
@@ -60,7 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 							// we got a glyph :)
 							regions.Add (new System.Drawing.Rectangle (left, top, right - left, bottom - top));
 							x = right;
-							linespacing = Math.Max (linespacing, bottom - top);
 						} else {
 							x += re.Width;
 						}
@@ -90,12 +88,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			// after that. 
 		    var systemBitmap = input.Faces[0][0].ToSystemBitmap();
 
-			int linespacing = 0;
-            var glyphs = ExtractGlyphs(systemBitmap, out linespacing);
-		    output.VerticalLineSpacing = linespacing;
+            var glyphs = ExtractGlyphs(systemBitmap);
 			// Optimize.
 			foreach (Glyph glyph in glyphs) {
-				GlyphCropper.Crop (glyph);
+				GlyphCropper.Crop(glyph);
+                output.VerticalLineSpacing = Math.Max(output.VerticalLineSpacing, glyph.Subrect.Height);
 			}
 
             systemBitmap.Dispose();
@@ -103,7 +100,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), compressed, compressed);
 			
 			foreach (Glyph glyph in glyphs) {
-				glyph.XAdvance += linespacing;
+                glyph.XAdvance += output.VerticalLineSpacing;
 				if (!output.CharacterMap.Contains (glyph.Character))
 					output.CharacterMap.Add (glyph.Character);
 				output.Glyphs.Add (new Rectangle (glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
