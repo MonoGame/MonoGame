@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 defaultGlyph = _glyphs[DefaultCharacter.Value];
 
 			var width = 0.0f;
-			var finalLineHeight = (float)LineSpacing;
+			var finalLineHeight = 0;
 			var fullLineCount = 0;
             var currentGlyph = Glyph.Empty;
 			var offset = Vector2.Zero;
