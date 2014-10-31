@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
 
         // FIXME: VideoPlayer 'needs' this to set up its own movie player view
         //        controller.
-        public iOSGameViewController ViewController
+        public UIViewController ViewController
         {
             get { return _viewController; }
         }

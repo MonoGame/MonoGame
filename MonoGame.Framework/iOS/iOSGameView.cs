@@ -517,7 +517,7 @@ namespace Microsoft.Xna.Framework {
         NSDictionary markedTextStyle;
 		IUITextInputDelegate inputDelegate;
 
-        public delegate void ViewWillEditDelegate (iOSGameViewController editableCoreTextView);
+        public delegate void ViewWillEditDelegate(UIViewController editableCoreTextView);
         public event ViewWillEditDelegate ViewWillEdit;
 
         #region UITextInput methods
