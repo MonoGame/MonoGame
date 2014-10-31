@@ -35,6 +35,7 @@ namespace Microsoft.Xna.Framework
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
         bool disposed;
+        public event EventHandler<EventArgs> Disposed;
 
 #if !WINRT
         private bool _wantFullScreen = false;
@@ -168,6 +169,7 @@ namespace Microsoft.Xna.Framework
                     {
                         _graphicsDevice.Dispose();
                         _graphicsDevice = null;
+                        Disposed(this, new EventArgs());
                     }
                 }
                 disposed = true;
