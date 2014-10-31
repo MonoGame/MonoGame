@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public bool SupportsBlitFramebuffer { get; private set; }
 #if IOS
-			internal const string OpenGLLibrary = "/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
+			internal const string OpenGLLibrary = ObjCRuntime.Constants.OpenGLESLibrary;
 #elif ANDROID
             internal const string OpenGLLibrary = "libGLESv2.dll";
 #endif
