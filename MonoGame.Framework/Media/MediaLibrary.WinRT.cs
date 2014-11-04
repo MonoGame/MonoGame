@@ -18,13 +18,11 @@ namespace Microsoft.Xna.Framework.Media
         private static AlbumCollection albumCollection;
         private static SongCollection songCollection;
 
-        static MediaLibrary()
-        {
-            musicFolder = KnownFolders.MusicLibrary;
-        }
-
         private void PlatformLoad(Action<int> progressCallback)
         {
+            if (musicFolder == null)
+                musicFolder = KnownFolders.MusicLibrary;
+
             List<StorageFile> files = new List<StorageFile>();
             this.GetAllFiles(musicFolder, files);
 
