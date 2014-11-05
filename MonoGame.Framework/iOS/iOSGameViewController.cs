@@ -20,6 +20,32 @@ namespace Microsoft.Xna.Framework
                 throw new ArgumentNullException("platform");
             _platform = platform;
             SupportedOrientations = DisplayOrientation.Default;
+
+            NSArray obj = (NSArray)NSBundle.MainBundle.ObjectForInfoDictionary("UISupportedInterfaceOrientations");
+
+            for(int idx = 0; idx < obj.Count; ++idx)
+            {
+                string value = obj.GetItem<NSString>(idx).ToString();
+
+                switch(value)
+                {
+                case "UIInterfaceOrientationLandscapeLeft":
+                    SupportedOrientations |= DisplayOrientation.LandscapeLeft;
+                    break;
+
+                case "UIInterfaceOrientationLandscapeRight":
+                    SupportedOrientations |= DisplayOrientation.LandscapeRight;
+                    break;
+
+                case "UIInterfaceOrientationPortrait":
+                    SupportedOrientations |= DisplayOrientation.Portrait;
+                    break;
+
+                case "UIInterfaceOrientationPortraitUpsideDown":
+                    SupportedOrientations |= DisplayOrientation.PortraitDown;
+                    break;
+                }
+            }
         }
 
         public event EventHandler<EventArgs> InterfaceOrientationChanged;
