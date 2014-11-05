@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool ShouldAutorotate()
         {
-            return true;
+            return SupportedOrientations.HasFlag(DisplayOrientation.LandscapeLeft) || SupportedOrientations.HasFlag(DisplayOrientation.LandscapeRight) || _platform.Game.Initialized;
         }
         #endregion
 
