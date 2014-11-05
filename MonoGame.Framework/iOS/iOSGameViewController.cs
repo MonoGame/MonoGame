@@ -29,12 +29,14 @@ namespace Microsoft.Xna.Framework
 
                 switch(value)
                 {
+                // NOTE: in XNA, Orientation Left is a 90 degree rotation counterclockwise, while on iOS
+                // it is a 90 degree rotation CLOCKWISE. They are BACKWARDS!
                 case "UIInterfaceOrientationLandscapeLeft":
-                    SupportedOrientations |= DisplayOrientation.LandscapeLeft;
+                    SupportedOrientations |= DisplayOrientation.LandscapeRight;
                     break;
 
                 case "UIInterfaceOrientationLandscapeRight":
-                    SupportedOrientations |= DisplayOrientation.LandscapeRight;
+                    SupportedOrientations |= DisplayOrientation.LandscapeLeft;
                     break;
 
                 case "UIInterfaceOrientationPortrait":
