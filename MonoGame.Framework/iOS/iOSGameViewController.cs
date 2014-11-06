@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework
 
         public override void LoadView()
         {
-			RectangleF frame = CalculateFrame();
+            RectangleF frame = CalculateFrame();
             base.View = new iOSGameView(_platform, frame);
         }
 
@@ -91,8 +91,8 @@ namespace Microsoft.Xna.Framework
         {
             base.DidRotate(fromInterfaceOrientation);
 
-			RectangleF frame = CalculateFrame();
-			base.View.Frame = frame;
+            RectangleF frame = CalculateFrame();
+            base.View.Frame = frame;
 
             var handler = InterfaceOrientationChanged;
             if (handler != null)
@@ -106,30 +106,29 @@ namespace Microsoft.Xna.Framework
         }
         #endregion
 
-		private RectangleF CalculateFrame()
-		{
-			RectangleF frame;
-			if (ParentViewController != null && ParentViewController.View != null)
-			{
-				frame = new RectangleF(PointF.Empty, ParentViewController.View.Frame.Size);
-			}
-			else
-			{
-				UIScreen screen = UIScreen.MainScreen;
+        private RectangleF CalculateFrame()
+        {
+            RectangleF frame;
+            if (ParentViewController != null && ParentViewController.View != null)
+            {
+                frame = new RectangleF(PointF.Empty, ParentViewController.View.Frame.Size);
+            } 
+            else
+            {
+                UIScreen screen = UIScreen.MainScreen;
 
-				// iOS 7 and older reverses width/height in landscape mode when reporting resolution,
-				// iOS 8+ reports resolution correctly in all cases
-				if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
-				{
-					frame = new RectangleF(0, 0, Math.Max(screen.Bounds.Width, screen.Bounds.Height), Math.Min(screen.Bounds.Width, screen.Bounds.Height));
-				}
-				else
-				{
-					frame = new RectangleF(0, 0, screen.Bounds.Width, screen.Bounds.Height);
-				}
-			}
+                // iOS 7 and older reverses width/height in landscape mode when reporting resolution,
+                // iOS 8+ reports resolution correctly in all cases
+                if (InterfaceOrientation == UIInterfaceOrientation.LandscapeLeft || InterfaceOrientation == UIInterfaceOrientation.LandscapeRight)
+                {
+                    frame = new RectangleF(0, 0, Math.Max(screen.Bounds.Width, screen.Bounds.Height), Math.Min(screen.Bounds.Width, screen.Bounds.Height));
+                } else
+                {
+                    frame = new RectangleF(0, 0, screen.Bounds.Width, screen.Bounds.Height);
+                }
+            }
 
-			return frame;
-		}
+            return frame;
+        }
     }
 }
