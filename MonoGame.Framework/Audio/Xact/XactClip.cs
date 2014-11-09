@@ -9,13 +9,20 @@ namespace Microsoft.Xna.Framework.Audio
 {
 	class XactClip
 	{
+        private readonly float _defaultVolume;
+        private float _volumeScale;
         private float _volume;
 
 		private readonly ClipEvent[] _events;
-		
+        private float _time;
+        private int _nextEvent;
+
 		public XactClip (SoundBank soundBank, BinaryReader clipReader)
 		{
-            _volume = XactHelpers.ParseVolumeFromDecibels(clipReader.ReadByte());
+            State = SoundState.Stopped;
+
+		    var volumeDb = XactHelpers.ParseDecibels(clipReader.ReadByte());
+            _defaultVolume = XactHelpers.ParseVolumeFromDecibels(volumeDb);
             var clipOffset = clipReader.ReadUInt32();
 
             // Unknown!
@@ -293,8 +300,31 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new NotImplementedException("Pitch event");
 
                 case 8:
-                    // Volume Event
-                    throw new NotImplementedException("Volume event");
+                {
+                    // Unknown!
+                    clipReader.ReadBytes(2);
+
+                    // Event flags
+                    var eventFlags = clipReader.ReadByte();
+                    var isAdd = (eventFlags & 0x01) == 0x01;
+
+                    // The replacement or additive volume.
+                    var decibles = clipReader.ReadSingle() / 100.0f;
+                    var volume = XactHelpers.ParseVolumeFromDecibels(decibles + (isAdd ? volumeDb : 0));
+
+                    // Unknown!
+                    clipReader.ReadBytes(9);
+
+                    _events[i] = new VolumeEvent(   this, 
+                                                    timeStamp, 
+                                                    randomOffset, 
+                                                    volume);
+                    break;
+                }
+
+                case 17:
+                    // Volume Repeat Event
+                    throw new NotImplementedException("Volume repeat event");
 
                 case 9:
                     // Marker Event
@@ -310,86 +340,105 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void Update(float dt)
         {
-            foreach (var evt in _events)
-                evt.Update(dt);
+            if (State != SoundState.Playing)
+                return;
+
+            _time += dt;
+
+            // Play the next event.
+            while (_nextEvent < _events.Length)
+            {
+                var evt = _events[_nextEvent];
+                if (_time < evt.TimeStamp)
+                    break;
+
+                evt.Play();
+                ++_nextEvent;
+            }
+
+            // Update all the active events.
+            var isPlaying = _nextEvent < _events.Length;
+            for (var i = 0; i < _nextEvent; i++)
+            {
+                var evt = _events[i];
+                isPlaying |= evt.Update(dt);
+            }
+
+            // Update the state.
+            if (!isPlaying)
+                State = SoundState.Stopped;
         }
 
         internal void SetFade(float fadeInDuration, float fadeOutDuration)
         {
-            foreach(var evt in _events)
-                (evt as PlayWaveEvent).SetFade(fadeInDuration, fadeOutDuration);
+            foreach (var evt in _events)
+            {
+                if (evt is PlayWaveEvent)
+                    evt.SetFade(fadeInDuration, fadeOutDuration);
+            }
         }
 		
 		public void Play()
-        {
-			//TODO: run events
-            foreach (var evt in _events)
-            {
-                if (evt.IsReady)
-                    evt.Play();
-            }
-		}
+		{
+		    _time = 0.0f;
+            _nextEvent = 0;
+		    SetVolume(_defaultVolume);
+            State = SoundState.Playing; 
+            Update(0);
+        }
 
 		public void Resume()
 		{
             foreach (var evt in _events)
-            {
-                if (evt.IsReady)
-                    evt.Resume();
-            }
+                evt.Resume();
+
+            State = SoundState.Playing;
 		}
 		
 		public void Stop()
         {
             foreach (var evt in _events)
                 evt.Stop();
-		}
+
+            State = SoundState.Stopped;
+        }
 		
 		public void Pause()
         {
+		    foreach (var evt in _events)
+		        evt.Pause();
+
+            State = SoundState.Paused;
+        }
+
+        public SoundState State { get; private set; }
+
+        /// <summary>
+        /// Set the combined volume scale from the parent objects.
+        /// </summary>
+        /// <param name="volume">The volume scale.</param>
+        public void SetVolumeScale(float volume)
+        {
+            _volumeScale = volume;
+		    UpdateVolumes();
+        }
+
+        /// <summary>
+        /// Set the volume for the clip.
+        /// </summary>
+        /// <param name="volume">The volume level.</param>
+        public void SetVolume(float volume)
+        {
+            _volume = volume;
+            UpdateVolumes();
+        }
+
+	    private void UpdateVolumes()
+	    {
+            var volume = _volume * _volumeScale;
             foreach (var evt in _events)
-                evt.Pause();
-		}
-		
-		public bool Playing
-        {
-			get
-            {
-                foreach (var evt in _events)
-                {
-                    if (evt.Playing)
-                        return true;
-                }
-
-				return false;
-			}
-		}
-		
-		public float Volume
-        {
-			get {
-				return _volume;
-			}
-			set {
-				_volume = value;
-                foreach(var evt in _events)
-				    evt.Volume = value;
-			}
-		}
-
-		public bool IsPaused
-        { 
-			get
-            {
-                foreach (var evt in _events)
-                {
-                    if (evt.IsPaused)
-                        return true;
-                }
-
-				return false; 
-			} 
-		}
+                evt.SetTrackVolume(volume);
+	    }
 
         public void Apply3D(AudioListener listener, AudioEmitter emitter)
         {

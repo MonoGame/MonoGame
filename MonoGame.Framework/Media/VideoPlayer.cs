@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                if (_currentVideo == null || _state == MediaState.Stopped)
+                if (_currentVideo == null || State == MediaState.Stopped)
                     return TimeSpan.Zero;
 
                 return PlatformGetPlayPosition();
@@ -75,7 +75,16 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the media playback state, MediaState.
         /// </summary>
-        public MediaState State { get { return _state; } }
+        public MediaState State
+        { 
+            get
+            {
+                // Give the platform code a chance to update 
+                // the playback state before we return the result.
+                PlatformGetState(ref _state);
+                return _state;
+            }
+        }
 
         /// <summary>
         /// Gets the Video that is currently playing.
@@ -148,14 +157,16 @@ namespace Microsoft.Xna.Framework.Media
 
             if (_currentVideo == video)
             {
+                var state = State;
+							
                 // No work to do if we're already
                 // playing this video.
-                if (_state == MediaState.Playing)
+                if (state == MediaState.Playing)
                     return;
 
                 // If we try to Play the same video
                 // from a paused state, just resume it instead.
-                if (_state == MediaState.Paused)
+                if (state == MediaState.Paused)
                 {
                     PlatformResume();
                     return;
@@ -177,11 +188,13 @@ namespace Microsoft.Xna.Framework.Media
             if (_currentVideo == null)
                 return;
 
+            var state = State;
+
             // No work to do if we're already playing
-            if (_state == MediaState.Playing)
+            if (state == MediaState.Playing)
                 return;
 
-            if (_state == MediaState.Stopped)
+            if (state == MediaState.Stopped)
             {
                 PlatformPlay();
                 return;

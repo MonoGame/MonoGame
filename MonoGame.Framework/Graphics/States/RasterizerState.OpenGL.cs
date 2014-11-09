@@ -24,6 +24,9 @@ namespace Microsoft.Xna.Framework.Graphics
             // When rendering offscreen the faces change order.
             var offscreen = device.IsRenderTargetBound;
 
+            // Turn off dithering to make sure data returned by Texture.GetData is accurate
+            GL.Disable(EnableCap.Dither);
+
             if (CullMode == CullMode.None)
             {
                 GL.Disable(EnableCap.CullFace);

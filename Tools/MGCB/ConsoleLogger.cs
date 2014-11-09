@@ -23,7 +23,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
         {
             var warning = string.Empty;
-            if (!string.IsNullOrEmpty(contentIdentity.SourceFilename))
+            if (contentIdentity != null && !string.IsNullOrEmpty(contentIdentity.SourceFilename))
             {
                 warning = contentIdentity.SourceFilename;
                 if (!string.IsNullOrEmpty(contentIdentity.FragmentIdentifier))

@@ -151,10 +151,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         // We need to copy each row separatly and skip trailing zeros.
                         stream.Seek(startIndex, SeekOrigin.Begin);
 
+                        int elementSizeInByte = Marshal.SizeOf(typeof(T));
                         for (var row = 0; row < rows; row++)
                         {
                             int i;
-                            for (i = row * elementsInRow; i < (row + 1) * elementsInRow; i++)
+                            for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
                                 data[i] = stream.Read<T>();
 
                             if (i >= elementCount)
@@ -187,6 +188,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return texture;
 #endif
 #if !WINDOWS_PHONE
+
+            if (!stream.CanSeek)
+                throw new NotSupportedException("stream must support seek operations");
 
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 

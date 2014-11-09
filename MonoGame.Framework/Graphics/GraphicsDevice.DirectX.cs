@@ -410,7 +410,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         // Creates a SwapChain from a CoreWindow pointer.
                         var coreWindow = Marshal.GetObjectForIUnknown(PresentationParameters.DeviceWindowHandle) as CoreWindow;
                         using (var comWindow = new ComObject(coreWindow))
-                            _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+#if WINDOWS_PHONE81
+                           _swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, comWindow, ref desc);
+#else
+                           _swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(_d3dDevice, comWindow, ref desc, null);
+#endif
                     }
                     else
                     {
@@ -418,7 +422,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
                         using (var nativePanel = ComObject.As<SharpDX.DXGI.ISwapChainBackgroundPanelNative>(PresentationParameters.SwapChainBackgroundPanel))
                         {
+#if WINDOWS_PHONE81
+                            _swapChain = new SwapChain1(dxgiFactory2, dxgiDevice2, ref desc, null);
+#else
                             _swapChain = dxgiFactory2.CreateSwapChainForComposition(_d3dDevice, ref desc, null);
+#endif
+
                             nativePanel.SwapChain = _swapChain;
                         }
                     }

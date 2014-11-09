@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Name="MonoGame.Framework.Content.Pipeline" Path="MonoGame.Framework.Content.Pipeline" Type="Library" Platforms="Linux,MacOS,Windows">
 
+  <!--
+    Using Protobuild in your own project?  ProjectGuids are only in use here
+    for backwards compatibility with existing users of MonoGame, and are not
+    required for new projects.
+
+    See https://github.com/hach-que/Protobuild/wiki/Project-GUIDs-in-Protobuild
+  -->
   <ProjectGuids>
 	<Platform Name="Linux">57696462-CE5E-4BC5-80AB-1B959E2420EA</Platform>
 	<Platform Name="MacOS">A6C47073-8FF9-4997-BA3A-BA257CC88CFE</Platform>
@@ -19,7 +26,7 @@
     <Reference Include="System.Xml.Linq" />
 
 	<!-- Platform specific and special references! -->
-    <Reference Include="PipelineReferences" />
+    <Reference Include="Framework.Content.Pipeline.References" />
 
   </References>
 
@@ -115,7 +122,9 @@
     <Compile Include="Graphics\Font\SharpFontImporter.cs" />
     <Compile Include="Graphics\SkinnedMaterialContent.cs" />
     <Compile Include="Graphics\Texture2DContent.cs" />
+    <Compile Include="Graphics\Texture3DContent.cs" />
     <Compile Include="Graphics\TextureContent.cs" />
+    <Compile Include="Graphics\TextureCubeContent.cs" />
     <Compile Include="Graphics\TextureReferenceDictionary.cs" />
     <Compile Include="Graphics\Font\TrueTypeImporter.cs" />
     <Compile Include="Graphics\VertexChannel.cs" />
@@ -355,6 +364,7 @@
     <Compile Include="Serialization\Intermediate\ListSerializer.cs" />
     <Compile Include="Serialization\Intermediate\LongSerializer.cs" />
     <Compile Include="Serialization\Intermediate\MatrixSerializer.cs" />
+	<Compile Include="Serialization\Intermediate\NullableSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PlaneSerializer.cs" />
     <Compile Include="Serialization\Intermediate\PointSerializer.cs" />
     <Compile Include="Serialization\Intermediate\QuaternionSerializer.cs" />
@@ -576,6 +586,20 @@
       <Link>ffprobe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\FreeImageNET.dll.config">
+      <Platforms>MacOS</Platforms>
+      <Link>FreeImage.dll.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreeimage.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimageplus.dylib">
+      <Platforms>MacOS</Platforms>
+      <Link>libfreeimageplus.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </Files>
 </Project>
