@@ -279,28 +279,33 @@ namespace Microsoft.Xna.Framework
                 return true;
 #endif
 
-            Keyboard.KeyDown(keyCode);
+            bool isHandled = Keyboard.KeyDown(keyCode);
             // we need to handle the Back key here because it doesnt work any other way
 #if !OUYA
             if (keyCode == Keycode.Back)
+            {
                 GamePad.Back = true;
+                isHandled = true;
+            }
 #endif
 
             if (keyCode == Keycode.VolumeUp)
             {
                 AudioManager audioManager = (AudioManager)Context.GetSystemService(Context.AudioService);
                 audioManager.AdjustStreamVolume(Stream.Music, Adjust.Raise, VolumeNotificationFlags.ShowUi);
-                return true;
+                isHandled = true;
             }
 
             if (keyCode == Keycode.VolumeDown)
             {
                 AudioManager audioManager = (AudioManager)Context.GetSystemService(Context.AudioService);
                 audioManager.AdjustStreamVolume(Stream.Music, Adjust.Lower, VolumeNotificationFlags.ShowUi);
-                return true;
+                isHandled = true;
             }
 
-            return true;
+            if (isHandled)
+                return true;
+            return base.OnKeyDown(keyCode, e);
         }
 
         public override bool OnKeyUp(Keycode keyCode, KeyEvent e)
@@ -309,8 +314,10 @@ namespace Microsoft.Xna.Framework
             if (GamePad.OnKeyUp(keyCode, e))
                 return true;
 #endif
-            Keyboard.KeyUp(keyCode);
-            return true;
+            bool isHandled = Keyboard.KeyUp(keyCode);
+            if (isHandled)
+                return true;
+            return base.OnKeyUp(keyCode, e);
         }
 
 #if OUYA

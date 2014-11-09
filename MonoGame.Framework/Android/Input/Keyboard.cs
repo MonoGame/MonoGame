@@ -52,34 +52,33 @@ namespace Microsoft.Xna.Framework.Input
 
         private static readonly IDictionary<Keycode, Keys> KeyMap = LoadKeyMap();
 
-        internal static void KeyDown(Keycode keyCode)
+        internal static bool KeyDown(Keycode keyCode)
         {
             Keys key;
             if (KeyMap.TryGetValue(keyCode, out key))
             {
                 if (!keys.Contains(key))
                     keys.Add(key);
+                return true;
             }
+            return false;
         }
 
-        internal static void KeyUp(Keycode keyCode)
+        internal static bool KeyUp(Keycode keyCode)
         {
             Keys key;
             if (KeyMap.TryGetValue(keyCode, out key))
             {
                 if (keys.Contains(key))
                     keys.Remove(key);
+                return true;
             }
+            return false;
         }
 
         private static IDictionary<Keycode, Keys> LoadKeyMap()
         {
-            // create a map for every Keycode and default it to none so that every possible key is mapped
-            var maps = Enum.GetValues(typeof (Keycode))
-                .Cast<Keycode>()
-                .ToDictionary(key => key, key => Keys.None);
-
-            // then update it with the actual mappings
+            IDictionary<Keycode, Keys> maps = new Dictionary<Keycode, Keys>();
             maps[Keycode.DpadLeft] = Keys.Left;
             maps[Keycode.DpadRight] = Keys.Right;
             maps[Keycode.DpadUp] = Keys.Up;
@@ -120,8 +119,7 @@ namespace Microsoft.Xna.Framework.Input
 			maps[Keycode.W] = Keys.W;
 			maps[Keycode.X] = Keys.X;
             maps[Keycode.Y] = Keys.Y;
-            maps[Keycode.C] = Keys.Z;
-			maps[Keycode.Back] = Keys.Escape;
+            maps[Keycode.Z] = Keys.Z;
             maps[Keycode.Back] = Keys.Back;
             maps[Keycode.Home] = Keys.Home;
             maps[Keycode.Enter] = Keys.Enter;
