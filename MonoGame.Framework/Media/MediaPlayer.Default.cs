@@ -5,7 +5,8 @@
 using System;
 
 #if IOS
-using MonoTouch.MediaPlayer;
+using MonoTouch.AudioToolbox;
+using MonoTouch.AVFoundation;
 #endif
 
 namespace Microsoft.Xna.Framework.Media
@@ -64,7 +65,7 @@ namespace Microsoft.Xna.Framework.Media
             return _queue.ActiveSong.Position;
         }
 
-#if IOS
+#if IOS || ANDROID
         private static void PlatformSetPlayPosition(TimeSpan playPosition)
         {
             if (_queue.ActiveSong != null)
@@ -95,23 +96,13 @@ namespace Microsoft.Xna.Framework.Media
         private static bool PlatformGetGameHasControl()
         {
 #if IOS
-            var musicPlayer = MPMusicPlayerController.iPodMusicPlayer;
-				
-			if (musicPlayer == null)
-				return true;
-				
-			// TODO: Research the Interrupted state and see if it's valid to
-			// have control at that time.
-				
-			// Note: This will throw a bunch of warnings/output to the console
-			// if running in the simulator. This is a known issue:
-			// http://forums.macrumors.com/showthread.php?t=689102
-			if (musicPlayer.PlaybackState == MPMusicPlaybackState.Playing || 
-				musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingForward ||
-				musicPlayer.PlaybackState == MPMusicPlaybackState.SeekingBackward)
-				return false;
-				
-			return true;
+            bool isOtherAudioPlaying;
+            AVAudioSession avAudioSession = AVAudioSession.SharedInstance();
+            if (avAudioSession.RespondsToSelector(new MonoTouch.ObjCRuntime.Selector("isOtherAudioPlaying")))
+                isOtherAudioPlaying = avAudioSession.OtherAudioPlaying; // iOS 6+
+            else
+                isOtherAudioPlaying = AudioSession.OtherAudioIsPlaying;
+            return !isOtherAudioPlaying;
 #else
             // TODO: Fix me!
             return true;

@@ -195,7 +195,10 @@ namespace Microsoft.Xna.Framework.Storage
             var task = folder.CreateFolderAsync(path, CreationCollisionOption.OpenIfExists);
             task.AsTask().Wait();
 #else
-            Directory.CreateDirectory(path);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
 #endif
         }
 

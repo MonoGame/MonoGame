@@ -33,7 +33,7 @@ namespace MonoGame.Tools.Pipeline
 
         public override int GetHashCode()
         {
-            return TypeName.GetHashCode();
+            return TypeName == null ? 0 : TypeName.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -41,8 +41,11 @@ namespace MonoGame.Tools.Pipeline
             var other = obj as ImporterTypeDescription;
             if (other == null)
                 return false;
+            
+            if (string.IsNullOrEmpty(other.TypeName) != string.IsNullOrEmpty(TypeName))
+                return false;
 
-            return this.TypeName.Equals(other.TypeName);
+            return TypeName.Equals(other.TypeName);
         }
     };
 
@@ -415,7 +418,7 @@ namespace MonoGame.Tools.Pipeline
                 try
                 {                    
                     var a = Assembly.LoadFrom(path);
-                    var types = a.GetExportedTypes();
+                    var types = a.GetTypes();
                     ProcessTypes(types);
                 }
                 catch 

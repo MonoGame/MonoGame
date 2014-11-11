@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-
+using Android.Views;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
@@ -21,6 +21,8 @@ namespace Microsoft.Xna.Framework
 
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
+
+            MediaLibrary.Context = Game.Activity;
         }
 
         protected override void Dispose(bool disposing)
@@ -71,19 +73,15 @@ namespace Microsoft.Xna.Framework
 
         public override void BeforeInitialize()
         {
-            // TODO: Determine whether device natural orientation is Portrait or Landscape for OrientationListener
-            //SurfaceOrientation currentOrient = Game.Activity.WindowManager.DefaultDisplay.Rotation;
+            var currentOrientation = AndroidCompatibility.GetAbsoluteOrientation();
 
-			switch (Game.Activity.Resources.Configuration.Orientation)
+            switch (Game.Activity.Resources.Configuration.Orientation)
             {
                 case Android.Content.Res.Orientation.Portrait:
-					_gameWindow.SetOrientation(DisplayOrientation.Portrait, false);
-                    break;
-                case Android.Content.Res.Orientation.Landscape:
-					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+                    this._gameWindow.SetOrientation(currentOrientation == DisplayOrientation.PortraitDown ? DisplayOrientation.PortraitDown : DisplayOrientation.Portrait, false);
                     break;
                 default:
-					_gameWindow.SetOrientation(DisplayOrientation.LandscapeLeft, false);
+                    this._gameWindow.SetOrientation(currentOrientation == DisplayOrientation.LandscapeRight ? DisplayOrientation.LandscapeRight : DisplayOrientation.LandscapeLeft, false);
                     break;
             }
             base.BeforeInitialize();

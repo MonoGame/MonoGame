@@ -1,6 +1,6 @@
 # [MonoGame](http://monogame.net/) [![Build Status](http://teamcity.monogame.net/app/rest/builds/buildType:MonoGame_DevelopWin/statusIcon)](http://teamcity.monogame.net/project.html?projectId=MonoGame&guest=1)
 
-[MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework. 
+[MonoGame](http://monogame.net) is an open source implementation of the Microsoft XNA 4.x Framework.
 
 Our goal is to make it easy for XNA developers to create cross-platform games with extremely high code reuse.
 
@@ -13,6 +13,7 @@ Our goal is to make it easy for XNA developers to create cross-platform games wi
 * Linux
 * [Windows Store Apps](http://dev.windows.com) (for Windows 8 and Windows RT)
 * [Windows Phone 8](http://dev.windowsphone.com)
+* [Windows Phone 8.1](http://dev.windows.com)
 * [PlayStation Mobile](https://psm.playstation.net/portal/en/index.html) (currently 2D only)
 * [OUYA](http://ouya.tv), an Android-based gaming console
 
@@ -46,7 +47,7 @@ Keep track of development and community news.
 
 * Follow [@MonoGameTeam on Twitter](https://twitter.com/monogameteam).
 * Have a question that's not a feature request or bug report? [Ask on our community site.](http://community.monogame.net)
-* Join us over IRC - [irc://irc.gnome.org/#monogame](http://mibbit.com/?server=irc.gnome.org&channel=%23monogame). 
+* Join us over IRC - [irc://irc.gnome.org/#monogame](http://mibbit.com/?server=irc.gnome.org&channel=%23monogame).
 
 ## Contributing
 

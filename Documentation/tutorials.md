@@ -32,6 +32,7 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Porting to Android - Performance on Devices](http://www.pencelgames.com/blog/porting-android-performance-devices)
  - [BMFont rendering with MonoGame](http://www.craftworkgames.com/blog/tutorial-bmfont-rendering-with-monogame/)
  - [RB Whitaker's MonoGame Tutorials](http://rbwhitaker.wikidot.com/monogame-tutorials)
+ - [RB Whitaker's XNA Tutorials including sharers, 2D, 3D, Game loops, advancted topics](http://rbwhitaker.wikidot.com/xna-tutorials)
  - [Another list of tutorials from the MonoGame github](https://github.com/mono/MonoGame/wiki/Tutorials)
  - [Setting window position tutorial](http://projectdrake.net/blog/?p=176)
  - [Using Spine with MonoGame - by Randolph Burt (Randeroo)](http://randolphburt.co.uk/2013/03/30/dragons-and-dancing-crabs/)
@@ -42,8 +43,13 @@ Tara Walker's "Building a Shooter Game" tutorial series.
  - [Building Games for Windows 8 with MonoGame](http://tjclifton.com/2013/06/16/building-games-for-windows-8-with-monogame-part-1/)
  - [Dark Genesis Blog](http://darkgenesis.zenithmoon.com/tag/monogame/)
  - [MonoGame "Hello World" on Mac OS X and Xamarin Studio](http://jaquadro.com/2013/09/monogame-hello-world-on-mac-os-x-and-xamarin-studio/)
+ - [Solving Resolution Independent Rendering And 2D Camera Using Monogame](http://blog.roboblob.com/2013/07/27/solving-resolution-independent-rendering-and-2d-camera-using-monogame/)
 
 ## Video Tutorials
 
  - [CodingMadeEasy RPG Tutorial](http://www.youtube.com/watch?feature=player_embedded&v=agt9-J9RPZ0)
  - [Psuedo Games Tutorials](http://www.youtube.com/watch?feature=player_embedded&v=BwtQn02oy6A)
+ - [Desenvolvendo jogos multiplataforma em C# com MonoGame - Alexandre Chohfi (Portuguese)](http://channel9.msdn.com/Blogs/MSDN-Brasil-Cursos-de-Desenvolvimento/Desenvolvendo-jogos-multiplataforma-em-C-com-MonoGame)
+ - [Desenvolvimento de jogos para Windows 8 com XNA - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=gM5pRnYV1tA)
+ - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=1IzuaIApnv4)
+ - [Desenvolvimento de jogos para Windows Phone 8 com MonoGame (C#) - Alexandre Chohfi (Portuguese)](https://www.youtube.com/watch?v=YHXTAWzsCDs)

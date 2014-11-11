@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
         private readonly byte[] _weights;
         private readonly int _totalWeights;
 
-        private float _volume;
+        private float _trackVolume;
 
         private readonly Vector2? _volumeVar;
         private readonly Vector2? _pitchVar;
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
             _pitchVar = pitchVar;
             _wavIndex = -1;
             _loopIndex = 0;
-            _volume = 1.0f;
+            _trackVolume = 1.0f;
             _variation = variation;
             _loopCount = loopCount;
             _newWaveOnLoop = newWaveOnLoop;
@@ -146,10 +146,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             // Set the volume.
-            if (_volumeVar.HasValue)
-                _wav.Volume = _volume + _volumeVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _volumeVar.Value.Y);
-            else
-                _wav.Volume = _volume;
+            SetTrackVolume(_trackVolume);
 
             // Set the pitch.
             if (_pitchVar.HasValue)
@@ -170,8 +167,6 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav = null;
             }
             _loopIndex = 0;
-
-            base.Stop();
 		}
 
 		public override void Pause() 
@@ -186,43 +181,25 @@ namespace Microsoft.Xna.Framework.Audio
                 _wav.Resume();
 		}
 
-		public override bool Playing 
+        public override void SetTrackVolume(float volume)
         {
-			get 
-            {
-                return _wav != null && _wav.State == SoundState.Playing;
-			}
-		}
+            _trackVolume = volume;
 
-		public override bool IsPaused
-		{
-			get
-			{
-                return _wav != null && _wav.State == SoundState.Paused;
-			}
-		}
-
-		public override float Volume 
-        {
-			get 
+            if (_wav != null)
             {
-                return _volume;
-			}
-
-			set 
-            {
-                _volume = value;
-                if (_wav != null)
-                    _wav.Volume = value;
-			}
-		}
+                if (_volumeVar.HasValue)
+                    _wav.Volume = _trackVolume * (_volumeVar.Value.X + ((float)XactHelpers.Random.NextDouble() * _volumeVar.Value.Y));
+                else
+                    _wav.Volume = _trackVolume;
+            }
+        }
 
         public override void SetFade(float fadeInDuration, float fadeOutDuration)
         {
             // TODO
         }
 
-        public override void Update(float dt)
+        public override bool Update(float dt)
         {
             if (_wav != null && _wav.State == SoundState.Stopped)
             {
@@ -244,7 +221,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
             }
 
-            base.Update(dt);
+            return _wav != null && _wav.State != SoundState.Stopped;
         }
 
         public override void Apply3D(AudioListener listener, AudioEmitter emitter)
