@@ -52,15 +52,15 @@
     </Reference>
     <Reference Include="Mono.Posix" />
     <Reference Include="MonoDevelop.Core">
-      <HintPath>\Applications\Xamarin Studio.app\Contents\MacOS\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
+      <HintPath>\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.DesignerSupport">
-      <HintPath>\Applications\Xamarin Studio.app\Contents\MacOS\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
+      <HintPath>\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\AddIns\MonoDevelop.DesignerSupport\MonoDevelop.DesignerSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
-      <HintPath>\Applications\Xamarin Studio.app\Contents\MacOS\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
+      <HintPath>\Applications\Xamarin Studio.app\Contents\Resources\lib\monodevelop\bin\MonoDevelop.Ide.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
