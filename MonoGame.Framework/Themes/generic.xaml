@@ -1,24 +1,15 @@
-<ResourceDictionary
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:gamerServices="using:Microsoft.Xna.Framework.Windows8.GamerServices">
 
     <Style TargetType="gamerServices:InputDialog">
         <Setter
-            Property="Background"
-            Value="White" />
-        <Setter
-            Property="BorderBrush"
-            Value="Black" />
-        <Setter
-            Property="BorderThickness"
-            Value="2" />
-        <Setter
             Property="BackgroundScreenBrush"
             Value="#80000000" />
         <Setter
             Property="BackgroundStripeBrush"
-            Value="Black" />
+            Value="#80000000" />
         <Setter
             Property="Padding"
             Value="25" />
@@ -32,13 +23,13 @@
                         Value="Segoe UI" />
                     <Setter
                         Property="FontSize"
-                        Value="26.67" />
+                        Value="50" />
                     <Setter
                         Property="Margin"
                         Value="3,0" />
                     <Setter
                         Property="Foreground"
-                        Value="Black" />
+                        Value="White" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -52,7 +43,7 @@
                         Value="Segoe UI Semilight" />
                     <Setter
                         Property="FontSize"
-                        Value="14.67" />
+                        Value="30" />
                     <Setter
                         Property="Margin"
                         Value="3,25,3,5" />
@@ -61,7 +52,7 @@
                         Value="Wrap" />
                     <Setter
                         Property="Foreground"
-                        Value="Black" />
+                        Value="White" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -72,13 +63,19 @@
                     TargetType="TextBox">
                     <Setter
                         Property="Margin"
-                        Value="5,5,5,5" />
+                        Value="0,15,15,15" />
                     <Setter
                         Property="TextWrapping"
                         Value="Wrap" />
                     <Setter
                         Property="BorderBrush"
                         Value="Black" />
+                    <Setter 
+						Property="FontSize"
+						Value="30" />
+                    <Setter
+                        Property="MinHeight"
+                        Value="52" />
                 </Style>
             </Setter.Value>
         </Setter>
@@ -102,21 +99,18 @@
                 <Style
                     TargetType="ButtonBase">
                     <Setter
-                        Property="Background"
-                        Value="#000000" />
-                    <Setter
                         Property="Foreground"
                         Value="#FFFFFF" />
                     <Setter
                         Property="Margin"
-                        Value="5,5,5,5" />
+                        Value="25,25,25,25" />
                     <Setter
                         Property="FontSize"
-                        Value="14.67" />
+                        Value="40" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">
-                                <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ButtonHighlight" BorderThickness="2" BorderBrush="Black">
+                                <Border Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ButtonHighlight" BorderThickness="0" BorderBrush="Black">
                                     <Grid>
                                         <Rectangle x:Name="innerRectangle" HorizontalAlignment="Stretch" 
                                            VerticalAlignment="Stretch" Fill="{TemplateBinding Background}" />
@@ -198,42 +192,57 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Border
-                            x:Name="BlackStripe"
-                            Background="{TemplateBinding BackgroundStripeBrush}"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Stretch">
-                            <Border
-                                x:Name="ContentBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Margin="0">
-                                <StackPanel
-                                    x:Name="ContentPanel"
-                                    Margin="{TemplateBinding Padding}"
-                                    MinWidth="200">
-                                    <TextBlock
-                                        x:Name="TitleTextBlock"
-                                        Style="{TemplateBinding TitleStyle}" />
-                                    <TextBlock
-                                        x:Name="TextTextBlock"
-                                        Style="{TemplateBinding TextStyle}" />
-                                    <TextBox
-                                        x:Name="InputTextBox"
-                                        Style="{TemplateBinding InputTextStyle}" />
-                                    <PasswordBox
-                                        x:Name="InputPasswordBox"
-                                        Style="{TemplateBinding InputPasswordStyle}" />
-                                    <StackPanel
-                                        x:Name="ButtonsPanel"
-                                        Orientation="{TemplateBinding ButtonsPanelOrientation}"
-                                        HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Border>
-                        </Border>
+                        <Grid.Resources>
+                            <Storyboard x:Key="VirtualKeyboardSlideStoryBoard" x:Name="VirtualKeyboardSlideStoryBoard">
+                                <DoubleAnimation x:Name="VirtualKeyboardAnimation" 
+                                                 To="0" 
+                                                 Duration="0:0:0.4" 
+                                                 Storyboard.TargetName="BlackStripeTransform" 
+                                                 Storyboard.TargetProperty="Y">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CircleEase EasingMode="EaseOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </Grid.Resources>
+                    	<Border
+                    		x:Name="BlackStripe"
+                    		Background="{TemplateBinding BackgroundStripeBrush}"
+                    		VerticalAlignment="Center"
+                    		HorizontalAlignment="Stretch"
+                    		Height="500"
+							>
+                            <Border.RenderTransform >
+                                <TranslateTransform x:Name="BlackStripeTransform" />
+                            </Border.RenderTransform>
+                    		<Border
+                    			x:Name="ContentBorder"
+                    			VerticalAlignment="Center"
+                    			HorizontalAlignment="Center"
+                    			Margin="0">
+                    			<StackPanel
+                    				x:Name="ContentPanel"
+                    				Margin="{TemplateBinding Padding}"
+                    				MinWidth="600">
+                    				<TextBlock
+                    					x:Name="TitleTextBlock"
+                    					Style="{TemplateBinding TitleStyle}" />
+                    				<TextBlock
+                    					x:Name="TextTextBlock"
+                    					Style="{TemplateBinding TextStyle}" />
+                    				<TextBox
+                    					x:Name="InputTextBox"
+                    					Style="{TemplateBinding InputTextStyle}" />
+                    				<PasswordBox
+                    					x:Name="InputPasswordBox"
+                    					Style="{TemplateBinding InputPasswordStyle}" />
+                    				<StackPanel
+                    					x:Name="ButtonsPanel"
+                    					Orientation="{TemplateBinding ButtonsPanelOrientation}"
+                    					HorizontalAlignment="Right" />
+                    			</StackPanel>
+                    		</Border>
+                    	</Border>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

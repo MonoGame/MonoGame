@@ -23,6 +23,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 		public FontTextureProcessor ()
 		{
+		    FirstCharacter = ' ';
+		    PremultiplyAlpha = true;
 		}
 
 		protected virtual char GetCharacterForIndex (int index)
@@ -30,9 +32,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			return (char)(((int)FirstCharacter) + index);
 		}
 
-		private List<Glyph> ExtractGlyphs (System.Drawing.Bitmap bitmap, out int linespacing)
+		private List<Glyph> ExtractGlyphs (System.Drawing.Bitmap bitmap)
 		{
-			linespacing = 0;
 			var glyphs = new List<Glyph> (); 
 			var regions = new List<System.Drawing.Rectangle> ();
 			for (int y = 0; y < bitmap.Height; y++) {
@@ -58,7 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 							// we got a glyph :)
 							regions.Add (new System.Drawing.Rectangle (left, top, right - left, bottom - top));
 							x = right;
-							linespacing = Math.Max (linespacing, bottom - top);
 						} else {
 							x += re.Width;
 						}
@@ -68,11 +68,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			for(int i=0; i < regions.Count; i++) {
 				var rect = regions[i];
-				rect.Inflate (-1, -1);
 				var newbitmap = new System.Drawing.Bitmap(rect.Width, rect.Height);
 				BitmapUtils.CopyRect (bitmap, rect, newbitmap, new System.Drawing.Rectangle (0,0, rect.Width, rect.Height));
-				glyphs.Add (new Glyph (GetCharacterForIndex (i), newbitmap));
-				//newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
+				var glyph = new Glyph (GetCharacterForIndex (i), newbitmap);
+			    glyph.CharacterWidths.B = glyph.Bitmap.Width;
+			    glyphs.Add(glyph);
+                //newbitmap.Save (GetCharacterForIndex(i)+".png", System.Drawing.Imaging.ImageFormat.Png);
 			}
 			return glyphs ;
 		}
@@ -87,22 +88,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			// after that. 
 		    var systemBitmap = input.Faces[0][0].ToSystemBitmap();
 
-			int linespacing = 0;
-            var glyphs = ExtractGlyphs(systemBitmap, out linespacing);
+            var glyphs = ExtractGlyphs(systemBitmap);
 			// Optimize.
 			foreach (Glyph glyph in glyphs) {
-				GlyphCropper.Crop (glyph);
+				GlyphCropper.Crop(glyph);
+                output.VerticalLineSpacing = Math.Max(output.VerticalLineSpacing, glyph.Subrect.Height);
 			}
 
             systemBitmap.Dispose();
-            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), true, true);
+		    var compressed = TextureFormat == TextureProcessorOutputFormat.DxtCompressed || TextureFormat == TextureProcessorOutputFormat.Compressed;
+            systemBitmap = GlyphPacker.ArrangeGlyphs(glyphs.ToArray(), compressed, compressed);
 			
 			foreach (Glyph glyph in glyphs) {
-				glyph.XAdvance += linespacing;
-				if (!output.CharacterMap.Contains (glyph.Character))
-					output.CharacterMap.Add (glyph.Character);
+				output.CharacterMap.Add (glyph.Character);
 				output.Glyphs.Add (new Rectangle (glyph.Subrect.X, glyph.Subrect.Y, glyph.Subrect.Width, glyph.Subrect.Height));
-				output.Cropping.Add (new Rectangle (0, 0, glyph.Subrect.Width, glyph.Subrect.Height));
+                output.Cropping.Add(new Rectangle((int)glyph.XOffset, (int)glyph.YOffset, glyph.Subrect.Width, glyph.Subrect.Height));
 				ABCFloat abc = glyph.CharacterWidths;
 				output.Kerning.Add (new Vector3 (abc.A, abc.B, abc.C));
 			}
@@ -110,7 +110,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			output.Texture.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
             systemBitmap.Dispose();
 
-            GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, false, false);
+            var bmp = output.Texture.Faces[0][0];
+            if (PremultiplyAlpha)
+            {
+                var data = bmp.GetPixelData();
+                var idx = 0;
+                for (; idx < data.Length; )
+                {
+                    var r = data[idx + 0];
+                    var g = data[idx + 1];
+                    var b = data[idx + 2];
+                    var a = data[idx + 3];
+                    var col = Color.FromNonPremultiplied(r, g, b, a);
+
+                    data[idx + 0] = col.R;
+                    data[idx + 1] = col.G;
+                    data[idx + 2] = col.B;
+                    data[idx + 3] = col.A;
+
+                    idx += 4;
+                }
+
+                bmp.SetPixelData(data);
+            }
+
+            if (compressed)
+                GraphicsUtil.CompressTexture(context.TargetProfile, output.Texture, context, false, PremultiplyAlpha, true);
 
 			return output;
 		}

@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.ViewManagement;
 
 namespace Microsoft.Xna.Framework.Windows8.GamerServices
 {
@@ -39,6 +40,10 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
         private const string TextTextBlockName = "TextTextBlock";
         private const string ButtonsPanelName = "ButtonsPanel";
 
+        private const string VirtualKeyboardSlideStoryBoardName = "VirtualKeyboardSlideStoryBoard";
+        private const string VirtualKeyboardAnimationName = "VirtualKeyboardAnimation";
+        private const string BlackStripeTransformName = "BlackStripeTransform";
+
         private Panel _layoutRoot;
         private Border _contentBorder;
         private TextBox _inputTextBox;
@@ -56,6 +61,12 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
         private Panel _parentPanel;
         private Panel _temporaryParentPanel;
         private ContentControl _parentContentControl;
+
+        private TranslateTransform _blackStripeTransform;
+
+        private Storyboard _virtualKeyboardSlideStoryboard;
+
+        private DoubleAnimation _virtualKeyboardSlideAnimation;
 
         public static readonly DependencyProperty ButtonStyleProperty =
             DependencyProperty.Register(
@@ -253,6 +264,10 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             _textTextBlock = GetTemplateChild(TextTextBlockName) as TextBlock;
             _buttonsPanel = GetTemplateChild(ButtonsPanelName) as Panel;
 
+            _virtualKeyboardSlideStoryboard = GetTemplateChild(VirtualKeyboardSlideStoryBoardName) as Storyboard;
+            _virtualKeyboardSlideAnimation = GetTemplateChild(VirtualKeyboardAnimationName) as DoubleAnimation;
+            _blackStripeTransform = this.GetTemplateChild(BlackStripeTransformName) as TranslateTransform;
+
             if (_layoutRoot != null) 
                 _layoutRoot.Tapped += OnLayoutRootTapped;
             if (_inputTextBox != null && _inputPasswordBox != null)
@@ -402,6 +417,9 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
             _buttons.Add(btnCancel);
             _buttonsPanel.Children.Add(btnCancel);
 
+            InputPane.GetForCurrentView().Showing += InputDialog_Showing;
+            InputPane.GetForCurrentView().Hiding += InputDialod_Hiding;
+
             if (_inputTextBox != null)
                 _inputTextBox.Focus(FocusState.Programmatic);
             if (_inputPasswordBox != null)
@@ -427,9 +445,32 @@ namespace Microsoft.Xna.Framework.Windows8.GamerServices
 #pragma warning restore 4014
             }
 
+            InputPane.GetForCurrentView().Showing -= InputDialog_Showing;
+            InputPane.GetForCurrentView().Hiding -= InputDialod_Hiding;
+
             Window.Current.Content.KeyUp -= OnGlobalKeyUp;
 
             return result;
+        }
+
+        private void InputDialod_Hiding(InputPane sender, InputPaneVisibilityEventArgs args)
+        {
+            TranslateStripeTo(0);
+        }
+
+        void InputDialog_Showing(Windows.UI.ViewManagement.InputPane sender, Windows.UI.ViewManagement.InputPaneVisibilityEventArgs args)
+        {
+            TranslateStripeTo(args.OccludedRect.Height / -2);
+        }
+
+        private void TranslateStripeTo(double value)
+        {
+            if (_virtualKeyboardSlideAnimation == null || _virtualKeyboardSlideStoryboard == null)
+                return;
+
+            _blackStripeTransform.Y = value;
+            //_virtualKeyboardSlideAnimation.To = value;
+            //_virtualKeyboardSlideStoryboard.Begin();
         }
 
         static async Task WaitForLayoutUpdateAsync(FrameworkElement frameworkElement)
