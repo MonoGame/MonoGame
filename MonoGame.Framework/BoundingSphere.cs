@@ -340,7 +340,7 @@ namespace Microsoft.Xna.Framework
 
         public void Intersects(ref BoundingBox box, out bool result)
         {
-            box.Intersects(ref box, out result);
+            box.Intersects(ref this, out result);
         }
 
         /*
