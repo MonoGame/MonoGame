@@ -72,6 +72,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             #endregion
 
+            #region GL_NV_framebuffer_multisample
+
+            internal const All AllFramebufferIncompleteMultisampleNV = (All)0x8D56;
+            internal const All AllMaxSamplesNV = (All)0x8D57;
+            internal const All AllReadFramebufferNV = (All)0x8CA8;
+            internal const All AllDrawFramebufferNV = (All)0x8CA9;
+            internal const All AllRenderBufferSamplesNV = (All)0x8CAB;
+
+            [DllImport(OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleNV")]
+            internal extern static void GLRenderbufferStorageMultisampleNV(All target, int samples, All internalformat, int width, int height);
+
+            [DllImport(OpenGLLibrary, EntryPoint = "glBlitFramebufferNV")]
+            internal extern static void GLBlitFramebufferNV(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, TextureMagFilter filter);
+
+            #endregion
+
             #region GL_IMG_multisampled_render_to_texture
 
             internal const All AllFramebufferIncompleteMultisampleImg = (All)0x9134;
@@ -122,9 +138,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.GLBlitFramebuffer = new GLBlitFramebufferDelegate(GLBlitFramebufferApple);
                     this.AllReadFramebuffer = AllReadFramebufferApple;
                     this.AllDrawFramebuffer = AllDrawFramebufferApple;
-                    
                 }
-                if (graphicsDevice._extensions.Contains("GL_EXT_multisampled_render_to_texture"))
+                else if (graphicsDevice._extensions.Contains("GL_EXT_multisampled_render_to_texture"))
                 {
                     this.GLRenderbufferStorageMultisample = new GLRenderbufferStorageMultisampleDelegate(GLRenderbufferStorageMultisampleExt);
                     this.GLFramebufferTexture2DMultisample = new GLFramebufferTexture2DMultisampleDelegate(GLFramebufferTexture2DMultisampleExt);
@@ -133,6 +148,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     this.GLRenderbufferStorageMultisample = new GLRenderbufferStorageMultisampleDelegate(GLRenderbufferStorageMultisampleImg);
                     this.GLFramebufferTexture2DMultisample = new GLFramebufferTexture2DMultisampleDelegate(GLFramebufferTexture2DMultisampleImg);
+                }
+                else if (graphicsDevice._extensions.Contains("GL_NV_framebuffer_multisample"))
+                {
+                    this.GLRenderbufferStorageMultisample = new GLRenderbufferStorageMultisampleDelegate(GLRenderbufferStorageMultisampleNV);
+                    this.GLBlitFramebuffer = new GLBlitFramebufferDelegate(GLBlitFramebufferNV);
+                    this.AllReadFramebuffer = AllReadFramebufferNV;
+                    this.AllDrawFramebuffer = AllDrawFramebufferNV;
                 }
 
                 this.SupportsBlitFramebuffer = this.GLBlitFramebuffer != null;
