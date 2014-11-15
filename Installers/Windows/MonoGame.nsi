@@ -281,6 +281,25 @@ Section "Visual Studio 2013 Templates" VS2013
 
 SectionEnd
 
+Section "Visual Studio 2014 Templates" VS2014
+
+  IfFileExists `$DOCUMENTS\Visual Studio 14\Templates\ProjectTemplates\Visual C#\*.*` InstallTemplates CannotInstallTemplates
+  InstallTemplates:
+    ; Set output path to the installation directory.
+    SetOutPath "$DOCUMENTS\Visual Studio 14\Templates\ProjectTemplates\Visual C#\MonoGame"
+
+    ; install the Templates for MonoDevelop
+    File /r '..\..\ProjectTemplates\VisualStudio2013\*.zip'
+    ; Install the VS 2010 templates as well 
+    File /r '..\..\ProjectTemplates\VisualStudio2010\*.zip'
+    GOTO EndTemplates
+  CannotInstallTemplates:
+
+    DetailPrint "Visual Studio 2014 not found"
+  EndTemplates:
+
+SectionEnd
+
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts" Menu
 	CreateDirectory $SMPROGRAMS\${APPNAME}
@@ -376,6 +395,7 @@ Section "Uninstall"
   RMDir /r "$DOCUMENTS\Visual Studio 2010\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2012\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "$DOCUMENTS\Visual Studio 2013\Templates\ProjectTemplates\Visual C#\MonoGame"
+  RMDir /r "$DOCUMENTS\Visual Studio 14\Templates\ProjectTemplates\Visual C#\MonoGame"
   RMDir /r "${MSBuildInstallDir}"
   RMDir /r "$SMPROGRAMS\${APPNAME}"
 
