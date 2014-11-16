@@ -6,7 +6,7 @@
     for backwards compatibility with existing users of MonoGame, and are not
     required for new projects.
 
-    See https://github.com/hach-que/Protobuild/wiki/Project-GUIDs-in-Protobuild
+    See https://protobuild.readthedocs.org/en/latest/faq.html#project-guids-faq
   -->
   <ProjectGuids>
 	<Platform Name="Android">713EE5CA-C850-42AD-AC67-B6546AC8BFFB</Platform>
