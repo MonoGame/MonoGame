@@ -32,7 +32,7 @@
     <Compile Include="..\MGCB\CommandLineParser.cs">
       <Link>Common\CommandLineParser.cs</Link>
     </Compile>
-    <None Include="app.config" />
+    <None Include="App.config" />
 
     <Compile Include="Common\ActionStack.cs" />
     <Compile Include="Common\ContentFolder.cs" />
