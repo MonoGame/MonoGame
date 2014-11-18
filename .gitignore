@@ -59,6 +59,7 @@ MonoGame.Framework/*.csproj
 Tools/2MGFX/*.csproj
 Tools/MGCB/*.csproj
 Tools/Pipeline/*.csproj
+ThirdParty/Lidgren.Network/*.csproj
 Test/*.csproj
 !Test/MonoGame.Test.XNA.csproj
 /*.sln
