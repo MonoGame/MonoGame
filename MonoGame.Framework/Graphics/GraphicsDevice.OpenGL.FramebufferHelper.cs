@@ -183,7 +183,11 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenRenderbuffer(out int renderbuffer)
             {
                 renderbuffer = 0;
+#if !ANDROID
                 GL.GenRenderbuffers(1, ref renderbuffer);
+#else
+                GL.GenRenderbuffers(1, out renderbuffer);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -211,7 +215,11 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenFramebuffer(out int framebuffer)
             {
                 framebuffer = 0;
+#if !ANDROID
                 GL.GenFramebuffers(1, ref framebuffer);
+#else
+                GL.GenFramebuffers(1, out framebuffer);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
 

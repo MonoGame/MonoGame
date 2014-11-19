@@ -47,6 +47,7 @@ namespace Microsoft.Xna.Framework
             _clientBounds = new Rectangle(0, 0, context.Resources.DisplayMetrics.WidthPixels, context.Resources.DisplayMetrics.HeightPixels);
 
             GameView = new MonoGameAndroidGameView(context, this, _game);
+            GameView.RenderOnUIThread = Game.Activity.RenderOnUIThread;
             GameView.RenderFrame += OnRenderFrame;
             GameView.UpdateFrame += OnUpdateFrame;
 
