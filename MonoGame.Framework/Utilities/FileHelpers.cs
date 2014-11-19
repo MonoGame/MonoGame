@@ -9,15 +9,16 @@ namespace Microsoft.Xna.Framework.Utilities
 {
     internal static class FileHelpers
     {
-        public static char ForwardSlash = '/';
-        public static char BackwardSlash = '\\';
+        public static readonly char ForwardSlash = '/';
+        public static readonly string ForwardSlashString = new string(ForwardSlash, 1);
+        public static readonly char BackwardSlash = '\\';
 
 #if WINRT
-        public static char NotSeparator = ForwardSlash;
-        public static char Separator = BackwardSlash;
+        public static readonly char NotSeparator = ForwardSlash;
+        public static readonly char Separator = BackwardSlash;
 #else
-        public static char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
-        public static char Separator = Path.DirectorySeparatorChar;
+        public static readonly char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
+        public static readonly char Separator = Path.DirectorySeparatorChar;
 #endif
 
         public static string NormalizeFilePathSeparators(string name)
@@ -35,25 +36,23 @@ namespace Microsoft.Xna.Framework.Utilities
         /// <param name="relativeFile">Relative location of another file to resolve the path to</param>
         public static string ResolveRelativePath(string filePath, string relativeFile)
         {
-            // The Uri class can produce incorrect results with 
-            // forward slashes on some unix-like systems.  So make 
-            // sure we always pass in backslashes for the paths.
-            filePath = filePath.Replace(ForwardSlash, BackwardSlash);
-            relativeFile = relativeFile.Replace(ForwardSlash, BackwardSlash);
+            // Uri accepts forward slashes
+            filePath = filePath.Replace(BackwardSlash, ForwardSlash);
+
+            bool hasForwardSlash = filePath.StartsWith(ForwardSlashString);
+            if (!hasForwardSlash)
+                filePath = ForwardSlashString + filePath;
 
             // Get a uri for filePath using the file:// schema and no host.
-            var src = new Uri("file:///" + filePath);
+            var src = new Uri("file://" + filePath);
 
-            // Add the relative path to relativeFile.
             var dst = new Uri(src, relativeFile);
-            
+
             // The uri now contains the path to the relativeFile with 
             // relative addresses resolved... get the local path.
             var localPath = dst.LocalPath;
 
-            // We can get an unwanted extra leading slash on some 
-            // platforms which we need to trim off.
-            if (localPath.StartsWith(@"\\") || localPath.StartsWith("//"))
+            if (!hasForwardSlash && localPath.StartsWith("/"))
                 localPath = localPath.Substring(1);
 
             // Convert the directory separator characters to the 

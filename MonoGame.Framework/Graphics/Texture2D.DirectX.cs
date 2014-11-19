@@ -189,6 +189,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 #if !WINDOWS_PHONE
 
+            if (!stream.CanSeek)
+                throw new NotSupportedException("stream must support seek operations");
+
             // For reference this implementation was ultimately found through this post:
             // http://stackoverflow.com/questions/9602102/loading-textures-with-sharpdx-in-metro 
             Texture2D toReturn = null;

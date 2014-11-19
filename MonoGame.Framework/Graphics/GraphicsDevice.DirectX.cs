@@ -536,12 +536,37 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_10_1);
                 featureLevels.Add(FeatureLevel.Level_10_0);
             }
-            featureLevels.Add(FeatureLevel.Level_9_3);
-            featureLevels.Add(FeatureLevel.Level_9_2);
-            featureLevels.Add(FeatureLevel.Level_9_1);
 
-            var driverType = GraphicsAdapter.UseReferenceDevice ? DriverType.Reference : DriverType.Hardware;
-            
+            // We can not give featureLevels for granted in GraphicsProfile.Reach
+            FeatureLevel supportedFeatureLevel = 0;
+            try
+            {
+                supportedFeatureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+            }
+            catch (SharpDX.SharpDXException)
+            {   
+                // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
+            }
+
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_3)
+                featureLevels.Add(FeatureLevel.Level_9_3);
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_2)
+                featureLevels.Add(FeatureLevel.Level_9_2);
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_1)
+                featureLevels.Add(FeatureLevel.Level_9_1);
+
+            var driverType = DriverType.Hardware;   //Default value
+            switch (GraphicsAdapter.UseDriverType)
+            {
+                case GraphicsAdapter.DriverType.Reference:
+                    driverType = DriverType.Reference;
+                    break;
+
+                case GraphicsAdapter.DriverType.FastSoftware:
+                    driverType = DriverType.Warp;
+                    break;
+            }
+
 #if DEBUG
             try 
             {
@@ -1243,8 +1268,16 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             FeatureLevel featureLevel;
 
-            if (graphicsDevice == null || graphicsDevice._d3dDevice == null)
-                featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+            if (graphicsDevice == null || graphicsDevice._d3dDevice == null) {
+                try
+                {
+                    featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+                }
+                catch (SharpDXException)
+                { 
+                    featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
+                }
+            }
             else
                 featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
 
