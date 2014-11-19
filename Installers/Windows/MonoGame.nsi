@@ -109,6 +109,12 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
+  ; Make .mgcb files open in the Pipeline tool from VisualStudio 10/11/12.
+  WriteRegStr	HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb' 'Custom' 'MonoGame Pipeline' 
+  WriteRegDWORD	HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb' 'Type' 0x00000002
+  WriteRegStr	HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb\MonoGame Pipeline' '' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  WriteRegStr	HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb\MonoGame Pipeline' 'Arguments' ''
+
 
   ; Install the assemblies for all the platforms we can 
   ; target from a Windows desktop system.
@@ -344,6 +350,10 @@ Section "Uninstall"
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoTouch\v1.0\AssemblyFoldersEx\${APPNAME} for iOS'
+
+  DeleteRegKey	HKCU 'Software\Microsoft\VisualStudio\10.0\Default Editors\mgcb'
+  DeleteRegKey	HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb'
+  DeleteRegKey	HKCU 'Software\Microsoft\VisualStudio\12.0\Default Editors\mgcb'
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
