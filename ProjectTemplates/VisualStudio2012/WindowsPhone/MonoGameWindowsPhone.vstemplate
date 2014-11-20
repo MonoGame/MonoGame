@@ -8,7 +8,7 @@
     <TemplateID>MonoGame.CS.WinRT.Game</TemplateID>
     <TemplateGroupID>WinRT-Managed</TemplateGroupID>
     <ProjectType>CSharp</ProjectType>
-    <SortOrder>40</SortOrder>
+    <SortOrder>43140</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
