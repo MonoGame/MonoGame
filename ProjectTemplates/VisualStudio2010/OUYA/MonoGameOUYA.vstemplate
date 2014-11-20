@@ -3,9 +3,10 @@
     <Name>MonoGame OUYA Project</Name>
     <Description>A MonoGame game project for OUYA using Xamarin.Android 4.8.2 or greater.</Description>
     <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <ProjectSubType>
     </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+    <SortOrder>43210</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>

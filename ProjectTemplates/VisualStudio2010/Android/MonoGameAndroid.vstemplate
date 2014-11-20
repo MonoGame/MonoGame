@@ -3,9 +3,10 @@
     <Name>MonoGame Android Project</Name>
     <Description>A MonoGame game project for Android which requires "Mono for Android" by Xamarin.</Description>
     <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <ProjectSubType>
     </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+    <SortOrder>43200</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
