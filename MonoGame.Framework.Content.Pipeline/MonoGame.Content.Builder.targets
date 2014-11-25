@@ -65,7 +65,8 @@
   <Target Name="BuildContent"
         BeforeTargets="PreBuildEvent"
         DependsOnTargets="Prepare">
-    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot; /incremental "
+
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot; "
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)"/>
 
     <ItemGroup>
