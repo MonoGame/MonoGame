@@ -7,24 +7,14 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
-
   <ItemGroup>
     <AvailableItemName Include="MonoGameContentReference" />
   </ItemGroup>
 
   <!-- Get all Mono Game Content References and store them in a list -->
-
   <ItemGroup>
     <ContentReferences Include="@(MonoGameContentReference)"/>
   </ItemGroup>
-
-  <!-- Hide Content References from Solution Explorer in Visual Studio -->
-
-  <ItemDefinitionGroup>
-    <MonoGameContentReference>
-      <Visible>False</Visible>
-    </MonoGameContentReference>
-  </ItemDefinitionGroup>
 
   <Target Name="Prepare">
     <PropertyGroup>
