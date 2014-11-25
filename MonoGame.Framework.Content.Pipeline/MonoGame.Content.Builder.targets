@@ -53,7 +53,7 @@
         DependsOnTargets="Prepare">
 
     <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
-          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)"/>
+          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
 
     <ItemGroup>
 
