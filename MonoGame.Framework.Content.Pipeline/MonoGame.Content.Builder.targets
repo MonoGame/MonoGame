@@ -4,17 +4,6 @@
   file 'LICENSE.txt', which is part of this source code package.
 -->
 
-<!--
-  This file defines the steps to automatically build referenced Content Projects and copy the .xnb files to the game output directory (or android package).
-  
-  You can reference Content Projects by manually adding the code below to your game project (where Content1 is the name of your content project)
-  
-    <ItemGroup>
-      <MonoGameContentReference Include="..\Content1\Content1.contentproj">
-      </MonoGameContentReference>
-    </ItemGroup>	
--->
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
