@@ -17,11 +17,12 @@
   </ItemGroup>
 
   <Target Name="Prepare">
+
     <PropertyGroup>
       <!-- This is the path where all .xnb files will land, by default Content/-->
       <ContentRootDirectory>Content</ContentRootDirectory>
-      <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\$(MonoGamePlatform)</ParentOutputDir>
-      <ParentIntermediateDir>$(ProjectDir)$(IntermediateOutputPath)</ParentIntermediateDir>
+      <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
+      <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
 
       <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
 
