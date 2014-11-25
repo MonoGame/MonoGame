@@ -16,6 +16,11 @@
     <ContentReferences Include="@(MonoGameContentReference)"/>
   </ItemGroup>
 
+  <!-- This disables the IDE feature that skips executing msbuild in some build situations. --> 
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
   <Target Name="Prepare">
 
     <PropertyGroup>
