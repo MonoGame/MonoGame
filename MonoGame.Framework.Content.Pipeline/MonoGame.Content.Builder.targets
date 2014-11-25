@@ -19,7 +19,7 @@
   <Target Name="Prepare">
 
     <PropertyGroup>
-      <!-- This is the path where all .xnb files will land, by default Content/-->
+
       <ContentRootDirectory>Content</ContentRootDirectory>
       <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
       <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
@@ -29,7 +29,6 @@
       <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /quiet</Header>
     </PropertyGroup>
 
-    <!--  Valid platforms: Windows, Xbox360, WindowsPhone, iOS, Android, Linux, MacOSX, WindowsStoreApp, NativeClient, Ouya, PlayStationMobile, PlayStation4, WindowsPhone8, RaspberryPi -->
     <Error Text="The MonoGamePlatform property is not set"
        Condition="'$(MonoGamePlatform)' == ''" />
 
@@ -62,9 +61,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AndroidAsset>
     </ItemGroup>
-
-    <Message Text="@(ExtraContent->'$(ContentRootDirectory)\%(RecursiveDir)%(FileName)%(Extension)')"/>
-
 
 
   </Target>
