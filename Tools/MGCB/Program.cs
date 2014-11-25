@@ -32,7 +32,9 @@ namespace MGCB
             // Do we have anything to do?
             if (!content.HasWork)
             {
-                parser.ShowUsage();
+                if (!content.Quiet)
+                    parser.ShowUsage();
+
                 return 0;
             }
 
