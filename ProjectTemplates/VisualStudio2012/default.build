@@ -6,6 +6,7 @@
 
 
 	<target name="build" description="Build Visual Studio Templates">
+		<delete file="./*.zip"/>
 		<!-- Find any applications that have valid build scripts, configure their references and then build them -->
 		<foreach item="Folder" property="folder" in="./">
 			
