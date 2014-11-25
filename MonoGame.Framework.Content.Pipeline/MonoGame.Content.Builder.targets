@@ -42,7 +42,7 @@
   </Target>
 
   <Target Name="BuildContent"
-        BeforeTargets="PreBuildEvent"
+        BeforeTargets="PreBuildEvent;Rebuild"
         DependsOnTargets="Prepare">
 
     <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot; "
@@ -64,22 +64,8 @@
 
     <Message Text="@(ExtraContent->'$(ContentRootDirectory)\%(RecursiveDir)%(FileName)%(Extension)')"/>
 
-  </Target>
 
-  <Target Name="RebuildContent"
-          BeforeTargets="Rebuild"
-          DependsOnTargets="Prepare">
-    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot; /rebuild "
-          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)"/>
-  </Target>
 
-  <Target Name="CleanContent"
-          BeforeTargets="Clean"
-          DependsOnTargets="Prepare">
-
-    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot;  /clean"
-          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)"
-          />
   </Target>
 
 </Project>
