@@ -8,6 +8,8 @@
     <TemplateID>MonoGame.CS.WinRT.Game</TemplateID>
     <TemplateGroupID>WinRT-Managed</TemplateGroupID>
     <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
     <SortOrder>43140</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>Game</DefaultName>
