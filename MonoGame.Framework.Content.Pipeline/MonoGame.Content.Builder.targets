@@ -26,7 +26,8 @@
 
       <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
 
-      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /quiet</Header>
+      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
+
     </PropertyGroup>
 
     <Error Text="The MonoGamePlatform property is not set"
@@ -39,29 +40,31 @@
 
     <MakeDir Directories="$(ParentIntermediateDir)"/>
     <MakeDir Directories="$(ParentOutputDir)"/>
+
   </Target>
 
   <Target Name="BuildContent"
         BeforeTargets="PreBuildEvent;Rebuild"
         DependsOnTargets="Prepare">
 
-    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)%(ContentReferences.Filename)&quot; "
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)"/>
 
     <ItemGroup>
-      <ExtraContent Include="$(ProjectDir)$(ContentRootDirectory)\$(MonoGamePlatform)\**\*.*" />
 
-      <Content Include="@(ExtraContent->'$(ProjectDir)$(ContentRootDirectory)\$(MonoGamePlatform)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) != 'Android'">
+      <ExtraContent Include="$(ParentOutputDir)\**\*.*" />
+
+      <Content Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) != 'Android'">
         <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
 
-      <AndroidAsset Include="@(ExtraContent->'$(ProjectDir)$(ContentRootDirectory)\$(MonoGamePlatform)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) == 'Android'">
+      <AndroidAsset Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) == 'Android'">
         <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AndroidAsset>
-    </ItemGroup>
 
+    </ItemGroup>
 
   </Target>
 
