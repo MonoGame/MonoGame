@@ -33,7 +33,7 @@
       <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\$(MonoGamePlatform)</ParentOutputDir>
       <ParentIntermediateDir>$(ProjectDir)$(IntermediateOutputPath)</ParentIntermediateDir>
 
-      <MonoGameContentBuilderExe>$(MSBuildProgramFiles32)\MonoGame\v3.0\MGCB.exe</MonoGameContentBuilderExe>
+      <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
 
       <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /quiet</Header>
     </PropertyGroup>
