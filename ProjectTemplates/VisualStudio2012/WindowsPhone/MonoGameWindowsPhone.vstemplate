@@ -39,6 +39,9 @@
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\FlipCycleTileSmall.png">FlipCycleTileSmall.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\IconicTileMediumLarge.png">IconicTileMediumLarge.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\IconicTileSmall.png">IconicTileSmall.png</ProjectItem>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+      </Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>

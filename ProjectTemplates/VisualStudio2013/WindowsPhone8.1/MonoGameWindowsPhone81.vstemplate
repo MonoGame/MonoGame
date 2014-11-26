@@ -12,11 +12,11 @@
     </ProjectSubType>
     <SortOrder>43141</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>GameName</DefaultName>
+    <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
   </TemplateData>
   <TemplateContent>
     <Project TargetFileName="MonoGamePhone.csproj" File="MonoGamePhone.csproj" ReplaceParameters="true">
@@ -36,6 +36,9 @@
       <ProjectItem ReplaceParameters="false" TargetFileName="Package.appxmanifest">Package.appxmanifest</ProjectItem>
       <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      </Folder>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
       </Folder>
     </Project>
   </TemplateContent>

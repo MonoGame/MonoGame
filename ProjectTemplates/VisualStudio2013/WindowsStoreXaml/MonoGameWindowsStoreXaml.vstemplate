@@ -10,11 +10,11 @@
     <ProjectType>CSharp</ProjectType>
     <SortOrder>43130</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>GameName</DefaultName>
+    <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <TargetPlatformName>Windows</TargetPlatformName>
     <RequiredPlatformVersion>8</RequiredPlatformVersion>
     <CreateInPlace>true</CreateInPlace>
@@ -32,10 +32,11 @@
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\SmallLogo.png">SmallLogo.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\SplashScreen.png">SplashScreen.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\StoreLogo.png">StoreLogo.png</ProjectItem>
-
       <ProjectItem ReplaceParameters="false" TargetFileName="Common\StandardStyles.xaml">StandardStyles.xaml</ProjectItem>
-
       <ProjectItem ReplaceParameters="false" TargetFileName="$projectname$_TemporaryKey.pfx" BlendDoNotCreate="true">Application_TemporaryKey.pfx</ProjectItem>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+      </Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>
