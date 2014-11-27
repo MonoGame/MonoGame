@@ -817,7 +817,7 @@
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
     <Compile Include="Input\Touch\TouchQueue.cs">
-		<Platforms>WindowsPhone,WindowsPhone81</Platforms>
+		<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
 	</Compile>
 
 

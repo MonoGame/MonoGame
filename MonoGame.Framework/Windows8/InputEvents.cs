@@ -53,10 +53,13 @@ namespace Microsoft.Xna.Framework
 {
     internal class InputEvents
     {
+        private readonly TouchQueue _touchQueue;
         private readonly List<Keys> _keys = new List<Keys>();
 
-        public InputEvents(CoreWindow window, UIElement inputElement)
+        public InputEvents(CoreWindow window, UIElement inputElement, TouchQueue touchQueue)
         {
+            _touchQueue = touchQueue;
+
             // The key events are always tied to the window as those will
             // only arrive here if some other control hasn't gotten it.
             window.KeyDown += CoreWindow_KeyDown;
@@ -155,7 +158,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
+            _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Pressed, pos, !isTouch);
             
             if (!isTouch)
             {
@@ -179,7 +182,7 @@ namespace Microsoft.Xna.Framework
 
             if (touchIsDown)
             {
-                TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Moved, pos, !isTouch);
+                _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Moved, pos, !isTouch);
             }
 
             if (!isTouch)
@@ -197,7 +200,7 @@ namespace Microsoft.Xna.Framework
 
             var isTouch = pointerPoint.PointerDevice.PointerDeviceType == PointerDeviceType.Touch;
 
-            TouchPanel.AddEvent((int)pointerPoint.PointerId, TouchLocationState.Released, pos, !isTouch);
+            _touchQueue.Enqueue((int)pointerPoint.PointerId, TouchLocationState.Released, pos, !isTouch);
 
             if (!isTouch)
             {
