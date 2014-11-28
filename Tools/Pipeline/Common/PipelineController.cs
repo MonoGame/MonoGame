@@ -77,7 +77,7 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            LoadTemplates(Environment.CurrentDirectory + "\\Templates");
+            LoadTemplates(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
         }
 
         public void OnProjectModified()

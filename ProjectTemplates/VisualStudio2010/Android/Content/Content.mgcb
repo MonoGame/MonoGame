@@ -1,0 +1,15 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/Android
+/intermediateDir:obj/Android
+/platform:Android
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+
+#---------------------------------- Content ---------------------------------#
+

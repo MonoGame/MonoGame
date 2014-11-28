@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="ProjectGroup">
 	<TemplateData>
-		<Name>MonoGame Windows 8.1 Universal Project </Name>
-		<Description>A MonoGame Windows 8.1 Universal Project </Description>
-		<ProjectType>CSharp</ProjectType>
+		<Name>MonoGame Windows 8.1 Universal Project</Name>
+    <Description>A MonoGame universal game project for the Windows Store and Windows Phone 8.1.</Description>
 		<TemplateID>MonoGame.WindowsUniversal.CS.WinRT.Game</TemplateID>
     <TemplateGroupID>WinRT-Managed</TemplateGroupID>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>43150</SortOrder>
 		<CreateNewFolder>true</CreateNewFolder>
-		<LocationField>Enabled</LocationField>
 		<DefaultName>GameName</DefaultName>
 		<Icon>__TemplateIcon.png</Icon>
     <PreviewImage>__PreviewImage.png</PreviewImage>
 		<ProvideDefaultName>true</ProvideDefaultName>
-		<SortOrder>1000</SortOrder>
+    <LocationField>Enabled</LocationField>
 		<EnableLocationBrowseButton>true</EnableLocationBrowseButton>
 		<NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
 		<PromptForSaveOnCreation>true</PromptForSaveOnCreation>

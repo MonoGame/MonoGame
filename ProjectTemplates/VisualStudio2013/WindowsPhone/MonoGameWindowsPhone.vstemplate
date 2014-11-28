@@ -8,9 +8,9 @@
     <TemplateID>MonoGame.CS.WinRT.Game</TemplateID>
     <TemplateGroupID>WinRT-Managed</TemplateGroupID>
     <ProjectType>CSharp</ProjectType>
-    <SortOrder>40</SortOrder>
+    <SortOrder>43140</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>GameName</DefaultName>
+    <DefaultName>Game</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
@@ -39,10 +39,13 @@
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\FlipCycleTileSmall.png">FlipCycleTileSmall.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\IconicTileMediumLarge.png">IconicTileMediumLarge.png</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName="Assets\Tiles\IconicTileSmall.png">IconicTileSmall.png</ProjectItem>
+      <Folder Name="Content" TargetFolderName="Content">
+        <ProjectItem ReplaceParameters="true" TargetFileName="Content.mgcb">Content.mgcb</ProjectItem>
+      </Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Base, Version=12.0.0.0, Culture=Neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <Assembly>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Base, Version=11.0.0.0, Culture=Neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
     <FullClassName>Microsoft.VisualStudio.SmartDevice.ProjectSystem.Wizards.ProjectTemplateWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>
