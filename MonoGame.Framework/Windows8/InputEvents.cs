@@ -61,6 +61,7 @@ namespace Microsoft.Xna.Framework
             // only arrive here if some other control hasn't gotten it.
             window.KeyDown += CoreWindow_KeyDown;
             window.KeyUp += CoreWindow_KeyUp;
+            window.VisibilityChanged += CoreWindow_VisibilityChanged;
 
             if (inputElement != null)
             {
@@ -271,6 +272,13 @@ namespace Microsoft.Xna.Framework
 
             if (!_keys.Contains(xnaKey))
                 _keys.Add(xnaKey);
+        }
+
+        private void CoreWindow_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
+        {
+            //Forget about the held keys when we disappear as we don't receive key events for them while we are in the background
+            if (!args.Visible)
+                _keys.Clear();
         }
     }
 }
