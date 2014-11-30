@@ -1243,7 +1243,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             FeatureLevel featureLevel;
 
-            if (graphicsDevice == null || graphicsDevice._d3dDevice == null)
+            if (graphicsDevice == null || graphicsDevice._d3dDevice == null || graphicsDevice._d3dDevice.NativePointer == IntPtr.Zero)
                 featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
             else
                 featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
