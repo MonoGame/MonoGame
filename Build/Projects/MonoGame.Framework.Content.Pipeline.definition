@@ -57,9 +57,6 @@
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="Audio\ConversionFormat.cs" />
     <Compile Include="Audio\ConversionQuality.cs" />
-    <Compile Include="Audio\ConvertAudio.cs">
-      <Platforms>MacOS</Platforms>
-    </Compile>
 
 
     <!-- MonoGame.Framework.Content.Pipeline.Builder -->
