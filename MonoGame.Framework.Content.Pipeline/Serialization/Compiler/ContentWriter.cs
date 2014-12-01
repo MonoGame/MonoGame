@@ -189,8 +189,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         void WriteSharedResources()
         {
-            foreach (var resource in sharedResources)
+            for (int i = 0; i < sharedResources.Count; i++)
+            {
+                var resource = sharedResources[i];
                 WriteObject<object>(resource);
+            }
         }
 
         /// <summary>
