@@ -90,6 +90,7 @@
     <Compile Include="Framework\PackedVectorTest.cs" />
     <Compile Include="Framework\TouchCollectionTest.cs" />
     <Compile Include="Framework\TouchPanelTest.cs" />
+    <Compile Include="Framework\TouchLocationTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
