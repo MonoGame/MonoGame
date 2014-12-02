@@ -44,6 +44,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
             _collection = touches;
         }
 
+        internal TouchCollection(List<InternalTouchLocation> touches)
+        {
+            _collection = new TouchLocation[touches.Count];
+            for (int i = 0; i < touches.Count; i++)
+                _collection[i] = touches[i].ToTouchLocation();
+        }
+
         /// <summary>
         /// Returns <see cref="TouchLocation"/> specified by ID.
         /// </summary>
