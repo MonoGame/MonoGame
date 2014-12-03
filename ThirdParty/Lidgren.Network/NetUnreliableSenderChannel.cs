@@ -45,9 +45,12 @@ namespace Lidgren.Network
 		internal override NetSendResult Enqueue(NetOutgoingMessage message)
 		{
 			int queueLen = m_queuedSends.Count + 1;
-			int left = m_windowSize - ((m_sendStart + NetConstants.NumSequenceNumbers) - m_windowStart) % NetConstants.NumSequenceNumbers;
-			if (queueLen > left)
+			int left = GetAllowedSends();
+			if (queueLen > left || (message.LengthBytes > m_connection.m_currentMTU && m_connection.m_peerConfiguration.UnreliableSizeBehaviour == NetUnreliableSizeBehaviour.DropAboveMTU))
+			{
+				m_connection.Peer.Recycle(message);
 				return NetSendResult.Dropped;
+			}
 
 			m_queuedSends.Enqueue(message);
 			return NetSendResult.Sent;
@@ -65,12 +68,12 @@ namespace Lidgren.Network
 			{
 				NetOutgoingMessage om;
 				if (m_queuedSends.TryDequeue(out om))
-					ExecuteSend(now, om);
+					ExecuteSend(om);
 				num--;
 			}
 		}
 
-		private void ExecuteSend(float now, NetOutgoingMessage message)
+		private void ExecuteSend(NetOutgoingMessage message)
 		{
 			m_connection.m_peer.VerifyNetworkThread();
 
