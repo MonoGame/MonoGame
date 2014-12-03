@@ -3,7 +3,7 @@
   Name="Lidgren.Network"
   Path="ThirdParty/Lidgren.Network"
   Type="Library"
-  Platforms="Android,Linux,MacOS,Ouya,PSMobile,Windows,WindowsGL,iOS">
+  Platforms="Android,Linux,MacOS,Ouya,Windows,WindowsGL,iOS">
 
   <!--
     Using Protobuild in your own project?  ProjectGuids are only in use here
