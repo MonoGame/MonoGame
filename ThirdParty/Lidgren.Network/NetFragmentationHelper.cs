@@ -152,8 +152,9 @@ namespace Lidgren.Network
 
 		internal static int GetBestChunkSize(int group, int totalBytes, int mtu)
 		{
-			int tryNumChunks = (totalBytes / (mtu - 8)) + 1;
-			int tryChunkSize = (totalBytes / tryNumChunks) + 1; // +1 since we immediately decrement it in the loop
+			int tryChunkSize = mtu - NetConstants.HeaderByteSize - 4; // naive approximation
+			int est = GetFragmentationHeaderSize(group, totalBytes, tryChunkSize, totalBytes / tryChunkSize);
+			tryChunkSize = mtu - NetConstants.HeaderByteSize - est; // slightly less naive approximation
 
 			int headerSize = 0;
 			do
@@ -164,9 +165,9 @@ namespace Lidgren.Network
 				if (numChunks * tryChunkSize < totalBytes)
 					numChunks++;
 
-				headerSize = GetFragmentationHeaderSize(group, totalBytes, tryChunkSize, numChunks);
+				headerSize = GetFragmentationHeaderSize(group, totalBytes, tryChunkSize, numChunks); // 4+ bytes
 
-			} while (tryChunkSize + headerSize + 5 + 1 >= mtu);
+			} while (tryChunkSize + headerSize + NetConstants.HeaderByteSize + 1 >= mtu);
 
 			return tryChunkSize;
 		}

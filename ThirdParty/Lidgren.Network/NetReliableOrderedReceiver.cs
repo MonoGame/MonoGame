@@ -37,7 +37,7 @@ namespace Lidgren.Network
 				//
 				// excellent, right on time
 				//
-				m_peer.LogVerbose("Received RIGHT-ON-TIME " + message);
+				//m_peer.LogVerbose("Received RIGHT-ON-TIME " + message);
 
 				AdvanceWindow();
 				m_peer.ReleaseMessage(message);
