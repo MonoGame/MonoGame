@@ -138,6 +138,7 @@ namespace MonoGame.Tools.Pipeline
         public string DisplayName;
         public ProcessorPropertyCollection Properties;
         public Type InputType;
+        public Type OutputType;
 
         public override string ToString()
         {
@@ -145,7 +146,7 @@ namespace MonoGame.Tools.Pipeline
         }
     };
 
-    internal class PipelineTypes
+    public class PipelineTypes
     {
         [DebuggerDisplay("ImporterInfo: {Type.Name}")]
         private struct ImporterInfo
@@ -290,12 +291,14 @@ namespace MonoGame.Tools.Pipeline
                 }
 
                 var inputType = (obj as IContentProcessor).InputType;
+                var outputType = (obj as IContentProcessor).OutputType;
                 var desc = new ProcessorTypeDescription()
                 {
                     TypeName = item.Type.Name,
                     DisplayName = item.Attribute.DisplayName,
                     Properties = new ProcessorTypeDescription.ProcessorPropertyCollection(properties),
                     InputType = inputType,
+                    OutputType = outputType,
                 };
                 if (string.IsNullOrEmpty(desc.DisplayName))
                     desc.DisplayName = desc.TypeName;
