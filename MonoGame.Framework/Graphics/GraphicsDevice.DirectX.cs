@@ -536,11 +536,36 @@ namespace Microsoft.Xna.Framework.Graphics
                 featureLevels.Add(FeatureLevel.Level_10_1);
                 featureLevels.Add(FeatureLevel.Level_10_0);
             }
+
+            // We can not give featureLevels for granted in GraphicsProfile.Reach
+            FeatureLevel supportedFeatureLevel = 0;
+            try
+            {
+                supportedFeatureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+            }
+            catch (SharpDX.SharpDXException)
+            {   
+                // if GetSupportedFeatureLevel() fails, do not crash the initialization. Program can run without this.
+            }
+
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_3)
             featureLevels.Add(FeatureLevel.Level_9_3);
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_2)
             featureLevels.Add(FeatureLevel.Level_9_2);
+            if (supportedFeatureLevel >= FeatureLevel.Level_9_1)
             featureLevels.Add(FeatureLevel.Level_9_1);
 
-            var driverType = GraphicsAdapter.UseReferenceDevice ? DriverType.Reference : DriverType.Hardware;
+            var driverType = DriverType.Hardware;   //Default value
+            switch (GraphicsAdapter.UseDriverType)
+            {
+                case GraphicsAdapter.DriverType.Reference:
+                    driverType = DriverType.Reference;
+                    break;
+
+                case GraphicsAdapter.DriverType.FastSoftware:
+                    driverType = DriverType.Warp;
+                    break;
+            }
             
 #if DEBUG
             try 
@@ -999,7 +1024,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: This code assumes _d3dContext has been locked by the caller.
             Debug.Assert(_d3dContext != null, "The d3d context is null!");
 
-            if ( _scissorRectangleDirty )
+            if (_scissorRectangleDirty)
 	        {
 	            _d3dContext.Rasterizer.SetScissorRectangle(
                     _scissorRectangle.X, 
@@ -1014,12 +1039,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 _blendState.PlatformApplyState(this);
                 _blendStateDirty = false;
             }
-	        if ( _depthStencilStateDirty )
+            if (_depthStencilStateDirty)
             {
 	            _depthStencilState.PlatformApplyState(this);
                 _depthStencilStateDirty = false;
             }
-	        if ( _rasterizerStateDirty )
+            if (_rasterizerStateDirty)
             {
 	            _rasterizerState.PlatformApplyState(this);
 	            _rasterizerStateDirty = false;
@@ -1243,10 +1268,17 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             FeatureLevel featureLevel;
 
+            try
+            {
             if (graphicsDevice == null || graphicsDevice._d3dDevice == null || graphicsDevice._d3dDevice.NativePointer == IntPtr.Zero)
                 featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
             else
                 featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
+            }
+            catch (SharpDXException)
+            {
+                featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
+            }
 
             GraphicsProfile graphicsProfile;
 

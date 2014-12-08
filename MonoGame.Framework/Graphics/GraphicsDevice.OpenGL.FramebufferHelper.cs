@@ -21,6 +21,7 @@ using OpenTK.Graphics.OpenGL;
 
 #if GLES
 using OpenTK.Graphics.ES20;
+using System.Security;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -38,15 +39,17 @@ namespace Microsoft.Xna.Framework.Graphics
             internal const string OpenGLLibrary = MonoTouch.Constants.OpenGLESLibrary;
 #elif ANDROID
             internal const string OpenGLLibrary = "libGLESv2.dll";
+            [DllImport("libEGL.dll", EntryPoint = "eglGetProcAddress")]
+            public static extern IntPtr EGLGetProcAddress(string funcname);
 #endif
-
             #region GL_EXT_discard_framebuffer
 
             internal const All AllColorExt = (All)0x1800;
             internal const All AllDepthExt = (All)0x1801;
             internal const All AllStencilExt = (All)0x1802;
 
-            [DllImport(OpenGLLibrary, EntryPoint = "glDiscardFramebufferEXT")]
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(OpenGLLibrary, EntryPoint = "glDiscardFramebufferEXT", ExactSpelling = true)]
             internal extern static void GLDiscardFramebufferExt(All target, int numAttachments, [MarshalAs(UnmanagedType.LPArray)] All[] attachments);
 
             #endregion
@@ -59,10 +62,12 @@ namespace Microsoft.Xna.Framework.Graphics
             internal const All AllDrawFramebufferApple = (All)0x8CA9;
             internal const All AllRenderBufferSamplesApple = (All)0x8CAB;
 
-            [DllImport(OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleAPPLE")]
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleAPPLE", ExactSpelling = true)]
             internal extern static void GLRenderbufferStorageMultisampleApple(All target, int samples, All internalformat, int width, int height);
 
-            [DllImport(OpenGLLibrary, EntryPoint = "glResolveMultisampleFramebufferAPPLE")]
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(OpenGLLibrary, EntryPoint = "glResolveMultisampleFramebufferAPPLE", ExactSpelling = true)]
             internal extern static void GLResolveMultisampleFramebufferApple();
 
             internal void GLBlitFramebufferApple(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, TextureMagFilter filter)
@@ -72,16 +77,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
             #endregion
 
+            #region GL_NV_framebuffer_multisample
+
+            internal const All AllFramebufferIncompleteMultisampleNV = (All)0x8D56;
+            internal const All AllMaxSamplesNV = (All)0x8D57;
+            internal const All AllReadFramebufferNV = (All)0x8CA8;
+            internal const All AllDrawFramebufferNV = (All)0x8CA9;
+            internal const All AllRenderBufferSamplesNV = (All)0x8CAB;
+
+            #endregion
+
             #region GL_IMG_multisampled_render_to_texture
 
             internal const All AllFramebufferIncompleteMultisampleImg = (All)0x9134;
             internal const All AllMaxSamplesImg = (All)0x9135;
-
-            [DllImport(OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleIMG")]
-            internal extern static void GLRenderbufferStorageMultisampleImg(All target, int samples, All internalformat, int width, int height);
-
-            [DllImport(OpenGLLibrary, EntryPoint = "glFramebufferTexture2DMultisampleIMG")]
-            internal extern static void GLFramebufferTexture2DMultisampleImg(All target, All attachment, All textarget, int texture, int level, int samples);
 
             #endregion
 
@@ -90,18 +99,14 @@ namespace Microsoft.Xna.Framework.Graphics
             internal const All AllFramebufferIncompleteMultisampleExt = (All)0x8D56;
             internal const All AllMaxSamplesExt = (All)0x8D57;
 
-            [DllImport(OpenGLLibrary, EntryPoint = "glRenderbufferStorageMultisampleEXT")]
-            internal extern static void GLRenderbufferStorageMultisampleExt(All target, int samples, All internalformat, int width, int height);
-
-            [DllImport(OpenGLLibrary, EntryPoint = "glFramebufferTexture2DMultisampleEXT")]
-            internal extern static void GLFramebufferTexture2DMultisampleExt(All target, All attachment, All textarget, int texture, int level, int samples);
-
             #endregion
 
+            internal delegate void GLInvalidateFramebufferDelegate(All target, int numAttachments, All[] attachments);
             internal delegate void GLRenderbufferStorageMultisampleDelegate(All target, int samples, All internalFormat, int width, int height);
             internal delegate void GLBlitFramebufferDelegate(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, TextureMagFilter filter);
             internal delegate void GLFramebufferTexture2DMultisampleDelegate(All target, All attachment, All textarget, int texture, int level, int samples);
 
+            internal GLInvalidateFramebufferDelegate GLInvalidateFramebuffer;
             internal GLRenderbufferStorageMultisampleDelegate GLRenderbufferStorageMultisample;
             internal GLFramebufferTexture2DMultisampleDelegate GLFramebufferTexture2DMultisample;
             internal GLBlitFramebufferDelegate GLBlitFramebuffer;
@@ -111,8 +116,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             internal FramebufferHelper(GraphicsDevice graphicsDevice)
             {
+#if IOS
                 if (graphicsDevice._extensions.Contains("GL_EXT_discard_framebuffer"))
                 {
+                    this.GLInvalidateFramebuffer = new GLInvalidateFramebufferDelegate(GLDiscardFramebufferExt);
                     this.SupportsInvalidateFramebuffer = true;
                 }
 
@@ -122,18 +129,53 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.GLBlitFramebuffer = new GLBlitFramebufferDelegate(GLBlitFramebufferApple);
                     this.AllReadFramebuffer = AllReadFramebufferApple;
                     this.AllDrawFramebuffer = AllDrawFramebufferApple;
-                    
+                }
+#elif ANDROID
+                // eglGetProcAddress doesn't guarantied returning NULL if the entry point doesn't exist. The returned address *should* be the same for all invalid entry point
+                var invalidFuncPtr = EGLGetProcAddress("InvalidFunctionName");
+
+                if (graphicsDevice._extensions.Contains("GL_EXT_discard_framebuffer"))
+                {
+                    var glDiscardFramebufferEXTPtr = EGLGetProcAddress("glDiscardFramebufferEXT");
+                    if (glDiscardFramebufferEXTPtr != invalidFuncPtr)
+                    {
+                        this.GLInvalidateFramebuffer = Marshal.GetDelegateForFunctionPointer<GLInvalidateFramebufferDelegate>(glDiscardFramebufferEXTPtr);
+                        this.SupportsInvalidateFramebuffer = true;
+                    }
                 }
                 if (graphicsDevice._extensions.Contains("GL_EXT_multisampled_render_to_texture"))
                 {
-                    this.GLRenderbufferStorageMultisample = new GLRenderbufferStorageMultisampleDelegate(GLRenderbufferStorageMultisampleExt);
-                    this.GLFramebufferTexture2DMultisample = new GLFramebufferTexture2DMultisampleDelegate(GLFramebufferTexture2DMultisampleExt);
+                    var glRenderbufferStorageMultisampleEXTPtr = EGLGetProcAddress("glRenderbufferStorageMultisampleEXT");
+                    var glFramebufferTexture2DMultisampleEXTPtr = EGLGetProcAddress("glFramebufferTexture2DMultisampleEXT");
+                    if (glRenderbufferStorageMultisampleEXTPtr != invalidFuncPtr && glFramebufferTexture2DMultisampleEXTPtr != invalidFuncPtr)
+                    {
+                        this.GLRenderbufferStorageMultisample = Marshal.GetDelegateForFunctionPointer<GLRenderbufferStorageMultisampleDelegate>(glRenderbufferStorageMultisampleEXTPtr);
+                        this.GLFramebufferTexture2DMultisample = Marshal.GetDelegateForFunctionPointer<GLFramebufferTexture2DMultisampleDelegate>(glFramebufferTexture2DMultisampleEXTPtr);
+                    }
                 }
                 else if (graphicsDevice._extensions.Contains("GL_IMG_multisampled_render_to_texture"))
                 {
-                    this.GLRenderbufferStorageMultisample = new GLRenderbufferStorageMultisampleDelegate(GLRenderbufferStorageMultisampleImg);
-                    this.GLFramebufferTexture2DMultisample = new GLFramebufferTexture2DMultisampleDelegate(GLFramebufferTexture2DMultisampleImg);
+                    var glRenderbufferStorageMultisampleIMGPtr = EGLGetProcAddress("glRenderbufferStorageMultisampleIMG");
+                    var glFramebufferTexture2DMultisampleIMGPtr = EGLGetProcAddress("glFramebufferTexture2DMultisampleIMG");
+                    if (glRenderbufferStorageMultisampleIMGPtr != invalidFuncPtr && glFramebufferTexture2DMultisampleIMGPtr != invalidFuncPtr)
+                    {
+                        this.GLRenderbufferStorageMultisample = Marshal.GetDelegateForFunctionPointer<GLRenderbufferStorageMultisampleDelegate>(glRenderbufferStorageMultisampleIMGPtr);
+                        this.GLFramebufferTexture2DMultisample = Marshal.GetDelegateForFunctionPointer<GLFramebufferTexture2DMultisampleDelegate>(glFramebufferTexture2DMultisampleIMGPtr);
+                    }
                 }
+                else if (graphicsDevice._extensions.Contains("GL_NV_framebuffer_multisample"))
+                {
+                    var glRenderbufferStorageMultisampleNVPtr = EGLGetProcAddress("glRenderbufferStorageMultisampleNV");
+                    var glBlitFramebufferNVPtr = EGLGetProcAddress("glBlitFramebufferNV");
+                    if (glRenderbufferStorageMultisampleNVPtr != invalidFuncPtr && glBlitFramebufferNVPtr != invalidFuncPtr)
+                    {
+                        this.GLRenderbufferStorageMultisample = Marshal.GetDelegateForFunctionPointer<GLRenderbufferStorageMultisampleDelegate>(glRenderbufferStorageMultisampleNVPtr);
+                        this.GLBlitFramebuffer = Marshal.GetDelegateForFunctionPointer<GLBlitFramebufferDelegate>(glBlitFramebufferNVPtr);
+                        this.AllReadFramebuffer = AllReadFramebufferNV;
+                        this.AllDrawFramebuffer = AllDrawFramebufferNV;
+                    }
+                }
+#endif
 
                 this.SupportsBlitFramebuffer = this.GLBlitFramebuffer != null;
             }
@@ -141,7 +183,11 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenRenderbuffer(out int renderbuffer)
             {
                 renderbuffer = 0;
+#if !ANDROID
                 GL.GenRenderbuffers(1, ref renderbuffer);
+#else
+                GL.GenRenderbuffers(1, out renderbuffer);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -169,7 +215,11 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void GenFramebuffer(out int framebuffer)
             {
                 framebuffer = 0;
+#if !ANDROID
                 GL.GenFramebuffers(1, ref framebuffer);
+#else
+                GL.GenFramebuffers(1, out framebuffer);
+#endif
                 GraphicsExtensions.CheckGLError();
             }
 
@@ -191,13 +241,13 @@ namespace Microsoft.Xna.Framework.Graphics
             internal virtual void InvalidateDrawFramebuffer()
             {
                 Debug.Assert(this.SupportsInvalidateFramebuffer);
-                GLDiscardFramebufferExt(AllDrawFramebuffer, 3, GLDiscardAttachements);
+                this.GLInvalidateFramebuffer(AllDrawFramebuffer, 3, GLDiscardAttachements);
             }
 
             internal virtual void InvalidateReadFramebuffer()
             {
                 Debug.Assert(this.SupportsInvalidateFramebuffer);
-                GLDiscardFramebufferExt(AllReadFramebuffer, 3, GLDiscardAttachements);
+                this.GLInvalidateFramebuffer(AllReadFramebuffer, 3, GLDiscardAttachements);
             }
 
             internal virtual void DeleteFramebuffer(int framebuffer)

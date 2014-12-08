@@ -34,7 +34,7 @@ namespace MonoGame.Framework
             MetroGamePlatform.LaunchParameters = launchParameters;
 
             // Setup the window class.
-            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel);
+            MetroGameWindow.Instance.Initialize(window, swapChainBackgroundPanel, MetroGamePlatform.TouchQueue);
 
             // Construct the game.
             var game = new T();

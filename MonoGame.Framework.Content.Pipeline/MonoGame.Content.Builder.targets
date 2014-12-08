@@ -4,121 +4,73 @@
   file 'LICENSE.txt', which is part of this source code package.
 -->
 
-<!--
-  This file defines the steps to automatically build referenced Content Projects and copy the .xnb files to the game output directory (or android package).
-  
-  You can reference Content Projects by manually adding the code below to your game project (where Content1 is the name of your content project)
-  
-    <ItemGroup>
-      <MonoGameContentReference Include="..\Content1\Content1.contentproj">
-      </MonoGameContentReference>
-    </ItemGroup>	
--->
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
-    <CoreBuildDependsOn>
-      MonoGame_BuildContentProjects;
-      $(CoreBuildDependsOn)
-    </CoreBuildDependsOn>
-
-    <CoreCleanDependsOn>
-      MonoGame_CleanContentProjects;
-      $(CoreCleanDependsOn)
-    </CoreCleanDependsOn>
-  </PropertyGroup>
-
-  <!-- Hide Content References from Solution Explorer in Visual Studio -->
-  
-  <ItemDefinitionGroup>
-    <MonoGameContentReference>
-        <Visible>False</Visible>
-    </MonoGameContentReference>
-  </ItemDefinitionGroup>
+  <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
+  <ItemGroup>
+    <AvailableItemName Include="MonoGameContentReference" />
+  </ItemGroup>
 
   <!-- Get all Mono Game Content References and store them in a list -->
-  
   <ItemGroup>
-      <ContentReferences Include="@(MonoGameContentReference)"/>
+    <ContentReferences Include="@(MonoGameContentReference)"/>
   </ItemGroup>
-  
+
+  <!-- This disables the IDE feature that skips executing msbuild in some build situations. --> 
   <PropertyGroup>
-     <!-- This is the path where all .xnb files will land, by default bin/Content/-->
-     <ParentOutputDir>$(TargetDir)</ParentOutputDir>
-	 
-	 <!-- For Android copy the .xnb files to "obj/assets/.." so they will be packaged with the application -->
-	 <ParentOutputDir Condition="'$(MonoGamePlatform)' == 'Android'">$(MSBuildProjectDirectory)\$(IntermediateOutputPath)assets\</ParentOutputDir>
-	 
-	 <ParentIntermediateDir>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</ParentIntermediateDir>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
-  
-  <PropertyGroup>
-    <MonoGame_BuildContentProjectsDependsOn>
-      PrepareForBuild;
-    </MonoGame_BuildContentProjectsDependsOn>
-  </PropertyGroup>
-  
-  <!-- This step builds all referenced Content Projects using MSBuild task and passes all required properties to target project -->
-  
-  <Target Name="MonoGame_BuildContentProjects"
-  
-    DependsOnTargets="$(MonoGame_BuildContentProjectsDependsOn)">
 
-	<Error Text="The MonoGamePlatform property must be set to * Windows * Xbox360 * WindowsPhone * iOS * Android * Linux * MacOSX * WindowsStoreApp * NativeClient * Ouya * PlayStationMobile * PlayStation4 * WindowsPhone8 * RaspberryPi" 
-             Condition="'$(MonoGamePlatform)' != 'Windows' And
-                        '$(MonoGamePlatform)' != 'Xbox360' And
-                        '$(MonoGamePlatform)' != 'WindowsPhone' And
-                        '$(MonoGamePlatform)' != 'iOS' And
-                        '$(MonoGamePlatform)' != 'Android' And
-                        '$(MonoGamePlatform)' != 'Linux' And
-                        '$(MonoGamePlatform)' != 'MacOSX' And
-                        '$(MonoGamePlatform)' != 'WindowsStoreApp' And
-                        '$(MonoGamePlatform)' != 'NativeClient' And
-                        '$(MonoGamePlatform)' != 'Ouya' And
-                        '$(MonoGamePlatform)' != 'PlayStationMobile' And
-                        '$(MonoGamePlatform)' != 'PlayStation4' And
-                        '$(MonoGamePlatform)' != 'WindowsPhone8' And
-                        '$(MonoGamePlatform)' != 'RaspberryPi'" />
-	
-	<!-- You may want to uncomment this line for debug purposes -->
-	<!--<Message Text="Building MonoGame Content ### Configuration=$(Configuration); Platform=$(Platform); MonoGamePlatform=$(MonoGamePlatform); OutputPath=$(ParentOutputDir); IntermediateOutputPath=$(ParentIntermediateDir); ParentProjectDir=$(ProjectDir);"/>-->
-	
-	<Message Importance="high" Text="Building MonoGame Content Project for: $(MonoGamePlatform), Output Directory: $(ParentOutputDir)"/>
-	
-    <MSBuild
-      Projects="@(ContentReferences)"
-      BuildInParallel="true"
-      Properties="Configuration=$(Configuration); Platform=$(Platform); MonoGamePlatform=$(MonoGamePlatform); OutputPath=$(ParentOutputDir); IntermediateOutputPath=$(ParentIntermediateDir); ParentProjectDir=$(ProjectDir); UsingContentBuilder=True;"
-      Condition="'@(ContentReferences)'!=''">
+  <Target Name="Prepare">
 
-      <Output TaskParameter="TargetOutputs" ItemName="MonoGame_BuiltContentProjects"/>
+    <PropertyGroup>
 
-    </MSBuild>
+      <ContentRootDirectory>Content</ContentRootDirectory>
+      <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
+      <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
+
+      <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
+
+      <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
+
+    </PropertyGroup>
+
+    <Error Text="The MonoGamePlatform property is not set"
+       Condition="'$(MonoGamePlatform)' == ''" />
+
+    <Error
+        Text="MonoGame Content Builder could not be located at '$(MonoGameContentBuilderExe)'"
+        Condition="!Exists('$(MonoGameContentBuilderExe)')"
+      />
+
+    <MakeDir Directories="$(ParentIntermediateDir)"/>
+    <MakeDir Directories="$(ParentOutputDir)"/>
 
   </Target>
-  
-  <PropertyGroup>
-    <MonoGame_CleanContentProjectsDependsOn>
-    </MonoGame_CleanContentProjectsDependsOn>
-  </PropertyGroup>
-  
-  <Target Name="MonoGame_CleanContentProjects"
-  
-    DependsOnTargets="$(MonoGame_CleanContentProjectsDependsOn)">
 
-    <MSBuild
-      Projects="@(ContentReferences)"
-      Targets="Clean"
-      Properties="Configuration=$(Configuration); Platform=$(Platform); MonoGamePlatform=$(MonoGamePlatform); OutputPath=$(ParentOutputDir); IntermediateOutputPath=$(ParentIntermediateDir); ParentProjectDir=$(ProjectDir); UsingContentBuilder=True;"
-      Condition="'@(ContentReferences)'!=''" />
+  <Target Name="BuildContent"
+        BeforeTargets="PreBuildEvent;Rebuild"
+        DependsOnTargets="Prepare">
+
+    <Exec Command="&quot;$(MonoGameContentBuilderExe)&quot; /@:&quot;%(ContentReferences.FullPath)&quot; $(Header)"
+          WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />
+
+    <ItemGroup>
+
+      <ExtraContent Include="$(ParentOutputDir)\**\*.*" />
+
+      <Content Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) != 'Android'">
+        <Link>$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+
+      <AndroidAsset Include="@(ExtraContent->'$(ParentOutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="$(MonoGamePlatform) == 'Android'">
+        <Link>Assets\$(ContentRootDirectory)\%(ExtraContent.RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </AndroidAsset>
+
+    </ItemGroup>
 
   </Target>
-  
-  <!-- Add MonoGameContentReference to item type selection in Visual Studio -->
-  
-  <ItemGroup>
-	<AvailableItemName Include="MonoGameContentReference" />
-  </ItemGroup>
-  
+
 </Project>

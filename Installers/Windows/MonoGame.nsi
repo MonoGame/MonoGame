@@ -64,6 +64,23 @@ RequestExecutionLevel admin
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
+
+!macro VS_ASSOCIATE_EDITOR TOOLNAME VSVERSION EXT TOOLPATH
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}' 'Custom' '${TOOLNAME}'
+  WriteRegDWORD HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}' 'Type' 0x00000002
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}\${TOOLNAME}' '' '${TOOLPATH}'
+  WriteRegStr   HKCU 'Software\Microsoft\VisualStudio\${VSVERSION}\Default Editors\${EXT}\${TOOLNAME}' 'Arguments' ''
+!macroend
+
+!macro APP_ASSOCIATE EXT FILECLASS DESCRIPTION ICON COMMANDTEXT COMMAND
+  WriteRegStr HKCR ".${EXT}" "" "${FILECLASS}" 
+  WriteRegStr HKCR "${FILECLASS}" "" `${DESCRIPTION}`
+  WriteRegStr HKCR "${FILECLASS}\DefaultIcon" "" `${ICON}`
+  WriteRegStr HKCR "${FILECLASS}\shell" "" "open"
+  WriteRegStr HKCR "${FILECLASS}\shell\open" "" `${COMMANDTEXT}`
+  WriteRegStr HKCR "${FILECLASS}\shell\open\command" "" `${COMMAND}`
+!macroend
+
 ;--------------------------------
 ;Languages
 
@@ -90,6 +107,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
+  File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
   File '..\..\ThirdParty\Dependencies\NAudio\*.dll'
   File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
@@ -97,7 +115,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll'
   File '..\..\ThirdParty\Dependencies\lame_enc.dll'
-
   
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools
@@ -109,6 +126,11 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\*.dll'
   File /r '..\..\Tools\Pipeline\bin\Windows\AnyCPU\Release\Templates'
 
+  ; Associate .mgcb files open in the Pipeline tool.
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '10.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '11.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro VS_ASSOCIATE_EDITOR 'MonoGame Pipeline' '12.0' 'mgcb' '${MSBuildInstallDir}\Tools\Pipeline.exe'
+  !insertmacro APP_ASSOCIATE 'mgcb' 'MonoGame.ContentBuilderFile' 'A MonoGame content builder project.' '${MSBuildInstallDir}\Tools\Pipeline.exe,0' 'Open with Pipeline' '${MSBuildInstallDir}\Tools\Pipeline.exe'
 
   ; Install the assemblies for all the platforms we can 
   ; target from a Windows desktop system.
@@ -344,6 +366,13 @@ Section "Uninstall"
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for Android'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoAndroid\v2.3\AssemblyFoldersEx\${APPNAME} for OUYA'
   DeleteRegKey HKLM 'SOFTWARE\Microsoft\MonoTouch\v1.0\AssemblyFoldersEx\${APPNAME} for iOS'
+
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\10.0\Default Editors\mgcb'
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\11.0\Default Editors\mgcb'
+  DeleteRegKey HKCU 'Software\Microsoft\VisualStudio\12.0\Default Editors\mgcb'
+
+  DeleteRegKey HKCR '.mgcb'
+  DeleteRegKey HKCR 'MonoGame.ContentBuilderFile'
 
   IfFileExists $WINDIR\SYSWOW64\*.* Is64bit Is32bit
   Is32bit:
