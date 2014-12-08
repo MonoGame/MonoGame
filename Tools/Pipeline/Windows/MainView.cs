@@ -231,6 +231,7 @@ namespace MonoGame.Tools.Pipeline
                 _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
             }
 
+            _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
         }
 
         public AskResult AskSaveOrCancel()
