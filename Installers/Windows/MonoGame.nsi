@@ -139,16 +139,23 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\Android'
   File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Android\AnyCPU\Release\*.xml'
-  
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Android\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Android\AnyCPU\Release\*.xml'
+
+
   ; Install OUYA Assemblies
   SetOutPath '$INSTDIR\Assemblies\OUYA'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Ouya\AnyCPU\Release\*.xml'
-  
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Ouya\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Ouya\AnyCPU\Release\*.xml'
+
   ; Install Windows Desktop OpenGL Assemblies
   SetOutPath '$INSTDIR\Assemblies\WindowsGL'
   File /nonfatal '..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\WindowsGL\AnyCPU\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsGL\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsGL\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
@@ -158,11 +165,15 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\Windows'
   File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Windows\AnyCPU\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Windows\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Windows\AnyCPU\Release\*.xml'
   
   ; Install Linux Assemblies
   SetOutPath '$INSTDIR\Assemblies\Linux'
   File /nonfatal '..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.dll'
   File /nonfatal ' ..\..\MonoGame.Framework\bin\Linux\AnyCPU\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Linux\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Linux\AnyCPU\Release\*.xml'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll'
   File '..\..\ThirdParty\Dependencies\OpenTK.dll.config'
   File '..\..\ThirdParty\GamepadConfig\Tao.Sdl.dll'
@@ -173,6 +184,8 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\Windows8'
   File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\Windows8\AnyCPU\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Windows8\AnyCPU\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\Windows8\AnyCPU\Release\*.xml'
 
     ; Install Windows Phone 8.1 Assemblies
   SetOutPath '$INSTDIR\Assemblies\WindowsPhone81'
@@ -183,11 +196,15 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   SetOutPath '$INSTDIR\Assemblies\WindowsPhone\ARM'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\ARM\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsPhone\ARM\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsPhone\ARM\Release\*.xml'
 
   ; Install Windows Phone x86 Assemblies
   SetOutPath '$INSTDIR\Assemblies\WindowsPhone\x86'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.dll'
   File '..\..\MonoGame.Framework\bin\WindowsPhone\x86\Release\*.xml'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsPhone\x86\Release\*.dll'
+  File '..\..\MonoGame.Framework\bin\MonoGame.Framework.Net\WindowsPhone\x86\Release\*.xml'
 
   ; Intall iOS Assemblies
   IfFileExists `$PROGRAMFILES\MSBuild\Xamarin\iOS\*.*` InstalliOSAssemblies SkipiOSAssemblies
