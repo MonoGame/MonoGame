@@ -2,14 +2,14 @@
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
 
   <Identity Name="$guid9$"
-            Publisher="$XmlEscapedPublisherDistinguishedName$"
+            Publisher="CN=$username$"
             Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="$guid9$" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>$projectname$</DisplayName>
-    <PublisherDisplayName>$XmlEscapedPublisher$</PublisherDisplayName>
+    <PublisherDisplayName>$username$</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -24,7 +24,7 @@
 
   <Applications>
     <Application Id="App"
-        Executable="$targetnametoken$.exe"
+        Executable="$safeprojectname$.exe"
         EntryPoint="$safeprojectname$.App">
         <m3:VisualElements
             DisplayName="$projectname$"
