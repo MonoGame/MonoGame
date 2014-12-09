@@ -29,17 +29,29 @@
       <ParentOutputDir>$(ProjectDir)$(ContentRootDirectory)\bin\$(MonoGamePlatform)</ParentOutputDir>
       <ParentIntermediateDir>$(ProjectDir)$(ContentRootDirectory)\obj\$(MonoGamePlatform)</ParentIntermediateDir>
 
-      <MonoGameContentBuilderExe>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
+      <MonoGameContentBuilderExe Condition="'$(MonoGameContentBuilderExe)' == ''">$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MGCB.exe</MonoGameContentBuilderExe>
 
       <Header>/platform:$(MonoGamePlatform) /outputDir:&quot;$(ParentOutputDir)&quot; /intermediateDir:&quot;$(ParentIntermediateDir)&quot; /quiet</Header>
 
     </PropertyGroup>
 
-    <Error Text="The MonoGamePlatform property is not set"
-       Condition="'$(MonoGamePlatform)' == ''" />
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, RaspberryPi, Android, Ouya, NativeClient, PlayStation4, or PlayStationMobile."
+       Condition="	'$(MonoGamePlatform)' != 'Windows' And
+			'$(MonoGamePlatform)' != 'iOS' And       
+			'$(MonoGamePlatform)' != 'Android' And       
+			'$(MonoGamePlatform)' != 'Linux' And       
+			'$(MonoGamePlatform)' != 'MacOSX' And       
+			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
+			'$(MonoGamePlatform)' != 'NativeClient' And       
+			'$(MonoGamePlatform)' != 'Ouya' And       
+			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
+			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
+			'$(MonoGamePlatform)' != 'RaspberryPi' And       
+			'$(MonoGamePlatform)' != 'PlayStation4' And       
+			'$(MonoGamePlatform)' != 'WindowsGL'" />
 
     <Error
-        Text="MonoGame Content Builder could not be located at '$(MonoGameContentBuilderExe)'"
+        Text="The MonoGame content builder executable could not be located at '$(MonoGameContentBuilderExe)'!"
         Condition="!Exists('$(MonoGameContentBuilderExe)')"
       />
 
