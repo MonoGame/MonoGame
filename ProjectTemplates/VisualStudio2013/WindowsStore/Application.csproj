@@ -16,6 +16,7 @@
     <PackageCertificateKeyFile>$projectname$_TemporaryKey.pfx</PackageCertificateKeyFile>
     $endif$
     <MonoGamePlatform>WindowsStoreApp</MonoGamePlatform>
+    <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

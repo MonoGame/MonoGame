@@ -20,6 +20,7 @@
     <MandroidI18n />
     <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
     <MonoGamePlatform>Android</MonoGamePlatform>
+    <MonoGameContentBuilderExe></MonoGameContentBuilderExe>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
