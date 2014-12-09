@@ -63,9 +63,11 @@
       <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
     </Reference>
   </Platform>
+  
   <Platform Type="WindowsPhone81">
     <Reference Include="MonoGame.Framework.WindowsPhone81" />
   </Platform>
+   
   <Platform Type="Web">
     <Reference Include="JSIL.Meta" />
   </Platform>
