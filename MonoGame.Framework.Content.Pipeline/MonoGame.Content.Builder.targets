@@ -39,7 +39,7 @@
        Condition="'$(MonoGamePlatform)' == ''" />
 
     <Error
-        Text="MonoGame Content Builder could not be located at '$(MonoGameContentBuilderExe)'"
+        Text="The MonoGame content builder executable could not be located at '$(MonoGameContentBuilderExe)'!"
         Condition="!Exists('$(MonoGameContentBuilderExe)')"
       />
 
