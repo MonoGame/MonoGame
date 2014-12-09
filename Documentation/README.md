@@ -17,7 +17,7 @@ Breaking these rules can result in your contribution being rejected.
 You can create and edit documentation right from the web browser without needing to install Git or ever leave the GitHub site.
 
  - [Fork the MonoGame repo](https://help.github.com/articles/fork-a-repo/).
- - [Create a branch to work from](https://help.github.com/articles/creating-and-deleting-branches-within-your-repository/).
+ - [Create a new branch](https://help.github.com/articles/creating-and-deleting-branches-within-your-repository/) from `develop` and make your changes only in that branch.
  - [Create a new file](https://help.github.com/articles/creating-new-files/) or [edit an existing one](https://help.github.com/articles/editing-files-in-your-repository/) using the GitHub markup editor.
  - [Submit pull requests](https://help.github.com/articles/creating-a-pull-request/) early and often to merge your documentation changes.
 
