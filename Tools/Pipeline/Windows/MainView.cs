@@ -223,14 +223,15 @@ namespace MonoGame.Tools.Pipeline
             foreach (var project in History.Default.ProjectHistory)
             {
                 var recentItem = new ToolStripMenuItem(project);
-                recentItem.Click += (sender, args) =>
-                {
-                    _controller.OpenProject(project);
-                };
+
+                // We need a local to make the delegate work correctly.
+                var localProject = project;
+                recentItem.Click += (sender, args) => _controller.OpenProject(localProject);
 
                 _openRecentMenuItem.DropDownItems.Insert(0, recentItem);
             }
 
+            _openRecentMenuItem.Enabled = (_openRecentMenuItem.DropDownItems.Count >= 1);
         }
 
         public AskResult AskSaveOrCancel()

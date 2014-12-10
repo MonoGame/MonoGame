@@ -107,6 +107,7 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\monogame.ico'
   File /r '..\..\MonoGame.ContentPipeline\ContentProcessors\bin\Release\*.dll'
   File '..\..\MonoGame.ContentPipeline\*.targets'
+  File '..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Content.Builder.targets'
   File '..\..\ThirdParty\Dependencies\NAudio\*.dll'
   File '..\..\ThirdParty\Dependencies\SharpDX\Windows\*.*'
   File /nonfatal '..\..\ThirdParty\Dependencies\NAudio\*.xml'
@@ -114,7 +115,6 @@ Section "MonoGame Core Components" CoreComponents ;No components page, name is n
   File '..\..\ThirdParty\Dependencies\ManagedPVRTC\x86\pvrtc.dll'
   File /oname=libmojoshader.dll  '..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_32.dll'
   File '..\..\ThirdParty\Dependencies\lame_enc.dll'
-
   
   ; Install the MonoGame tools to a single shared folder.
   SetOutPath ${MSBuildInstallDir}\Tools

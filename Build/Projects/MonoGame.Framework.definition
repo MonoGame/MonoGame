@@ -816,6 +816,9 @@
     <Compile Include="Input\Touch\TouchPanel.cs" />
     <Compile Include="Input\Touch\TouchPanelCapabilities.cs" />
     <Compile Include="Input\Touch\TouchPanelState.cs" />
+    <Compile Include="Input\Touch\TouchQueue.cs">
+		<Platforms>Windows8,WindowsPhone,WindowsPhone81</Platforms>
+	</Compile>
 
 
     <!-- Microsoft.Xna.Framework.Media -->

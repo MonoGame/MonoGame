@@ -8,7 +8,7 @@
   <mp:PhoneIdentity PhoneProductId="$guid9$" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$ext_projectname$</DisplayName>
+    <DisplayName>$ext_safeprojectname$</DisplayName>
     <PublisherDisplayName>$XmlEscapedPublisher$</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -24,7 +24,7 @@
 
   <Applications>
     <Application Id="App"
-        Executable="$targetnametoken$.exe"
+        Executable="$ext_safeprojectname$.exe"
         EntryPoint="$ext_safeprojectname$.App">
         <m3:VisualElements
             DisplayName="$ext_safeprojectname$"

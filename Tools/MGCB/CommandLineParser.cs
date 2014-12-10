@@ -181,9 +181,12 @@ namespace MGCB
         {
             args = Preprocess(args);
 
+            var showUsage = true;
             var success = true;            
             foreach (var arg in args)
             {
+                showUsage = false;
+
                 if (!ParseArgument(arg))
                 {
                     success = false;
@@ -197,6 +200,9 @@ namespace MGCB
                 ShowError("Missing argument '{0}'", GetAttribute<CommandLineParameterAttribute>(missingRequiredOption).Name);
                 return false;
             }
+
+            if (showUsage)
+                ShowError(null);
 
             return success;
         }
@@ -467,11 +473,6 @@ namespace MGCB
         }
 
         public string Title { get; set; }
-
-        public void ShowUsage()
-        {
-            ShowError(null);
-        }
 
         public void ShowError(string message, params object[] args)
         {

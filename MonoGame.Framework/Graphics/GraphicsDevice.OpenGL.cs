@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             MaxTextureSlots = 16;
 
-#if ANDROID || IOS
+#if  IOS
             GL.GetInteger(All.MaxTextureImageUnits, ref MaxTextureSlots);
             GraphicsExtensions.CheckGLError();
 
@@ -345,7 +345,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				bufferMask = bufferMask | ClearBufferMask.DepthBufferBit;
 			}
 
-#if GLES && !ANGLE
+#if GLES && !ANGLE && !ANDROID
 			GL.Clear((uint)bufferMask);
 #else
 			GL.Clear(bufferMask);

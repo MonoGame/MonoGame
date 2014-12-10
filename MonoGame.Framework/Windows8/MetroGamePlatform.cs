@@ -86,6 +86,8 @@ namespace Microsoft.Xna.Framework
 		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
+        internal static readonly TouchQueue TouchQueue = new TouchQueue();
+
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
         public MetroGamePlatform(Game game)
@@ -190,6 +192,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            TouchQueue.ProcessQueued();
             return true;
         }
 

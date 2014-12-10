@@ -85,22 +85,22 @@ namespace Microsoft.Xna.Framework.Content
                 	key = input.ReadObject<TKey>(keyReader);
 				}
 				else
-				{
-					int readerType = input.ReadByte();
-                	key = input.ReadObject<TKey>(input.TypeReaders[readerType - 1]);
-				}
+                {
+                    var readerType = input.Read7BitEncodedInt();
+                    key = readerType > 0 ? input.ReadObject<TKey>(input.TypeReaders[readerType - 1]) : default(TKey);
+                }
 
                 if (ReflectionHelpers.IsValueType(valueType))
 				{
                 	value = input.ReadObject<TValue>(valueReader);
 				}
 				else
-				{
-					int readerType = input.ReadByte();
-                	value = input.ReadObject<TValue>(input.TypeReaders[readerType - 1]);
-				}
-				
-				dictionary.Add(key, value);
+                {
+                    var readerType = input.Read7BitEncodedInt();
+                    value = readerType > 0 ? input.ReadObject<TValue>(input.TypeReaders[readerType - 1]) : default(TValue);
+                }
+
+                dictionary.Add(key, value);
             }
             return dictionary;
         }

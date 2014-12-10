@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 //GLExt.Oes.GenVertexArrays(1, out this.vao);
                 //GLExt.Oes.BindVertexArray(this.vao);
-#if IOS || ANDROID
+#if IOS
                 GL.GenBuffers(1, ref this.vbo);
 #else
                 GL.GenBuffers(1, out this.vbo);

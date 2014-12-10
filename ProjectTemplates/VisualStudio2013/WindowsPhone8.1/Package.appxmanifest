@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
 
-  <Identity Name="1daba941-cfdf-413d-a68b-c8d94eb9d92b"
-            Publisher="CN=aljim"
+  <Identity Name="$guid9$"
+            Publisher="CN=$username$"
             Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="1daba941-cfdf-413d-a68b-c8d94eb9d92b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="$guid9$" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>MonoGamePhone</DisplayName>
-    <PublisherDisplayName>aljim</PublisherDisplayName>
+    <DisplayName>$projectname$</DisplayName>
+    <PublisherDisplayName>$username$</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -24,13 +24,13 @@
 
   <Applications>
     <Application Id="App"
-        Executable="$targetnametoken$.exe"
-        EntryPoint="MonoGamePhone.App">
+        Executable="$safeprojectname$.exe"
+        EntryPoint="$safeprojectname$.App">
         <m3:VisualElements
-            DisplayName="MonoGamePhone"
+            DisplayName="$projectname$"
             Square150x150Logo="Assets\Logo.png"
             Square44x44Logo="Assets\SmallLogo.png"
-            Description="MonoGamePhone"
+            Description="$projectname$"
             ForegroundText="light"
             BackgroundColor="transparent">
             <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png"/>
