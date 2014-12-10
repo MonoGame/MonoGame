@@ -575,6 +575,7 @@ namespace Microsoft.Xna.Framework
 		/// This event also supports key repeat.
 		/// </summary>
 		public event EventHandler<TextInputEventArgs> TextInput;
+
 		List<Keys> _flags = new List<Keys> ();
 
 		public override void FlagsChanged (NSEvent theEvent)
