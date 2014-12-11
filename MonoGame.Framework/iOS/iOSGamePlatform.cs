@@ -204,7 +204,8 @@ namespace Microsoft.Xna.Framework
 
             BeginObservingUIApplication();
 
-            _viewController.View.BecomeFirstResponder();
+			// Running this opens the keyboard immediately on opening the app now we have keyboard support.
+            //_viewController.View.BecomeFirstResponder();
             CreateDisplayLink();
         }
 
