@@ -104,12 +104,32 @@ namespace Microsoft.Xna.Framework.Media
             // Set the new song.
             _session.SetTopology(0, _currentVideo.Topology);
 
-            // Get the volume interface.
-            IntPtr volumeObj=(IntPtr)0;
+            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(GetVolumeObj());
+            _volumeController.Mute = IsMuted;
+            _volumeController.MasterVolume = _volume;
 
+            // Get the clock.
+            _clock = _session.Clock.QueryInterface<PresentationClock>();
+
+            //create the callback if it hasn't been created yet
+            if (_callback == null)
+            {
+                _callback = new Callback();
+                _session.BeginGetEvent(_callback, null);
+            }
+
+            // Start playing.
+            var varStart = new Variant();
+            _session.Start(null, varStart);
+        }
+
+        internal static IntPtr GetVolumeObj()
+        {
+            // Get the volume interface - shared between MediaPlayer and VideoPlayer
             const int retries = 10;
             const int sleepTimeFactor = 50;
 
+            var volumeObj = (IntPtr)0;
 
             //See https://github.com/mono/MonoGame/issues/2620
             //MediaFactory.GetService throws a SharpDX exception for unknown reasons. it appears retrying will solve the problem but there
@@ -128,29 +148,11 @@ namespace Microsoft.Xna.Framework.Media
                     {
                         throw;
                     }
-                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
-                    Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i*sleepTimeFactor);
+                    Thread.Sleep(i*sleepTimeFactor); //Sleep for longer and longer times
                 }
             }
-
-
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(volumeObj);
-            _volumeController.Mute = IsMuted;
-            _volumeController.MasterVolume = _volume;
-
-            // Get the clock.
-            _clock = _session.Clock.QueryInterface<PresentationClock>();
-
-            //create the callback if it hasn't been created yet
-            if (_callback == null)
-            {
-                _callback = new Callback();
-                _session.BeginGetEvent(_callback, null);
-            }
-
-            // Start playing.
-            var varStart = new Variant();
-            _session.Start(null, varStart);
+            return volumeObj;
         }
 
         private void PlatformResume()
