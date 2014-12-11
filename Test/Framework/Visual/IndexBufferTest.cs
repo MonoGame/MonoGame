@@ -23,7 +23,7 @@ namespace MonoGame.Tests.Visual
 
                 var readData = new short[4];
                 indexBuffer.GetData(readData, 0, 4);
-                Assert.AreEqual(readData, savedData);
+                Assert.AreEqual(savedData, readData);
             };
             Game.RunOneFrame();
         }
@@ -39,10 +39,10 @@ namespace MonoGame.Tests.Visual
                 
                 var readData = new short[4];
                 indexBuffer.GetData(readData, 0, 2);
-                Assert.AreEqual(readData[0], 1);
-                Assert.AreEqual(readData[1], 2);
-                Assert.AreEqual(readData[2], 0);
-                Assert.AreEqual(readData[3], 0);
+                Assert.AreEqual(1, readData[0]);
+                Assert.AreEqual(2, readData[1]);
+                Assert.AreEqual(0, readData[2]);
+                Assert.AreEqual(0, readData[3]);
             };
             Game.RunOneFrame();
         }
@@ -58,10 +58,10 @@ namespace MonoGame.Tests.Visual
 
                 var readData = new short[4];
                 indexBuffer.GetData(readData, 2, 2);
-                Assert.AreEqual(readData[0], 0);
-                Assert.AreEqual(readData[1], 0);
-                Assert.AreEqual(readData[2], 1);
-                Assert.AreEqual(readData[3], 2);
+                Assert.AreEqual(0, readData[0]);
+                Assert.AreEqual(0, readData[1]);
+                Assert.AreEqual(1, readData[2]);
+                Assert.AreEqual(2, readData[3]);
             };
             Game.RunOneFrame();
         }
@@ -77,8 +77,8 @@ namespace MonoGame.Tests.Visual
 
                 var readData = new short[2];
                 indexBuffer.GetData(sizeof(short) * 2, readData, 0, 2);
-                Assert.AreEqual(readData[0], 3);
-                Assert.AreEqual(readData[1], 4);
+                Assert.AreEqual(3, readData[0]);
+                Assert.AreEqual(4, readData[1]);
             };
             Game.RunOneFrame();
         }
