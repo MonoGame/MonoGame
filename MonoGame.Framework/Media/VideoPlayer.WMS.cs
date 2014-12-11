@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Media
             // Set the new song.
             _session.SetTopology(0, _currentVideo.Topology);
 
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(GetVolumeObj());
+            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(GetVolumeObj(_session));
             _volumeController.Mute = IsMuted;
             _volumeController.MasterVolume = _volume;
 
@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.Media
             _session.Start(null, varStart);
         }
 
-        internal static IntPtr GetVolumeObj()
+        internal static IntPtr GetVolumeObj(MediaSession session)
         {
             // Get the volume interface - shared between MediaPlayer and VideoPlayer
             const int retries = 10;
@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 try
                 {
-                    MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+                    MediaFactory.GetService(session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
                     break;
                 }
                 catch (SharpDXException)
