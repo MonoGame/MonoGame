@@ -19,6 +19,10 @@ namespace Microsoft.Xna.Framework.Media
         private static SimpleAudioVolume _volumeController;
         private static PresentationClock _clock;
 
+        // HACK: Need SharpDX to fix this.
+        private static readonly Guid MRPolicyVolumeService = Guid.Parse("1abaa2ac-9d3b-47c6-ab48-c59506de784d");
+        private static readonly Guid SimpleAudioVolumeGuid = Guid.Parse("089EDF13-CF71-4338-8D13-9E569DBDC319");
+
 	    private static Callback _callback;
 
 	    private class Callback : IAsyncCallback
@@ -134,7 +138,7 @@ namespace Microsoft.Xna.Framework.Media
             // Set the new song.
             _session.SetTopology(SessionSetTopologyFlags.Immediate, song.Topology);
 
-            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(VideoPlayer.GetVolumeObj(_session));
+            _volumeController = CppObject.FromPointer<SimpleAudioVolume>(VideoPlayer.GetVolumeObj());
             _volumeController.Mute = _isMuted;
             _volumeController.MasterVolume = _volume;
 
