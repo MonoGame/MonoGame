@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Diagnostics;
+using System.Threading;
+using Microsoft.Xna.Framework.Graphics;
 using SharpDX;
 using SharpDX.MediaFoundation;
 using SharpDX.Win32;
@@ -103,16 +105,32 @@ namespace Microsoft.Xna.Framework.Media
             _session.SetTopology(0, _currentVideo.Topology);
 
             // Get the volume interface.
-            IntPtr volumeObj;
+            IntPtr volumeObj=(IntPtr)0;
+
+            const int retries = 10;
+            const int sleepTimeFactor = 50;
 
 
-            try
+            //See https://github.com/mono/MonoGame/issues/2620
+            //MediaFactory.GetService throws a SharpDX exception for unknown reasons. it appears retrying will solve the problem but there
+            //is no specific number of times, nor pause that works. So we will retry N times with an increasing Sleep between each one
+            //before finally throwing the error we saw in the first place.
+            for (int i = 0; i < retries; i++)
             {
-                MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
-            }
-            catch
-            {
-                MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+                try
+                {
+                    MediaFactory.GetService(_session, MRPolicyVolumeService, SimpleAudioVolumeGuid, out volumeObj);
+                    break;
+                }
+                catch (SharpDXException)
+                {
+                    if (i == retries - 1)
+                    {
+                        throw;
+                    }
+                    Debug.WriteLine("MediaFactory.GetService failed({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
+                    Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+                }
             }
 
 
