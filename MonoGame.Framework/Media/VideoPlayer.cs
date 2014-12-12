@@ -3,7 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
+using System.Web.UI.WebControls;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.MediaFoundation;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -128,9 +131,22 @@ namespace Microsoft.Xna.Framework.Media
         public Texture2D GetTexture()
         {
             if (_currentVideo == null)
-                return null;
+                throw new InvalidOperationException("Operation is not valid due to the current state of the object");
 
-            return PlatformGetTexture();
+            //XNA never returns a null texture
+            const int timeOutMs = 500;
+            Texture2D texture=null;
+            var timer = new Stopwatch();
+            timer.Start();
+            do
+            {
+                //texture = PlatformGetTexture();
+                if (timer.ElapsedMilliseconds > timeOutMs)
+                {
+                    throw new InvalidOperationException("Platform returned a null texture");
+                }
+            } while (texture == null);
+            return texture;
         }
 
         /// <summary>
@@ -178,6 +194,20 @@ namespace Microsoft.Xna.Framework.Media
             PlatformPlay();
 
             _state = MediaState.Playing;
+
+            // XNA doesn't return until the video is playing
+            const int timeOutMs = 500;
+            var timer = new Stopwatch();
+            timer.Start();
+            while (State != MediaState.Playing )
+            {
+                if (timer.ElapsedMilliseconds > timeOutMs)
+                {
+                    //We timed out - attempt to stop to fix any bad state
+                    Stop();
+                    throw new InvalidOperationException("cannot start video"); 
+                }
+            }
         }
 
         /// <summary>
