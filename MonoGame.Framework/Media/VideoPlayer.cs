@@ -135,12 +135,12 @@ namespace Microsoft.Xna.Framework.Media
 
             //XNA never returns a null texture
             const int timeOutMs = 500;
-            Texture2D texture=null;
+            Texture2D texture;
             var timer = new Stopwatch();
             timer.Start();
             do
             {
-                //texture = PlatformGetTexture();
+                texture = PlatformGetTexture();
                 if (timer.ElapsedMilliseconds > timeOutMs)
                 {
                     throw new InvalidOperationException("Platform returned a null texture");
