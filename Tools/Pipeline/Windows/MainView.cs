@@ -100,10 +100,14 @@ namespace MonoGame.Tools.Pipeline
             ContextMenu contextMenu = new ContextMenu();
 
             MenuItem miCopy = new MenuItem("&Copy");
-            miCopy.Click += OnOutputCopy;
+            miCopy.Click += (o, a) =>
+            {
+                if (!string.IsNullOrEmpty(_outputWindow.SelectedText))
+                    Clipboard.SetText(_outputWindow.SelectedText);
+            };
 
             MenuItem miSelectAll = new MenuItem("&Select all");
-            miSelectAll.Click += OnOutputSelectAll;
+            miSelectAll.Click += (o, a) => _outputWindow.SelectAll();
 
             contextMenu.MenuItems.Add(miCopy);
             contextMenu.MenuItems.Add(miSelectAll);
@@ -539,19 +543,6 @@ namespace MonoGame.Tools.Pipeline
             _outputWindow.Clear();
         }
 
-        private void OutputCopy()
-        {
-            if ( ! String.IsNullOrEmpty(_outputWindow.SelectedText) )
-            {
-                Clipboard.SetText(_outputWindow.SelectedText);
-            }
-        }
-
-        private void OutputSelectAll()
-        {
-            _outputWindow.SelectAll();
-        }
-
         public Process CreateProcess(string exe, string commands)
         {
             var _buildProcess = new Process();
@@ -603,15 +594,6 @@ namespace MonoGame.Tools.Pipeline
         private void OnImportProjectClick(object sender, EventArgs e)
         {
             _controller.ImportProject();
-        }
-
-        private void OnOutputCopy(object sender, EventArgs e)
-        {
-            OutputCopy();
-        }
-        private void OnOutputSelectAll(object sender, EventArgs e)
-        {
-            OutputSelectAll();
         }
 
         private void OnOpenProjectClick(object sender, EventArgs e)
