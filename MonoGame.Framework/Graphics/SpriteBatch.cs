@@ -46,6 +46,31 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
 		}
+		
+		public void Begin (BlendState blendState)
+		{
+            Begin(SpriteSortMode.Deferred, blendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
+		}
+		public void Begin (SamplerState samplerState)
+		{
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
+		}
+		public void Begin (DepthStencilState depthStencilState)
+		{
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, depthStencilState, RasterizerState.CullCounterClockwise, null, Matrix.Identity);	
+		}
+		public void Begin (RasterizerState rasterizerState)
+		{
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, rasterizerState, null, Matrix.Identity);	
+		}
+		public void Begin (Effect effect)
+		{
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect, Matrix.Identity);	
+		}
+		public void Begin (Matrix transformMatrix)
+		{
+            Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, transformMatrix);	
+		}
 
 		public void Begin (SpriteSortMode sortMode, BlendState blendState, SamplerState samplerState, DepthStencilState depthStencilState, RasterizerState rasterizerState, Effect effect, Matrix transformMatrix)
 		{
