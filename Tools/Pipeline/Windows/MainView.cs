@@ -71,6 +71,9 @@ namespace MonoGame.Tools.Pipeline
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
             Form = this;
+
+            // So it is obvious which version of monogame is being used to build content.
+            Text = Application.ExecutablePath;
         }
 
         public void Attach(IController controller)
