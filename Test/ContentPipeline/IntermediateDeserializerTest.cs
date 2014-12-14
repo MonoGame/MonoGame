@@ -433,5 +433,20 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.IsEmpty(strings);
         }
+
+        [Test]
+        public void SystemTypes()
+        {
+            object result;
+            var filePath = Paths.Xml("20_SystemTypes.xml");
+            using (var reader = XmlReader.Create(filePath))
+                result = IntermediateSerializer.Deserialize<object>(reader, filePath);
+                        
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<SystemTypes>(result);
+            var obj = (SystemTypes)result;
+
+            Assert.AreEqual(TimeSpan.FromSeconds(42.5f), obj.TimeSpan);            
+        }
     }
 }

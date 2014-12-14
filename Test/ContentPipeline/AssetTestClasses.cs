@@ -265,4 +265,11 @@ namespace MonoGame.Tests.ContentPipeline
         private List<string> _list = new List<string>();
     }
     #endregion
+
+    #region SystemTypes
+    class SystemTypes
+    {
+        public TimeSpan TimeSpan;
+    }
+    #endregion
 }
