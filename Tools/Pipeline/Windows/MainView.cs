@@ -70,6 +70,8 @@ namespace MonoGame.Tools.Pipeline
 
             _propertyGrid.PropertyValueChanged += OnPropertyGridPropertyValueChanged;
 
+            InitOutputWindowContextMenu();
+
             Form = this;
         }
 
@@ -91,6 +93,26 @@ namespace MonoGame.Tools.Pipeline
 
             _controller.OnCanUndoRedoChanged += invokeUpdateUndoRedo;
             _controller.Selection.Modified += OnSelectionModified;
+        }
+
+        private void InitOutputWindowContextMenu()
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem miCopy = new MenuItem("&Copy");
+            miCopy.Click += (o, a) =>
+            {
+                if (!string.IsNullOrEmpty(_outputWindow.SelectedText))
+                    Clipboard.SetText(_outputWindow.SelectedText);
+            };
+
+            MenuItem miSelectAll = new MenuItem("&Select all");
+            miSelectAll.Click += (o, a) => _outputWindow.SelectAll();
+
+            contextMenu.MenuItems.Add(miCopy);
+            contextMenu.MenuItems.Add(miSelectAll);
+
+            _outputWindow.ContextMenu = contextMenu;
         }
 
         public void OnTemplateDefined(ContentItemTemplate template)
@@ -575,7 +597,7 @@ namespace MonoGame.Tools.Pipeline
             _controller.ImportProject();
         }
 
-        private void OnOpenProjectClick(object sender, System.EventArgs e)
+        private void OnOpenProjectClick(object sender, EventArgs e)
         {
             _controller.OpenProject();
         }
