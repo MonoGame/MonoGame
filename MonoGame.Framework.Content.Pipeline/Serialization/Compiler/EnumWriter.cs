@@ -16,10 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         Type underlyingType;
         ContentTypeWriter elementWriter;
 
-        /// <summary>
-        /// Initialize the writer.
-        /// </summary>
-        /// <param name="compiler">Compiler instance calling this writer.</param>
         protected override void Initialize(ContentCompiler compiler)
         {
             base.Initialize(compiler);
@@ -33,11 +29,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             return "Microsoft.Xna.Framework.Content.EnumReader`1[[" + GetRuntimeType(targetPlatform) + "]]";
         }
 
-        /// <summary>
-        /// Writes the value to the output.
-        /// </summary>
-        /// <param name="output">The output writer object.</param>
-        /// <param name="value">The value to write to the output.</param>
         protected internal override void Write(ContentWriter output, T value)
         {
             elementWriter.Write(output, Convert.ChangeType(value, underlyingType));
