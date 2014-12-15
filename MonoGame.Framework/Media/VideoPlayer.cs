@@ -5,6 +5,9 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+#if WINRT
+using System.Threading.Tasks;
+#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
@@ -147,8 +150,13 @@ namespace Microsoft.Xna.Framework.Media
                 {
                     break;
                 }
-                Debug.WriteLine("PlatformGetTexture returned null ({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
-                Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+                var sleepTime = i*sleepTimeFactor;
+                Debug.WriteLine("PlatformGetTexture returned null ({0}) sleeping for {1} ms", i + 1, sleepTime);
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                Thread.Sleep(sleepTime); //Sleep for longer and longer times
+#endif
             }
             if (texture == null)
             {
@@ -214,8 +222,13 @@ namespace Microsoft.Xna.Framework.Media
                 {
                     break;
                 }
-                Debug.WriteLine("State != MediaState.Playing ({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
-                Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+                var sleepTime = i*sleepTimeFactor;
+                Debug.WriteLine("State != MediaState.Playing ({0}) sleeping for {1} ms", i + 1, sleepTime);
+#if WINRT
+                Task.Delay(sleepTime).Wait();
+#else
+                Thread.Sleep(sleepTime); //Sleep for longer and longer times
+#endif
             }
             if (State != MediaState.Playing )
             {
