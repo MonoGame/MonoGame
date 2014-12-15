@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Web.UI.WebControls;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.MediaFoundation;
@@ -128,24 +129,34 @@ namespace Microsoft.Xna.Framework.Media
         /// Retrieves a Texture2D containing the current frame of video being played.
         /// </summary>
         /// <returns>The current frame of video.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if no video is set on the player</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the platform was unable to get a texture in a reasonable amount of time. Often the platform specific media code is running
+        /// in a different thread or process. Note: This may be a change from XNA behaviour</exception>
         public Texture2D GetTexture()
         {
             if (_currentVideo == null)
                 throw new InvalidOperationException("Operation is not valid due to the current state of the object");
 
             //XNA never returns a null texture
-            const int timeOutMs = 500;
-            Texture2D texture;
-            var timer = new Stopwatch();
-            timer.Start();
-            do
+            const int retries = 5;
+            const int sleepTimeFactor = 50;
+            Texture2D texture=null;
+
+            for (int i = 0; i < retries; i++)
             {
                 texture = PlatformGetTexture();
-                if (timer.ElapsedMilliseconds > timeOutMs)
+                if (texture != null)
                 {
-                    throw new InvalidOperationException("Platform returned a null texture");
+                    break;
                 }
-            } while (texture == null);
+                Debug.WriteLine("PlatformGetTexture returned null ({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
+                Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+            }
+            if (texture == null)
+            {
+                throw new InvalidOperationException("Platform returned a null texture");
+            }
+
             return texture;
         }
 
