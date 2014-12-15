@@ -370,9 +370,35 @@ namespace Microsoft.Xna.Framework.Graphics
         [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Bitmap bitmap)
         {
-            var texture = PlatformFromStream(graphicsDevice, bitmap);
-            bitmap.Recycle();
-            return texture;
+            return PlatformFromStream(graphicsDevice, bitmap);
+        }
+
+        [CLSCompliant(false)]
+        public void Reload(Bitmap image)
+        {
+            var width = image.Width;
+            var height = image.Height;
+
+            int[] pixels = new int[width * height];
+            if ((width != image.Width) || (height != image.Height))
+            {
+                using (Bitmap imagePadded = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+                {
+                    Canvas canvas = new Canvas(imagePadded);
+                    canvas.DrawARGB(0, 0, 0, 0);
+                    canvas.DrawBitmap(image, 0, 0, null);
+                    imagePadded.GetPixels(pixels, 0, width, 0, 0, width, height);
+                    imagePadded.Recycle();
+                }
+            }
+            else
+            {
+                image.GetPixels(pixels, 0, width, 0, 0, width, height);
+            }
+
+            image.Recycle();
+
+            this.SetData<int>(pixels);
         }
 #endif
 
