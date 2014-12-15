@@ -115,19 +115,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
             if (!isSharedResource)
             {
-                if (writer == null && elementType == typeof(object))
-                {
-                    // Write elements serialized as "object".
+                if (writer == null || elementType == typeof(object) || elementType == typeof(Array))
                     output.WriteObject(memberObject);
-                }
                 else
-                {
-                    // We can get here and still be NULL, exit gracefully.
-                    if (writer == null)
-                        return;
-
                     output.WriteObject(memberObject, writer);
-                }
             }
             else
             {
