@@ -379,6 +379,7 @@
     <Compile Include="Serialization\Intermediate\Vector2Serializer.cs" />
     <Compile Include="Serialization\Intermediate\Vector3Serializer.cs" />
     <Compile Include="Serialization\Intermediate\Vector4Serializer.cs" />
+    <Compile Include="Serialization\Intermediate\TimeSpanSerializer.cs" />
 
 
     <!-- Microsoft.Xna.Framework.Content.Pipeline -->

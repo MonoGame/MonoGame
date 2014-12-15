@@ -8,8 +8,8 @@ This package is just the Binaries for MonoGame.Net for easier platform dll updat
 
 _Supported Platforms
 	* Windows GL
-	* Windows 8
-	* Windows Phone
+	* Windows 8 / 8.1
+	* Windows Phone 8 / 8.1 & Universal
 	* iOS
 	* MacOS
 	* Android
@@ -21,15 +21,15 @@ For project templates either use the Monogame Project templates or the Main Mono
 
 _Install Instructions
 This package simply sits along side the existing MonoGame.Framework package
-It has a dependancy on the MonoGame.Binaries NuGet package, please check the install instructions for that package if not yet installed
+It has a dependency on the MonoGame.Binaries NuGet package, please check the install instructions for that package if not yet installed
 
 When applied, this NuGet will install all relevant dll's for MonoGame.Net including LidGren
-**Note You may not see MonoGame or it's dependant libraries in the project references, this is Normal as we use MSBuild configuration to refernece them
+**Note You may not see MonoGame or it's dependant libraries in the project references, this is Normal as we use MSBuild configuration to reference them
 
 
 _Release Notes
-3.2.2 release
-Updated to latest development build following MonoGame.Framework.Net separation and numerous bug fixes.
+3.2.3 release
+Updated to latest development build including the new Windows Phone 8.1 platform
 More details can be found at http://monogame.net
 
 _Known Issues

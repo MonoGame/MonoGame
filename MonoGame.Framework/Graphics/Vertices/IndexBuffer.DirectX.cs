@@ -86,14 +86,14 @@ namespace Microsoft.Xna.Framework.Graphics
                 var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 var startBytes = startIndex * TsizeInBytes;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
-                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, data.Length * TsizeInBytes);
+                SharpDX.DataPointer DataPointer = new SharpDX.DataPointer(dataPtr, elementCount * TsizeInBytes);
 
                 lock (GraphicsDevice._d3dContext)
                 {
                     // Map the staging resource to a CPU accessible memory
                     var box = deviceContext.MapSubresource(stagingBuffer, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
-                    SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer, TsizeInBytes * data.Length);
+                    SharpDX.Utilities.CopyMemory(dataPtr, box.DataPointer + offsetInBytes, elementCount * TsizeInBytes);
 
                     // Make sure that we unmap the resource in case of an exception
                     deviceContext.UnmapSubresource(stagingBuffer, 0);
