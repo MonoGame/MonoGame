@@ -205,17 +205,23 @@ namespace Microsoft.Xna.Framework.Media
             _state = MediaState.Playing;
 
             // XNA doesn't return until the video is playing
-            const int timeOutMs = 500;
-            var timer = new Stopwatch();
-            timer.Start();
-            while (State != MediaState.Playing )
+            const int retries = 5;
+            const int sleepTimeFactor = 50;
+
+            for (int i = 0; i < retries; i++)
             {
-                if (timer.ElapsedMilliseconds > timeOutMs)
+                if (State == MediaState.Playing )
                 {
-                    //We timed out - attempt to stop to fix any bad state
-                    Stop();
-                    throw new InvalidOperationException("cannot start video"); 
+                    break;
                 }
+                Debug.WriteLine("State != MediaState.Playing ({0}) sleeping for {1} ms", i + 1, i * sleepTimeFactor);
+                Thread.Sleep(i * sleepTimeFactor); //Sleep for longer and longer times
+            }
+            if (State != MediaState.Playing )
+            {
+                //We timed out - attempt to stop to fix any bad state
+                Stop();
+                throw new InvalidOperationException("cannot start video"); 
             }
         }
 
