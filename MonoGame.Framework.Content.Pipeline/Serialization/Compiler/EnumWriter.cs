@@ -13,15 +13,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class EnumWriter<T> : BuiltInContentWriter<T>
     {
-        Type underlyingType;
-        ContentTypeWriter elementWriter;
+        Type _underlyingType;
 
         protected override void Initialize(ContentCompiler compiler)
         {
             base.Initialize(compiler);
-
-            underlyingType = Enum.GetUnderlyingType(typeof(T));
-            elementWriter = compiler.GetTypeWriter(underlyingType);
+            _underlyingType = Enum.GetUnderlyingType(typeof(T));
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
@@ -31,7 +28,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         protected internal override void Write(ContentWriter output, T value)
         {
-            elementWriter.Write(output, Convert.ChangeType(value, underlyingType));
+            var typeWriter = output.GetTypeWriter(_underlyingType);
+            output.WriteRawObject(Convert.ChangeType(value, _underlyingType), typeWriter);
         }
     }
 }
