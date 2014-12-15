@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         private FieldInfo[] _fields;
 
         private Type _baseType;
-        private ContentTypeWriter _baseTypeWriter;
 
         private string _runtimeType;
 
@@ -30,10 +29,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
             var type = ReflectionHelpers.GetBaseType(TargetType);
             if (type != null && type != typeof(object))
-            {
                 _baseType = type;
-                _baseTypeWriter = compiler.GetTypeWriter(_baseType);
-            }
 
             var runtimeType = TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() as ContentSerializerRuntimeTypeAttribute;
             if (runtimeType != null)
@@ -156,8 +152,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         protected internal override void Write(ContentWriter output, object value)
         {
-            if(_baseTypeWriter != null)
-                _baseTypeWriter.Write(output, value);
+            if (_baseType != null)
+            {
+                var baseTypeWriter = output.GetTypeWriter(_baseType);
+                baseTypeWriter.Write(output, value);
+            }
 
             foreach (var property in _properties)
                 Write(value, output, property);
