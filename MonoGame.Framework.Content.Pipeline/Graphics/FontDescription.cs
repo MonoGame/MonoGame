@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -199,6 +199,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         [ContentSerializer(CollectionItemName = "CharacterRegion")]
         internal CharacterRegion[] CharacterRegions
         {
+            get
+            {
+                var regions = new List<CharacterRegion>();
+                var chars = Characters.ToList();
+                chars.Sort();
+
+                var start = chars[0];
+                var end = chars[0];
+
+                for (var i=1; i < chars.Count; i++)
+                {
+                    if (chars[i] != (end+1))
+                    {
+                        regions.Add(new CharacterRegion(start, end));
+                        start = chars[i];
+                    }
+                    end = chars[i];
+                }
+
+                regions.Add(new CharacterRegion(start, end));
+
+                return regions.ToArray();
+            }
+
             set
             {
                 for (int index = 0; index < value.Length; ++index)
