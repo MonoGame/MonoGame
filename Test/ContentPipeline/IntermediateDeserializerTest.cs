@@ -365,9 +365,9 @@ namespace MonoGame.Tests.ContentPipeline
             Deserialize<ExternalReferences>("17_ExternalReferences.xml", externalReferences =>
             {
                 Assert.NotNull(externalReferences.Texture);
-                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.xnb"));
+                Assert.IsTrue(externalReferences.Texture.Filename.EndsWith(@"\Xml\grass.tga"));
                 Assert.NotNull(externalReferences.Shader);
-                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.xnb"));
+                Assert.IsTrue(externalReferences.Shader.Filename.EndsWith(@"\Xml\foliage.fx"));
             });
         }
 
