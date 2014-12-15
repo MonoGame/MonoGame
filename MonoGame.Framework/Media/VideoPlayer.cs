@@ -5,9 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Web.UI.WebControls;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.MediaFoundation;
 
 namespace Microsoft.Xna.Framework.Media
 {
