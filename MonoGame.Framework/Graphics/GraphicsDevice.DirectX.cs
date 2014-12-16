@@ -999,10 +999,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerStateDirty = true;
             _scissorRectangleDirty = true;   
         
-            for (var i = 0; i < _vertexBufferSlotDirty.Length; i++)
-            {
+            for (var i = 0; i < _vertexBufferSlotDirty.Length; i++)            
                 _vertexBufferSlotDirty[i] = true;
-            }
+            
             _vertexBuffersDirty = true;
         }
 #endif
