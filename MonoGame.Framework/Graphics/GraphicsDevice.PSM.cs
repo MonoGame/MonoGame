@@ -226,14 +226,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         private void BindVertexBuffer(bool bindIndexBuffer)
         {
-            int requiredVertexLength = _vertexBuffer.VertexCount;
+            var vb = _vertexBufferSlots[0].VertexBuffer;
+            int requiredVertexLength = vb.VertexCount;
             int requiredIndexLength = (!bindIndexBuffer || _indexBuffer == null) ? 0 : _indexBuffer.IndexCount;
-            
-            var vertexFormat = _vertexBuffer.VertexDeclaration.GetVertexFormat();
+
+            var vertexFormat = vb.VertexDeclaration.GetVertexFormat();
             
             var vertexBuffer = GetVertexBuffer(vertexFormat, requiredVertexLength, requiredIndexLength);
-            
-            vertexBuffer.SetVertices(_vertexBuffer._vertexArray);
+
+            vb.SetVertices(_vertexBuffer._vertexArray);
             if (requiredIndexLength > 0)
                 vertexBuffer.SetIndices(_indexBuffer._buffer);
             _graphics.SetVertexBuffer(0, vertexBuffer);
