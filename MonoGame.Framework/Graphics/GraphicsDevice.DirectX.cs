@@ -1267,19 +1267,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private static GraphicsProfile PlatformGetHighestSupportedGraphicsProfile(GraphicsDevice graphicsDevice)
         {
             FeatureLevel featureLevel;
-
-            if (graphicsDevice == null || graphicsDevice._d3dDevice == null) {
-                try
-                {
-                    featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
-                }
-                catch (SharpDXException)
-                { 
-                    featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
-                }
+			try
+            {
+				if (graphicsDevice == null || graphicsDevice._d3dDevice == null || graphicsDevice._d3dDevice.NativePointer == null) 
+					featureLevel = SharpDX.Direct3D11.Device.GetSupportedFeatureLevel();
+               	else
+                	featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
             }
-            else
-                featureLevel = graphicsDevice._d3dDevice.FeatureLevel;
+            catch (SharpDXException)
+            { 
+            	featureLevel = FeatureLevel.Level_9_1; //Minimum defined level
+            }
 
             GraphicsProfile graphicsProfile;
 
