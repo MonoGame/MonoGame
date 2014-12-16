@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Xna.Framework.Utilities;
 
@@ -60,6 +61,7 @@ namespace Microsoft.Xna.Framework.Content
         {
             var property = member as PropertyInfo;
             var field = member as FieldInfo;
+            Debug.Assert(field != null || property != null);
 
             // properties must have public get and set
             if (property != null && (property.CanWrite == false || property.CanRead == false))
