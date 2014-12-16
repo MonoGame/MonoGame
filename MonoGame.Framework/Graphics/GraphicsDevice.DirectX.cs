@@ -1130,7 +1130,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var key = (ulong)_vertexBufferSlots[0].VertexBuffer.VertexDeclaration.HashKey << 32 | (uint)shader.HashKey;
             if (!_inputLayouts.TryGetValue(key, out layout))
             {
-                List<SharpDX.Direct3D11.InputElement> inputElements = new List<SharpDX.Direct3D11.InputElement>();
+                var inputElements = new List<SharpDX.Direct3D11.InputElement>();
                 for (int vertexDeclIndex = 0; vertexDeclIndex < _numVertexBufferSlots; ++vertexDeclIndex)
                 {
                     if (_vertexBufferSlots[vertexDeclIndex].VertexBuffer != null)
