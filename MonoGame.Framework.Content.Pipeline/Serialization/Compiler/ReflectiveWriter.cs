@@ -72,17 +72,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 }
             }
 
+            // Are we explicitly asked to ignore this item?
             var attr = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
             if (attr != null) 
                 return;
 
             var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
-
-            bool isSharedResource = false;
+            var isSharedResource = false;
             if (contentSerializerAttribute != null)
-            {
                 isSharedResource = contentSerializerAttribute.SharedResource;
-            }
             else
             {
                 if (property != null)
