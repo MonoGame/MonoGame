@@ -499,5 +499,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Write(value.Width);
             Write(value.Height);
         }
+
+        /// <summary>
+        /// Helper for checking if a type can be deserialized into an existing object.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <returns>True if the type can be deserialized into an existing object.</returns>
+        internal bool CanDeserializeIntoExistingObject(Type type)
+        {
+            var typeWriter = compiler.GetTypeWriter(type);
+            return typeWriter != null && typeWriter.CanDeserializeIntoExistingObject;
+        }
     }
 }

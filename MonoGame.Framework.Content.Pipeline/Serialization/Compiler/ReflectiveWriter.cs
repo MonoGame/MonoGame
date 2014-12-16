@@ -54,21 +54,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             var field = member as FieldInfo;
             Debug.Assert(field != null || property != null);
 
-            // Properties must have public get and set
-            if (property != null && (property.CanWrite == false || property.CanRead == false))
-                return;
-
-            if (property != null && property.Name == "Item")
+            if (property != null)
             {
-                var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
-                var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
-
-                if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
-                    (setMethod != null && setMethod.GetParameters().Length > 0))
-                {
-                    // This is presumably a property like this[indexer] and this
-                    // should not get involved in the object deserialization.
+                // Properties must have at least a getter.
+                if (property.CanRead == false)
                     return;
+
+                // Skip over indexer properties.
+                if (property.Name == "Item")
+                {
+                    var getMethod = ReflectionHelpers.GetPropertyGetMethod(property);
+                    var setMethod = ReflectionHelpers.GetPropertySetMethod(property);
+
+                    if ((getMethod != null && getMethod.GetParameters().Length > 0) ||
+                        (setMethod != null && setMethod.GetParameters().Length > 0))
+                        return;
                 }
             }
 
@@ -81,11 +81,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             {
                 if (property != null)
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // properties cannot be serialized.
                     if (!ReflectionHelpers.PropertyIsPublic(property))
+                        return;
+
+                    // Check the type reader to see if it is safe to
+                    // deserialize into the existing type.
+                    if (!property.CanWrite && !output.CanDeserializeIntoExistingObject(property.PropertyType))
                         return;
                 }
                 else
                 {
+                    // There is no ContentSerializerAttribute, so non-public
+                    // fields cannot be deserialized.
                     if (!field.IsPublic)
                         return;
 
@@ -95,20 +104,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 }
             }
 
-            ContentTypeWriter writer;
             Type elementType;
             object memberObject;
 
             if (property != null)
             {
                 elementType = property.PropertyType;
-                writer = output.GetTypeWriter(elementType);
                 memberObject = property.GetValue(parent, null);
             }
             else
             {
                 elementType = field.FieldType;
-                writer = output.GetTypeWriter(elementType);
                 memberObject = field.GetValue(parent);
             }
 
@@ -116,6 +122,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 output.WriteSharedResource(memberObject);
             else
             {
+                var writer = output.GetTypeWriter(elementType);
                 if (writer == null || elementType == typeof(object) || elementType == typeof(Array))
                     output.WriteObject(memberObject);
                 else
