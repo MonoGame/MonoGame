@@ -27,8 +27,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
         protected override void Initialize(ContentCompiler compiler)
         {
-            var type = ReflectionHelpers.GetBaseType(TargetType);
-            if (type != null && type != typeof(object))
+            var type = ReflectionHelpers.GetBaseType(TargetType);                
+            if (type != null && type != typeof(object) && !TargetType.IsValueType)
                 _baseType = type;
 
             var runtimeType = TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() as ContentSerializerRuntimeTypeAttribute;
