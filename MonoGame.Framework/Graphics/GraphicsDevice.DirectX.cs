@@ -1074,6 +1074,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_vertexBuffersDirty)
             {
                 // TODO: Preferable to use InputAssembler.SetVertexBuffers taking an array of bindings.
+                // TODO: We should be setting the InstanceFrequency for each slot. We can probably do this fix once we get a unit test for validating the API works.
                 for (int slot = 0; slot < _numVertexBufferSlots; ++slot)
                 {
                     if (_vertexBufferSlotDirty[slot])
