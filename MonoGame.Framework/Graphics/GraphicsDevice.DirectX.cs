@@ -1073,6 +1073,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexBuffersDirty)
             {
+                // TODO: Preferable to use InputAssembler.SetVertexBuffers taking an array of bindings.
                 for (int slot = 0; slot < _numVertexBufferSlots; ++slot)
                 {
                     if (_vertexBufferSlotDirty[slot])
