@@ -124,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var linked = 0;
 
-#if GLES && !ANGLE
+#if GLES && !ANGLE && !ANDROID
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, ref linked);
 #else
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out linked);

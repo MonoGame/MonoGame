@@ -29,10 +29,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private List<string> _boneNames = new List<string>();
         private List<string> _skeletonNodes = new List<string>();
         private Dictionary<string, Matrix4x4> _objectToBone = new Dictionary<string, Matrix4x4>();
+        private Dictionary<string, Matrix4x4> _offsetMatrix = new Dictionary<string, Matrix4x4>();
+
+        public string ImporterName { get; set; }
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            var identity = new ContentIdentity(filename, GetType().Name);
+            var identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
             {
@@ -70,6 +73,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     CreateAnimation(skeleton);
                 }
 
+                // If we have a simple hierarchy with no bones and just the one
+                // mesh, we can flatten it out so the mesh is the root node.
+                if (_rootNode.Children.Count == 1 && _rootNode.Children[0] is MeshContent)
+                {
+                    var absXform = _rootNode.Children[0].AbsoluteTransform;
+                    _rootNode = _rootNode.Children[0];
+                    _rootNode.Identity = identity;
+                    _rootNode.Transform = absXform;
+                }
+
                 _scene.Clear();
             }
 
@@ -102,6 +115,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     material.Textures.Add("Transparency", texture);
                 }
 
+                if (sceneMaterial.HasTextureSpecular)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureSpecular.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureSpecular.UVIndex));
+                    material.Textures.Add("Specular", texture);
+                }
+
+                if (sceneMaterial.HasTextureHeight)
+                {
+                    var texture = new ExternalReference<TextureContent>(sceneMaterial.TextureHeight.FilePath, identity);
+                    texture.OpaqueData.Add("TextureCoordinate", string.Format("TextureCoordinate{0}", sceneMaterial.TextureHeight.UVIndex));
+                    material.Textures.Add("Bump", texture);
+                }
+
                 if (sceneMaterial.HasColorDiffuse)
                     material.DiffuseColor = ToXna(sceneMaterial.ColorDiffuse);
 
@@ -123,34 +150,88 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return materials;
         }
 
-        private MeshContent CreateMesh(Mesh sceneMesh)
+        private void FindMeshes(Node aiNode, Matrix4x4 parentXform)
         {
-            var mesh = new MeshContent { Name = sceneMesh.Name };
+            var transform = parentXform * aiNode.Transform;
 
-            // Position vertices are shared at the mesh level
-            foreach (var vert in sceneMesh.Vertices)
-                mesh.Positions.Add(new Vector3(vert.X, vert.Y, vert.Z));
-
-            var geom = new GeometryContent
+            if (aiNode.HasMeshes)
             {
-                Material = _materials[sceneMesh.MaterialIndex]
-            };
+                var mesh = new MeshContent
+                {
+                    Name = aiNode.Name,
+                    Transform = ToXna(transform)
+                };
 
-            // Geometry vertices reference 1:1 with the MeshContent parent,
-            // no indirection is necessary.
-            //geom.Vertices.Positions.AddRange(mesh.Positions);
-            geom.Vertices.AddRange(Enumerable.Range(0, sceneMesh.VertexCount));
-            geom.Indices.AddRange(sceneMesh.GetIndices());
+                foreach (var meshIndex in aiNode.MeshIndices)
+                {
+                    var aiMesh = _scene.Meshes[meshIndex];
+                    if (!aiMesh.HasVertices)
+                        continue;
 
-            if (sceneMesh.HasBones)
+                    // Extract bind pose.
+                    foreach (var bone in aiMesh.Bones)
+                    {
+                        if (!_boneNames.Contains(bone.Name))
+                            _boneNames.Add(bone.Name);
+
+                        _offsetMatrix[bone.Name] = bone.OffsetMatrix;
+                    }
+
+                    var geom = CreateGeometry(mesh, aiMesh);
+                    mesh.Geometry.Add(geom);
+                }
+
+                _rootNode.Children.Add(mesh);
+            }
+
+            // Children
+            foreach (var child in aiNode.Children)
+                FindMeshes(child, transform);
+        }
+
+        private void AddAllSkeletonBones(Node aiNode)
+        {
+            //The skeleton bones list is generated from the bones found in the mesh only
+            //This means its missing any helper bones that are animated but not actually attached to vertices
+            //Now we've found the root of the skeleton we can all all bones
+
+            if (!_boneNames.Contains(aiNode.Name))
+            {
+                _boneNames.Add(aiNode.Name);
+                _objectToBone[aiNode.Name] = Matrix4x4.Identity;
+            }
+
+            if (!_skeletonNodes.Contains(aiNode.Name))
+            {
+                _skeletonNodes.Add(aiNode.Name);
+            }
+
+            foreach (var child in aiNode.Children)
+            {
+                AddAllSkeletonBones(child);
+            }
+        }
+
+        private GeometryContent CreateGeometry(MeshContent mesh, Mesh aiMesh)
+        {
+            var geom = new GeometryContent { Material = _materials[aiMesh.MaterialIndex] };
+
+            // Vertices
+            var baseVertex = mesh.Positions.Count;
+            foreach (var vert in aiMesh.Vertices)
+                mesh.Positions.Add(ToXna(vert));
+            geom.Vertices.AddRange(Enumerable.Range(baseVertex, aiMesh.VertexCount));
+            geom.Indices.AddRange(aiMesh.GetIndices());
+
+            if (aiMesh.HasBones)
             {
                 var xnaWeights = new List<BoneWeightCollection>();
                 for (var i = 0; i < geom.Indices.Count; i++)
                 {
                     var list = new BoneWeightCollection();
-                    for (var boneIndex = 0; boneIndex < sceneMesh.BoneCount; boneIndex++)
+                    for (var boneIndex = 0; boneIndex < aiMesh.BoneCount; boneIndex++)
                     {
-                        var bone = sceneMesh.Bones[boneIndex];
+                        var bone = aiMesh.Bones[boneIndex];
                         foreach (var weight in bone.VertexWeights)
                         {
                             if (weight.VertexID != i)
@@ -167,47 +248,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             // Individual channels go here
-            if (sceneMesh.HasNormals)
-                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(sceneMesh.Normals));
+            if (aiMesh.HasNormals)
+                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), ToXna(aiMesh.Normals));
 
-            for (var i = 0; i < sceneMesh.TextureCoordinateChannelCount; i++)
+            for (var i = 0; i < aiMesh.TextureCoordinateChannelCount; i++)
                 geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i),
-                                           ToXnaTexCoord(sceneMesh.TextureCoordinateChannels[i]));
+                                           ToXnaTexCoord(aiMesh.TextureCoordinateChannels[i]));
 
-            mesh.Geometry.Add(geom);
-
-            return mesh;
-        }
-
-        private void FindMeshes(Node aiNode, Matrix4x4 parentXform)
-        {
-            var transform = parentXform * aiNode.Transform;
-            foreach (var meshIndex in aiNode.MeshIndices)
+            for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
             {
-                var aiMesh = _scene.Meshes[meshIndex];
-
-                // Extract bind pose.
-                foreach (var bone in aiMesh.Bones)
-                {
-                    if (!_boneNames.Contains(bone.Name))
-                        _boneNames.Add(bone.Name);
-
-                    var boneName = bone.Name;
-                    _objectToBone[boneName] = Matrix4x4.Identity;
-                    //_objectToBone[boneName].Inverse();
-                }
-
-                // Extract geometry
-                var mesh = CreateMesh(aiMesh);
-                mesh.Name = aiNode.Name;
-                mesh.Transform = ToXna(transform);
-
-                _rootNode.Children.Add(mesh);
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(i),
+                       ToXnaColors(aiMesh.VertexColorChannels[i]));
             }
 
-            // Children
-            foreach (var child in aiNode.Children)
-                FindMeshes(child, transform);
+            return geom;
         }
 
         private BoneContent CreateSkeleton()
@@ -264,6 +318,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 rootNode = rootNode.Parent;
             }
 
+            AddAllSkeletonBones(skeletonRoot);
             return skeletonRoot;
         }
 
@@ -293,6 +348,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     node.Transform = ToXna(transform);
                     xnaParent.Children.Add(node);
+
+                    _objectToBone[aiNode.Name] = transform;
 
                     // For the children, this is the new parent.
                     xnaParent = node;
@@ -330,6 +387,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             foreach (var aiChannel in aiAnimation.NodeAnimationChannels)
             {
+                if (aiChannel.NodeName.Contains("_$AssimpFbx$"))
+                    continue;
+
                 var channel = new AnimationChannel();
 
                 // We can have different numbers of keyframes for each, so find the max index.
@@ -341,25 +401,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     .Union(aiChannel.ScalingKeys.Select(k => k.Time))
                     .Distinct().ToList();
 
-                // The rest of this loop is almost certainly wrong. Don't trust it.
-                // There's some magical combination, ordering, or transposition we have
-                // to figure out to translate FBX->Assimp->XNA.
-                // Possibilities: matrix offset transform, missing a base transform, an extra base transform, etc.
-
-                var toBoneSpace = _objectToBone.ContainsKey(aiChannel.NodeName)
-                    ? _objectToBone[aiChannel.NodeName] * _skeletonRoot.Transform
-                    : _skeletonRoot.Transform;
-
+                var translation = new Vector3D(0, 0, 0);
+                var rotation = new Assimp.Quaternion(1, 0, 0, 0);
+                var scale = new Vector3D(1, 1, 1);
                 foreach (var aiKeyTime in times)
                 {
                     var time = TimeSpan.FromSeconds(aiKeyTime / aiAnimation.TicksPerSecond);
-                    var translation = Matrix4x4.FromTranslation(aiChannel.PositionKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value);
-                    var rotation = new Matrix4x4(aiChannel.RotationKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value.GetMatrix());
-                    var scale = Matrix4x4.FromScaling(aiChannel.ScalingKeys.FirstOrDefault(k => k.Time == aiKeyTime).Value);
-                    var nodeTransform = translation * rotation * scale;
 
-                    var xform = toBoneSpace * nodeTransform * _globalInverseXform;
-                    channel.Add(new AnimationKeyframe(time, ToXna(xform)));
+                    var translateIndex = aiChannel.PositionKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (translateIndex != -1)
+                        translation = aiChannel.PositionKeys[translateIndex].Value;
+
+                    var rotationIndex = aiChannel.RotationKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (rotationIndex != -1)
+                        rotation = aiChannel.RotationKeys[rotationIndex].Value;
+
+                    var scaleIndex = aiChannel.ScalingKeys.FindIndex(k => k.Time == aiKeyTime);
+                    if (scaleIndex != -1)
+                        scale = aiChannel.ScalingKeys[scaleIndex].Value;
+
+                    var nodeTransform = Matrix4x4.FromScaling(scale) *
+                                        new Matrix4x4(rotation.GetMatrix()) *
+                                        Matrix4x4.FromTranslation(translation);
+
+                    channel.Add(new AnimationKeyframe(time, ToXna(nodeTransform)));
                 }
 
                 animation.Channels.Add(aiChannel.NodeName, channel);
@@ -441,6 +506,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public static Vector3 ToXna(Assimp.Color4D color)
         {
             return new Vector3(color.R, color.G, color.B);
+        }
+
+        public static IEnumerable<Color> ToXnaColors(IEnumerable<Color4D> colors)
+        {
+            foreach (var color in colors)
+                yield return new Color(color.R, color.G, color.B, color.A);
         }
 
         #endregion

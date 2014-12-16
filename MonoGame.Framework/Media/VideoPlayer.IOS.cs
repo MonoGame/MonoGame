@@ -30,6 +30,10 @@ namespace Microsoft.Xna.Framework.Media
             throw new NotImplementedException();
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+        }
+
         private void PlatformPause()
         {
             throw new NotImplementedException();
@@ -71,7 +75,17 @@ namespace Microsoft.Xna.Framework.Media
             Stop();
         }
 
-                private TimeSpan PlatformGetPlayPosition()
+        private TimeSpan PlatformGetPlayPosition()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
         {
             throw new NotImplementedException();
         }
@@ -79,6 +93,10 @@ namespace Microsoft.Xna.Framework.Media
         private TimeSpan PlatformSetVolume()
         {
             throw new NotImplementedException();
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

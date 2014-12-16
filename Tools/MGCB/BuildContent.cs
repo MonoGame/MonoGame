@@ -16,6 +16,11 @@ namespace MGCB
     class BuildContent
     {
         [CommandLineParameter(
+            Name = "launchdebugger",
+            Description = "Wait for debugger to attach before building content.")]
+        public bool LaunchDebugger = false;
+
+        [CommandLineParameter(
             Name = "quiet",
             Description = "Only output content build errors.")]
         public bool Quiet = false;
@@ -24,7 +29,14 @@ namespace MGCB
             Name = "@",
             ValueName = "responseFile",
             Description = "Read a text response file with additional command line options and switches.")]
-        public readonly List<string> ResponseFiles = new List<string>();
+        // This property only exists for documentation.
+        // The actual handling of '/@' is done in the preprocess step.
+        public List<string> ResponseFiles
+        {
+            get { throw new InvalidOperationException(); }
+            set { throw new InvalidOperationException(); }
+        }
+
 
         [CommandLineParameter(
             Name = "outputDir",
@@ -62,7 +74,7 @@ namespace MGCB
         [CommandLineParameter(
             Name = "platform",
             ValueName = "targetPlatform",
-            Description = "Set the target platform for this build.  Defaults to Windows.")]
+            Description = "Set the target platform for this build.  Defaults to Windows desktop DirectX.")]
         public TargetPlatform Platform = TargetPlatform.Windows;
 
         [CommandLineParameter(
@@ -169,6 +181,11 @@ namespace MGCB
             _copyItems.Add(sourceFile);
         }
 
+        [CommandLineParameter(
+            Name = "compress",
+            Description = "Compress the XNB files for smaller file sizes.")]
+        public bool CompressContent = false;
+
         public class ContentItem
         {
             public string SourceFile;
@@ -188,20 +205,37 @@ namespace MGCB
             get { return _content.Count > 0 || _copyItems.Count > 0 || Clean; }    
         }
 
+        string ReplaceSymbols(string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(parameter))
+                return parameter;
+            return parameter
+                .Replace("$(Platform)", Platform.ToString())
+                .Replace("$(Configuration)", Config)
+                .Replace("$(Config)", Config)
+                .Replace("$(Profile)", this.Profile.ToString());
+        }
+
         public void Build(out int successCount, out int errorCount)
         {
             var projectDirectory = PathHelper.Normalize(Directory.GetCurrentDirectory());
 
-            var outputPath = OutputDir;
+            var outputPath = ReplaceSymbols (OutputDir);
             if (!Path.IsPathRooted(outputPath))
                 outputPath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, outputPath)));
 
-            var intermediatePath = IntermediateDir;
+            var intermediatePath = ReplaceSymbols (IntermediateDir);
             if (!Path.IsPathRooted(intermediatePath))
-                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, IntermediateDir)));
+                intermediatePath = PathHelper.Normalize(Path.GetFullPath(Path.Combine(projectDirectory, intermediatePath)));
             
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
+            _manager.CompressContent = CompressContent;
+
+            // If the intent is to debug build, break at the original location
+            // of any exception, eg, within the actual importer/processor.
+            if (LaunchDebugger)
+                _manager.RethrowExceptions = false;
 
             // Feed all the assembly references to the pipeline manager
             // so it can resolve importers, processors, writers, and types.
@@ -255,6 +289,20 @@ namespace MGCB
                     newContent.SourceFiles.Add(c.SourceFile);
 
                     ++successCount;
+                }
+                catch (InvalidContentException ex)
+                {
+                    var message = string.Empty;
+                    if (ex.ContentIdentity != null && !string.IsNullOrEmpty(ex.ContentIdentity.SourceFilename))
+                    {
+                        message = ex.ContentIdentity.SourceFilename;
+                        if (!string.IsNullOrEmpty(ex.ContentIdentity.FragmentIdentifier))
+                            message += "(" + ex.ContentIdentity.FragmentIdentifier + ")";
+                        message += ": ";
+                    }
+                    message += ex.Message;
+                    Console.WriteLine(message);
+                    ++errorCount;
                 }
                 catch (PipelineException ex)
                 {
@@ -310,6 +358,11 @@ namespace MGCB
                         Directory.CreateDirectory(destPath);
 
                     File.Copy(c, dest, true);
+
+                    // Destination file should not be read-only even if original was.
+                    var fileAttr = File.GetAttributes(dest);
+                    fileAttr = fileAttr & (~FileAttributes.ReadOnly);
+                    File.SetAttributes(dest, fileAttr);
 
                     ++successCount;
                 }

@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var sizeInBytes = IndexCount * (this.IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4);
 
-#if IOS || ANDROID
+#if IOS
                 GL.GenBuffers(1, ref ibo);
 #else
                 GL.GenBuffers(1, out ibo);

@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
             depthStencilFormat = DepthFormat.None;
             multiSampleCount = 0;
             PresentationInterval = PresentInterval.Default;
-            DisplayOrientation = DisplayOrientation.Default;
+            DisplayOrientation = Microsoft.Xna.Framework.DisplayOrientation.Default;
         }
 
         public PresentationParameters Clone()

@@ -40,11 +40,9 @@ purpose and non-infringement.
 
 using System;
 using System.Collections.Generic;
-#if WINRT
-using System.Reflection;
-#endif
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -63,48 +61,48 @@ namespace Microsoft.Xna.Framework.Content
 
 					Type itemType = item.Value.GetType();
 
-					if (IsAssignableFromInternal(typeof(Texture), itemType)) {
+					if (ReflectionHelpers.IsAssignableFromType(typeof(Texture), itemType)) {
 						parameter.SetValue ((Texture)item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(int), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(int), itemType)) {
 						parameter.SetValue((int) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(bool), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(bool), itemType)) {
 						parameter.SetValue((bool) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(float), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(float), itemType)) {
 						parameter.SetValue((float) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(float []), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(float []), itemType)) {
 						parameter.SetValue((float[]) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector2), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector2), itemType)) {
 						parameter.SetValue((Vector2) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector2 []), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector2 []), itemType)) {
 						parameter.SetValue((Vector2 []) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector3), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector3), itemType)) {
 						parameter.SetValue((Vector3) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector3 []), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector3 []), itemType)) {
 						parameter.SetValue((Vector3 []) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector4), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector4), itemType)) {
 						parameter.SetValue((Vector4) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Vector4 []), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Vector4 []), itemType)) {
 						parameter.SetValue((Vector4 []) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Matrix), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Matrix), itemType)) {
 						parameter.SetValue((Matrix) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Matrix []), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Matrix []), itemType)) {
 						parameter.SetValue((Matrix[]) item.Value);
 					}
-					else if (IsAssignableFromInternal(typeof(Quaternion), itemType)) {
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(Quaternion), itemType)) {
 						parameter.SetValue((Quaternion) item.Value);
-					}                   
+					}
 					else {
 						throw new NotSupportedException ("Parameter type is not supported");
 					}
@@ -115,14 +113,5 @@ namespace Microsoft.Xna.Framework.Content
 
 			return effectMaterial;
 		}
-
-        internal static bool IsAssignableFromInternal(Type type1, Type type2 ) {
-#if WINRT
-			return type1.GetTypeInfo().IsAssignableFrom(type2.GetTypeInfo());
-#else
-			return type1.IsAssignableFrom(type2);
-#endif
-        }
-        
 	}
 }

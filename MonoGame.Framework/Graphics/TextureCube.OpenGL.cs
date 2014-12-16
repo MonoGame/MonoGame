@@ -22,17 +22,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public partial class TextureCube
 	{
-		PixelInternalFormat glInternalFormat;
-		PixelFormat glFormat;
-		PixelType glType;
-
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
             this.glTarget = TextureTarget.TextureCubeMap;
 
             Threading.BlockOnUIThread(() =>
             {
-#if IOS || ANDROID
+#if IOS
 			GL.GenTextures(1, ref this.glTexture);
 #else
             GL.GenTextures(1, out this.glTexture);

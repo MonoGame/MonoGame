@@ -30,6 +30,23 @@ namespace MonoGame.Tools.Pipeline
         {
             return TypeName;
         }
+
+        public override int GetHashCode()
+        {
+            return TypeName == null ? 0 : TypeName.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as ImporterTypeDescription;
+            if (other == null)
+                return false;
+            
+            if (string.IsNullOrEmpty(other.TypeName) != string.IsNullOrEmpty(TypeName))
+                return false;
+
+            return TypeName.Equals(other.TypeName);
+        }
     };
 
     public class ProcessorTypeDescription
@@ -156,6 +173,9 @@ namespace MonoGame.Tools.Pipeline
         public static ImporterTypeDescription MissingImporter { get; private set; }
         public static ProcessorTypeDescription MissingProcessor { get; private set; }
 
+        public static TypeConverter.StandardValuesCollection ImportersStandardValuesCollection { get; private set; }
+        public static TypeConverter.StandardValuesCollection ProcessorsStandardValuesCollection { get; private set; }
+
         private static readonly Dictionary<string, string> _oldNameRemap = new Dictionary<string, string>()
             {
                 { "MGMaterialProcessor", "MaterialProcessor" },
@@ -229,7 +249,7 @@ namespace MonoGame.Tools.Pipeline
             var cur = 0;
             foreach (var item in _importers)
             {
-                var outputType = item.Type.BaseType.GenericTypeArguments[0];
+                var outputType = item.Type.BaseType.GetGenericArguments()[0];
                 var desc = new ImporterTypeDescription()
                     {
                         TypeName = item.Type.Name,
@@ -243,14 +263,17 @@ namespace MonoGame.Tools.Pipeline
             }
 
             Importers = importerDescriptions;
+            ImportersStandardValuesCollection = new TypeConverter.StandardValuesCollection(Importers);
 
             var processorDescriptions = new ProcessorTypeDescription[_processors.Count];
+
+            const BindingFlags bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
             cur = 0;
             foreach (var item in _processors)
             {
                 var obj = Activator.CreateInstance(item.Type);
-                var typeProperties = item.Type.GetRuntimeProperties();
+                var typeProperties = item.Type.GetProperties(bindings);
                 var properties = new List<ProcessorTypeDescription.Property>();
                 foreach (var i in typeProperties)
                 {
@@ -261,7 +284,7 @@ namespace MonoGame.Tools.Pipeline
                         {
                             Name = i.Name,
                             Type = i.PropertyType,
-                            DefaultValue = i.GetValue(obj),
+                            DefaultValue = i.GetValue(obj, null),
                         };
                     properties.Add(p);
                 }
@@ -281,7 +304,8 @@ namespace MonoGame.Tools.Pipeline
                 cur++;
             }
 
-            Processors = processorDescriptions;            
+            Processors = processorDescriptions;
+            ProcessorsStandardValuesCollection = new TypeConverter.StandardValuesCollection(Processors);
         }
 
         public static void Unload()
@@ -291,6 +315,9 @@ namespace MonoGame.Tools.Pipeline
          
             _processors = null;
             Processors = null;
+
+            ImportersStandardValuesCollection = null;
+            ProcessorsStandardValuesCollection = null;
         }        
 
         public static TypeConverter FindConverter(Type type)
@@ -391,7 +418,7 @@ namespace MonoGame.Tools.Pipeline
                 try
                 {                    
                     var a = Assembly.LoadFrom(path);
-                    var types = a.GetExportedTypes();
+                    var types = a.GetTypes();
                     ProcessTypes(types);
                 }
                 catch 

@@ -1,5 +1,5 @@
-﻿#if !ANDROID && !IOS && !PSM
-#define IS_FULL_NET_AVAILABLE
+﻿#if !__ANDROID__ && !IOS && !UNITY_WEBPLAYER && !UNITY_ANDROID && !UNITY_IPHONE
+#define IS_MAC_AVAILABLE
 #endif
 
 using System;
@@ -16,7 +16,7 @@ namespace Lidgren.Network
 	{
 		private NetPeerStatus m_status;
 		private Thread m_networkThread;
-        private PlatformSocket m_socket;
+		private Socket m_socket;
 		internal byte[] m_sendBuffer;
 		internal byte[] m_receiveBuffer;
 		internal NetIncomingMessage m_readHelperMessage;
@@ -24,6 +24,7 @@ namespace Lidgren.Network
 		private object m_initializeLock = new object();
 		private uint m_frameCounter;
 		private double m_lastHeartbeat;
+		private double m_lastSocketBind = float.MinValue;
 		private NetUPnP m_upnp;
 
 		internal readonly NetPeerConfiguration m_configuration;
@@ -34,23 +35,50 @@ namespace Lidgren.Network
 
 		internal readonly NetPeerStatistics m_statistics;
 		internal long m_uniqueIdentifier;
+		internal bool m_executeFlushSendQueue;
 
-		private AutoResetEvent m_messageReceivedEvent = new AutoResetEvent(false);
+		private AutoResetEvent m_messageReceivedEvent;
 		private List<NetTuple<SynchronizationContext, SendOrPostCallback>> m_receiveCallbacks;
 
 		/// <summary>
 		/// Gets the socket, if Start() has been called
 		/// </summary>
-		public PlatformSocket Socket { get { return m_socket; } }
+		public Socket Socket { get { return m_socket; } }
 
 		/// <summary>
 		/// Call this to register a callback for when a new message arrives
 		/// </summary>
-		public void RegisterReceivedCallback(SendOrPostCallback callback)
+		public void RegisterReceivedCallback(SendOrPostCallback callback, SynchronizationContext syncContext = null)
 		{
+			if (syncContext == null)
+				syncContext = SynchronizationContext.Current;
+			if (syncContext == null)
+				throw new NetException("Need a SynchronizationContext to register callback on correct thread!");
 			if (m_receiveCallbacks == null)
 				m_receiveCallbacks = new List<NetTuple<SynchronizationContext, SendOrPostCallback>>();
-			m_receiveCallbacks.Add(new NetTuple<SynchronizationContext, SendOrPostCallback>(SynchronizationContext.Current, callback));
+			m_receiveCallbacks.Add(new NetTuple<SynchronizationContext, SendOrPostCallback>(syncContext, callback));
+		}
+
+		/// <summary>
+		/// Call this to unregister a callback, but remember to do it in the same synchronization context!
+		/// </summary>
+		public void UnregisterReceivedCallback(SendOrPostCallback callback)
+		{
+			if (m_receiveCallbacks == null)
+				return;
+
+			// remove all callbacks regardless of sync context
+		RestartRemoveCallbacks:
+			for (int i = 0; i < m_receiveCallbacks.Count; i++)
+			{
+				if (m_receiveCallbacks[i].Item2.Equals(callback))
+				{
+					m_receiveCallbacks.RemoveAt(i);
+					goto RestartRemoveCallbacks;
+				}
+			}
+			if (m_receiveCallbacks.Count < 1)
+				m_receiveCallbacks = null;
 		}
 
 		internal void ReleaseMessage(NetIncomingMessage msg)
@@ -62,7 +90,7 @@ namespace Lidgren.Network
 				HandleReleasedFragment(msg);
 				return;
 			}
-			
+
 			m_releasedIncomingMessages.Enqueue(msg);
 
 			if (m_messageReceivedEvent != null)
@@ -71,8 +99,57 @@ namespace Lidgren.Network
 			if (m_receiveCallbacks != null)
 			{
 				foreach (var tuple in m_receiveCallbacks)
-					tuple.Item1.Post(tuple.Item2, this);
+				{
+					try
+					{
+						tuple.Item1.Post(tuple.Item2, this);
+					}
+					catch (Exception ex)
+					{
+						LogWarning("Receive callback exception:" + ex);
+					}
+				}
 			}
+		}
+
+		private void BindSocket(bool reBind)
+		{
+			double now = NetTime.Now;
+			if (now - m_lastSocketBind < 1.0)
+			{
+				LogDebug("Suppressed socket rebind; last bound " + (now - m_lastSocketBind) + " seconds ago");
+				return; // only allow rebind once every second
+			}
+			m_lastSocketBind = now;
+
+			if (m_socket == null)
+				m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+			if (reBind)
+				m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, (int)1); 
+
+			m_socket.ReceiveBufferSize = m_configuration.ReceiveBufferSize;
+			m_socket.SendBufferSize = m_configuration.SendBufferSize;
+			m_socket.Blocking = false;
+
+			var ep = (EndPoint)new IPEndPoint(m_configuration.LocalAddress, reBind ? m_listenPort : m_configuration.Port);
+			m_socket.Bind(ep);
+
+			try
+			{
+				const uint IOC_IN = 0x80000000;
+				const uint IOC_VENDOR = 0x18000000;
+				uint SIO_UDP_CONNRESET = IOC_IN | IOC_VENDOR | 12;
+				m_socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+			}
+			catch
+			{
+				// ignore; SIO_UDP_CONNRESET not supported on this platform
+			}
+
+			IPEndPoint boundEp = m_socket.LocalEndPoint as IPEndPoint;
+			LogDebug("Socket bound to " + boundEp + ": " + m_socket.IsBound);
+			m_listenPort = boundEp.Port;
 		}
 
 		private void InitializeNetwork()
@@ -94,21 +171,7 @@ namespace Lidgren.Network
 				m_handshakes.Clear();
 
 				// bind to socket
-				IPEndPoint iep = null;
-
-				iep = new IPEndPoint(m_configuration.LocalAddress, m_configuration.Port);
-				EndPoint ep = (EndPoint)iep;
-
-                m_socket = new PlatformSocket();
-				m_socket.ReceiveBufferSize = m_configuration.ReceiveBufferSize;
-				m_socket.SendBufferSize = m_configuration.SendBufferSize;
-				m_socket.Blocking = false;
-				m_socket.Bind(ep);
-                m_socket.Setup();
-
-				IPEndPoint boundEp = m_socket.LocalEndPoint as IPEndPoint;
-				LogDebug("Socket bound to " + boundEp + ": " + m_socket.IsBound);
-				m_listenPort = boundEp.Port;
+				BindSocket(false);
 
 				m_receiveBuffer = new byte[m_configuration.ReceiveBufferSize];
 				m_sendBuffer = new byte[m_configuration.SendBufferSize];
@@ -116,9 +179,9 @@ namespace Lidgren.Network
 				m_readHelperMessage.m_data = m_receiveBuffer;
 
 				byte[] macBytes = new byte[8];
-				NetRandom.Instance.NextBytes(macBytes);
+				MWCRandom.Instance.NextBytes(macBytes);
 
-#if IS_FULL_NET_AVAILABLE
+#if IS_MAC_AVAILABLE
 				try
 				{
 					System.Net.NetworkInformation.PhysicalAddress pa = NetUtility.GetMacAddress();
@@ -137,16 +200,12 @@ namespace Lidgren.Network
 					// not supported; lets just keep the random bytes set above
 				}
 #endif
+				IPEndPoint boundEp = m_socket.LocalEndPoint as IPEndPoint;
 				byte[] epBytes = BitConverter.GetBytes(boundEp.GetHashCode());
 				byte[] combined = new byte[epBytes.Length + macBytes.Length];
 				Array.Copy(epBytes, 0, combined, 0, epBytes.Length);
 				Array.Copy(macBytes, 0, combined, epBytes.Length, macBytes.Length);
-#if WINDOWS_PHONE
-                SHA1 s = new SHA1Managed();
-                m_uniqueIdentifier = BitConverter.ToInt64(s.ComputeHash(combined), 0);
-#else
-                m_uniqueIdentifier = BitConverter.ToInt64(SHA1.Create().ComputeHash(combined), 0);
-#endif
+				m_uniqueIdentifier = BitConverter.ToInt64(NetUtility.CreateSHA1Hash(combined), 0);
 
 				m_status = NetPeerStatus.Running;
 			}
@@ -205,8 +264,12 @@ namespace Lidgren.Network
 				}
 			}
 
+			FlushDelayedPackets();
+
 			// one final heartbeat, will send stuff and do disconnect
 			Heartbeat();
+
+			Thread.Sleep(10);
 
 			lock (m_initializeLock)
 			{
@@ -214,21 +277,23 @@ namespace Lidgren.Network
 				{
 					if (m_socket != null)
 					{
-						// Wrapped this in a try for MonoGame.  I think we are bombing here
-						//  because there are no clients connecting during tests.
-						try {
+						try
+						{
 							m_socket.Shutdown(SocketShutdown.Receive);
 						}
-						catch (Exception socketException) {
-							LogDebug("Exception trying to Shutdown Socket: " + socketException.Message);
+						catch(Exception ex)
+						{
+							LogDebug("Socket.Shutdown exception: " + ex.ToString());
 						}
-						m_socket.Close(2); // 2 seconds timeout
-					}
-					if (m_messageReceivedEvent != null)
-					{
-						m_messageReceivedEvent.Set();
-						m_messageReceivedEvent.Close();
-						m_messageReceivedEvent = null;
+
+						try
+						{
+							m_socket.Close(2); // 2 seconds timeout
+						}
+						catch (Exception ex)
+						{
+							LogDebug("Socket.Close exception: " + ex.ToString());
+						}
 					}
 				}
 				finally
@@ -236,12 +301,18 @@ namespace Lidgren.Network
 					m_socket = null;
 					m_status = NetPeerStatus.NotRunning;
 					LogDebug("Shutdown complete");
+
+					// wake up any threads waiting for server shutdown
+					if (m_messageReceivedEvent != null)
+						m_messageReceivedEvent.Set();
 				}
 
+				m_lastSocketBind = float.MinValue;
 				m_receiveBuffer = null;
 				m_sendBuffer = null;
 				m_unsentUnconnectedMessages.Clear();
 				m_connections.Clear();
+				m_connectionLookup.Clear();
 				m_handshakes.Clear();
 			}
 
@@ -260,7 +331,7 @@ namespace Lidgren.Network
 			int maxCHBpS = 1250 - m_connections.Count;
 			if (maxCHBpS < 250)
 				maxCHBpS = 250;
-			if (delta > (1.0 / (double)maxCHBpS)) // max connection heartbeats/second max
+			if (delta > (1.0 / (double)maxCHBpS) || delta < 0.0) // max connection heartbeats/second max
 			{
 				m_frameCounter++;
 				m_lastHeartbeat = dnow;
@@ -281,10 +352,10 @@ namespace Lidgren.Network
 						{
 #if DEBUG
 							// sanity check
-							if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndpoint))
+							if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
 							{
 								LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
-								m_handshakes.Remove(conn.RemoteEndpoint);
+								m_handshakes.Remove(conn.RemoteEndPoint);
 							}
 #endif
 							break; // collection has been modified
@@ -293,8 +364,12 @@ namespace Lidgren.Network
 				}
 
 #if DEBUG
-			SendDelayedPackets();
+				SendDelayedPackets();
 #endif
+
+				// update m_executeFlushSendQueue
+				if (m_configuration.m_autoFlushSendQueue)
+					m_executeFlushSendQueue = true;
 
 				// do connection heartbeats
 				lock (m_connections)
@@ -308,23 +383,18 @@ namespace Lidgren.Network
 							// remove connection
 							//
 							m_connections.Remove(conn);
-							m_connectionLookup.Remove(conn.RemoteEndpoint);
+							m_connectionLookup.Remove(conn.RemoteEndPoint);
 							break; // can't continue iteration here
 						}
 					}
 				}
+				m_executeFlushSendQueue = false;
 
 				// send unsent unconnected messages
 				NetTuple<IPEndPoint, NetOutgoingMessage> unsent;
 				while (m_unsentUnconnectedMessages.TryDequeue(out unsent))
 				{
 					NetOutgoingMessage om = unsent.Item2;
-#if DEBUG
-                    if (om.m_messageType == NetMessageType.NatPunchMessage)
-                    {
-                        LogDebug("Sending Nat Punch Message to " + unsent.Item1.ToString());
-                    }
-#endif
 
 					bool connReset;
 					int len = om.Encode(m_sendBuffer, 0, 0);
@@ -342,31 +412,43 @@ namespace Lidgren.Network
 			if (m_socket == null)
 				return;
 
-			if (!m_socket.Poll(1000)) // wait up to 1 ms for data to arrive
+			if (!m_socket.Poll(1000, SelectMode.SelectRead)) // wait up to 1 ms for data to arrive
 				return;
 
 			//if (m_socket == null || m_socket.Available < 1)
 			//	return;
+
+			// update now
+			dnow = NetTime.Now;
+			now = (float)dnow;
 
 			do
 			{
 				int bytesReceived = 0;
 				try
 				{
-					bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer, 0, m_receiveBuffer.Length, ref m_senderRemote);
+					bytesReceived = m_socket.ReceiveFrom(m_receiveBuffer, 0, m_receiveBuffer.Length, SocketFlags.None, ref m_senderRemote);
 				}
 				catch (SocketException sx)
 				{
-					if (sx.SocketErrorCode == SocketError.ConnectionReset)
+					switch (sx.SocketErrorCode)
 					{
-						// connection reset by peer, aka connection forcibly closed aka "ICMP port unreachable" 
-						// we should shut down the connection; but m_senderRemote seemingly cannot be trusted, so which connection should we shut down?!
-						// So, what to do?
-						return;
-					}
+						case SocketError.ConnectionReset:
+							// connection reset by peer, aka connection forcibly closed aka "ICMP port unreachable" 
+							// we should shut down the connection; but m_senderRemote seemingly cannot be trusted, so which connection should we shut down?!
+							// So, what to do?
+							LogWarning("ConnectionReset");
+							return;
 
-					LogWarning(sx.ToString());
-					return;
+						case SocketError.NotConnected:
+							// socket is unbound; try to rebind it (happens on mobile when process goes to sleep)
+							BindSocket(true);
+							return;
+
+						default:
+							LogWarning("Socket exception: " + sx.ToString());
+							return;
+					}
 				}
 
 				if (bytesReceived < NetConstants.HeaderByteSize)
@@ -376,31 +458,37 @@ namespace Lidgren.Network
 
 				IPEndPoint ipsender = (IPEndPoint)m_senderRemote;
 
-				if (ipsender.Port == 1900)
+				if (m_upnp != null && now < m_upnp.m_discoveryResponseDeadline && bytesReceived > 32)
 				{
-					// UPnP response
-					try
+					// is this an UPnP response?
+					string resp = System.Text.Encoding.ASCII.GetString(m_receiveBuffer, 0, bytesReceived);
+					if (resp.Contains("upnp:rootdevice") || resp.Contains("UPnP/1.0"))
 					{
-						string resp = System.Text.Encoding.UTF8.GetString(m_receiveBuffer, 0, bytesReceived);
-						if (resp.Contains("upnp:rootdevice"))
+						try
 						{
 							resp = resp.Substring(resp.ToLower().IndexOf("location:") + 9);
 							resp = resp.Substring(0, resp.IndexOf("\r")).Trim();
 							m_upnp.ExtractServiceUrl(resp);
 							return;
 						}
+						catch (Exception ex)
+						{
+							LogDebug("Failed to parse UPnP response: " + ex.ToString());
+
+							// don't try to parse this packet further
+							return;
+						}
 					}
-					catch { }
 				}
 
 				NetConnection sender = null;
 				m_connectionLookup.TryGetValue(ipsender, out sender);
 
-				double receiveTime = NetTime.Now;
 				//
 				// parse packet into messages
 				//
 				int numMessages = 0;
+				int numFragments = 0;
 				int ptr = 0;
 				while ((bytesReceived - ptr) >= NetConstants.HeaderByteSize)
 				{
@@ -420,6 +508,8 @@ namespace Lidgren.Network
 					bool isFragment = ((low & 1) == 1);
 					ushort sequenceNumber = (ushort)((low >> 1) | (((int)high) << 7));
 
+					numFragments++;
+
 					ushort payloadBitLength = (ushort)(m_receiveBuffer[ptr++] | (m_receiveBuffer[ptr++] << 8));
 					int payloadByteLength = NetUtility.BytesToHoldBits(payloadBitLength);
 
@@ -429,16 +519,20 @@ namespace Lidgren.Network
 						return;
 					}
 
+					if (tp >= NetMessageType.Unused1 && tp <= NetMessageType.Unused29)
+					{
+						ThrowOrLog("Unexpected NetMessageType: " + tp);
+						return;
+					}
+
 					try
 					{
-						NetException.Assert(tp < NetMessageType.Unused1 || tp > NetMessageType.Unused29);
-
 						if (tp >= NetMessageType.LibraryError)
 						{
 							if (sender != null)
 								sender.ReceivedLibraryMessage(tp, ptr, payloadByteLength);
 							else
-								ReceivedUnconnectedLibraryMessage(receiveTime, ipsender, tp, ptr, payloadByteLength);
+								ReceivedUnconnectedLibraryMessage(dnow, ipsender, tp, ptr, payloadByteLength);
 						}
 						else
 						{
@@ -447,12 +541,13 @@ namespace Lidgren.Network
 
 							NetIncomingMessage msg = CreateIncomingMessage(NetIncomingMessageType.Data, payloadByteLength);
 							msg.m_isFragment = isFragment;
-							msg.m_receiveTime = receiveTime;
+							msg.m_receiveTime = dnow;
 							msg.m_sequenceNumber = sequenceNumber;
 							msg.m_receivedMessageType = tp;
 							msg.m_senderConnection = sender;
-							msg.m_senderEndpoint = ipsender;
+							msg.m_senderEndPoint = ipsender;
 							msg.m_bitLength = payloadBitLength;
+
 							Buffer.BlockCopy(m_receiveBuffer, ptr, msg.m_data, 0, payloadByteLength);
 							if (sender != null)
 							{
@@ -484,14 +579,22 @@ namespace Lidgren.Network
 					ptr += payloadByteLength;
 				}
 
-				m_statistics.PacketReceived(bytesReceived, numMessages);
+				m_statistics.PacketReceived(bytesReceived, numMessages, numFragments);
 				if (sender != null)
-					sender.m_statistics.PacketReceived(bytesReceived, numMessages);
+					sender.m_statistics.PacketReceived(bytesReceived, numMessages, numFragments);
 
 			} while (m_socket.Available > 0);
 		}
 
-		internal void HandleIncomingDiscoveryRequest(double now, IPEndPoint senderEndpoint, int ptr, int payloadByteLength)
+		/// <summary>
+		/// If NetPeerConfiguration.AutoFlushSendQueue() is false; you need to call this to send all messages queued using SendMessage()
+		/// </summary>
+		public void FlushSendQueue()
+		{
+			m_executeFlushSendQueue = true;
+		}
+
+		internal void HandleIncomingDiscoveryRequest(double now, IPEndPoint senderEndPoint, int ptr, int payloadByteLength)
 		{
 			if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.DiscoveryRequest))
 			{
@@ -500,12 +603,12 @@ namespace Lidgren.Network
 					Buffer.BlockCopy(m_receiveBuffer, ptr, dm.m_data, 0, payloadByteLength);
 				dm.m_receiveTime = now;
 				dm.m_bitLength = payloadByteLength * 8;
-				dm.m_senderEndpoint = senderEndpoint;
+				dm.m_senderEndPoint = senderEndPoint;
 				ReleaseMessage(dm);
 			}
 		}
 
-		internal void HandleIncomingDiscoveryResponse(double now, IPEndPoint senderEndpoint, int ptr, int payloadByteLength)
+		internal void HandleIncomingDiscoveryResponse(double now, IPEndPoint senderEndPoint, int ptr, int payloadByteLength)
 		{
 			if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.DiscoveryResponse))
 			{
@@ -514,15 +617,15 @@ namespace Lidgren.Network
 					Buffer.BlockCopy(m_receiveBuffer, ptr, dr.m_data, 0, payloadByteLength);
 				dr.m_receiveTime = now;
 				dr.m_bitLength = payloadByteLength * 8;
-				dr.m_senderEndpoint = senderEndpoint;
+				dr.m_senderEndPoint = senderEndPoint;
 				ReleaseMessage(dr);
 			}
 		}
 
-		private void ReceivedUnconnectedLibraryMessage(double now, IPEndPoint senderEndpoint, NetMessageType tp, int ptr, int payloadByteLength)
+		private void ReceivedUnconnectedLibraryMessage(double now, IPEndPoint senderEndPoint, NetMessageType tp, int ptr, int payloadByteLength)
 		{
 			NetConnection shake;
-			if (m_handshakes.TryGetValue(senderEndpoint, out shake))
+			if (m_handshakes.TryGetValue(senderEndPoint, out shake))
 			{
 				shake.ReceivedHandshake(now, tp, ptr, payloadByteLength);
 				return;
@@ -534,16 +637,18 @@ namespace Lidgren.Network
 			switch (tp)
 			{
 				case NetMessageType.Discovery:
-					HandleIncomingDiscoveryRequest(now, senderEndpoint, ptr, payloadByteLength);
+					HandleIncomingDiscoveryRequest(now, senderEndPoint, ptr, payloadByteLength);
 					return;
 				case NetMessageType.DiscoveryResponse:
-					HandleIncomingDiscoveryResponse(now, senderEndpoint, ptr, payloadByteLength);
+					HandleIncomingDiscoveryResponse(now, senderEndPoint, ptr, payloadByteLength);
 					return;
 				case NetMessageType.NatIntroduction:
-					HandleNatIntroduction(ptr);
+					if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+						HandleNatIntroduction(ptr);
 					return;
 				case NetMessageType.NatPunchMessage:
-					HandleNatPunch(ptr, senderEndpoint);
+					if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.NatIntroductionSuccess))
+						HandleNatPunch(ptr, senderEndPoint);
 					return;
 				case NetMessageType.ConnectResponse:
 
@@ -551,7 +656,7 @@ namespace Lidgren.Network
 					{
 						foreach (var hs in m_handshakes)
 						{
-							if (hs.Key.Address.Equals(senderEndpoint.Address))
+							if (hs.Key.Address.Equals(senderEndPoint.Address))
 							{
 								if (hs.Value.m_connectionInitiator)
 								{
@@ -564,11 +669,11 @@ namespace Lidgren.Network
 									m_connectionLookup.Remove(hs.Key);
 									m_handshakes.Remove(hs.Key);
 
-									LogDebug("Detected host port change; rerouting connection to " + senderEndpoint);
-									hsconn.MutateEndpoint(senderEndpoint);
+									LogDebug("Detected host port change; rerouting connection to " + senderEndPoint);
+									hsconn.MutateEndPoint(senderEndPoint);
 
-									m_connectionLookup.Add(senderEndpoint, hsconn);
-									m_handshakes.Add(senderEndpoint, hsconn);
+									m_connectionLookup.Add(senderEndPoint, hsconn);
+									m_handshakes.Add(senderEndPoint, hsconn);
 
 									hsconn.ReceivedHandshake(now, tp, ptr, payloadByteLength);
 									return;
@@ -577,38 +682,42 @@ namespace Lidgren.Network
 						}
 					}
 
-					LogWarning("Received unhandled library message " + tp + " from " + senderEndpoint);
+					LogWarning("Received unhandled library message " + tp + " from " + senderEndPoint);
 					return;
 				case NetMessageType.Connect:
-					// proceed
-					break;
+					if (m_configuration.AcceptIncomingConnections == false)
+					{
+						LogWarning("Received Connect, but we're not accepting incoming connections!");
+						return;
+					}
+					// handle connect
+					// It's someone wanting to shake hands with us!
+
+					int reservedSlots = m_handshakes.Count + m_connections.Count;
+					if (reservedSlots >= m_configuration.m_maximumConnections)
+					{
+						// server full
+						NetOutgoingMessage full = CreateMessage("Server full");
+						full.m_messageType = NetMessageType.Disconnect;
+						SendLibrary(full, senderEndPoint);
+						return;
+					}
+
+					// Ok, start handshake!
+					NetConnection conn = new NetConnection(this, senderEndPoint);
+					conn.m_status = NetConnectionStatus.ReceivedInitiation;
+					m_handshakes.Add(senderEndPoint, conn);
+					conn.ReceivedHandshake(now, tp, ptr, payloadByteLength);
+					return;
+
 				case NetMessageType.Disconnect:
 					// this is probably ok
-					LogVerbose("Received Disconnect from unconnected source: " + senderEndpoint);
+					LogVerbose("Received Disconnect from unconnected source: " + senderEndPoint);
 					return;
 				default:
-					LogWarning("Received unhandled library message " + tp + " from " + senderEndpoint);
+					LogWarning("Received unhandled library message " + tp + " from " + senderEndPoint);
 					return;
 			}
-
-			// It's someone wanting to shake hands with us!
-
-			int reservedSlots = m_handshakes.Count + m_connections.Count;
-			if (reservedSlots >= m_configuration.m_maximumConnections)
-			{
-				// server full
-				NetOutgoingMessage full = CreateMessage("Server full");
-				full.m_messageType = NetMessageType.Disconnect;
-				SendLibrary(full, senderEndpoint);
-				return;
-			}
-
-			// Ok, start handshake!
-			NetConnection conn = new NetConnection(this, senderEndpoint);
-			m_handshakes.Add(senderEndpoint, conn);
-			conn.ReceivedHandshake(now, tp, ptr, payloadByteLength);
-
-			return;
 		}
 
 		internal void AcceptConnection(NetConnection conn)
@@ -616,7 +725,7 @@ namespace Lidgren.Network
 			// LogDebug("Accepted connection " + conn);
 			conn.InitExpandMTU(NetTime.Now);
 
-			if (m_handshakes.Remove(conn.m_remoteEndpoint) == false)
+			if (m_handshakes.Remove(conn.m_remoteEndPoint) == false)
 				LogWarning("AcceptConnection called but m_handshakes did not contain it!");
 
 			lock (m_connections)
@@ -628,7 +737,7 @@ namespace Lidgren.Network
 				else
 				{
 					m_connections.Add(conn);
-					m_connectionLookup.Add(conn.m_remoteEndpoint, conn);
+					m_connectionLookup.Add(conn.m_remoteEndPoint, conn);
 				}
 			}
 		}

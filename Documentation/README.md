@@ -14,12 +14,12 @@ First some general rules one should follow when contributing documentation to th
 Breaking these rules can result in your contribution being rejected.
 
 ## Getting Started
-TODO!
+You can create and edit documentation right from the web browser without needing to install Git or ever leave the GitHub site.
 
- - Fork the MonoGame repo.
- - Create a branch to work from.
- - Use the GitHub markup editor from the browser.
- - Submit pull requests early and often.
+ - [Fork the MonoGame repo](https://help.github.com/articles/fork-a-repo/).
+ - [Create a new branch](https://help.github.com/articles/creating-and-deleting-branches-within-your-repository/) from `develop` and make your changes only in that branch.
+ - [Create a new file](https://help.github.com/articles/creating-new-files/) or [edit an existing one](https://help.github.com/articles/editing-files-in-your-repository/) using the GitHub markup editor.
+ - [Submit pull requests](https://help.github.com/articles/creating-a-pull-request/) early and often to merge your documentation changes.
 
 ## Style Guide
 Before you contribute any documentation you should learn a bit about what we expect out of the different types of documentation.
@@ -28,7 +28,7 @@ Before you contribute any documentation you should learn a bit about what we exp
 TODO!
 
 ### API Reference 
-The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](http://msdn.microsoft.com/en-us/library/b2s063f7(vs.71).aspx) and is inline to the MonoGame source code.
+The API reference documentation is a big part of the documentation effort for MonoGame.  The documentation is written in the [C# XML format](http://msdn.microsoft.com/en-us/library/b2s063f7(vs.71).aspx) and is inline to the MonoGame source code. The final web pages with API documentation are generated using [SharpDoc](http://sharpdx.org/documentation/tools/sharpdoc).
 
 #### Every Word Should Contain Value
 In the reference documentation every word should strive to provide additional information beyond the API itself.  If the documentation only rehashes or rephrases what is already apparent in the class, method, parameter, or property name it has zero value and will only waste the time of both the writer and reader.

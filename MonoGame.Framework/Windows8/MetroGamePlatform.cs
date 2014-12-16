@@ -86,15 +86,18 @@ namespace Microsoft.Xna.Framework
 		//private OpenALSoundController soundControllerInstance = null;
         internal static string LaunchParameters;
 
+        internal static readonly TouchQueue TouchQueue = new TouchQueue();
+
         internal static ApplicationExecutionState PreviousExecutionState { get; set; }
 
         public MetroGamePlatform(Game game)
             : base(game)
         {
+#if !WINDOWS_PHONE81
             // Set the starting view state so the Game class can
             // query it during construction.
             ViewState = ApplicationView.Value;
-
+#endif
             // Setup the game window.
             Window = MetroGameWindow.Instance;
             MetroGameWindow.Instance.Game = game;
@@ -189,6 +192,7 @@ namespace Microsoft.Xna.Framework
 
         public override bool BeforeUpdate(GameTime gameTime)
         {
+            TouchQueue.ProcessQueued();
             return true;
         }
 

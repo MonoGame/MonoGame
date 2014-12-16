@@ -13,25 +13,93 @@ using System.ComponentModel;
 
 
 namespace MGCB
-{
-    // Reusable, reflection based helper for parsing commandline options.
-    //
-    // Original From Shawn Hargreaves Blog:
-    // http://blogs.msdn.com/b/shawnhar/archive/2012/04/20/a-reusable-reflection-based-command-line-parser.aspx
-    //
+{    
     
-    public class CommandLineParser
+    
+
+    /// <summary>
+    /// Adapted from this generic command line argument parser:
+    /// http://blogs.msdn.com/b/shawnhar/archive/2012/04/20/a-reusable-reflection-based-command-line-parser.aspx     
+    /// </summary>
+    public class MGBuildParser
     {
-        readonly object _optionsObject;
+        #region Supporting Types
 
-        readonly Queue<MemberInfo> _requiredOptions = new Queue<MemberInfo>();
-        readonly Dictionary<string, MemberInfo> _optionalOptions = new Dictionary<string, MemberInfo>();
+        public class PreprocessorProperty
+        {
+            public string Name;            
+            public string CurrentValue;
 
-        readonly List<string> _requiredUsageHelp = new List<string>();
+            public PreprocessorProperty()
+            {
+                Name = string.Empty;
+                CurrentValue = string.Empty;
+            }
+        }
 
-        public CommandLineParser(object optionsObject)
+        public class PreprocessorPropertyCollection
+        {
+            private readonly List<PreprocessorProperty> _properties;
+
+            public PreprocessorPropertyCollection()
+            {
+                _properties = new List<PreprocessorProperty>();
+            }
+
+            public string this[string name]
+            {
+                get
+                {
+                    foreach (var i in _properties)
+                    {
+                        if (i.Name.Equals(name))
+                            return i.CurrentValue;
+                    }
+
+                    return null;
+                }
+
+                set
+                {
+                    foreach (var i in _properties)
+                    {
+                        if (i.Name.Equals(name))
+                        {
+                            i.CurrentValue = value;
+                            return;
+                        }
+                    }
+
+                    var prop = new PreprocessorProperty()
+                        {
+                            Name = name,
+                            CurrentValue = value,
+                        };
+                    _properties.Add(prop);
+                }
+            }
+        }
+
+        #endregion
+
+        private readonly object _optionsObject;
+        private readonly Queue<MemberInfo> _requiredOptions;
+        private readonly Dictionary<string, MemberInfo> _optionalOptions;
+        private readonly List<string> _requiredUsageHelp;
+
+        public readonly PreprocessorPropertyCollection _properties;
+
+        public delegate void ErrorCallback(string msg, object[] args);
+        public event ErrorCallback OnError;
+
+        public MGBuildParser(object optionsObject)
         {
             _optionsObject = optionsObject;
+            _requiredOptions = new Queue<MemberInfo>();
+            _optionalOptions = new Dictionary<string, MemberInfo>();
+            _requiredUsageHelp = new List<string>();
+
+            _properties = new PreprocessorPropertyCollection();
 
             // Reflect to find what commandline options are available...
 
@@ -41,6 +109,8 @@ namespace MGCB
                 var param = GetAttribute<CommandLineParameterAttribute>(field);
                 if (param == null)
                     continue;
+
+                CheckReservedPrefixes(param.Name);
 
                 if (param.Required)
                 {
@@ -63,6 +133,8 @@ namespace MGCB
                 if (param == null)
                     continue;
 
+                CheckReservedPrefixes(param.Name);
+
                 if (param.Required)
                 {
                     // Record a required option.
@@ -84,6 +156,8 @@ namespace MGCB
                 if (param == null)
                     continue;
 
+                CheckReservedPrefixes(param.Name);
+
                 // Only accept methods that take less than 1 parameter.
                 if (method.GetParameters().Length > 1)
                     throw new NotSupportedException("Methods must have one or zero parameters.");
@@ -101,24 +175,25 @@ namespace MGCB
                     _optionalOptions.Add(param.Name.ToLowerInvariant(), method);
                 }
             }
-        }
+        }        
 
-
-        public bool ParseCommandLine(string[] args)
+        public bool Parse(IEnumerable<string> args)
         {
-            var success = true;
+            args = Preprocess(args);
 
-            // Parse each argument in turn.
+            var showUsage = true;
+            var success = true;            
             foreach (var arg in args)
             {
-                if (!ParseArgument(arg.Trim()))
+                showUsage = false;
+
+                if (!ParseArgument(arg))
                 {
                     success = false;
                     break;
                 }
             }
 
-            // Make sure we got all the required options.
             var missingRequiredOption = _requiredOptions.FirstOrDefault(field => !IsList(field) || GetList(field).Count == 0);
             if (missingRequiredOption != null)
             {
@@ -126,11 +201,118 @@ namespace MGCB
                 return false;
             }
 
+            if (showUsage)
+                ShowError(null);
+
             return success;
         }
 
+        private IEnumerable<string> Preprocess(IEnumerable<string> args)
+        {
+            var output = new List<string>();
+            var lines = new List<string>(args);
+            var ifstack = new Stack<Tuple<string, string>>();
+            var fileStack = new Stack<string>();
 
-        bool ParseArgument(string arg)
+            while (lines.Count > 0)
+            {            
+                var arg = lines[0];
+                lines.RemoveAt(0);
+
+                if (arg.StartsWith("# Begin:"))
+                {
+                    var file = arg.Substring(8);
+                    fileStack.Push(file);
+                    continue;
+                }
+
+                if (arg.StartsWith("# End:"))
+                {
+                    fileStack.Pop();
+                    continue;
+                }
+
+                if (arg.StartsWith("$endif"))
+                {
+                    ifstack.Pop();
+                    continue;
+                }
+                
+                if (ifstack.Count > 0)
+                {
+                    var skip = false;
+                    foreach (var i in ifstack)
+                    {
+                        var val = _properties[i.Item1];
+                        if (!(i.Item2).Equals(val))
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+
+                    if (skip)
+                        continue;
+                }
+
+                if (arg.StartsWith("$set"))
+                {
+                    var words = arg.Substring(5).Split('=');
+                    var name = words[0];
+                    var value = words[1];
+
+                    _properties[name] = value;
+
+                    continue;
+                }
+
+                if (arg.StartsWith("$if"))
+                {
+                    if (fileStack.Count == 0)
+                        throw new Exception("$if is invalid outside of a response file.");
+
+                    var words = arg.Substring(4).Split('=');
+                    var name = words[0];
+                    var value = words[1];
+
+                    var condition = new Tuple<string, string>(name, value);
+                    ifstack.Push(condition);
+                    
+                    continue;
+                }
+
+                if (arg.StartsWith("/@:"))
+                {
+                    var file = arg.Substring(3);
+                    var commands = File.ReadAllLines(file);
+                    var offset = 0;
+                    lines.Insert(0, string.Format("# Begin:{0} ", file));
+                    offset++;
+
+                    for (var j = 0; j < commands.Length; j++)
+                    {
+                        var line = commands[j];
+                        if (string.IsNullOrEmpty(line))
+                            continue;
+                        if (line.StartsWith("#"))
+                            continue;
+
+                        lines.Insert(offset, line);
+                        offset++;
+                    }
+
+                    lines.Insert(offset, string.Format("# End:{0}", file));
+
+                    continue;
+                }                
+                
+                output.Add(arg);
+            }
+
+            return output.ToArray();
+        }
+
+        private bool ParseArgument(string arg)
         {
             if (arg.StartsWith("/"))
             {
@@ -140,7 +322,7 @@ namespace MGCB
                     return false;
 
                 // Parse an optional argument.
-                char[] separators = { ':' };
+                char[] separators = {':'};
 
                 var split = arg.Substring(1).Split(separators, 2, StringSplitOptions.None);
 
@@ -157,7 +339,8 @@ namespace MGCB
 
                 return SetOption(member, value);
             }
-            else if ( _requiredOptions.Count > 0 )
+
+            if (_requiredOptions.Count > 0)
             {
                 // Parse the next non escaped argument.
                 var field = _requiredOptions.Peek();
@@ -167,11 +350,9 @@ namespace MGCB
 
                 return SetOption(field, arg);
             }
-            else
-            {
-                ShowError("Too many arguments");
-                return false;
-            }
+
+            ShowError("Too many arguments");
+            return false;
         }
 
 
@@ -204,7 +385,7 @@ namespace MGCB
                     else 
                     {
                         var property = member as PropertyInfo;
-                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType));
+                        property.SetValue(_optionsObject, ChangeType(value, property.PropertyType), null);
                     }
                 }
 
@@ -217,6 +398,21 @@ namespace MGCB
             }
         }
 
+        static readonly string[] ReservedPrefixes = new[]
+            {   
+                "$",
+                "/",                
+                "#",                
+            };
+
+        static void CheckReservedPrefixes(string str)
+        {
+            foreach (var i in ReservedPrefixes)
+            {
+                if (str.StartsWith(i))
+                    throw new Exception(string.Format("'{0}' is a reserved prefix and cannot be used at the start of an argument name.", i));
+            }
+        }
 
         static object ChangeType(string value, Type type)
         {
@@ -241,7 +437,7 @@ namespace MGCB
         IList GetList(MemberInfo member)
         {
             if (member is PropertyInfo)
-                return (IList)(member as PropertyInfo).GetValue(_optionsObject);
+                return (IList)(member as PropertyInfo).GetValue(_optionsObject, null);
 
             if (member is FieldInfo)
                 return (IList)(member as FieldInfo).GetValue(_optionsObject);
@@ -277,13 +473,14 @@ namespace MGCB
 
         public string Title { get; set; }
 
-        public void ShowUsage()
-        {
-            ShowError(null);
-        }
-
         public void ShowError(string message, params object[] args)
         {
+            if (!string.IsNullOrEmpty(message) && OnError != null)
+            {
+                OnError(message, args);
+                return;
+            }
+
             var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
 
             if (!string.IsNullOrEmpty(Title))
@@ -311,11 +508,18 @@ namespace MGCB
                 foreach (var pair in _optionalOptions)
                 {
                     var field = pair.Value as FieldInfo;
+                    var prop = pair.Value as PropertyInfo;
                     var method = pair.Value as MethodInfo;
                     var param = GetAttribute<CommandLineParameterAttribute>(pair.Value);
 
-                    var hasValue = (field != null && field.FieldType != typeof (bool)) ||
-                                   (method != null && method.GetParameters().Length != 0);
+                    var hasValue = false;
+
+                    if (field != null && field.FieldType != typeof (bool))
+                        hasValue = true;
+                    if (prop != null && prop.PropertyType != typeof (bool))
+                        hasValue = true;
+                    if (method != null && method.GetParameters().Length != 0)
+                        hasValue = true;
 
                     if (hasValue)
                         Console.Error.WriteLine("  /{0}:<{1}>\n    {2}\n", param.Name, param.ValueName, param.Description);

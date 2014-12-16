@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -12,22 +13,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     public class VideoContent : ContentItem, IDisposable
     {
-        bool disposed;
-        int bitsPerSecond;
-        TimeSpan duration;
-        float framesPerSecond;
-        int height;
-        int width;
+        private bool _disposed;
+        private int _bitsPerSecond;
+        private TimeSpan _duration;
+        private float _framesPerSecond;
+        private int _height;
+        private int _width;
 
         /// <summary>
         /// Gets the bit rate for this video.
         /// </summary>
-        public int BitsPerSecond { get { return bitsPerSecond; } }
+        public int BitsPerSecond { get { return _bitsPerSecond; } }
 
         /// <summary>
         /// Gets the duration of this video.
         /// </summary>
-        public TimeSpan Duration { get { return duration; } }
+        public TimeSpan Duration { get { return _duration; } }
 
         /// <summary>
         /// Gets or sets the file name for this video.
@@ -38,12 +39,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets the frame rate for this video.
         /// </summary>
-        public float FramesPerSecond { get { return framesPerSecond; } }
+        public float FramesPerSecond { get { return _framesPerSecond; } }
 
         /// <summary>
         /// Gets the height of this video.
         /// </summary>
-        public int Height { get { return height; } }
+        public int Height { get { return _height; } }
 
         /// <summary>
         /// Gets or sets the type of soundtrack accompanying the video.
@@ -54,24 +55,52 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Gets the width of this video.
         /// </summary>
-        public int Width { get { return width; } }
+        public int Width { get { return _width; } }
 
         /// <summary>
         /// Initializes a new copy of the VideoContent class for the specified video file.
         /// </summary>
         /// <param name="filename">The file name of the video to import.</param>
-        public VideoContent(
-            string filename
-            )
+        public VideoContent(string filename)
         {
             Filename = filename;
-            // TODO: Open video and fill in properties
-            // ...
-            bitsPerSecond = 0;
-            duration = TimeSpan.Zero;
-            framesPerSecond = 0.0f;
-            height = 0;
-            width = 0;
+
+            string stdout, stderr;
+            var result = ExternalTool.Run("ffprobe",
+                string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename), out stdout, out stderr);
+
+            var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (!line.Contains('='))
+                    continue;
+
+                var key = line.Substring(0, line.IndexOf('='));
+                var value = line.Substring(line.IndexOf('=') + 1);
+                switch (key)
+                {
+                    case "duration":
+                        _duration = TimeSpan.FromSeconds(double.Parse(value));
+                        break;
+
+                    case "bit_rate":
+                        _bitsPerSecond = int.Parse(value);
+                        break;
+
+                    case "width":
+                        _width = int.Parse(value);
+                        break;
+
+                    case "height":
+                        _height = int.Parse(value);
+                        break;
+
+                    case "r_frame_rate":
+                        var frac = value.Split('/');
+                        _framesPerSecond = float.Parse(frac[0]) / float.Parse(frac[1]);
+                        break;
+                }
+            }
         }
 
         ~VideoContent()
@@ -90,7 +119,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 if (disposing)
                 {
@@ -99,7 +128,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 }
                 // TODO: Free unmanaged resources here
                 // ...
-                disposed = true;
+                _disposed = true;
             }
         }
     }

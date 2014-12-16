@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Reference Include="MonoGame.Framework">
-      <HintPath>$(MSBuildThisFileDirectory)\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX">
+	<Reference Include="MonoGame.Framework">
+		<HintPath>$(MSBuildThisFileDirectory)$(Platform)\MonoGame.Framework.dll</HintPath>
+	</Reference>
+	<Reference Include="SharpDX">
       <HintPath>$(MSBuildThisFileDirectory)\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">

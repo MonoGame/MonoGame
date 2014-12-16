@@ -3,11 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MonoGame.Tools.Pipeline
 {
-    delegate void SelectionChanged();
-
     enum AskResult
     {
         Yes,
@@ -17,13 +16,11 @@ namespace MonoGame.Tools.Pipeline
 
     interface IView
     {
-        //event SelectionChanged OnSelectionChanged;
-
         void Attach(IController controller);
 
         AskResult AskSaveOrCancel();
 
-        bool AskSaveName(ref string filePath);
+        bool AskSaveName(ref string filePath, string title);
 
         bool AskOpenProject(out string projectFilePath);
 
@@ -41,13 +38,9 @@ namespace MonoGame.Tools.Pipeline
 
         void RemoveTreeItem(ContentItem contentItem);
 
-        void SelectTreeItem(IProjectItem item);
-    
         void UpdateTreeItem(IProjectItem item);
 
         void EndTreeUpdate();
-
-        void ShowProperties(IProjectItem item);
 
         void UpdateProperties(IProjectItem item);
 
@@ -56,5 +49,9 @@ namespace MonoGame.Tools.Pipeline
         void OutputClear();
 
         bool ChooseContentFile(string initialDirectory, out List<string> files);        
+        
+        void OnTemplateDefined(ContentItemTemplate item);
+
+        Process CreateProcess(string exe, string commands);
     }
 }

@@ -5,113 +5,101 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="OpenTK" />
-    <Project
-      Name="Lidgren.Network.iOS"
-      Guid="734EAA48-F1CA-481A-B391-0285BC0E8B40"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.iOS.csproj">
-        <ConfigurationMapping Old="Debug" New="Debug|Any CPU" />
-        <ConfigurationMapping Old="Release" New="Release|Any CPU" />
-        <ConfigurationMapping Old="Ad-Hoc" New="Release|Any CPU" />
-        <ConfigurationMapping Old="AppStore" New="Release|Any CPU" />
-    </Project>
   </Platform>
 
   <Platform Type="Linux">
-    <Reference Include="System.Drawing" />
-    <Binary
-      Name="Tao.Sdl"
-      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    <Binary
-      Name="OpenTK"
-      Path="ThirdParty/Dependencies/OpenTK.dll" />
-    <Project
-      Name="Lidgren.Network.Linux"
-      Guid="758CB33D-6EBD-41EA-BB0C-55B1C97A325F"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Linux.csproj" />
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Drawing" />
+      <Binary
+        Name="Tao.Sdl"
+        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+      <Binary
+        Name="OpenTK"
+        Path="ThirdParty/Dependencies/OpenTK.dll" />
+    </Service>
   </Platform>
 
   <Platform Type="MacOS">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Binary
-      Name="Tao.Sdl"
-      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    <Project
-      Name="Lidgren.Network.MacOS"
-      Guid="5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.MacOS.csproj" />
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Core" />
+      <Reference Include="System.Drawing" />
+      <Binary
+        Name="Tao.Sdl"
+        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+    </Service>
   </Platform>
 
   <Platform Type="Android">
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK" />
+    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
-    <Project
-      Name="Lidgren.Network.Android"
-      Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
 
   <Platform Type="Ouya">
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK" />
+    <Reference Include="OpenTK-1.0" />
     <Reference Include="System.Core" />
     <Binary
       Name="Ouya.Console.Api"
       Path="ThirdParty/Dependencies/OUYA/Ouya.Console.Api.dll" />
-    <Project
-      Name="Lidgren.Network.Android"
-      Guid="565129E0-4EE5-4F6F-B403-C3484C9740BE"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Android.csproj" />
   </Platform>
 
   <Platform Type="PSMobile">
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Sce.PlayStation.Core" />
-    <Project
-      Name="Lidgren.Network.PSMobile"
-      Guid="167676EE-E2D5-440A-BB2B-EFBD02BC8493"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.PSMobile.csproj" />
   </Platform>
 
   <Platform Type="Windows">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Binary
-      Name="SharpDX"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
-    <Binary
-      Name="SharpDX.Direct2D1"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct2D1.dll" />
-    <Binary
-      Name="SharpDX.Direct3D11"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct3D11.dll" />
-    <Binary
-      Name="SharpDX.DXGI"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.DXGI.dll" />
-    <Binary
-      Name="SharpDX.MediaFoundation"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
-    <Binary
-      Name="SharpDX.RawInput"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.RawInput.dll" />
-    <Binary
-      Name="SharpDX.XAudio2"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
-    <Binary
-      Name="SharpDX.XInput"
-      Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
-    <Project
-      Name="Lidgren.Network.Windows"
-      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
+    <Service Name="MonoGame.Framework/DirectXGraphics">
+      <Reference Include="System.Core" />
+      <Reference Include="System.Drawing" />
+      <Reference Include="System.Web" />
+      <Reference Include="System.Web.Services" />
+      <Reference Include="System.Windows.Forms" />
+      <Reference Include="System.Xml" />
+      <Binary
+        Name="SharpDX"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.dll" />
+      <Binary
+        Name="SharpDX.Direct2D1"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct2D1.dll" />
+      <Binary
+        Name="SharpDX.Direct3D11"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.Direct3D11.dll" />
+      <Binary
+        Name="SharpDX.DXGI"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.DXGI.dll" />
+      <Binary
+        Name="SharpDX.MediaFoundation"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.MediaFoundation.dll" />
+      <Binary
+        Name="SharpDX.RawInput"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.RawInput.dll" />
+      <Binary
+        Name="SharpDX.XAudio2"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XAudio2.dll" />
+      <Binary
+        Name="SharpDX.XInput"
+        Path="ThirdParty/Dependencies/SharpDX/Windows/SharpDX.XInput.dll" />
+    </Service>
+
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Core" />
+      <Reference Include="System.Drawing" />
+      <Reference Include="System.Web" />
+      <Reference Include="System.Web.Services" />
+      <Reference Include="System.Windows.Forms" />
+      <Reference Include="System.Xml" />
+      <Binary
+        Name="Tao.Sdl"
+        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+      <Binary
+        Name="OpenTK"
+        Path="ThirdParty/Dependencies/OpenTK.dll" />
+    </Service>
   </Platform>
 
   <Platform Type="Windows8">
@@ -139,41 +127,20 @@
   </Platform>
 
   <Platform Type="WindowsGL">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Binary
-      Name="Tao.Sdl"
-      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    <Binary
-      Name="OpenTK"
-      Path="ThirdParty/Dependencies/OpenTK.dll" />
-    <Project
-      Name="Lidgren.Network.Windows"
-      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
-  </Platform>
-
-  <Platform Type="Angle">
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Binary
-      Name="Tao.Sdl"
-      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
-    <Binary
-      Name="OpenTK"
-      Path="ThirdParty/Dependencies/OpenTK.dll" />
-    <Project
-      Name="Lidgren.Network.Windows"
-      Guid="AE483C29-042E-4226-BA52-D247CE7676DA"
-      Path="ThirdParty/Lidgren.Network/Lidgren.Network.Windows.csproj" />
+    <Service Name="MonoGame.Framework/OpenGLGraphics">
+      <Reference Include="System.Core" />
+      <Reference Include="System.Drawing" />
+      <Reference Include="System.Web" />
+      <Reference Include="System.Web.Services" />
+      <Reference Include="System.Windows.Forms" />
+      <Reference Include="System.Xml" />
+      <Binary
+        Name="Tao.Sdl"
+        Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+      <Binary
+        Name="OpenTK"
+        Path="ThirdParty/Dependencies/OpenTK.dll" />
+    </Service>
   </Platform>
 
   <Platform Type="WindowsPhone">
@@ -192,14 +159,50 @@
     <Binary
       Name="SharpDX.XAudio2"
       Path="ThirdParty/Dependencies/SharpDX/Windows Phone/$(Platform)/SharpDX.XAudio2.dll" />
-    <Reference  Include="Microsoft.Xna.Framework.GamerServices"
-                Aliases="MicrosoftXnaGamerServices" />
-    <Reference  Include="Microsoft.Xna.Framework"
-                Aliases="MicrosoftXnaFramework" />
+    <Reference Include="Microsoft.Xna.Framework">
+      <Alias Platform="WindowsPhone">MicrosoftXnaFramework</Alias>
+    </Reference>
   </Platform>
-
+  <Platform Type="WindowsPhone81">
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.dll" />
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct2D1.dll" />
+    <Binary
+      Name="SharpDX"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.Direct3D11"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.Direct3D11.dll" />
+    <Binary
+      Name="SharpDX.DXGI"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.DXGI.dll" />
+    <Binary
+      Name="SharpDX.MediaFoundation"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.MediaFoundation.dll" />
+    <Binary
+      Name="SharpDX.XAudio2"
+      Path="ThirdParty/Dependencies/SharpDX/Windows Phone 8.1/SharpDX.XAudio2.dll" />
+  </Platform>
   <Platform Type="Web">
     <Reference Include="JSIL.Meta" />
   </Platform>
+
+  <Service Name="MonoGame.Framework/ANGLEGraphics">
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Binary
+      Name="Tao.Sdl"
+      Path="ThirdParty/GamepadConfig/Tao.Sdl.dll" />
+    <Binary
+      Name="OpenTK"
+      Path="ThirdParty/Dependencies/OpenTK.dll" />
+  </Service>
 
 </ExternalProject>

@@ -19,12 +19,6 @@ using MonoTouch.AudioUnit;
 using MonoTouch.AVFoundation;
 using MonoTouch.Foundation;
 #endif
-#elif ANDROID
-using Android.Content;
-using Android.Content.Res;
-using Android.Media;
-using Android.Util;
-using Stream = System.IO.Stream;
 #endif
 
 namespace Microsoft.Xna.Framework.Audio
@@ -37,32 +31,46 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal int Size { get; set; }
 
-#if OPENAL
-
         internal ALFormat Format { get; set; }
-#endif
-
-#if ANDROID
-		private int _soundID = -1;
-#endif
 
         #region Public Constructors
 
         private void PlatformLoadAudioStream(Stream s)
         {
-#if WINDOWS || LINUX || ANGLE
+#if OPENAL && !(MONOMAC || IOS)
             
             ALFormat format;
             int size;
             int freq;
 
-            _data = AudioLoader.Load(s, out format, out size, out freq);
-
+            var stream = s;
+#if ANDROID
+            var needsDispose = false;
+            try
+            {
+                // If seek is not supported (usually an indicator of a stream opened into the AssetManager), then copy
+                // into a temporary MemoryStream.
+                if (!s.CanSeek)
+                {
+                    needsDispose = true;
+                    stream = new MemoryStream();
+                    s.CopyTo(stream);
+                    stream.Position = 0;
+                }
+#endif
+                _data = AudioLoader.Load(stream, out format, out size, out freq);
+#if ANDROID
+            }
+            finally
+            {
+                if (needsDispose)
+                    stream.Dispose();
+            }
+#endif
             Format = format;
             Size = size;
             Rate = freq;
 
-            return;
 #endif
 
 #if MONOMAC || IOS
@@ -111,12 +119,6 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
 #endif
-
-#if ANDROID
-
-			// Creating a soundeffect from a stream
-			// doesn't seem to be supported in Android
-#endif
         }
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, AudioChannels channels)
@@ -124,7 +126,7 @@ namespace Microsoft.Xna.Framework.Audio
 			Rate = (float)sampleRate;
             Size = (int)buffer.Length;
 
-#if WINDOWS || LINUX || ANGLE
+#if OPENAL && !(MONOMAC || IOS)
 
             _data = buffer;
             Format = (channels == AudioChannels.Stereo) ? ALFormat.Stereo16 : ALFormat.Mono16;
@@ -146,23 +148,7 @@ namespace Microsoft.Xna.Framework.Audio
             _data = buffer;
 
 #endif
-
-#if ANDROID
-            _name = "";
-
-            _data = AudioUtil.FormatWavData(buffer, sampleRate, (int)channels);
-#endif
         }
-
-#if ANDROID
-
-		internal SoundEffect(string fileName)
-		{
-			using (AssetFileDescriptor fd = Game.Activity.Assets.OpenFd(fileName))
-				_soundID = SoundEffectInstance.SoundPool.Load(fd.FileDescriptor, fd.StartOffset, fd.Length, 1);
-		}
-
-#endif
 
         private void PlatformInitialize(byte[] buffer, int offset, int count, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
         {
@@ -177,62 +163,24 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetupInstance(SoundEffectInstance inst)
         {
-#if OPENAL
-
             inst.InitializeSound();
             inst.BindDataBuffer(_data, Format, Size, (int)Rate);
-#endif
-
-#if ANDROID
-            inst._soundId = _soundID;
-            inst._sampleRate = Rate;
-#endif
-        }
-
-        #endregion
-
-        #region Static Members
-
-        private static void PlatformSetMasterVolume()
-        {
-            var activeSounds = SoundEffectInstancePool.GetAllPlayingSounds();
-
-            // A little gross here, but there's
-            // no if(value == value) check in SFXInstance.Volume
-            // This'll allow the sound's current volume to be recalculated
-            // against SoundEffect.MasterVolume.
-            foreach(var sound in activeSounds)
-                sound.Volume = sound.Volume;
         }
 
         #endregion
 
         #region IDisposable Members
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            // A No-op for WINDOWS and LINUX. Note that isDisposed remains false!
-
-#if ANDROID
-            if (!isDisposed)
-            {
-				if (_soundID != -1)
-					SoundEffectInstance.SoundPool.Unload(_soundID);
-
-				_soundID = -1;
-
-                isDisposed = true;
-            }
-#endif
+            // A no-op for OpenAL
         }
 
         #endregion
 
         internal static void PlatformShutdown()
         {
-#if OPENAL
             OpenALSoundController.DestroyInstance();
-#endif
         }
     }
 }

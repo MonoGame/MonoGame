@@ -9,10 +9,9 @@ using SharpDX.Multimedia;
 
 namespace Microsoft.Xna.Framework.Audio
 {
-    public sealed partial class SoundEffectInstance : IDisposable
+    public partial class SoundEffectInstance : IDisposable
     {
         internal SourceVoice _voice;
-        internal SoundEffect _effect;
 
         private static float[] _panMatrix;
 
@@ -135,7 +134,7 @@ namespace Microsoft.Xna.Framework.Audio
             _pan = MathHelper.Clamp(value, -1.0f, 1.0f);
 
             // If we have no voice then nothing more to do.
-            if (_voice == null)
+            if (_voice == null || _effect == null)
                 return;
 
             var srcChannelCount = _effect._format.Channels;
@@ -220,10 +219,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPitch(float value)
         {
+            _pitch = value;
+
             if (_voice == null)
                 return;
-
-            _pitch = value;
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.
@@ -251,14 +250,17 @@ namespace Microsoft.Xna.Framework.Audio
                 _voice.SetVolume(value, XAudio2.CommitNow);
         }
 
-        private void PlatformDispose()
+        private void PlatformDispose(bool disposing)
         {
-            if (_voice != null)
+            if (disposing)
             {
-                _voice.DestroyVoice();
-                _voice.Dispose();
-                _voice = null;
+                if (_voice != null)
+                {
+                    _voice.DestroyVoice();
+                    _voice.Dispose();
+                }
             }
+            _voice = null;
             _effect = null;
         }
     }

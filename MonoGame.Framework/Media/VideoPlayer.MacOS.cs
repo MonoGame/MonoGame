@@ -28,6 +28,10 @@ namespace Microsoft.Xna.Framework.Media
             throw new NotImplementedException();
         }
 
+        private void PlatformGetState(ref MediaState result)
+        {
+        }
+
         private void PlatformPause()
         {
             _currentVideo.MovieView.Pause(new NSObject());
@@ -92,9 +96,23 @@ namespace Microsoft.Xna.Framework.Media
             _currentVideo.Volume = _volume;
         }
 
+        private void PlatformSetIsLooped()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformSetIsMuted()
+        {
+            throw new NotImplementedException();
+        }
+
         private TimeSpan PlatformGetPlayPosition()
         {
             return _currentVideo.CurrentPosition;
+        }
+
+        private void PlatformDispose(bool disposing)
+        {
         }
     }
 }

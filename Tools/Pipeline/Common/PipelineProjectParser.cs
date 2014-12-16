@@ -4,15 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using System.Xml;
 using MGCB;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -21,12 +15,12 @@ using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
 {
-    internal class PipelineProjectParser
+    public class PipelineProjectParser
     {
         #region Other Data
 
         private readonly PipelineProject _project;
-        private readonly IController _controller;
+        private readonly IContentItemObserver _observer;
         private readonly OpaqueDataDictionary _processorParams = new OpaqueDataDictionary();
         
         private string _processor;
@@ -74,6 +68,28 @@ namespace MonoGame.Tools.Pipeline
             ValueName = "string",
             Description = "The optional build config string from the build system.")]
         public string Config { set { _project.Config = value; } }
+
+        // Allow a MGCB file containing the /rebuild parameter to be imported without error
+        [CommandLineParameter(
+            Name = "rebuild",
+            ValueName = "bool",
+            Description = "Forces a rebuild of the project.")]
+        public bool Rebuild { set { _rebuild = value; } }
+        private bool _rebuild;
+
+        // Allow a MGCB file containing the /clean parameter to be imported without error
+        [CommandLineParameter(
+            Name = "clean",
+            ValueName = "bool",
+            Description = "Removes intermediate and output files.")]
+        public bool Clean { set { _clean = value; } }
+        private bool _clean;
+
+        [CommandLineParameter(
+            Name = "compress",
+            ValueName = "bool",
+            Description = "Content files can be compressed for smaller file sizes.")]
+        public bool Compress { set { _project.Compress = value; } }
 
         [CommandLineParameter(
             Name = "importer",
@@ -128,7 +144,7 @@ namespace MonoGame.Tools.Pipeline
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Do we have a duplicate?
-            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _project.ContentItems.FindIndex(e => string.Equals(e.OriginalPath, sourceFile, StringComparison.InvariantCultureIgnoreCase));
             if (previous != -1)
             {
                 if (skipDuplicates)
@@ -141,9 +157,9 @@ namespace MonoGame.Tools.Pipeline
             // Create the item for processing later.
             var item = new ContentItem
             {
-                Controller = _controller,
+                Observer = _observer,
                 BuildAction = BuildAction.Build,
-                SourceFile = sourceFile,
+                OriginalPath = sourceFile,
                 ImporterName = Importer,
                 ProcessorName = Processor,
                 ProcessorParams = new OpaqueDataDictionary()
@@ -170,7 +186,7 @@ namespace MonoGame.Tools.Pipeline
             sourceFile = PathHelper.GetRelativePath(projectDir, sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _project.ContentItems.FirstOrDefault(e => e.SourceFile.Equals(sourceFile));
+            var previous = _project.ContentItems.FirstOrDefault(e => e.OriginalPath.Equals(sourceFile));
             if (previous != null)
                 _project.ContentItems.Remove(previous);
 
@@ -178,7 +194,7 @@ namespace MonoGame.Tools.Pipeline
             var item = new ContentItem
             {
                 BuildAction = BuildAction.Copy,
-                SourceFile = sourceFile,
+                OriginalPath = sourceFile,
                 ProcessorParams = new OpaqueDataDictionary()
             };
             _project.ContentItems.Add(item);
@@ -192,141 +208,153 @@ namespace MonoGame.Tools.Pipeline
 
         #endregion
 
-        public PipelineProjectParser(IController controller, PipelineProject project)
+        public PipelineProjectParser(IContentItemObserver observer, PipelineProject project)
         {
-            _controller = controller;
+            _observer = observer;
             _project = project;
         }        
 
-        public void OpenProject(string projectFilePath)
+        public void OpenProject(string projectFilePath, MGBuildParser.ErrorCallback errorCallback)
         {
             _project.ContentItems.Clear();
 
             // Store the file name for saving later.
-            _project.FilePath = projectFilePath;
+            _project.OriginalPath = projectFilePath;
 
-            var parser = new CommandLineParser(this);
+            var parser = new MGBuildParser(this);
             parser.Title = "Pipeline";
 
-            var commands = File.ReadAllLines(projectFilePath).
-                                Select(x => x.Trim()).
-                                Where(x => !string.IsNullOrEmpty(x) && !x.StartsWith("#")).
-                                ToArray();
+            if (errorCallback != null)
+                parser.OnError += errorCallback;
 
-            parser.ParseCommandLine(commands);
+            var commands = new string[]
+                {
+                    string.Format("/@:{0}", projectFilePath),
+                };
+            parser.Parse(commands);
         }
 
         public void SaveProject()
+        {
+            using (var io = File.CreateText(_project.OriginalPath))
+                SaveProject(io, null);
+        }
+        
+        public void SaveProject(TextWriter io, Func<ContentItem, bool> filterItem)
         {
             const string lineFormat = "/{0}:{1}";
             const string processorParamFormat = "{0}={1}";
             string line;
 
-            using (var io = File.CreateText(_project.FilePath))
+            line = FormatDivider("Global Properties");
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "outputDir", _project.OutputDir);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "platform", _project.Platform);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "config", _project.Config);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "profile", _project.Profile);
+            io.WriteLine(line);
+
+            line = string.Format(lineFormat, "compress", _project.Compress);
+            io.WriteLine(line);
+
+            line = FormatDivider("References");
+            io.WriteLine(line);
+
+            foreach (var i in _project.References)
             {
-                line = FormatDivider("Global Properties");
+                line = string.Format(lineFormat, "reference", i);
+                io.WriteLine(line);
+            }
+
+            line = FormatDivider("Content");
+            io.WriteLine(line);
+
+            foreach (var i in _project.ContentItems)
+            {
+                // Reject any items that don't pass the filter.              
+                if (filterItem != null && filterItem(i))
+                    continue;
+
+                // Wrap content item lines with a begin comment line
+                // to make them more cohesive (for version control).                  
+                line = string.Format("#begin {0}", i.OriginalPath);
                 io.WriteLine(line);
 
-                line = string.Format(lineFormat, "outputDir", _project.OutputDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "intermediateDir", _project.IntermediateDir);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "platform", _project.Platform);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "config", _project.Config);
-                io.WriteLine(line);
-
-                line = string.Format(lineFormat, "profile", _project.Profile);
-                io.WriteLine(line);
-
-                line = FormatDivider("References");
-                io.WriteLine(line);
-
-                foreach (var i in _project.References)
+                if (i.BuildAction == BuildAction.Copy)
                 {
-                    line = string.Format(lineFormat, "reference", i);
+                    line = string.Format(lineFormat, "copy", i.OriginalPath);
                     io.WriteLine(line);
+                    io.WriteLine();
                 }
-
-                line = FormatDivider("Content");
-                io.WriteLine(line);
-
-                foreach (var i in _project.ContentItems)
+                else
                 {
-                    // Wrap content item lines with a begin comment line
-                    // to make them more cohesive (for version control).                  
-                    line = string.Format("#begin {0}", i.SourceFile);
-                    io.WriteLine(line);
 
-                    if (i.BuildAction == BuildAction.Copy)
+                    // Write importer.
                     {
-                        line = string.Format(lineFormat, "copy", i.SourceFile);
+                        line = string.Format(lineFormat, "importer", i.ImporterName);
                         io.WriteLine(line);
-                        io.WriteLine();
                     }
-                    else
+
+                    // Write processor.
                     {
+                        line = string.Format(lineFormat, "processor", i.ProcessorName);
+                        io.WriteLine(line);
+                    }
 
-                        // Write importer.
+                    // Write processor parameters.
+                    {
+                        if (i.Processor == PipelineTypes.MissingProcessor)
                         {
-                            line = string.Format(lineFormat, "importer", i.ImporterName);
-                            io.WriteLine(line);
-                        }
-
-                        // Write processor.
-                        {
-                            line = string.Format(lineFormat, "processor", i.ProcessorName);
-                            io.WriteLine(line);
-                        }
-
-                        // Write processor parameters.
-                        {
-                            if (i.Processor == PipelineTypes.MissingProcessor)
+                            // Could still be missing the real processor.
+                            // If so, write the string parameters from import.
+                            foreach (var j in i.ProcessorParams)
                             {
-                                // Could still be missing the real processor.
-                                // If so, write the string parameters from import.
-                                foreach (var j in i.ProcessorParams)
+                                line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                                io.WriteLine(line);
+                            }
+                        }
+                        else
+                        {
+                            // Otherwise, write only values which are defined by the real processor.
+                            foreach (var j in i.Processor.Properties)
+                            {
+                                object value = null;
+                                if (i.ProcessorParams.ContainsKey(j.Name))
+                                    value = i.ProcessorParams[j.Name];
+
+                                // JCF: I 'think' writting an empty string for null would be appropriate but to be on the safe side
+                                //      im just not writting the value at all.
+                                if (value != null)
                                 {
-                                    line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Key, j.Value));
+                                    var converter = PipelineTypes.FindConverter(value.GetType());
+                                    var valueStr = converter.ConvertTo(null, CultureInfo.InvariantCulture, value, typeof(string));
+                                    line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
                                     io.WriteLine(line);
                                 }
                             }
-                            else
-                            {
-                                // Otherwise, write only values which are defined by the real processor.
-                                foreach (var j in i.Processor.Properties)
-                                {
-                                    object value = null;
-                                    if (i.ProcessorParams.ContainsKey(j.Name))
-                                        value = i.ProcessorParams[j.Name];
-
-                                    // JCF: I 'think' writting an empty string for null would be appropriate but to be on the safe side
-                                    //      im just not writting the value at all.
-                                    if (value != null)
-                                    {
-                                        var converter = PipelineTypes.FindConverter(value.GetType());
-                                        var valueStr = converter.ConvertTo(value, typeof(string));
-                                        line = string.Format(lineFormat, "processorParam", string.Format(processorParamFormat, j.Name, valueStr));
-                                        io.WriteLine(line);
-                                    }
-                                }
-                            }
                         }
-
-                        line = string.Format(lineFormat, "build", i.SourceFile);
-                        io.WriteLine(line);
-                        io.WriteLine();
                     }
+
+                    line = string.Format(lineFormat, "build", i.OriginalPath);
+                    io.WriteLine(line);
+                    io.WriteLine();
                 }
             }
         }
 
         public void ImportProject(string projectFilePath)
         {
-            _project.FilePath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
+            _project.OriginalPath = projectFilePath.Remove(projectFilePath.LastIndexOf('.')) + ".mgcb";
 
             using (var io = XmlReader.Create(File.OpenText(projectFilePath)))
             {
@@ -347,12 +375,12 @@ namespace MonoGame.Tools.Pipeline
                                 _project.References.Add(hintPath);
                             }
                         }
-                        else if (buildAction.Equals("Content"))
+                        else if (buildAction.Equals("Content") || buildAction.Equals("None"))
                         {
                             string include, copyToOutputDirectory;
                             ReadIncludeContent(io, out include, out copyToOutputDirectory);
 
-                            if (!copyToOutputDirectory.Equals("Never"))
+                            if (!string.IsNullOrEmpty(copyToOutputDirectory) && !copyToOutputDirectory.Equals("Never"))
                             {
                                 var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                                 sourceFilePath += "\\" + include;
@@ -394,7 +422,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void ReadIncludeReference(XmlReader io, out string include, out string hintPath)
         {
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();            
             hintPath = null;
 
             if (!io.IsEmptyElement)
@@ -406,7 +434,7 @@ namespace MonoGame.Tools.Pipeline
                     if (io.IsStartElement("HintPath"))
                     {
                         io.Read();
-                        hintPath = io.Value;
+                        hintPath = io.Value.Unescape();
                     }
                 }
             }
@@ -415,7 +443,7 @@ namespace MonoGame.Tools.Pipeline
         private void ReadIncludeContent(XmlReader io, out string include, out string copyToOutputDirectory)
         {
             copyToOutputDirectory = null;
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();
 
             if (!io.IsEmptyElement)
             {
@@ -430,7 +458,7 @@ namespace MonoGame.Tools.Pipeline
                         {
                             case "CopyToOutputDirectory":
                                 io.Read();
-                                copyToOutputDirectory = io.Value;
+                                copyToOutputDirectory = io.Value.Unescape();
                                 break;
                         }
                     }
@@ -449,7 +477,7 @@ namespace MonoGame.Tools.Pipeline
             importer = null;
             processor = null;
 
-            include = io.GetAttribute("Include");
+            include = io.GetAttribute("Include").Unescape();
             var parameters = new List<string>();
 
             if (!io.IsEmptyElement)
@@ -465,15 +493,15 @@ namespace MonoGame.Tools.Pipeline
                         {
                             case "Name":
                                 io.Read();
-                                name = io.Value;
+                                name = io.Value.Unescape();
                                 break;
                             case "Importer":
                                 io.Read();
-                                importer = io.Value;
+                                importer = io.Value.Unescape();
                                 break;
                             case "Processor":
                                 io.Read();
-                                processor = io.Value;
+                                processor = io.Value.Unescape();
                                 break;
                             default:
                                 if (io.LocalName.Contains("ProcessorParameters_"))
@@ -482,7 +510,7 @@ namespace MonoGame.Tools.Pipeline
                                     line += "=";
                                     io.Read();
                                     line += io.Value;
-                                    parameters.Add(line);
+                                    parameters.Add(line.Unescape());
                                 }
                                 break;
                         }
@@ -495,7 +523,7 @@ namespace MonoGame.Tools.Pipeline
 
         private string FormatDivider(string label)
         {
-            const string commentFormat = "\n#----------------------------------------------------------------------------#\n";
+            var commentFormat = Environment.NewLine + "#----------------------------------------------------------------------------#" + Environment.NewLine;
 
             label = " " + label + " ";
             var src = commentFormat.Length / 2 - label.Length / 2;

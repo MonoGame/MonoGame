@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework
             _drawGameTime = new GameTime();
 
             // Initialize _lastUpdate
-            _lastUpdate = DateTime.Now;
+            _lastUpdate = DateTime.UtcNow;
 			
 			//TODO gesture = new GestureDetector(new GestureListener((AndroidGameActivity)this.Context));
         }

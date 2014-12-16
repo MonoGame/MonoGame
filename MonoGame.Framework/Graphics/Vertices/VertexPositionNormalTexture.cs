@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -35,7 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public override string ToString()
         {
-            return string.Format("{{Position:{0} Normal:{1} TextureCoordinate:{2}}}", new object[] { this.Position, this.Normal, this.TextureCoordinate });
+            return "{{Position:" + this.Position + " Normal:" + this.Normal + " TextureCoordinate:" + this.TextureCoordinate + "}}";
         }
 
         public static bool operator ==(VertexPositionNormalTexture left, VertexPositionNormalTexture right)

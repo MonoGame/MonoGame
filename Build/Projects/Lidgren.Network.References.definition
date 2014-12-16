@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ExternalProject Name="Lidgren.Network.References">
+
+  <Platform Type="Android">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+  </Platform>
+
+  <Platform Type="iOS">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </Platform>
+
+  <Platform Type="Linux">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="MacOS">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="Ouya">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+  </Platform>
+
+  <Platform Type="PSMobile">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+  </Platform>
+
+  <Platform Type="Windows">
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+  <Platform Type="WindowsGL">
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </Platform>
+
+</ExternalProject>

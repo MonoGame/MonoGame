@@ -42,7 +42,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.Content
 {
-	public class VertexDeclarationReader : ContentTypeReader<VertexDeclaration>
+    internal class VertexDeclarationReader : ContentTypeReader<VertexDeclaration>
 	{
 		protected internal override VertexDeclaration Read(ContentReader reader, VertexDeclaration existingInstance)
         {

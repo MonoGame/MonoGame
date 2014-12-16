@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
-#if WINDOWS
+#if WINDOWS || MACOS
 using FreeImageAPI;
 #endif
 
@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// Provides methods for reading texture files for use in the Content Pipeline.
     /// </summary>
-#if WINDOWS
+#if WINDOWS || MACOS
     [ContentImporter(   ".bmp", // Bitmap Image File
                         ".cut", // Dr Halo CUT
                         ".dds", // Direct Draw Surface
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 		{
 			var output = new Texture2DContent ();
 
-#if WINDOWS
+#if WINDOWS || MACOS
 
             // TODO: This is a pretty lame way to do this. It would be better
             // if we could completely get rid of the System.Drawing.Bitmap
@@ -82,35 +82,46 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // to System.Drawing.Bitmap and replace it with FreeImage. For now
             // this is the quickest way to add support for virtually every input Texture
             // format without breaking functionality in other places.
-            var format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
-            var fiBitmap = FreeImage.LoadEx(filename, ref format);
+            var fBitmap = FreeImage.LoadEx(filename);
+            var info = FreeImage.GetInfoHeaderEx(fBitmap);
 
-            output._bitmap = FreeImage.GetBitmap(fiBitmap);
-            FreeImage.UnloadEx(ref fiBitmap);
+            // creating a System.Drawing.Bitmap from a >= 64bpp image isn't
+            // supported.
+            if (info.biBitCount > 32)
+            {
+                var temp = FreeImage.ConvertTo32Bits(fBitmap);
+
+                // The docs are unclear on what's happening here...
+                // If a new bitmap is created or if the old is just converted.
+                // UnloadEx doesn't throw any exceptions if it's called multiple
+                // times on the same bitmap, so just being cautious here.
+                FreeImage.UnloadEx(ref fBitmap);
+                fBitmap = temp;
+            }
+
+            var systemBitmap = FreeImage.GetBitmap(fBitmap);
+            FreeImage.UnloadEx(ref fBitmap);
+            
 #else
-            output._bitmap = new Bitmap(filename);
+            var systemBitmap = new Bitmap(filename);
 #endif
 
-            var height = output._bitmap.Height;
-            var width = output._bitmap.Width;
+            var height = systemBitmap.Height;
+            var width = systemBitmap.Width;
 
             // Force the input's pixelformat to ARGB32, so we can have a common pixel format to deal with.
-			if (output._bitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb) {
-
+            if (systemBitmap.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+            {
 				var bitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				using ( var graphics = System.Drawing.Graphics.FromImage(bitmap)) {
-					graphics.DrawImage(output._bitmap, 0,0, width, height);
+                    graphics.DrawImage(systemBitmap, 0, 0, width, height);
 				}
 
-				output._bitmap = bitmap;
+				systemBitmap = bitmap;
 			}
 
-			var imageData = output._bitmap.GetData();
-
-            var bitmapContent = new PixelBitmapContent<Color>(width, height);
-            bitmapContent.SetPixelData(imageData);
-
-            output.Faces.Add(new MipmapChain(bitmapContent));
+            output.Faces[0].Add(systemBitmap.ToXnaBitmap(true));
+            systemBitmap.Dispose();
 
             return output;
         }

@@ -28,13 +28,8 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-#if WINRT
-using System.Reflection;
-#endif
-
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -107,13 +102,8 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void InitializeTypeReaders()
         {
-            typeReaderManager = new ContentTypeReaderManager(this);
-            typeReaders = typeReaderManager.LoadAssetReaders();
-            foreach (ContentTypeReader r in typeReaders)
-            {
-                r.Initialize(typeReaderManager);
-            }
-
+            typeReaderManager = new ContentTypeReaderManager();
+            typeReaders = typeReaderManager.LoadAssetReaders(this);
             sharedResourceCount = Read7BitEncodedInt();
             sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
         }
@@ -150,24 +140,7 @@ namespace Microsoft.Xna.Framework.Content
 
             if (!String.IsNullOrEmpty(externalReference))
             {
-#if WINRT
-                const char notSeparator = '/';
-                const char separator = '\\';
-#else
-                const char notSeparator = '\\';
-                var separator = Path.DirectorySeparatorChar;
-#endif
-                externalReference = externalReference.Replace(notSeparator, separator);
-
-                // Get a uri for the asset path using the file:// schema and no host
-                var src = new Uri("file:///" + assetName.Replace(notSeparator, separator));
-
-                // Add the relative path to the external reference
-                var dst = new Uri(src, externalReference);
-
-                // The uri now contains the path to the external reference within the content manager
-                // Get the local path and skip the first character (the path separator)
-                return contentManager.Load<T>(dst.LocalPath.Substring(1));
+                return contentManager.Load<T>(FileHelpers.ResolveRelativePath(assetName, externalReference));
             }
 
             return default(T);
@@ -208,7 +181,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         public T ReadObject<T>()
-        {			
+        {
             int typeReaderIndex = Read7BitEncodedInt();
         
             if (typeReaderIndex == 0) 
@@ -246,11 +219,7 @@ namespace Microsoft.Xna.Framework.Content
 
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
-#if WINRT
-            if (!typeReader.TargetType.GetTypeInfo().IsValueType)
-#else
-            if (!typeReader.TargetType.IsValueType)
-#endif
+            if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
                 return (T)ReadObject<object>();
 
             var result = (T)typeReader.Read(this, existingInstance);

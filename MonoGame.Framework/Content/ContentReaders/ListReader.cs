@@ -28,16 +28,13 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-#if WINRT
-using System.Reflection;
-#endif
 
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    public class ListReader<T> : ContentTypeReader<List<T>>
+    internal class ListReader<T> : ContentTypeReader<List<T>>
     {
         ContentTypeReader elementReader;
 
@@ -59,21 +56,14 @@ namespace Microsoft.Xna.Framework.Content
             if (list == null) list = new List<T>(count);
             for (int i = 0; i < count; i++)
             {
-                // list.Add(input.ReadObject<T>(elementReader));
-				
-				Type objectType = typeof(T);
-#if WINRT
-                if (objectType.GetTypeInfo().IsValueType)
-#else
-                if (objectType.IsValueType)
-#endif
+                if (ReflectionHelpers.IsValueType(typeof(T)))
 				{
                 	list.Add(input.ReadObject<T>(elementReader));
 				}
 				else
 				{
-					int readerType = input.ReadByte();
-                	list.Add(input.ReadObject<T>(input.TypeReaders[readerType - 1]));
+                    var readerType = input.Read7BitEncodedInt();
+                	list.Add(readerType > 0 ? input.ReadObject<T>(input.TypeReaders[readerType - 1]) : default(T));
 				}
             }
             return list;

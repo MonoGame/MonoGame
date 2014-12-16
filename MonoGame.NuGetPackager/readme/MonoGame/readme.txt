@@ -8,6 +8,10 @@ _Supported Platforms
 	* Windows GL
 	* Windows 8
 	* Windows Phone
+_Experimental Platforms (newly added, please test)
+	* iOS
+	* MacOS
+	* Android
 
 _Contents
 This package contains the project templates for MonoGame projects for the currently supported platforms
@@ -22,10 +26,8 @@ When asked, simply overwrite any files (if unsure, create a blank solution and c
 This package also installs the latest dependant MonoGame.Binaries NuGet package
 
 _Release Notes
-3.2 release in-line with the recent full 3.2 release
+3.2.2 release in-line with the recent full 3.2 release and post updates
 More details can be found at http://monogame.net
 
 _Known Issues
 The Binaries package currently supports more platforms than this template package.
-For iOS / MacOS / Android, use the existing MonoGame templates or your existing projects and just install the Binaries package.
-This package will be updated with those templates in a later date.
