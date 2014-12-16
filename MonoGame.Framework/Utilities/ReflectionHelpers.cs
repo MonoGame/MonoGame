@@ -82,20 +82,15 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
         }
 
-		public static Attribute GetCustomAttribute(MemberInfo member, Type memberType)
+		public static T GetCustomAttribute<T>(MemberInfo member) where T : Attribute
 		{
 			if (member == null)
-			{
 				throw new NullReferenceException("Must supply the member parameter");
-			}
-			if (memberType == null)
-			{
-				throw new NullReferenceException("Must supply the memberType parameter");
-			}
+
 #if WINRT
-			return member.GetCustomAttribute(memberType);
+			return member.GetCustomAttribute(typeof(T)) as T;
 #else
-			return Attribute.GetCustomAttribute(member, memberType);
+            return Attribute.GetCustomAttribute(member, typeof(T)) as T;
 #endif
 		}
 

@@ -83,18 +83,12 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 
-            var attr = ReflectionHelpers.GetCustomAttribute(member, typeof (ContentSerializerIgnoreAttribute));
-            if (attr != null)
+            // Are we explicitly asked to ignore this item?
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null) 
                 return null;
 
-            var contentSerializerAttribute =
-                ReflectionHelpers.GetCustomAttribute(member, typeof (ContentSerializerAttribute)) as
-                ContentSerializerAttribute;
-
-            var isSharedResource = false;
-            if (contentSerializerAttribute != null)
-                isSharedResource = contentSerializerAttribute.SharedResource;
-            else
+            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
+            if (contentSerializerAttribute == null)
             {
                 if (property != null)
                 {
@@ -132,7 +126,7 @@ namespace Microsoft.Xna.Framework.Content
                 setter = field.SetValue;
             }
 
-            if (isSharedResource)
+            if (contentSerializerAttribute != null && contentSerializerAttribute.SharedResource)
             {
                 return (input, parent) =>
                 {

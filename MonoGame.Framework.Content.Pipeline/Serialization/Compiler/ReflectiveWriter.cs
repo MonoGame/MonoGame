@@ -73,15 +73,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
 
             // Are we explicitly asked to ignore this item?
-            var attr = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute));
-            if (attr != null) 
+            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null) 
                 return;
 
-            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) as ContentSerializerAttribute;
-            var isSharedResource = false;
-            if (contentSerializerAttribute != null)
-                isSharedResource = contentSerializerAttribute.SharedResource;
-            else
+            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
+            if (contentSerializerAttribute == null)
             {
                 if (property != null)
                 {
@@ -116,16 +112,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 memberObject = field.GetValue(parent);
             }
 
-            if (!isSharedResource)
+            if (contentSerializerAttribute != null && contentSerializerAttribute.SharedResource)
+                output.WriteSharedResource(memberObject);
+            else
             {
                 if (writer == null || elementType == typeof(object) || elementType == typeof(Array))
                     output.WriteObject(memberObject);
                 else
                     output.WriteObject(memberObject, writer);
-            }
-            else
-            {
-                output.WriteSharedResource(memberObject);
             }
         }
 
