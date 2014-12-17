@@ -58,8 +58,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			_samplerState = samplerState ?? SamplerState.LinearClamp;
 			_depthStencilState = depthStencilState ?? DepthStencilState.None;
 			_rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
-
+			
+#if PSM
+			if(effect == null)
+				_effect = _spriteEffect;
+			else
+				_effect = effect;
+#else
 			_effect = effect;
+#endif
 			
 			_matrix = transformMatrix;
 
