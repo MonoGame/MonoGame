@@ -7,7 +7,7 @@ using System.Diagnostics;
 #if WINDOWS
 using System.Windows.Forms;
 #endif
-#if XWT
+#if MONOMAC
 using Xwt;
 #endif
 
@@ -38,12 +38,9 @@ namespace MonoGame.Tools.Pipeline
             var controller = new PipelineController(view, model);   
             Application.Run(view);
 #endif
-#if XWT
+#if MONOMAC
 #if MONOMAC
             Application.Initialize(ToolkitType.Cocoa);
-#endif
-#if LINUX
-            Application.Initialize(ToolkitType.Gtk);
 #endif
 			var view = new XwtView();
             if (args != null && args.Length > 0)
@@ -57,6 +54,17 @@ namespace MonoGame.Tools.Pipeline
 			view.Show();
             Application.Run();
 #endif
+
+			#if LINUX
+
+			Gtk.Application.Init ();
+			MainWindow win = new MainWindow ();
+			win.Show (); 
+			var model = new PipelineProject();
+			new PipelineController(win, model);   
+			Gtk.Application.Run ();
+
+			#endif
         }
     }
 }
