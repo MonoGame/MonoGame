@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private float spacing;
         private FontDescriptionStyle style;
         private bool useKerning;
-	    private CharacterCollection characters = new CharacterCollection(CharacterRegion.Default.Characters());
+	    private CharacterCollection characters = new CharacterCollection();
 
 		/// <summary>
 		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
@@ -207,8 +207,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     if (characterRegion.End < characterRegion.Start)
                         throw new ArgumentException("CharacterRegion.End must be greater than CharacterRegion.Start");
 
-                    for (var start = characterRegion.Start; start <= characterRegion.End; start++)
-                        Characters.Add(start);
+                    foreach (var character in characterRegion.Characters())
+                        Characters.Add(character);
                 }
             }
         }

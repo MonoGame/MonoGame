@@ -8,15 +8,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	[TypeConverter(typeof(CharacterRegionTypeConverter))]
 	public struct CharacterRegion
 	{
-	    public char Start;
-	    public char End;
+	    public int Start;
+	    public int End;
 
 		// Enumerates all characters within the region.        
 	    public IEnumerable<Char> Characters()
 	    {
 	        for (var c = Start; c <= End; c++)
 	        {
-	            yield return c;
+	            yield return (char)c;
 	        }
 	    }
 
