@@ -18,6 +18,9 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformInitialize(string fileName)
         {
+			// PSM can only load MP3 files, but XNA XNBs use always WMA.
+			if (fileName!=null && Path.GetExtension(fileName).ToLower()==".wma") fileName=Path.ChangeExtension (fileName,"mp3");
+			
 			_bgm = new Bgm(fileName);
         }
      
