@@ -102,15 +102,16 @@ namespace MGCB
             _properties = new PreprocessorPropertyCollection();
 
             // Reflect to find what commandline options are available...
+            var bindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
             // Fields
-            foreach (var field in optionsObject.GetType().GetFields())
+            foreach (var field in optionsObject.GetType().GetFields(bindingFlags))
             {
                 var param = GetAttribute<CommandLineParameterAttribute>(field);
                 if (param == null)
                     continue;
 
-                CheckReservedPrefixes(param.Name);
+                CheckReservedPrefixes(param.Name);                
 
                 if (param.Required)
                 {
@@ -127,13 +128,21 @@ namespace MGCB
             }
 
             // Properties
-            foreach (var property in optionsObject.GetType().GetProperties())
+            foreach (var property in optionsObject.GetType().GetProperties(bindingFlags))
             {
                 var param = GetAttribute<CommandLineParameterAttribute>(property);
                 if (param == null)
                     continue;
 
                 CheckReservedPrefixes(param.Name);
+
+                // Only accept properties that have a set method defined.
+                if (!property.CanWrite)
+                    throw new ArgumentException("Properties must define a set method.");
+
+                // List type properties must also have a getter.
+                if (IsList(property) && !property.CanRead)
+                    throw new ArgumentException("List type properties must define a getter.");
 
                 if (param.Required)
                 {
@@ -150,7 +159,7 @@ namespace MGCB
             }
 
             // Methods
-            foreach (var method in optionsObject.GetType().GetMethods())
+            foreach (var method in optionsObject.GetType().GetMethods(bindingFlags))
             {
                 var param = GetAttribute<CommandLineParameterAttribute>(method);
                 if (param == null)
