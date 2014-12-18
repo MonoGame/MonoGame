@@ -15,8 +15,8 @@
       
       <!-- Standard letters and numbers -->
       <CharacterRegion>
-        <Start>&#32;</Start>
-        <End>&#126;</End>
+        <Start>32</Start>
+        <End>126</End>
       </CharacterRegion>
 
       <!-- Δ Delta symbol -->
