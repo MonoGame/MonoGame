@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private float spacing;
         private FontDescriptionStyle style;
         private bool useKerning;
-	    private CharacterCollection characters = new CharacterCollection(CharacterRegion.Default.Characters());
+	    private CharacterCollection characters = new CharacterCollection();
 
 		/// <summary>
 		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
@@ -126,7 +126,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			set
 			{
 				if (value <= 0.0f)
-					throw new ArgumentOutOfRangeException("Size is less than or equal to zero. Specify a value for this property that is greater than zero.");
+					throw new ArgumentOutOfRangeException("Size must be greater than zero.");
 				size = value;
 			}
 		}
@@ -143,8 +143,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			}
 			set
 			{
-				if (value < 0.0f)
-					throw new ArgumentOutOfRangeException("Spacing is less than or equal to zero.");
 				spacing = value;
 			}
 		}
@@ -255,7 +253,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="size">The size, in points, of the font.</param>
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		public FontDescription(string fontName, float size, float spacing)
-			: this(fontName, size, spacing, FontDescriptionStyle.Regular, true)
+			: this(fontName, size, spacing, FontDescriptionStyle.Regular, false)
 		{
 		}
 
@@ -267,7 +265,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle)
-            : this(fontName, size, spacing, fontStyle, true)
+            : this(fontName, size, spacing, fontStyle, false)
 		{
 		}
 
