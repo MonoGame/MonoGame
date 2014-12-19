@@ -334,10 +334,13 @@ namespace MonoGame.Tools.Pipeline
 
 		private void UpdateMenus()
 		{
+			UpdateUndoRedo (_controller.CanUndo, _controller.CanRedo);
 		}
 
 		private void UpdateUndoRedo(bool canUndo, bool canRedo)
 		{
+			UndoAction.Sensitive = canUndo;
+			RedoAction.Sensitive = canRedo;
 		}
 
 		#region IView implementation
