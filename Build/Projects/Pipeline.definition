@@ -21,8 +21,8 @@
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;XWT</Platform>
-      <Platform Name="Linux">TRACE;LINUX;XWT</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -135,6 +135,7 @@
     </EmbeddedResource>
 
     <!-- The Xwt specific stuff -->
+    <!--
     <Compile Include="Xwt\PipelineProjectProxy.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -147,6 +148,22 @@
     <Compile Include="Xwt\PropertyGrid.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    -->
+
+    <!-- The Gtk specific stuff -->
+    <Compile Include="Gtk\PropertyGrid.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\GtkView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\IgeMacIntegration.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Content Include="App.ico">
+      <Platforms>MacOS,Linux</Platforms>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 
     <!-- The resources for icons and buttons -->
     <EmbeddedResource Include="Icons\blueprint.png" />

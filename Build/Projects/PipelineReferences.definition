@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ExternalProject Name="PipelineReferences">
 
+  <!--
   <Platform Type="Linux">
     <Binary
       Name="Xwt"
@@ -17,6 +18,15 @@
     <Binary
       Name="Xwt.Mac"
       Path="ThirdParty\Dependencies\Xwt\Xwt.Mac.dll" />
+  </Platform>
+  -->
+  <Platform Type="MacOS">
+    <Reference Include="atk-sharp"/>
+    <Reference Include="gdk-sharp"/>
+    <Reference Include="glade-sharp"/>
+    <Reference Include="glib-sharp"/>
+    <Reference Include="gtk-dotnet"/>
+    <Reference Include="gtk-sharp"/>
   </Platform>
 
   <Platform Type="Windows">
