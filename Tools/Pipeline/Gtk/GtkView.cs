@@ -32,6 +32,8 @@ namespace MonoGame.Tools.Pipeline
 		Gtk.Action executeAction;
 		Gtk.Action FileAction;
 		Gtk.Action EditAction;
+		Gtk.Action UndoAction;
+		Gtk.Action RedoAction;
 		Gtk.Action ItemsAction;
 		Gtk.Action BuildAction;
 		Gtk.Action BuildAction1;
@@ -87,6 +89,12 @@ namespace MonoGame.Tools.Pipeline
 			this.EditAction = new global::Gtk.Action ("EditAction", "Edit", null, null);
 			this.EditAction.ShortLabel =  "Edit";
 			w2.Add (this.EditAction, null);
+			this.UndoAction = new global::Gtk.Action ("UndoAction", "Undo", null, null);
+			this.UndoAction.ShortLabel =  "Undo";
+			w2.Add (this.UndoAction, null);
+			this.RedoAction = new global::Gtk.Action ("RedoAction", "Redo", null, null);
+			this.RedoAction.ShortLabel =  "Redo";
+			w2.Add (this.RedoAction, null);
 			this.ItemsAction = new global::Gtk.Action ("ItemsAction", "Items", null, null);
 			this.ItemsAction.ShortLabel = "Items";
 			w2.Add (this.ItemsAction, null);
@@ -139,7 +147,7 @@ namespace MonoGame.Tools.Pipeline
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='menuBar'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='openAction1' action='openAction1'/><menuitem name='saveAction1' action='saveAction1'/><menuitem name='CloseAction' action='CloseAction'/><menuitem name='Action' action='Action'/><menuitem name='ImportAction' action='ImportAction'/><menuitem name='Action1' action='Action1'/><menuitem name='deleteAction' action='deleteAction'/></menu><menu name='ItemsAction' action='ItemsAction'><menuitem name='AddNewAction' action='AddNewAction'/><menuitem name='AddExistingAction' action='AddExistingAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='menuBar'><menu name='FileAction' action='FileAction'><menuitem name='NewAction' action='NewAction'/><menuitem name='openAction1' action='openAction1'/><menuitem name='saveAction1' action='saveAction1'/><menuitem name='CloseAction' action='CloseAction'/><menuitem name='Action' action='Action'/><menuitem name='ImportAction' action='ImportAction'/><menuitem name='Action1' action='Action1'/><menuitem name='deleteAction' action='deleteAction'/></menu><menu name='EditAction' action='EditAction'><menuitem name='UndoAction' action='UndoAction'/><menuitem name='RedoAction' action='RedoAction'/></menu><menu name='ItemsAction' action='ItemsAction'><menuitem name='AddNewAction' action='AddNewAction'/><menuitem name='AddExistingAction' action='AddExistingAction'/></menu><menu name='BuildAction' action='BuildAction'><menuitem name='BuildAction1' action='BuildAction1'/><menuitem name='RebuildAction' action='RebuildAction'/><menuitem name='CleanAction' action='CleanAction'/></menu></menubar></ui>");
 			this.menuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menuBar")));
 			this.menuBar.Name = "menuBar";
 			this.vbox1.Add (this.menuBar);
@@ -180,6 +188,8 @@ namespace MonoGame.Tools.Pipeline
 			this.deleteAction.Activated += new global::System.EventHandler (this.Exit_Clicked);
 			this.CloseAction.Activated += new global::System.EventHandler (this.CloseProject_Click);
 			this.NewAction.Activated += new global::System.EventHandler (this.NewProject_Click);
+			this.UndoAction.Activated += new global::System.EventHandler (this.Undo_Click);
+			this.RedoAction.Activated += new global::System.EventHandler (this.Redo_Click);
 		}
 
 		public void BuildUI () {
@@ -676,6 +686,16 @@ namespace MonoGame.Tools.Pipeline
 		{
 			_controller.NewProject ();
 			grid.CurrentObject = null;
+		}
+
+		protected void Undo_Click (object sender, EventArgs e)
+		{
+			_controller.Undo ();
+		}
+
+		protected void Redo_Click (object sender, EventArgs e)
+		{
+			_controller.Redo ();
 		}
 
 		protected void AddNew_Click (object sender, EventArgs e)
