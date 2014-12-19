@@ -155,7 +155,7 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\GtkView.cs">
-      <Plaforms>MacOS,Linux</Plaforms>
+      <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="Gtk\IgeMacIntegration.cs">
       <Platforms>MacOS</Platforms>
