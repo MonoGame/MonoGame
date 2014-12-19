@@ -31,6 +31,7 @@ namespace MonoGame.Tools.Pipeline
 		Gtk.Action saveAction;
 		Gtk.Action executeAction;
 		Gtk.Action FileAction;
+		Gtk.Action EditAction;
 		Gtk.Action ItemsAction;
 		Gtk.Action BuildAction;
 		Gtk.Action BuildAction1;
@@ -83,6 +84,9 @@ namespace MonoGame.Tools.Pipeline
 			this.FileAction = new global::Gtk.Action ("FileAction", "File", null, null);
 			this.FileAction.ShortLabel =  "File";
 			w2.Add (this.FileAction, null);
+			this.EditAction = new global::Gtk.Action ("EditAction", "Edit", null, null);
+			this.EditAction.ShortLabel =  "Edit";
+			w2.Add (this.EditAction, null);
 			this.ItemsAction = new global::Gtk.Action ("ItemsAction", "Items", null, null);
 			this.ItemsAction.ShortLabel = "Items";
 			w2.Add (this.ItemsAction, null);
@@ -390,8 +394,16 @@ namespace MonoGame.Tools.Pipeline
 		public bool AskImportProject (out string projectFilePath)
 		{
 			projectFilePath = String.Empty;
-			ShowMessage ("Not Implemented on Mac yet!");
-			return false;
+			using (var dialog = new FileChooserDialog ("", host, FileChooserAction.Open, "Cancel", ResponseType.Cancel,
+				"Open", ResponseType.Accept)) {
+				dialog.Filter = new FileFilter ();
+				dialog.Filter.Name = "XNA Content Project (*.contentproj)";
+				dialog.Filter.AddPattern ("*.contentproj");
+				var respose = (ResponseType)dialog.Run ();
+				projectFilePath = dialog.Filename;
+				dialog.Hide ();
+				return respose == ResponseType.Accept;
+			}
 		}
 
 		public void ShowError (string title, string message)
