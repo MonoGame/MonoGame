@@ -628,7 +628,7 @@ namespace MonoGame.Tools.Pipeline
             return _project.Location + "\\" + filePath;
 			#endif
 
-			#if LINUX || MAC
+			#if LINUX || MONOMAC
 			return _project.Location + "/" + filePath;
 			#endif
         }
