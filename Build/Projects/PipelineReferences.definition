@@ -23,6 +23,9 @@
     <Binary
       Name="pango-sharp"
       Path="ThirdParty\Dependencies\Gtk\pango-sharp.dll" />
+    <Binary
+      Name="Mono.Posix"
+      Path="ThirdParty\Dependencies\Gtk\Mono.Posix.dll" />
   </Platform>
 
   <Platform Type="MacOS">
