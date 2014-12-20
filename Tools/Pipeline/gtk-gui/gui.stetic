@@ -6,7 +6,7 @@
   </configuration>
   <import>
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <widget-library name="../bin/Linux/AnyCPU/Debug/Pipeline.exe" internal="true" />
+    <widget-library name="../bin/MacOS/AnyCPU/Debug/Pipeline.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="MonoGame.Tools.Pipeline.MainWindow" design-size="751 557">
     <action-group name="Default">
@@ -160,7 +160,7 @@
     <property name="MemberName" />
     <property name="GeneratePublic">False</property>
     <property name="Title" translatable="yes">Monogame Pipeline</property>
-    <property name="Icon">resource:MonoGame.Tools.Pipeline.Icons.monogame.png</property>
+    <property name="Icon">resource:MonoGame.Tools.Pipeline.App.ico</property>
     <property name="WindowPosition">CenterOnParent</property>
     <signal name="DeleteEvent" handler="OnDeleteEvent" />
     <child>
@@ -303,22 +303,9 @@
           <widget class="Gtk.VPaned" id="vpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">187</property>
+            <property name="Position">122</property>
             <child>
-              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
-                <property name="MemberName" />
-                <property name="ShadowType">In</property>
-                <child>
-                  <widget class="Gtk.TreeView" id="treeview2">
-                    <property name="MemberName" />
-                    <property name="CanFocus">True</property>
-                    <property name="ShowScrollbars">True</property>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="Resize">False</property>
-              </packing>
+              <placeholder />
             </child>
             <child>
               <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
