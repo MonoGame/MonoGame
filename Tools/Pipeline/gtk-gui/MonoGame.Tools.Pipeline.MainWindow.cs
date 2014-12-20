@@ -153,7 +153,7 @@ namespace MonoGame.Tools.Pipeline
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "MonoGame.Tools.Pipeline.MainWindow";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Monogame Pipeline");
-			this.Icon = global::Gdk.Pixbuf.LoadFromResource ("MonoGame.Tools.Pipeline.Icons.monogame.png");
+			this.Icon = global::Gdk.Pixbuf.LoadFromResource ("MonoGame.Tools.Pipeline.App.ico");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Container child MonoGame.Tools.Pipeline.MainWindow.Gtk.Container+ContainerChild
 			this.vbox2 = new global::Gtk.VBox ();

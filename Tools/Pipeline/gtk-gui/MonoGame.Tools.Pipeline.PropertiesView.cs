@@ -8,13 +8,7 @@ namespace MonoGame.Tools.Pipeline
 		
 		private global::Gtk.VPaned vpaned1;
 		
-		private global::Gtk.ScrolledWindow GtkScrolledWindow;
-		
-		private global::Gtk.TreeView treeview2;
-		
-		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
-		
-		private global::Gtk.TextView textview1;
+		private global::Gtk.ScrolledWindow scrolledwindow2;
 
 		protected virtual void Build ()
 		{
@@ -29,34 +23,22 @@ namespace MonoGame.Tools.Pipeline
 			this.vpaned1 = new global::Gtk.VPaned ();
 			this.vpaned1.CanFocus = true;
 			this.vpaned1.Name = "vpaned1";
-			this.vpaned1.Position = 187;
+			this.vpaned1.Position = 259;
 			// Container child vpaned1.Gtk.Paned+PanedChild
-			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
-			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
-			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
-			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
-			this.treeview2 = new global::Gtk.TreeView ();
-			this.treeview2.CanFocus = true;
-			this.treeview2.Name = "treeview2";
-			this.GtkScrolledWindow.Add (this.treeview2);
-			this.vpaned1.Add (this.GtkScrolledWindow);
-			global::Gtk.Paned.PanedChild w2 = ((global::Gtk.Paned.PanedChild)(this.vpaned1 [this.GtkScrolledWindow]));
-			w2.Resize = false;
-			// Container child vpaned1.Gtk.Paned+PanedChild
-			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
-			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
-			this.GtkScrolledWindow1.VscrollbarPolicy = ((global::Gtk.PolicyType)(2));
-			this.GtkScrolledWindow1.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
-			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
-			// Container child GtkScrolledWindow1.Gtk.Container+ContainerChild
-			this.textview1 = new global::Gtk.TextView ();
-			this.textview1.CanFocus = true;
-			this.textview1.Name = "textview1";
-			this.GtkScrolledWindow1.Add (this.textview1);
-			this.vpaned1.Add (this.GtkScrolledWindow1);
+			this.scrolledwindow2 = new global::Gtk.ScrolledWindow ();
+			this.scrolledwindow2.WidthRequest = 100;
+			this.scrolledwindow2.HeightRequest = 100;
+			this.scrolledwindow2.CanFocus = true;
+			this.scrolledwindow2.Name = "scrolledwindow2";
+			this.scrolledwindow2.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
+			this.scrolledwindow2.ShadowType = ((global::Gtk.ShadowType)(1));
+			this.scrolledwindow2.BorderWidth = ((uint)(2));
+			this.vpaned1.Add (this.scrolledwindow2);
+			global::Gtk.Paned.PanedChild w1 = ((global::Gtk.Paned.PanedChild)(this.vpaned1 [this.scrolledwindow2]));
+			w1.Resize = false;
 			this.vbox1.Add (this.vpaned1);
-			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.vpaned1]));
-			w5.Position = 1;
+			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.vpaned1]));
+			w2.Position = 0;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();

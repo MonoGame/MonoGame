@@ -2,6 +2,10 @@
 using System.Diagnostics;
 using System;
 using Gtk;
+using System.Reflection;
+#if MONOMAC
+using IgeMacIntegration;
+#endif
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -66,6 +70,36 @@ namespace MonoGame.Tools.Pipeline
 				projectview1.Rebuild ();
 			};
 			projectview1.Initalize (this, treerebuild, propertiesview1);
+
+			if (Assembly.GetEntryAssembly ().FullName.Contains ("Pipeline"))
+				BuildMenu ();
+			else {
+				menubar1.Hide ();
+				vbox2.Remove (menubar1);
+			}
+		}
+			
+		void BuildMenu() {
+
+#if MONOMAC
+			if (Environment.OSVersion.Platform == PlatformID.Unix) {
+				IgeMacMenu.GlobalKeyHandlerEnabled = true;
+
+				//Tell the IGE library to use your GTK menu as the Mac main menu
+				IgeMacMenu.MenuBar = this.menubar1;
+
+				//tell IGE which menu item should be used for the app menu's quit item
+				//IgeMacMenu.QuitMenuItem = yourQuitMenuItem;
+
+				//add a new group to the app menu, and add some items to it
+				var appGroup = IgeMacMenu.AddAppMenuGroup ();
+				appGroup.AddMenuItem (new MenuItem(), "About Pipeline...");
+
+				//hide the menu bar so it no longer displays within the window
+				menubar1.Hide ();
+				vbox2.Remove (menubar1);
+#endif
+			}
 		}
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -78,6 +112,7 @@ namespace MonoGame.Tools.Pipeline
 		public void Attach (IController controller)
 		{
 			_controller = controller;
+			propertiesview1.controller = _controller;
 
 			_controller.OnBuildStarted += UpdateMenus;
 			_controller.OnBuildFinished += UpdateMenus;

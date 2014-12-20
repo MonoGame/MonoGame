@@ -340,6 +340,10 @@ namespace MonoGame.Tools.Pipeline
 				}
 
 				#region propgridcalls
+				if (citems.Count > 0)
+					propertiesView.CurrentObject = citems[0];
+				else 
+					propertiesView.CurrentObject = project;
 				#endregion
 			}
 

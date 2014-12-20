@@ -21,8 +21,8 @@
     <WindowsApplicationIcon>App.ico</WindowsApplicationIcon>
     <CustomDefinitions>
       <Platform Name="Windows">TRACE;WINDOWS</Platform>
-      <Platform Name="MacOS">TRACE;MONOMAC;XWT</Platform>
-      <Platform Name="Linux">TRACE;LINUX;XWT</Platform>
+      <Platform Name="MacOS">TRACE;MONOMAC;GTK</Platform>
+      <Platform Name="Linux">TRACE;LINUX;GTK</Platform>
     </CustomDefinitions>
   </Properties>
 
@@ -134,17 +134,14 @@
       <DependentUpon>NewContentDialog.cs</DependentUpon>
     </EmbeddedResource>
 
-    <!-- The Xwt specific stuff -->
-    <Compile Include="Xwt\PipelineProjectProxy.cs">
+    <!-- The Gtk specific stuff -->
+    <Compile Include="MainWindow.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\XwtView.cs">
+    <Compile Include="Widgets\ProjectView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Xwt\OutputTextView.cs">
-      <Platforms>MacOS,Linux</Platforms>
-    </Compile>
-    <Compile Include="Xwt\PropertyGrid.cs">
+    <Compile Include="Widgets\PropertyView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
 

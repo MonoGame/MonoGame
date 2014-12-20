@@ -297,35 +297,39 @@
         <property name="MemberName" />
         <signal name="SizeAllocated" handler="OnVbox1SizeAllocated" />
         <child>
-          <placeholder />
-        </child>
-        <child>
           <widget class="Gtk.VPaned" id="vpaned1">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">122</property>
+            <property name="Position">259</property>
             <child>
-              <placeholder />
-            </child>
-            <child>
-              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
-                <property name="MemberName" />
-                <property name="VscrollbarPolicy">Never</property>
+              <widget class="Gtk.ScrolledWindow" id="scrolledwindow2">
+                <property name="MemberName">scrolledwindows2</property>
+                <property name="WidthRequest">100</property>
+                <property name="HeightRequest">100</property>
+                <property name="CanFocus">True</property>
                 <property name="HscrollbarPolicy">Never</property>
                 <property name="ShadowType">In</property>
+                <property name="BorderWidth">2</property>
                 <child>
-                  <widget class="Gtk.TextView" id="textview1">
+                  <widget class="Gtk.Viewport" id="GtkViewport">
                     <property name="MemberName" />
-                    <property name="CanFocus">True</property>
-                    <property name="ShowScrollbars">True</property>
-                    <property name="Text" translatable="yes" />
+                    <property name="ShadowType">None</property>
+                    <child>
+                      <placeholder />
+                    </child>
                   </widget>
                 </child>
               </widget>
+              <packing>
+                <property name="Resize">False</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder />
             </child>
           </widget>
           <packing>
-            <property name="Position">1</property>
+            <property name="Position">0</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>
