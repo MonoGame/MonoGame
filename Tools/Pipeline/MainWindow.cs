@@ -98,8 +98,9 @@ namespace MonoGame.Tools.Pipeline
 				//hide the menu bar so it no longer displays within the window
 				menubar1.Hide ();
 				vbox2.Remove (menubar1);
-#endif
+
 			}
+#endif
 		}
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
