@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
+using System.Diagnostics;
 using System;
 using Gtk;
 
@@ -8,16 +10,19 @@ namespace MonoGame.Tools.Pipeline
 	partial class ProjectView : Gtk.Bin
 	{
 		public Menu menu;
+		public string openedProject;
 
-		Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
-		Gdk.Pixbuf ICON_FOLDER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png");
-		Gdk.Pixbuf ICON_OTHER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
+		public Gdk.Pixbuf ICON_BASE = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.settings.png");
+		public Gdk.Pixbuf ICON_FOLDER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.folder_closed.png");
+		public Gdk.Pixbuf ICON_OTHER = new Gdk.Pixbuf (null, "MonoGame.Tools.Pipeline.Icons.blueprint.png");
 
 		string basename;
 		TreeStore listStore;
 		MainWindow window;
+		PropertiesView propertiesView;
 
-		MenuItem treenewitem, treeadditem, treeopenfile, treerebuild;
+		MenuItem treenewitem, treeadditem, treeopenfile, treedelete, treeopenfilelocation;
+		SeparatorMenuItem seperator, seperator2;
 
 		public ProjectView ()
 		{
@@ -39,11 +44,13 @@ namespace MonoGame.Tools.Pipeline
 
 			listStore = new Gtk.TreeStore (typeof (Gdk.Pixbuf), typeof (string));
 			treeview1.Model = listStore;
+			treeview1.Selection.Mode = SelectionMode.Multiple;
 		}
 
-		public void Initalize(MainWindow window, MenuItem treerebuild)
+		public void Initalize(MainWindow window, MenuItem treerebuild, PropertiesView propertiesView)
 		{
 			this.window = window;
+			this.propertiesView = propertiesView;
 
 			menu = new Menu ();
 
@@ -55,20 +62,40 @@ namespace MonoGame.Tools.Pipeline
 			treeadditem.Activated += window.OnAddItemActionActivated;
 			menu.Add (treeadditem);
 
-			MenuItem treedelete = new MenuItem ("Delete");
+			treedelete = new MenuItem ("Delete");
 			treedelete.Activated += window.OnDeleteActionActivated;
 			menu.Add (treedelete);
 
-			SeparatorMenuItem seperator = new SeparatorMenuItem ();
+			seperator = new SeparatorMenuItem ();
 			menu.Add (seperator);
 
 			treeopenfile = new MenuItem ("Open File");
+			treeopenfile.Activated += delegate {
+				List<TreeIter> iters;
+				List<Gdk.Pixbuf> icons;
+				GetSelectedTreePath(out iters, out icons);
+
+				if(icons[0] != ICON_BASE)
+					Process.Start(window._controller.GetFullPath(GetPathFromIter(iters[0])));
+				else
+					Process.Start(openedProject);
+			};
 			menu.Add (treeopenfile);
 
-			MenuItem treeopenfilelocation = new MenuItem ("Open File Location");
+			treeopenfilelocation = new MenuItem ("Open File Location");
+			treeopenfilelocation.Activated += delegate {
+				List<TreeIter> iters;
+				List<Gdk.Pixbuf> icons;
+				GetSelectedTreePath(out iters, out icons);
+
+				if(icons[0] != ICON_BASE)
+					Process.Start(System.IO.Path.GetDirectoryName(window._controller.GetFullPath(GetPathFromIter(iters[0]))));
+				else
+					Process.Start(System.IO.Path.GetDirectoryName(window._controller.GetFullPath("")));
+			};
 			menu.Add (treeopenfilelocation);
 
-			SeparatorMenuItem seperator2 = new SeparatorMenuItem ();
+			seperator2 = new SeparatorMenuItem ();
 			menu.Add (seperator2);
 
 			menu.Add (treerebuild);
@@ -130,7 +157,22 @@ namespace MonoGame.Tools.Pipeline
 
 					RemoveItem (itr, newpath);
 				} else 
-					listStore.Remove (ref itr);
+					RemoveIterAndUneededParents (itr);
+			}
+		}
+
+		public void RemoveIterAndUneededParents(TreeIter iter)
+		{
+			if ((Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0) != ICON_BASE) {
+				TreeIter piter;
+
+				treeview1.Model.IterParent (out piter, iter);
+				int nc = treeview1.Model.IterNChildren (piter);
+				listStore.Remove (ref iter);
+
+				if (nc <= 1) 
+					RemoveIterAndUneededParents (piter);
+				
 			}
 		}
 
@@ -168,17 +210,25 @@ namespace MonoGame.Tools.Pipeline
 			return filePath;
 		}
 
-		public string GetSelectedTreePath(out TreeIter iter, out Gdk.Pixbuf icon)
+		public string[] GetSelectedTreePath(out List<TreeIter> iters, out List<Gdk.Pixbuf> icons)
 		{
-			string filePath = "";
-			icon = ICON_BASE;
+			TreePath[] paths = treeview1.Selection.GetSelectedRows ();
 
-			if (treeview1.Selection.GetSelected (out iter)) {
-				icon = (Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0);
-				filePath = GetPathFromIter (iter);
+			List<string> filePaths = new List<string>();
+			iters = new List<TreeIter> ();
+			icons = new List<Gdk.Pixbuf> ();
+
+			foreach (TreePath path in paths) {
+
+				TreeIter iter;
+				if (treeview1.Model.GetIter (out iter, path)) {
+					filePaths.Add (GetPathFromIter (iter));
+					iters.Add (iter);
+					icons.Add ((Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0));
+				}
 			}
 
-			return filePath;
+			return filePaths.ToArray();
 		}
 
 		private List<string> GetAllPaths(TreeIter iter)
@@ -200,63 +250,167 @@ namespace MonoGame.Tools.Pipeline
 
 		public void Remove()
 		{
-			TreeIter iter;
-			Gdk.Pixbuf icon;
-			string path = GetSelectedTreePath (out iter, out icon);
+			List<TreeIter> iter;
+			List<Gdk.Pixbuf> icon;
+			string[] path = GetSelectedTreePath (out iter, out icon);
 
 			List<ContentItem> items = new List<ContentItem>();
 
-			if (icon == ICON_OTHER) {
-				var item = window._controller.GetItem(path) as ContentItem;
-				items.Add (item);
-			} else if (icon == ICON_FOLDER) {
-				List<string> paths = GetAllPaths (iter);
-				foreach(string pth in paths)
-				{
-					var item = window._controller.GetItem(pth) as ContentItem;
-					items.Add (item);
-				}
+			for (int i = 0; i < path.Length; i++) {
+				if (icon [i] == ICON_OTHER) {
+					var item = window._controller.GetItem (path [i]) as ContentItem;
+					if(!items.Contains(item))
+						items.Add (item);
+				} else {
+					List<string> paths = GetAllPaths (iter [i]);
+					foreach (string pth in paths) {
+						var item = window._controller.GetItem (pth) as ContentItem;
+						if(!items.Contains(item))
+							items.Add (item);
+					}
 
-				listStore.Remove (ref iter);
+					TreeIter itr = iter [i];
+				}
 			}
 
 			if(items.Count > 0)
 				window._controller.Exclude (items);
 		}
 
+		public void Rebuild()
+		{
+			List<TreeIter> iter;
+			List<Gdk.Pixbuf> icon;
+			string[] path = GetSelectedTreePath (out iter, out icon);
+
+			List<ContentItem> items = new List<ContentItem>();
+
+			for (int i = 0; i < path.Length; i++) {
+				if (icon [i] == ICON_OTHER) {
+					var item = window._controller.GetItem (path [i]) as ContentItem;
+					if(!items.Contains(item))
+						items.Add (item);
+				} else {
+					List<string> paths = GetAllPaths (iter [i]);
+					foreach (string pth in paths) {
+						var item = window._controller.GetItem (pth) as ContentItem;
+						if(!items.Contains(item))
+							items.Add (item);
+					}
+
+					TreeIter itr = iter [i];
+				}
+			}
+
+			if(items.Count > 0)
+				window._controller.RebuildItems (items);
+		}
+
 		protected void OnTreeview1ButtonReleaseEvent (object o, ButtonReleaseEventArgs args)
 		{
-			if (args.Event.Button != 3 || !window._controller.ProjectOpen)
+			if (!window._controller.ProjectOpen)
 				return;
 
-			TreeViewDropPosition pos; 
-			TreePath path;
-			TreeIter iter;
+			if (args.Event.Button == 1) {
+				window._controller.Selection.Clear (window);
+				List<TreeIter> iters;
+				List<Gdk.Pixbuf> icons;
+				List<string> paths = new List<string> ();
+				paths.AddRange (GetSelectedTreePath (out iters, out icons));
 
-			treeview1.GetDestRowAtPos ((int)args.Event.X, (int)args.Event.Y, out path, out pos);
-			if (path != null) {
-				listStore.GetIter (out iter, path);
+				PipelineProject project = (PipelineProject)window._controller.GetItem(openedProject);
+				bool ps = false;
 
-				Gdk.Pixbuf icon = (Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0);
-				window.UpdateMenus ();
+				List<ContentItem> citems = new List<ContentItem> ();
+				List<string> dirpaths = new List<string> ();
 
-				menu.ShowAll ();
-				if (icon == ICON_BASE) {
-					treenewitem.Visible = true;
-					treeadditem.Visible = true;
-					treeopenfile.Visible = true;
-				} else if (icon == ICON_FOLDER) {
-					treenewitem.Visible = true;
-					treeadditem.Visible = true;
-					treeopenfile.Visible = false;
-				} else {
-					treenewitem.Visible = false;
-					treeadditem.Visible = false;
-					treeopenfile.Visible = true;
+				for(int i = 0;i < paths.Count;i++)
+				{
+					if (icons [i] == ICON_BASE)
+						ps = true;
+					else {
+						var item = window._controller.GetItem (paths [i]);
+
+						if (item as ContentItem != null) {
+							citems.Add (item as ContentItem);
+							window._controller.Selection.Add (item as ContentItem, window);
+						} else
+							dirpaths.Add (paths[i]);
+					}
 				}
 
-				menu.Popup ();
+				#region propgridcalls
+				#endregion
 			}
+
+			if (args.Event.Button == 3) {
+				List<TreePath> paths = new List<TreePath> ();
+				paths.AddRange (treeview1.Selection.GetSelectedRows ());
+
+				if (paths.Count == 1) {
+					TreeViewDropPosition pos; 
+					TreePath path;
+					TreeIter iter;
+
+					treeview1.GetDestRowAtPos ((int)args.Event.X, (int)args.Event.Y, out path, out pos);
+					if (path != null) {
+						listStore.GetIter (out iter, path);
+
+						Gdk.Pixbuf icon = (Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0);
+						window.UpdateMenus ();
+
+						menu.ShowAll ();
+						if (icon == ICON_BASE) {
+							treenewitem.Visible = true;
+							treeadditem.Visible = true;
+							treeopenfile.Visible = true;
+						} else if (icon == ICON_FOLDER) {
+							treenewitem.Visible = true;
+							treeadditem.Visible = true;
+							treeopenfile.Visible = false;
+						} else {
+							treenewitem.Visible = false;
+							treeadditem.Visible = false;
+							treeopenfile.Visible = true;
+						}
+
+						menu.Popup ();
+					}
+				} else {
+					menu.ShowAll ();
+
+					treenewitem.Visible = false;
+					treeadditem.Visible = false;
+					treeopenfile.Visible = false;
+					seperator.Visible = false;
+					treeopenfile.Visible = false;
+					treeopenfilelocation.Visible = false;
+
+					menu.Popup ();
+				}
+			}
+		}
+
+		[GLib.ConnectBefore]
+		protected void OnTreeview1ButtonPressEvent (object o, ButtonPressEventArgs args)
+		{
+			if (args.Event.Button == 3) {
+
+				List<TreePath> paths = new List<TreePath> ();
+				paths.AddRange (treeview1.Selection.GetSelectedRows ());
+
+				TreeViewDropPosition pos; 
+				TreePath path;
+
+				treeview1.GetDestRowAtPos ((int)args.Event.X, (int)args.Event.Y, out path, out pos);
+
+				if (paths.Contains (path)) {
+					args.RetVal = true;
+					return;
+				}
+			}
+
+			args.RetVal = false;
 		}
 	}
 }

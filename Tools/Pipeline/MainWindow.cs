@@ -7,8 +7,18 @@ namespace MonoGame.Tools.Pipeline
 {
 	partial class MainWindow : Gtk.Window, IView
 	{
-		public string OpenProjectPath;
+		public static string AllowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _.";
 
+		public static bool CheckString(string s, string allowedCharacters)
+		{
+			for (int i = 0; i < s.Length; i++) 
+				if (!allowedCharacters.Contains (s.Substring (i, 1)))
+					return false;
+
+			return true;
+		}
+
+		public string OpenProjectPath;
 		public IController _controller;
 
 		FileFilter MonoGameContentProjectFileFilter;
@@ -16,6 +26,7 @@ namespace MonoGame.Tools.Pipeline
 		FileFilter AllFilesFilter;
 
 		MenuItem treerebuild;
+		MenuItem recentMenu;
 
 		public MainWindow () :
 			base (Gtk.WindowType.Toplevel)
@@ -39,8 +50,22 @@ namespace MonoGame.Tools.Pipeline
 				OpenProjectPath = null;
 			}
 
+			Widget[] widgets = menubar1.Children;
+			foreach (Widget w in widgets) {
+				if(((MenuItem)w).Name == "FileAction")
+				{
+					Menu m = (Menu)((MenuItem)w).Submenu;
+					foreach (Widget w2 in m.Children) 
+						if (((MenuItem)w2).Name == "OpenRecentAction") 
+							recentMenu = (MenuItem)w2;
+				}
+			}
+
 			treerebuild = new MenuItem ("Rebuild");
-			projectview1.Initalize (this, treerebuild);
+			treerebuild.Activated += delegate {
+				projectview1.Rebuild ();
+			};
+			projectview1.Initalize (this, treerebuild, propertiesview1);
 		}
 
 		protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -159,8 +184,10 @@ namespace MonoGame.Tools.Pipeline
 
 		public void SetTreeRoot (IProjectItem item)
 		{
-			if (item != null)
+			if (item != null) {
+				projectview1.openedProject = item.OriginalPath;
 				projectview1.SetBaseIter (System.IO.Path.GetFileNameWithoutExtension (item.OriginalPath));
+			}
 			else {
 				projectview1.SetBaseIter ("");
 				projectview1.Close ();
@@ -180,7 +207,6 @@ namespace MonoGame.Tools.Pipeline
 
 		public void UpdateTreeItem (IProjectItem item)
 		{
-			Console.WriteLine (item.OriginalPath);
 			//throw new NotImplementedException();
 		}
 
@@ -228,6 +254,7 @@ namespace MonoGame.Tools.Pipeline
 
 			files = new List<string>();
 			files.AddRange (filechooser.Filenames);
+			filechooser.Destroy ();
 
 			return result;
 		}
@@ -308,12 +335,48 @@ namespace MonoGame.Tools.Pipeline
 
 		public void OnNewItemActionActivated (object sender, EventArgs e)
 		{
-			
+			NewTemplateDialog dialog = new NewTemplateDialog(_controller.Templates.GetEnumerator ());
+			dialog.TransientFor = this;
+
+			if (dialog.Run () == (int)ResponseType.Ok) {
+
+				List<TreeIter> iters;
+				List<Gdk.Pixbuf> icons;
+				string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
+
+				string location = "";
+
+				if (paths.Length == 1) {
+					if (icons [0] == projectview1.ICON_FOLDER)
+						location = paths [0];
+					else if (icons [0] == projectview1.ICON_OTHER)
+						location = System.IO.Path.GetDirectoryName (paths [0]);
+					else
+						location = _controller.GetFullPath ("");
+				}
+				else
+					location = _controller.GetFullPath ("");
+
+				_controller.NewItem(dialog.name, location, dialog.templateFile);
+			}
 		}
 
 		public void OnAddItemActionActivated (object sender, EventArgs e)
 		{
+			List<TreeIter> iters;
+			List<Gdk.Pixbuf> icons;
+			string[] paths = projectview1.GetSelectedTreePath (out iters, out icons);
 
+			if (paths.Length == 1) {
+				if (icons [0] == projectview1.ICON_FOLDER)
+					_controller.Include (paths [0]);
+				else if (icons [0] == projectview1.ICON_OTHER)
+					_controller.Include (System.IO.Path.GetDirectoryName (paths [0]));
+				else
+					_controller.Include (_controller.GetFullPath (""));
+			}
+			else
+				_controller.Include (_controller.GetFullPath (""));
 		}
 
 		public void OnDeleteActionActivated (object sender, EventArgs e)
@@ -374,11 +437,46 @@ namespace MonoGame.Tools.Pipeline
 			RebuildAction.Sensitive = treerebuild.Sensitive;
 
 			CleanAction.Sensitive = projectOpenAndNotBuilding;
-			CancelBuildAction.Sensitive = !notBuilding;
-			CancelBuildAction.Visible = !notBuilding;
+			CancelBuildAction.Sensitive = false;
+			CancelBuildAction.Visible = false;
 
 			UpdateUndoRedo(_controller.CanUndo, _controller.CanRedo);
-			//UpdateRecentProjectList();
+			UpdateRecentProjectList();
+		}
+
+		public void UpdateRecentProjectList()
+		{
+			History.Default.Load ();
+			recentMenu.Submenu = null;
+			Menu m = new Menu ();
+
+			int nop = 0;
+
+			foreach (var project in History.Default.ProjectHistory)
+			{
+				nop++;
+				var recentItem = new MenuItem(project);
+
+				// We need a local to make the delegate work correctly.
+				var localProject = project;
+				recentItem.Activated += (sender, args) => _controller.OpenProject(localProject);
+
+				m.Insert (recentItem, 0);
+			}
+				
+			if (nop > 0) {
+				m.Add (new SeparatorMenuItem ());
+				MenuItem item = new MenuItem ("Clear");
+				item.Activated += delegate {
+					History.Default.Clear ();
+					UpdateRecentProjectList ();
+				};
+				m.Add (item);
+
+				recentMenu.Submenu = m;
+				m.ShowAll ();
+			}
+			menubar1.ShowAll ();
 		}
 
 		private void UpdateUndoRedo(bool canUndo, bool canRedo)

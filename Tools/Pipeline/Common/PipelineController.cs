@@ -615,14 +615,22 @@ namespace MonoGame.Tools.Pipeline
             if (_project == null)
                 return filePath;
 
+			#if WINDOWS
             filePath = filePath.Replace("/", "\\");
             if (filePath.StartsWith("\\"))
                 filePath = filePath.Substring(2);
+			#endif
 
             if (Path.IsPathRooted(filePath))
                 return filePath;
 
+			#if WINDOWS
             return _project.Location + "\\" + filePath;
+			#endif
+
+			#if LINUX || MAC
+			return _project.Location + "/" + filePath;
+			#endif
         }
     }
 }

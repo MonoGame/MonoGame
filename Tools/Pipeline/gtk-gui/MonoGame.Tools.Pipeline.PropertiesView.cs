@@ -45,6 +45,8 @@ namespace MonoGame.Tools.Pipeline
 			// Container child vpaned1.Gtk.Paned+PanedChild
 			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
+			this.GtkScrolledWindow1.VscrollbarPolicy = ((global::Gtk.PolicyType)(2));
+			this.GtkScrolledWindow1.HscrollbarPolicy = ((global::Gtk.PolicyType)(2));
 			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
 			// Container child GtkScrolledWindow1.Gtk.Container+ContainerChild
 			this.textview1 = new global::Gtk.TextView ();
@@ -60,7 +62,7 @@ namespace MonoGame.Tools.Pipeline
 				this.Child.ShowAll ();
 			}
 			this.Hide ();
-			this.GtkScrolledWindow1.SizeAllocated += new global::Gtk.SizeAllocatedHandler (this.OnGtkScrolledWindow1SizeAllocated);
+			this.vbox1.SizeAllocated += new global::Gtk.SizeAllocatedHandler (this.OnVbox1SizeAllocated);
 		}
 	}
 }
