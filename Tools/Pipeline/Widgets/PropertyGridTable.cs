@@ -7,11 +7,8 @@ namespace MonoGame.Tools.Pipeline
 	[System.ComponentModel.ToolboxItem (true)]
 	public class PropertyGridTable : Gtk.Table {
 
-		//PropertyGrid parent;
-
 		internal PropertyGridTable () : base(0,2,false)
 		{
-			//parent = propertyGrid;
 		}
 
 		public enum EntryType {

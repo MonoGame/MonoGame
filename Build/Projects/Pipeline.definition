@@ -10,6 +10,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Framework.Content.Pipeline" />
+    <Reference Include="MGCB" />
 
     <Reference Include="PipelineReferences" />
   </References>
@@ -141,11 +142,45 @@
     <Compile Include="Widgets\ProjectView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Widgets\PropertyView.cs">
+    <Compile Include="Widgets\PropertyGridTable.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Widgets\PropertiesView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Dialogs\NewTemplateDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Dialogs\YesNoCancelDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\generated.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.MainWindow.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.NewTemplateDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ProjectView.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertiesView.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="IgeMacIntegration.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <Platforms>MacOS,Linux</Platforms>
+    </EmbeddedResource>
 
     <!-- The resources for icons and buttons -->
+    <EmbeddedResource Include="App.ico" />
     <EmbeddedResource Include="Icons\blueprint.png" />
     <EmbeddedResource Include="Icons\folder_closed.png" />
     <EmbeddedResource Include="Icons\folder_open.png" />

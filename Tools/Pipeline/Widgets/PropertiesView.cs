@@ -33,7 +33,6 @@ namespace MonoGame.Tools.Pipeline
 			vbox.PackStart (processorParams, false, false, 0);
 
 			scrolledwindow2.AddWithViewport (vbox);
-			//PackStart (GtkScrolledWindow, true, true, 0);
 		}
 
 		protected void OnVbox1SizeAllocated (object o, SizeAllocatedArgs args)

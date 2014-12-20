@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace IgeMacIntegration {
 
+#if MONOMAC
 	public class IgeMacMenu {
 
 		[DllImport("libigemacintegration.dylib")]
@@ -64,4 +65,5 @@ namespace IgeMacIntegration {
 
 		public IgeMacMenuGroup(IntPtr raw) : base(raw) {}
 	}
+#endif
 }
