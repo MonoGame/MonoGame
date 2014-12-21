@@ -262,14 +262,14 @@ namespace MonoGame.Tools.Pipeline
 				return;
 
 			Gtk.Application.Invoke (delegate { 
-				textview2.Buffer.Text += text;
+				textview2.Buffer.Text += text + "\r\n";
 			});
 		}
 
 		public void OutputClear ()
 		{
 			Gtk.Application.Invoke (delegate { 
-				textview2.Buffer.Text += "";
+				textview2.Buffer.Text = "";
 			});
 		}
 
@@ -314,11 +314,8 @@ namespace MonoGame.Tools.Pipeline
 			}
 			else
 			{
-				_buildProcess.StartInfo.FileName = "/bin/bash";
-				_buildProcess.StartInfo.Arguments = "-c \"cd " + OpenProjectPath + " && mono " + ReplaceCharacters(AppDomain.CurrentDomain.BaseDirectory.ToString()) + "/MGCB.exe " + commands + "\"";
-
-				_buildProcess.StartInfo.UseShellExecute = false; 
-				_buildProcess.StartInfo.RedirectStandardOutput = true;
+				_buildProcess.StartInfo.FileName = exe;
+				_buildProcess.StartInfo.Arguments = commands;
 			}
 			return _buildProcess;
 		}
