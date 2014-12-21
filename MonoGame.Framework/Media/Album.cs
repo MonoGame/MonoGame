@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework.Media
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
-            return this.thumbnail.ImageWithSize(new SizeF(100, 100)); // TODO: Check size
+            return this.thumbnail.ImageWithSize(new SizeF(220, 220));
         }
 #elif ANDROID
         [CLSCompliant(false)]
@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             using (var albumArt = this.GetAlbumArt())
             {
-                return Bitmap.CreateScaledBitmap(albumArt, 100, 100, false); // TODO: Check size
+                return Bitmap.CreateScaledBitmap(albumArt, 220, 220, false);
             }
         }
 #else
