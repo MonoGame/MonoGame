@@ -118,6 +118,7 @@
     <Compile Include="Framework\Visual\Texture2DTest.cs" />
     <Compile Include="Framework\Visual\Texture3DTest.cs" />
     <Compile Include="Framework\Visual\IndexBufferTest.cs" />
+    <Compile Include="Framework\Visual\VertexBufferTest.cs" />
     <Compile Include="Framework\Visual\MiscellaneousTests.cs" />
     <Compile Include="Framework\Visual\ShaderTest.cs" />
     <Compile Include="Framework\Visual\SpriteBatchTest.cs" />
