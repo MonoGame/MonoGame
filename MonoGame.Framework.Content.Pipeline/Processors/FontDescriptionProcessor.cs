@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 			directories.Add(directory);
 			directories.Add("/Library/Fonts");
 #if WINDOWS
-			directories.Add(fontDirectory,);
+			directories.Add(fontDirectory);
 #endif
 
 #if LINUX
