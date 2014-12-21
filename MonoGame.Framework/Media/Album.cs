@@ -219,12 +219,10 @@ namespace Microsoft.Xna.Framework.Media
             var albumArt = MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
             if (width == 0 || height == 0)
                 return albumArt;
-            else
-            {
-                var scaledAlbumArt = Bitmap.CreateScaledBitmap(albumArt, width, height, false);
-                albumArt.Dispose();
-                return scaledAlbumArt;
-            }
+
+            var scaledAlbumArt = Bitmap.CreateScaledBitmap(albumArt, width, height, false);
+            albumArt.Dispose();
+            return scaledAlbumArt;
         }
 #else
         /// <summary>
@@ -248,16 +246,13 @@ namespace Microsoft.Xna.Framework.Media
         [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
-            return this.thumbnail.ImageWithSize(new SizeF(220, 220));
+            return this.GetAlbumArt(220, 220);
         }
 #elif ANDROID
         [CLSCompliant(false)]
         public Bitmap GetThumbnail()
         {
-            using (var albumArt = this.GetAlbumArt())
-            {
-                return Bitmap.CreateScaledBitmap(albumArt, 220, 220, false);
-            }
+            return this.GetAlbumArt(220, 220);
         }
 #else
         /// <summary>
