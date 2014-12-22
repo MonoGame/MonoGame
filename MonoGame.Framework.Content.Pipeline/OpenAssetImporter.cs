@@ -14,6 +14,9 @@ using System.IO;
 using System.Diagnostics;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System.Text;
+using Assimp.Unmanaged;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -35,6 +38,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
+#if LINUX
+			var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+
+			try
+			{
+				AssimpLibrary.Instance.LoadLibrary(
+					Path.Combine(targetDir, "libassimp.so"), 
+					Path.Combine(targetDir, "libassimp.so"));
+			}
+			catch { }
+#endif
+
             var identity = new ContentIdentity(filename, string.IsNullOrEmpty(ImporterName) ? GetType().Name : ImporterName);
 
             using (var importer = new AssimpContext())
