@@ -312,7 +312,7 @@ namespace MonoGame.Tools.Pipeline
 			_buildProcess.StartInfo.Arguments = commands;
 #endif
 
-#if MAC
+#if MONOMAC
 			_buildProcess.StartInfo.FileName = "mono";
 			_buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
 #endif
