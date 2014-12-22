@@ -307,12 +307,11 @@ namespace MonoGame.Tools.Pipeline
 		public Process CreateProcess(string exe, string commands)
 		{
 			var _buildProcess = new Process();
-#if WINDOWS || LINUX
+#if WINDOWS
 			_buildProcess.StartInfo.FileName = exe;
 			_buildProcess.StartInfo.Arguments = commands;
 #endif
-
-#if MONOMAC
+#if MONOMAC || LINUX
 			_buildProcess.StartInfo.FileName = "mono";
 			_buildProcess.StartInfo.Arguments = string.Format("\"{0}\" {1}", exe, commands);
 #endif
