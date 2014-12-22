@@ -6,6 +6,7 @@
     <Reference Include="gdk-sharp"/>
     <Reference Include="glade-sharp"/>
     <Reference Include="glib-sharp"/>
+    <Reference Include="gtk-dotnet"/>
     <Reference Include="gtk-sharp"/>
     <Reference Include="pango-sharp"/>
     <Reference Include="Mono.Posix"/>
