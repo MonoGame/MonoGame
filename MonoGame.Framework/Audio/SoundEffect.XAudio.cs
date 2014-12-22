@@ -142,7 +142,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AudioBytes = count,
                 Flags = BufferFlags.EndOfStream,
                 PlayBegin = loopStart,
-                PlayLength = loopLength,
+                PlayLength = loopLength / (2 * (int)channels),
                 Context = new IntPtr(42),
             };
 
@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework.Audio
                 AudioBytes = count,
                 Flags = BufferFlags.EndOfStream,
                 LoopBegin = loopStart,
-                LoopLength = loopLength,
+                LoopLength = loopLength / (2 * (int)channels),
                 LoopCount = AudioBuffer.LoopInfinite,
                 Context = new IntPtr(42),
             };
