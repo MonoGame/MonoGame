@@ -10,8 +10,7 @@
       Path="ThirdParty\Dependencies\Gtk\atk-sharp.dll" />
     <Binary
       Name="gdk-sharp"
-      Path="ThirdParty\Dependencies\Gtk\gdk-sharp.dll"
-      Private="false" />
+      Path="ThirdParty\Dependencies\Gtk\gdk-sharp.dll" />
     <Binary
       Name="glade-sharp"
       Path="ThirdParty\Dependencies\Gtk\glade-sharp.dll" />
