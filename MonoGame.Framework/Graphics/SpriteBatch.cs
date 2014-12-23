@@ -453,7 +453,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position and color.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
@@ -469,7 +469,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont"></param>
         /// <param name="text">The text which will be drawn.</param>
@@ -492,7 +492,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont"></param>
         /// <param name="text">The text which will be drawn.</param>
@@ -514,7 +514,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position and color.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
@@ -529,7 +529,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont"></param>
         /// <param name="text">The text which will be drawn.</param>
@@ -552,7 +552,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
+        /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
         /// <param name="spriteFont"></param>
         /// <param name="text">The text which will be drawn.</param>
