@@ -1,5 +1,4 @@
-RawBlameHistory  
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -580,3 +579,4 @@ RawBlameHistory
     </child>
   </widget>
 </stetic-interface>
+
