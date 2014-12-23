@@ -58,8 +58,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="samplerState">State of the sampler.</param>
         /// <param name="depthStencilState">State of the depth-stencil buffer.</param>
         /// <param name="rasterizerState">State of the rasterization.</param>
-        /// <param name="effect">Custom <see cref="Effect"/> for applying to pixel shader.</param>
-        /// <param name="transformMatrix">Transformation matrix of position,rotation and scale.</param>
+        /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect.</param>
+        /// <param name="transformMatrix">A transformation matrix of position,rotation and scale.</param>
         /// <exception cref="InvalidOperationException">Thrown if Begin is called next time without previous End.</exception>
         public void Begin
         (
