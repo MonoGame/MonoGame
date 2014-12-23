@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Begins batching or drawing sprites, using optional parameters.
+        /// Begins a new sprite and text batch with the specified render state.
         /// </summary>
         /// <param name="sortMode">Sorting mode.</param>
         /// <param name="blendState">State of the blending.</param>
