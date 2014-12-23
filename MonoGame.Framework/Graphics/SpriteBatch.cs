@@ -53,7 +53,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Begins a new sprite and text batch with the specified render state.
         /// </summary>
-        /// <param name="sortMode">Sorting mode.</param>
+        /// <param name="sortMode">The drawing order for sprite and text drawing.</param>
         /// <param name="blendState">State of the blending.</param>
         /// <param name="samplerState">State of the sampler.</param>
         /// <param name="depthStencilState">State of the depth-stencil buffer.</param>
