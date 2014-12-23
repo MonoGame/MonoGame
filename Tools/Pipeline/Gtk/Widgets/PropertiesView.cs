@@ -5,7 +5,6 @@ using System.Linq;
 using Gtk;
 using System.Reflection;
 using System.ComponentModel;
-using Microsoft.Xna.Framework.Graphics;
 using TP = Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
