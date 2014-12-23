@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Flushes the sprite batches to a screen and restores device states.
+        /// Flushes all batched text and sprites to the screen.
         /// </summary>
 		public void End ()
 		{	
