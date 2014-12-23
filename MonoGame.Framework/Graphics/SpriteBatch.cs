@@ -456,7 +456,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position and color.
         /// </summary>
         /// <param name="spriteFont">A font.</param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
 		public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
@@ -472,7 +472,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
         /// </summary>
         /// <param name="spriteFont"></param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
         /// <param name="rotation">A rotation of this string.</param>
@@ -495,7 +495,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
         /// </summary>
         /// <param name="spriteFont"></param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
         /// <param name="rotation">A rotation of this string.</param>
@@ -517,7 +517,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position and color.
         /// </summary>
         /// <param name="spriteFont">A font.</param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
 		public void DrawString (SpriteFont spriteFont, StringBuilder text, Vector2 position, Color color)
@@ -532,7 +532,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
         /// </summary>
         /// <param name="spriteFont"></param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
         /// <param name="rotation">A rotation of this string.</param>
@@ -555,7 +555,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite string to a batch of sprites using specified font, text, position, color, rotation, origin, scale, effects and depth.
         /// </summary>
         /// <param name="spriteFont"></param>
-        /// <param name="text">A text which will be drawn.</param>
+        /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
         /// <param name="rotation">A rotation of this string.</param>
