@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites, using optional parameters.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="position">An optional drawing location on screen.</param>
@@ -217,7 +217,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, optional source, color, rotation, origin, scale, effects and depth.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="position">The drawing location on screen.</param>
@@ -260,7 +260,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, optional source, color, rotation, origin, scale, effects and depth.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="position">The drawing location on screen.</param>
@@ -303,7 +303,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, destination bounds, optional source, color, rotation, origin, effects and depth.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="destinationRectangle">The drawing bounds.</param>
@@ -407,7 +407,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, position, optional source and color.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="position">The drawing location on screen.</param>
@@ -419,7 +419,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, destination bounds, optional source and color.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="destinationRectangle">The drawing bounds.</param>
@@ -431,7 +431,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, position and color.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="position">The drawing location on screen.</param>
@@ -442,7 +442,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Pushes a sprite to a batch of sprites using specified texture, destination bounds and color.
+        /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
         /// <param name="destinationRectangle">The drawing bounds.</param>
