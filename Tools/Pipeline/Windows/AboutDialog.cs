@@ -13,12 +13,12 @@ namespace MonoGame.Tools.Pipeline
         public AboutDialog()
         {
             InitializeComponent();
-            this.Text = String.Format("About {0}", AttributeAccessors.AssemblyTitle);
-            this.labelProductName.Text = AttributeAccessors.AssemblyProduct;
-            this.labelVersion.Text = String.Format("Version {0}", AttributeAccessors.AssemblyVersion);
-            this.labelCopyright.Text = AttributeAccessors.AssemblyCopyright;
-            this.labelCompanyName.Text = AttributeAccessors.AssemblyCompany;
-            this.textBoxDescription.Text = AttributeAccessors.AssemblyDescription;
+            this.Text = String.Format("About {0}", AssemblyAttributes.AssemblyTitle);
+            this.labelProductName.Text = AssemblyAttributes.AssemblyProduct;
+            this.labelVersion.Text = String.Format("Version {0}", AssemblyAttributes.AssemblyVersion);
+            this.labelCopyright.Text = AssemblyAttributes.AssemblyCopyright;
+            this.labelCompanyName.Text = AssemblyAttributes.AssemblyCompany;
+            this.textBoxDescription.Text = AssemblyAttributes.AssemblyDescription;
         }
 
         private void okButton_Click(object sender, EventArgs e)

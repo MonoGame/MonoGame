@@ -8,14 +8,14 @@ namespace MonoGame.Tools.Pipeline
 		{
 			this.Build ();
 
-			this.Title = String.Format("About {0}", AttributeAccessors.AssemblyTitle);
+			this.Title = String.Format("About {0}", AssemblyAttributes.AssemblyTitle);
 
-			label1.Text = AttributeAccessors.AssemblyProduct;
-			label2.Text = String.Format("Version {0}", AttributeAccessors.AssemblyVersion);
-			label3.Text = AttributeAccessors.AssemblyCopyright;
-			label4.Text = AttributeAccessors.AssemblyCompany;
+			label1.Text = AssemblyAttributes.AssemblyProduct;
+			label2.Text = String.Format("Version {0}", AssemblyAttributes.AssemblyVersion);
+			label3.Text = AssemblyAttributes.AssemblyCopyright;
+			label4.Text = AssemblyAttributes.AssemblyCompany;
 
-			textview1.Buffer.Text = AttributeAccessors.AssemblyDescription;
+			textview1.Buffer.Text = AssemblyAttributes.AssemblyDescription;
 		}
 
 		protected void OnResponse(object sender, EventArgs e)

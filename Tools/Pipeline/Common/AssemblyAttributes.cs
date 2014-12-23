@@ -3,7 +3,7 @@ using System;
 
 namespace MonoGame.Tools.Pipeline
 {
-	public static class AttributeAccessors
+	public static class AssemblyAttributes
 	{
 		public static string AssemblyTitle
 		{

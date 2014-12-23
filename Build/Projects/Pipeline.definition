@@ -37,7 +37,7 @@
     <None Include="App.config" />
 
     <Compile Include="Common\ActionStack.cs" />
-    <Compile Include="Common\AttributeAccessors.cs" />
+    <Compile Include="Common\AssemblyAttributes.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
