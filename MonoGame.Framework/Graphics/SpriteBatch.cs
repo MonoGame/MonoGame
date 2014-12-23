@@ -445,11 +445,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Pushes a sprite to a batch of sprites using specified texture, destination bounds and color.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="rectangle">The drawing bounds.</param>
+        /// <param name="destinationRectangle">The drawing bounds.</param>
         /// <param name="color">A color mask.</param>
-		public void Draw (Texture2D texture, Rectangle rectangle, Color color)
+        public void Draw(Texture2D texture, Rectangle destinationRectangle, Color color)
 		{
-			Draw (texture, rectangle, null, color);
+            Draw(texture, destinationRectangle, null, color);
 		}
 
         /// <summary>
