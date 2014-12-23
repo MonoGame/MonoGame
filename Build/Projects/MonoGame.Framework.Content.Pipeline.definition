@@ -470,6 +470,11 @@
     </None>
 
     <!-- Linux Additional Binaries -->
+    <None Include="..\ThirdParty\Dependencies\assimp\libassimp.so">
+      <Platforms>Linux</Platforms>
+      <Link>libassimp.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\ThirdParty\Dependencies\NVTT\Linux\libnvcore.so">
       <Platforms>Linux</Platforms>
       <Link>libnvcore.so</Link>
