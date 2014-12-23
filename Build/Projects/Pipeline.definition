@@ -136,22 +136,22 @@
     </EmbeddedResource>
 
     <!-- The Gtk specific stuff -->
-    <Compile Include="MainWindow.cs">
+    <Compile Include="Gtk\MainWindow.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Widgets\ProjectView.cs">
+    <Compile Include="Gtk\Widgets\ProjectView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Widgets\PropertyGridTable.cs">
+    <Compile Include="Gtk\Widgets\PropertyGridTable.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Widgets\PropertiesView.cs">
+    <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Dialogs\NewTemplateDialog.cs">
+    <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
-    <Compile Include="Dialogs\YesNoCancelDialog.cs">
+    <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\generated.cs">
