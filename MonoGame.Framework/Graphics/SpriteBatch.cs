@@ -471,7 +471,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
-        /// <param name="spriteFont"></param>
+        /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
@@ -494,7 +494,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
-        /// <param name="spriteFont"></param>
+        /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
@@ -531,7 +531,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
-        /// <param name="spriteFont"></param>
+        /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
@@ -554,7 +554,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Submit a text string of sprites for drawing in the current batch.
         /// </summary>
-        /// <param name="spriteFont"></param>
+        /// <param name="spriteFont">A font.</param>
         /// <param name="text">The text which will be drawn.</param>
         /// <param name="position">The drawing location on screen.</param>
         /// <param name="color">A color mask.</param>
@@ -573,6 +573,10 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteFont.DrawInto(this, ref source, position, color, rotation, origin, scale, effects, layerDepth);
 		}
 
+        /// <summary>
+        /// Immediately releases the unmanaged resources used by this object.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
