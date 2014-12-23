@@ -37,6 +37,7 @@
     <None Include="App.config" />
 
     <Compile Include="Common\ActionStack.cs" />
+    <Compile Include="Common\AttributeAccessors.cs" />
     <Compile Include="Common\ContentFolder.cs" />
     <Compile Include="Common\ContentItem.cs" />
     <Compile Include="Common\ContentItem.Processor.cs" />
@@ -159,6 +160,9 @@
     <Compile Include="Gtk\Widgets\PropertiesView.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\AboutDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="Gtk\Dialogs\NewTemplateDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -181,6 +185,9 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="IgeMacIntegration.cs">

@@ -433,12 +433,15 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnViewHelpActionActivated (object sender, EventArgs e)
 		{
-			Process.Start("http://www.monogame.net/documentation/");
+			Process.Start("http://www.monogame.net/documentation/?page=Pipeline");
 		}
 
 		protected void OnAboutActionActivated (object sender, EventArgs e)
 		{
 			Process.Start("http://www.monogame.net/about/");
+			AboutDialog adialog = new AboutDialog ();
+			adialog.TransientFor = this;
+			adialog.Run ();
 		}
 
 		public void UpdateMenus()
