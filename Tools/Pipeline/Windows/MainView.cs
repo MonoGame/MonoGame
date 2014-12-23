@@ -762,12 +762,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void ViewHelpMenuItemClick(object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/documentation/");
+            Process.Start("http://www.monogame.net/documentation/?page=Pipeline");
         }
 
         private void AboutMenuItemClick(object sender, EventArgs e)
         {
-            Process.Start("http://www.monogame.net/about/");
+            var about = new AboutDialog();
+            about.Show();
         }
 
         private void OnAddItemClick(object sender, EventArgs e)

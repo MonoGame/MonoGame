@@ -103,6 +103,13 @@
     <Compile Include="Windows\SortedEnumTypeConverter.cs">
       <Platforms>Windows</Platforms>
     </Compile>
+	<Compile Include="Windows\AboutDialog.cs">
+      <Platforms>Windows</Platforms>
+    </Compile> 
+	<Compile Include="Windows\AboutDialog.Designer.cs">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Windows\MainView.resx">
       <Platforms>Windows</Platforms>
       <DependentUpon>MainView.cs</DependentUpon>
@@ -112,6 +119,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+	 <EmbeddedResource Include="Windows\AboutDialog.resx">
+      <Platforms>Windows</Platforms>
+      <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <Platforms>Windows</Platforms>
