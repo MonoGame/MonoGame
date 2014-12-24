@@ -53,6 +53,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'u', // Ouya
             'p', // PlayStationMobile
             'M', // WindowsPhone8
+            'M', // WindowsPhone8.1
             'r', // RaspberryPi
             'P', // PlayStation4
             'g', // Windows (OpenGL)
