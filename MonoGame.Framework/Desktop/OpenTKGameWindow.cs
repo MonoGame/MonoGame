@@ -247,11 +247,11 @@ namespace Microsoft.Xna.Framework
                 if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
                     if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
                         window.WindowBorder = WindowBorder.Fixed;
-                }
 
-                pwidth = window.Width;
-                pheight = window.Height;
-                pstate = window.WindowState;
+                    pwidth = window.Width;
+                    pheight = window.Height;
+                    pstate = window.WindowState;
+                }
             }
 #endif
         }
