@@ -336,7 +336,9 @@ namespace Microsoft.Xna.Framework
         private void Initialize(Game game)
         {
             Game = game;
+#if LINUX
             _init = false;
+#endif
 
             GraphicsContext.ShareContexts = true;
 
@@ -396,7 +398,9 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
+#if LINUX
             updateClientBounds = true;
+#endif
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
