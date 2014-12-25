@@ -339,6 +339,9 @@ namespace MonoGame.Framework
                 var newWidth = _form.ClientRectangle.Width;
                 var newHeight = _form.ClientRectangle.Height;
 #if !(WINDOWS && DIRECTX)
+
+                // FIXME : FULLSCREEN
+
                 manager.PreferredBackBufferWidth = newWidth;
                 manager.PreferredBackBufferHeight = newHeight;
 #endif

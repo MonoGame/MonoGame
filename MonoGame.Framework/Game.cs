@@ -634,6 +634,9 @@ namespace Microsoft.Xna.Framework
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
 #if !(WINDOWS && DIRECTX)
+
+            // FIXME : FULLSCREEN
+
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
             else

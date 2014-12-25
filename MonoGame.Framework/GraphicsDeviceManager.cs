@@ -34,7 +34,13 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
+
+#if WINDOWS && DIRECTX
+
+        // FIXME : FULLSCREEN
+
         private bool _firstLaunch = true;
+#endif
         bool disposed;
 
 #if !WINRT
@@ -228,7 +234,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen; // FIXME : FULLSCREEN
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -290,6 +296,9 @@ namespace Microsoft.Xna.Framework
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
 
 #if WINDOWS && DIRECTX
+
+            // FIXME : FULLSCREEN
+
             if (!_firstLaunch)
             {
                 if (IsFullScreen)
@@ -386,6 +395,9 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 #if WINDOWS && DIRECTX
+
+            // FIXME : FULLSCREEN
+
             ApplyChanges();
 #endif
         }
@@ -412,6 +424,10 @@ namespace Microsoft.Xna.Framework
 #if WINRT
                 return true;
 #elif (WINDOWS && DIRECTX)
+
+
+                // FIXME : FULLSCREEN
+
                 return _wantFullScreen;
 #else
                 if (_graphicsDevice != null)
@@ -429,6 +445,9 @@ namespace Microsoft.Xna.Framework
 #if WINRT
                 // Just ignore this as it is not relevant on Windows 8
 #elif WINDOWS && DIRECTX
+
+                // FIXME : FULLSCREEN
+
                 _wantFullScreen = value;
 #else
                 _wantFullScreen = value;
