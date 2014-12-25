@@ -61,10 +61,10 @@ namespace Microsoft.Xna.Framework
         private bool _isMouseInBounds;
 
 #if LINUX
-		private bool _init;
-		WindowState pstate;
-		int pwidth = 0;
-		int pheight = 0;
+        private bool _init;
+        WindowState pstate;
+        int pwidth = 0;
+        int pheight = 0;
 #endif
 
 		//private DisplayOrientation _currentOrientation;
@@ -180,7 +180,7 @@ namespace Microsoft.Xna.Framework
             Keys xnaKey = KeyboardUtil.ToXna(e.Key);
             if (keys.Contains(xnaKey)) keys.Remove(xnaKey);
         }
-
+        
         private void Keyboard_KeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
         {
             if (_allowAltF4 && e.Key == OpenTK.Input.Key.F4 && keys.Contains(Keys.LeftAlt))
@@ -206,12 +206,12 @@ namespace Microsoft.Xna.Framework
 
             // If window size is zero, leave bounds unchanged
             // OpenTK appears to set the window client size to 1x1 when minimizing
-			if (winWidth <= 1 || winHeight <= 1) 
-				return;
+            if (winWidth <= 1 || winHeight <= 1) 
+                return;
 
             //If we've already got a pending change, do nothing
-			if (updateClientBounds)
-				return;
+            if (updateClientBounds)
+                return;
             
             Game.GraphicsDevice.PresentationParameters.BackBufferWidth = winWidth;
             Game.GraphicsDevice.PresentationParameters.BackBufferHeight = winHeight;
@@ -223,16 +223,16 @@ namespace Microsoft.Xna.Framework
             OnClientSizeChanged();
 
 #if LINUX
-			if(!_init)
-			{
-				if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
-					window.WindowBorder = WindowBorder.Fixed;
+            if(!_init)
+            {
+                if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
+                    window.WindowBorder = WindowBorder.Fixed;
 
-				pwidth = window.Width;
-				pheight = window.Height;
-				pstate = window.WindowState;
-				_init = true;
-			}
+                pwidth = window.Width;
+                pheight = window.Height;
+                pstate = window.WindowState;
+                _init = true;
+            }
 #endif
         }
 
@@ -243,16 +243,16 @@ namespace Microsoft.Xna.Framework
             HandleInput();
 
 #if LINUX
-			if (_init) {
-				if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
-					if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
-						window.WindowBorder = WindowBorder.Fixed;
-				}
+            if (_init) {
+                if (pwidth != window.Width || pheight != window.Height || pstate != window.WindowState) {
+                    if (!_isResizable && !_isBorderless && window.WindowState != WindowState.Fullscreen && window.WindowBorder != WindowBorder.Fixed)
+                        window.WindowBorder = WindowBorder.Fixed;
+                }
 
-				pwidth = window.Width;
-				pheight = window.Height;
-				pstate = window.WindowState;
-			}
+                pwidth = window.Width;
+                pheight = window.Height;
+                pstate = window.WindowState;
+            }
 #endif
         }
 
@@ -262,14 +262,14 @@ namespace Microsoft.Xna.Framework
             if (updateClientBounds)
             {
 #if LINUX
-				if(window.WindowBorder == WindowBorder.Fixed)
-					window.WindowBorder = WindowBorder.Resizable;
+                if(window.WindowBorder == WindowBorder.Fixed)
+                    window.WindowBorder = WindowBorder.Resizable;
 #endif
 
                 updateClientBounds = false;
                 window.ClientRectangle = new System.Drawing.Rectangle(targetBounds.X,
                                      targetBounds.Y, targetBounds.Width, targetBounds.Height);
-
+                
                 // if the window-state is set from the outside (maximized button pressed) we have to update it here.
                 // if it was set from the inside (.IsFullScreen changed), we have to change the window.
                 // this code might not cover all corner cases
@@ -286,9 +286,9 @@ namespace Microsoft.Xna.Framework
                     desired = WindowBorder.Hidden;
                 else
 #if LINUX
-					desired = WindowBorder.Resizable;
+                    desired = WindowBorder.Resizable;
 #else
-					desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
+                    desired = _isResizable ? WindowBorder.Resizable : WindowBorder.Fixed;
 #endif
                 if (desired != window.WindowBorder && window.WindowState != WindowState.Fullscreen)
                     window.WindowBorder = desired;
@@ -297,8 +297,8 @@ namespace Microsoft.Xna.Framework
                 if (context != null)
                 {
                     context.Update(window.WindowInfo);
-				}
-			}
+                }
+            }
         }
 
         private void HandleInput()
@@ -336,7 +336,7 @@ namespace Microsoft.Xna.Framework
         private void Initialize(Game game)
         {
             Game = game;
-			_init = false;
+            _init = false;
 
             GraphicsContext.ShareContexts = true;
 
@@ -396,7 +396,7 @@ namespace Microsoft.Xna.Framework
                 windowState = WindowState.Normal;
             else
                 windowState = WindowState.Fullscreen;
-			updateClientBounds = true;
+            updateClientBounds = true;
         }
 
         internal void ChangeClientBounds(Rectangle clientBounds)
