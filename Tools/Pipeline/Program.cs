@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 #if WINDOWS
 using System.Windows.Forms;
 #endif
@@ -24,6 +25,19 @@ namespace MonoGame.Tools.Pipeline
 #if WINDOWS
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            if (args.Length == 0)
+            {
+                // This simple hack is fix for irritating bug described in https://github.com/mono/MonoGame/issues/3230
+
+                string missedContentPath = Directory.GetCurrentDirectory().ToString() + @"\Content.mgcb";
+
+                if (File.Exists(missedContentPath))
+                {
+                    args = new string[1];
+                    args[0] = missedContentPath;
+                }
+            }
 
             History.Default.Load();
 
