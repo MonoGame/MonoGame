@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.Xna.Framework.Design;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
@@ -151,6 +153,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <typeparam name="TargetType">Target vector format for the converted channel data.</typeparam>
         /// <returns>The converted channel data.</returns>
         public override IEnumerable<TargetType> ReadConvertedContent<TargetType>()
+        {
+            if (typeof(TargetType).IsAssignableFrom(typeof(T)))
+                return items.Cast<TargetType>();
+
+            return Convert<TargetType>(items);
+        }
+
+        private static IEnumerable<TargetType> Convert<TargetType>(IEnumerable<T> items)
         {
             // The following formats are supported:
             // - Single
