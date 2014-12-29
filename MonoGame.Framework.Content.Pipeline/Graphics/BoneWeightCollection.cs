@@ -50,10 +50,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             //
             // Throws InvalidContentException if all weights are zero.
 
-            List<BoneWeight> weights = new List<BoneWeight>(this.Items);
+            var weights = (List<BoneWeight>)Items;
 
             // Sort into descending order
-            weights.Sort((b1, b2) => { return b2.Weight.CompareTo(b1.Weight); });
+            weights.Sort((b1, b2) => b2.Weight.CompareTo(b1.Weight));
 
             // Find the sum to validate we have weights and to normalize the weights
             float sum = 0.0f;
