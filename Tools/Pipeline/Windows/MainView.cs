@@ -197,34 +197,39 @@ namespace MonoGame.Tools.Pipeline
                 var node = _treeView.GetNodeAt(p);
                 if (node != null)
                 {
-                    if (!_treeView.SelectedNodes.Contains(node))
-                    {
-                        _treeView.SelectedNode = node;
-                    }
-
-                    if (node.Tag is ContentItem)
-                    {
-                        _treeAddItemMenuItem.Visible = false;
-                        _treeNewItemMenuItem.Visible = false;
-                    }
-                    else
-                    {
-                        _treeAddItemMenuItem.Visible = true;
-                        _treeNewItemMenuItem.Visible = true;
-                    }
-
-                    if (node.Tag is FolderItem)
-                    {
-                        _treeOpenFileMenuItem.Visible = false;
-                    }
-                    else
-                    {
-                        _treeOpenFileMenuItem.Visible = true;
-                    }
-
-                    _treeContextMenu.Show(_treeView, p);
+                    TreeViewShowContextMenu(node, p);
                 }
             }
+        }
+
+        private void TreeViewShowContextMenu(TreeNode node, Point contextMenuLocation)
+        {
+            if (!_treeView.SelectedNodes.Contains(node))
+            {
+                _treeView.SelectedNode = node;
+            }
+
+            if (node.Tag is ContentItem)
+            {
+                _treeAddItemMenuItem.Visible = false;
+                _treeNewItemMenuItem.Visible = false;
+            }
+            else
+            {
+                _treeAddItemMenuItem.Visible = true;
+                _treeNewItemMenuItem.Visible = true;
+            }
+
+            if (node.Tag is FolderItem)
+            {
+                _treeOpenFileMenuItem.Visible = false;
+            }
+            else
+            {
+                _treeOpenFileMenuItem.Visible = true;
+            }
+
+            _treeContextMenu.Show(_treeView, contextMenuLocation);
         }
 
         private void TreeViewOnNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs args)
@@ -695,6 +700,18 @@ namespace MonoGame.Tools.Pipeline
             {
                 e.Node.ImageIndex = FolderOpenIcon;
                 e.Node.SelectedImageIndex = FolderOpenIcon;
+            }
+        }
+
+        private void TreeViewOnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Apps)
+            {
+                if (_treeView.SelectedNode != null)
+                {
+                    Point nodeCoords = _treeView.PointToScreen(_treeView.SelectedNode.Bounds.Location);
+                    TreeViewShowContextMenu(_treeView.SelectedNode, nodeCoords);
+                }
             }
         }
 

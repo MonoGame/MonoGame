@@ -133,6 +133,7 @@ namespace MonoGame.Tools.Pipeline
             _splitTreeProps.TabIndex = 1;
             _splitTreeProps.TabStop = false;
             // 
+            this._treeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TreeViewOnKeyDown);
             // _propertyGrid
             // 
             this._propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
