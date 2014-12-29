@@ -329,7 +329,9 @@
     <Compile Include="Serialization\Compiler\SoundEffectContentWriter.cs" />
     <Compile Include="Serialization\Compiler\SpriteFontContentWriter.cs" />
     <Compile Include="Serialization\Compiler\StringWriter.cs" />
+    <Compile Include="Serialization\Compiler\TextureWriter.cs" />
     <Compile Include="Serialization\Compiler\Texture2DContentWriter.cs" />
+    <Compile Include="Serialization\Compiler\TextureCubeWriter.cs" />
     <Compile Include="Serialization\Compiler\TimeSpanWriter.cs" />
     <Compile Include="Serialization\Compiler\UInt16Writer.cs" />
     <Compile Include="Serialization\Compiler\UInt32Writer.cs" />
