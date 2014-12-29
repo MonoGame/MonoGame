@@ -42,11 +42,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
         {
             // Look for an existing normals channel.
-            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
-            if (channel == null)
+            if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal()))
             {
                 // We don't have existing normals, so add a new channel.
-                channel = geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
+                geom.Vertices.Channels.Add<Vector3>(VertexChannelNames.Normal(), null);
             }
             else
             {
@@ -56,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     return;
             }
 
+            var channel = geom.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
             var positionIndices = geom.Vertices.PositionIndices;
             Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
 
