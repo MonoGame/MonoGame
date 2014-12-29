@@ -78,6 +78,9 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
+#if WINDOWS_PHONE81
+using Windows.UI.Xaml;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -187,6 +190,9 @@ namespace Microsoft.Xna.Framework
             if (!MetroGameWindow.Instance.IsExiting)
             {
                 MetroGameWindow.Instance.IsExiting = true;
+#if WINDOWS_PHONE81
+                Application.Current.Exit();
+#endif
             }
         }
 
