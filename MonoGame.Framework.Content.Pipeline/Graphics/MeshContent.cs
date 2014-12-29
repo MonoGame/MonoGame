@@ -49,32 +49,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         internal void TransformContents(ref Matrix xform)
         {
             // Transform positions
-            var updateBuffer = new Vector3[positions.Count];
+            for (int i = 0; i < positions.Count; i++)
+                positions[i] = Vector3.Transform(positions[i], xform);
 
-            positions.CopyTo(updateBuffer, 0);
-            Vector3.Transform(updateBuffer, ref xform, updateBuffer);
-            positions.Clear();
-            foreach (var pos in updateBuffer)
-                positions.Add(pos);
-
+            // Transform all vectors too:
+            // Normals are "tangent covectors", which need to be transformed using the
+            // transpose of the inverse matrix!
+            Matrix inverseTranspose = Matrix.Transpose(Matrix.Invert(xform));
             foreach (var geom in geometry)
             {
-                // Transform all vectors too
-                var geomBuffer = new Vector3[geom.Vertices.VertexCount];
                 foreach (var channel in geom.Vertices.Channels)
                 {
+                    var vector3Channel = channel as VertexChannel<Vector3>;
+                    if (vector3Channel == null)
+                        continue;
+
                     if (channel.Name.StartsWith("Normal") ||
                         channel.Name.StartsWith("Binormal") ||
                         channel.Name.StartsWith("Tangent"))
                     {
-                        channel.Items.CopyTo(geomBuffer, 0);
-                        Vector3.TransformNormal(geomBuffer, ref xform, geomBuffer);
-                        channel.Items.Clear();
-                        foreach (var item in geomBuffer)
-                            channel.Items.Add(item);
+                        for (int i = 0; i < vector3Channel.Count; i++)
+                            vector3Channel[i] = Vector3.TransformNormal(vector3Channel[i], inverseTranspose);
                     }
                 }
             }
+
+            // Swap winding order when faces are mirrored.
+            if (MeshHelper.IsLeftHanded(ref xform))
+                MeshHelper.SwapWindingOrder(this);
         }
     }
 }
