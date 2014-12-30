@@ -20,17 +20,18 @@ namespace Microsoft.Xna.Framework.Media
 
         private void PlatformLoad(Action<int> progressCallback)
         {
-            if (musicFolder == null)
-                musicFolder = KnownFolders.MusicLibrary;
-
-            List<StorageFile> files = new List<StorageFile>();
-            this.GetAllFiles(musicFolder, files);
-
-            List<Song> songList = new List<Song>();
-            List<Album> albumList = new List<Album>();
-
             Task.Run(async () =>
             {
+                if (musicFolder == null)
+                    musicFolder = KnownFolders.MusicLibrary;
+            
+                List<StorageFile> files = new List<StorageFile>();
+                await this.GetAllFiles(musicFolder, files);
+                System.Diagnostics.Debug.WriteLine("Current thread: " + Environment.CurrentManagedThreadId);
+
+                List<Song> songList = new List<Song>();
+                List<Album> albumList = new List<Album>();
+
                 Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
                 Dictionary<string, Album> albums = new Dictionary<string, Album>();
                 Dictionary<string, Genre> genres = new Dictionary<string, Genre>();
@@ -116,23 +117,23 @@ namespace Microsoft.Xna.Framework.Media
                         }
                     }
                 }
+
+                if (progressCallback != null)
+                    progressCallback.Invoke(100);
+
+                albumCollection = new AlbumCollection(albumList);
+                songCollection = new SongCollection(songList);
             }).Wait();
-
-            if (progressCallback != null)
-                progressCallback.Invoke(100);
-
-            albumCollection = new AlbumCollection(albumList);
-            songCollection = new SongCollection(songList);
         }
 
-        private void GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
+        private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
         {
             foreach (var file in Task.Run(async () => await storageFolder.GetFilesAsync()).Result)
                 if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
                     musicFiles.Add(file);
 
             foreach (var folder in Task.Run(async () => await storageFolder.GetFoldersAsync()).Result)
-                this.GetAllFiles(folder, musicFiles);
+                await this.GetAllFiles(folder, musicFiles);
         }
 
         private AlbumCollection PlatformGetAlbums()
