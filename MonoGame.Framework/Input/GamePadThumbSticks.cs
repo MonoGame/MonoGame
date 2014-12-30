@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Input
             Right = right;
         }
 
-        internal void ApplyDeadZone(GamePadDeadZone dz)
+        private void ApplyDeadZone(GamePadDeadZone dz)
         {
 #if DIRECTX
             // XInput Xbox 360 Controller dead zones
