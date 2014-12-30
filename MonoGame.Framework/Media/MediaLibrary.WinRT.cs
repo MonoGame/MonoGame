@@ -25,16 +25,15 @@ namespace Microsoft.Xna.Framework.Media
                 if (musicFolder == null)
                     musicFolder = KnownFolders.MusicLibrary;
             
-                List<StorageFile> files = new List<StorageFile>();
+                var files = new List<StorageFile>();
                 await this.GetAllFiles(musicFolder, files);
-                System.Diagnostics.Debug.WriteLine("Current thread: " + Environment.CurrentManagedThreadId);
 
-                List<Song> songList = new List<Song>();
-                List<Album> albumList = new List<Album>();
+                var songList = new List<Song>();
+                var albumList = new List<Album>();
 
-                Dictionary<string, Artist> artists = new Dictionary<string, Artist>();
-                Dictionary<string, Album> albums = new Dictionary<string, Album>();
-                Dictionary<string, Genre> genres = new Dictionary<string, Genre>();
+                var artists = new Dictionary<string, Artist>();
+                var albums = new Dictionary<string, Album>();
+                var genres = new Dictionary<string, Genre>();
 
                 var cacheFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("MediaLibrary.cache", CreationCollisionOption.OpenIfExists);
                 var cache = new Dictionary<string, MusicProperties>();
@@ -128,11 +127,11 @@ namespace Microsoft.Xna.Framework.Media
 
         private async Task GetAllFiles(StorageFolder storageFolder, List<StorageFile> musicFiles)
         {
-            foreach (var file in Task.Run(async () => await storageFolder.GetFilesAsync()).Result)
+            foreach (var file in await storageFolder.GetFilesAsync())
                 if (file.ContentType.StartsWith("audio") && !file.ContentType.EndsWith("url"))
                     musicFiles.Add(file);
 
-            foreach (var folder in Task.Run(async () => await storageFolder.GetFoldersAsync()).Result)
+            foreach (var folder in await storageFolder.GetFoldersAsync())
                 await this.GetAllFiles(folder, musicFiles);
         }
 
