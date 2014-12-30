@@ -161,7 +161,8 @@ namespace Microsoft.Xna.Framework.Input
                 leftPosition: ConvertThumbStick(gamepad.LeftThumbX, gamepad.LeftThumbY,
                     SharpDX.XInput.Gamepad.LeftThumbDeadZone, deadZoneMode),
                 rightPosition: ConvertThumbStick(gamepad.RightThumbX, gamepad.RightThumbY,
-                    SharpDX.XInput.Gamepad.RightThumbDeadZone, deadZoneMode));
+                    SharpDX.XInput.Gamepad.RightThumbDeadZone, deadZoneMode),
+                    deadZoneMode: deadZoneMode);
 
             var triggers = new GamePadTriggers(
                     leftTrigger: gamepad.LeftTrigger / (float)byte.MaxValue,
@@ -193,49 +194,8 @@ namespace Microsoft.Xna.Framework.Input
 
         private static Vector2 ConvertThumbStick(short x, short y, short deadZone, GamePadDeadZone deadZoneMode)
         {
-            if (deadZoneMode == GamePadDeadZone.IndependentAxes)
-            {
-                // using int to prevent overrun
-                int fx = x;
-                int fy = y;
-                int fdz = deadZone;
-                if (fx * fx < fdz * fdz)
-                    x = 0;
-                if (fy * fy < fdz * fdz)
-                    y = 0;
-            }
-            else if (deadZoneMode == GamePadDeadZone.Circular)
-            {
-                // using int to prevent overrun
-                int fx = x;
-                int fy = y;
-                int fdz = deadZone;
-                if ((fx * fx) + (fy * fy) < fdz * fdz)
-                {
-                    x = 0;
-                    y = 0;
-                }
-            }
-
-            // excluding deadZone from the final output range
-            if (deadZoneMode != GamePadDeadZone.None)
-            {
-                if (x < -deadZone)
-                    x = (short)(x + deadZone);
-                else if (x > deadZone)
-                    x = (short)(x - deadZone);
-
-                if (y < -deadZone)
-                    y = (short)(y + deadZone);
-                else if (y > deadZone)
-                    y = (short)(y - deadZone);
-
-                return new Vector2(x < 0 ? -((float)x / (float)(short.MinValue + deadZone)) : (float)x / (float)(short.MaxValue - deadZone),
-                               y < 0 ? -((float)y / (float)(short.MinValue + deadZone)) : (float)y / (float)(short.MaxValue - deadZone));
-            }
-
-            return new Vector2(x < 0 ? -((float)x / (float)short.MinValue) : (float)x / (float)short.MaxValue,
-                               y < 0 ? -((float)y / (float)short.MinValue) : (float)y / (float)short.MaxValue);
+            return new Vector2(x / (float)short.MaxValue,
+                               y / (float)short.MaxValue);
         }
 
         private static ButtonState ConvertToButtonState(
