@@ -119,6 +119,16 @@ namespace Microsoft.Xna.Framework.Input
 			Right = rightPosition;
 		}
 
+        internal GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition, GamePadDeadZone deadZoneMode):this()
+        {
+            // XNA applies dead zones before rounding/clamping values. The public ctor does not allow this because the dead zone must be known before
+            left = leftPosition;
+            right = rightPosition;
+            ApplyDeadZone(deadZoneMode);
+            Left = left;
+            Right = right;
+        }
+
         internal void ApplyDeadZone(GamePadDeadZone dz)
         {
 #if DIRECTX
