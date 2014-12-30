@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework.Media
             if (width == 0 || height == 0)
                 return albumArt;
 
-            var scaledAlbumArt = Bitmap.CreateScaledBitmap(albumArt, width, height, false);
+            var scaledAlbumArt = Bitmap.CreateScaledBitmap(albumArt, width, height, true);
             albumArt.Dispose();
             return scaledAlbumArt;
         }
