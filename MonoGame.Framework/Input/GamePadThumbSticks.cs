@@ -174,7 +174,32 @@ namespace Microsoft.Xna.Framework.Input
                     break;
             }
 
+            // excluding deadZone from the final output range
+             if (dz != GamePadDeadZone.None)
+             {
+                 if (left.X < -leftThumbDeadZone)
+                     left.X = left.X + leftThumbDeadZone;
+                 else if (left.X > leftThumbDeadZone)
+                     left.X = left.X - leftThumbDeadZone;
+                 if (left.Y < -leftThumbDeadZone)
+                     left.Y = left.Y + leftThumbDeadZone;
+                 else if (left.Y > leftThumbDeadZone)
+                     left.Y = left.Y - leftThumbDeadZone;
 
+                 if (right.X < -rightThumbDeadZone)
+                     right.X = right.X + rightThumbDeadZone;
+                 else if (right.X > rightThumbDeadZone)
+                     right.X = right.X - rightThumbDeadZone;
+                 if (right.Y < -rightThumbDeadZone)
+                     right.Y = right.Y + rightThumbDeadZone;
+                 else if (right.Y > rightThumbDeadZone)
+                     right.Y = right.Y - rightThumbDeadZone;
+
+                 left.X = left.X / (1.0f - leftThumbDeadZone);
+                 left.Y = left.Y / (1.0f - leftThumbDeadZone);
+                 right.X = right.X / (1.0f - rightThumbDeadZone);
+                 right.Y = right.Y / (1.0f - rightThumbDeadZone);
+            }
         }
 
         /// <summary>
