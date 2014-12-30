@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework.Input
 
         private void ApplyDeadZone(GamePadDeadZone dz)
         {
-#if DIRECTX
+#if DIRECTX && !WINDOWS_PHONE && !WINDOWS_PHONE81
             // XInput Xbox 360 Controller dead zones
             // Dead zones are slighty different between left and right sticks, this may come from Microsoft usability tests
             const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
@@ -173,6 +173,8 @@ namespace Microsoft.Xna.Framework.Input
                         right = Vector2.Zero;
                     break;
             }
+
+
         }
 
         /// <summary>
