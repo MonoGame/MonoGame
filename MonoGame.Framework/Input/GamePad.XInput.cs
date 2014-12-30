@@ -158,10 +158,8 @@ namespace Microsoft.Xna.Framework.Input
             }
 
             var thumbSticks = new GamePadThumbSticks(
-                leftPosition: ConvertThumbStick(gamepad.LeftThumbX, gamepad.LeftThumbY,
-                    SharpDX.XInput.Gamepad.LeftThumbDeadZone, deadZoneMode),
-                rightPosition: ConvertThumbStick(gamepad.RightThumbX, gamepad.RightThumbY,
-                    SharpDX.XInput.Gamepad.RightThumbDeadZone, deadZoneMode),
+                leftPosition: ConvertThumbStick(gamepad.LeftThumbX, gamepad.LeftThumbY, deadZoneMode),
+                rightPosition: ConvertThumbStick(gamepad.RightThumbX, gamepad.RightThumbY, deadZoneMode),
                     deadZoneMode: deadZoneMode);
 
             var triggers = new GamePadTriggers(
@@ -192,7 +190,7 @@ namespace Microsoft.Xna.Framework.Input
             return state;
         }
 
-        private static Vector2 ConvertThumbStick(short x, short y, short deadZone, GamePadDeadZone deadZoneMode)
+        private static Vector2 ConvertThumbStick(short x, short y, GamePadDeadZone deadZoneMode)
         {
             return new Vector2(x / (float)short.MaxValue,
                                y / (float)short.MaxValue);
