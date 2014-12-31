@@ -173,7 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (!IsDisposed)
             {
-                GraphicsDevice.AddDisposeAction(() =>
+                Threading.BlockOnUIThread(() =>
                 {
                     GL.DeleteBuffers(1, ref vbo);
                     GraphicsExtensions.CheckGLError();
