@@ -178,8 +178,7 @@ namespace Microsoft.Xna.Framework.Input
                     return state;
                 }
 
-                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick);
-                thumbSticks.ApplyDeadZone(deadZoneMode, 0.3f);
+                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, deadZoneMode);
 
                 if (gamePad._startButtonPressed)
                 {
