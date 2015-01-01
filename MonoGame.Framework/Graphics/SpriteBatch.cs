@@ -4,7 +4,7 @@ using System.Text;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Draws 2d graphical elements in a group of batches.
+    /// Helper class for drawing text strings and sprites in one or more optimized batches.
     /// </summary>
 	public class SpriteBatch : GraphicsResource
 	{
@@ -53,14 +53,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Begins a new sprite and text batch with the specified render state.
         /// </summary>
-        /// <param name="sortMode">The drawing order for sprite and text drawing.</param>
-        /// <param name="blendState">State of the blending.</param>
-        /// <param name="samplerState">State of the sampler.</param>
-        /// <param name="depthStencilState">State of the depth-stencil buffer.</param>
-        /// <param name="rasterizerState">State of the rasterization.</param>
-        /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect.</param>
-        /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry.</param>
-        /// <exception cref="InvalidOperationException">Thrown if Begin is called next time without previous End.</exception>
+        /// <param name="sortMode">The drawing order for sprite and text drawing. <see cref="SpriteSortMode.Deferred"/> by default.</param>
+        /// <param name="blendState">State of the blending. Uses <see cref="BlendState.AlphaBlend"/> if null.</param>
+        /// <param name="samplerState">State of the sampler. Uses <see cref="SamplerState.LinearClamp"/> if null.</param>
+        /// <param name="depthStencilState">State of the depth-stencil buffer. Uses <see cref="DepthStencilState.None"/> if null.</param>
+        /// <param name="rasterizerState">State of the rasterization. Uses <see cref="RasterizerState.CullCounterClockwise"/> if null.</param>
+        /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect. Uses default sprite effect if null.</param>
+        /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry. Uses <see cref="Matrix.Identity"/> if null.</param>
+        /// <exception cref="InvalidOperationException">Thrown if <see cref="Begin"/> is called next time without previous <see cref="End"/>.</exception>
+        /// <remarks>This method uses optional parameters.</remarks>
+        /// <remarks>The <see cref="Begin"/> Begin should be called before drawing commands, and you cannot call it again before subsequent <see cref="End"/>.</remarks>
         public void Begin
         (
              SpriteSortMode sortMode = SpriteSortMode.Deferred,
@@ -96,6 +98,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Flushes all batched text and sprites to the screen.
         /// </summary>
+        /// <remarks>This command should be called after <see cref="Begin"/> and drawing commands.</remarks>
 		public void End ()
 		{	
 			_beginCalled = false;
@@ -168,16 +171,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="position">An optional drawing location on screen.</param>
-        /// <param name="destinationRectangle">An optional drawing bound.</param>
+        /// <param name="position">An optional drawing location on screen. If null - <param name="destinationRectangle"> using intended.</param></param>
+        /// <param name="destinationRectangle">An optional drawing bound. If null - <param name="position"> using intended.</param></param>
         /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
-        /// <param name="origin">An optional center of rotation.</param>
-        /// <param name="rotation">An optional rotation of this sprite.</param>
-        /// <param name="scale">An optional scale vector.</param>
-        /// <param name="color">An optional color mask.</param>
-        /// <param name="effects">The optional drawing modificators.</param>
-        /// <param name="layerDepth">An optional depth of the layer of this sprite.</param>
+        /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
+        /// <param name="rotation">An optional rotation of this sprite. 0 by default.</param>
+        /// <param name="scale">An optional scale vector. Uses <see cref="Vector2.One"/> if null.</param>
+        /// <param name="color">An optional color mask. Uses <see cref="Color.White"/> if null.</param>
+        /// <param name="effects">The optional drawing modificators. <see cref="SpriteEffects.None"/> by default.</param>
+        /// <param name="layerDepth">An optional depth of the layer of this sprite. 0 by default.</param>
         /// <exception cref="InvalidOperationException">Throwns if both <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</exception>
+        /// <remarks>This overload uses optional parameters.</remarks>
         /// <remarks>This overload requires only one of <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</remarks>
         public void Draw (Texture2D texture,
                 Vector2? position = null,
