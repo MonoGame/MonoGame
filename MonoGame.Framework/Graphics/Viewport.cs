@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Gets the actual visible area of this <see cref="Viewport"/> which can differs from <see cref="Bounds"/> on some platforms.
+        /// Returns the subset of the viewport that is guaranteed to be visible on a lower quality display.
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
