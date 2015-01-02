@@ -13,9 +13,6 @@ namespace Microsoft.Xna.Framework.Graphics
     [DataContract]
     public struct Viewport
     {
-		/// <summary>
-		/// Attributes 
-		/// </summary>
 		private int x;
 		private int y;
 		private int width;
@@ -143,7 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Gets a TV title safe area for this <see cref="Viewport"/> which is a 10% smaller than actual <see cref="Bounds"/>.
+        /// Gets the TV title safe area for this <see cref="Viewport"/> which is a 10% smaller than actual <see cref="Bounds"/>.
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
