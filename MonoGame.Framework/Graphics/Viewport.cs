@@ -156,15 +156,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
 			}
 		}
-		
+
         /// <summary>
         /// Creates a new instance of <see cref="Viewport"/> struct.
         /// </summary>
-        /// <param name="x">The x coordinate of the view bounds.</param>
-        /// <param name="y">The y coordinate of the view bounds.</param>
-        /// <param name="width">The width of the view bounds.</param>
-        /// <param name="height">The height of the view bounds.</param>
-		public Viewport(int x, int y, int width, int height)
+        /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="width">The width of the view bounds in pixels.</param>
+        /// <param name="height">The height of the view bounds in pixels.</param>
+        public Viewport(int x, int y, int width, int height)
 		{
 			this.x = x;
 		    this.y = y;
@@ -177,10 +177,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Creates a new instance of <see cref="Viewport"/> struct.
         /// </summary>
-        /// <param name="x">The x coordinate of the upper-left corner, of the view bounds, in pixels.</param>
-        /// <param name="y">The y coordinate of the upper-left corner, of the view bounds, in pixels.</param>
-        /// <param name="width">The width of the view bounds, in pixels.</param>
-        /// <param name="height">The height of the view bounds, in pixels.</param>
+        /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="width">The width of the view bounds in pixels.</param>
+        /// <param name="height">The height of the view bounds in pixels.</param>
         /// <param name="minDepth">The lower limit of depth.</param>
         /// <param name="maxDepth">The upper limit of depth.</param>
         public Viewport(int x, int y, int width, int height,float minDepth,float maxDepth)
