@@ -171,8 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="position">An optional drawing location on screen. If null - <param name="destinationRectangle"> using intended.</param></param>
-        /// <param name="destinationRectangle">An optional drawing bound. If null - <param name="position"> using intended.</param></param>
+        /// <param name="position">The drawing location on screen or null if <param name="destinationRectangle"> is used.</param></param>
+        /// <param name="destinationRectangle">The drawing bounds on screen or null if <param name="position"> is used.</param></param>
         /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
         /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
         /// <param name="rotation">An optional rotation of this sprite. 0 by default.</param>
