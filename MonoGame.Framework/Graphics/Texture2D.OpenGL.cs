@@ -503,6 +503,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if MONOMAC || WINDOWS
 			SaveAsImage(stream, width, height, ImageFormat.Jpeg);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Jpeg);
 #else
             throw new NotImplementedException();
 #endif
@@ -512,6 +514,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
 #if MONOMAC || WINDOWS
             SaveAsImage(stream, width, height, ImageFormat.Png);
+#elif ANDROID
+            SaveAsImage(stream, width, height, Bitmap.CompressFormat.Png);
 #else
             throw new NotImplementedException();
 #endif
@@ -574,6 +578,24 @@ namespace Microsoft.Xna.Framework.Graphics
 				}
 			}
 		}
+#elif ANDROID
+        private void SaveAsImage(Stream stream, int width, int height, Bitmap.CompressFormat format)
+        {
+            int[] data = new int[width * height];
+            GetData(data);
+            // internal structure is BGR while bitmap expects RGB
+            for (int i = 0; i < data.Length; ++i)
+            {
+                uint pixel = (uint)data[i];
+                data[i] = (int)((pixel & 0xFF00FF00) | ((pixel & 0x00FF0000) >> 16) | ((pixel & 0x000000FF) << 16));
+            }
+            using (Bitmap bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+            {
+                bitmap.SetPixels(data, 0, width, 0, 0, width, height);
+                bitmap.Compress(format, 100, stream);
+                bitmap.Recycle();
+            }
+        }
 #endif
 
         // This method allows games that use Texture2D.FromStream 
