@@ -140,18 +140,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Gets the TV title safe area for this <see cref="Viewport"/> which is a 10% smaller than actual <see cref="Bounds"/>.
+        /// Gets the actual visible area of this <see cref="Viewport"/> which can differs from <see cref="Bounds"/> on some platforms.
         /// </summary>
 		public Rectangle TitleSafeArea 
 		{
 			get
 			{
-                // code from http://tayxsgames.wordpress.com/2010/02/13/xna-lesson-1-titlesafearea/
+                // TODO : Possible change it for XBOX or PS4 
 
-                var iSafeStartX = (int)(Width * 0.1f);
-                var iSafeStartY = (int)(Height * 0.1f);
-                var iSafeWidth = (int)(Width * 0.8f);
-                var iSafeHeight = (int)(Height * 0.8f);
+                var iSafeStartX = x;
+                var iSafeStartY = y;
+                var iSafeWidth = Width;
+                var iSafeHeight = Height;
 
                 return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
 			}
