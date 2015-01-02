@@ -150,8 +150,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var iSafeStartX = x;
                 var iSafeStartY = y;
-                var iSafeWidth = Width;
-                var iSafeHeight = Height;
+                var iSafeWidth = width;
+                var iSafeHeight = height;
 
                 return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
 			}
