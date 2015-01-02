@@ -310,7 +310,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="destinationRectangle">The drawing bounds.</param>
+        /// <param name="destinationRectangle">The drawing bounds on screen.</param>
         /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
         /// <param name="color">A color mask.</param>
         /// <param name="rotation">A rotation of this sprite.</param>
@@ -426,7 +426,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="destinationRectangle">The drawing bounds.</param>
+        /// <param name="destinationRectangle">The drawing bounds on screen.</param>
         /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
         /// <param name="color">A color mask.</param>
 		public void Draw (Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
@@ -449,7 +449,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="destinationRectangle">The drawing bounds.</param>
+        /// <param name="destinationRectangle">The drawing bounds on screen.</param>
         /// <param name="color">A color mask.</param>
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Color color)
 		{
