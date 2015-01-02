@@ -399,7 +399,6 @@ namespace MonoGame.Tools.Pipeline
 		protected void OnTreeview1ButtonPressEvent (object o, ButtonPressEventArgs args)
 		{
 			if (args.Event.Button == 3) {
-
 				List<TreePath> paths = new List<TreePath> ();
 				paths.AddRange (treeview1.Selection.GetSelectedRows ());
 
@@ -415,6 +414,43 @@ namespace MonoGame.Tools.Pipeline
 			}
 
 			args.RetVal = false;
+		}
+
+		protected void OnTreeview1CursorChanged (object o, EventArgs args)
+		{
+			window._controller.Selection.Clear (window);
+			List<TreeIter> iters;
+			List<Gdk.Pixbuf> icons;
+			List<string> paths = new List<string> ();
+			paths.AddRange (GetSelectedTreePath (out iters, out icons));
+
+			PipelineProject project = (PipelineProject)window._controller.GetItem(openedProject);
+			bool ps = false;
+
+			List<ContentItem> citems = new List<ContentItem> ();
+			List<string> dirpaths = new List<string> ();
+
+			for(int i = 0;i < paths.Count;i++)
+			{
+				if (icons [i] == ICON_BASE)
+					ps = true;
+				else {
+					var item = window._controller.GetItem (paths [i]);
+
+					if (item as ContentItem != null) {
+						citems.Add (item as ContentItem);
+						window._controller.Selection.Add (item as ContentItem, window);
+					} else
+						dirpaths.Add (paths[i]);
+				}
+			}
+
+			#region propgridcalls
+			if (citems.Count > 0)
+				propertiesView.CurrentObject = citems[0];
+			else 
+				propertiesView.CurrentObject = project;
+			#endregion
 		}
 	}
 }

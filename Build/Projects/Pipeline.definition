@@ -169,6 +169,12 @@
     <Compile Include="Gtk\Dialogs\YesNoCancelDialog.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
+    <Compile Include="Gtk\Dialogs\CollectionEditorDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="Gtk\Dialogs\ColorPickerDialog.cs">
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
     <Compile Include="gtk-gui\generated.cs">
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
@@ -185,6 +191,15 @@
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.YesNoCancelDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.CollectionEditorDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.ColorPickerDialog.cs">  
+      <Platforms>MacOS,Linux</Platforms>
+    </Compile>
+    <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.PropertyGridTable.cs">  
       <Platforms>MacOS,Linux</Platforms>
     </Compile>
     <Compile Include="gtk-gui\MonoGame.Tools.Pipeline.AboutDialog.cs">  

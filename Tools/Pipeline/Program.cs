@@ -44,9 +44,9 @@ namespace MonoGame.Tools.Pipeline
 			MainWindow win = new MainWindow ();
 			win.Show (); 
 			var model = new PipelineProject();
-			new PipelineController(win, model);   
+			new PipelineController(win, model);  
+			win.OnShowEvent ();
 			Gtk.Application.Run ();
-
 #endif
         }
     }

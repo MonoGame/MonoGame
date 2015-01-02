@@ -29,7 +29,6 @@ namespace MonoGame.Tools.Pipeline
 			global::Stetic.Gui.Initialize (this);
 			// Widget MonoGame.Tools.Pipeline.AboutDialog
 			this.Name = "MonoGame.Tools.Pipeline.AboutDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString ("dialog1");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child MonoGame.Tools.Pipeline.AboutDialog.VBox
 			global::Gtk.VBox w1 = this.VBox;
