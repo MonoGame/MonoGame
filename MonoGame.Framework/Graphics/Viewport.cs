@@ -19,11 +19,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		private int height;
 		private float minDepth;
 		private float maxDepth;
-		
-		#region Properties
+
+        #region Properties
 
         /// <summary>
-        /// The height of this viewport.
+        /// The height of the bounds in pixels.
         /// </summary>
         [DataMember]
         public int Height
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// The width of this viewport.
+        /// The width of the bounds in pixels.
         /// </summary>
         [DataMember]
         public int Width
