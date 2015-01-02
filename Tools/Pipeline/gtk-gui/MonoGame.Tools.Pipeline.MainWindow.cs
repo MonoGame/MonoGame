@@ -229,6 +229,7 @@ namespace MonoGame.Tools.Pipeline
 			this.NewItemAction.Activated += new global::System.EventHandler (this.OnNewItemActionActivated);
 			this.AddItemAction.Activated += new global::System.EventHandler (this.OnAddItemActionActivated);
 			this.DeleteAction.Activated += new global::System.EventHandler (this.OnDeleteActionActivated);
+			this.BuildAction.Activated += new global::System.EventHandler (this.OnBuildActionActivated);
 			this.BuildAction1.Activated += new global::System.EventHandler (this.OnBuildAction1Activated);
 			this.RebuildAction.Activated += new global::System.EventHandler (this.OnRebuildActionActivated);
 			this.CleanAction.Activated += new global::System.EventHandler (this.OnCleanActionActivated);
