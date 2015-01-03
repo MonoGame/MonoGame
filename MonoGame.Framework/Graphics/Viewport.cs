@@ -1,63 +1,30 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009 The MonoGame Team
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-accept the license, do not use the software.
-
-1. Definitions
-The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the software.
-A "contributor" is any person that distributes its contribution under this license.
-"Licensed patents" are a contributor's patent claims that read directly on its contribution.
-
-2. Grant of Rights
-(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-
-3. Conditions and Limitations
-(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-your patent license from such contributor to the software ends automatically.
-(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-notices that are present in the software.
-(D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-code form, you may only do so under a license that complies with this license.
-(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-purpose and non-infringement.
-*/
-#endregion License
-
-using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Describes the view bounds for render-target surface.
+    /// </summary>
     [DataContract]
     public struct Viewport
     {
-		/// <summary>
-		/// Attributes 
-		/// </summary>
 		private int x;
 		private int y;
 		private int width;
 		private int height;
 		private float minDepth;
 		private float maxDepth;
-		
-		#region Properties
+
+        #region Properties
+
+        /// <summary>
+        /// The height of the bounds in pixels.
+        /// </summary>
         [DataMember]
         public int Height
         {
@@ -69,6 +36,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        /// <summary>
+        /// The upper limit of depth of this viewport.
+        /// </summary>
         [DataMember]
         public float MaxDepth
         {
@@ -80,6 +50,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        /// <summary>
+        /// The lower limit of depth of this viewport.
+        /// </summary>
         [DataMember]
         public float MinDepth
         {
@@ -91,6 +64,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        /// <summary>
+        /// The width of the bounds in pixels.
+        /// </summary>
         [DataMember]
         public int Width
         {
@@ -102,6 +78,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        /// <summary>
+        /// The y coordinate of the beginning of this viewport.
+        /// </summary>
         [DataMember]
         public int Y
         {
@@ -114,14 +93,21 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        /// <summary>
+        /// The x coordinate of the beginning of this viewport.
+        /// </summary>
         [DataMember]
         public int X 
 		{
 			get{ return x;}
 			set{ x = value;}
 		}
+
 		#endregion
 		
+        /// <summary>
+        /// Gets the aspect ratio of this <see cref="Viewport"/>, which is width / height. 
+        /// </summary>
 		public float AspectRatio 
 		{
 			get
@@ -134,17 +120,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 		
+        /// <summary>
+        /// Gets or sets a boundary of this <see cref="Viewport"/>.
+        /// </summary>
 		public Rectangle Bounds 
-		{ 
-			get 
-			{
-				Rectangle rectangle;
-				rectangle.X = x;
-				rectangle.Y = y;
-				rectangle.Width = width;
-				rectangle.Height = height;
-				return rectangle;
-			}
+		{
+            get
+            {
+                return new Rectangle(x, y, width, height);
+            }
 				
 			set
 			{				
@@ -154,16 +138,33 @@ namespace Microsoft.Xna.Framework.Graphics
 				height = value.Height;
 			}
 		}
-		
+
+        /// <summary>
+        /// Returns the subset of the viewport that is guaranteed to be visible on a lower quality display.
+        /// </summary>
 		public Rectangle TitleSafeArea 
 		{
 			get
 			{
-				return new Rectangle(x,y,width,height);
+                // TODO : Possible change it for XBOX or PS4 
+
+                var iSafeStartX = x;
+                var iSafeStartY = y;
+                var iSafeWidth = width;
+                var iSafeHeight = height;
+
+                return new Rectangle(iSafeStartX, iSafeStartY, iSafeWidth, iSafeHeight);
 			}
 		}
-		
-		public Viewport(int x, int y, int width, int height)
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="width">The width of the view bounds in pixels.</param>
+        /// <param name="height">The height of the view bounds in pixels.</param>
+        public Viewport(int x, int y, int width, int height)
 		{
 			this.x = x;
 		    this.y = y;
@@ -172,11 +173,42 @@ namespace Microsoft.Xna.Framework.Graphics
 		    this.minDepth = 0.0f;
 		    this.maxDepth = 1.0f;
 		}
-		
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="x">The x coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="y">The y coordinate of the upper-left corner of the view bounds in pixels.</param>
+        /// <param name="width">The width of the view bounds in pixels.</param>
+        /// <param name="height">The height of the view bounds in pixels.</param>
+        /// <param name="minDepth">The lower limit of depth.</param>
+        /// <param name="maxDepth">The upper limit of depth.</param>
+        public Viewport(int x, int y, int width, int height,float minDepth,float maxDepth)
+        {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.minDepth = minDepth;
+            this.maxDepth = maxDepth;
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Viewport"/> struct.
+        /// </summary>
+        /// <param name="bounds">A <see cref="Rectangle"/> that defines the location and size of the <see cref="Viewport"/> in a render target.</param>
 		public Viewport(Rectangle bounds) : this(bounds.X, bounds.Y, bounds.Width, bounds.Height)
 		{
 		}
 
+        /// <summary>
+        /// Projects a <see cref="Vector3"/> from world space into screen space.
+        /// </summary>
+        /// <param name="source">The <see cref="Vector3"/> to project.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <param name="world">The world <see cref="Matrix"/>.</param>
+        /// <returns></returns>
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix = Matrix.Multiply(Matrix.Multiply(world, view), projection);
@@ -194,6 +226,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		    return vector;
         }
 
+        /// <summary>
+        /// Unprojects a <see cref="Vector3"/> from screen space into world space.
+        /// </summary>
+        /// <param name="source">The <see cref="Vector3"/> to unproject.</param>
+        /// <param name="projection">The projection <see cref="Matrix"/>.</param>
+        /// <param name="view">The view <see cref="Matrix"/>.</param>
+        /// <param name="world">The world <see cref="Matrix"/>.</param>
+        /// <returns></returns>
         public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
              Matrix matrix = Matrix.Invert(Matrix.Multiply(Matrix.Multiply(world, view), projection));
@@ -218,11 +258,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		    return ((-1.401298E-45f <= num) && (num <= float.Epsilon));
 		}
 
-
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Viewport"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>] Width:[<see cref="Width"/>] Height:[<see cref="Height"/>] MinDepth:[<see cref="MinDepth"/>] MaxDepth:[<see cref="MaxDepth"/>]}
+        /// </summary>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Viewport"/>.</returns>
         public override string ToString ()
-	{
+	    {
 	        return "{X:" + x + " Y:" + y + " Width:" + width + " Height:" + height + " MinDepth:" + minDepth + " MaxDepth:" + maxDepth + "}";
-	}
+	    }
     }
 }
 
