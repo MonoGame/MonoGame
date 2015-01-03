@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
+            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -426,8 +426,10 @@ namespace Microsoft.Xna.Framework
                 return true;
 #elif (WINDOWS && DIRECTX)
 
-
-                // FIXME : FULLSCREEN
+                if (_graphicsDevice != null)
+                {
+                    return _graphicsDevice.PresentationParameters.IsFullScreen;
+                }
 
                 return _wantFullScreen;
 #else
@@ -446,8 +448,6 @@ namespace Microsoft.Xna.Framework
 #if WINRT
                 // Just ignore this as it is not relevant on Windows 8
 #elif WINDOWS && DIRECTX
-
-                // FIXME : FULLSCREEN
 
                 _wantFullScreen = value;
 #else
