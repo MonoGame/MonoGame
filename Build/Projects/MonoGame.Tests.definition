@@ -93,7 +93,7 @@
     <Compile Include="Framework\TouchLocationTest.cs" />
     <Compile Include="Framework\Bounding.cs" />
     <Compile Include="Framework\MathHelperTest.cs" />
-	<Compile Include="Framework\PlaneTest.cs" />
+    <Compile Include="Framework\PlaneTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
