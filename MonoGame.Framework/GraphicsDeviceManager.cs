@@ -424,23 +424,13 @@ namespace Microsoft.Xna.Framework
             {
 #if WINRT
                 return true;
-#elif (WINDOWS && DIRECTX)
-
+#else
                 if (_graphicsDevice != null)
                 {
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
                 }
 
                 return _wantFullScreen;
-#else
-                if (_graphicsDevice != null)
-                {
-                    return _graphicsDevice.PresentationParameters.IsFullScreen;
-                }
-                else
-                {
-                    return _wantFullScreen;
-                }
 #endif
             }
             set

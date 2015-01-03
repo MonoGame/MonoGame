@@ -171,8 +171,8 @@ namespace MonoGame.Framework
             }
             else
             {
-                _window._form.WindowState = FormWindowState.Maximized;
                 _window.IsBorderless = true;
+                _window._form.WindowState = FormWindowState.Maximized;
             }
 #endif
         }
@@ -191,9 +191,8 @@ namespace MonoGame.Framework
             }
             else
             {
-
-                _window.IsBorderless = false;
                 _window._form.WindowState = FormWindowState.Normal;
+                _window.IsBorderless = false;
             }
 #endif
         }

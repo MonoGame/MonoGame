@@ -691,7 +691,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     ModeDescription =
                     {
                         Format = format,
+#if WINRT
+                        Scaling = DisplayModeScaling.Stretched,
+#else
                         Scaling = DisplayModeScaling.Unspecified,
+#endif
                         Width = PresentationParameters.BackBufferWidth,
                         Height = PresentationParameters.BackBufferHeight,                        
                     },
