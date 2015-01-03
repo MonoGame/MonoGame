@@ -162,8 +162,18 @@ namespace MonoGame.Framework
 #if (WINDOWS && DIRECTX)
             // FIXME : FULLSCREEN
 
-            _window._form.WindowState = FormWindowState.Maximized;
-            _window.IsBorderless = true;
+
+            if (Game.graphicsDeviceManager.HardwareModeSwitch)
+            {
+                 Game.GraphicsDevice.PresentationParameters.IsFullScreen = true;
+                 Game.GraphicsDevice.CreateSizeDependentResources(true);
+                 Game.GraphicsDevice.ApplyRenderTargets(null);
+            }
+            else
+            {
+                _window._form.WindowState = FormWindowState.Maximized;
+                _window.IsBorderless = true;
+            }
 #endif
         }
 
@@ -172,9 +182,19 @@ namespace MonoGame.Framework
 #if (WINDOWS && DIRECTX)
 
             // FIXME : FULLSCREEN
-             
-            _window.IsBorderless = false;
-            _window._form.WindowState = FormWindowState.Normal;
+
+            if (Game.graphicsDeviceManager.HardwareModeSwitch)
+            {
+                Game.GraphicsDevice.PresentationParameters.IsFullScreen = false;
+                Game.GraphicsDevice.CreateSizeDependentResources(true);
+                Game.GraphicsDevice.ApplyRenderTargets(null);
+            }
+            else
+            {
+
+                _window.IsBorderless = false;
+                _window._form.WindowState = FormWindowState.Normal;
+            }
 #endif
         }
 

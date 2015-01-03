@@ -34,6 +34,7 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
+        private bool _hardwareModeSwitch = false;
 
 #if WINDOWS && DIRECTX
 
@@ -234,7 +235,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
             _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen; // FIXME : FULLSCREEN
+            _graphicsDevice.PresentationParameters.IsFullScreen = false;
 
             // TODO: We probably should be resetting the whole 
             // device if this changes as we are targeting a different
@@ -460,6 +461,12 @@ namespace Microsoft.Xna.Framework
                 }
 #endif
             }
+        }
+
+        public bool HardwareModeSwitch
+        {
+            get { return _hardwareModeSwitch;}
+            set { if (_graphicsDevice == null) _hardwareModeSwitch = value; }
         }
 
 #if ANDROID
