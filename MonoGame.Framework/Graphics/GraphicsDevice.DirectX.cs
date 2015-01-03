@@ -663,11 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
                                             format,
-#if WINRT
                                             SwapChainFlags.None
-#else
-                                            SwapChainFlags.AllowModeSwitch
-#endif
                                             );
 
                 if (useFullscreenParameter)

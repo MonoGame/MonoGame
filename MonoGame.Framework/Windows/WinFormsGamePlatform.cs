@@ -128,6 +128,10 @@ namespace MonoGame.Framework
             {
                 EnterFullScreen();
             }
+            else
+            {
+                ExitFullScreen();
+            }
 #endif
         }
 
@@ -162,6 +166,10 @@ namespace MonoGame.Framework
 #if (WINDOWS && DIRECTX)
             // FIXME : FULLSCREEN
 
+            if (_alreadyInFullScreenMode)
+            {
+                return;
+            }
 
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
@@ -174,14 +182,21 @@ namespace MonoGame.Framework
                 _window.IsBorderless = true;
                 _window._form.WindowState = FormWindowState.Maximized;
             }
+
+            _alreadyInWindowedMode = false;
+            _alreadyInFullScreenMode = true;
 #endif
         }
 
         public override void ExitFullScreen()
         {
 #if (WINDOWS && DIRECTX)
-
             // FIXME : FULLSCREEN
+
+            if (_alreadyInWindowedMode)
+            {
+                return;
+            }
 
             if (Game.graphicsDeviceManager.HardwareModeSwitch)
             {
@@ -194,6 +209,10 @@ namespace MonoGame.Framework
                 _window._form.WindowState = FormWindowState.Normal;
                 _window.IsBorderless = false;
             }
+            ResetWindowBounds();
+
+            _alreadyInWindowedMode = true;
+            _alreadyInFullScreenMode = false;
 #endif
         }
 
