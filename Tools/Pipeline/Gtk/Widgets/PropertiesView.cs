@@ -213,8 +213,15 @@ namespace MonoGame.Tools.Pipeline
 							}
 						}, data);
 
-					if(value.ToString() != "")
-						RefreshProcessorParams ((ProcessorTypeDescription)value, contentItem);
+					if (value.ToString () != "") {
+
+						List<ProcessorTypeDescription> procs = new List<ProcessorTypeDescription> ();
+
+						foreach (object o in currentObjects)
+							procs.Add ((ProcessorTypeDescription)p.GetValue (o, null));
+
+						RefreshProcessorParams (procs, currentObjects);
+					}
 					continue;
 				}
 
@@ -225,104 +232,152 @@ namespace MonoGame.Tools.Pipeline
 			propertygridtable1.Refresh ();
 		}
 
-		void RefreshProcessorParams(ProcessorTypeDescription processor, ContentItem contentItem) {
-			foreach (var p1 in processor.Properties) {
+		void RefreshProcessorParams(List<ProcessorTypeDescription> processors, List<object> contentItems) {
+
+			if (processors.Count == 0)
+				return;
+
+			foreach (var p1 in processors[0].Properties) {
+
+				object value = "???";
+				foreach (object o in contentItems) 
+					value = CompareVariables (value, ((ContentItem)o).ProcessorParams[p1.Name]);
+
 				if (p1.Type == typeof(bool)) {
-					propertygridtable1.AddProcEntry (p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if (value == null)
+						value = "";
+
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Check, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = Convert.ToBoolean((string)((FalseWidget)s).newvalue);
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = Convert.ToBoolean((string)((FalseWidget)s).newvalue);
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(string)) {
-					propertygridtable1.AddProcEntry (p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if (value == null)
+						value = "";
+
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = (string)((FalseWidget)s).newvalue;
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (string)((FalseWidget)s).newvalue;
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(char)) {
+					if (value == null)
+						value = "";
+
 					char c = ' ';
-					var v = contentItem.ProcessorParams [p1.Name];
+					var v = value;
 					char.TryParse (v.ToString(), out c);
 
 					propertygridtable1.AddProcEntry (p1.Name, c, 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							if (!string.IsNullOrEmpty((string)((FalseWidget)s).newvalue))
-								contentItem.ProcessorParams[p1.Name] = ((string)((FalseWidget)s).newvalue)[0];
-							else 
-								contentItem.ProcessorParams[p1.Name] = ' '.ToString();
+							foreach (object o in contentItems) 
+							{
+								if (!string.IsNullOrEmpty((string)((FalseWidget)s).newvalue))
+									((ContentItem)o).ProcessorParams[p1.Name] = ((string)((FalseWidget)s).newvalue)[0];
+								else 
+									((ContentItem)o).ProcessorParams[p1.Name] = ' '.ToString();
 
-							controller.OnItemModified (contentItem);
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
 				if (p1.Type == typeof(ConversionQuality)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(ConversionQuality))
 						.Cast<ConversionQuality> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (ConversionQuality)p1.DefaultValue;
 					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue, 
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = (ConversionQuality)data[(string)((FalseWidget)s).newvalue];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (ConversionQuality)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(MaterialProcessorDefaultEffect)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(MaterialProcessorDefaultEffect))
 						.Cast<MaterialProcessorDefaultEffect> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (MaterialProcessorDefaultEffect)p1.DefaultValue;
 					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = (MaterialProcessorDefaultEffect)data[(string)((FalseWidget)s).newvalue];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (MaterialProcessorDefaultEffect)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(TextureProcessorOutputFormat)) {
-					var value = contentItem.ProcessorParams [p1.Name];
+					if (value == null)
+						value = "";
 					Dictionary<string, object> data = Enum.GetValues (typeof(TextureProcessorOutputFormat))
 						.Cast<TextureProcessorOutputFormat> ()
 						.ToDictionary (t => t.ToString(), t => (object)t);
 					var defaultValue = (TextureProcessorOutputFormat)p1.DefaultValue;
 					propertygridtable1.AddProcEntry (p1.Name, (object)value ?? (object)defaultValue,
 						PropertyGridTable.EntryType.Combo,(s,e) => { 
-							contentItem.ProcessorParams[p1.Name] = (TextureProcessorOutputFormat)data[(string)((FalseWidget)s).newvalue];
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] = (TextureProcessorOutputFormat)data[(string)((FalseWidget)s).newvalue];
+								controller.OnItemModified ((ContentItem)o);
+							}
 						}, data);
 					continue;
 				}
 				if (p1.Type == typeof(Microsoft.Xna.Framework.Color)) {
-					propertygridtable1.AddProcEntry (p1.Name, contentItem.ProcessorParams[p1.Name], 
+					if(value == null)
+						value = new Microsoft.Xna.Framework.Color();
+					propertygridtable1.AddProcEntry (p1.Name, value, 
 						PropertyGridTable.EntryType.Color, (s,e) => { 
+							foreach (object o in contentItems) 
+							{
+								try {
+									string[] cvalues = ((FalseWidget)s).newvalue.ToString().Replace (":", " ").Replace("}", " ").Split (' ');
+									Microsoft.Xna.Framework.Color color = new Microsoft.Xna.Framework.Color();
 
-							try {
-								string[] cvalues = ((FalseWidget)s).newvalue.ToString().Replace (":", " ").Replace("}", " ").Split (' ');
-								Microsoft.Xna.Framework.Color color = new Microsoft.Xna.Framework.Color();
+									color.R = (byte)Convert.ToInt16 (cvalues [1]);
+									color.G = (byte)Convert.ToInt16 (cvalues [3]);
+									color.B = (byte)Convert.ToInt16 (cvalues [5]);
+									color.A = (byte)Convert.ToInt16 (cvalues [7]);
 
-								color.R = (byte)Convert.ToInt16 (cvalues [1]);
-								color.G = (byte)Convert.ToInt16 (cvalues [3]);
-								color.B = (byte)Convert.ToInt16 (cvalues [5]);
-								color.A = (byte)Convert.ToInt16 (cvalues [7]);
-
-								contentItem.ProcessorParams[p1.Name] = color;
-								controller.OnItemModified (contentItem);
+									((ContentItem)o).ProcessorParams[p1.Name] = color;
+									controller.OnItemModified ((ContentItem)o);
+								}
+								catch { }
 							}
-							catch { }
 						});
 					continue;
 				}
 				if (p1.Type == typeof(Single)) {
-					propertygridtable1.AddProcEntry (p1.Name, contentItem.ProcessorParams[p1.Name].ToString(), 
+					if(value == null)
+						value = "";
+					propertygridtable1.AddProcEntry (p1.Name, value.ToString(), 
 						PropertyGridTable.EntryType.Text, (s,e) => { 
-							contentItem.ProcessorParams[p1.Name] =  Single.Parse ((string)((FalseWidget)s).newvalue).ToString();
-							controller.OnItemModified (contentItem);
+							foreach (object o in contentItems) 
+							{
+								((ContentItem)o).ProcessorParams[p1.Name] =  Single.Parse ((string)((FalseWidget)s).newvalue).ToString();
+								controller.OnItemModified ((ContentItem)o);
+							}
 						});
 					continue;
 				}
@@ -343,4 +398,3 @@ namespace MonoGame.Tools.Pipeline
 		}
 	}
 }
-

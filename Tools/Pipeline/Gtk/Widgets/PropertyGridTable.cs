@@ -419,7 +419,7 @@ namespace MonoGame.Tools.Pipeline
 
 				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, model, item.value.ToString ());
 			} else if (item.type == EntryType.Check) {
-				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, new string[] { "True", "False" }, ((bool)item.value).ToString ());
+				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, new string[] { "True", "False" }, item.value.ToString ());
 			} else if (item.type == EntryType.List) {
 				List<string> values = (List<string>)item.value;
 				string text = "";
