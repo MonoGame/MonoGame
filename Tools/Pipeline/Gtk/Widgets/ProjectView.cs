@@ -45,6 +45,14 @@ namespace MonoGame.Tools.Pipeline
 			listStore = new Gtk.TreeStore (typeof (Gdk.Pixbuf), typeof (string));
 			treeview1.Model = listStore;
 			treeview1.Selection.Mode = SelectionMode.Multiple;
+
+			treeview1.KeyReleaseEvent += HandleKeyReleaseEvent;
+		}
+
+		void HandleKeyReleaseEvent (object o, KeyReleaseEventArgs args)
+		{
+			if (args.Event.Key.ToString () == "Menu") 
+				ShowMenu ();
 		}
 
 		public void Initalize(MainWindow window, MenuItem treerebuild, PropertiesView propertiesView)
@@ -311,88 +319,10 @@ namespace MonoGame.Tools.Pipeline
 			if (!window._controller.ProjectOpen)
 				return;
 
-			if (args.Event.Button == 1) {
-				window._controller.Selection.Clear (window);
-				List<TreeIter> iters;
-				List<Gdk.Pixbuf> icons;
-				List<string> paths = new List<string> ();
-				paths.AddRange (GetSelectedTreePath (out iters, out icons));
-
-				PipelineProject project = (PipelineProject)window._controller.GetItem(openedProject);
-				bool ps = false;
-
-				List<ContentItem> citems = new List<ContentItem> ();
-				List<string> dirpaths = new List<string> ();
-
-				for(int i = 0;i < paths.Count;i++)
-				{
-					if (icons [i] == ICON_BASE)
-						ps = true;
-					else {
-						var item = window._controller.GetItem (paths [i]);
-
-						if (item as ContentItem != null) {
-							citems.Add (item as ContentItem);
-							window._controller.Selection.Add (item as ContentItem, window);
-						} else
-							dirpaths.Add (paths[i]);
-					}
-				}
-
-				#region propgridcalls
-				if (citems.Count > 0)
-					propertiesView.CurrentObject = citems[0];
-				else 
-					propertiesView.CurrentObject = project;
-				#endregion
-			}
-
-			if (args.Event.Button == 3) {
-				List<TreePath> paths = new List<TreePath> ();
-				paths.AddRange (treeview1.Selection.GetSelectedRows ());
-
-				if (paths.Count == 1) {
-					TreeViewDropPosition pos; 
-					TreePath path;
-					TreeIter iter;
-
-					treeview1.GetDestRowAtPos ((int)args.Event.X, (int)args.Event.Y, out path, out pos);
-					if (path != null) {
-						listStore.GetIter (out iter, path);
-
-						Gdk.Pixbuf icon = (Gdk.Pixbuf)treeview1.Model.GetValue (iter, 0);
-						window.UpdateMenus ();
-
-						menu.ShowAll ();
-						if (icon == ICON_BASE) {
-							treenewitem.Visible = true;
-							treeadditem.Visible = true;
-							treeopenfile.Visible = true;
-						} else if (icon == ICON_FOLDER) {
-							treenewitem.Visible = true;
-							treeadditem.Visible = true;
-							treeopenfile.Visible = false;
-						} else {
-							treenewitem.Visible = false;
-							treeadditem.Visible = false;
-							treeopenfile.Visible = true;
-						}
-
-						menu.Popup ();
-					}
-				} else {
-					menu.ShowAll ();
-
-					treenewitem.Visible = false;
-					treeadditem.Visible = false;
-					treeopenfile.Visible = false;
-					seperator.Visible = false;
-					treeopenfile.Visible = false;
-					treeopenfilelocation.Visible = false;
-
-					menu.Popup ();
-				}
-			}
+			if (args.Event.Button == 1) 
+				ReloadPropertyGrid ();
+			else if (args.Event.Button == 3) 
+				ShowMenu ();
 		}
 
 		[GLib.ConnectBefore]
@@ -418,6 +348,18 @@ namespace MonoGame.Tools.Pipeline
 
 		protected void OnTreeview1CursorChanged (object o, EventArgs args)
 		{
+			ReloadPropertyGrid ();
+		}
+
+		private string CombineVariables(string vara, string varb)
+		{
+			if (vara == "????" || vara == varb)
+				return varb;
+			return "";
+		}
+
+		private void ReloadPropertyGrid()
+		{
 			window._controller.Selection.Clear (window);
 			List<TreeIter> iters;
 			List<Gdk.Pixbuf> icons;
@@ -429,11 +371,16 @@ namespace MonoGame.Tools.Pipeline
 
 			List<ContentItem> citems = new List<ContentItem> ();
 			List<string> dirpaths = new List<string> ();
+			string name = "????";
+			string location = "????";
 
 			for(int i = 0;i < paths.Count;i++)
 			{
-				if (icons [i] == ICON_BASE)
+				if (icons [i] == ICON_BASE) {
 					ps = true;
+					name = CombineVariables (name, treeview1.Model.GetValue (iters [i], 1).ToString ());
+					location = CombineVariables (location, project.Location);
+				}
 				else {
 					var item = window._controller.GetItem (paths [i]);
 
@@ -442,15 +389,70 @@ namespace MonoGame.Tools.Pipeline
 						window._controller.Selection.Add (item as ContentItem, window);
 					} else
 						dirpaths.Add (paths[i]);
+
+					name = CombineVariables (name, treeview1.Model.GetValue (iters [i], 1).ToString ());
+					TreeIter piter;
+					treeview1.Model.IterParent (out piter, iters [i]);
+					location = CombineVariables (location, treeview1.Model.GetValue (piter, 1).ToString ());
 				}
 			}
 
-			#region propgridcalls
-			if (citems.Count > 0)
-				propertiesView.CurrentObject = citems[0];
-			else 
-				propertiesView.CurrentObject = project;
-			#endregion
+			if (citems.Count > 0 && !ps && dirpaths.Count == 0) {
+				List<object> objs = new List<object> ();
+				objs.AddRange (citems.ToArray ());
+				propertiesView.Load (objs, name, location);
+			}
+			else if (citems.Count == 0 && ps && dirpaths.Count == 0) {
+				List<object> objs = new List<object> ();
+				objs.Add (project);
+				propertiesView.Load (objs, name, location);
+			}
+			else
+				propertiesView.Load(null, name, location);
+		}
+
+		private void ShowMenu()
+		{
+			List<TreeIter> iters;
+			List<Gdk.Pixbuf> icons;
+			List<string> paths = new List<string> ();
+			paths.AddRange (GetSelectedTreePath (out iters, out icons));
+
+			if (paths.Count == 0)
+				return;
+			else if (paths.Count == 1) {
+				if (paths[0] != null) {
+					window.UpdateMenus ();
+
+					menu.ShowAll ();
+					if (icons[0] == ICON_BASE) {
+						treenewitem.Visible = true;
+						treeadditem.Visible = true;
+						treeopenfile.Visible = true;
+					} else if (icons[0] == ICON_FOLDER) {
+						treenewitem.Visible = true;
+						treeadditem.Visible = true;
+						treeopenfile.Visible = false;
+					} else {
+						treenewitem.Visible = false;
+						treeadditem.Visible = false;
+						treeopenfile.Visible = true;
+					}
+
+					menu.Popup ();
+				}
+			} else {
+				menu.ShowAll ();
+
+				treenewitem.Visible = false;
+				treeadditem.Visible = false;
+				treeopenfile.Visible = false;
+				seperator.Visible = false;
+				treeopenfile.Visible = false;
+				treeopenfilelocation.Visible = false;
+
+				menu.Popup ();
+			}
 		}
 	}
 }

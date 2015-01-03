@@ -443,7 +443,7 @@ namespace MonoGame.Tools.Pipeline
 			listStore.Clear ();
 		}
 
-		public void AddEntry(uint line, string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
+		public void AddEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
 			TreeItem item = new TreeItem (label, value, type, eventHandler, comboItems);
 
@@ -455,7 +455,7 @@ namespace MonoGame.Tools.Pipeline
 			items.Add (item);
 		}
 
-		public void AddProcEntry(uint line, string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
+		public void AddProcEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
 			pitems.Add (new TreeItem (label, value, type, eventHandler, comboItems));
 		}
