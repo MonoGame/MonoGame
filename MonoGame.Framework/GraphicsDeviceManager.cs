@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework
         private DisplayOrientation _supportedOrientations;
         private bool _synchronizedWithVerticalRetrace = true;
         private bool _drawBegun;
-        private bool _hardwareModeSwitch = false;
+        private bool _hardwareModeSwitch = true;
 
 #if WINDOWS && DIRECTX
 

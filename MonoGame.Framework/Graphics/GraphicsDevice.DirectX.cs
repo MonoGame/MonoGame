@@ -663,7 +663,7 @@ namespace Microsoft.Xna.Framework.Graphics
                                             PresentationParameters.BackBufferWidth,
                                             PresentationParameters.BackBufferHeight,
                                             format,
-                                            SwapChainFlags.None);
+                                            SwapChainFlags.AllowModeSwitch);
 
                 if (useFullscreenParameter)
                 {
@@ -691,7 +691,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     ModeDescription =
                     {
                         Format = format,
-                        Scaling = DisplayModeScaling.Stretched,
+                        Scaling = DisplayModeScaling.Unspecified,
                         Width = PresentationParameters.BackBufferWidth,
                         Height = PresentationParameters.BackBufferHeight,                        
                     },
