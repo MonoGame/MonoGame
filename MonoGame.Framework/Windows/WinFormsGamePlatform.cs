@@ -85,17 +85,6 @@ namespace MonoGame.Framework
         private WinFormsGameWindow _window;
         private readonly List<XnaKeys> _keyState;
 
-#if WINDOWS && DIRECTX
-
-        // FIXME : FULLSCREEN
-
-        private int _savedWindowedLocX;
-        private int _savedWindowedLocY;
-        private int _savedWindowedSizeX;
-        private int _savedWindowedSizeY;
-
-#endif
-
         public WinFormsGamePlatform(Game game)
             : base(game)
         {
@@ -135,11 +124,6 @@ namespace MonoGame.Framework
 
             // FIXME : FULLSCREEN
 
-            _savedWindowedLocX = _window._form.Location.X;
-            _savedWindowedLocY = _window._form.Location.Y;
-            _savedWindowedSizeX = _window._form.Bounds.Width;
-            _savedWindowedSizeY = _window._form.Bounds.Height;
-
             if (Game.graphicsDeviceManager.IsFullScreen)
             {
                 EnterFullScreen();
@@ -178,30 +162,19 @@ namespace MonoGame.Framework
 #if (WINDOWS && DIRECTX)
             // FIXME : FULLSCREEN
 
-            if (_window._form.Location.X != 0 && _window._form.Location.Y != 0)
-            {
-                _savedWindowedLocX = _window._form.Location.X;
-                _savedWindowedLocY = _window._form.Location.Y;
-            }
+            _window._form.WindowState = FormWindowState.Maximized;
             _window.IsBorderless = true;
-
-            var monitor = Screen.PrimaryScreen.Bounds;
-            _window._form.SetBounds(0, 0, monitor.Width, monitor.Height);
 #endif
         }
 
         public override void ExitFullScreen()
         {
 #if (WINDOWS && DIRECTX)
+
             // FIXME : FULLSCREEN
              
             _window.IsBorderless = false;
-            _window._form.SetBounds(_savedWindowedLocX, _savedWindowedLocY, _savedWindowedSizeX, _savedWindowedSizeY);
-            
-            _savedWindowedLocX = _window._form.Location.X;
-            _savedWindowedLocY = _window._form.Location.Y;
-            _savedWindowedSizeX = _window._form.Bounds.Width;
-            _savedWindowedSizeY = _window._form.Bounds.Height;
+            _window._form.WindowState = FormWindowState.Normal;
 #endif
         }
 
