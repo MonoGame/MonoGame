@@ -374,7 +374,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return result;
         }
 
-        private void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
+        internal void ResolveOutputFilepath(string sourceFilepath, ref string outputFilepath)
         {
             // If the output path is null... build it from the source file path.
             if (string.IsNullOrEmpty(outputFilepath))
