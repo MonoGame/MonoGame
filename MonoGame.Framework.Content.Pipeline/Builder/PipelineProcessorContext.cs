@@ -66,6 +66,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             var sourceFilepath = PathHelper.Normalize(sourceAsset.Filename);
 
+            string outputFilepath = string.Empty;
+            _manager.ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
+
             // The processorName can be null or empty. In this case the asset should
             // be imported but not processed. This is, for example, necessary to merge
             // animation files as described here:
@@ -76,6 +79,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var buildEvent = new PipelineBuildEvent 
             { 
                 SourceFile = sourceFilepath,
+                DestFile = outputFilepath,
                 Importer = importerName,
                 Processor = processAsset ? processorName : null,
                 Parameters = _manager.ValidateProcessorParameters(processorName, processorParameters),
