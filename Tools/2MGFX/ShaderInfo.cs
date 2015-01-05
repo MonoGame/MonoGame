@@ -78,7 +78,8 @@ namespace TwoMGFX
             result.Dependencies = dependencies;
             result.FilePath = fullPath;
             result.FileContent = newFile;
-            result.OutputFilePath = Path.GetFullPath(options.OutputFile);
+            if (!string.IsNullOrEmpty(options.OutputFile))
+                result.OutputFilePath = Path.GetFullPath(options.OutputFile);
             result.AdditionalOutputFiles = new List<string>();
 
             // Remove empty techniques.
