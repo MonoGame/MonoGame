@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "PLease make sure you are running this installer with sudo or as root."
+#echo "PLease make sure you are running this installer with sudo or as root."
 
 #installation
 DIR=$(pwd)
