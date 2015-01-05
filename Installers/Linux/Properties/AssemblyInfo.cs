@@ -1,15 +1,15 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle ("PipelineInstaller")]
-[assembly: AssemblyDescription ("")]
+[assembly: AssemblyDescription ("Pipeline Installer for Linux")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("")]
-[assembly: AssemblyCopyright ("")]
+[assembly: AssemblyProduct ("Pipeline")]
+[assembly: AssemblyCopyright ("Copyright © MonoGameTeam 2014")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 

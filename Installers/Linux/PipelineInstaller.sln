@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineInstaller", "PipelineInstaller.csproj", "{CEBC97C2-DEDA-65E6-496E-7374616C6C65}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEBC97C2-DEDA-65E6-496E-7374616C6C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEBC97C2-DEDA-65E6-496E-7374616C6C65}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = PipelineInstaller.csproj
+	EndGlobalSection
+EndGlobal
