@@ -21,10 +21,20 @@
     <echo message="Detected : ${os}"/>
   </target>
 
-  <target name="build" description="Build Addins" depends="checkos">
+  <target name="build" description="Build All" depends="checkos">
+    <call target="buildaddin"/>
+    <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="setup rep-build ."/>
   </target>
 
-
+  <target name="buildaddin" description="Build Xamarin Studio Addin" depends="checkos">
+     <mkdir dir="MonoDevelop.MonoGame/packages/"/>
+     <get src="https://www.nuget.org/api/v2/package/MonoGame.Binaries/3.2.0" dest="MonoDevelop.MonoGame/packages/MonoGame.Binaries.3.2.0.nupkg"/>
+     <if test="${os == 'MacOS'}">
+       <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGame.Core/MonoDevelop.MonoGame.Addin.sln" />
+       <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Build -c:Release  MonoDevelop.MonoGame.Core/MonoDevelop.MonoGame.Addin.sln" />
+       <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="setup pack bin/Release/MonoDevelop.MonoGame.dll"/>
+     </if>
+  </target>
 	
 	
 </project>

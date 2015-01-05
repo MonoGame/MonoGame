@@ -1,0 +1,173 @@
+<Addin id="MonoGame" 
+		namespace="MonoDevelop" 
+		name="MonoGame Addin" 
+		author="Dean Ellis" 
+		copyright="MSPL" 
+		url="http://www.monogame.net/" 
+		description="MonoGame Addin for MonoDevelop" 
+		category="Game Development" 
+		version="3.2.0">
+	<Runtime>
+		<Import file="icons/monogame-project-32.png" />
+		<Import file="templates/MonoGameContentBuilderTemplate.xpt.xml"/>
+		<!-- Windows Templates -->
+		<Import file="templates/MonoGameWindowsProject.xpt.xml" />
+		<Import file="templates/MonoGameProject.xpt.xml" />
+		<Import file="templates/Common/AssemblyInfo.cs" />
+		<Import file="templates/Common/Game1.cs" />
+		<Import file="templates/Common/Icon-md.png" />
+		<Import file="templates/Common/Icon-hd.png" />
+		<Import file="templates/Common/Program.cs" />
+		<Import file="templates/Common/Content.mgcb" />
+		<!-- Android Templates -->
+		<Import file="templates/MonoGameAndroidProject.xpt.xml" />
+		<Import file="templates/Android/Activity1.cs" />
+		<Import file="templates/Android/Resource.cs" />
+		<Import file="templates/Android/AndroidManifest.xml" />
+		<Import file="templates/Android/AboutAssets.txt" />
+		<Import file="templates/Android/AboutContent.txt" />
+		<Import file="templates/Android/AboutResources.txt" />
+		<Import file="templates/Android/Splash.png" />
+		<Import file="templates/Android/Styles.xml" />
+		<!-- Mac Templates -->
+		<Import file="templates/MonoGameMacProject.xpt.xml" />
+		<Import file="templates/Mac/MacInfo.plist" />
+		<Import file="templates/Mac/Program.cs" />
+		<!-- iOS Templates -->
+		<Import file="templates/MonoGameiOSProject.xpt.xml"/>
+		<Import file="templates/iOS/iOSDefault.png" />
+		<Import file="templates/iOS/iOSGameThumbnail.png" />
+		<Import file="templates/iOS/iOSInfo.plist" />
+		<!-- Shared Templates -->
+		<Import file="templates/MonoGameMobileOnly-SAP.xpt.xml" />
+		<Import file="templates/Shared/Program.cs" />
+		<Import file="templates/Shared/Activity1.cs" />
+		<!-- Additional Modules -->
+		<Import file="MonoDevelop.MonoGame.Android.dll" />
+		<Import file="MonoDevelop.MonoGame.Core.dll" />
+		<Import file="MonoDevelop.MonoGame.iOS.dll" />
+		<Import file="MonoDevelop.MonoGame.Mac.dll" />
+		<!-- Nuget Packages -->
+		<Import file="packages/MonoGame.Binaries.3.2.0.nupkg" />
+		<!-- Exclude non .net files from a scan -->
+		<ScanExclude path="nvtt.dll"/>
+		<!--  Exclude -->
+		<Import file="exclude.addins"/>
+	</Runtime>
+	
+	<Dependencies>
+		<Addin id="Core" version="5.0" />
+		<Addin id="Ide" version="5.0" />
+		<Addin id="DesignerSupport" version="4.0" />
+	</Dependencies>
+	
+	<Extension path="/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid="monogame-project" file="icons/monogame-project-32.png" />
+	</Extension>
+
+	<Extension path="/MonoDevelop/ProjectModel/MSBuildItemTypes">
+		<DotNetProjectSubtype id="MonoGame" guid="{9b831fef-f496-498f-9fe8-180da5cb4258}" type="MonoDevelop.MonoGame.MonoGameProject">
+		</DotNetProjectSubtype>
+	</Extension>
+
+	<Extension path="/MonoDevelop/ProjectModel/ProjectBindings">
+		<ProjectBinding id="MonoGame" class="MonoDevelop.MonoGame.MonoGameProjectBinding" />
+	</Extension>
+	
+	<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+		<ProjectTemplate id="MonoGameForWindowsProject" file="templates/MonoGameWindowsProject.xpt.xml" />
+		<ProjectTemplate id="MonoGameProject" file="templates/MonoGameProject.xpt.xml" />
+	</Extension>
+
+	<Extension path="/MonoDevelop/Ide/FileTemplates">
+		<FileTemplate id="MonoGameContentBuilderTemplate" file="templates/MonoGameContentBuilderTemplate.xpt.xml" />
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Ide/ProjectTemplatePackageRepositories">
+		<PackageRepository path="packages" />
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Ide/FileFilters">
+		<FileFilter
+			id = "MGCB"
+			insertbefore = "AllFiles"
+			_label = "MonnoGame Content Build Files"
+			extensions = "*.mgcb"/>
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Core/MimeTypes">
+		<MimeType id="text/x-mgcb" _description="MonoGame Content Build File" icon="monogame-project" isText="false">
+			<File pattern="*.mgcb" />
+		</MimeType>
+	</Extension>
+
+	<Extension path="/MonoDevelop/Ide/DisplayBindings">
+		<DisplayBinding id = "MonoGamePipeline"
+			insertbefore ="DefaultDisplayBinding"
+			class = "MonoDevelop.MonoGame.PipelineDisplayBinding" />
+	</Extension>
+
+	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">  
+		<Class class="MonoDevelop.MonoGame.MonoGameBuildExtension"/>  
+	</Extension>
+	
+	<Module>
+		<Runtime>
+			<Import assembly="MonoDevelop.MonoGame.Android.dll"/>
+		</Runtime>
+		<Dependencies>
+			<Addin id="MonoAndroid" version="4.0"/>
+		</Dependencies>
+		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+			<ProjectTemplate id="MonoGameForAndroidProject" file="templates/MonoGameAndroidProject.xpt.xml" />
+		</Extension>
+	</Module>
+	
+	<Module>
+		<Runtime>
+			<Import assembly="MonoDevelop.MonoGame.iOS.dll"/>
+		</Runtime>
+		<Dependencies>
+			<Addin id="IPhone" version="4.0"/>
+		</Dependencies>
+		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+			<ProjectTemplate id="MonoGameForIPhoneProject" file="templates/MonoGameiOSProject.xpt.xml" />
+		</Extension>
+	</Module>
+
+	<Module>
+		<Runtime>
+		</Runtime>
+		<Dependencies>
+			<Addin id="IPhone" version="4.0"/>
+			<Addin id="MonoAndroid" version="4.0"/>
+		</Dependencies>
+		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+			<ProjectTemplate id="MonoGameForMobileSAPProject" file="templates/MonoGameMobileOnly-SAP.xpt.xml" />
+		</Extension>
+	</Module>
+	
+	<Module>
+		<Runtime>
+			<Import assembly="MonoDevelop.MonoGame.Mac.dll"/>
+		</Runtime>
+		<Dependencies>
+			<Addin id="MonoMac" version="4.0"/>
+		</Dependencies>
+		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
+			<ProjectTemplate id="MonoGameForMonoMacProject" file="templates/MonoGameMacProject.xpt.xml" />
+		</Extension>
+	</Module>
+
+	<!--
+	<Module>
+		<Runtime>
+			<Import assembly="MonoDevelop.MonoGame.Content.dll"/>
+		</Runtime>
+		<Dependencies>
+		</Dependencies>
+		
+	</Module>
+	-->
+</Addin>
+

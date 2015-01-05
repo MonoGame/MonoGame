@@ -200,7 +200,6 @@
 
   <target name="build_installer" description="Build the installers." depends="build_code,build_docs,run_tests">
 
-    <nant buildfile="ProjectTemplates/MonoDevelop/MonoDevelop.MonoGame/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2010/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2012/default.build" target="build" />
     <nant buildfile="ProjectTemplates/VisualStudio2013/default.build" target="build" />
