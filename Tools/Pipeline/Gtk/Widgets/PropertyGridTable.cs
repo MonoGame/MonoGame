@@ -419,7 +419,7 @@ namespace MonoGame.Tools.Pipeline
 
 				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, model, item.value.ToString ());
 			} else if (item.type == EntryType.Check) {
-				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, new string[] { "True", "False" }, ((bool)item.value).ToString ());
+				return AddPropertyComboBox (iter, eitem.id.ToString (), item.label, new string[] { "True", "False" }, item.value.ToString ());
 			} else if (item.type == EntryType.List) {
 				List<string> values = (List<string>)item.value;
 				string text = "";
@@ -443,7 +443,7 @@ namespace MonoGame.Tools.Pipeline
 			listStore.Clear ();
 		}
 
-		public void AddEntry(uint line, string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
+		public void AddEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
 			TreeItem item = new TreeItem (label, value, type, eventHandler, comboItems);
 
@@ -455,7 +455,7 @@ namespace MonoGame.Tools.Pipeline
 			items.Add (item);
 		}
 
-		public void AddProcEntry(uint line, string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
+		public void AddProcEntry(string label, object value, EntryType type, EventHandler eventHandler = null, Dictionary<string, object> comboItems = null) {
 
 			pitems.Add (new TreeItem (label, value, type, eventHandler, comboItems));
 		}
