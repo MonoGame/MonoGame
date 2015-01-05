@@ -218,6 +218,18 @@ namespace Microsoft.Xna.Framework.Graphics
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
 #endif
 #endif
+
+#if MONOMAC
+			// Trying to discard contents on render target change causes us
+			// to try to clear during initialisation.
+			//
+			// On OS X 10.7 and above, this can cause a crash, since the window isn't ready yet,
+			// and those versions no longer allow drawing to an OpenGL context of a window
+			// that is still hidden.
+			//
+			// So on OS X in particular, we need to default to preserving contents.
+			PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+#endif
             _extensions = GetGLExtensions();
         }
 

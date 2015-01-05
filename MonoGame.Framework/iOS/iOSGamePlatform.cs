@@ -84,7 +84,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework
 {
-    class iOSGamePlatform : GamePlatform
+    public class iOSGamePlatform : GamePlatform
     {
         private iOSGameViewController _viewController;
         private UIWindow _mainWindow;
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework
 
         // FIXME: VideoPlayer 'needs' this to set up its own movie player view
         //        controller.
-        public iOSGameViewController ViewController
+        public UIViewController ViewController
         {
             get { return _viewController; }
         }
@@ -204,7 +204,8 @@ namespace Microsoft.Xna.Framework
 
             BeginObservingUIApplication();
 
-            _viewController.View.BecomeFirstResponder();
+			// Running this opens the keyboard immediately on opening the app now we have keyboard support.
+            //_viewController.View.BecomeFirstResponder();
             CreateDisplayLink();
         }
 

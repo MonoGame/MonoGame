@@ -59,8 +59,12 @@ using Microsoft.Xna.Framework.Input.Touch;
 namespace Microsoft.Xna.Framework
 {
 	[CLSCompliant(false)]
-	public class GameWindow : MonoMacGameView
-	{
+	public class GameWindow : MacGameView	{
+		// Amendment: Added events for integrating out key processing logic with monogame.
+		// These events are triggered when keyboard keys are released and pressed down respectively.
+		public event EventHandler<KeysEventArgs> TSKeyUp;
+		public event EventHandler<KeysEventArgs> TSKeyDown;
+	
 		//private readonly Rectangle clientBounds;
 		private Rectangle clientBounds;
 		private Game _game;
@@ -405,7 +409,11 @@ namespace Microsoft.Xna.Framework
                 else
                     Window.StyleMask &= ~NSWindowStyle.Resizable;
 
-				Window.StandardWindowButton(NSWindowButton.ZoomButton).Enabled = value;
+				// Null check here is important because some of the time we don't have a zoom button.
+				NSButton zoomButton = Window.StandardWindowButton(NSWindowButton.ZoomButton);
+				if (zoomButton != null) {
+					zoomButton.Enabled = value;
+				}
 			}
 		}	
 
@@ -457,7 +465,7 @@ namespace Microsoft.Xna.Framework
 			                      	NSTrackingAreaOptions.MouseMoved | 
 			                        NSTrackingAreaOptions.MouseEnteredAndExited |
 			                        NSTrackingAreaOptions.EnabledDuringMouseDrag |
-			                        NSTrackingAreaOptions.ActiveWhenFirstResponder |
+			                        NSTrackingAreaOptions.ActiveAlways |
 			                        NSTrackingAreaOptions.InVisibleRect |
 				NSTrackingAreaOptions.CursorUpdate,
 			                      this, new NSDictionary());
@@ -511,7 +519,7 @@ namespace Microsoft.Xna.Framework
 
 		public override void KeyDown (NSEvent theEvent)
 		{
-			if (!string.IsNullOrEmpty (theEvent.Characters) && theEvent.Characters.All (c => char.GetUnicodeCategory (c) != UnicodeCategory.PrivateUse)) 
+			if (!string.IsNullOrEmpty (theEvent.Characters) && theEvent.Characters.All (c => char.GetUnicodeCategory (c) != UnicodeCategory.PrivateUse))
 			{
 				foreach(char c in theEvent.Characters)
 				{
@@ -525,6 +533,12 @@ namespace Microsoft.Xna.Framework
 				_keys.Add (kk);
 
 			UpdateKeyboardState ();
+			
+			EventHandler<KeysEventArgs> handler = TSKeyDown;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
 
 		public override void KeyUp (NSEvent theEvent)
@@ -534,6 +548,12 @@ namespace Microsoft.Xna.Framework
 			_keys.Remove (kk);
 
 			UpdateKeyboardState ();
+
+			EventHandler<KeysEventArgs> handler = TSKeyUp;
+			if (handler != null)
+			{
+				handler(this, new KeysEventArgs(kk));
+			}
 		}
 
 		protected void OnTextInput(TextInputEventArgs e)
@@ -712,6 +732,14 @@ namespace Microsoft.Xna.Framework
 			}			
 		}
 
+		public override NSDragOperation DraggingUpdated(NSDraggingInfo sender)
+		{
+			// Cause the mouse to move. We don't get normal updates during a dragging operation.
+			UpdateMousePosition (sender.DraggingLocation);
+
+			return base.DraggingUpdated (sender);
+		}
+
 		private void UpdateMousePosition (PointF location)
 		{
 			MouseState.X = (int)location.X;
@@ -720,6 +748,17 @@ namespace Microsoft.Xna.Framework
 
 		internal void SetSupportedOrientations(DisplayOrientation orientations)
 		{
+		}
+	}
+		
+	// Amendment to the GameWindow code to allow us to use our existing key processing logic.
+	// I put it in this file for convenience, although it is breaking convention by doing so.
+	public class KeysEventArgs : EventArgs
+	{
+		public Keys Keys { get; private set; }
+		public KeysEventArgs(Keys keys)
+		{
+			this.Keys = keys;
 		}
 	}
 }

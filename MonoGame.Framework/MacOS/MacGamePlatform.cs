@@ -304,7 +304,7 @@ namespace Microsoft.Xna.Framework
                 // FIXME: EnterFullScreen gets called very early and interferes
                 //        with Synchronous mode, so disabling this for now.
                 //        Hopefully this does not cause excessive havoc.
-                //_mainWindow.MakeKeyAndOrderFront(Window);
+                _mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = true;
                 _gameWindow.MouseState.LeftButton = ButtonState.Released;
@@ -327,7 +327,7 @@ namespace Microsoft.Xna.Framework
                 // I will leave this here just in case someone can figure out
                 // how to do a full screen with this and still get Alt + Tab to
                 // friggin work.
-                // _mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
+                //_mainWindow.ContentView.ExitFullscreenModeWithOptions(new NSDictionary());
 
                 //Changing window style resets the title. Save it.
                 string oldTitle = _gameWindow.Title;
@@ -347,7 +347,7 @@ namespace Microsoft.Xna.Framework
                 // FIXME: EnterFullScreen gets called very early and interferes
                 //        with Synchronous mode, so disabling this for now.
                 //        Hopefully this does not cause excessive havoc.
-                //_mainWindow.MakeKeyAndOrderFront(Window);
+                _mainWindow.MakeKeyAndOrderFront(Window);
                 ResetWindowBounds();
                 _mainWindow.HidesOnDeactivate = false;
                 _gameWindow.MouseState.LeftButton = ButtonState.Released;
@@ -494,8 +494,10 @@ namespace Microsoft.Xna.Framework
 
             public override void WillClose(NSNotification notification)
             {
-                NSApplication.SharedApplication.BeginInvokeOnMainThread(() =>
-                    _owner.State = MacGamePlatform.RunState.Exited);
+				NSApplication.SharedApplication.BeginInvokeOnMainThread( delegate {
+				    _owner.State = MacGamePlatform.RunState.Exited;
+				    _owner.Game.DoExiting();
+				});
             }
 
 			public override bool ShouldZoom (NSWindow window, RectangleF newFrame)

@@ -291,7 +291,8 @@ namespace Microsoft.Xna.Framework
         private void Initialize()
         {
             var presentationParameters = new PresentationParameters();
-            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+            presentationParameters.DepthStencilFormat = DepthFormat.None;
+
 
 #if WINDOWS || WINRT
             _game.Window.SetSupportedOrientations(_supportedOrientations);
@@ -322,6 +323,32 @@ namespace Microsoft.Xna.Framework
 #endif
 
 #else
+
+#if ANDROID
+            switch (((AndroidGameWindow)_game.Window).GameView.GraphicsMode.Stencil)
+            {
+                case 8:
+                    presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+                    break;
+
+                default:
+                    switch (((AndroidGameWindow)_game.Window).GameView.GraphicsMode.Depth)
+                    {
+                        case 24:
+                            presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
+                            break;
+
+                        case 16:
+                            presentationParameters.DepthStencilFormat = DepthFormat.Depth16;
+                            break;
+                    }
+                    break;
+            }
+#endif
+
+#if IOS || MONOMAC
+			presentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+#endif
 
 #if MONOMAC
             presentationParameters.IsFullScreen = _wantFullScreen;
@@ -575,11 +602,13 @@ namespace Microsoft.Xna.Framework
             // Set the veiwport so the (potentially) resized client bounds are drawn in the middle of the screen
             _graphicsDevice.Viewport = new Viewport(newClientBounds.X, -newClientBounds.Y, newClientBounds.Width, newClientBounds.Height);
 
-            ((AndroidGameWindow)_game.Window).ChangeClientBounds(newClientBounds);
-
             // Touch panel needs latest buffer size for scaling
             TouchPanel.DisplayWidth = newClientBounds.Width;
             TouchPanel.DisplayHeight = newClientBounds.Height;
+
+            // Must be set after the touch panel is updated,
+            // because it raises a notification which may cause the bounds to be changed again.
+            ((AndroidGameWindow)_game.Window).ChangeClientBounds(newClientBounds);
 
             Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif

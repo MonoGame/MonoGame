@@ -59,8 +59,12 @@ using XnaPoint = Microsoft.Xna.Framework.Point;
 
 namespace MonoGame.Framework
 {
-    class WinFormsGameWindow : GameWindow
+    public class WinFormsGameWindow : GameWindow
     {
+        // Amendment: Added events for integrating our key processing logic with monogame.
+        public event EventHandler<KeysEventArgs> TSKeyUp;
+        public event EventHandler<KeysEventArgs> TSKeyDown;
+
         internal WinFormsGameForm _form;
 
         static private List<WinFormsGameWindow> _allWindows = new List<WinFormsGameWindow>();
@@ -194,6 +198,8 @@ namespace MonoGame.Framework
             _form.ClientSizeChanged += OnClientSizeChanged;
 
             _form.KeyPress += OnKeyPress;
+            _form.KeyDown += OnKeyDown;
+            _form.KeyUp += OnKeyUp;
 
             _allWindows.Add(this);
         }
@@ -253,6 +259,36 @@ namespace MonoGame.Framework
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
         } 
+
+        private void OnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+
+            if (KeyState != null && !KeyState.Contains(key))
+                KeyState.Add(key);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyDown;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs keyEventArgs)
+        {
+            var key = (XnaKey)keyEventArgs.KeyCode;
+
+            if (KeyState != null)
+                KeyState.Remove(key);
+
+            // Amendment: raise our added event.
+            EventHandler<KeysEventArgs> handler = TSKeyUp;
+            if (handler != null)
+            {
+                handler(this, new KeysEventArgs(key));
+            }
+        }
 
         private void OnMouseEnter(object sender, EventArgs e)
         {

@@ -1095,6 +1095,9 @@
 
 
     <!-- MacOS Platform -->
+    <Compile Include="MacOS\DragDropEventArgs.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
     <Compile Include="MacOS\GameWindow.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
@@ -1108,6 +1111,9 @@
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\MacGamePlatform+Synchronous.cs">
+      <Platforms>MacOS</Platforms>
+    </Compile>
+    <Compile Include="MacOS\MacGameView.cs">
       <Platforms>MacOS</Platforms>
     </Compile>
     <Compile Include="MacOS\Storage\StorageDeviceHelper.cs">
@@ -1177,6 +1183,9 @@
     <!-- Windows Desktop Platfom -->
     <Compile Include="Windows\Input\KeyboardUtil.cs">
       <Platforms>Angle,WindowsGL</Platforms>
+    </Compile>
+    <Compile Include="Windows\KeysEventArgs.cs">
+      <Platforms>Windows8,Windows,WindowsPhone</Platforms>
     </Compile>
     <Compile Include="Windows\WinFormsGameForm.cs">
       <Platforms>Windows</Platforms>

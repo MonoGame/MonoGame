@@ -5,7 +5,9 @@
 using System;
 using Android.Content;
 using Android.Content.PM;
+using Android.Text;
 using Android.Views;
+using Android.Views.InputMethods;
 using Microsoft.Xna.Framework.Input.Touch;
 using OpenTK;
 
@@ -40,6 +42,12 @@ namespace Microsoft.Xna.Framework
             Initialize(activity);
 
             game.Services.AddService(typeof(View), GameView);
+        }
+
+        public void SetInputConnection(IInputConnection connection,
+            InputTypes inputTypes, ImeFlags imeOptions, string label)
+        {
+            GameView.SetInputConnection(connection, inputTypes, imeOptions, label);
         }
 
         private void Initialize(Context context)
