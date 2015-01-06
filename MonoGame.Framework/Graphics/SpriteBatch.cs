@@ -171,8 +171,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
         /// <param name="texture">A texture.</param>
-        /// <param name="position">The drawing location on screen or null if <param name="destinationRectangle"> is used.</param></param>
-        /// <param name="destinationRectangle">The drawing bounds on screen or null if <param name="position"> is used.</param></param>
+        /// <param name="position">The drawing location on screen or null if <paramref name="destinationRectangle"> is used.</paramref></param>
+        /// <param name="destinationRectangle">The drawing bounds on screen or null if <paramref name="position"> is used.</paramref></param>
         /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
         /// <param name="origin">An optional center of rotation. Uses <see cref="Vector2.Zero"/> if null.</param>
         /// <param name="rotation">An optional rotation of this sprite. 0 by default.</param>
@@ -181,8 +181,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="effects">The optional drawing modificators. <see cref="SpriteEffects.None"/> by default.</param>
         /// <param name="layerDepth">An optional depth of the layer of this sprite. 0 by default.</param>
         /// <exception cref="InvalidOperationException">Throwns if both <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</exception>
-        /// <remarks>This overload uses optional parameters.</remarks>
-        /// <remarks>This overload requires only one of <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</remarks>
+        /// <remarks>This overload uses optional parameters. This overload requires only one of <paramref name="position"/> and <paramref name="destinationRectangle"/> been used.</remarks>
         public void Draw (Texture2D texture,
                 Vector2? position = null,
                 Rectangle? destinationRectangle = null,
