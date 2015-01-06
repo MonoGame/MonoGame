@@ -267,7 +267,7 @@ namespace Microsoft.Xna.Framework
 
         public override string ToString()
         {
-            return "{{Normal:" + Normal + " D:" + D + "}}";
+            return "{Normal:" + Normal + " D:" + D + "}";
         }
 
         #endregion
