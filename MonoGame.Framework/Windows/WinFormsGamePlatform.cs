@@ -122,8 +122,6 @@ namespace MonoGame.Framework
 
 #if (WINDOWS && DIRECTX)
 
-            // FIXME : FULLSCREEN
-
             if (Game.graphicsDeviceManager.IsFullScreen)
             {
                 EnterFullScreen();
@@ -164,7 +162,6 @@ namespace MonoGame.Framework
         public override void EnterFullScreen()
         {
 #if (WINDOWS && DIRECTX)
-            // FIXME : FULLSCREEN
 
             if (_alreadyInFullScreenMode)
             {
@@ -192,8 +189,6 @@ namespace MonoGame.Framework
         public override void ExitFullScreen()
         {
 #if (WINDOWS && DIRECTX)
-            // FIXME : FULLSCREEN
-
             if (_alreadyInWindowedMode)
             {
                 return;

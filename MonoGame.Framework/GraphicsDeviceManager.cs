@@ -37,9 +37,6 @@ namespace Microsoft.Xna.Framework
         private bool _hardwareModeSwitch = true;
 
 #if WINDOWS && DIRECTX
-
-        // FIXME : FULLSCREEN
-
         private bool _firstLaunch = true;
 #endif
         bool disposed;
@@ -298,8 +295,6 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS && DIRECTX
 
-            // FIXME : FULLSCREEN
-
             if (!_firstLaunch)
             {
                 if (IsFullScreen)
@@ -396,8 +391,6 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 #if WINDOWS && DIRECTX
-
-            // FIXME : FULLSCREEN
 
             ApplyChanges();
 #endif
