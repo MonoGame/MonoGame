@@ -1071,6 +1071,9 @@
     <Compile Include="iOS\iOSGameView.cs">
       <Platforms>iOS</Platforms>
     </Compile>
+    <Compile Include="iOS\EditableCoreTextView.cs">
+      <Platforms>iOS</Platforms>
+    </Compile>
     <Compile Include="iOS\iOSGameView_GLAbstraction.cs">
       <Platforms>iOS</Platforms>
     </Compile>
