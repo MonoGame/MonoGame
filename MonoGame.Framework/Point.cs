@@ -187,7 +187,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="String"/> representation of this <see cref="Point"/>.</returns>
         public override string ToString()
         {
-            return "{{X:" + X + " Y:" + Y + "}}";
+            return "{X:" + X + " Y:" + Y + "}";
         }
 
         /// <summary>
