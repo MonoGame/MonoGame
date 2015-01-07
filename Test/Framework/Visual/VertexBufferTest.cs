@@ -121,7 +121,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.Run();
+            Game.RunOneFrame();
         }
 
         //[TestCase(true)]
@@ -150,7 +150,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].Position, readData[2]);
                 Assert.AreEqual(savedData[3].Position, readData[3]);
             };
-            Game.Run();
+            Game.RunOneFrame();
         }
 
         //[TestCase(true)]
@@ -173,7 +173,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.Run();
+            Game.RunOneFrame();
         }
 
         //[TestCase(true)]
@@ -203,7 +203,7 @@ namespace MonoGame.Tests.Visual
                 Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                 Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
             };
-            Game.Run();
+            Game.RunOneFrame();
         }
     }
 }
