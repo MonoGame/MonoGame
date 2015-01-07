@@ -24,6 +24,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             public ContentImporterAttribute attribue;
             public Type type;
+            public DateTime assemblyTimestamp;
         };
 
         private List<ImporterInfo> _importers;
@@ -33,6 +34,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             public ContentProcessorAttribute attribue;
             public Type type;
+            public DateTime assemblyTimestamp;
         };
 
         private List<ProcessorInfo> _processors;
@@ -139,6 +141,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             foreach (var assemblyPath in Assemblies)
             {
                 Type[] exportedTypes;
+                DateTime assemblyTimestamp;
                 try
                 {
                     Assembly a;
@@ -148,6 +151,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         a = Assembly.LoadFrom(assemblyPath);
 
                     exportedTypes = a.GetTypes();
+                    assemblyTimestamp = File.GetLastWriteTime(a.Location);
                 }
                 catch (BadImageFormatException e)
                 {
@@ -175,7 +179,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var importerAttribute = attributes[0] as ContentImporterAttribute;
-                            _importers.Add(new ImporterInfo { attribue = importerAttribute, type = t });
+                            _importers.Add(new ImporterInfo
+                            {
+                                attribue = importerAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                         else
                         {
@@ -183,7 +192,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             var importerAttribute = new ContentImporterAttribute(".*");
                             importerAttribute.DefaultProcessor = "";
                             importerAttribute.DisplayName = t.Name;
-                            _importers.Add(new ImporterInfo { attribue = importerAttribute, type = t });
+                            _importers.Add(new ImporterInfo
+                            {
+                                attribue = importerAttribute,
+                                type = t,
+                                assemblyTimestamp = assemblyTimestamp
+                            });
                         }
                     }
                     else if (t.GetInterface(@"IContentProcessor") != null)
@@ -264,6 +278,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return null;
         }
 
+        public DateTime GetImporterAssemblyTimestamp(string name)
+        {
+            if (_importers == null)
+                ResolveAssemblies();
+
+            // Search for the importer.
+            foreach (var info in _importers)
+            {
+                if (info.type.Name.Equals(name))
+                    return info.assemblyTimestamp;
+            }
+
+            return DateTime.MaxValue;
+        }
+
         public string FindDefaultProcessor(string importer)
         {
             if (_importers == null)
@@ -341,6 +370,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             return processor;
+        }
+
+        public DateTime GetProcessorAssemblyTimestamp(string name)
+        {
+            if (_processors == null)
+                ResolveAssemblies();
+
+            // Search for the processor.
+            foreach (var info in _processors)
+            {
+                if (info.type.Name.Equals(name))
+                    return info.assemblyTimestamp;
+            }
+
+            return DateTime.MaxValue;
         }
 
         public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
@@ -445,7 +489,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
             TrackPipelineBuildEvent(pipelineEvent);
 
-            var rebuild = pipelineEvent.NeedsRebuild(cachedEvent);
+            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (!rebuild)
             {
                 // While this asset doesn't need to be rebuilt the dependent assets might.
