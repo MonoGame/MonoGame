@@ -22,7 +22,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [DebuggerDisplay("ImporterInfo: {type.Name}")]
         private struct ImporterInfo
         {
-            public ContentImporterAttribute attribue;
+            public ContentImporterAttribute attribute;
             public Type type;
             public DateTime assemblyTimestamp;
         };
@@ -32,7 +32,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [DebuggerDisplay("ProcessorInfo: {type.Name}")]
         private struct ProcessorInfo
         {
-            public ContentProcessorAttribute attribue;
+            public ContentProcessorAttribute attribute;
             public Type type;
             public DateTime assemblyTimestamp;
         };
@@ -181,7 +181,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             var importerAttribute = attributes[0] as ContentImporterAttribute;
                             _importers.Add(new ImporterInfo
                             {
-                                attribue = importerAttribute,
+                                attribute = importerAttribute,
                                 type = t,
                                 assemblyTimestamp = assemblyTimestamp
                             });
@@ -194,7 +194,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             importerAttribute.DisplayName = t.Name;
                             _importers.Add(new ImporterInfo
                             {
-                                attribue = importerAttribute,
+                                attribute = importerAttribute,
                                 type = t,
                                 assemblyTimestamp = assemblyTimestamp
                             });
@@ -206,7 +206,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var processorAttribute = attributes[0] as ContentProcessorAttribute;
-                            _processors.Add(new ProcessorInfo {attribue = processorAttribute, type = t});
+                            _processors.Add(new ProcessorInfo {attribute = processorAttribute, type = t});
                         }
                     }
                     else if (t.GetInterface(@"ContentTypeWriter") != null)
@@ -271,7 +271,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Search for the importer.
             foreach (var info in _importers)
             {
-                if (info.attribue.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
+                if (info.attribute.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
                     return info.type.Name;
             }
 
@@ -302,7 +302,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             foreach (var info in _importers)
             {
                 if (info.type.Name == importer)
-                    return info.attribue.DefaultProcessor;
+                    return info.attribute.DefaultProcessor;
             }
 
             return null;
