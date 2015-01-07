@@ -95,6 +95,7 @@
     <Compile Include="Framework\MathHelperTest.cs" />
     <Compile Include="Framework\PlaneTest.cs" />
     <Compile Include="Framework\RayTest.cs" />
+	<Compile Include="Framework\RectangleTest.cs" />
     <Compile Include="Framework\GameTest+Methods.cs" />
     <Compile Include="Framework\GameTest+Properties.cs" />
     <Compile Include="Framework\GameTest.cs" />
