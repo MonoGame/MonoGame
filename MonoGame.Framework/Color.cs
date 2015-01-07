@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the blue component of this <see cref="Color"/>.
+        /// Gets or sets the blue component.
         /// </summary>
         [DataMember]
         public byte B
@@ -315,7 +315,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the green component of this <see cref="Color"/>.
+        /// Gets or sets the green component.
         /// </summary>
         [DataMember]
         public byte G
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the red component of this <see cref="Color"/>.
+        /// Gets or sets the red component.
         /// </summary>
         [DataMember]
         public byte R
@@ -353,7 +353,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets or sets the alpha component of this <see cref="Color"/>.
+        /// Gets or sets the alpha component.
         /// </summary>
         [DataMember]
         public byte A
@@ -1733,7 +1733,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets a <see cref="Vector3"/> representation for this object.
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector3"/> format.
         /// </summary>
         /// <returns>A <see cref="Vector3"/> representation for this object.</returns>
         public Vector3 ToVector3()
@@ -1742,7 +1742,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Gets a <see cref="Vector4"/> representation for this object.
+        /// Returns the color in a 0-to-1 normalized <see cref="Vector4"/> format.
         /// </summary>
         /// <returns>A <see cref="Vector4"/> representation for this object.</returns>
         public Vector4 ToVector4()
