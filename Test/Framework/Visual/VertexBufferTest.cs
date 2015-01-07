@@ -126,6 +126,35 @@ namespace MonoGame.Tests.Visual
 
         //[TestCase(true)]
         [TestCase(false)]
+        public void SetPosition(bool dynamic)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = (dynamic)
+                    ? new DynamicVertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None)
+                    : new VertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None);
+                var positions = new[]
+                {
+                    savedData[0].Position,
+                    savedData[1].Position,
+                    savedData[2].Position,
+                    savedData[3].Position
+                };
+                var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
+                vertexBuffer.SetData(0, positions, 0, 4, vertexStride);
+
+                var readData = new Vector3[4];
+                vertexBuffer.GetData(0, readData, 0, 4, vertexStride);
+                Assert.AreEqual(savedData[0].Position, readData[0]);
+                Assert.AreEqual(savedData[1].Position, readData[1]);
+                Assert.AreEqual(savedData[2].Position, readData[2]);
+                Assert.AreEqual(savedData[3].Position, readData[3]);
+            };
+            Game.RunOneFrame();
+        }
+
+        //[TestCase(true)]
+        [TestCase(false)]
         public void GetTextureCoordinate(bool dynamic)
         {
             Game.DrawWith += (sender, e) =>
@@ -146,6 +175,35 @@ namespace MonoGame.Tests.Visual
             };
             Game.RunOneFrame();
         }
-                
+
+        //[TestCase(true)]
+        [TestCase(false)]
+        public void SetTextureCoordinate(bool dynamic)
+        {
+            Game.DrawWith += (sender, e) =>
+            {
+                var vertexBuffer = (dynamic)
+                    ? new DynamicVertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None)
+                    : new VertexBuffer(Game.GraphicsDevice, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None);
+                var texCoords = new[]
+                {
+                    savedData[0].TextureCoordinate,
+                    savedData[1].TextureCoordinate,
+                    savedData[2].TextureCoordinate,
+                    savedData[3].TextureCoordinate
+                };
+                var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
+                var offsetInBytes = VertexPositionTexture.VertexDeclaration.GetVertexElements()[1].Offset;
+                vertexBuffer.SetData(offsetInBytes, texCoords, 0, 4, vertexStride);
+
+                var readData = new Vector2[4];
+                vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
+                Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
+                Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
+                Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
+                Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
+            };
+            Game.RunOneFrame();
+        }
     }
 }
