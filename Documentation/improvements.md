@@ -26,7 +26,7 @@ Note that the MonoGame documentation project is currently a work in progress and
 
 [Rectangle.Offset(float,float)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_3.html) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset.html)
 
-[Rectangle.Offset(Vector2)](http://www.monogame.net/docs/html/M_Milcrosoft_Xna_Framework_Rectangle_Offset_1.htm) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
+[Rectangle.Offset(Vector2)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Offset_1) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
 
 [Rectangle.Size](http://www.monogame.net/docs/html/M_Milcrosoft_Xna_Framework_Rectangle_Size.htm) - this property is a [Point](http://www.monogame.net/documentation/?page=T_Microsoft_Xna_Framework_Point) which contains width and height of this rectangle.
 
