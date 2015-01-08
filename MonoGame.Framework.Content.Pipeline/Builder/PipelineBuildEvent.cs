@@ -51,7 +51,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         public string Importer { get; set; }
 
+        /// <summary>
+        /// The date/time stamp of the DLL containing the importer.
+        /// </summary>
+        public DateTime ImporterTime { get; set; }
+
         public string Processor { get; set; }
+
+        /// <summary>
+        /// The date/time stamp of the DLL containing the processor.
+        /// </summary>
+        public DateTime ProcessorTime { get; set; }
 
         [XmlIgnore]
         public OpaqueDataDictionary Parameters { get; set; }
@@ -181,7 +191,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 return true;
 
             // Did the importer assembly change?
-            if (manager.GetImporterAssemblyTimestamp(cachedEvent.Importer) > cachedEvent.DestTime)
+            if (manager.GetImporterAssemblyTimestamp(cachedEvent.Importer) > cachedEvent.ImporterTime)
                 return true;
 
             // Did the importer change?
@@ -189,7 +199,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 return true;
 
             // Did the processor assembly change?
-            if (manager.GetProcessorAssemblyTimestamp(cachedEvent.Processor) > cachedEvent.DestTime)
+            if (manager.GetProcessorAssemblyTimestamp(cachedEvent.Processor) > cachedEvent.ProcessorTime)
                 return true;
 
             // Did the processor change?
