@@ -24,7 +24,7 @@ Note that the MonoGame documentation project is currently a work in progress and
 
 [Rectangle.Contains(ref Vector2,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_5) - float-based version of [Rectangle.Contains(ref Point,out bool)](http://www.monogame.net/documentation/?page=M_Microsoft_Xna_Framework_Rectangle_Contains_3)
 
-[Rectangle.Offset(float,float)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset.html) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_3.html)
+[Rectangle.Offset(float,float)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_3.html) - float-based version of [Rectangle.Offset(int,int)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset.html)
 
 [Rectangle.Offset(Vector2)](http://www.monogame.net/docs/html/M_Milcrosoft_Xna_Framework_Rectangle_Offset_1.htm) - float-based version of [Rectangle.Offset(Point)](http://www.monogame.net/docs/html/M_Microsoft_Xna_Framework_Rectangle_Offset_2.html)
 
