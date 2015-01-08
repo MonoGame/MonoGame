@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Template>
 	<TemplateConfiguration>
-		<_Name>MonoGame SDL Application</_Name>
+		<_Name>MonoGame Application</_Name>
 		<_Category>C#/MonoGame</_Category>
 		<Icon>monogame-project</Icon>
 		<LanguageName>C#</LanguageName>

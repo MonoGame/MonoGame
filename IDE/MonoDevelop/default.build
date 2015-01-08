@@ -29,6 +29,7 @@
   <target name="buildaddin" description="Build Xamarin Studio Addin" depends="checkos">
      <mkdir dir="MonoDevelop.MonoGame/packages/"/>
      <get src="https://www.nuget.org/api/v2/package/MonoGame.Binaries/3.2.0" dest="MonoDevelop.MonoGame/packages/MonoGame.Binaries.3.2.0.nupkg"/>
+     <get src="https://www.nuget.org/api/v2/package/Ouya.Console.Api/1.0.13.1" dest="MonoDevelop.MonoGame/packages/Ouya.Console.Api.1.0.13.1.nupkg"/>
      <if test="${os == 'MacOS'}">
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Clean -c:Release  MonoDevelop.MonoGame.Core/MonoDevelop.MonoGame.Addin.sln" />
        <exec program="mdtool" basedir="${mdtooldir}" workingdir="." commandline="build -t:Build -c:Release  MonoDevelop.MonoGame.Core/MonoDevelop.MonoGame.Addin.sln" />

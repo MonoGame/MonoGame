@@ -45,11 +45,19 @@ namespace MonoGame.Tools.Pipeline
 			win.Show (); 
 			var model = new PipelineProject();
 			new PipelineController(win, model);  
+			#if LINUX
 			if (args != null && args.Length > 0)
 			{
 				var projectFilePath = string.Join(" ", args);
 				win.OpenProjectPath = projectFilePath;
 			}
+			#elif MONOMAC
+			var project = Environment.GetEnvironmentVariable("MONOGAME_PIPELINE_PROJECT");
+			if (!string.IsNullOrEmpty (project)) {
+				System.IO.File.WriteAllText("/Users/dean/Pipeline.log", string.Format ("ENV : {0}", project));
+				win.OpenProjectPath = project;
+			}
+			#endif
 			win.OnShowEvent ();
 			Gtk.Application.Run ();
 #endif

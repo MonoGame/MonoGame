@@ -45,7 +45,7 @@ namespace MonoDevelop.MonoGame
 		#region IExternalDisplayBinding implementation
 		public MonoDevelop.Ide.Desktop.DesktopApplication GetApplication (MonoDevelop.Core.FilePath fileName, string mimeType, MonoDevelop.Projects.Project ownerProject)
 		{
-			return new PipelineDesktopApplication (fileName.FileName,ownerProject);
+			return new PipelineDesktopApplication (fileName.FullPath,ownerProject);
 		}
 		#endregion
 		#region IDisplayBinding implementation
@@ -78,16 +78,17 @@ namespace MonoDevelop.MonoGame
 		{
 			var process = new Process ();
 			if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-			process.StartInfo.FileName = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MonoGame\Tools", "Pipeline.exe");;
+				process.StartInfo.FileName = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.ProgramFilesX86), @"MonoGame\Tools", "Pipeline.exe");;
 				process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
 			} else {
-				if (File.Exists ("/Applications/Pipeline.app/Contents/MacOS/Pipeline")) {
-					process.StartInfo.FileName = "/Applications/Pipeline.app/Contents/MacOS/Pipeline";
-					process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
+				if (Directory.Exists ("/Applications/Pipeline.app")) {
+					process.StartInfo.FileName = "open";
+					process.StartInfo.EnvironmentVariables.Add("MONOGAME_PIPELINE_PROJECT", Path.GetFullPath (filename));
+					process.StartInfo.Arguments = string.Format ("-b com.monogame.pipeline --args \"{0}\"", Path.GetFullPath (filename));
 				} else {
 					// figure out linix 
-					process.StartInfo.FileName = "mono";
-					process.StartInfo.Arguments = string.Format ("\"{0}\" \"{2}\"", "/usr/local/bin/Pipeline.exe", filename);
+					process.StartInfo.FileName = "/bin/monogame-pipeline";
+					process.StartInfo.Arguments = string.Format ("\"{0}\"", filename);
 				}
 			}
 			process.StartInfo.CreateNoWindow = true;

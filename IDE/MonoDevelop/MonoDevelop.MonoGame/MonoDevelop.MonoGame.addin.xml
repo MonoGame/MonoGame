@@ -21,6 +21,7 @@
 		<Import file="templates/Common/Content.mgcb" />
 		<!-- Android Templates -->
 		<Import file="templates/MonoGameAndroidProject.xpt.xml" />
+		<Import file="templates/MonoGameOUYAProject.xpt.xml" />
 		<Import file="templates/Android/Activity1.cs" />
 		<Import file="templates/Android/Resource.cs" />
 		<Import file="templates/Android/AndroidManifest.xml" />
@@ -49,6 +50,7 @@
 		<Import file="MonoDevelop.MonoGame.Mac.dll" />
 		<!-- Nuget Packages -->
 		<Import file="packages/MonoGame.Binaries.3.2.0.nupkg" />
+		<Import file="packages/Ouya.Console.Api.1.0.13.1.nupkg" />
 		<!-- Exclude non .net files from a scan -->
 		<ScanExclude path="nvtt.dll"/>
 		<!--  Exclude -->
@@ -120,6 +122,7 @@
 		</Dependencies>
 		<Extension path="/MonoDevelop/Ide/ProjectTemplates">
 			<ProjectTemplate id="MonoGameForAndroidProject" file="templates/MonoGameAndroidProject.xpt.xml" />
+			<ProjectTemplate id="MonoGameForOUYAProject" file="templates/MonoGameOUYAProject.xpt.xml" />
 		</Extension>
 	</Module>
 	

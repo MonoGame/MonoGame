@@ -80,7 +80,7 @@ namespace MonoDevelop.MonoGame
 							Directory.Exists ("/Users")) {
 							location = Path.Combine ("/Applications/Pipeline.app/Contents/MonoBundle", "MGCB.exe");
 						} else {
-							location = Path.Combine ("/usr/local/bin", "MGCB.exe");
+							location = Path.Combine ("/bin", "mgcb");
 						}
 						break;
 					case PlatformID.MacOSX:
@@ -96,9 +96,13 @@ namespace MonoDevelop.MonoGame
 			if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
 				process.StartInfo.FileName = location;
 				process.StartInfo.Arguments = string.Format ("/platform:{0} /@:\"{1}\" ", platform, responseFile);
-			} else {
+			} else if (Directory.Exists ("/Applications") &&
+					Directory.Exists ("/Users")) {
 				process.StartInfo.FileName = "mono";
 				process.StartInfo.Arguments = string.Format ("\"{0}\" /platform:{1} /@:\"{2}\"", location, platform, responseFile);
+			} else {
+				process.StartInfo.FileName = location;
+				process.StartInfo.Arguments = string.Format ("/platform:{0} /@:\"{1}\" ", platform, responseFile);
 			}
 			process.StartInfo.CreateNoWindow = true;
 			process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
